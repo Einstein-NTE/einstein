@@ -18,11 +18,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.59
+#	Version No.: 0.60
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
 #                           Tom Sobota                          23/03/2008
+#                           Hans Schweiger                      24/03/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -32,6 +33,7 @@
 #       22/03/2008  Small changes due to changes in interface
 #       23/03/2008  Added panels EA1 - EA6, EM1. Added a subtree for Yearly, Monthly and Daily
 #                   statistics
+#       24/03/2008  Small changes in calls to PanelBB
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -2433,13 +2435,8 @@ class EinsteinFrame(wx.Frame):
 
         #PageTitle
         if select == "Einstein":
-            # TEST
             self.hidePages()
-            self.pageBB.modBB.initModule()
-            self.pageBB.Show()
-            ###################
-            #self.hidePages()
-            #self.pageTitle.Show()
+            self.pageTitle.Show()
         #Page0
         elif select == PList["X018"][1]:
             self.hidePages()
@@ -2585,6 +2582,7 @@ class EinsteinFrame(wx.Frame):
             ret = self.OnEnterHeatPumpPage()
             if  ret == 0:
                 self.hidePages()
+                self.pageHeatPump.modHP.initPanel()
                 self.pageHeatPump.Show()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
@@ -2593,14 +2591,14 @@ class EinsteinFrame(wx.Frame):
         elif select == "Boilers & burners":
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-            self.pageBB.modBB.initModule()
+            self.pageBB.modBB.initPanel()
             self.pageBB.Show()
 ###HS2008-03-12
         #panelEnergy
         elif select == "Energy performance":
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-#            self.panelEnergy.mod.initModule()
+            self.panelEnergy.mod.initPanel()
             self.panelEnergy.Show()
         else:
             self.hidePages()
@@ -3565,6 +3563,7 @@ class EinsteinFrame(wx.Frame):
         self.pageFinalReport.Hide()
         self.pageHeatPump.Hide()
         self.pageBB.Hide()
+        self.panelEnergy.Hide()
 
     def showError(self, message):
         dlg = wx.MessageDialog(None, message, 'Error', wx.OK)

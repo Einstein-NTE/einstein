@@ -1,4 +1,40 @@
 #Boa:FramePanel:PanelBB
+# -*- coding: cp1252 -*-
+#============================================================================== 				
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#	Panel Boilers and Burners
+#			
+#------------------------------------------------------------------------------
+#			
+#	Short description:
+#	
+#	Panel for BB design assistant
+#
+#==============================================================================
+#
+#	Version No.: 0.02
+#	Created by: 	    Hans Schweiger	    February 2008
+#	Last revised by:    Hans Schweiger          24/03/2008
+#
+#       Changes to previous version:
+#       - structure of plots identical to that of HP
+#
+#------------------------------------------------------------------------------		
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	www.energyxperts.net / info@energyxperts.net
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#============================================================================== 
 
 import wx
 import wx.grid
@@ -6,11 +42,15 @@ import einstein.modules.boiler.ModuleBB as BB
 from einstein.GUI.status import Status
 from einstein.GUI.panelBB_PopUp1 import BBPopUp1
 
+import einstein.modules.matPanel as Mp
+from einstein.modules.interfaces import *
+
+
 [wxID_PANELBB, wxID_PANELBBBBCALCULATE, wxID_PANELBBBUTTONPAGEBBADD, 
  wxID_PANELBBBUTTONPAGEBBBACK, wxID_PANELBBBUTTONPAGEBBCANCEL, 
  wxID_PANELBBBUTTONPAGEBBFWD, wxID_PANELBBBUTTONPAGEBBOK, 
  wxID_PANELBBCB1PAGEBB, wxID_PANELBBCHOICEPAGEBB, wxID_PANELBBGRIDPAGEBB, 
- wxID_PANELBBHEATDEMANDPLOT, wxID_PANELBBST10PAGEBB, wxID_PANELBBST11PAGEBB, 
+ wxID_PANELBBFIG, wxID_PANELBBST10PAGEBB, wxID_PANELBBST11PAGEBB, 
  wxID_PANELBBST12PAGEBB, wxID_PANELBBST1PAGEBB, wxID_PANELBBST2PAGEBB, 
  wxID_PANELBBST3PAGEBB, wxID_PANELBBST4PAGEBB, wxID_PANELBBST5PAGEBB, 
  wxID_PANELBBST6PAGEBB, wxID_PANELBBST7PAGEBB, wxID_PANELBBST8PAGEBB, 
@@ -19,19 +59,59 @@ from einstein.GUI.panelBB_PopUp1 import BBPopUp1
  wxID_PANELBBTC5PAGEBB, wxID_PANELBBTC6PAGEBB, wxID_PANELBBTC7PAGEBB, 
 ] = [wx.NewId() for _init_ctrls in range(31)]
 
+#------------------------------------------------------------------------------		
+#HS2008-03-22: 
+#------------------------------------------------------------------------------		
+def drawFigure(self):
+#------------------------------------------------------------------------------
+#   defines the figures to be plotted
+#------------------------------------------------------------------------------		
+    if not hasattr(self, 'subplot'):
+        self.subplot = self.figure.add_subplot(1,1,1)
+    self.subplot.plot(Interfaces.GData['BB Plot'][0],
+                      Interfaces.GData['BB Plot'][1],
+                      'go-', label='QD', linewidth=2)
+    self.subplot.plot(Interfaces.GData['BB Plot'][0],
+                      Interfaces.GData['BB Plot'][2],
+                      'rs',  label='QA')
+    self.subplot.plot(Interfaces.GData['BB Plot'][0],
+                      Interfaces.GData['BB Plot'][3],
+                      'go-', label='QD_mod', linewidth=2)
+    self.subplot.plot(Interfaces.GData['BB Plot'][0],
+                      Interfaces.GData['BB Plot'][4],
+                      'rs',  label='QA_mod')
+    self.subplot.axis([0, 100, 0, 3e+7])
+    self.subplot.legend()
+
+
 class PanelBB(wx.Panel):
 
     def __init__(self, parent, id, pos, size, style, name):
-        print "initialising BB Panel. DB = ", Status.DB
         self._init_ctrls(parent)
-        self.modBB = BB.ModuleBB(self)  #creates and initialises module
-        print "initialising BB Panel after creating module. DB = ", Status.DB
+        self.modBB = BB.ModuleBB()  #creates and initialises module
+
+        dummy = Mp.MatPanel(self.panelBBFig, wx.Panel, self.getDrawFigure())
+        del dummy
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELBB, name='PanelBB', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
+
+#------------------------------------------------------------------------------		
+#       Displays of status
+#------------------------------------------------------------------------------		
+
+#..............................................................................
+# Figure to be plotted
+
+
+        self.panelBBFig = wx.Panel(id=wxID_PANELBBFIG, name='panelBBFigure', parent=self,
+              pos=wx.Point(450, 66), size=wx.Size(316, 220),
+              style=wx.TAB_TRAVERSAL)
+
+#..............................................................................
 
         self.BBCalculate = wx.Button(id=wxID_PANELBBBBCALCULATE,
               label='run design assistant', name='BB_Calculate', parent=self,
@@ -189,9 +269,18 @@ class PanelBB(wx.Panel):
               name='staticText1', parent=self, pos=wx.Point(424, 32),
               size=wx.Size(352, 17), style=0)
 
-        self.panelHeatDemandPlot = wx.Panel(id=wxID_PANELBBHEATDEMANDPLOT, name='panelHeatDemandPlot',
-              parent=self, pos=wx.Point(424, 48), size=wx.Size(344, 300),
-              style=0)
+#------------------------------------------------------------------------------		
+    def getDrawFigure(self):
+#------------------------------------------------------------------------------		
+#   function for drawing 
+#------------------------------------------------------------------------------		
+
+        global drawFigure
+        return drawFigure
+
+#==============================================================================
+#   Event handlers
+#==============================================================================
 
     def OnBBCalculateButton(self, event):
         ret = self.modBB.designAssistant1()

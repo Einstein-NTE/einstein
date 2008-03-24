@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 #==============================================================================#
 #	E I N S T E I N
 #
@@ -14,12 +15,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	11/03/2008
 #	Last revised by:    Tom Sobota          15/03/2008
+#                           Enrico Facci /
+#                           Hans Schweiger      24/03/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
+#       2008-03-24  Incorporated "calculateEnergyFlows" from Enrico Facci
+#                   - adapted __init__ and plots similar to moduleHP
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,67 +46,84 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def drawHeatDemandPlot(self):
-    #
-    # this function draws the Heat Demand Plot
-    #
-    from matplotlib.numerix import arange, sin, cos, pi
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    theta = arange(0, 45*2*pi, 0.02)
-    rad = (0.8*theta/(2*pi)+1)
-    r = rad*(8 + sin(theta*7+rad/1.8))
-    x = r*cos(theta)
-    y = r*sin(theta)
-    # now draw it
-    self.subplot.plot(x,y, '-r')
-    # set some plot attributes
-    self.subplot.set_title("A Polar star(%s points)"%len(x), fontsize = 12)
-    self.subplot.set_xlabel("Example adapted from  http://www.physics.emory.edu/~weeks/ideas/rose.html",
-                            fontsize = 8)
-    self.subplot.set_xlim([-400, 400])
-    self.subplot.set_ylim([-400, 400])
-
-class ModulePars():
-    topMin = None  #minimum annual operation hours
-    par2 = None #other parameter of the module
-    par3 = None #...
-
-    def __init__(self):
-#       initialise with some default parameters
-        pass
-    
-
 class ModuleBB():
 
     BBList = []
-    # please use status.DB, status.PId ...
-    #DB = None
-    #sql = None
-    #PId = None #Project identity
-    #ANo = None #Alternative number
-    Pars = ModulePars()
     
-    def __init__(self, parent):
-        self.parent = parent
-        self.initModule()
+    def __init__(self):
+        self.interface = Interfaces()
 
-#------------------------------------------------------------------------------
-    def initModule(self):
-        """
-        carries out any calculations necessary previous to displaying the BB
-        design assistant window
-        """
-        #interfaces.chargeCurvesQDQA() #gets the updated heat demand from the SQL
+        self.DB = Status.DB
+        self.sql = Status.SQL
         
-        #self.DB = status.DB
-        #self.sql = status.SQL
-        #self.PId = status.PId
-        #self.ANo = status.ANo
-#       self.BBList = detectBB() # detects the boilers & burners in the list of existing equipment
-        self.updateHeatDemandPlot()
+        
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
+        print "ModuleBB (__init__): %s equipes found"%self.NEquipe
 
-        return "ok"
+
+#............................................................................................
+#XXXHS2008-03-22: here for testing purposes.
+#   -> initPanel should be activated by event handler on entry into panel
+
+        self.initPanel()
+        self.updatePanel()
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def initPanel(self):
+#------------------------------------------------------------------------------
+#       screens existing equipment, whether there are already heat pumps
+#       XXX to be implemented
+#------------------------------------------------------------------------------
+
+        BBList = self.screenEquipments()
+        
+#............................................................................................
+#XXX FOR TESTING PURPOSES ONLY: load default demand
+# here it should be assured that heat demand and availability for position in cascade
+# of presently existing heat pumps is already defined
+
+        self.interface.initCascadeArrays(self.NEquipe)
+       
+#............................................................................................
+#returns HPList to the GUI for displaying in window
+        
+        return (BBList)
+    
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def screenEquipments(self):
+#------------------------------------------------------------------------------
+#       screens existing equipment, whether there are already heat pumps
+#       XXX to be implemented
+#------------------------------------------------------------------------------
+
+        self.interface.getEquipmentCascade()
+        self.cascadeIndex = 0
+        
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def updatePanel(self):
+#------------------------------------------------------------------------------
+#       Here all the information should be prepared so that it can be plotted on the panel
+#------------------------------------------------------------------------------
+
+        print "ModuleHP (updatePanel): data for panel are copied to interface"
+        
+# plot to be displayed
+        self.interface.setGraphicsData('BB Plot',[self.interface.T,
+                                        self.interface.QD_T_mod[self.cascadeIndex],
+                                        self.interface.QA_T_mod[self.cascadeIndex],
+                                        self.interface.QD_T_mod[self.cascadeIndex+1],
+                                        self.interface.QA_T_mod[self.cascadeIndex+1]])
+# info for text boxes in right side of panel
+        self.interface.setGraphicsData('BB Info',{"noseque":55})
+
+# list of equipments in cascade for Table
+        self.interface.setGraphicsData('BB List',self.interface.cascade)
+
 #------------------------------------------------------------------------------
 
     def exitModule(self,exit_option):
@@ -155,6 +177,25 @@ class ModuleBB():
         #--> delete HP from the equipment list under current alternative
         
 #------------------------------------------------------------------------------
+    def addEquipmentDummy(self):
+#------------------------------------------------------------------------------
+#       adds a new dummy equipment to the equipment list and returns the
+#       position in the cascade 
+#------------------------------------------------------------------------------
+
+#XXX    Here some function adding a row to the QGenerationHC and CGenerationHC
+#       in the SQL
+#XXX    Cascade index should be set by default to something reasonable,
+#       depending if the equipment is a base load equipment or a peak load one
+
+#for the moment the HP Module works always on Eq. 0 / CI 0
+        self.cascadeIndex = 0
+        self.equipe = self.equipments[0]
+        self.equipeC = self.equipmentsC[0]
+        return(self.equipe,self.equipeC)
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def retrieveDeleted(self):
         """
         returns a list of previously deleted equipment that can be retrieved
@@ -203,34 +244,116 @@ class ModuleBB():
 
 #------------------------------------------------------------------------------
 
-    def calculateEnergyFlows(self,BBid):
-        """
-        updates the energy flows in the newly added equipment 
-        """
-        print "calculateEnergyFlows: function not yet defined"
-        return "ok"
-
+#------------------------------------------------------------------------------
+    def calculateEnergyFlows(self,equipe,equipeC,cascadeIndex):
+#------------------------------------------------------------------------------
+#   calculates the energy flows in the equipment identified by "cascadeIndex"
 #------------------------------------------------------------------------------
 
-    def calculateCascade(self):
-        """
-        updates the energy flows for ALL boilers, following the cascade
-        hierarchy
-        """
-        for BBid in self.BBList:
-            calculateEnergyFlows(BBid)
+        print "ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
+#..............................................................................
+# get equipment data from equipment list in SQL
 
-        return "ok"
-#------------------------------------------------------------------------------
-
-    def updateHeatDemandPlot(self):
-        try:
-            self.parent.panelHeatDemandPlot.draw()
-        except:
-            # First call. Drawing widget not yet initialized.
-            dummy = mP.MatPanel(self.parent.panelHeatDemandPlot,wx.Panel,drawHeatDemandPlot)
-            del dummy
-            self.parent.panelHeatDemandPlot.draw()
+        BBModel = equipe.Model
+        print equipe.Model
+        BBType = equipe.EquipType
+        PNom = equipe.HCGPnom
+        COPh_nom = equipe.HCGTEfficiency
+#XXX TOpMax or something similar should be defined in SQL        TMax = equipe.TOpMax
+# for the moment set some value manually
+        TMax = 95
     
+#XXX ENRICO: here other equipment parameters should be imported from SQL database
+        
+        EquipmentNo = self.interface.cascade[cascadeIndex]["equipeNo"]
+
+        print 'ModuleBB (calculateEnergyFlows): Model = ', BBModel, ' Type = ', BBType, 'PNom = ', PNom
+
+#..............................................................................
+# get demand data for CascadeIndex/EquipmentNo from Interfaces
+# and create arrays for storing heat flow in equipment
+
+        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex]
+        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex]
+        
+        USHj_Tt = self.interface.createQ_Tt()
+        USHj_T = self.interface.createQ_T()
+
+        
+        QHXj_Tt = self.interface.createQ_Tt()
+        QHXj_T = self.interface.createQ_T()
+
+#..............................................................................
+# Start hourly loop
+
+        USHj = 0
+        QHXj = 0
+
+        for it in range(Status.Nt):
+
+            print "time = ",it*Status.TimeStep
+
+#..............................................................................
+# Calculate heat delivered by the given equipment for each time interval
+            for iT in range (Status.NT+2):
+                QHXj_Tt[iT][it] = 0     #for the moment no waste heat considered
+                if TMax >= self.interface.T[iT] :   #TMax is the max operating temperature of the boiler 
+                    USHj_Tt[iT][it] = min(QD_Tt[iT][it],PNom*Status.TimeStep)     #from low to high T
+                else:
+                    if (iT > 0):
+                        USHj_Tt[iT][it] = USHj_Tt[iT-1][it]     #no additional heat supply at high temp.
+                    else:
+                        USHj_Tt[iT][it] = 0
+            USHj += USHj_Tt[Status.NT+1][it]
+            print USHj_Tt[Status.NT+1][it]      #total heat supplied at present timestep
+#........................................................................
+# End of year reached. Store results in interfaces
+
+        print "ModuleBB (calculateEnergyFlows): now storing final results"
+        
+# remaining heat demand and availability for next equipment in cascade
+        Interfaces.QD_Tt_mod[cascadeIndex+1] = QD_Tt
+        Interfaces.QD_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QD_Tt)
+        Interfaces.QA_Tt_mod[cascadeIndex+1] = QA_Tt
+        Interfaces.QA_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QA_Tt)
+
+# heat delivered by present equipment                            
+        Interfaces.USHj_Tt[cascadeIndex] = USHj_Tt
+        Interfaces.USHj_T[cascadeIndex] = self.interface.calcQ_T(USHj_Tt)
+
+# waste heat absorbed by present equipment                            
+        Interfaces.QHXj_Tt[cascadeIndex] = QHXj_Tt
+        Interfaces.QHXj_T[cascadeIndex] = self.interface.calcQ_T(QHXj_Tt)
+
+#        equipeC.USHj = USHj
+#        equipeC.QHXj = QHXj    #XXX to be defined in data base
+
+        print "Total energy supplied by equipment ",USHj, " MWh"
+        print "Total waste heat input  ",QHXj, " MWh"
+
+        return USHj    
 
 #==============================================================================
+
+if __name__ == "__main__":
+    print "Testing ModuleBB"
+    import einstein.GUI.pSQL as pSQL, MySQLdb
+    from einstein.modules.interfaces import *
+    from einstein.modules.energy.moduleEnergy import *
+    stat = Status("testModuleHP")
+
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    
+    Status.PId = 2
+    Status.ANo = 0
+
+    interf = Interfaces()
+
+    mod = ModuleBB()
+    (equipe,equipeC) = mod.addEquipmentDummy()
+    mod.calculateEnergyFlows(equipe,equipeC,mod.cascadeIndex)
+                    
+
+#    mod.designAssistant1()
+#    mod.designAssistant2(12)
