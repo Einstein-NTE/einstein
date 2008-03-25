@@ -18,12 +18,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.60
+#	Version No.: 0.61
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
 #                           Tom Sobota                          23/03/2008
 #                           Hans Schweiger                      24/03/2008
+#                           Hans Schweiger                      25/03/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -34,6 +35,7 @@
 #       23/03/2008  Added panels EA1 - EA6, EM1. Added a subtree for Yearly, Monthly and Daily
 #                   statistics
 #       24/03/2008  Small changes in calls to PanelBB
+#       25/03/2008  Picture added in main panel
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -474,13 +476,17 @@ class EinsteinFrame(wx.Frame):
         ####----PAGE Title
         self.pageTitle = wx.Panel(id=-1, name='pageTitle', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
         self.pageTitle.Show()
-        self.st1Titel = wx.StaticText(id=-1,
-              label='Welcome to EINSTEIN Energie audit Programm',
-              name='st1Titel', parent=self.pageTitle, pos=wx.Point(295, 293),
+        self.st1Title = wx.StaticText(id=-1,
+              label='Welcome to EINSTEIN energy audit tool',
+              name='st1Title', parent=self.pageTitle, pos=wx.Point(295, 30),
               size=wx.Size(222, 13), style=0)
-        self.st1Titel.Center(wx.BOTH)
-        self.st1Titel.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.st1Title.Center(wx.HORIZONTAL)
+        self.st1Title.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(u'zunge.jpg',
+              wx.BITMAP_TYPE_JPEG), id=wxID_PANELCCPIC1,
+              name='staticBitmap1', parent=self.pageTitle, pos=wx.Point(220, 50),
+              size=wx.Size(400, 500), style=0)
         
         ####--- End of PAGE 0
 
