@@ -25,6 +25,7 @@
 #                           Tom Sobota                          23/03/2008
 #                           Hans Schweiger                      24/03/2008
 #                           Hans Schweiger                      25/03/2008
+#                           Tom Sobota                          26/03/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -36,6 +37,7 @@
 #                   statistics
 #       24/03/2008  Small changes in calls to PanelBB
 #       25/03/2008  Picture added in main panel
+#       26/03/2008  Suppressed actions on upper level tree items
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -483,10 +485,13 @@ class EinsteinFrame(wx.Frame):
         self.st1Title.Center(wx.HORIZONTAL)
         self.st1Title.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(u'zunge.jpg',
-              wx.BITMAP_TYPE_JPEG), id=wxID_PANELCCPIC1,
-              name='staticBitmap1', parent=self.pageTitle, pos=wx.Point(220, 50),
-              size=wx.Size(400, 500), style=0)
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(u'zunge.jpg',wx.BITMAP_TYPE_JPEG),
+                                             id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
+                                             name='staticBitmap1',
+                                             parent=self.pageTitle,
+                                             pos=wx.Point(220, 50),
+                                             size=wx.Size(400, 500),
+                                             style=0)
         
         ####--- End of PAGE 0
 
@@ -2283,8 +2288,8 @@ class EinsteinFrame(wx.Frame):
 
 
         ####----PAGE pageStatistics
-        self.pageStatistics = wx.Panel(id=-1, name='pageStatistics', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageStatistics.Hide()
+        #self.pageStatistics = wx.Panel(id=-1, name='pageStatistics', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
+        #self.pageStatistics.Hide()
         ####--- End of pageStatistics
 
 
@@ -2515,8 +2520,10 @@ class EinsteinFrame(wx.Frame):
             if self.activeQid <> 0: self.fillPage("Page8")
         #qDataCheck
         elif select == PList["X133"][1]:
-            self.hidePages()
-            self.pageDataCheck.Show()        
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageDataCheck.Show()
+            pass
         #qDataCheckPage1
         elif select == PList["X134"][1]:
             self.hidePages()
@@ -2527,8 +2534,10 @@ class EinsteinFrame(wx.Frame):
             self.pageDataCheckPage2.Show()
         #qStatistics
         elif select == PList["X136"][1]:
-            self.hidePages()
-            self.pageStatistics.Show()
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageStatistics.Show()
+            pass
         #qStatisticYPage1 'Primary energy - Yearly'
         elif select == PList["X137"][1]:
             self.hidePages()
@@ -2561,16 +2570,22 @@ class EinsteinFrame(wx.Frame):
         #
         #qBenchmarkCheck
         elif select == PList["X143"][1]:
-            self.hidePages()
-            self.pageBenchmarkCheck.Show()
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageBenchmarkCheck.Show()
+            pass
         #qOptimisationProposals
         elif select == PList["X145"][1]:
-            self.hidePages()
-            self.pageOptimisationProposals.Show()
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageOptimisationProposals.Show()
+            pass
         #qFinalReport
         elif select == PList["X147"][1]:
-            self.hidePages()
-            self.pageFinalReport.Show()
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageFinalReport.Show()
+            pass
         #qFinalReportPage1
         elif select == PList["X148"][1]:
             self.hidePages()
@@ -2606,8 +2621,8 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEnergy.mod.initPanel()
             self.panelEnergy.Show()
-        else:
-            self.hidePages()
+        #else:
+        #    self.hidePages()
             
             
     ########## DrawPages
@@ -3555,7 +3570,7 @@ class EinsteinFrame(wx.Frame):
         self.pageDataCheck.Hide()
         self.pageDataCheckPage1.Hide()
         self.pageDataCheckPage2.Hide()
-        self.pageStatistics.Hide()
+        #self.pageStatistics.Hide()
         self.panelEA1.Hide()
         self.panelEA2.Hide()
         self.panelEA3.Hide()
