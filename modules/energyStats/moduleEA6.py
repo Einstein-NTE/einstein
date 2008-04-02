@@ -12,9 +12,12 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
-#	
+#	28/03/08:   functions draw_ ... moved to panel
+#	28/03/08:   changed functions draw... to use numpy arrays,
+#
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -27,6 +30,7 @@
 
 from sys import *
 from math import *
+from numpy import *
 import wx
 
 
@@ -35,23 +39,10 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_CO2byFuel_Plot(self):
-    try:
-        theData = Interfaces.GData['EA6_CO2']
-    except:
-        print "draw_CO2byFuel_Plot: values EA6_CO2 missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("Production of\nCO2 by fuel")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
-
 class ModuleEA6(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -63,12 +54,19 @@ class ModuleEA6(object):
         """
 #------------------------------------------------------------------------------
         # generate data for graphics
-        CO2_values = [28, 14, 42, 15]
-        CO2_labels = ['Natural gas','Gasoil','LPG', 'Electricity']
-        self.interface.setGraphicsData('EA6_CO2', (CO2_values, CO2_labels))
+
+        data = array([['Heavy fuel oil',   0.0,    0.00],
+                      ['Natural gas'   ,  50.0,   28.17],
+                      ['Gas oil'       ,  25.0,   14.08],
+                      ['LPG'           ,  75.0,   42.25],
+                      ['Other'         ,   0.0,    0.00],
+                      ['Electricity'   ,  27.5,   15.49],
+                      ['Total'         , 177.5,  100.00]])
+
+        self.interface.setGraphicsData(self.keys[0], data)
 
         #print "ModuleEA6 graphics data initialization"
-        #print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]))
 
         return "ok"
 
@@ -92,14 +90,4 @@ class ModuleEA6(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEA5
-    def getPlotMethod(self,item):
-        global draw_CO2byFuel_Plot
-        if item == 0:
-            return draw_CO2byFuel_Plot
-        elif item == 1:
-            return None
-        else:
-            return None
 #==============================================================================

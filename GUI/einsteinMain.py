@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.61
+#	Version No.: 0.62
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008

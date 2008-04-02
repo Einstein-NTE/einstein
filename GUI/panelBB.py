@@ -1,6 +1,6 @@
 #Boa:FramePanel:PanelBB
 # -*- coding: cp1252 -*-
-#============================================================================== 				
+#==============================================================================
 #
 #	E I N S T E I N
 #
@@ -37,8 +37,8 @@
 #============================================================================== 
 
 import wx
-import wx.grid
-import einstein.modules.boiler.ModuleBB as BB
+from einstein.GUI.graphics import drawPiePlot
+from einstein.modules.boiler.ModuleBB import *
 from einstein.GUI.status import Status
 from einstein.GUI.panelBB_PopUp1 import BBPopUp1
 
@@ -58,40 +58,83 @@ from einstein.modules.interfaces import *
  wxID_PANELBBTC2PAGEBB, wxID_PANELBBTC3PAGEBB, wxID_PANELBBTC4PAGEBB, 
  wxID_PANELBBTC5PAGEBB, wxID_PANELBBTC6PAGEBB, wxID_PANELBBTC7PAGEBB, 
 ] = [wx.NewId() for _init_ctrls in range(31)]
-
-#------------------------------------------------------------------------------		
-#HS2008-03-22: 
-#------------------------------------------------------------------------------		
-def drawFigure(self):
-#------------------------------------------------------------------------------
-#   defines the figures to be plotted
-#------------------------------------------------------------------------------		
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.plot(Interfaces.GData['BB Plot'][0],
-                      Interfaces.GData['BB Plot'][1],
-                      'go-', label='QD', linewidth=2)
-    self.subplot.plot(Interfaces.GData['BB Plot'][0],
-                      Interfaces.GData['BB Plot'][2],
-                      'rs',  label='QA')
-    self.subplot.plot(Interfaces.GData['BB Plot'][0],
-                      Interfaces.GData['BB Plot'][3],
-                      'go-', label='QD_mod', linewidth=2)
-    self.subplot.plot(Interfaces.GData['BB Plot'][0],
-                      Interfaces.GData['BB Plot'][4],
-                      'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 3e+7])
-    self.subplot.legend()
+#
+# constants
+#
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
+GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 
 class PanelBB(wx.Panel):
 
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
-        self.modBB = BB.ModuleBB()  #creates and initialises module
+	keys = ['BB Plot']
+        self.modBB = ModuleBB(keys)  #creates and initialises module
+#==============================================================================
+#   graphic: Cumulative heat demand by hours
+#==============================================================================
+        labels_column = 0
+        ignoredrows = []
+        paramList={'labels'      : labels_column,          # labels column
+                   'data'        : 3,                      # data column for this graph
+                   'key'         : keys[0],                # key for Interface
+                   'title'       : 'Some title',           # title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
+                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        dummy = Mp.MatPanel(self.panelBBFig, wx.Panel, self.getDrawFigure())
-        del dummy
+        dummy = Mp.MatPanel(self.panelBBFig,
+                            wx.Panel,
+                            drawPiePlot,
+                            paramList)
+
+        #
+        # additional widgets setup
+        # here, we modify some widgets attributes that cannot be changed
+        # directly by Boa. This cannot be done in _init_ctrls, since that
+        # method is rewritten by Boa each time.
+        #
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        key = keys[0]
+        data = Interfaces.GData[key]
+        (rows,cols) = data.shape
+        self.gridPageBB.CreateGrid(max(rows,20), cols)
+
+        self.gridPageBB.EnableGridLines(True)
+        self.gridPageBB.SetDefaultRowSize(20)
+        self.gridPageBB.SetRowLabelSize(30)
+        self.gridPageBB.SetColSize(0,115)
+        self.gridPageBB.EnableEditing(False)
+        self.gridPageBB.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.gridPageBB.SetColLabelValue(0, "Short name")
+        self.gridPageBB.SetColLabelValue(1, "Year")
+        self.gridPageBB.SetColLabelValue(2, "Type")
+        self.gridPageBB.SetColLabelValue(3, "Operating\nhours")
+        self.gridPageBB.SetColLabelValue(4, "Power")
+        self.gridPageBB.SetColLabelValue(5, "Temperature")
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(rows):
+            self.gridPageBB.SetRowAttr(r, attr)
+            for c in range(cols):
+                self.gridPageBB.SetCellValue(r, c, data[r][c])
+                if c == labels_column:
+                    self.gridPageBB.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.gridPageBB.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+
+        self.gridPageBB.SetGridCursor(0, 0)
+
+        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -122,17 +165,6 @@ class PanelBB(wx.Panel):
         self.gridPageBB = wx.grid.Grid(id=wxID_PANELBBGRIDPAGEBB,
               name='gridpageBB', parent=self, pos=wx.Point(40, 48),
               size=wx.Size(376, 168), style=0)
-        self.gridPageBB.EnableGridLines(True)
-        self.gridPageBB.CreateGrid(10, 6)
-        self.gridPageBB.SetDefaultColSize(60, resizeExistingCols=False)
-        self.gridPageBB.SetDefaultRowSize(12, resizeExistingRows=False)
-        self.gridPageBB.SetRowLabelSize(20)
-        self.gridPageBB.SetColLabelValue(0, "Name")
-        self.gridPageBB.SetColLabelValue(1, "Type")
-        self.gridPageBB.SetColLabelValue(2, "Power")
-        self.gridPageBB.SetColLabelValue(3, "---")
-        self.gridPageBB.SetColLabelValue(4, "---")
-        self.gridPageBB.SetColLabelValue(5, "---")
         self.gridPageBB.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPageBBGridCellLeftDclick, id=wxID_PANELBBGRIDPAGEBB)
         self.gridPageBB.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
@@ -269,14 +301,6 @@ class PanelBB(wx.Panel):
               name='staticText1', parent=self, pos=wx.Point(424, 32),
               size=wx.Size(352, 17), style=0)
 
-#------------------------------------------------------------------------------		
-    def getDrawFigure(self):
-#------------------------------------------------------------------------------		
-#   function for drawing 
-#------------------------------------------------------------------------------		
-
-        global drawFigure
-        return drawFigure
 
 #==============================================================================
 #   Event handlers

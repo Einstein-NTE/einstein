@@ -1,5 +1,6 @@
 #Boa:Frame:PanelEA4
-#==============================================================================#
+#==============================================================================
+#
 #	E I N S T E I N
 #
 #       Expert System for an Intelligent Supply of Thermal Energy in Industry
@@ -12,9 +13,11 @@
 #==============================================================================
 #
 #	Version No.: 0.01
-#	Created by: 	    Tom Sobota	21/03/2008
+#	Created by: 	    Tom Sobota 21/03/2008
+#       Revised by:         Tom Sobota 29/03/2008
 #
 #       Changes to previous version:
+#       29/03/08:           mod. to use external graphics module
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,7 +30,8 @@
 #============================================================================== 
 
 import wx
-import wx.grid
+from einstein.GUI.graphics import drawPiePlot
+
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
 import einstein.modules.matPanel as Mp
@@ -37,33 +41,100 @@ import einstein.modules.matPanel as Mp
  wxID_PANELEA4STATICTEXT1, wxID_PANELEA4STATICTEXT2,
  wxID_PANELEA4STATICTEXT3, 
 ] = [wx.NewId() for _init_ctrls in range(8)]
+#
+# constants
+#
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
+GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+
 
 class PanelEA4(wx.Panel):
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
-        self.mod = ModuleEA4()
-
+        keys = ['EA4_UPH', 'EA4_HDP'] 
+        self.mod = ModuleEA4(keys)
+        labels_column = 0
         # remaps drawing methods to the wx widgets.
-        # gets the drawing methods from moduleEM1
-        dummy = Mp.MatPanel(self.panelGraphUPH, wx.Panel, self.mod.getPlotMethod(0))
-        dummy = Mp.MatPanel(self.panelGraphHD, wx.Panel, self.mod.getPlotMethod(1))
-        del dummy
+        #
+        # upper graphic: UPH demand by process
+        #
+        (rows,cols) = Interfaces.GData[keys[0]].shape
+        ignoredrows = [rows-1]
+        paramList={'labels'      : labels_column,          # labels column
+                   'data'        : 2,                      # data column for this graph
+                   'key'         : keys[0],                # key for Interface
+                   'title'       : 'UPH by process',       # title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
+                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
+
+        dummy = Mp.MatPanel(self.panelGraphUPH,
+                            wx.Panel,
+                            drawPiePlot,
+                            paramList)
+
+        #
+        # lower graphic: Heat demand by process temperature
+        #
+        # no rows to ignore here
+        paramList={'labels'      : labels_column,              # labels column
+                   'data'        : 3,                          # data column for this graph
+                   'key'         : keys[1],                    # key for Interface
+                   'title'       : 'HD by process temperature',# title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR}     # graph background color
+
+        dummy = Mp.MatPanel(self.panelGraphHD,
+                            wx.Panel,
+                            drawPiePlot,
+                            paramList)
         #
         # additional widgets setup
         #
-        self.grid1.CreateGrid(50, 3)
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        #
+        # set upper grid
+        #
+        key = keys[0]
+        data = Interfaces.GData[key]
+        (rows,cols) = data.shape
+        self.grid1.CreateGrid(max(rows,20), cols)
+
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
         self.grid1.SetColSize(0,115)
         self.grid1.EnableEditing(False)
-        self.grid1.SetDefaultCellFont(wx.Font(9, wx.ROMAN, wx.NORMAL, wx.NORMAL))
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, "Process")
         self.grid1.SetColLabelValue(1, "MWh")
         self.grid1.SetColLabelValue(2, "%")
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(rows):
+            self.grid1.SetRowAttr(r, attr)
+            for c in range(cols):
+                self.grid1.SetCellValue(r, c, data[r][c])
+                if c == labels_column:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.grid2.CreateGrid(50, 4)
+        self.grid1.SetGridCursor(0, 0)
+        #
+        # set lower grid
+        #
+        key = keys[1]
+        data = Interfaces.GData[key]
+        (rows,cols) = data.shape
+        self.grid2.CreateGrid(max(rows,20), cols)
+
         self.grid2.EnableGridLines(True)
         self.grid2.SetDefaultRowSize(20)
         self.grid2.SetRowLabelSize(30)
@@ -72,12 +143,24 @@ class PanelEA4(wx.Panel):
         self.grid2.SetColSize(2,100)
         self.grid2.SetColSize(3,100)
         self.grid2.EnableEditing(False)
-        self.grid2.SetDefaultCellFont(wx.Font(9, wx.ROMAN, wx.NORMAL, wx.NORMAL))
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid2.SetColLabelValue(0, "Process")
         self.grid2.SetColLabelValue(1, "Process\ntemperature")
         self.grid2.SetColLabelValue(2, "Distribution\ntemperature")
         self.grid2.SetColLabelValue(3, "Heat\ndemand MWh")
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(rows):
+            self.grid2.SetRowAttr(r, attr)
+            for c in range(cols):
+                self.grid2.SetCellValue(r, c, data[r][c])
+                if c == labels_column:
+                    self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.grid2.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+
+        self.grid2.SetGridCursor(0, 0)
 
         self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
         self.staticText3.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))

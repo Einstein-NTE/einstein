@@ -12,8 +12,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	22/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
+#	28/03/08:   TS changed functions draw... to use numpy arrays,
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,73 +29,18 @@
 
 from sys import *
 from math import *
+from numpy import *
 import wx
-
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_EIbyType_Plot(self):
-    try:
-        theData = Interfaces.GData['EA5_EI']
-    except:
-        print "draw_EIbyType_Plot: values EA5_EI missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("Energy intensity")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
-
-def draw_SECbyProduct_Plot(self):
-    n_energies = 3               # values per set
-    width = 0.3                  # the width of the bars
-    theLabels = ('Energy by fuels', 'Energy by electricity', 'Primary energy')
-
-    try:
-        theData = Interfaces.GData['EA5_SEC']
-        theValues = theData[0]
-        theProducts = theData[1]
-    except:
-        print "draw_SECbyProduct_Plot: values EA5_SEC missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    n_products = len(theValues)
-    ind = range(n_energies)     # the x locations for the groups
-    fuels = []
-    electricity = []
-    primary = []
-    for i in range(n_energies):
-        product = theValues[i]
-        fuels.append(product[0])
-        electricity.append(product[1])
-        primary.append(product[2])
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("SEC by product")
-    # labels and ticks
-    self.subplot.set_xlabel(theLabels)
-    self.subplot.set_ylabel('Energy')
-    self.subplot.set_title('SEC by product')
-    self.subplot.set_xticks(map(lambda x: x+width,ind), theProducts)
-    self.subplot.set_xlim(-width,len(ind))
-    self.subplot.set_yticks(range(0,1000,100))
-    #self.subplot.legend( (p1[0], p2[0], p3[0]), labels, shadow=True)
-    # bars
-    self.subplot.bar(ind, fuels, width, color='b')
-    self.subplot.bar(map(lambda x: x+width,ind), electricity, width, color='r')
-    self.subplot.bar(map(lambda x: x+(2*width),ind), primary, width, color='w')
-
-
 class ModuleEA5(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -104,20 +51,27 @@ class ModuleEA5(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        EI_values = [1.91, 0.18, 2.65]
-        EI_labels = ['Fuels','Electricity','Total primary energy']
-        self.interface.setGraphicsData('EA5_EI', (EI_values, EI_labels))
+        #
+        # upper grid: Energy intensity by type
+        #
+        data = array([['Fuels',                1.91],
+                      ['Electricity',          0.18],
+                      ['Total primary energy', 2.65]])
+                          
+        self.interface.setGraphicsData(self.keys[0], data)
 
-
-        SEC_values = [[500,50,700], # values of En.by fuels, En.by electricity, Primary en. for Product 1
-                      [400,80,680], # values of En.by fuels, En.by electricity, Primary en. for Product 2
-                      [100,10,140]] # values of En.by fuels, En.by electricity, Primary en. for Product 3
-
-        SEC_labels = ['Product 1','Product 2','Product 3']
-        self.interface.setGraphicsData('EA5_SEC', (SEC_values, SEC_labels))
+        #
+        # lower grid: Energy consumption by product
+        #
+        data = array([['Product 1', 500.0, 50.0, 700.0],
+                      ['Product 2', 400.0, 80.0, 680.0],
+                      ['Product 3', 100.0, 10.0, 140.0]])
+                          
+        self.interface.setGraphicsData(self.keys[1], data)
 
         #print "ModuleEA5 graphics data initialization"
-        #print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]]))
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[1], repr(Interfaces.GData[self.keys[1]]))
 
         return "ok"
 
@@ -141,14 +95,4 @@ class ModuleEA5(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEA5
-    def getPlotMethod(self,item):
-        global draw_EIbyType_Plot, draw_SECbyProduct_Plot
-        if item == 0:
-            return draw_EIbyType_Plot
-        elif item == 1:
-            return draw_SECbyProduct_Plot
-        else:
-            return None
 #==============================================================================

@@ -20,11 +20,13 @@
 #	Last revised by:    Tom Sobota          15/03/2008
 #                           Enrico Facci /
 #                           Hans Schweiger      24/03/2008
+#                           Tom Sobota           1/04/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
 #       2008-03-24  Incorporated "calculateEnergyFlows" from Enrico Facci
 #                   - adapted __init__ and plots similar to moduleHP
+#       1/04/2008   Adapted to new graphics interfase using numpy
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,7 +40,7 @@
 
 from sys import *
 from math import *
-import wx
+from numpy import *
 
 
 from einstein.auxiliary.auxiliary import *
@@ -46,16 +48,16 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-class ModuleBB():
+class ModuleBB(object):
 
     BBList = []
     
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys # the key to the data is sent by the panel
         self.interface = Interfaces()
 
         self.DB = Status.DB
         self.sql = Status.SQL
-        
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
@@ -112,17 +114,29 @@ class ModuleBB():
 
         print "ModuleHP (updatePanel): data for panel are copied to interface"
         
-# plot to be displayed
-        self.interface.setGraphicsData('BB Plot',[self.interface.T,
-                                        self.interface.QD_T_mod[self.cascadeIndex],
-                                        self.interface.QA_T_mod[self.cascadeIndex],
-                                        self.interface.QD_T_mod[self.cascadeIndex+1],
-                                        self.interface.QA_T_mod[self.cascadeIndex+1]])
-# info for text boxes in right side of panel
-        self.interface.setGraphicsData('BB Info',{"noseque":55})
+        # plot to be displayed
+	# this is how the data should be set up
+	# (this data are just an example!)
+        data = array([['Boiler 1', 2004, 'Type 1', 3000, 100, 120],
+		      ['Boiler 2', 2006, 'Type 1', 4500, 120, 140],
+                      ['Boiler 3', 2007, 'Type 2', 5000,  80, 130]])
 
-# list of equipments in cascade for Table
-        self.interface.setGraphicsData('BB List',self.interface.cascade)
+
+        self.interface.setGraphicsData(self.keys[0], data)
+
+        try:
+	    #    self.interface.setGraphicsData('BB Plot',[self.interface.T,
+	    #                                              self.interface.QD_T_mod[self.cascadeIndex],
+	    #                                              self.interface.QA_T_mod[self.cascadeIndex],
+	    #                                              self.interface.QD_T_mod[self.cascadeIndex+1],
+	    #                                              self.interface.QA_T_mod[self.cascadeIndex+1]])
+	    # info for text boxes in right side of panel
+	    self.interface.setGraphicsData('BB Info',{"noseque":55})
+
+            # list of equipments in cascade for Table
+            self.interface.setGraphicsData('BB List',self.interface.cascade)
+        except:
+            pass
 
 #------------------------------------------------------------------------------
 
@@ -332,6 +346,7 @@ class ModuleBB():
         print "Total waste heat input  ",QHXj, " MWh"
 
         return USHj    
+
 
 #==============================================================================
 

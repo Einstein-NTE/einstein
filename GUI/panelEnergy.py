@@ -1,10 +1,39 @@
 #Boa:FramePanel:PanelEnergy
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelEnergy- GUI component for: Energetic performance simulation
+#			
+#==============================================================================
+#
+#	Version No.: 0.01
+#	Created by: 	    ?
+#       Revised by:         Tom Sobota 31/03/2008
+#                           Tom Sobota 31/03/2008
+#
+#       Changes to previous version:
+#       31/03/08:           mod. to use numpy based graphics arg passing
+#	
+#------------------------------------------------------------------------------		
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	www.energyxperts.net / info@energyxperts.net
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#============================================================================== 
 
 import wx
-import wx.grid
-#from einstein.modules.energy.moduleEnergy import ModuleEnergy
 from status import Status
 from einstein.modules.energy.moduleEnergy import *
+from einstein.GUI.graphics import drawPiePlot
 import einstein.modules.matPanel as Mp
 
 
@@ -18,19 +47,95 @@ import einstein.modules.matPanel as Mp
  wxID_PANELENERGYPICTURE1, wxID_PANELENERGYPICTURE2,
 ] = [wx.NewId() for _init_ctrls in range(18)]
 
+#
+# constants
+#
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
+GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+
 class PanelEnergy(wx.Panel):
 
     def __init__(self, parent, id, pos, size, style, name):
-
         self._init_ctrls(parent)
-        self.mod = ModuleEnergy()
+        keys = ['ENERGY'] 
+        self.mod = ModuleEnergy(keys)
+        labels_column = 0
 
-        #TS2008-03-17 modified graphics generation structure
         # remaps drawing methods to the wx widgets.
-        # gets the drawing methods from moduleEnergy.
-        dummy = Mp.MatPanel(self.panelEnergyDemand, wx.Panel, self.mod.getDrawEnergyDemand())
-        dummy = Mp.MatPanel(self.panelComPerformance, wx.Panel, self.mod.getDrawComPerformance())
-        del dummy
+        #
+        (rows,cols) = Interfaces.GData[keys[0]].shape
+        ignoredrows = [rows-1,rows-2] # ignore totals and savings
+
+        # left graphic: Energy demand
+        paramList={'labels'      : labels_column,          # labels column
+                   'data'        : 3,                      # data column for this graph
+                   'key'         : keys[0],                # key for Interface
+                   'title'       : 'Energy demand',        # title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
+                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
+
+        #dummy = Mp.MatPanel(self.panelEnergyDemand, wx.Panel, drawPiePlot, paramList)
+
+
+        # right graphic: Comparative performance
+        paramList={'labels'      : labels_column,            # labels column
+                   'data'        : 2,                        # data column for this graph
+                   'key'         : keys[0],                  # key for Interface
+                   'title'       : 'Comparative performance',# title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR,   # graph background color
+                   'ignoredrows' : ignoredrows}              # rows that should not be plotted
+
+
+        dummy = Mp.MatPanel(self.panelComPerformance,
+                            wx.Panel,
+                            drawPiePlot,
+                            paramList)
+
+
+        #
+        # additional widgets setup
+        #
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        #
+        # set grid
+        #
+        key = keys[0]
+        data = Interfaces.GData[key]
+        (rows,cols) = data.shape
+        self.grid1.CreateGrid(max(rows,20), cols)
+
+        self.grid1.EnableGridLines(True)
+        self.grid1.SetDefaultRowSize(20)
+        self.grid1.SetRowLabelSize(30)
+        self.grid1.SetDefaultColSize(115)
+        self.grid1.EnableEditing(False)
+        self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid1.SetColLabelValue(0, "Equipment\ntype")
+        self.grid1.SetColLabelValue(1, "Useful supply\nheat/cold")
+        self.grid1.SetColLabelValue(2, "Primary energy\nconsumption")
+        self.grid1.SetColLabelValue(3, "CO2 generation")
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(rows):
+            self.grid1.SetRowAttr(r, attr)
+            for c in range(cols):
+                self.grid1.SetCellValue(r, c, data[r][c])
+                if c == labels_column:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+
+        self.grid1.EnableEditing(False)
+        self.grid1.SetGridCursor(0, 0)
+
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -44,11 +149,9 @@ class PanelEnergy(wx.Panel):
         self.monthly.Bind(wx.EVT_BUTTON, self.OnMonthlyButton,
               id=wxID_PANELENERGYMONTHLY)
 
-        self.grid = wx.grid.Grid(id=wxID_PANELENERGYGRID, name='grid',
+        self.grid1 = wx.grid.Grid(id=wxID_PANELENERGYGRID, name='grid1',
               parent=self, pos=wx.Point(16, 104), size=wx.Size(504, 168),
               style=0)
-        self.grid.SetDefaultRowSize(12)
-        self.grid.EnableEditing(False)
 
         self.st2 = wx.StaticText(id=wxID_PANELENERGYST2,
               label='simulation results', name='st2', parent=self,

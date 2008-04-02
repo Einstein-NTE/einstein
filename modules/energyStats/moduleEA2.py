@@ -12,8 +12,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
+#       29/3/2008          Adapted to numpy arrays
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,6 +29,7 @@
 
 from sys import *
 from math import *
+from numpy import *
 import wx
 
 
@@ -35,38 +38,10 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_PECbyFuel_Plot(self):
-    try:
-        theData = Interfaces.GData['EA2_PEC']
-    except:
-        print "draw_PECbyFuel_Plot: values EA2_PEC missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("PEC by fuel")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1], autopct=None,
-                     pctdistance=0.6, labeldistance=1.2, shadow=True)
-
-def draw_PETbyFuel_Plot(self):
-    try:
-        theData = Interfaces.GData['EA2_PET']
-    except:
-        print "draw_PETbyFuel_Plot: values EA2_PET missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("PET by fuel")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1], autopct=None,
-                     pctdistance=0.6, labeldistance=1.2, shadow=True)
-
-
 class ModuleEA2(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -77,16 +52,14 @@ class ModuleEA2(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        PEC_values = [81, 19]
-        PEC_labels = ['Total fuels','Total electricity']
-        self.interface.setGraphicsData('EA2_PEC',(PEC_values, PEC_labels))
+        data = array([['Total Fuels'       ,660.0,  81.48, 583.0,  90.67],
+                      ['Total Electricity' ,150.0,  18.52,  60.0,   9.33],
+                      ['Total (F+E)'       ,810.0, 100.00, 643.0, 100.00]])
 
-        PET_values = [91, 9]
-        PET_labels = ['Total fuels','Total electricity']
-        self.interface.setGraphicsData('EA2_PET',(PET_values, PET_labels))
+        self.interface.setGraphicsData(self.keys[0], data)
 
         #print "ModuleEA2 graphics data initialization"
-        #print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]))
 
         return "ok"
 
@@ -110,14 +83,4 @@ class ModuleEA2(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEA2
-    def getPlotMethod(self,item):
-        global draw_PECbyFuel_Plot, draw_PETbyFuel_Plot
-        if item == 0:
-            return draw_PECbyFuel_Plot
-        elif item == 1:
-            return draw_PETbyFuel_Plot
-        else:
-            return None
 #==============================================================================

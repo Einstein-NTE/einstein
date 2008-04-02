@@ -12,8 +12,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
+#	29/03/08:   TS changed functions draw... to use numpy arrays,
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,35 +29,19 @@
 
 from sys import *
 from math import *
+from numpy import *
 import wx
-
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_MPHD_Plot(self):
-    #
-    # this function draws the Monthly process heat demand Plot
-    #
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    # this is just an example curve
-    # the curve takes it's data from the dictionary Interfaces.GData, with the key 'EM1'
-    self.subplot.plot(Interfaces.GData['EM1_MPHD'][0],
-                      Interfaces.GData['EM1_MPHD'][1],
-                      'go-', label='line 1', linewidth=2)
-    self.subplot.plot(Interfaces.GData['EM1_MPHD'][2],
-                      Interfaces.GData['EM1_MPHD'][3],
-                      'rs',  label='line 2')
-    self.subplot.axis([0, 4, 0, 10])
-    self.subplot.legend()
-
 
 class ModuleEM1(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -66,7 +52,29 @@ class ModuleEM1(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        self.interface.setGraphicsData('EM1_MPHD',([1,2,3], [1,2,3], [1,2,3], [1,4,9]))
+        # In this grid the nr. of cols is variable, so we generate the
+        # column headings dynamically here
+        data = array([['Process heat\ndemand','Process 1\nMWh','Process 2\nMWh',
+                       'Office heating\nMWh','TOTAL\nKWh'],
+                      ['January'  ,  10.0,  14.0,   30.0,   54.0],
+                      ['February' ,  12.0,  16.0,   20.0,   48.0],
+                      ['March'    ,  14.0,  18.0,   10.0,   42.0],
+                      ['April'    ,  16.0,  20.0,    5.0,   41.0],
+                      ['May'      ,  19.0,  23.0,    0.0,   42.0],
+                      ['June'     ,   6.0,  10.0,    0.0,   16.0],
+                      ['July'     ,   4.0,   8.0,    0.0,   12.0],
+                      ['August'   ,   2.0,   6.0,    0.0,    8.0],
+                      ['September',   7.0,  11.0,    0.0,   18.0],
+                      ['October'  ,   9.0,  13.0,    10.0,  32.0],
+                      ['November' ,  15.0,  19.0,    20.0,  54.0],
+                      ['December' ,   4.0,   8.0,    30.0,  42.0],
+                      ['Total'    , 118.0,  75.0,    60.0, 182.0]])
+                          
+        self.interface.setGraphicsData(self.keys[0], data)
+
+        #print "ModuleEM1 graphics data initialization"
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
+
         return "ok"
 #------------------------------------------------------------------------------
     def exitModule(self,exit_option):
@@ -88,14 +96,4 @@ class ModuleEM1(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEM1
-    def getPlotMethod(self, item):
-        global draw_MPHD_Plot
-        if item == 0:
-            return draw_MPHD_Plot
-        elif item == 1:
-            return None
-        else:
-            return None
 #==============================================================================

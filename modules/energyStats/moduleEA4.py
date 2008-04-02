@@ -12,8 +12,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
+#       29/3/2008          Adapted to numpy arrays
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,7 +29,7 @@
 
 from sys import *
 from math import *
-import wx
+from numpy import *
 
 
 from einstein.auxiliary.auxiliary import *
@@ -35,37 +37,11 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_UPHbyProcess_Plot(self):
-    try:
-        theData = Interfaces.GData['EA4_UPH']
-    except:
-        print "draw_UPHbyProcess_Plot: values EA4_UPH missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("UPH by process")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
-
-def draw_HDbyProcess_Plot(self):
-    try:
-        theData = Interfaces.GData['EA4_HD']
-    except:
-        print "draw_HDbyProcess_Plot: values EA4_HD missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("Heat demand by process")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
 
 class ModuleEA4(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -76,16 +52,29 @@ class ModuleEA4(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        UPH_values = [33.01, 54.37, 12.62]
-        UPH_labels = ['Process 1','Process 2','Process 3']
-        self.interface.setGraphicsData('EA4_UPH', (UPH_values, UPH_labels))
+        #
+        # upper grid: UPH by process
+        #
+        data = array([['Process name 1', 170.0,   33.01],
+                      ['Process name 2', 280.0,   54.37],
+                      ['Process name 3',  65.0,   12.62],
+                      ['Total'         , 515.0,  100.00]])
 
-        HD_values = [170, 280, 65]
-        HD_labels = ['Process 1','Process 2','Process 3']
-        self.interface.setGraphicsData('EA4_HD', (HD_values, HD_labels))
+        self.interface.setGraphicsData(self.keys[0], data)
+
+        #
+        # lower grid: Process heat by temperature
+        #
+        data = array([['Process name 1',  40.0, 180.0, 170.0],
+                      ['Process name 2',  75.0, 180.0, 280.0],
+                      ['Process name 3',  90.0, 180.0,  65.0]])
+
+
+        self.interface.setGraphicsData(self.keys[1], data)
 
         #print "ModuleEA4 graphics data initialization"
-        #print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[1],repr(Interfaces.GData[self.keys[1]]))
         return "ok"
 
 #------------------------------------------------------------------------------
@@ -108,14 +97,4 @@ class ModuleEA4(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEA4
-    def getPlotMethod(self,item):
-        global draw_UPHbyProcess_Plot, draw_HDbyProcess_Plot
-        if item == 0:
-            return draw_UPHbyProcess_Plot
-        elif item == 1:
-            return draw_HDbyProcess_Plot
-        else:
-            return None
 #==============================================================================

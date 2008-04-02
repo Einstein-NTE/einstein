@@ -12,8 +12,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
+#       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
+#       29/3/2008          Adapted to numpy arrays
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -27,45 +29,18 @@
 
 from sys import *
 from math import *
+from numpy import *
 import wx
-
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
-def draw_FETbyEquipment_Plot(self):
-    try:
-        theData = Interfaces.GData['EA3_FET']
-    except:
-        print "draw_FETbyProcess_Plot: values EA3_FET missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("FET by equipment")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
-
-def draw_USHbyEquipment_Plot(self):
-    try:
-        theData = Interfaces.GData['EA3_USH']
-    except:
-        print "draw_USHbyProcess_Plot: values EA3_USH missing"
-        print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
-        return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.set_title("USH by equipment")
-    self.subplot.pie(theData[0], explode=None, labels=theData[1],
-                     autopct=None, pctdistance=0.6, labeldistance=1.2, shadow=True)
-
 class ModuleEA3(object):
 
-    def __init__(self):
+    def __init__(self, keys):
+        self.keys = keys # two grids, so a list of (2) keys
         self.interface = Interfaces()
         self.initModule()
 
@@ -76,15 +51,34 @@ class ModuleEA3(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        self.interface.setGraphicsData('EA3_FET',([16.36, 16.36, 9.09, 27.27, 27.27, 3.64],
-                                       ['Equipment 1','Equipment 2','Equipment 3','Equipment 4',
-                                        'Equipment 5','Equipment 6']))
+        #
+        # upper grid FET by equipment
+        #
+        data = array([['Equipname 1', 'Natural gas',  90.0,   16.36],
+                      ['Equipname 2', 'Natural gas',  90.0,   16.36],
+                      ['Equipname 3', 'Gas oil'    ,  50.0,  9.09],
+                      ['Equipname 4', 'LPG'        , 150.0, 27.27],
+                      ['Equipname 5', 'LPG'        , 150.0, 27.27],
+                      ['Equipname 6', 'Electricity',  20.0,  3.64],
+                      ['Total'      , ''           , 550.0, 100.00]])
+                          
+        self.interface.setGraphicsData(self.keys[0], data)
+        #
+        # lower grid USH by equipment
+        #
+        data = array([['Equipname 1',  76.5,  16.29],
+                      ['Equipname 2',  76.5,  16.29],
+                      ['Equipname 3',  42.5,   9.05],
+                      ['Equipname 4', 127.5,  27.16],
+                      ['Equipname 5', 127.5,  27.16],
+                      ['Equipname 6',  19.0 ,  4.05],
+                      ['Total'      , 469.5, 100.00]])
 
-        self.interface.setGraphicsData('EA3_USH',([16.29, 16.29, 9.05, 27.16, 27.16, 4.05],
-                                       ['Equipment 1','Equipment 2','Equipment 3','Equipment 4',
-                                        'Equipment 5','Equipment 6']))
+        self.interface.setGraphicsData(self.keys[1], data)
+
         #print "ModuleEA3 graphics data initialization"
-        #print "Interfaces.GData contains:\n%s\n" % (repr(Interfaces.GData),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]]),)
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[1], repr(Interfaces.GData[self.keys[1]]),)
 
         return "ok"
 
@@ -108,14 +102,4 @@ class ModuleEA3(object):
 
 #------------------------------------------------------------------------------
 
-    # Method for copying the graphic methods.
-    # called from panelEA3
-    def getPlotMethod(self,item):
-        global draw_FETbyEquipment_Plot, draw_USHbyEquipment_Plot
-        if item == 0:
-            return draw_FETbyEquipment_Plot
-        elif item == 1:
-            return draw_USHbyEquipment_Plot
-        else:
-            return None
 #==============================================================================

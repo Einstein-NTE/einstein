@@ -29,28 +29,25 @@ heiko.henning@imsai.de
 #-----  Imports
 import wx
 import wx.grid
+import einstein.GUI.pSQL as pSQL
+from einstein.GUI.status import *
 
 
-class wxFrame(wx.Frame):
+class DBEditFrame(wx.Frame):
 
     #def _init_ctrls(self, prnt):
-    def __init__(self, prnt, fname, dbtable, mysql):
+    def __init__(self, prnt, fname, tablename):
         
         wx.Frame.__init__(self, id=-1, name='', parent=prnt, 
               pos=wx.Point(0, 0), size=wx.Size(800, 600),
               style=wx.DEFAULT_FRAME_STYLE, title=fname)
 
 
-        self.sql = mysql
-        self.table = dbtable
-
+        self.table = pSQL.Table(Status.DB, tablename)
         self.maxrow = 25
         self.rowcount = 0
-
         self.lastEditCell = []
         
-              
-
         
         self.window_1 = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
         self.window_1_pane_2 = wx.Panel(self.window_1, -1, style=wx.STATIC_BORDER|wx.TAB_TRAVERSAL)
@@ -59,7 +56,8 @@ class wxFrame(wx.Frame):
 
         self.gridDBTable = wx.grid.Grid(self.window_1_pane_1, -1, size=(1, 1))
 
-        self.DBPageSlider = wx.Slider(self.window_1_pane_2, -1, 1, 1, 1, style=wx.SL_HORIZONTAL|wx.SL_AUTOTICKS|wx.SL_LABELS|wx.SL_TOP|wx.SL_SELRANGE)
+        self.DBPageSlider = wx.Slider(self.window_1_pane_2, -1, 1, 1, 1,
+                                      style=wx.SL_HORIZONTAL|wx.SL_AUTOTICKS|wx.SL_LABELS|wx.SL_TOP|wx.SL_SELRANGE)
 
         self.buttonAddRow = wx.Button(self.window_1_pane_2, -1, "add row")
         self.buttonDeleteRow = wx.Button(self.window_1_pane_2, -1, "delete row")
@@ -115,23 +113,12 @@ class wxFrame(wx.Frame):
         self.displayDBPage(1)
              
 
-        
-
-
-
-
-
-
     def OnImportData(self, event):
         event.Skip()
 
 
-
-
     def OnDBPageSliderScroll(self, event):
         self.displayDBPage(self.DBPageSlider.GetValue())
-
-
 
 
     def OnButtonAddRow(self, event):
@@ -143,12 +130,10 @@ class wxFrame(wx.Frame):
                 tmp[col] = 'NULL' 
                 
         self.table.insert(tmp)    
-        self.sql.commit()
+        Status.DB.commit()
         self.setValues()
         self.displayDBPage(self.dbpages)
         self.DBPageSlider.SetValue(self.dbpages)
-
-
 
 
 
@@ -162,7 +147,7 @@ class wxFrame(wx.Frame):
             row[self.lastEditCell[1]] = value
         else:
             row[self.lastEditCell[1]] = 'NULL'
-        self.sql.commit()
+        Status.DB.commit()
         self.lastEditCell = []
 
         
@@ -172,11 +157,7 @@ class wxFrame(wx.Frame):
             self.gridDBTable.SetColLabelValue(row, self.table.keys()[row])
         self.gridDBTable.AutoSizeColumns(setAsMin=True)
         self.gridDBTable.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
-        self.gridDBTable.SetMinSize((-1, 500))      
-
-
-
-
+        self.gridDBTable.SetMinSize((-1, 400))      
 
 
     def displayDBPage(self, pagenr):
@@ -186,7 +167,9 @@ class wxFrame(wx.Frame):
         rownr = startrow + 1
         r = 0
         c = 0
-        for row in self.table.sql_select("%s > 0 ORDER BY %s LIMIT %s,%s" % (self.table.keys()[0], self.table.keys()[0], startrow, self.maxrow)):
+        for row in self.table.sql_select("%s > 0 ORDER BY %s LIMIT %s,%s" % (self.table.keys()[0],
+                                                                             self.table.keys()[0],
+                                                                             startrow, self.maxrow)):
             self.gridDBTable.AppendRows(numRows=1)
             self.gridDBTable.SetRowLabelValue(r, "%s" % (rownr))
             for col in row:
@@ -197,9 +180,6 @@ class wxFrame(wx.Frame):
             r +=1
             rownr += 1
                 
-            
-        
-        
 
     def setValues(self):
         self.rowcount = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
@@ -212,6 +192,3 @@ class wxFrame(wx.Frame):
         self.dbpages = self.rowcount/self.maxrow + tmp
         self.DBPageSlider.SetRange(1, self.dbpages)
 
-
-
-        

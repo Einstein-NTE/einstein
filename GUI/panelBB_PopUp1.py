@@ -1,6 +1,7 @@
 #Boa:Dialog:BBPopUp1
 
 import wx
+from einstein.GUI.DBEditFrame import DBEditFrame
 
 [wxID_BBPOPUP1, wxID_BBPOPUP1BTNACCEPT, wxID_BBPOPUP1BTNCANCEL, 
  wxID_BBPOPUP1BTNENTERMANUALLY, wxID_BBPOPUP1BTNSELECTFROMDATABASE, 
@@ -56,6 +57,8 @@ class BBPopUp1(wx.Dialog):
         self.RetrieveDeleted()
 
     def OnBtnSelectFromDatabaseButton(self, event):
+        self.dbe = DBEditFrame(self, 'Title of the frame', 'uheatpump')
+        self.dbe.Show()
         event.Skip()
 
     def OnBtnEnterManuallyButton(self, event):

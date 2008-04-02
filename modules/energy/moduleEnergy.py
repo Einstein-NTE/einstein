@@ -20,11 +20,13 @@
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
+#                           Tom Sobota          31/03/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
 #       17/03/2008 Changes to graphics.
 #       20/03/2008 Adaptation to changes in interfaces and module HP
+#       31/03/2008 Adaptation to new numpy-based graphics
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,22 +40,14 @@
 
 from sys import *
 from math import *
+from numpy import *
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.heatPump.moduleHP import ModuleHP
+import einstein.modules.matPanel as mP
 
-## TS 2008/03/17 #########################################################################
-#
-# following are two graphic routines for each of the two graphics in the panelEnergy panel.
-# Caution: the routines have the form of class methods (using 'self') but they will NOT
-# be executed in the context of any of the other classes in this file.
-# They will be dynamically bound to the wx widget doing the actual drawing (in panelEnergy.py)
-# For the same reason, even if the routines draw their graphics using the 'matplotlib'
-# package, the package does not have to be imported here.
-#
-##########################################################################################
 def drawEnergyDemand(self):
     # draws Energy Demand graphic
     if not hasattr(self, 'subplot'):
@@ -69,21 +63,10 @@ def drawEnergyDemand(self):
     self.subplot.axis([0, 100, 0, 1e+8])
     self.subplot.legend()
 
-def drawComPerformance(self):
-    # draws Comparative Performance graphic
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    # this is just an example curve
-    # the curve takes it's data from the dictionary Interfaces.GData, with the key 'Energy_CP'
-    self.subplot.pie(Interfaces.GData['Energy_CP'], explode=None,
-                     labels=[' uno ',' dos ',' tres ',' cuatro '],
-                     colors=('b', 'g', 'r', 'c', 'm', 'y', 'k', 'w'),
-                     autopct=None, pctdistance=0.6, labeldistance=1.1, shadow=True)
+class ModuleEnergy(object):
 
-class ModuleEnergy():
-
-    def __init__(self):
-
+    def __init__(self, keys):
+        self.keys = keys
         self.interface = Interfaces()
 
 #..............................................................................
@@ -102,16 +85,23 @@ class ModuleEnergy():
         design assitant window
         """
 #------------------------------------------------------------------------------
-        
+        # send data to GUI panel
         #
-        # TS 2008/03/17 Load graphics data for the panel into Interfaces
-        # Here, the data for the graphics on panelEnergy will be calculated or
-        # extracted from the BD, and stored in the module Interfaces.
-        # The graphics routines will later take the data from there.
+        # grid: Energetic performance
         #
+        data = array([['Steam boiler',   100.0,    2.0,  5.0],
+                      ['CHP',            280.0,    3.0,  3.0],
+                      ['Gas burner',      65.0,    4.0,  2.4],
+                      ['Chiller',        105.0,    5.0,  1.8],
+                      ['Chiller',         35.0,    6.0,  7.3],
+                      ['Total',          585.0,   20.0, 19.5],
+                      ['Energy savings',  65.0,   10.0,  3.0]])
+
+        self.interface.setGraphicsData(self.keys[0], data)
+
+        #print "ModuleEnergy graphics data initialization"
+        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
         
-        self.interface.setGraphicsData('Energy_ED',(self.interface.T, self.interface.QD_T, self.interface.T,self.interface.QA_T))
-        self.interface.setGraphicsData('Energy_CP',[10,20,30,40])
         return "ok"
 
 #------------------------------------------------------------------------------
@@ -313,15 +303,6 @@ class ModuleEnergy():
         else:       #everything is fine
             return 0
 
-    # TS 2008/03/17 Methods for copying the graphic methods.
-    # these are called from panelEnergy
-    def getDrawEnergyDemand(self):
-        global drawEnergyDemand
-        return drawEnergyDemand
-
-    def getDrawComPerformance(self):
-        global drawComPerformance
-        return drawComPerformance
 #==============================================================================
 
 if __name__ == "__main__":
