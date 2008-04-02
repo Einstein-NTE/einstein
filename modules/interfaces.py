@@ -16,11 +16,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
+#	Version No.: 0.09
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Last revised by:    Hans Schweiger      13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #	Last revised by:    Hans Schweiger      21/03/2008
+#       Last revised by:    Stoyan Danov        27/03/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -29,6 +30,7 @@
 #       17/3/2008 Added support for getting and setting graphic values.
 #       21/3/2008 Storage space for full heat supply cascade
 #                   QDh/QAh renamed to QD_Tt, QA_Tt
+#       27/03/2008 getEquipmentCascade(self): adaptation
 #
 #	
 #------------------------------------------------------------------------------		
@@ -89,7 +91,8 @@ class Interfaces(object):
 # DATA BLOCK 2: graphics data dictionary for graphics on panels
 
     GData = {}
-    
+
+   
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
@@ -181,19 +184,27 @@ class Interfaces(object):
 #   gets the equipment list
 #------------------------------------------------------------------------------
 
-#XXX query should be sorted by priority in cascade ...
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
-        self.equipmentsC = Status.DB.qgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipments)
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
+        self.equipmentsC = Status.DB.cgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipmentsC)
         print "Interfaces (getEquipmentCascade): %s equipes found" % self.NEquipe
+
+
+        self.equipments = []
+        for rowC in self.equipmentsC:
+            row = Status.DB.qgenerationhc.QGenerationHC_ID[rowC.QGenerationHC_id][0]
+            self.equipments.append(row)
 
         self.cascade = []
         for j in range(self.NEquipe):
-            equipe = self.equipments[j]
-            self.cascade.append({"equipeID":equipe.QGenerationHC_ID,"equipeNo":j,"equipeType":equipe.EquipType})
+            self.cascade.append({"equipeID":self.equipments[j].QGenerationHC_ID,"equipeNo":self.equipments[j].EqNo,\
+                            "equipeType":self.equipments[j].EquipType,\
+                            "equipePnom":self.equipmentsC[j].HPHeatCap,"equipeCOPh":self.equipmentsC[j].HPHeatCOP,\
+                            "equipeHOp":self.equipmentsC[j].HoursOp})
+
         print "Interfaces (getEquipmentCascade): present cascade", self.cascade
+        
 
 #------------------------------------------------------------------------------		
     def setGraphicsData(self,key, data):

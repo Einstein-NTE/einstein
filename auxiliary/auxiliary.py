@@ -17,15 +17,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	30/01/2008
 #	Revised by:         Tom Sobota          12/03/2008
 #                           Hans Schweiger      21/03/2008
+#       Last revised by:    Stoyan Danov        28/03/2008
 #
 #       Changes:
 #       - introduction of function frange
 #	20/03/08: HP specific functions eliminated. abstract nomenclature of
 #                   list and table interpolation functions
+#       28/03/2008 added: transpose(), firstHigher()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -160,6 +162,35 @@ def interpolateTable(x,xlist,ylist):
             y = ylist[n-1]
 
     return y
+
+#---------------------------------------------------------------------------
+def transpose(T):
+    """ Transposes a matrix (list of lists) interchanging rows with columns
+    """
+    invT = []
+
+    for j in range(len(T[0])):
+        row = []
+        for i in range(len(T)):
+            row.append(T[i][j])
+        invT.append(row)
+
+    return invT
+
+#-----------------------------------------------------------------------------
+def firstHigher(val, ASClist):
+    """Returns the index of the first higher value than val in the
+    ascending values list ASClist"""
+
+    for i in range(len(ASClist)):
+        if val <= ASClist[i]:
+            return i
+        else:
+            continue
+    
+    print 'In auxiliary.py - firstHigher() not found: error!'
+    return 0
+
 
 #------------------------------------------------------------------------------		
 #   3. Others
