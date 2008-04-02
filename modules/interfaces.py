@@ -16,12 +16,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.09
+#	Version No.: 0.10
 #	Created by: 	    Hans Schweiger	10/03/2008
-#	Last revised by:    Hans Schweiger      13/03/2008
-#	Last revised by:    Tom Sobota          17/03/2008
-#	Last revised by:    Hans Schweiger      21/03/2008
-#       Last revised by:    Stoyan Danov        27/03/2008
+#	Revised by:         Hans Schweiger      13/03/2008
+#	                    Tom Sobota          17/03/2008
+#	                    Hans Schweiger      21/03/2008
+#                           Stoyan Danov        27/03/2008
+#                           Hans Schweiger      02/04/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -31,6 +32,7 @@
 #       21/3/2008 Storage space for full heat supply cascade
 #                   QDh/QAh renamed to QD_Tt, QA_Tt
 #       27/03/2008 getEquipmentCascade(self): adaptation
+#       02/04/2008 corrections in getEquipmentCascade
 #
 #	
 #------------------------------------------------------------------------------		
@@ -200,8 +202,7 @@ class Interfaces(object):
         for j in range(self.NEquipe):
             self.cascade.append({"equipeID":self.equipments[j].QGenerationHC_ID,"equipeNo":self.equipments[j].EqNo,\
                             "equipeType":self.equipments[j].EquipType,\
-                            "equipePnom":self.equipmentsC[j].HPHeatCap,"equipeCOPh":self.equipmentsC[j].HPHeatCOP,\
-                            "equipeHOp":self.equipmentsC[j].HoursOp})
+                            "equipePnom":self.equipments[j].HCGPnom})
 
         print "Interfaces (getEquipmentCascade): present cascade", self.cascade
         

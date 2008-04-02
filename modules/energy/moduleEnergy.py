@@ -16,17 +16,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
 #                           Tom Sobota          31/03/2008
+#                           Hans Schweiger      02/04/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
 #       17/03/2008 Changes to graphics.
 #       20/03/2008 Adaptation to changes in interfaces and module HP
 #       31/03/2008 Adaptation to new numpy-based graphics
+#       02/04/2008 Small change in instantiatio of ModuleHP (key included)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -74,7 +76,7 @@ class ModuleEnergy(object):
 
         self.getEquipmentList()
         self.initModule()
-        self.HP = ModuleHP()
+        self.HP = ModuleHP(["HP Table"])
 
 #------------------------------------------------------------------------------
     def initModule(self):

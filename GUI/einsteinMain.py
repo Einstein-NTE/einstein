@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.62
+#	Version No.: 0.63
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -26,6 +26,7 @@
 #                           Hans Schweiger                      24/03/2008
 #                           Hans Schweiger                      25/03/2008
 #                           Tom Sobota                          26/03/2008
+#                           Hans Schweiger                      02/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -38,6 +39,8 @@
 #       24/03/2008  Small changes in calls to PanelBB
 #       25/03/2008  Picture added in main panel
 #       26/03/2008  Suppressed actions on upper level tree items
+#       29/03/2008  Added panels EA2, EH1, EH2 (EH1, EH2 not yet functional)
+#       02/04/2008  Small changes in event handler selectQuestionnaire
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -78,6 +81,10 @@ from panelEA4 import *
 from panelEA5 import *
 from panelEA6 import *
 from panelEM1 import *
+#TS2008-03-29 panelEM2,EH1,EH2 added
+from panelEM2 import *
+#from panelEH1 import *
+#from panelEH2 import *
 
 
 #-----  Global variables 
@@ -2320,6 +2327,10 @@ class EinsteinFrame(wx.Frame):
         self.panelEM1 = PanelEM1(id=-1, name='pageEM1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelEM1.Hide()
 
+        #TS2008-03-29 changed this, added panels EM2, EH1, EH2
+        self.panelEM2 = PanelEM2(id=-1, name='pageEM2', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelEM2.Hide()
+
         ####--- End of pageStatisticPages
 
 
@@ -2566,6 +2577,18 @@ class EinsteinFrame(wx.Frame):
         elif select == 'Monthly demand':
             self.hidePages()
             self.panelEM1.Show()
+        #qStatisticMPage2 'Heat supply - Monthly'
+        elif select == 'Monthly supply':
+            self.hidePages()
+            self.panelEM2.Show()
+        #qStatisticHPage1 'Energy performance - Hourly'
+        elif select == 'Hourly demand':
+            self.hidePages()
+            #self.panelEH1.Show()
+        #qStatisticHPage2 'Heat supply - Hourly'
+        elif select == 'Hourly supply':
+            self.hidePages()
+            #self.panelEH2.Show()
         #
         #
         #qBenchmarkCheck
@@ -2619,7 +2642,7 @@ class EinsteinFrame(wx.Frame):
         elif select == "Energy performance":
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-            self.panelEnergy.mod.initPanel()
+            #self.panelEnergy.mod.initPanel()
             self.panelEnergy.Show()
         #else:
         #    self.hidePages()
@@ -3658,12 +3681,12 @@ class EinsteinFrame(wx.Frame):
                     self.choiceOfEquipmentPage5.Append(n.Equipment)
         self.choiceOfEquipmentPage5.SetSelection(0)
 
+###HS2008-04-02 changed status into Status, alternative-no set to 0
     def selectQuestionnaire(self):
         self.activeQid = Status.DB.questionnaire.Name[self.listBoxQuestionnaresPage0.GetStringSelection()][0].Questionnaire_ID
-        status.PId = self.activeQid
-        self.activeANo = 1
-###HS2008-03-11 Test -> ANo should be initialised to zero
-        status.ANo = self.activeANo
+        Status.PId = self.activeQid
+        self.activeANo = 0
+        Status.ANo = self.activeANo
         
         self.tree.SelectItem(self.qPage1, select=True)
         #self.tc1Page1.SetValue(self.listBoxQuestionnaresPage0.GetStringSelection())

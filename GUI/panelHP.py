@@ -19,12 +19,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	    February 2008
-#	Last revised by:    Hans Schweiger          20/03/2008
+#	Revised by:         Hans Schweiger          20/03/2008
+#                           Hans Schweiger          02/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
+#       02/04/08:   adaptation to format from PanelBB from Tom
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,17 +40,20 @@
 
 import wx
 import wx.grid
-import einstein.modules.heatPump.moduleHP as HP
-import status
+from einstein.modules.heatPump.moduleHP import *
+from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
+from numpy import *
+from einstein.GUI.panelHP_PopUp1 import HPPopUp1
+
 
 
 [wxID_PANELHP, wxID_PANELHPBUTTONPAGEHEATPUMPADD, 
  wxID_PANELHPBUTTONPAGEHEATPUMPBACK, wxID_PANELHPBUTTONPAGEHEATPUMPCANCEL, 
  wxID_PANELHPBUTTONPAGEHEATPUMPFWD, wxID_PANELHPBUTTONPAGEHEATPUMPOK, 
  wxID_PANELHPCB1PAGEHEATPUMP, wxID_PANELHPCHOICEPAGEHEATPUMP, 
- wxID_PANELHPGRIDPAGEHEATPUMP, wxID_PANELHPHPCALCULATE, 
+ wxID_PANELHPGRIDPAGEHP, wxID_PANELHPHPCALCULATE, 
  wxID_PANELHPST10PAGEHEATPUMP, wxID_PANELHPST11PAGEHEATPUMP, 
  wxID_PANELHPST12PAGEHEATPUMP, wxID_PANELHPST1PAGEHEATPUMP, 
  wxID_PANELHPST2PAGEHEATPUMP, wxID_PANELHPST3PAGEHEATPUMP, 
@@ -61,6 +66,17 @@ from einstein.modules.interfaces import *
  wxID_PANELHPTC6PAGEHEATPUMP, wxID_PANELHPTC7PAGEHEATPUMP,
  wxID_PANELHPFIG
 ] = [wx.NewId() for _init_ctrls in range(31)]
+
+#XXX HS2008-04-02: block copied from panelBB
+#
+# constants
+#
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
+GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+
 
 #------------------------------------------------------------------------------		
 #HS2008-03-22: 
@@ -100,10 +116,66 @@ class PanelHP(wx.Panel):
         
         self._init_ctrls(parent)
 
-        self.modHP = HP.ModuleHP()
+	keys = ['HP Table']
+        self.modHP = ModuleHP(keys)
+
+#   graphic: Cumulative heat demand by hours
+        labels_column = 0
+        ignoredrows = []
+        paramList={'labels'      : labels_column,          # labels column
+                   'data'        : 3,                      # data column for this graph
+                   'key'         : keys[0],                # key for Interface
+                   'title'       : 'Some title',           # title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
+                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
         dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, self.getDrawFigure())
         del dummy
+
+#XXXHS2008-04-02: copied block from PanelBB. Tom, please revise
+        #
+        # additional widgets setup
+        # here, we modify some widgets attributes that cannot be changed
+        # directly by Boa. This cannot be done in _init_ctrls, since that
+        # method is rewritten by Boa each time.
+        #
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        key = keys[0]
+        data = Interfaces.GData[key]
+        print "PanelHP (__init__): data = ",data
+        (rows,cols) = data.shape
+        self.gridPageHP.CreateGrid(max(rows,20), cols)
+
+        self.gridPageHP.EnableGridLines(True)
+        self.gridPageHP.SetDefaultRowSize(20)
+        self.gridPageHP.SetRowLabelSize(30)
+        self.gridPageHP.SetColSize(0,115)
+        self.gridPageHP.EnableEditing(False)
+        self.gridPageHP.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.gridPageHP.SetColLabelValue(0, "Short name")
+        self.gridPageHP.SetColLabelValue(1, "Year")
+        self.gridPageHP.SetColLabelValue(2, "Type")
+        self.gridPageHP.SetColLabelValue(3, "Operating\nhours")
+        self.gridPageHP.SetColLabelValue(4, "Power")
+        self.gridPageHP.SetColLabelValue(5, "Temperature")
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(rows):
+            self.gridPageHP.SetRowAttr(r, attr)
+            for c in range(cols):
+                self.gridPageHP.SetCellValue(r, c, data[r][c])
+                if c == labels_column:
+                    self.gridPageHP.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.gridPageHP.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+
+        self.gridPageHP.SetGridCursor(0, 0)
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -130,11 +202,14 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # Grid for display of existing heat pumps
 
-        self.gridpageHeatPump = wx.grid.Grid(id=-1, name='gridpageHeatPump',
-              parent=self, pos=wx.Point(40, 48), size=wx.Size(376, 168),
-              style=0)
-        self.gridpageHeatPump.SetDefaultRowSize(12)
-        self.gridpageHeatPump.EnableEditing(False)
+        self.gridPageHP = wx.grid.Grid(id=wxID_PANELHPGRIDPAGEHP,
+              name='gridpageHP', parent=self, pos=wx.Point(40, 48),
+              size=wx.Size(376, 168), style=0)
+        self.gridPageHP.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
+              self.OnGridPageHPGridCellLeftDclick, id=wxID_PANELHPGRIDPAGEHP)
+        self.gridPageHP.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+              self.OnGridPageHPGridCellRightClick, id=wxID_PANELHPGRIDPAGEHP)
+
 
         self.st1pageHeatpump = wx.StaticText(id=-1,
               label='Existing Heat pumps in the HC system',
@@ -145,6 +220,7 @@ class PanelHP(wx.Panel):
 #       Action buttons and text entry
 #------------------------------------------------------------------------------		
 
+# Button "run design assistant"
         self.hpCalculate = wx.Button(id=wxID_PANELHPHPCALCULATE,
               label='Run design assistant', name='HP_Calculate', parent=self,
               pos=wx.Point(232, 224), size=wx.Size(184, 23), style=0)
@@ -152,10 +228,13 @@ class PanelHP(wx.Panel):
         self.hpCalculate.Bind(wx.EVT_BUTTON, self.OnHpCalculateButton,
               id=wxID_PANELHPHPCALCULATE)
 
+# Button "add heat pump"
         self.buttonpageHeatPumpAdd = wx.Button(id=-1,
               label='add heat pump manually', name='buttonpageHeatPumpAdd',
               parent=self, pos=wx.Point(40, 224), size=wx.Size(184, 23),
               style=0)
+        self.buttonpageHeatPumpAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageHPAddButton,
+              id=-1)
 
         self.st2pageHeatPump = wx.StaticText(id=-1,
               label='Design assistant options:', name='st2pageHeatPump',
@@ -315,6 +394,54 @@ class PanelHP(wx.Panel):
         #updatePlots ???
 
 #------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+    def OnButtonpageHPAddButton(self, event):
+#------------------------------------------------------------------------------		
+#   adds an equipment to the list
+#------------------------------------------------------------------------------		
+        (self.equipe,self.equipeC) = self.modHP.addEquipmentDummy()      #creates space for new equipment in Q/C
+        
+        #show pop-up menu 1: add from where ???
+        pu1 = HPPopUp1(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print 'Accepted'
+        else:
+            self.equipe.delete()         #delete the space created before, if not accepted
+            self.equipeC.delete()
+            print 'Cancelled'
+            
+        Status.SQL.commit()
+        self.modHP.updatePanel()
+
+
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+    def OnGridPageHPGridCellLeftDclick(self, event):
+#------------------------------------------------------------------------------		
+#   adds an equipment to he 
+#------------------------------------------------------------------------------		
+        print "Grid - left button Dclick: here I should call the Q4H"
+        ret = "ok"
+        if (ret=="ok"):
+#            ret = self.modBB.calculateCascade()
+            pass
+        #updatePlots
+
+    def OnGridPageHPGridCellRightClick(self, event):
+        print "Grid - right button click: scroll-up should appear"
+        #here a scroll-up should appear with some options: edit, delete,...
+        RowNo = 1 #number of the selected boiler should be detected depending on the selected row
+        ret = "delete"
+        if (ret=="delete"):
+            # a pop-up should confirm.
+            ret = "ok"
+            if (ret == "ok"):
+                ret = self.modHP.delete(RowNo)
+                ret = self.modHP.calculateCascade()
+        elif (ret == "edit"):
+            OnGridPageBBGridCellLeftDclick(self,event)
+        
+
         
     def OnButton1Button(self, event):
         event.Skip()
@@ -328,5 +455,42 @@ class PanelHP(wx.Panel):
 
     def OnButtonpageHeatPumpFwdButton(self, event):
         event.Skip()
+
+    def OnButtonpageBBOkButton(self, event):
+        saveOption = "save"
+        self.modBB.exitModule(saveOption)
+        self.Hide()
+        print "Button exitModuleOK: now I should go back to HC"
+
+    def OnButtonpageBBCancelButton(self, event):
+        #warning: do you want to leave w/o saving ???
+        saveOption = "save"
+        self.modBB.exitModule(saveOption)
+        self.Hide()
+        print "Button exitModuleCancel: now I should go back to HC"
+
+
+        
+
+    def OnCb1pageBBCheckbox(self, event):
+        self.modBB.storeModulePars()
+
+    def OnChoicepageBBChoice(self, event):
+        self.modBB.storeModulePars()
+
+    def OnTc1pageBBTextEnter(self, event):
+        self.modBB.storeModulePars()
+
+    def OnTc2pageBBTextEnter(self, event):
+        self.modBB.storeModulePars()
+
+    def OnTc3pageBBTextEnter(self, event):
+        self.modBB.storeModulePars()
+
+    def OnTc4pageBBTextEnter(self, event):
+        self.modBB.storeModulePars()
+
+    def OnTc5pageBBTextEnter(self, event):
+        self.modBB.storeModulePars()
 
 

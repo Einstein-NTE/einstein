@@ -19,12 +19,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.05
 #	Created by: 	    Stoyan Danov	    31/01/2008
-#	Last revised by:    Hans Schweiger          22/03/2008
+#	Revised by:         Hans Schweiger          22/03/2008
+#                           Stoyan Danov            27/03/2008
+#                           Stoyan Danov            01/04/2008
+#                           Hans Schweiger          02/04/2008
+#   
 #
 #       Changes to previous version:
 #       22/03/2008 general restructuring and clean-up
+#       27/03/2008 screenEquipments(), initPanel(),initUserDefinedParamHP(), getUserDefinedParamHP()
+#       01/04/2008 deleteE() - to be finished
+#       02/04/2008  __init__: connnetion to sql/DB corrected
+#                   initPanel: adaptation to new panel structure
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,6 +46,7 @@
 
 from sys import *
 from math import *
+from numpy import *
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
@@ -57,14 +66,18 @@ class ModuleHP():
     equipments = None
     cascadeIndex = None
     
-    def __init__(self):
+    def __init__(self,keys):
 #..............................................................................
 # getting list of equipment in SQL
 
+#XXX HS2008-04-02: keys copied here similar to BB. doesn't do anything for the moment
+        self.keys = keys
         self.interface = Interfaces()
 
         self.DB = Status.DB
         self.sql = Status.SQL
+    
+        self.setupid = Status.SetUpId
         
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
@@ -73,6 +86,8 @@ class ModuleHP():
         self.NEquipe = len(self.equipments)
         print "ModuleHP (__init__): %s equipes found"%self.NEquipe
 
+#        self.initUserDefinedParamHP() #puts the user defined parameters from PSetUpData to UHeatPump
+#XXX problems with this function in einsteinMain
 
 #............................................................................................
 #XXXHS2008-03-22: here for testing purposes.
@@ -81,7 +96,44 @@ class ModuleHP():
         self.initPanel()
         self.updatePanel()
 
+#------------------------------------------------------------------------------
+    def getUserDefinedParamHP(self):
+#------------------------------------------------------------------------------
+#   gets the user defined data from UHeatPump and stores it to interfaces to be shown in HP panel
+#------------------------------------------------------------------------------
+
+        uHP = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+
+        #returns to the GUI the default user-defined data to be shown in HP panel
+        self.interface.setGraphicsData('HP UserDef',[uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
+                                                     uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
+
+
+#------------------------------------------------------------------------------
+    def initUserDefinedParamHP(self):
+#------------------------------------------------------------------------------
+#   gets the default user defined data for HP from PSetUpData table. Stores them in UHeatPump.
+#   to be executed only onece when new alternative is created
+#------------------------------------------------------------------------------
+        default = Status.DB.psetupdata.PSetUpData_ID[Status.SetUpId][0]
+        uheatpump = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+
+        uheatpump.UHPType = default.UHPType
+        uheatpump.UHPMinHop = default.UHPMinHop
+        uheatpump.UHPDTMax = default.UHPDTMax
+        uheatpump.UHPmaxT = default.UHPmaxT
+        uheatpump.UHPminT = default.UHPminT
+        uheatpump.UHPTgenIn = default.UHPTgenIn
+
+        self.sql.commit()
         
+##XXX idea aparte:
+##en vez de duplicar todas las columnas de la tabla en UHeatPump en PSetUp, no sería mejor crear una convención tipo
+##PId = -1 en la tabla UHeatPump mismo = espacio reservado para los default values ????
+### La definicion de la sql ahora no permute entrar PId negativo, SD, 28/03/2008, se tiene que cambiar
+
+
+   
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
@@ -90,18 +142,47 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
         HPList = self.screenEquipments()
+
+        print 'test initPanel: HPList =', HPList
+        print 'moduleHP (initPanel): ci = ',self.cascadeIndex
         
 #............................................................................................
 #XXX FOR TESTING PURPOSES ONLY: load default demand
 # here it should be assured that heat demand and availability for position in cascade
 # of presently existing heat pumps is already defined
 
-        self.interface.initCascadeArrays(self.NEquipe)
-       
-#............................................................................................
-#returns HPList to the GUI for displaying in window
-        
-        return (HPList)
+        #creates space/lists for storing the modified QD,QA, assigns total D,A in all positions
+        self.interface.initCascadeArrays(self.NEquipe) 
+
+        print 'moduleHP (initPanel): cascade Arrays initialised '
+
+        #returns HPList to the GUI for displaying in HP panel, table: Existing Heat Pumps
+        self.interface.setGraphicsData('HP Table',[HPList,["o","o","r","r","r","r"]]) 
+#XXX ["o","o","r","r","r","r"] indicates which columns should de shown in the panel: "o" oculto, "r" read only
+#XXX es esto tu idea Hans? SD,28/03/2008
+
+#XXX        self.cascadeIndex = 0 #indicates first in list of modyfied demand and availability: total D,A to be shown in plot
+#XXX esto sobreescribe el posicionamento de cascadeIndex que has hecho en screenEquipments !!! realmente quieres eso ... ???
+#XXX si, cuando se inicia el panel queria que mostrara las curvas totales, mientras que si se utiliza en otro lugar,
+#XXX que apunte a las ultimas, no se si sera necesario llamar screenEquipments en otro lugar, por si acaso...SD,28/03/2008
+
+        #returns to the GUI the lists to dislay the plot in HP panel. Initially shows the total heat demand and availability 
+        self.interface.setGraphicsData('HP Plot',[self.interface.T, 
+                                                      self.interface.QD_T_mod[self.cascadeIndex],
+                                                      self.interface.QA_T_mod[self.cascadeIndex],
+                                                      self.interface.QD_T_mod[self.cascadeIndex+1],
+                                                      self.interface.QA_T_mod[self.cascadeIndex+1]])
+
+        #returns to the GUI the pinch temperature and the temperature gap to be shown in HP panel (below graphic)
+        #XXX Define where they come from.....SD,27.03.2008
+#        self.interface.setGraphicsData('HP Info',[ TPinch, TGap])
+
+#        self.initUserDefinedParamHP() #puts the user defined parameters from PSetUpData to UHeatPump
+#XXX problems with this function in einsteinMain
+
+        self.getUserDefinedParamHP() #returns to the GUI the default user-defined data to be shown in HP panel
+
+        print 'moduleHP (initPanel): reached the end '
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -112,7 +193,20 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
         self.interface.getEquipmentCascade()
-        self.cascadeIndex = 0
+        HPList = []
+        for row in self.interface.cascade:
+            if row['equipeType'] == 'Heat pump':
+                HPList.append(row)
+
+        if(len(HPList)>0):
+            self.cascadeIndex = len(HPList)-1 #by default sets selection to last HP in cascade
+        else:
+            self.cascadeIndex = 0
+#XXXHS2008-04-02: he puesto cascadeIndex a 0 en vez de None: check que sea consistente esto ...
+
+#        print '\n cascadeIndex =', self.cascadeIndex
+        
+        return HPList
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -129,6 +223,20 @@ class ModuleHP():
         print self.interface.QD_T_mod[self.cascadeIndex]
         print self.interface.QA_T_mod[self.cascadeIndex]
         
+#XXX TESTING ONLY TESTING ONLY TESTING ONLY
+        print "ModuleHP (updatePanel): setting HP list dummy for testing"
+        
+        # plot to be displayed
+	# this is how the data should be set up
+	# (this data are just an example!)
+        data = array([['HP 1', 2004, 'Type 1', 3000, 100, 120],
+		      ['HP 2', 2006, 'Type 1', 4500, 120, 140],
+                      ['HP 3', 2007, 'Type 2', 5000,  80, 130]])
+
+
+        print "ModuleHP (updatePanel): key = ",self.keys[0]
+        self.interface.setGraphicsData(self.keys[0], data)
+
         # plot to be displayed
         try:
             self.interface.setGraphicsData('HP Plot',[self.interface.T,
@@ -177,7 +285,7 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def delete(HPid):
+    def deleteE(self,HPid):
 #------------------------------------------------------------------------------
         """
         deletes the selected heat pump in the current alternative
@@ -185,9 +293,64 @@ class ModuleHP():
 #------------------------------------------------------------------------------
         print "deleteHP: function not yet defined"
 
-        #--> delete HP from the equipment list under current alternative
+        #--> delete HP from the equipment list under current alternative #from C&QGenerationHC under ANo
         
+        eq = self.equipments.QGenerationHC_ID[HPid][0] #select the corresponding rows to HPid in both tables
+        eqC = self.equipmentsC.QGenerationHC_id[HPid][0]
+
+        eq.delete() #deletes the rows in both tables, to be activated later, SD
+        eqC.delete()
+        self.sql.commit()
+
+        #actuallise the cascade list: define deleteFromCascade
+        self.deleteFromCascade(self.interface.cascade, HPid)
+
+        #actuallize the CascadeIndex & EqNo in C,QGen..HC tables
+
+        #change self.cascadeIndex -> to appoint the next in list
+        
+
 #------------------------------------------------------------------------------
+    def deleteFromCascade(self, cascade, HPid):
+#------------------------------------------------------------------------------
+        """
+        deletes from the actual list casade and re-assigns the CascadeIndex values in CGenerationHC table
+        """
+#-----------------------------------------------------------------------------
+
+        print '\n deleteFromCascade():', 'cascade =', cascade
+
+        idx = -1
+        new_cascade = cascade
+        for i in range(len(new_cascade)):
+            if new_cascade[i]['equipeID'] == HPid:
+                idx = i
+
+        new_cascade.pop(idx)           
+
+        for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
+            eqC = self.equipmentsC.QGenerationHC_id[new_cascade[i]['equipeID']][0]
+            eqC.CascadeIndex = i+1
+            print '\n new_CascadeIndex', eqC.CascadeIndex
+            
+#        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
+
+        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
+
+
+        
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+##        print '\n \nequipments', equipments
+
+        for i in range(len(equipments)): #assign new EqNo in QGenerationHC table
+            equipments[i].EqNo = i+1
+
+#        self.sql.commit() #to be activated, SD
+
+
+
+
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):
 #------------------------------------------------------------------------------
@@ -201,6 +364,8 @@ class ModuleHP():
 #       depending if the equipment is a base load equipment or a peak load one
 
 #for the moment the HP Module works always on Eq. 0 / CI 0
+        print 'moduleHP (addEquipmentDummy): cascade Arrays initialised '
+
         self.cascadeIndex = 0
         self.equipe = self.equipments[0]
         self.equipeC = self.equipmentsC[0]
@@ -663,7 +828,10 @@ if __name__ == "__main__":
     
     Status.PId = 2
     Status.ANo = 0
+    Status.SetUpId = 1 #this is PSetUpData_ID
 
+    HPid = 6
+    
     interf = Interfaces()
 
 #    modE = ModuleEnergy()
@@ -671,5 +839,6 @@ if __name__ == "__main__":
 
     mod = ModuleHP()
     mod.initPanel()
-    mod.designAssistant1()
-    mod.designAssistant2(12)
+#    mod.deleteE(HPid)
+##    mod.designAssistant1()
+##    mod.designAssistant2(12)
