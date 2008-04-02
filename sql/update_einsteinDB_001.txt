@@ -1,0 +1,10 @@
+--select database
+USE einstein;
+
+-- add new columns to an existing table - QGenerationHC
+ALTER TABLE QGenerationHC ADD COLUMN EqNo INTEGER NOT NULL COMMENT 'No. of equipment by order of Questionnaire filling' AFTER EquipIDFromDB;
+
+-- add new columns to CGenerationHC
+ALTER TABLE CGenerationHC ADD COLUMN CascadeIndex INTEGER NOT NULL COMMENT 'No. of equipment for cascade evaluation sequence' AFTER HGEffAvg;
+--consider if CascadeIndex should not be also PRIMARY KEY (assure non repetitiveness)
+
