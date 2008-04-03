@@ -69,7 +69,7 @@ def drawEnergyDemand(self):
 
 class ModuleEnergy(object):
 
-    def __init__(self, parent, keys):
+    def __init__(self, keys):
         self.keys = keys
         self.interface = Interfaces()
 
@@ -78,8 +78,6 @@ class ModuleEnergy(object):
 
         self.getEquipmentList()
         self.initModule()
-#        self.modules = parent
-#        self.HP = parent.moduleHP
 
 #------------------------------------------------------------------------------
     def initModule(self):
@@ -287,7 +285,7 @@ class ModuleEnergy(object):
                 if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL":
                     print "======================================"
                     print "heat pump"
-                    self.modules.moduleHP.calculateEnergyFlows(equipe,equipeC,cascadeIndex)
+                    Status.mod.moduleHP.calculateEnergyFlows(equipe,equipeC,cascadeIndex)
                     print "end heat pump"
                     print "======================================"
                 elif equipe.EquipType == "Boiler":

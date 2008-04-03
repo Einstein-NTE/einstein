@@ -67,7 +67,7 @@ class ModuleHP():
     equipments = None
     cascadeIndex = None
     
-    def __init__(self,parent,keys):
+    def __init__(self,keys):
 #..............................................................................
 # getting list of equipment in SQL
 
@@ -607,7 +607,7 @@ class ModuleHP():
             self.setEquipmentFromDB(self.equipe,modelID) #add selected equipment to the equipment list
             print "ModuleHP: heat pump added. model no: ",modelID
 
-#        ModuleEnergy.runSimulation()
+        Status.mod.moduleEnergy.runSimulation()
         self.updatePanel()
                                 
         

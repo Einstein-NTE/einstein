@@ -44,17 +44,17 @@ class Modules(object):
 #------------------------------------------------------------------------------		
         keys = ['ENERGY'] 
         print "Modules (__init__): energy - starting"
-        self.moduleEnergy = ModuleEnergy(self,keys)
+        self.moduleEnergy = ModuleEnergy(keys)
         print "Modules (__init__): energy",self.moduleEnergy
 
         keys = ['HP Table'] 
         print "Modules (__init__): HP - starting"
-        self.moduleHP = ModuleHP(self,keys)
+        self.moduleHP = ModuleHP(keys)
         print "Modules (__init__): HP",self.moduleHP
         
         keys = ['BB Table'] 
         print "Modules (__init__): BB - starting"
-        self.moduleBB = ModuleBB(self,keys)
+        self.moduleBB = ModuleBB(keys)
         print "Modules (__init__): energy",self.moduleBB
        
 #------------------------------------------------------------------------------		

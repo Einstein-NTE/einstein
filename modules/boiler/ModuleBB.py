@@ -54,10 +54,9 @@ class ModuleBB(object):
 
     BBList = []
     
-    def __init__(self, parent,keys):
+    def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
         self.interface = Interfaces()
-        self.modules = parent
 
         self.DB = Status.DB
         self.sql = Status.SQL
