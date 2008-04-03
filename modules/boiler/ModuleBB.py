@@ -21,12 +21,14 @@
 #                           Enrico Facci /
 #                           Hans Schweiger      24/03/2008
 #                           Tom Sobota           1/04/2008
+#                           Hans Schweiger      03/04/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
 #       2008-03-24  Incorporated "calculateEnergyFlows" from Enrico Facci
 #                   - adapted __init__ and plots similar to moduleHP
 #       1/04/2008   Adapted to new graphics interfase using numpy
+#       03/04/2008  Link to modules via Modules
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,9 +54,10 @@ class ModuleBB(object):
 
     BBList = []
     
-    def __init__(self, keys):
+    def __init__(self, parent,keys):
         self.keys = keys # the key to the data is sent by the panel
         self.interface = Interfaces()
+        self.modules = parent
 
         self.DB = Status.DB
         self.sql = Status.SQL
@@ -112,7 +115,7 @@ class ModuleBB(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
-        print "ModuleHP (updatePanel): data for panel are copied to interface"
+        print "ModuleBB (updatePanel): data for panel are copied to interface"
         
         # plot to be displayed
 	# this is how the data should be set up

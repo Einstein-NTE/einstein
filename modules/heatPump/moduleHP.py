@@ -25,6 +25,7 @@
 #                           Stoyan Danov            27/03/2008
 #                           Stoyan Danov            01/04/2008
 #                           Hans Schweiger          02/04/2008
+#                           Hans Schweiger          03/04/2008
 #   
 #
 #       Changes to previous version:
@@ -33,6 +34,7 @@
 #       01/04/2008 deleteE() - to be finished
 #       02/04/2008  __init__: connnetion to sql/DB corrected
 #                   initPanel: adaptation to new panel structure
+#       03/04/2008 receives moduleEnergy from Modules
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,8 +54,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.constants as CONST
-#from einstein.modules.energy.moduleEnergy import ModuleEnergy
-#XXXHS2008-03-22: crossed imports between ModuleEnergy and ModuleHP seems to give problems
+#from einstein.modules.modules import Modules
 
 EPS_COP = 1.e-4
 EPS_TEMP = 1.e-4
@@ -66,7 +67,7 @@ class ModuleHP():
     equipments = None
     cascadeIndex = None
     
-    def __init__(self,keys):
+    def __init__(self,parent,keys):
 #..............................................................................
 # getting list of equipment in SQL
 

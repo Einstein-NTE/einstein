@@ -23,10 +23,12 @@
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
+#                           Hans Schweiger          03/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
 #       02/04/08:   adaptation to format from PanelBB from Tom
+#       03/04/08:   adaptation to structure Modules
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -40,10 +42,11 @@
 
 import wx
 import wx.grid
-from einstein.modules.heatPump.moduleHP import *
+#from einstein.modules.heatPump.moduleHP import *
 from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
+from einstein.modules.modules import *
 from numpy import *
 from einstein.GUI.panelHP_PopUp1 import HPPopUp1
 
@@ -117,7 +120,8 @@ class PanelHP(wx.Panel):
         self._init_ctrls(parent)
 
 	keys = ['HP Table']
-        self.modHP = ModuleHP(keys)
+        self.modHP = Status.mod.moduleHP
+        print "PanelHP (__init__): modHP created",self.modHP
 
 #   graphic: Cumulative heat demand by hours
         labels_column = 0

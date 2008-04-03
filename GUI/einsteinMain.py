@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.63
+#	Version No.: 0.64
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -27,6 +27,7 @@
 #                           Hans Schweiger                      25/03/2008
 #                           Tom Sobota                          26/03/2008
 #                           Hans Schweiger                      02/04/2008
+#                           Hans Schweiger                      03/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -41,6 +42,8 @@
 #       26/03/2008  Suppressed actions on upper level tree items
 #       29/03/2008  Added panels EA2, EH1, EH2 (EH1, EH2 not yet functional)
 #       02/04/2008  Small changes in event handler selectQuestionnaire
+#       03/04/2008  Instance of moduleEnergy created in main
+#                   Function connectToDB out of EinsteinFrame
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -93,7 +96,25 @@ PList = {}      # PList stores the Parameterlist
 #----- Constants
 qPageSize = (800, 600) # this would be better in Status?
 
+def connectToDB():
+    
+        doLog = HelperClass.LogHelper()
+        conf = HelperClass.ConfigHelper()
+        doLog.LogThis('Starting program')
 
+        DBHost = conf.get('DB', 'DBHost')
+        DBUser = conf.get('DB', 'DBUser')
+        DBPass = conf.get('DB', 'DBPass')
+        DBName = conf.get('DB', 'DBName')
+        LANGUAGE = conf.get('GUI', 'LANGUAGE')
+        doLog.LogThis('Reading config done')
+        
+        #----- Connect to the Database
+        Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
+        Status.DB =  pSQL.pSQL(Status.SQL, DBName)
+        print "database assigned to status variable " + repr(Status.DB)
+        
+        doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
 
 
 #------------------------------------------------------------------------------		
@@ -115,19 +136,19 @@ class EinsteinFrame(wx.Frame):
 
         global activeQid
         self.activeQid = 0
-        DBHost = conf.get('DB', 'DBHost')
-        DBUser = conf.get('DB', 'DBUser')
-        DBPass = conf.get('DB', 'DBPass')
-        DBName = conf.get('DB', 'DBName')
+#        DBHost = conf.get('DB', 'DBHost')
+#        DBUser = conf.get('DB', 'DBUser')
+#        DBPass = conf.get('DB', 'DBPass')
+#        DBName = conf.get('DB', 'DBName')
         LANGUAGE = conf.get('GUI', 'LANGUAGE')
         doLog.LogThis('Reading config done')
         
         #----- Connect to the Database
-        Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
-        Status.DB =  pSQL.pSQL(Status.SQL, DBName)
-        print "database assigned to status variable " + repr(Status.DB)
+#        Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
+#        Status.DB =  pSQL.pSQL(Status.SQL, DBName)
+#        print "database assigned to status variable " + repr(Status.DB)
         
-        doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
+#        doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
 
         #----- Import the Parameterfile
         global PList
@@ -4152,15 +4173,21 @@ class EinsteinFrame(wx.Frame):
         
 if __name__ == '__main__':
     from einstein.modules.interfaces import Interfaces
+    from einstein.modules.modules import Modules
 
     Status.PId=2 # just for testing!
     Status.ANo=0
 
+    connectToDB()
+
+    interf = Interfaces()       
+    interf = None
+
+    Status.mod = Modules()
+
     app = wx.PySimpleApp()
     frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
-    interf = Interfaces()       #HS2008-03-22: NT and Nt no longer needed as arguments
-#HS2008-03-22 - eliminated:    interf.chargeCurvesQDQA()
-    interf = None
+    
     frame.Show(True)
     app.MainLoop()
 

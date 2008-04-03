@@ -12,13 +12,15 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
-#	Created by: 	    ?
+#	Version No.: 0.02
+#	Created by: 	    Hans Schweiger
 #       Revised by:         Tom Sobota 31/03/2008
 #                           Tom Sobota 31/03/2008
+#                           Hans Schweiger  03/04/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
+#       03/04/08:           moduleEnergy passed from Interfaces
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,7 +34,9 @@
 
 import wx
 from status import Status
-from einstein.modules.energy.moduleEnergy import *
+#from einstein.modules.energy.moduleEnergy import *
+from einstein.modules.interfaces import *
+from einstein.modules.modules import *
 from einstein.GUI.graphics import drawPiePlot
 import einstein.modules.matPanel as Mp
 
@@ -61,7 +65,8 @@ class PanelEnergy(wx.Panel):
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
         keys = ['ENERGY'] 
-        self.mod = ModuleEnergy(keys)
+#        self.mod = ModuleEnergy(keys)
+        self.mod = Status.mod.moduleEnergy
         labels_column = 0
 
         # remaps drawing methods to the wx widgets.

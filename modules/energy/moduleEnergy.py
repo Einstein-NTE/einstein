@@ -16,12 +16,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.06
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
 #                           Tom Sobota          31/03/2008
 #                           Hans Schweiger      02/04/2008
+#                           Hans Schweiger      03/04/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -29,6 +30,7 @@
 #       20/03/2008 Adaptation to changes in interfaces and module HP
 #       31/03/2008 Adaptation to new numpy-based graphics
 #       02/04/2008 Small change in instantiatio of ModuleHP (key included)
+#       03/04/2008 Link to modules via parent (= Modules)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -67,7 +69,7 @@ def drawEnergyDemand(self):
 
 class ModuleEnergy(object):
 
-    def __init__(self, keys):
+    def __init__(self, parent, keys):
         self.keys = keys
         self.interface = Interfaces()
 
@@ -76,7 +78,8 @@ class ModuleEnergy(object):
 
         self.getEquipmentList()
         self.initModule()
-        self.HP = ModuleHP(["HP Table"])
+#        self.modules = parent
+#        self.HP = parent.moduleHP
 
 #------------------------------------------------------------------------------
     def initModule(self):
@@ -116,7 +119,7 @@ class ModuleEnergy(object):
         self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
         self.equipmentsC = Status.DB.qgenerationhc.sql_select(sqlQuery)
         self.NEquipe = len(self.equipments)
-        print "%s equipes found" % self.NEquipe
+        print "ModuleEnergy (getEquipmentList): %s equipes found" % self.NEquipe
 
         Interfaces.cascade = []
         for j in range(self.NEquipe):
@@ -284,7 +287,7 @@ class ModuleEnergy(object):
                 if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL":
                     print "======================================"
                     print "heat pump"
-                    self.HP.calculateEnergyFlows(equipe,equipeC,cascadeIndex)
+                    self.modules.moduleHP.calculateEnergyFlows(equipe,equipeC,cascadeIndex)
                     print "end heat pump"
                     print "======================================"
                 elif equipe.EquipType == "Boiler":

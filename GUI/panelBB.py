@@ -19,12 +19,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
+#                           Hans Schweiger          03/04/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
+#       03/04/2008:         Adaptation to structure Modules
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,7 +40,7 @@
 
 import wx
 from einstein.GUI.graphics import drawPiePlot
-from einstein.modules.boiler.ModuleBB import *
+from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
 from einstein.GUI.panelBB_PopUp1 import BBPopUp1
 
@@ -72,8 +74,10 @@ class PanelBB(wx.Panel):
 
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
-	keys = ['BB Plot']
-        self.modBB = ModuleBB(keys)  #creates and initialises module
+	keys = ['BB Table']
+#        self.modBB = ModuleBB(keys)  #creates and initialises module
+        self.modBB = Status.mod.moduleBB
+        
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
 #==============================================================================
