@@ -33,7 +33,9 @@
 #
 #==============================================================================
 
+from einstein.modules.moduleA import ModuleA
 from einstein.modules.energy.moduleEnergy import ModuleEnergy
+from einstein.modules.moduleHC import ModuleHC
 from einstein.modules.heatPump.moduleHP import ModuleHP
 from einstein.modules.boiler.moduleBB import ModuleBB
 
@@ -42,11 +44,21 @@ class Modules(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
+        keys = ['A Table'] 
+        print "Modules (__init__): A - starting"
+        self.moduleA = ModuleA(keys)
+        print "Modules (__init__): A",self.moduleA
+        
         keys = ['ENERGY'] 
         print "Modules (__init__): energy - starting"
         self.moduleEnergy = ModuleEnergy(keys)
         print "Modules (__init__): energy",self.moduleEnergy
 
+        keys = ['HC Table'] 
+        print "Modules (__init__): HC - starting"
+        self.moduleHC = ModuleHC(keys)
+        print "Modules (__init__): HC",self.moduleHC
+        
         keys = ['HP Table'] 
         print "Modules (__init__): HP - starting"
         self.moduleHP = ModuleHP(keys)

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.64
+#	Version No.: 0.65
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -44,6 +44,7 @@
 #       02/04/2008  Small changes in event handler selectQuestionnaire
 #       03/04/2008  Instance of moduleEnergy created in main
 #                   Function connectToDB out of EinsteinFrame
+#                   Second update: PanelHC and PanelA added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -70,12 +71,14 @@ from status import Status #processing status of the tool
 import DBEditFrame
 import PreferencesFrame
 
-#--- Module Frames
-#HS2008-03-12 panelEnergy added
+#--- Module Panels
 from panelCCheck import *
+from panelA import *
+from panelHC import *
 from panelHP import *
 from panelBB import *
 from panelEnergy import *
+
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
 from panelEA2 import *
@@ -84,7 +87,6 @@ from panelEA4 import *
 from panelEA5 import *
 from panelEA6 import *
 from panelEM1 import *
-#TS2008-03-29 panelEM2,EH1,EH2 added
 from panelEM2 import *
 #from panelEH1 import *
 #from panelEH2 import *
@@ -2360,34 +2362,31 @@ class EinsteinFrame(wx.Frame):
         self.pageBenchmarkCheck.Hide()
         ####--- End of pageBenchmarkCheck
 
-
-
         ####----PAGE pageHeatRecoveryTargets
         #self.pageHeatRecoveryTargets = wx.Panel(id=-1, name='pageHeatRecoveryTargets', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
         #self.pageHeatRecoveryTargets.Hide()
         ####--- End of pageHeatRecoveryTargets
 
-
-
-        ####----PAGE pageOptimisationProposals
-        self.pageOptimisationProposals = wx.Panel(id=-1, name='pageOptimisationProposals', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageOptimisationProposals.Hide()
-        ####--- End of pageOptimisationProposals
-
-###HS2008-03-07: Heat Pump page definition and lay-out moved to file
-
-        ####--- Page HeatPump
-        self.pageHeatPump = PanelHP(id=-1, name='pageHeatPump', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
-        self.pageHeatPump.Hide()
-#        self.drawPageHeatPump()
+        ####--- Page Alternatives
+        self.panelA = PanelA(id=-1, name='panelA', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelA.Hide()
         ####--- End op pageHeatPump
+
+        ####--- Page H&C Supply
+        self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelHC.Hide()
+        ####--- End op pageHeatPump
+
+        ####--- PanelHP
+        self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
+        self.panelHP.Hide()
+        ####--- End op panelHP
 
         ####--- Page Boilers
-        self.pageBB = PanelBB(id=-1, name='pageBB', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.pageBB.Hide()
-        ####--- End op pageHeatPump
+        self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelBB.Hide()
+        ####--- End op panelHP
 
-#HS2008-03-12: added
         ####--- Panel Energy
         self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelEnergy.Hide()
@@ -2619,12 +2618,10 @@ class EinsteinFrame(wx.Frame):
             #self.pageBenchmarkCheck.Show()
             pass
         #qOptimisationProposals
-        elif select == PList["X145"][1]:
-            #TS 2008-3-26 No action here
-            #self.hidePages()
-            #self.pageOptimisationProposals.Show()
-            pass
-        #qFinalReport
+        elif select == PList["X145"][1]:        #generation of alternatives
+            self.hidePages()
+            self.panelA.Show()
+
         elif select == PList["X147"][1]:
             #TS 2008-3-26 No action here
             #self.hidePages()
@@ -2642,13 +2639,13 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X150"][1]:
             self.hidePages()
             self.pageFinalReport.Show()
-        #pageHeatPump
+        #panelHP
         elif select == "Heat Pumps":
             ret = self.OnEnterHeatPumpPage()
             if  ret == 0:
                 self.hidePages()
-                self.pageHeatPump.modHP.initPanel()
-                self.pageHeatPump.Show()
+                self.panelHP.modHP.initPanel()
+                self.panelHP.Show()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
 ###HS2008-03-07
@@ -2656,8 +2653,8 @@ class EinsteinFrame(wx.Frame):
         elif select == "Boilers & burners":
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-            self.pageBB.modBB.initPanel()
-            self.pageBB.Show()
+            self.panelBB.modBB.initPanel()
+            self.panelBB.Show()
 ###HS2008-03-12
         #panelEnergy
         elif select == "Energy performance":
@@ -2665,12 +2662,11 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             #self.panelEnergy.mod.initPanel()
             self.panelEnergy.Show()
-        #else:
-        #    self.hidePages()
-            
-            
-    ########## DrawPages
-###HS2008-03-07 -> drawPageHeatPump eliminated (-> moved to FrameHP        
+
+###HS2008-04-03
+        elif select == "H&C Supply":
+            self.hidePages()
+            self.panelHC.Show()
 
 
 #------------------------------------------------------------------------------
@@ -3588,8 +3584,8 @@ class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------		
     def OnEnterHeatPumpPage(self):
         if self.activeQid <> 0:
-            #ret = self.ModBridge.StartPageHeatPump(Status.SQL, DB, self.activeQid)
-            #self.showInfo("Return of StartPageHeatPump %s" %(ret))
+            #ret = self.ModBridge.StartpanelHP(Status.SQL, DB, self.activeQid)
+            #self.showInfo("Return of StartpanelHP %s" %(ret))
             return 0
         else:
             self.showError("Select Questionnaire first!")
@@ -3611,9 +3607,11 @@ class EinsteinFrame(wx.Frame):
         self.Page6.Hide()
         self.Page7.Hide()
         self.Page8.Hide()
+
         self.pageDataCheck.Hide()
         self.pageDataCheckPage1.Hide()
         self.pageDataCheckPage2.Hide()
+
         #self.pageStatistics.Hide()
         self.panelEA1.Hide()
         self.panelEA2.Hide()
@@ -3622,13 +3620,19 @@ class EinsteinFrame(wx.Frame):
         self.panelEA5.Hide()
         self.panelEA6.Hide()
         self.panelEM1.Hide()
+        self.panelEM2.Hide()
         self.pageBenchmarkCheck.Hide()
         #self.pageHeatRecoveryTargets.Hide()
-        self.pageOptimisationProposals.Hide()
-        self.pageFinalReport.Hide()
-        self.pageHeatPump.Hide()
-        self.pageBB.Hide()
+
+        self.panelA.Hide()
+
+        self.panelHC.Hide()
+        self.panelHP.Hide()
+        self.panelBB.Hide()
         self.panelEnergy.Hide()
+        self.panelHC.Hide()
+
+        self.pageFinalReport.Hide()
 
     def showError(self, message):
         dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
