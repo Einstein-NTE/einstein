@@ -18,14 +18,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Last revised by:    Hans Schweiger      20/03/2008
+#                           Hans Schweiger      05/04/2008
 #
 #       Changes in last update:
 #       - NT and Nt added
 #       20/03/08: 
-#	
+#       05/04/08:     some renaming (see ParameterList v0.31);
+#                     identification of data blocks that should
+#                     be included in SQL in future versions
+#
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -37,13 +41,14 @@
 #==============================================================================
 
 class Status(object):
-  PId = None #Active project identity
-  ANo = None #Active alternative under processing
+  PId = None #Active project identity [==> SQL: ActiveProject]
+  ANo = None #Active alternative under processing [==> SQL: ActiveAlternative]
   SetUpId = 0 #Active configuration
   DB = None
   SQL = None
   #------------------------------------------------------------------------------		
-  # Statistical data of project
+  # Statistical data of project [==> SQL Table STATUS]
+  
   ProjectCreationDate = None
   ProjectFinalisationDate = None
   LastModificationDate = None
@@ -51,24 +56,24 @@ class Status(object):
   ConfidentialityLevel = "Public"
 
   #------------------------------------------------------------------------------		
-  # Tool interface configuration
+  # Tool interface configuration [==> SQL Table STATUS]
 
   InteractionLevel = "interactive" # Selected level of user interaction
   LanguageTool = "english"         # Selected language for tool interface
-  LanguageReport = "english"       # Selected language for report
   Units = "SI"                     # System of units (default: SI)
   Country = "Spain"                # Configuration for country specific aids ... NOT USED AT PRESENT
   UserType = "Expert"              # type of user: expert, student, end-user ... ???
 
   #------------------------------------------------------------------------------		
-  # Status of processing
+  # Status of processing [==> SQL Table STATUS]
 
   DataImportOK = False
   ConsistencyCheckOK = False
-  NumberOfAlternatives = 0
+  NoOfAlternatives = 0
   AlternativesOK =[]
   ComparativeAnalysisOK = False
   ReportOK = False
+  LanguageReport = "english"       # Selected language for report
 
   #------------------------------------------------------------------------------		
   # Tool configuration
