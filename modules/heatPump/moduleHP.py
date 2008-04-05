@@ -26,6 +26,7 @@
 #                           Stoyan Danov            01/04/2008
 #                           Hans Schweiger          02/04/2008
 #                           Hans Schweiger          03/04/2008
+#                           Stoyan Danov            03/04/2008
 #   
 #
 #       Changes to previous version:
@@ -35,6 +36,7 @@
 #       02/04/2008  __init__: connnetion to sql/DB corrected
 #                   initPanel: adaptation to new panel structure
 #       03/04/2008 receives moduleEnergy from Modules
+#       03/04/2008 SD: addEquipmentDummy, setEquipmentFromDB
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -79,7 +81,8 @@ class ModuleHP():
         self.sql = Status.SQL
     
         self.setupid = Status.SetUpId
-        
+
+        self.neweqs = 0 #new equips added
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
@@ -366,30 +369,114 @@ class ModuleHP():
 
 #for the moment the HP Module works always on Eq. 0 / CI 0
         print 'moduleHP (addEquipmentDummy): cascade Arrays initialised '
+##
+##        self.cascadeIndex = 0
+##        self.equipe = self.equipments[0]
+##        self.equipeC = self.equipmentsC[0]
+##        return(self.equipe,self.equipeC)
 
-        self.cascadeIndex = 0
-        self.equipe = self.equipments[0]
-        self.equipeC = self.equipmentsC[0]
+        self.neweqs += 1 #No of last equip added
+
+        CascadeIndex = self.NEquipe + 1
+
+        NewEquipmentName = "New heat pump %s"%(self.neweqs)
+        
+        EqNo = self.NEquipe + 1
+        print 'CascadeIndex', CascadeIndex
+        dic = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"HeatPump"}
+        QGid = self.DB.qgenerationhc.insert(dic)
+        dicC = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"QGenerationHC_id":QGid,"CascadeIndex":CascadeIndex}
+        CGid = self.DB.cgenerationhc.insert(dicC)
+
+        Status.SQL.commit()
+
+        print "new equip row created"
+        
+        self.cascadeIndex = CascadeIndex - 1 #appoints the last (cascadeIndex starts from 0, CascadeIndex starts from 1)
+
+        print "self.cascadeIndex", self.cascadeIndex
+
+        self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
+        self.equipeC = self.equipmentsC.CGenerationHC_ID[CGid][0]
         return(self.equipe,self.equipeC)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def setEquipmentFromDB(self,equipe,modelID):
+    def setEquipmentFromDB(self,equipe,equipeC,modelID):
 #------------------------------------------------------------------------------
 #   takes an equipment from the data base and stores it under a given Id in
 #   the equipment data base
 #------------------------------------------------------------------------------
 
-        model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
-        equipe.Model = model.HPModel
-        equipe.EquipType = "HP " + model.HPType
-        equipe.HCGPnom = model.HPHeatCap
-        equipe.HCGTEfficiency = model.HPHeatCOP
+##        model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
+##        equipe.Model = model.HPModel
+##        equipe.EquipType = "HP " + model.HPType
+##        equipe.HCGPnom = model.HPHeatCap
+##        equipe.HCGTEfficiency = model.HPHeatCOP
+##
+##        print "HP Model: ",model.HPModel, "Type: ",model.HPType," Cap.: ",model.HPHeatCap
+##        
+###        Status.DB.commit()
+###XXX TO BE CHECKED ...
 
-        print "HP Model: ",model.HPModel, "Type: ",model.HPType," Cap.: ",model.HPHeatCap
+        model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
+
+##        tmpEquipe = {
+##            "HCGPnom":model.HPHeatCap,
+##            "HCGTEfficiency":model.HPThHeatCOP,
+##            "Manufact":model.HPManufacturer,
+##            "Model":model.HPModel,
+##            "ElectriConsum":model.HPElectConsum,
+##            "EquipTypeFromDB":model.HPType,
+##            "EquipIDFromDB":model.DBHeatPump_ID
+##            }
+##        equipe.update(tmpEquipe)
+##        Status.SQL.commit()
+##
+##        tmpEquipeC = {
+##            "HPSubType":model.HPSubType,
+##            "HPWorkFluid":model.HPWorkFluid,
+##            "HPExHeatCOP":model.HPExHeatCOP,
+##            "HPThHeatCOP":model.HPThHeatCOP
+####            "HPAbsTinH":model.HPAbsTinH, #to consider if leaving
+####            "HPCondTinH":model.HPCondTinH, #to consider if leaving
+####            "HPGenTinH":model.HPGenTinH, #to consider if leaving
+####            "HPLimDT":model.HPLimDT, #to consider if leaving
+####            "HPPrice":model.HPPrice, #change to generic - without HP in sqlDB
+####            "HPTurnKeyPrice":model.HPTurnKeyPrice, #change to generic - without HP in sqlDB
+####            "HPOandMvar":model.HPOandMvar #change to generic - without HP in sqlDB
+##            }
+##        equipeC.update(tmpEquipeC)
+##        Status.SQL.commit()
+
+
         
-#        Status.DB.commit()
-#XXX TO BE CHECKED ...
+        equipe.update({"HCGPnom":model.HPHeatCap})
+        equipe.update({"HCGTEfficiency":model.HPThHeatCOP})
+        equipe.update({"Manufact":model.HPManufacturer})
+        equipe.update({"Model":model.HPModel})
+##        equipe.update({"ElectriConsum":model.HPElectConsum})
+##        equipe.update({"EquipTypeFromDB":model.HPType})
+##        equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
+        Status.SQL.commit()
+
+        
+##        equipeC.update({"HPSubType":model.HPSubType})
+##        equipeC.update({"HPWorkFluid":model.HPWorkFluid})
+##        equipeC.update({"HPExHeatCOP":model.HPExHeatCOP})
+##        equipeC.update({"HPThHeatCOP":model.HPThHeatCOP})
+##        Status.SQL.commit()            
+
+##        tmpEquipe = {"HCGPnom":model.HPHeatCap,"HCGTEfficiency":model.HPThHeatCOP,"Manufact":model.HPManufacturer,
+##            "Model":model.HPModel,"ElectriConsum":model.HPElectConsum,"EquipTypeFromDB":model.HPType,"EquipIDFromDB":model.DBHeatPump_ID}
+##        equipe.update(tmpEquipe)
+##        Status.SQL.commit()
+##
+##        tmpEquipeC = {"HPSubType":model.HPSubType,"HPWorkFluid":model.HPWorkFluid,"HPExHeatCOP":model.HPExHeatCOP,"HPThHeatCOP":model.HPThHeatCOP}
+##        equipeC.update(tmpEquipeC)
+##        Status.SQL.commit()
+
+
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -544,7 +631,7 @@ class ModuleHP():
                     modelID = HPList[listIndex] #a row in the DBHeatPump corresponding to j
                     print 'ModuleHP (designAssistant1): modelID = ', modelID
                                         
-                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
                     print "ModuleHP (designAssistant1): equipment stored"
                     
                     USHj = self.calculateEnergyFlows(equipe,equipeC,self.cascadeIndex)
@@ -824,10 +911,10 @@ if __name__ == "__main__":
     from einstein.modules.energy.moduleEnergy import *
     stat = Status("testModuleHP")
 
-    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.SQL = MySQLdb.connect(user="root", passwd="vrania48", db="einstein")
     Status.DB = pSQL.pSQL(Status.SQL, "einstein")
     
-    Status.PId = 2
+    Status.PId = 1
     Status.ANo = 0
     Status.SetUpId = 1 #this is PSetUpData_ID
 
@@ -838,8 +925,9 @@ if __name__ == "__main__":
 #    modE = ModuleEnergy()
 #    modE.runSimulation()
 
-    mod = ModuleHP()
+    mod = ModuleHP(["HP Table"])
     mod.initPanel()
+    mod.addEquipmentDummy()
 #    mod.deleteE(HPid)
 ##    mod.designAssistant1()
 ##    mod.designAssistant2(12)
