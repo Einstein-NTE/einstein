@@ -23,10 +23,13 @@
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
 #                           Hans Schweiger          03/04/2008
+#                           Tom Sobota              05/04/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
 #       03/04/2008:         Adaptation to structure Modules
+#       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
+#                   slight change to OK and Cancel buttons, to show the right icons
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -42,7 +45,7 @@ import wx
 from einstein.GUI.graphics import drawPiePlot
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
-from einstein.GUI.panelBB_PopUp1 import BBPopUp1
+from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
@@ -269,18 +272,18 @@ class PanelBB(wx.Panel):
         self.st12pageBB = wx.StaticText(id=-1, label='Temperature gap \xb0K',
               name='st12pageBB', parent=self, pos=wx.Point(440, 464), style=0)
 
-        self.buttonpageBBOk = wx.Button(id=wxID_PANELBBBUTTONPAGEBBOK,
-              label='ok', name='buttonpageBBOk', parent=self, pos=wx.Point(528,
+        self.buttonpageBBOk = wx.Button(id=wx.ID_OK,
+              label='OK', name='buttonpageBBOk', parent=self, pos=wx.Point(528,
               544), size=wx.Size(75, 23), style=0)
         self.buttonpageBBOk.Bind(wx.EVT_BUTTON, self.OnButtonpageBBOkButton,
-              id=wxID_PANELBBBUTTONPAGEBBOK)
+              id=wx.ID_OK)
 
-        self.buttonpageBBCancel = wx.Button(id=wxID_PANELBBBUTTONPAGEBBCANCEL,
-              label='cancel', name='buttonpageBBCancel', parent=self,
+        self.buttonpageBBCancel = wx.Button(id=wx.ID_CANCEL,
+              label='Cancel', name='buttonpageBBCancel', parent=self,
               pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageBBCancel.Bind(wx.EVT_BUTTON,
               self.OnButtonpageBBCancelButton,
-              id=wxID_PANELBBBUTTONPAGEBBCANCEL)
+              id=wx.ID_CANCEL)
 
         self.buttonpageBBFwd = wx.Button(id=wxID_PANELBBBUTTONPAGEBBFWD,
               label='>>>', name='buttonpageBBFwd', parent=self,
@@ -320,10 +323,12 @@ class PanelBB(wx.Panel):
             #updatePlots
         
     def OnButtonpageBBAddButton(self, event):
-        #show pop-up menu 1: add from where ???
-        pu1 = BBPopUp1(self)
+        #show pop-up menu for adding equipment
+        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
+	#right table when it is created
+        pu1 = AddEquipment(self, self.modBB, 'Add Boiler/Burner equipment','dbheatpump',0,False)
         if pu1.ShowModal() == wx.ID_OK:
-            print 'Accepted'
+            print 'PanelBB AddEquipment accepted. Id='+str(pu1.theId)
             ret = self.modBB.add(BBId)
             #update plots
         else:

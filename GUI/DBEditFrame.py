@@ -1,194 +1,166 @@
-#!/usr/bin/env python
-# -*- coding: cp1252 -*-
+#Boa:Frame:DBEditFrame
 
-"""
-##########################################################################################
-
-EINSTEIN
-Expert system for an intelligent supply of thermal energy in industry
-www.energyxperts.net
-
-energyXperts.BCN
-
-Ingeniería Termo-energética y Energías Renovables
-Thermo-energetical Engineering and Renewable Energies
-
-Dr. Ullés, 2, 3o
-08224 Terrassa (Barcelona), Spain
-
-
-GUI-Modul Version 0.5
-2008 by imsai eSoft Heiko Henning
-heiko.henning@imsai.de
-
-
-##########################################################################################
-"""
-
-
-#-----  Imports
 import wx
-import wx.grid
 import einstein.GUI.pSQL as pSQL
-from einstein.GUI.status import *
+from einstein.GUI.status import Status
 
+def create(parent):
+    return DBEditFrame(parent)
 
-class DBEditFrame(wx.Frame):
+[wxID_DBEDITFRAME, wxID_DBEDITFRAMEBUTTON1, wxID_DBEDITFRAMEBUTTON2, 
+ wxID_DBEDITFRAMEGRID1, 
+] = [wx.NewId() for _init_ctrls in range(4)]
 
-    #def _init_ctrls(self, prnt):
-    def __init__(self, prnt, fname, tablename):
-        
-        wx.Frame.__init__(self, id=-1, name='', parent=prnt, 
-              pos=wx.Point(0, 0), size=wx.Size(800, 600),
-              style=wx.DEFAULT_FRAME_STYLE, title=fname)
+#
+# constants
+#
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR_NOEDITABLE = '#F0FFFF' # idem
+GRID_BACKGROUND_COLOR_EDITABLE = '#FFFFC0' # idem
 
+class DBEditFrame(wx.Dialog):
+    def _init_ctrls(self, prnt):
+        # generated method, don't edit
+        wx.Dialog.__init__(self, id=wxID_DBEDITFRAME, name=u'DBEditFrame',
+              parent=prnt, pos=wx.Point(354, 332), size=wx.Size(800, 400),
+              style=wx.DEFAULT_FRAME_STYLE, title=self.title)
+        self.SetClientSize(wx.Size(800, 400))
 
-        self.table = pSQL.Table(Status.DB, tablename)
-        self.maxrow = 25
+        self.grid1 = wx.grid.Grid(id=wxID_DBEDITFRAMEGRID1, name='grid1',
+              parent=self, pos=wx.Point(8, 32), size=wx.Size(632, 352),
+              style=wx.WANTS_CHARS | wx.VSCROLL | wx.HSCROLL)
+        self.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN, self.OnGridEdit, self.grid1)
+        self.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.OnGridEditStore, self.grid1)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid1)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellLeftDClick, self.grid1)
+
+        self.button1 = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
+              name='button1', parent=self, pos=wx.Point(656, 352),
+              size=wx.Size(128, 32), style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.button1)
+
+        self.button2 = wx.Button(id=wx.ID_OK, label=u'OK', name='button2',
+              parent=self, pos=wx.Point(656, 312), size=wx.Size(128, 32),
+              style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.button2)
+
+    def __init__(self, parent, title, tablename, col_returned, can_edit):
+	self.title = title
+	self.tablename = tablename
+	self.can_edit = can_edit
+	self.col_returned = col_returned
+        self._init_ctrls(parent)
+
+        #self.maxrow = 25
         self.rowcount = 0
-        self.lastEditCell = []
-        
-        
-        self.window_1 = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
-        self.window_1_pane_2 = wx.Panel(self.window_1, -1, style=wx.STATIC_BORDER|wx.TAB_TRAVERSAL)
-        self.window_1_pane_1 = wx.Panel(self.window_1, -1, style=wx.STATIC_BORDER|wx.TAB_TRAVERSAL)
-        self.frame_1_statusbar = self.CreateStatusBar(1, 0)
+	self.theId = -1
+        self.grid1.EnableEditing(can_edit)
+	if can_edit:
+	    self.backcolor = GRID_BACKGROUND_COLOR_EDITABLE
+	else:
+	    self.backcolor = GRID_BACKGROUND_COLOR_NOEDITABLE
 
-        self.gridDBTable = wx.grid.Grid(self.window_1_pane_1, -1, size=(1, 1))
+        self.lastEditRow = 0
+        self.lastEditCol = 0
 
-        self.DBPageSlider = wx.Slider(self.window_1_pane_2, -1, 1, 1, 1,
-                                      style=wx.SL_HORIZONTAL|wx.SL_AUTOTICKS|wx.SL_LABELS|wx.SL_TOP|wx.SL_SELRANGE)
-
-        self.buttonAddRow = wx.Button(self.window_1_pane_2, -1, "add row")
-        self.buttonDeleteRow = wx.Button(self.window_1_pane_2, -1, "delete row")
-        self.label_2 = wx.StaticText(self.window_1_pane_2, -1, " ")
-        self.label_1 = wx.StaticText(self.window_1_pane_2, -1, "Page")
-        
-        
-      
-        self.window_1_pane_1.SetMinSize((-1, 500))
-        self.DBPageSlider.SetMinSize((300, 90))
-        self.window_1_pane_2.SetMinSize((-1, 100))
-       
-        self.sizer_3 = wx.GridSizer(1, 1, 0, 0)
-        self.grid_sizer_1 = wx.GridSizer(2, 4, 0, 0)
-        self.grid_sizer_2 = wx.GridSizer(1, 1, 0, 0)
-        self.grid_sizer_2.Add(self.gridDBTable, 1, wx.EXPAND|wx.FIXED_MINSIZE, 0)
-        self.window_1_pane_1.SetSizer(self.grid_sizer_2)
-        self.grid_sizer_1.Add(self.DBPageSlider, 0, wx.EXPAND|wx.FIXED_MINSIZE, 0)
-        self.grid_sizer_1.Add(self.buttonAddRow, 0, wx.ALIGN_RIGHT, 0)
-        self.grid_sizer_1.Add(self.buttonDeleteRow, 0, wx.ALIGN_RIGHT, 0)
-        self.grid_sizer_1.Add(self.label_2, 0, wx.ALIGN_RIGHT, 0)
-        self.grid_sizer_1.Add(self.label_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-        self.window_1_pane_2.SetSizer(self.grid_sizer_1)
-        self.window_1.SplitHorizontally(self.window_1_pane_1, self.window_1_pane_2, 800)
-        self.sizer_3.Add(self.window_1, 1, wx.EXPAND|wx.ALIGN_RIGHT|wx.FIXED_MINSIZE, 0)
-        self.SetSizer(self.sizer_3)
-        self.Layout()
-
-
-        self.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN, self.OnGridEdit, self.gridDBTable)
-        self.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.OnGridEditStore, self.gridDBTable)
-        
-        self.Bind(wx.EVT_COMMAND_SCROLL_ENDSCROLL, self.OnDBPageSliderScroll, self.DBPageSlider)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddRow, self.buttonAddRow)
-
-        
-
-
-        #----- add menu
-        
-        self.menuImport = wx.Menu()
-        self.ImportData = self.menuImport.Append(-1, "Import from file")
-        self.Bind(wx.EVT_MENU, self.OnImportData, self.ImportData)
-        
-        self.menuBar = wx.MenuBar()
-        self.menuBar.Append(self.menuImport, "File")        
-        self.SetMenuBar(self.menuBar)
-
-        
-        
-        self.setValues()
+        self.initDatabase()
         self.SetupGrid()
-        self.displayDBPage(1)
-             
+	self.displayData()
 
-    def OnImportData(self, event):
-        event.Skip()
+    def initDatabase(self):
+        self.table = pSQL.Table(Status.DB, self.tablename)
+        self.rows = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
 
-
-    def OnDBPageSliderScroll(self, event):
-        self.displayDBPage(self.DBPageSlider.GetValue())
-
-
-    def OnButtonAddRow(self, event):
-        tmp={}
-        for col in self.table.keys():
-            if col.find('_id') > -1:
-                tmp[col] = 0 
-            elif col.find('_ID') == -1:
-                tmp[col] = 'NULL' 
-                
-        self.table.insert(tmp)    
-        Status.DB.commit()
-        self.setValues()
-        self.displayDBPage(self.dbpages)
-        self.DBPageSlider.SetValue(self.dbpages)
-
-
-
-    def OnGridEdit(self, event):
-        self.lastEditCell = [self.gridDBTable.GetGridCursorRow(), self.gridDBTable.GetGridCursorCol()]
-        
-    def OnGridEditStore(self, event):
-        value = self.gridDBTable.GetCellValue(self.lastEditCell[0], self.lastEditCell[1])
-        row = self.table.select({self.table.keys()[0]:self.gridDBTable.GetCellValue(self.lastEditCell[0],0)})[0]
-        if value <> "" and value <> "None":
-            row[self.lastEditCell[1]] = value
-        else:
-            row[self.lastEditCell[1]] = 'NULL'
-        Status.DB.commit()
-        self.lastEditCell = []
-
-        
     def SetupGrid(self):
-        self.gridDBTable.CreateGrid(0, len(self.table.keys()))
+        self.grid1.CreateGrid(self.rows, len(self.table.keys()))
         for row in range(len(self.table.keys())):
-            self.gridDBTable.SetColLabelValue(row, self.table.keys()[row])
-        self.gridDBTable.AutoSizeColumns(setAsMin=True)
-        self.gridDBTable.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
-        self.gridDBTable.SetMinSize((-1, 400))      
+            self.grid1.SetColLabelValue(row, self.table.keys()[row])
+        self.grid1.AutoSizeColumns(setAsMin=True)
+        self.grid1.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        #self.grid1.SetMinSize((-1, 400))      
 
+        self.grid1.EnableGridLines(True)
+        self.grid1.SetDefaultRowSize(20)
+        self.grid1.SetRowLabelSize(30)
+        self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
-    def displayDBPage(self, pagenr):
-        startrow = pagenr * self.maxrow - self.maxrow
-        if self.gridDBTable.GetNumberRows() > 0:
-            self.gridDBTable.DeleteRows(pos=0,numRows=self.gridDBTable.GetNumberRows())
+    def displayData(self):
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(self.backcolor)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        #startrow = pagenr * self.maxrow - self.maxrow # if paginated
+        startrow = 0
+        if self.grid1.GetNumberRows() > 0:
+            self.grid1.DeleteRows(pos=0,numRows=self.grid1.GetNumberRows())
         rownr = startrow + 1
         r = 0
         c = 0
-        for row in self.table.sql_select("%s > 0 ORDER BY %s LIMIT %s,%s" % (self.table.keys()[0],
-                                                                             self.table.keys()[0],
-                                                                             startrow, self.maxrow)):
-            self.gridDBTable.AppendRows(numRows=1)
-            self.gridDBTable.SetRowLabelValue(r, "%s" % (rownr))
+        #for row in self.table.sql_select("%s > 0 ORDER BY %s LIMIT %s,%s" % (self.table.keys()[0],
+        #                                                                     self.table.keys()[0],
+        #                                                                     startrow, self.maxrow)):
+
+        for row in self.table.sql_select("%s > 0 ORDER BY %s" % (self.table.keys()[0],
+								 self.table.keys()[0])):
+            self.grid1.SetRowAttr(r, attr)
+            self.grid1.AppendRows(numRows=1)
+            self.grid1.SetRowLabelValue(r, "%s" % (rownr))
             for col in row:
-                self.gridDBTable.SetCellValue(r, c, "%s" % (row[c]))
-                if c == 0:self.gridDBTable.SetReadOnly(r, c, isReadOnly=True)
+                self.grid1.SetCellValue(r, c, "%s" % (row[c]))
+                if c == 0:self.grid1.SetReadOnly(r, c, isReadOnly=True)
                 c += 1
             c = 0
             r +=1
             rownr += 1
-                
 
-    def setValues(self):
-        self.rowcount = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
+    def OnGridEdit(self, event):
+        self.lastEditRow = self.grid1.GetGridCursorRow()
+        self.lastEditCol = self.grid1.GetGridCursorCol()
+        event.Skip()
         
-        if self.rowcount%self.maxrow > 0:
-            tmp = 1
+    def OnGridEditStore(self, event):
+        value = self.grid1.GetCellValue(self.lastEditRow, self.lastEditCol)
+        row = self.table.select({self.table.keys()[0]:self.grid1.GetCellValue(self.lastEditRow,0)})[0]
+        if value <> "" and value <> "None":
+            row[self.lastEditCol] = value
         else:
-            tmp = 0
+            row[self.lastEditCol] = 'NULL'
+        self.lastEditRow = 0
+        self.lastEditCol = 0
+        event.Skip()
 
-        self.dbpages = self.rowcount/self.maxrow + tmp
-        self.DBPageSlider.SetRange(1, self.dbpages)
+    def OnGridCellLeftClick(self, event):
+	try:
+	    self.theId = int(self.grid1.GetCellValue(event.GetRow(), self.col_returned))
+	except:
+	    print 'DBEditFrame. Returned cell is empty or not integer'
+	    self.theId = -1
 
+        event.Skip()
+
+
+    def OnGridCellLeftDClick(self, event):
+	try:
+	    self.theId = int(self.grid1.GetCellValue(event.GetRow(), self.col_returned))
+	except:
+	    print 'DBEditFrame. Returned cell is empty or not integer'
+	    self.theId = -1
+
+	# accept editions and close this dialog
+	if self.can_edit:
+	    Status.DB.sql_query('commit')
+	self.EndModal(wx.ID_OK)
+
+
+    def OnButtonCancel(self,event):
+	if self.can_edit:
+	    Status.DB.sql_query('rollback')
+        event.Skip()
+
+    def OnButtonOK(self,event):
+	if self.can_edit:
+	    Status.DB.sql_query('commit')
+        event.Skip()

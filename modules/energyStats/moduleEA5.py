@@ -10,12 +10,14 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Last revised by:    Stoyan Danov 07/04/2008
 #
 #       Changes to previous version:
 #	28/03/08:   TS changed functions draw... to use numpy arrays,
+#       07/04/08:   SD, adapted to use data from sql, not checked
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -42,6 +44,16 @@ class ModuleEA5(object):
     def __init__(self, keys):
         self.keys = keys
         self.interface = Interfaces()
+#...................................................................
+        PId = Status.PId
+        ANo = Status.ANo
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
+        self.cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)[0]
+        self.questionnaire = Status.DB.questionnaire.Questionnaire_ID[PId][0]
+        self.cproduct = Status.DB.cproduct.sql_select(sqlQuery)
+        self.qproduct = Status.DB.qproduct.sql_select(sqlQuery)
+#....................................................................
         self.initModule()
 
     def initModule(self):
@@ -51,23 +63,109 @@ class ModuleEA5(object):
         module initialization
         """
 #------------------------------------------------------------------------------
+
+#Part 1: Energy Intensity
+
+        TotalFEC = self.cgeneraldata.FEC   #FEC in [MWh]
+        ElectFEC = self.cgeneraldata.FECel
+        FuelsFEC = TotalFEC - ElectFEC
+        PE_FEC = 1.1*FuelsFEC + 3.0*ElectFEC #substitute later the conv. coef. from SetUp #pending put conv. coef. in status.py
+            
+        Turnover = self.questionnaire.Turnover #in [million euros]
+
+        if (Turnover > 0) and not (Turnover==None):    
+            self.cgeneraldata.FUEL_INT = (FuelsFEC)/(Turnover*1000) #converted to [kWh/euro]
+            self.cgeneraldata.EL_INT = (ElectFEC)/(Turnover*1000) #converted to [kWh/euro]
+            self.cgeneraldata.PE_INT = (PE_FEC)/(Turnover*1000) #converted to [kWh/euro]
+        else:
+            self.cgeneraldata.FUEL_INT = None
+            self.cgeneraldata.EL_INT = None
+            self.cgeneraldata.PE_INT = None
+
+# back-up in SQL                                      
+        Status.SQL.commit() #SD, to be checked
+
+
+        EI_values = []
+        EI_values.append(self.cgeneraldata.FUEL_INT)
+        EI_values.append(self.cgeneraldata.EL_INT)
+        EI_values.append(self.cgeneraldata.PE_INT)
+
+        EI_labels = ['Fuels','Electricity','Total primary energy']
+
+
+#.........................................................................
+#Part 2: SEC by product
+
+        for row in self.qproduct:
+
+            #calculate SEC for each product
+            FUEL_SEC = (row.FuelProd)*1000/row.QProdYear #converted to [kWh/pu]
+            EL_SEC = (row.ElProd)*1000/row.QProdYear #converted to [kWh/pu]
+            PE_SEC = (1.1*row.FuelProd + 3.0*row.ElProd)*1000/row.QProdYear #converted to [kWh/pu], fixed energy conv. coef. ->change this later
+
+            #this selects the corresponding row in CProduct in a shorter variable name
+            rowCProd = Status.DB.cproduct.QProduct_id[row.QProduct_ID][0]
+            #now write the SEC values in the CProduct table
+            rowCProd.FUEL_SEC = FUEL_SEC
+            rowCProd.EL_SEC = EL_SEC
+            rowCProd.PE_SEC = PE_SEC
+            Status.SQL.commit() #SD, check this
+
+        SEC_values = []
+        ProductNames = []
+        for row in self.cproduct:
+            SECPerProduct = []
+            SECPerProduct.append(row.FUEL_SEC)
+            SECPerProduct.append(row.EL_SEC)
+            SECPerProduct.append(row.PE_SEC)
+            SEC_values.append(SECPerProduct)
+            Product = Status.DB.qproduct.QProduct_ID[row.QProduct_id][0].Product
+            ProductNames.append(Product)
+
+##        print 'SEC_values=',SEC_values
+##        print 'ProductNames =', ProductNames
+
+
+#...............................................................................
+#Part 3: SEC by unit operation
+#XXX Still missing...
+
+#...............................................................................
+
         #
         # upper grid: Energy intensity by type
         #
-        data = array([['Fuels',                1.91],
-                      ['Electricity',          0.18],
-                      ['Total primary energy', 2.65]])
+
+        TableColumnList1 = [EI_labels,EI_values]
+
+        matrix1 = transpose(TableColumnList1)
+
+        data1 = array(matrix1)
+
+##        data = array([['Fuels',                1.91], #SD, active before changes
+##                      ['Electricity',          0.18],
+##                      ['Total primary energy', 2.65]])
                           
-        self.interface.setGraphicsData(self.keys[0], data)
+        self.interface.setGraphicsData(self.keys[0], data1)
 
         #
         # lower grid: Energy consumption by product
         #
-        data = array([['Product 1', 500.0, 50.0, 700.0],
-                      ['Product 2', 400.0, 80.0, 680.0],
-                      ['Product 3', 100.0, 10.0, 140.0]])
+
+        SEC_values.insert(0,ProductNames) #add ProductNames as a first in the list
+        
+        TableColumnList2 = SEC_values
+
+        matrix2 = transpose(TableColumnList2)
+
+        data2 = array(matrix2)            
+
+##        data = array([['Product 1', 500.0, 50.0, 700.0], #SD, active before changes
+##                      ['Product 2', 400.0, 80.0, 680.0],
+##                      ['Product 3', 100.0, 10.0, 140.0]])
                           
-        self.interface.setGraphicsData(self.keys[1], data)
+        self.interface.setGraphicsData(self.keys[1], data2)
 
         #print "ModuleEA5 graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]]))

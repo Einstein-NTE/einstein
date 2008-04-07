@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.10
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -27,6 +27,8 @@
 #                           Hans Schweiger          02/04/2008
 #                           Hans Schweiger          03/04/2008
 #                           Stoyan Danov            03/04/2008
+#                           Stoyan Danov            04/04/2008
+#                           Hans Schweiger          07/04/2008
 #   
 #
 #       Changes to previous version:
@@ -37,6 +39,8 @@
 #                   initPanel: adaptation to new panel structure
 #       03/04/2008 receives moduleEnergy from Modules
 #       03/04/2008 SD: addEquipmentDummy, setEquipmentFromDB
+#       04/04/2008 SD: initPanel - graphics to interfaces, screenEquipments add:if..or..or
+#       07/04/2008 HS: adaptación init_panel / update_panel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -109,7 +113,8 @@ class ModuleHP():
         uHP = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
 
         #returns to the GUI the default user-defined data to be shown in HP panel
-        self.interface.setGraphicsData('HP UserDef',[uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
+        maintainExisting = True
+        self.interface.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
                                                      uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
 
 
@@ -141,51 +146,18 @@ class ModuleHP():
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
+#       initialisation of the panel
 #------------------------------------------------------------------------------
-
-        HPList = self.screenEquipments()
-
-        print 'test initPanel: HPList =', HPList
-        print 'moduleHP (initPanel): ci = ',self.cascadeIndex
-        
-#............................................................................................
-#XXX FOR TESTING PURPOSES ONLY: load default demand
-# here it should be assured that heat demand and availability for position in cascade
-# of presently existing heat pumps is already defined
 
         #creates space/lists for storing the modified QD,QA, assigns total D,A in all positions
         self.interface.initCascadeArrays(self.NEquipe) 
 
         print 'moduleHP (initPanel): cascade Arrays initialised '
 
-        #returns HPList to the GUI for displaying in HP panel, table: Existing Heat Pumps
-        self.interface.setGraphicsData('HP Table',[HPList,["o","o","r","r","r","r"]]) 
-#XXX ["o","o","r","r","r","r"] indicates which columns should de shown in the panel: "o" oculto, "r" read only
-#XXX es esto tu idea Hans? SD,28/03/2008
-
-#XXX        self.cascadeIndex = 0 #indicates first in list of modyfied demand and availability: total D,A to be shown in plot
-#XXX esto sobreescribe el posicionamento de cascadeIndex que has hecho en screenEquipments !!! realmente quieres eso ... ???
-#XXX si, cuando se inicia el panel queria que mostrara las curvas totales, mientras que si se utiliza en otro lugar,
-#XXX que apunte a las ultimas, no se si sera necesario llamar screenEquipments en otro lugar, por si acaso...SD,28/03/2008
-
-        #returns to the GUI the lists to dislay the plot in HP panel. Initially shows the total heat demand and availability 
-        self.interface.setGraphicsData('HP Plot',[self.interface.T, 
-                                                      self.interface.QD_T_mod[self.cascadeIndex],
-                                                      self.interface.QA_T_mod[self.cascadeIndex],
-                                                      self.interface.QD_T_mod[self.cascadeIndex+1],
-                                                      self.interface.QA_T_mod[self.cascadeIndex+1]])
-
-        #returns to the GUI the pinch temperature and the temperature gap to be shown in HP panel (below graphic)
-        #XXX Define where they come from.....SD,27.03.2008
-#        self.interface.setGraphicsData('HP Info',[ TPinch, TGap])
-
-#        self.initUserDefinedParamHP() #puts the user defined parameters from PSetUpData to UHeatPump
-#XXX problems with this function in einsteinMain
 
         self.getUserDefinedParamHP() #returns to the GUI the default user-defined data to be shown in HP panel
 
+        self.updatePanel()
         print 'moduleHP (initPanel): reached the end '
     
 #------------------------------------------------------------------------------
@@ -199,7 +171,7 @@ class ModuleHP():
         self.interface.getEquipmentCascade()
         HPList = []
         for row in self.interface.cascade:
-            if row['equipeType'] == 'Heat pump':
+            if row['equipeType'] == 'Heat pump' or row['equipeType'] == 'HeatPump' or row['equipeType'] == 'Heat Pump' or row['equipeType'] == 'HP COMP':
                 HPList.append(row)
 
         if(len(HPList)>0):
@@ -218,30 +190,24 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
+                
+#............................................................................................
+# 1. List of equipments
 
-        print "ModuleHP (updatePanel): data for panel are copied to interface"
+        HPList = self.screenEquipments()
+        matrix = []
+        for i in range(len(HPList)):
+            row = [HPList[i]['equipeID'],HPList[i]['equipeNo'],HPList[i]['equipeType'],HPList[i]['equipePnom']] 
+            matrix.append(row)
 
-        print self.interface.T
-        print self.interface.QD_T
-        print self.interface.QA_T
-        print self.interface.QD_T_mod[self.cascadeIndex]
-        print self.interface.QA_T_mod[self.cascadeIndex]
-        
-#XXX TESTING ONLY TESTING ONLY TESTING ONLY
-        print "ModuleHP (updatePanel): setting HP list dummy for testing"
-        
-        # plot to be displayed
-	# this is how the data should be set up
-	# (this data are just an example!)
-        data = array([['HP 1', 2004, 'Type 1', 3000, 100, 120],
-		      ['HP 2', 2006, 'Type 1', 4500, 120, 140],
-                      ['HP 3', 2007, 'Type 2', 5000,  80, 130]])
+        data = array(matrix)
 
+        self.interface.setGraphicsData('HP Table',data)
+        print "ModuleHP (updatePanel): HP Table written to GData. ",data
 
-        print "ModuleHP (updatePanel): key = ",self.keys[0]
-        self.interface.setGraphicsData(self.keys[0], data)
+#............................................................................................
+# 2. XY Plot
 
-        # plot to be displayed
         try:
             self.interface.setGraphicsData('HP Plot',[self.interface.T,
                                                       self.interface.QD_T_mod[self.cascadeIndex],
@@ -250,11 +216,20 @@ class ModuleHP():
                                                       self.interface.QA_T_mod[self.cascadeIndex+1]])
         except:
             pass
-# info for text boxes in right side of panel
-        self.interface.setGraphicsData('HP Info',{"noseque":55})
 
-# list of equipments in cascade for Table
-        self.interface.setGraphicsData('HP List',self.interface.cascade)
+#............................................................................................
+# 3. Configuration design assistant
+
+        self.getUserDefinedParamHP() #returns to the GUI the default user-defined data to be shown in HP panel
+
+#............................................................................................
+# 4. additional information
+
+        info = []
+        info.append(999.01)  #first value to be displayed
+        info.append(999.02)  #second value to be displayed
+
+        self.interface.setGraphicsData('HP Info',info)
 
 #------------------------------------------------------------------------------
 
@@ -691,7 +666,7 @@ class ModuleHP():
 #XXX Function to be defined           deleteEquipment(equipe)
 
         else:                        
-            self.setEquipmentFromDB(self.equipe,modelID) #add selected equipment to the equipment list
+            self.setEquipmentFromDB(self.equipe,self.equipeC,modelID) #add selected equipment to the equipment list
             print "ModuleHP: heat pump added. model no: ",modelID
 
         Status.mod.moduleEnergy.runSimulation()
@@ -911,7 +886,7 @@ if __name__ == "__main__":
     from einstein.modules.energy.moduleEnergy import *
     stat = Status("testModuleHP")
 
-    Status.SQL = MySQLdb.connect(user="root", passwd="vrania48", db="einstein")
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
     Status.DB = pSQL.pSQL(Status.SQL, "einstein")
     
     Status.PId = 1
@@ -924,10 +899,11 @@ if __name__ == "__main__":
 
 #    modE = ModuleEnergy()
 #    modE.runSimulation()
-
-    mod = ModuleHP(["HP Table"])
+    keys = ["HP Table","HP Plot","HP UserDef"]
+    mod = ModuleHP(keys)
+##    mod.updatePanel()
     mod.initPanel()
-    mod.addEquipmentDummy()
-#    mod.deleteE(HPid)
+##    mod.addEquipmentDummy()
+##    mod.deleteE(HPid)
 ##    mod.designAssistant1()
 ##    mod.designAssistant2(12)

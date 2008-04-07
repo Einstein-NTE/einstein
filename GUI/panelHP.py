@@ -19,16 +19,21 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.06
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
 #                           Hans Schweiger          03/04/2008
+#                           Tom Sobota              05/04/2008
+#                           Hans Schweiger          07/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
 #       02/04/08:   adaptation to format from PanelBB from Tom
 #       03/04/08:   adaptation to structure Modules
+#       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
+#                   slight change to OK and Cancel buttons, to show the right icons
+#       07/04/08:   adapted for changes in heat pump module
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,7 +53,7 @@ import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
 from numpy import *
-from einstein.GUI.panelHP_PopUp1 import HPPopUp1
+from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
 
 
 
@@ -116,6 +121,9 @@ class PanelHP(wx.Panel):
 
         self.sql = sql
         self.db = db
+
+        self.info = Interfaces.GData["HP Info"]
+        self.config = Interfaces.GData["HP Config"]
         
         self._init_ctrls(parent)
 
@@ -133,10 +141,11 @@ class PanelHP(wx.Panel):
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, self.getDrawFigure())
+        dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, drawFigure, paramList)
         del dummy
 
 #XXXHS2008-04-02: copied block from PanelBB. Tom, please revise
+#TS20080405 Looks fine ...
         #
         # additional widgets setup
         # here, we modify some widgets attributes that cannot be changed
@@ -180,6 +189,11 @@ class PanelHP(wx.Panel):
                     self.gridPageHP.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         self.gridPageHP.SetGridCursor(0, 0)
+
+        print "Panel HP (__init__): getting info data"
+
+        info = Interfaces.GData["HP Info"]
+        print "Panel HP (__init__): info data = ",info
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -240,11 +254,18 @@ class PanelHP(wx.Panel):
         self.buttonpageHeatPumpAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageHPAddButton,
               id=-1)
 
+#------------------------------------------------------------------------------		
+#       Configuration design assistant
+#------------------------------------------------------------------------------		
+
         self.st2pageHeatPump = wx.StaticText(id=-1,
               label='Design assistant options:', name='st2pageHeatPump',
               parent=self, pos=wx.Point(40, 272), style=0)
         self.st2pageHeatPump.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, 'Tahoma'))
+
+#..............................................................................
+# 1. Maintain existing equipment ?
 
         self.st3pageHeatPump = wx.StaticText(id=-1,
               label='Maintain existing equipment ?', name='st3pageHeatPump',
@@ -253,7 +274,10 @@ class PanelHP(wx.Panel):
         self.cb1pageHeatPump = wx.CheckBox(id=-1, label='',
               name='cb1pageHeatPump', parent=self, pos=wx.Point(288, 308),
               size=wx.Size(24, 13), style=0)
-        self.cb1pageHeatPump.SetValue(False)
+        self.cb1pageHeatPump.SetValue(self.config[0])
+
+#..............................................................................
+# 2. Heat pump type 
 
         self.st4pageHeatPump = wx.StaticText(id=-1, label='Type of heat pump',
               name='st4pageHeatPump', parent=self, pos=wx.Point(40, 344),
@@ -262,26 +286,60 @@ class PanelHP(wx.Panel):
         self.choicepageHeatPump = wx.Choice(choices=["compression",
               "absorption"], id=-1, name='choicepageHeatPump', parent=self,
               pos=wx.Point(288, 336), size=wx.Size(130, 21), style=0)
+#HS 2008-04-07 XXX does not work !!!        self.choicepageHeatPump.SetValue(self.config[1])
+
+#..............................................................................
+# 3. Minimum operating hours
 
         self.st5pageHeatPump = wx.StaticText(id=-1,
               label='Minimum desired annual operation hours, h',
               name='st5pageHeatPump', parent=self, pos=wx.Point(40, 384),
               style=0)
 
+        self.tc1pageHeatPump = wx.TextCtrl(id=-1, name='tc1pageHeatPump',
+              parent=self, pos=wx.Point(288, 376), size=wx.Size(128, 21),
+              style=0, value=str(self.config[2]))
+
+#..............................................................................
+# 4. Temperature lift
+
         self.st6pageHeatPump = wx.StaticText(id=-1,
               label='Maximum desired temperature lift, \xbaC',
               name='st6pageHeatPump', parent=self, pos=wx.Point(40, 424),
               style=0)
+
+        self.tc2pageHeatPump = wx.TextCtrl(id=-1, name='tc2pageHeatPump',
+              parent=self, pos=wx.Point(288, 416), size=wx.Size(128, 21),
+              style=0, value=str(self.config[3]))
+
+
+#..............................................................................
+# 5. condensing temperature
 
         self.st7pageHeatPump = wx.StaticText(id=-1,
               label='Maximum desired condensing temperature, \xbaC',
               name='st7pageHeatPump', parent=self, pos=wx.Point(40, 464),
               style=0)
 
+        self.tc3pageHeatPump = wx.TextCtrl(id=-1, name='tc3pageHeatPump',
+              parent=self, pos=wx.Point(288, 456), size=wx.Size(128, 21),
+              style=0, value=str(self.config[4]))
+
+
+#..............................................................................
+# 6. evaporating temperature
+
         self.st8pageHeatPump = wx.StaticText(id=-1,
               label='Minimum desired evaporating temperature, \xbaC',
               name='st8pageHeatPump', parent=self, pos=wx.Point(40, 504),
               style=0)
+
+        self.tc4pageHeatPump = wx.TextCtrl(id=-1, name='tc4pageHeatPump',
+              parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 21),
+              style=0, value=str(self.config[4]))
+
+#..............................................................................
+# 7. condensing temperature: inlet temp.
 
         self.st9pageHeatPump = wx.StaticText(id=-1,
               label='Only for absorption type:', name='st9pageHeatPump',
@@ -292,51 +350,47 @@ class PanelHP(wx.Panel):
               name='st10pageHeatPump', parent=self, pos=wx.Point(40, 552),
               style=0)
 
-        self.tc2pageHeatPump = wx.TextCtrl(id=-1, name='tc2pageHeatPump',
-              parent=self, pos=wx.Point(288, 416), size=wx.Size(128, 21),
-              style=0, value='')
-
-        self.tc3pageHeatPump = wx.TextCtrl(id=-1, name='tc3pageHeatPump',
-              parent=self, pos=wx.Point(288, 456), size=wx.Size(128, 21),
-              style=0, value='')
-
-        self.tc4pageHeatPump = wx.TextCtrl(id=-1, name='tc4pageHeatPump',
-              parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 21),
-              style=0, value='')
-
-        self.tc6pageHeatPump = wx.TextCtrl(id=-1, name='tc6pageHeatPump',
-              parent=self, pos=wx.Point(640, 416), size=wx.Size(128, 21),
-              style=0, value='')
-
-        self.tc1pageHeatPump = wx.TextCtrl(id=-1, name='tc1pageHeatPump',
-              parent=self, pos=wx.Point(288, 376), size=wx.Size(128, 21),
-              style=0, value='')
-
-        self.tc7pageHeatPump = wx.TextCtrl(id=-1, name='tc7pageHeatPump',
-              parent=self, pos=wx.Point(640, 456), size=wx.Size(128, 21),
-              style=0, value='')
-
         self.tc5pageHeatPump = wx.TextCtrl(id=-1, name='tc5pageHeatPump',
               parent=self, pos=wx.Point(288, 544), size=wx.Size(128, 21),
-              style=0, value='')
+              style=0, value=str(self.config[5]))
+
+#------------------------------------------------------------------------------		
+#       Display field at the right
+#------------------------------------------------------------------------------		
+
 
         self.st11pageHeatPump = wx.StaticText(id=-1,
               label='Pinch temperature \xb0C', name='st11pageHeatPump',
               parent=self, pos=wx.Point(440, 424), style=0)
 
+        self.tc6pageHeatPump = wx.TextCtrl(id=-1, name='tc6pageHeatPump',
+              parent=self, pos=wx.Point(640, 416), size=wx.Size(128, 21),
+              style=0, value=str(self.info[0]))
+
         self.st12pageHeatPump = wx.StaticText(id=-1,
               label='Temperature gap \xb0K', name='st12pageHeatPump',
               parent=self, pos=wx.Point(440, 464), style=0)
 
+        self.tc7pageHeatPump = wx.TextCtrl(id=-1, name='tc7pageHeatPump',
+              parent=self, pos=wx.Point(640, 456), size=wx.Size(128, 21),
+              style=0, value=str(self.info[1]))
+
+
+
 #------------------------------------------------------------------------------		
 #       Default action buttons: FWD / BACK / OK / Cancel
+#       TS20080405 Notice: the OK button should always have an ID = wx.ID_OK
+#                  and a label='OK' (uppercase)
+#                  The Cancel button should always have an ID = wx.ID_CANCEL
+#                  and a label 'Cancel' (as written)
+#                  In this way, wxWidgets will show the right icons on the buttons
 #------------------------------------------------------------------------------		
 
-        self.buttonpageHeatPumpOk = wx.Button(id=-1, label='ok',
+        self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label='OK',
               name='buttonpageHeatPumpOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
 
-        self.buttonpageHeatPumpCancel = wx.Button(id=-1, label='cancel',
+        self.buttonpageHeatPumpCancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
               name='buttonpageHeatPumpCancel', parent=self, pos=wx.Point(616,
               544), size=wx.Size(75, 23), style=0)
 
@@ -357,13 +411,6 @@ class PanelHP(wx.Panel):
               id=wxID_PANELHPBUTTONPAGEHEATPUMPBACK)
 
 #------------------------------------------------------------------------------		
-    def getDrawFigure(self):
-#------------------------------------------------------------------------------		
-#   function for drawing 
-#------------------------------------------------------------------------------		
-
-        global drawFigure
-        return drawFigure
 
 #==============================================================================
 #   Event handlers
@@ -403,18 +450,48 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
-        (self.equipe,self.equipeC) = self.modHP.addEquipmentDummy()      #creates space for new equipment in Q/C
+	#TS20080405 had to put the try because I get index errors here ...
+        try:
+            #creates space for new equipment in Q/C
+	    (self.equipe,self.equipeC) = self.modHP.addEquipmentDummy()
+	except:
+	    pass
         
-        #show pop-up menu 1: add from where ???
-        pu1 = HPPopUp1(self)
+        #show pop-up menu for adding equipment
+        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
+	#right table when it is created
+	# the args are:
+	# 1. the module address
+	# 2. Title for the dialogs (for both AddEquipment and DBEditFrame)
+	# 3. The name of the db table (for DBEditFrame)
+	# 4. The column from a table whose value will be eventually returned by DBEditFrame. Must
+	#    be an integer.
+	# 5. If the database can be edited in DBEditFrame
+	#
+	# On return, the value in the specified column (arg 4) in the selected row is available
+	# in pu1.theId, if a selection from the grid was made. If not, pu1.theId is -1. 
+	# The selection is made clicking once in any field of the grid and then clicking on the
+	# 'ok' button, or just double-clicking on any field.
+	#
+	# If the database is editable in DBEditFrame (arg 5), the background color of the
+	# grid will be a tone of Yellow. If not, a tone of Cyan.
+	#
+
+        pu1 =  AddEquipment(self,                      # pointer to this panel
+			    self.modHP,                # pointer to the associated module
+			    'Add Heat Pump equipment', # title for the dialogs
+			    'dbheatpump',              # database table
+			    0,                         # column to be returned
+			    False)                     # database table can be edited in DBEditFrame?
+
         if pu1.ShowModal() == wx.ID_OK:
-            print 'Accepted'
+            print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
         else:
             self.equipe.delete()         #delete the space created before, if not accepted
             self.equipeC.delete()
             print 'Cancelled'
             
-        Status.SQL.commit()
+        #Status.SQL.commit() # TS it is already committed in DBEditFrame
         self.modHP.updatePanel()
 
 

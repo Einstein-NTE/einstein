@@ -21,9 +21,12 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	    03/04/2008
-#	Last revised by:    
+#	Revised by:    
+#                           Tom Sobota              05/04/2008
 #
 #       Changes to previous version:
+#       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
+#                   slight change to OK and Cancel buttons, to show the right icons
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -36,11 +39,11 @@
 #============================================================================== 
 
 import wx
-import wx.grid
 from einstein.GUI.graphics import drawPiePlot
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
-from einstein.GUI.panelA_PopUp1 import APopUp1
+from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
+
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
@@ -166,17 +169,17 @@ class PanelA(wx.Panel):
         self.stTitlePageA.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, 'Tahoma'))
 
-        self.buttonpageAOk = wx.Button(id=wxID_PANELABUTTONPAGEAOK, label='ok',
+        self.buttonpageAOk = wx.Button(id=wx.ID_OK, label='OK',
               name='buttonpageAOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageAOk.Bind(wx.EVT_BUTTON, self.OnButtonpageAOkButton,
-              id=wxID_PANELABUTTONPAGEAOK)
+              id=wx.ID_OK)
 
-        self.buttonpageACancel = wx.Button(id=wxID_PANELABUTTONPAGEACANCEL,
-              label='cancel', name='buttonpageACancel', parent=self,
+        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL,
+              label='Cancel', name='buttonpageACancel', parent=self,
               pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageACancel.Bind(wx.EVT_BUTTON,
-              self.OnButtonpageACancelButton, id=wxID_PANELABUTTONPAGEACANCEL)
+              self.OnButtonpageACancelButton, id=wx.ID_CANCEL)
 
         self.buttonpageAFwd = wx.Button(id=wxID_PANELABUTTONPAGEAFWD,
               label='>>>', name='buttonpageAFwd', parent=self, pos=wx.Point(704,
@@ -229,10 +232,12 @@ class PanelA(wx.Panel):
             #updatePlots
         
     def OnGenerateNewButton(self, event):
-        #show pop-up menu 1: add from where ???
-        pu1 = APopUp1(self)
+        #show pop-up menu for adding equipment
+        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
+	#right table when it is created
+        pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
         if pu1.ShowModal() == wx.ID_OK:
-            print 'Accepted'
+            print 'PanelA AddEquipment accepted. Id='+str(pu1.theId)
 #            ret = self.modA.add(AId)
             #update plots
         else:

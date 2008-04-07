@@ -28,6 +28,7 @@
 #                           Tom Sobota                          26/03/2008
 #                           Hans Schweiger                      02/04/2008
 #                           Hans Schweiger                      03/04/2008
+#                           Tom Sobota                          06/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -45,6 +46,8 @@
 #       03/04/2008  Instance of moduleEnergy created in main
 #                   Function connectToDB out of EinsteinFrame
 #                   Second update: PanelHC and PanelA added
+#       06/04/2008  Extracted Page 4 and all related code as an external module,so it
+#                   can be called from other places
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -78,6 +81,8 @@ from panelHC import *
 from panelHP import *
 from panelBB import *
 from panelEnergy import *
+#TS20080406 the new panelQ4
+from einstein.GUI.panelQ4 import PanelQ4
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -443,10 +448,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnButtonClearPage3, self.buttonClearPage3)
 
         #--- bindings Page 4
-        self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentListPage4ListboxClick, self.listBoxEquipmentListPage4)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipmentPage4Button, self.buttonDeleteEquipmentPage4)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipmentPage4Button, self.buttonAddEquipmentPage4)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonClearPage4Button, self.buttonClearPage4)
+	#TS20080406 Moved to panelQ4.py
 
         #--- bindings Page 5
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxDistributionListPage5ListboxClick, self.listBoxDistributionListPage5)
@@ -1211,190 +1213,11 @@ class EinsteinFrame(wx.Frame):
 
         
         ####----PAGE 4
-
-        self.Page4 = wx.Panel(id=-1, name='Page4',
-              parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+	#TS20080406 The generation of this panel has been moved to panelQ4.py
+	#           together with all the actions. Here we only instantiate the panel.
+	#
+        self.Page4 = PanelQ4(self.leftpanel2, self.activeQid)
         self.Page4.Hide()
-
-
-        self.stInfo1Page4 = wx.StaticText(id=-1, label=PList["X060"][1], name='stInfo1Page4', parent=self.Page4, pos=wx.Point(24, 24), style=0)
-        self.stInfo1Page4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.stInfo2Page4 = wx.StaticText(id=-1, label=PList["0500"][1], name='stInfo2Page4', parent=self.Page4, pos=wx.Point(272, 24), style=0)
-        self.stInfo2Page4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-
-        self.listBoxEquipmentListPage4 = wx.ListBox(choices=[],
-              id=-1,
-              name='listBoxEquipmentListPage4', parent=self.Page4,
-              pos=wx.Point(24, 40), size=wx.Size(200, 216), style=0)
-
-
-        self.buttonDeleteEquipmentPage4 = wx.Button(id=-1,
-              label=PList["X061"][1], name='buttonDeleteEquipmentPage4',
-              parent=self.Page4, pos=wx.Point(120, 264), size=wx.Size(107, 16),
-              style=0)
-
-        self.buttonAddEquipmentPage4 = wx.Button(id=-1,
-              label=PList["X062"][1], name='buttonAddEquipmentPage4',
-              parent=self.Page4, pos=wx.Point(584, 464), size=wx.Size(123, 16),
-              style=0)
-
-        self.buttonClearPage4 = wx.Button(id=-1,
-              label=PList["X028"][1], name='buttonClearPage4', parent=self.Page4,
-              pos=wx.Point(272, 464), size=wx.Size(120, 16), style=0)
-
-
-        
-
-        self.st1Page4 = wx.StaticText(id=-1, label=PList["0501"][1] + ' ' + PList["0501"][2], name='st1Page4', parent=self.Page4, pos=wx.Point(272, 48), style=0)
-
-        self.tc1Page4 = wx.TextCtrl(id=-1, name='tc1Page4',
-              parent=self.Page4, pos=wx.Point(272, 64), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st2Page4 = wx.StaticText(id=-1, label=PList["0502"][1] + ' ' + PList["0502"][2], name='st2Page4', parent=self.Page4, pos=wx.Point(272, 88), style=0)
-
-        self.tc2Page4 = wx.TextCtrl(id=-1, name='tc2Page4',
-              parent=self.Page4, pos=wx.Point(272, 104), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st3Page4 = wx.StaticText(id=-1, label=PList["0503"][1] + ' ' + PList["0503"][2], name='st3Page4', parent=self.Page4, pos=wx.Point(272, 128), style=0)
-
-        self.tc3Page4 = wx.TextCtrl(id=-1, name='tc3Page4',
-              parent=self.Page4, pos=wx.Point(272, 144), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st4Page4 = wx.StaticText(id=-1, label=PList["0504"][1] + ' ' + PList["0504"][2], name='st4Page4', parent=self.Page4, pos=wx.Point(272, 168), style=0)
-
-        self.tc4Page4 = wx.TextCtrl(id=-1, name='tc4Page4',
-              parent=self.Page4, pos=wx.Point(272, 184), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st5Page4 = wx.StaticText(id=-1, label=PList["0505"][1] + ' ' + PList["0505"][2], name='st5Page4', parent=self.Page4, pos=wx.Point(272, 208), style=0)
-
-        self.tc5Page4 = wx.TextCtrl(id=-1, name='tc5Page4',
-              parent=self.Page4, pos=wx.Point(272, 224), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st6Page4 = wx.StaticText(id=-1, label=PList["0506"][1] + ' ' + PList["0506"][2], name='st6Page4', parent=self.Page4, pos=wx.Point(272, 248), style=0)
-
-        self.tc6Page4 = wx.TextCtrl(id=-1, name='tc6Page4',
-              parent=self.Page4, pos=wx.Point(272, 264), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st7Page4 = wx.StaticText(id=-1, label=PList["0507"][1] + ' ' + PList["0507"][2], name='st7Page4', parent=self.Page4, pos=wx.Point(272, 288), style=0)
-
-        #self.tc7Page4 = wx.TextCtrl(id=-1, name='tc7Page4',
-        #      parent=self.Page4, pos=wx.Point(272, 304), size=wx.Size(200, 21),
-        #      style=0, value='')
-        self.choiceOfDBFuelPage4 = wx.Choice(choices=[],
-              id=-1, name='choiceOfDBFuelPage4', parent=self.Page4, pos=wx.Point(272, 304),
-              size=wx.Size(200, 21), style=0)
-
-
-        self.st8Page4 = wx.StaticText(id=-1, label=PList["0521"][1] + ' ' + PList["0521"][2], name='st8Page4', parent=self.Page4, pos=wx.Point(272, 328), style=0)
-
-        self.tc8Page4 = wx.TextCtrl(id=-1, name='tc8Page4',
-              parent=self.Page4, pos=wx.Point(272, 344), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st9Page4 = wx.StaticText(id=-1, label=PList["0508"][1] + ' ' + PList["0508"][2], name='st9Page4', parent=self.Page4, pos=wx.Point(272, 368), style=0)
-
-        self.tc9Page4 = wx.TextCtrl(id=-1, name='tc9Page4',
-              parent=self.Page4, pos=wx.Point(272, 384), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st10Page4 = wx.StaticText(id=-1, label=PList["0509"][1] + ' ' + PList["0509"][2], name='st10Page4', parent=self.Page4, pos=wx.Point(272, 408), style=0)
-
-        self.tc10Page4 = wx.TextCtrl(id=-1, name='tc10Page4',
-              parent=self.Page4, pos=wx.Point(272, 424), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st11Page4 = wx.StaticText(id=-1, label=PList["0510"][1] + ' ' + PList["0510"][2], name='st11Page4', parent=self.Page4, pos=wx.Point(512, 48), style=0)
-
-        self.tc11Page4 = wx.TextCtrl(id=-1, name='tc11Page4',
-              parent=self.Page4, pos=wx.Point(512, 64), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st12Page4 = wx.StaticText(id=-1, label=PList["0511"][1] + ' ' + PList["0511"][2], name='st12Page4', parent=self.Page4, pos=wx.Point(512, 88), style=0)
-
-        self.tc12Page4 = wx.TextCtrl(id=-1, name='tc12Page4',
-              parent=self.Page4, pos=wx.Point(512, 104), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st13Page4 = wx.StaticText(id=-1, label=PList["0512"][1] + ' ' + PList["0512"][2], name='st13Page4', parent=self.Page4, pos=wx.Point(512, 128), style=0)
-
-        self.tc13Page4 = wx.TextCtrl(id=-1, name='tc13Page4',
-              parent=self.Page4, pos=wx.Point(512, 144), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st14Page4 = wx.StaticText(id=-1, label=PList["0514"][1] + ' ' + PList["0514"][2], name='st14Page4', parent=self.Page4, pos=wx.Point(512, 168), style=0)
-
-        self.tc14Page4 = wx.TextCtrl(id=-1, name='tc14Page4',
-              parent=self.Page4, pos=wx.Point(512, 184), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st15Page4 = wx.StaticText(id=-1, label=PList["0513"][1] + ' ' + PList["0513"][2], name='st15Page4', parent=self.Page4, pos=wx.Point(512, 208), style=0)
-
-        self.tc15Page4 = wx.TextCtrl(id=-1, name='tc15Page4',
-              parent=self.Page4, pos=wx.Point(512, 224), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st16Page4 = wx.StaticText(id=-1, label=PList["0515"][1] + ' ' + PList["0515"][2], name='st16Page4', parent=self.Page4, pos=wx.Point(512, 248), style=0)
-
-        self.tc16Page4 = wx.TextCtrl(id=-1, name='tc16Page4',
-              parent=self.Page4, pos=wx.Point(512, 264), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st17Page4 = wx.StaticText(id=-1, label=PList["0516"][1] + ' ' + PList["0516"][2], name='st17Page4', parent=self.Page4, pos=wx.Point(512, 288), style=0)
-
-        self.tc17Page4 = wx.TextCtrl(id=-1, name='tc17Page4',
-              parent=self.Page4, pos=wx.Point(512, 304), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st18Page4 = wx.StaticText(id=-1, label=PList["0517"][1] + ' ' + PList["0517"][2], name='st18Page4', parent=self.Page4, pos=wx.Point(512, 328), style=0)
-
-        self.tc18Page4 = wx.TextCtrl(id=-1, name='tc18Page4',
-              parent=self.Page4, pos=wx.Point(512, 344), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st19Page4 = wx.StaticText(id=-1, label=PList["0518"][1] + ' ' + PList["0518"][2], name='st19Page4', parent=self.Page4, pos=wx.Point(512, 368), style=0)
-
-        self.tc19Page4 = wx.TextCtrl(id=-1, name='tc19Page4',
-              parent=self.Page4, pos=wx.Point(512, 384), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-        self.st20Page4 = wx.StaticText(id=-1, label=PList["0520"][1] + ' ' + PList["0520"][2], name='st20Page4', parent=self.Page4, pos=wx.Point(512, 408), style=0)
-
-        self.tc20Page4 = wx.TextCtrl(id=-1, name='tc20Page4',
-              parent=self.Page4, pos=wx.Point(512, 424), size=wx.Size(200, 21),
-              style=0, value='')
-
-
-
-
-
-
-
         ####--- End of PAGE 4
 
 
@@ -2517,8 +2340,8 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.Page4.Show()
             self.help.SetValue(PList["0102"][1])
-            self.fillChoiceOfDBFuelPage4()
-            self.clearPage4()
+            self.Page4.fillChoiceOfDBFuel()
+            self.Page4.clear()
             if self.activeQid <> 0: self.fillPage("Page4")
         #Page5
         elif select == PList["X014"][1]:
@@ -3147,112 +2970,8 @@ class EinsteinFrame(wx.Frame):
 #--- Eventhandlers Page 4
 #------------------------------------------------------------------------------		
 
+# gone ...
     
-    def OnListBoxEquipmentListPage4ListboxClick(self, event):
-        q = Status.DB.qgenerationhc.Questionnaire_id[self.activeQid].Equipment[str(self.listBoxEquipmentListPage4.GetStringSelection())][0]
-        self.tc1Page4.SetValue(str(q.Equipment))
-        self.tc2Page4.SetValue(str(q.Manufact))
-        self.tc3Page4.SetValue(str(q.YearManufact))
-        self.tc4Page4.SetValue(str(q.Model))
-        self.tc5Page4.SetValue(str(q.EquipType))
-        self.tc6Page4.SetValue(str(q.NumEquipUnits))
-        self.tc9Page4.SetValue(str(q.HCGPnom))
-        self.tc10Page4.SetValue(str(q.FuelConsum))
-        self.tc11Page4.SetValue(str(q.UnitsFuelConsum))
-        self.tc12Page4.SetValue(str(q.ElectriConsum))
-        self.tc13Page4.SetValue(str(q.HCGTEfficiency))
-        self.tc14Page4.SetValue(str(q.HCGEEfficiency))
-        self.tc15Page4.SetValue(str(q.ElectriProduction))
-        self.tc16Page4.SetValue(str(q.TExhaustGas))
-        self.tc17Page4.SetValue(str(q.PartLoad))
-        self.tc18Page4.SetValue(str(q.HPerDayEq))
-        self.tc19Page4.SetValue(str(q.NDaysEq))
-        self.tc20Page4.SetValue(str(q.PipeDuctEquip))
-        self.tc8Page4.SetValue(str(q.CoolTowerType))
-        if q.DBFuel_id <> None:
-            self.choiceOfDBFuelPage4.SetSelection(self.choiceOfDBFuelPage4.FindString(str(Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id][0].FuelName)))
-        #event.Skip()
-
-    def OnButtonDeleteEquipmentPage4Button(self, event):
-        event.Skip()
-
-
-
-    def OnButtonAddEquipmentPage4Button(self, event):        
-        if self.activeQid <> 0:
-            if self.check(self.tc1Page4.GetValue()) <> 'NULL' and len(Status.DB.qgenerationhc.Equipment[self.tc1Page4.GetValue()].Questionnaire_id[self.activeQid]) == 0:
-                dbfid = Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelPage4.GetStringSelection())][0].DBFuel_ID                      
-        
-                tmp = {
-                    "Questionnaire_id":self.activeQid,
-                    "Equipment":self.check(self.tc1Page4.GetValue()), 
-                    "Manufact":self.check(self.tc2Page4.GetValue()), 
-                    "YearManufact":self.check(self.tc3Page4.GetValue()), 
-                    "Model":self.check(self.tc4Page4.GetValue()), 
-                    "EquipType":self.check(self.tc5Page4.GetValue()), 
-                    "NumEquipUnits":self.check(self.tc6Page4.GetValue()),
-                    "DBFuel_id":dbfid,
-                    "HCGPnom":self.check(self.tc9Page4.GetValue()), 
-                    "FuelConsum":self.check(self.tc10Page4.GetValue()), 
-                    "UnitsFuelConsum":self.check(self.tc11Page4.GetValue()), 
-                    "ElectriConsum":self.check(self.tc12Page4.GetValue()), 
-                    "HCGTEfficiency":self.check(self.tc13Page4.GetValue()), 
-                    "HCGEEfficiency":self.check(self.tc14Page4.GetValue()), 
-                    "ElectriProduction":self.check(self.tc15Page4.GetValue()), 
-                    "TExhaustGas":self.check(self.tc16Page4.GetValue()), 
-                    "PartLoad":self.check(self.tc17Page4.GetValue()), 
-                    "HPerDayEq":self.check(self.tc18Page4.GetValue()), 
-                    "NDaysEq":self.check(self.tc19Page4.GetValue()), 
-                    "PipeDuctEquip":self.check(self.tc20Page4.GetValue()), 
-                    "CoolTowerType":self.check(self.tc8Page4.GetValue()),
-                    "IsAlternative":0
-                    }
-
-                Status.DB.qgenerationhc.insert(tmp)               
-                Status.SQL.commit()
-                self.fillEquipmentList()
-
-            elif self.check(self.tc1Page4.GetValue()) <> 'NULL' and len(Status.DB.qgenerationhc.Equipment[self.tc1Page4.GetValue()].Questionnaire_id[self.activeQid]) == 1:
-                dbfid = Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelPage4.GetStringSelection())][0].DBFuel_ID                       
-        
-                tmp = {
-                    "Equipment":self.check(self.tc1Page4.GetValue()), 
-                    "Manufact":self.check(self.tc2Page4.GetValue()), 
-                    "YearManufact":self.check(self.tc3Page4.GetValue()), 
-                    "Model":self.check(self.tc4Page4.GetValue()), 
-                    "EquipType":self.check(self.tc5Page4.GetValue()), 
-                    "NumEquipUnits":self.check(self.tc6Page4.GetValue()),
-                    "DBFuel_id":dbfid,
-                    "HCGPnom":self.check(self.tc9Page4.GetValue()), 
-                    "FuelConsum":self.check(self.tc10Page4.GetValue()), 
-                    "UnitsFuelConsum":self.check(self.tc11Page4.GetValue()), 
-                    "ElectriConsum":self.check(self.tc12Page4.GetValue()), 
-                    "HCGTEfficiency":self.check(self.tc13Page4.GetValue()), 
-                    "HCGEEfficiency":self.check(self.tc14Page4.GetValue()), 
-                    "ElectriProduction":self.check(self.tc15Page4.GetValue()), 
-                    "TExhaustGas":self.check(self.tc16Page4.GetValue()), 
-                    "PartLoad":self.check(self.tc17Page4.GetValue()), 
-                    "HPerDayEq":self.check(self.tc18Page4.GetValue()), 
-                    "NDaysEq":self.check(self.tc19Page4.GetValue()), 
-                    "PipeDuctEquip":self.check(self.tc20Page4.GetValue()), 
-                    "CoolTowerType":self.check(self.tc8Page4.GetValue()),
-                    "IsAlternative":0
-                    }
-                q = Status.DB.qgenerationhc.Equipment[self.tc1Page4.GetValue()].Questionnaire_id[self.activeQid][0]
-                q.update(tmp)               
-                Status.SQL.commit()
-                self.fillEquipmentList()
-                          
-            else:
-                self.showError("Equipment have to be an uniqe value!")
-        
-        
-
-    def OnButtonClearPage4Button(self, event):
-        self.clearPage4()
-        #event.Skip()
-
-
 #------------------------------------------------------------------------------		
 #--- Eventhandlers Page 5
 #------------------------------------------------------------------------------		
@@ -3690,12 +3409,6 @@ class EinsteinFrame(wx.Frame):
             self.choiceOfSMDBFluidPage3.Append (n.FluidName)
         self.choiceOfSMDBFluidPage3.SetSelection(0)
 
-    def fillChoiceOfDBFuelPage4(self):
-        self.choiceOfDBFuelPage4.Clear()
-        self.choiceOfDBFuelPage4.Append ("None")
-        for n in Status.DB.dbfuel.FuelName["%"]:
-            self.choiceOfDBFuelPage4.Append (n.FuelName)
-        self.choiceOfDBFuelPage4.SetSelection(0)
 
     def fillchoiceOfEquipmentPage5(self):
         self.choiceOfEquipmentPage5.Clear()
@@ -3828,29 +3541,6 @@ class EinsteinFrame(wx.Frame):
         
         
 
-    def clearPage4(self):
-        self.tc1Page4.SetValue('')
-        self.tc2Page4.SetValue('')
-        self.tc3Page4.SetValue('')
-        self.tc4Page4.SetValue('')
-        self.tc5Page4.SetValue('')
-        self.tc6Page4.SetValue('')
-        self.tc9Page4.SetValue('')
-        self.tc10Page4.SetValue('')
-        self.tc11Page4.SetValue('')
-        self.tc12Page4.SetValue('')
-        self.tc13Page4.SetValue('')
-        self.tc14Page4.SetValue('')
-        self.tc15Page4.SetValue('')
-        self.tc16Page4.SetValue('')
-        self.tc17Page4.SetValue('')
-        self.tc18Page4.SetValue('')
-        self.tc19Page4.SetValue('')
-        self.tc20Page4.SetValue('')
-        self.tc8Page4.SetValue('')
-        
-        
-
     def clearPage5(self):
         self.tc1Page5.SetValue('')
         #self.tc2Page5.SetValue('')
@@ -3977,12 +3667,6 @@ class EinsteinFrame(wx.Frame):
             for n in Status.DB.qprocessdata.Questionnaire_id[self.activeQid]:
                 self.listBoxProcessesPage3.Append (str(n.Process))
 
-    def fillEquipmentList(self):
-        self.listBoxEquipmentListPage4.Clear()
-        if len(Status.DB.qgenerationhc.Questionnaire_id[self.activeQid]) > 0:
-            for n in Status.DB.qgenerationhc.Questionnaire_id[self.activeQid]:
-                self.listBoxEquipmentListPage4.Append (str(n.Equipment))
-
 
     def fillDistributionList(self):
         self.listBoxDistributionListPage5.Clear()
@@ -4079,7 +3763,7 @@ class EinsteinFrame(wx.Frame):
 
 
         if page == "Page4":
-            self.fillEquipmentList()            
+            self.Page4.fillEquipmentList()            
 
 
 

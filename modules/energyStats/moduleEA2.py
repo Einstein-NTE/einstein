@@ -10,12 +10,14 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Revised by:         Stoyan Danov  07/04/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
+#       07/04/2008           Adapted to use data from sql, not checked     
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -43,6 +45,13 @@ class ModuleEA2(object):
     def __init__(self, keys):
         self.keys = keys
         self.interface = Interfaces()
+#...............................................................
+        PId = Status.PId
+        ANo = Status.ANo
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
+        self.cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)[0]
+#................................................................
         self.initModule()
 
     def initModule(self):
@@ -52,16 +61,38 @@ class ModuleEA2(object):
         module initialization
         """
 #------------------------------------------------------------------------------
-        data = array([['Total Fuels'       ,660.0,  81.48, 583.0,  90.67],
-                      ['Total Electricity' ,150.0,  18.52,  60.0,   9.33],
-                      ['Total (F+E)'       ,810.0, 100.00, 643.0, 100.00]])
 
+        PEC = [self.cgeneraldata.PECFuels, self.cgeneraldata.PECElect]
+        PECTotal = self.cgeneraldata.PECFuels + self.cgeneraldata.PECElect
+        PECPercentage = [PEC[0]*100.0/PECTotal, PEC[1]*100.0/PECTotal]
+
+        PET = [self.cgeneraldata.PETFuels, self.cgeneraldata.PETElect]
+        PETTotal = self.cgeneraldata.PETFuels + self.cgeneraldata.PETElect
+        PETPercentage = [PET[0]*100.0/PETTotal, PET[1]*100.0/PETTotal]
+
+#..............................................................
+        #finish the table columns, add total, percentage
+        Labels = ['Total fuels','Total electricity','Total (fuels + electricity)']
+        PEC.append(PECTotal)
+        PET.append(PETTotal)
+
+        suma = 0
+        for i in PECPercentage:
+            suma += i
+        PECPercentage.append(suma)
+
+        suma = 0
+        for i in PETPercentage:
+            suma += i
+        PETPercentage.append(suma)
+      
+#.................................................................
+
+        TableColumnList = [Labels,PEC,PECPercentage,PET,PETPercentage]
+
+        matrix = transpose(TableColumnList)
+        data = array(matrix)
         self.interface.setGraphicsData(self.keys[0], data)
-
-        #print "ModuleEA2 graphics data initialization"
-        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]))
-
-        return "ok"
 
 #------------------------------------------------------------------------------
     def exitModule(self,exit_option):

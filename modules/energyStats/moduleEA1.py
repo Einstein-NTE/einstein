@@ -11,14 +11,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	   21/03/2008
 #       Revised by:         Hans Schweiger 28/03/2008
 #       Revised by:         Tom Sobota     28/03/2008
+#       Revised by:         Stoyan Danov     07/04/2008
 #
 #       Changes to previous version:
 #	28/03/08:   functions draw_ ... moved to panel
 #	28/03/08:   TS changed functions draw... to use numpy arrays,
+#       07/04/2008: SD Adapted to show data from sql, not checked
 #                   
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -45,6 +47,24 @@ class ModuleEA1(object):
     def __init__(self, keys):
         self.keys = keys # keys for accessing the data in Interfaces
         self.interface = Interfaces()
+#..............................................................................
+
+        PId = Status.PId
+        ANo = Status.ANo
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
+        self.equipements = Status.DB.qgenerationhc.sql_select(sqlQuery) 
+        self.NEquipe = len(self.equipements)
+        print "%s equipes found" % self.NEquipe
+
+        self.fuels = Status.DB.qfuel.sql_select(sqlQuery)
+
+        self.cfuel = Status.DB.cfuel.sql_select(sqlQuery) 
+        self.NFuels = len(self.cfuel)
+        print "%s fuels found" % self.NFuels
+        
+#..............................................................................
+
         self.initModule()
 
     def initModule(self):
@@ -66,19 +86,67 @@ class ModuleEA1(object):
         #
         # This data is only an example, the actual data will come from the database
         #
-        data = array([['Heavy fuel oil' ,  0.0,   0.00,   0.0,   0.00],
-                      ['Natural gas'    ,200.0,  30.77, 180.0,  32.73],
-                      ['Gas oil'        ,100.0,  15.38,  50.0,   9.09],
-                      ['LPG'            ,300.0,  46.15, 300.0,  54.55],
-                      ['Other'          ,  0.0,   0.00,   0.0,   0.00],
-                      ['Electricity'    , 50.0,   7.69,  20.0,   3.64],
-                      ['Total'          ,650.0, 100.00, 550.0, 100.00]])
+
+
+#..............................................................................
+# Final energy consumption by fuels (data for panel EA1)
+
+        TotalFEC = 0.0
+        TotalFETi = 0.0
+        FEC = []
+        FETi = []
+        FuelType = []
+            
+        for row in self.cfuel:  #sum all FECi/FETi for fuels used
+            Fuel_id = Status.DB.qfuel.QFuel_ID[row.QFuel_id][0].DBFuel_id
+            FuelName = Status.DB.dbfuel.DBFuel_ID[Fuel_id][0].FuelName
+            FuelType.append(FuelName)
+            TotalFEC += row.FECi
+            FEC.append(row.FECi)
+            TotalFETi += row.FETi
+            FETi.append(row.FETi)
+
+        TotalFEC += Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FECel  #add FECel to TotalFEC
+        TotalFETi += Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FETel
+        FuelType.append("Electricity")
+        FEC.append(Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FECel)
+        FETi.append(Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FETel)
+
+        #save TotalFEC in CGeneralData table in DB variable FEC (FEC total) #Necessary ?? SD
+        Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FEC = TotalFEC
+        Status.DB.cgeneraldata.Questionnaire_id[Status.PId][0].FET = TotalFETi
+        Status.SQL.commit() 
+
+        FECPercentage = []
+        FETPercentage = []
+
+        for i in range (self.NFuels + 1):
+            FECPercentage.append(FEC[i]*100.0/TotalFEC)
+            FETPercentage.append(FETi[i]*100.0/TotalFETi)
+
+#.........................................................        
+        #finish the table columns, add total, sum percentage
+        FuelType.append('Total')
+        FEC.append(TotalFEC)
+        FETi.append(TotalFETi)
+
+        suma = 0
+        for i in FECPercentage:
+            suma += i
+        FECPercentage.append(suma)
+
+        suma = 0
+        for i in FETPercentage:
+            suma += i
+        FETPercentage.append(suma)
+
+#.........................................................
+
+        TableColumnList = [FuelType,FEC,FECPercentage,FETi,FETPercentage]
+        matrix = transpose(TableColumnList)
+        data = array(matrix)
                           
         self.interface.setGraphicsData(self.keys[0], data)
-
-        #print "ModuleEA1 graphics data initialization"
-        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
-        return "ok"
 
 #------------------------------------------------------------------------------
     def exitModule(self,exit_option):
