@@ -1,0 +1,25 @@
+--update einstein database: add Boiler Database table, 08.04.2008, Stoyan Danov
+USE einstein;
+
+--add new table
+CREATE TABLE DBBoiler (
+	DBBoiler_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '',
+	BoilerManufacturer VARCHAR(45) COMMENT 'Manufacturer',
+	BoilerModel VARCHAR(45) COMMENT 'Model',
+	BoilerType VARCHAR(45) COMMENT 'Type of Boiler',	
+	BBPnom DOUBLE COMMENT 'Nominal power [kW]',
+	Economiser VARCHAR(45) COMMENT 'Does the equip. include an economiser (water preheater)? Yes/No',
+	Preheater VARCHAR(45) COMMENT 'Does the equip. include an air pre-heater? Yes/No',
+	BBEfficiency DOUBLE COMMENT 'Boiler efficiency',
+	BoilerTemp DOUBLE COMMENT 'Maximum operating temperature',
+	BBA1 DOUBLE COMMENT 'Linear dependence of the efficiency on the load',
+	BBA2 DOUBLE COMMENT 'Quadratic dependence of the efficiency on the load',
+	BBK1 DOUBLE COMMENT 'Linear dependence of the efficiency on temperature',
+	BBK2 DOUBLE COMMENT 'Quadratic dependence of the efficiency on temperature',
+	BoilerPrice DOUBLE COMMENT 'Equipment price at factory applied installers discount',
+	BoilerTurnKeyPrice DOUBLE COMMENT 'Price of installed equipment (including work, additional accessories)',
+	BoilerOandMfix DOUBLE COMMENT 'Annual operational and maintenance fixed costs (approximate average per kW heating)',
+	BoilerOandMvar DOUBLE COMMENT 'Annual operational and maintenance variable costs (approximate average per MWh heating)',
+	PRIMARY KEY (DBBoiler_ID)
+);
+
