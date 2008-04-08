@@ -29,6 +29,7 @@
 #                           Hans Schweiger                      02/04/2008
 #                           Hans Schweiger                      03/04/2008
 #                           Tom Sobota                          06/04/2008
+#                           Hans Schweiger                      08/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -48,6 +49,7 @@
 #                   Second update: PanelHC and PanelA added
 #       06/04/2008  Extracted Page 4 and all related code as an external module,so it
 #                   can be called from other places
+#       08/04/2008  Panels BM1-3 added (Benchmark modules)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -95,6 +97,10 @@ from panelEM1 import *
 from panelEM2 import *
 #from panelEH1 import *
 #from panelEH2 import *
+
+from panelBM1 import *
+from panelBM2 import *
+from panelBM3 import *
 
 
 #-----  Global variables 
@@ -2183,7 +2189,16 @@ class EinsteinFrame(wx.Frame):
         ####----PAGE pageBenchmarkCheck
         self.pageBenchmarkCheck = wx.Panel(id=-1, name='pageBenchmarkCheck', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
         self.pageBenchmarkCheck.Hide()
+
+
+#HS2008-04-08 Benchmark Check
         ####--- End of pageBenchmarkCheck
+        self.panelBM1 = PanelBM1(id=-1, name='panelBM1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
+        self.panelBM1.Hide()
+        self.panelBM2 = PanelBM2(id=-1, name='panelBM2', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
+        self.panelBM2.Hide()
+        self.panelBM3 = PanelBM3(id=-1, name='panelBM3', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
+        self.panelBM3.Hide()
 
         ####----PAGE pageHeatRecoveryTargets
         #self.pageHeatRecoveryTargets = wx.Panel(id=-1, name='pageHeatRecoveryTargets', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
@@ -2440,6 +2455,21 @@ class EinsteinFrame(wx.Frame):
             #self.hidePages()
             #self.pageBenchmarkCheck.Show()
             pass
+
+#XXXHS2008-04-08
+        elif select == "Global energy intensity":
+            self.hidePages()
+            self.panelBM1.Show()
+            
+        elif select == "SEC by product":
+            self.hidePages()
+            self.panelBM2.Show()
+            
+        elif select == "SEC by process":
+            self.hidePages()
+            self.panelBM3.Show()
+            
+
         #qOptimisationProposals
         elif select == PList["X145"][1]:        #generation of alternatives
             self.hidePages()
@@ -3340,7 +3370,13 @@ class EinsteinFrame(wx.Frame):
         self.panelEA6.Hide()
         self.panelEM1.Hide()
         self.panelEM2.Hide()
+
+#HS2008-04-08        
         self.pageBenchmarkCheck.Hide()
+        self.panelBM1.Hide()
+        self.panelBM2.Hide()
+        self.panelBM3.Hide()
+        
         #self.pageHeatRecoveryTargets.Hide()
 
         self.panelA.Hide()

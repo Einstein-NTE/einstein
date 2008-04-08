@@ -16,12 +16,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	03/04/2008
-#	Revised by:         ---
+#	Revised by:         Hans Schweiger      08/04/2008
 #
 #       Changes in last update:
-#       ---
+#       08/04/08    Benchmark module included
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -33,6 +33,7 @@
 #
 #==============================================================================
 
+from einstein.modules.moduleBM import ModuleBM
 from einstein.modules.moduleA import ModuleA
 from einstein.modules.energy.moduleEnergy import ModuleEnergy
 from einstein.modules.moduleHC import ModuleHC
@@ -44,6 +45,11 @@ class Modules(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
+        keys = ['BM Table'] 
+        print "Modules (__init__): BM - starting"
+        self.moduleBM = ModuleBM(keys)
+        print "Modules (__init__): BM",self.moduleBM
+        
         keys = ['A Table'] 
         print "Modules (__init__): A - starting"
         self.moduleA = ModuleA(keys)
