@@ -14,10 +14,13 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Stoyan Danov  07/04/2008
+#       Revised by:         Stoyan Danov     11/04/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
-#       07/04/2008           Adapted to use data from sql, not checked     
+#       07/04/2008           Adapted to use data from sql, not checked
+#       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
+#                       Return to original state later!
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -92,7 +95,12 @@ class ModuleEA2(object):
 
         matrix = transpose(TableColumnList)
         data = array(matrix)
-        self.interface.setGraphicsData(self.keys[0], data)
+
+        dummydata = array([['Total Fuels'       ,660.0,  81.48, 583.0,  90.67],
+                      ['Total Electricity' ,150.0,  18.52,  60.0,   9.33],
+                      ['Total (F+E)'       ,810.0, 100.00, 643.0, 100.00]])
+        
+        self.interface.setGraphicsData(self.keys[0], dummydata)
 
 #------------------------------------------------------------------------------
     def exitModule(self,exit_option):

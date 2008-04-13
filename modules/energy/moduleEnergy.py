@@ -16,13 +16,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.07
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
 #                           Tom Sobota          31/03/2008
 #                           Hans Schweiger      02/04/2008
 #                           Hans Schweiger      03/04/2008
+#                           Hans Schweiger      13/04/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -31,6 +32,7 @@
 #       31/03/2008 Adaptation to new numpy-based graphics
 #       02/04/2008 Small change in instantiatio of ModuleHP (key included)
 #       03/04/2008 Link to modules via parent (= Modules)
+#       13/04/2008 CascadeIndex corrected: now from 1 to N
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -153,7 +155,7 @@ class ModuleEnergy(object):
 
         PNom = equipe.HCGPnom
         EqName = equipe.Equipment
-        EquipmentNo = self.interface.cascade[cascadeIndex]["equipeNo"]
+        EquipmentNo = self.interface.cascade[cascadeIndex-1]["equipeNo"]
         
         NT = Status.NT
         DT = Status.TemperatureInterval
@@ -166,8 +168,8 @@ class ModuleEnergy(object):
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex]
-        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex]
+        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex-1]
+        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex-1]
         
         USHj_Tt = self.interface.createQ_Tt()
         USHj_t = self.interface.createQ_t()
@@ -204,18 +206,18 @@ class ModuleEnergy(object):
 # storing results in Interfaces
 
 # remaining heat demand and availability for next equipment in cascade
-        Interfaces.QD_Tt_mod[cascadeIndex+1] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex+1] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QA_Tt)
+        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Interfaces.QD_T_mod[cascadeIndex] = self.interface.calcQ_T(QD_Tt)
+        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Interfaces.QA_T_mod[cascadeIndex] = self.interface.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment                            
-        Interfaces.USHj_Tt[cascadeIndex] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex] = self.interface.calcQ_T(USHj_Tt)
+        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Interfaces.USHj_T[cascadeIndex-1] = self.interface.calcQ_T(USHj_Tt)
 
 # waste heat absorbed by present equipment                            
-        Interfaces.QHXj_Tt[cascadeIndex] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex] = self.interface.calcQ_T(QHXj_Tt)
+        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Interfaces.QHXj_T[cascadeIndex-1] = self.interface.calcQ_T(QHXj_Tt)
 
 #        equipeC.USHj = USHj
 #        equipeC.QHXj = QHXj    #XXX to be defined in data base
@@ -275,8 +277,8 @@ class ModuleEnergy(object):
 # now calculate the cascade
 # call the calculation modules for each equipment
 
-            for cascadeIndex in range(self.NEquipe):
-                equipeID = self.interface.cascade[cascadeIndex]["equipeID"]
+            for cascadeIndex in range(1,self.NEquipe+1):
+                equipeID = self.interface.cascade[cascadeIndex-1]["equipeID"]
 
                 equipe = self.equipments.QGenerationHC_ID[equipeID][0]
                 equipeC = self.equipmentsC.QGenerationHC_ID[equipeID][0]

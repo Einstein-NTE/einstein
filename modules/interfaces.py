@@ -23,6 +23,7 @@
 #	                    Hans Schweiger      21/03/2008
 #                           Stoyan Danov        27/03/2008
 #                           Hans Schweiger      02/04/2008
+#                           Stoyan Danov        09/04/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -33,6 +34,7 @@
 #                   QDh/QAh renamed to QD_Tt, QA_Tt
 #       27/03/2008 getEquipmentCascade(self): adaptation
 #       02/04/2008 corrections in getEquipmentCascade
+#       09/04/2008 getEquipmentCascade: add filling EquipTableDataList-data fields shown in Table panel
 #
 #	
 #------------------------------------------------------------------------------		
@@ -88,6 +90,7 @@ class Interfaces(object):
 
     NEquipe = None
     cascade = []
+    EquipTableDataList = []
     
 #..........................................................................
 # DATA BLOCK 2: graphics data dictionary for graphics on panels
@@ -180,6 +183,40 @@ class Interfaces(object):
                 Interfaces.QHXj_Tt.append(self.createQ_Tt)
                 Interfaces.QHXj_T.append(self.createQ_T)
                 
+#------------------------------------------------------------------------------		
+    def addCascadeArrays(self):
+#------------------------------------------------------------------------------		
+
+        Interfaces.QD_Tt_mod.append(self.QD_Tt)       
+        Interfaces.QD_T_mod.append(self.QD_T)
+        Interfaces.QA_Tt_mod.append(self.QA_Tt)      
+        Interfaces.QA_T_mod.append(self.QA_T)
+
+        Interfaces.USHj_Tt.append(self.createQ_Tt)
+        Interfaces.USHj_T.append(self.createQ_T)
+        Interfaces.QHXj_Tt.append(self.createQ_Tt)
+        Interfaces.QHXj_T.append(self.createQ_T)
+
+        self.NEquipe += 1
+
+#------------------------------------------------------------------------------		
+    def deleteCascadeArrays(self,NEquipe):
+#------------------------------------------------------------------------------		
+
+        Interfaces.QD_Tt_mod.pop(NEquipe-1)       
+        Interfaces.QD_T_mod.pop(NEquipe-1)
+        Interfaces.QA_Tt_mod.pop(NEquipe-1)      
+        Interfaces.QA_T_mod.pop(NEquipe-1)
+
+        Interfaces.USHj_Tt.pop(NEquipe-1)
+        Interfaces.USHj_T.pop(NEquipe-1)
+        Interfaces.QHXj_Tt.pop(NEquipe-1)
+        Interfaces.QHXj_T.pop(NEquipe-1)
+
+        self.NEquipe -= 1
+
+
+        
 #------------------------------------------------------------------------------
     def getEquipmentCascade(self):
 #------------------------------------------------------------------------------
@@ -204,7 +241,12 @@ class Interfaces(object):
                             "equipeType":self.equipments[j].EquipType,\
                             "equipePnom":self.equipments[j].HCGPnom})
 
-        print "Interfaces (getEquipmentCascade): present cascade", self.cascade
+        self.EquipTableDataList = []
+        for j in range(self.NEquipe):
+            self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].YearManufact, \
+                                            self.equipments[j].EquipType, self.equipmentsC[j].USHj, \
+                                           self.equipments[j].HCGPnom, self.equipments[j].HCGPnom]) #SD change later USHj to HOp when added to sql
+                                                                                        #SD change HCGPnom (last) to Temperature(??) 09/04/2008
         
 
 #------------------------------------------------------------------------------		

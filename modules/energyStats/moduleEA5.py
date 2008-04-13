@@ -14,10 +14,13 @@
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Last revised by:    Stoyan Danov 07/04/2008
+#       Revised by:         Stoyan Danov     11/04/2008
 #
 #       Changes to previous version:
 #	28/03/08:   TS changed functions draw... to use numpy arrays,
 #       07/04/08:   SD, adapted to use data from sql, not checked
+#       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
+#                       Return to original state later!
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -143,11 +146,11 @@ class ModuleEA5(object):
 
         data1 = array(matrix1)
 
-##        data = array([['Fuels',                1.91], #SD, active before changes
-##                      ['Electricity',          0.18],
-##                      ['Total primary energy', 2.65]])
+        dummydata1 = array([['Fuels',                1.91],
+                      ['Electricity',          0.18],
+                      ['Total primary energy', 2.65]])
                           
-        self.interface.setGraphicsData(self.keys[0], data1)
+        self.interface.setGraphicsData(self.keys[0], dummydata1)
 
         #
         # lower grid: Energy consumption by product
@@ -161,11 +164,11 @@ class ModuleEA5(object):
 
         data2 = array(matrix2)            
 
-##        data = array([['Product 1', 500.0, 50.0, 700.0], #SD, active before changes
-##                      ['Product 2', 400.0, 80.0, 680.0],
-##                      ['Product 3', 100.0, 10.0, 140.0]])
+        dummydata2 = array([['Product 1', 500.0, 50.0, 700.0],
+                      ['Product 2', 400.0, 80.0, 680.0],
+                      ['Product 3', 100.0, 10.0, 140.0]])
                           
-        self.interface.setGraphicsData(self.keys[1], data2)
+        self.interface.setGraphicsData(self.keys[1], dummydata2)
 
         #print "ModuleEA5 graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]]))

@@ -14,10 +14,13 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Last revised by:    Stoyan Danov 07/04/2008
+#       Revised by:         Stoyan Danov     11/04/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
 #       07/04/2008          Adapted to use data from sql, not checked
+#       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
+#                       Return to original state later!
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -108,12 +111,12 @@ class ModuleEA4(object):
         data1 = array(matrix1)
 
         
-##        data = array([['Process name 1', 170.0,   33.01], #SD, active before changes
-##                      ['Process name 2', 280.0,   54.37],
-##                      ['Process name 3',  65.0,   12.62],
-##                      ['Total'         , 515.0,  100.00]])
+        dummydata1 = array([['Process name 1', 170.0,   33.01],
+                      ['Process name 2', 280.0,   54.37],
+                      ['Process name 3',  65.0,   12.62],
+                      ['Total'         , 515.0,  100.00]])
 
-        self.interface.setGraphicsData(self.keys[0], data1)
+        self.interface.setGraphicsData(self.keys[0], dummydata1)
 
         #
         # lower grid: Process heat by temperature
@@ -128,12 +131,12 @@ class ModuleEA4(object):
 
         data2 = array(matrix2)
 
-##        data = array([['Process name 1',  40.0, 180.0, 170.0], #SD, active before changes
-##                      ['Process name 2',  75.0, 180.0, 280.0],
-##                      ['Process name 3',  90.0, 180.0,  65.0]])
+        dummydata2 = array([['Process name 1',  40.0, 180.0, 170.0],
+                      ['Process name 2',  75.0, 180.0, 280.0],
+                      ['Process name 3',  90.0, 180.0,  65.0]])
 
 
-        self.interface.setGraphicsData(self.keys[1], data2)
+        self.interface.setGraphicsData(self.keys[1], dummydata2)
 
         #print "ModuleEA4 graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))

@@ -1,5 +1,5 @@
 #Boa:Frame:DBEditFrame
-
+#HS 2008-04-13: preselection added as input
 import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
@@ -46,12 +46,13 @@ class DBEditFrame(wx.Dialog):
               style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.button2)
 
-    def __init__(self, parent, title, tablename, col_returned, can_edit):
+    def __init__(self, parent, title, tablename, col_returned, can_edit, preselection = None):
 	self.title = title
 	self.tablename = tablename
 	self.can_edit = can_edit
 	self.col_returned = col_returned
         self._init_ctrls(parent)
+        self.preselection = preselection
 
         #self.maxrow = 25
         self.rowcount = 0
@@ -69,14 +70,32 @@ class DBEditFrame(wx.Dialog):
         self.SetupGrid()
 	self.displayData()
 
+#HS2008-04-13: possibility of preselection-list added in DB Editor.
     def initDatabase(self):
         self.table = pSQL.Table(Status.DB, self.tablename)
+#HS        sqlTable = pSQL.Table(Status.DB, self.tablename)
+#HS        self.table = self.preSelected(sqlTable,self.preselection)
         self.rows = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
+#HS        self.rows = len(self.table)
+#HS        self.keys = sqlTable.keys()
+        
+    def preSelected(self,sqlTable,preselection):
+        pTable = []
+        for row in sqlTable:
+            print "preSelected: ", row.DBHeatPump_ID
+            if (row.DBHeatPump_ID in preselection) or (preselection is None):
+                print "OK"
+                pTable.append(row)
+        return pTable
 
     def SetupGrid(self):
+#HS2008-04-13
         self.grid1.CreateGrid(self.rows, len(self.table.keys()))
+#HS        self.grid1.CreateGrid(self.rows, len(self.keys))
         for row in range(len(self.table.keys())):
             self.grid1.SetColLabelValue(row, self.table.keys()[row])
+#HS        for row in range(len(self.keys)):
+#HS            self.grid1.SetColLabelValue(row, self.keys[row])
         self.grid1.AutoSizeColumns(setAsMin=True)
         self.grid1.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         #self.grid1.SetMinSize((-1, 400))      
@@ -105,6 +124,7 @@ class DBEditFrame(wx.Dialog):
 
         for row in self.table.sql_select("%s > 0 ORDER BY %s" % (self.table.keys()[0],
 								 self.table.keys()[0])):
+
             self.grid1.SetRowAttr(r, attr)
             self.grid1.AppendRows(numRows=1)
             self.grid1.SetRowLabelValue(r, "%s" % (rownr))
@@ -124,6 +144,7 @@ class DBEditFrame(wx.Dialog):
     def OnGridEditStore(self, event):
         value = self.grid1.GetCellValue(self.lastEditRow, self.lastEditCol)
         row = self.table.select({self.table.keys()[0]:self.grid1.GetCellValue(self.lastEditRow,0)})[0]
+#HS        row = self.table.select({self.keys[0]:self.grid1.GetCellValue(self.lastEditRow,0)})[0]
         if value <> "" and value <> "None":
             row[self.lastEditCol] = value
         else:

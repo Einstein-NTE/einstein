@@ -13,6 +13,21 @@
 #          Donations are always welcome but, certainly, not required.        #
 #                                                                            #
 #----------------------------------------------------------------------------#
+# Changes made for the Einstein Project
+# Tom Sobota 2008-04-12 Global replacing of None by NULL
+#                       changed the default value of Force flag to True so that
+#                       updates that don't actually change the value will not
+#                       produce errors
+#
+# The None to NULL change will work with this form of update:
+# row = t.select({'id':1})
+# row[0].field1 = None
+#
+# and also with this form:
+# row = t.select({'id':1})
+# row[0].update({'field1':None})
+#
+##############################################################################
 
 from re import sub
 from string import split, join, strip, find
@@ -198,8 +213,11 @@ class Table(object):
     query = "INSERT INTO `%s`(%s) VALUES (%s)" % (self._name, col[:-2], val[:-2])
     ####################################################################
     #CANGES 19.02.07 support for NULL
-    if query.find("'NULL'") > - 1:
+    if query.find("'NULL'") > -1:
 	query = query.replace("'NULL'", "NULL")
+    #TS20080410 Change None to NULL
+    if query.find('None') > -1:
+	query = query.replace('None', "NULL")
     ####################################################################    
     self._db._c.execute(query)
     """changes done"""
@@ -801,13 +819,16 @@ class Result(object):
                                               _qstr(data), self._qlist())
             #self._cols[i]+"='"+_qstr(data)+"'"+self._qlist()
     ####################################################################
+    #TS 20080412 This replace is done in _do_query
     #CANGES 19.02.07 support for NULL
-    if query.find("'NULL'") > - 1:
-	query = query.replace("'NULL'", "NULL")
+    #if query.find("'NULL'") > -1:
+    #	query = query.replace("'NULL'", "NULL")
     ####################################################################
-    noex = (self._data[i] == data or type(data) == FloatType \
-                                  or _qstr(self._data[i]) == str(data) )
-    self._do_query(query, noex)
+    #TS 20080412 disabled this test.
+    #noex = (self._data[i] == data or type(data) == FloatType \
+    #                              or _qstr(self._data[i]) == str(data) )
+    #self._do_query(query, noex)
+    self._do_query(query, True)
     self._data[i] = data
 
   #    ------------------------------------------------------------------
@@ -842,20 +863,26 @@ class Result(object):
 
   #    ------------------------------------------------------------------
 
-  def update(self, data, force=0):
+  def update(self, data, force=True):
     """This method may be used to update all or certain columns of a certain
        result (row). Expected argument is a dictionary or a complete list.
        Optional argument is 'force' True or False, (default False). Use
        force = True to suppress exceptions in case of an update that does
-       not actually change anything in the database."""
+       not actually change anything in the database.
+
+       TS20080412 WARNING changed the force default to be True
+       """
     if type(data) == DictionaryType:
       self._fetch._table._check_cols_(data)
       qdata = data
     elif type(data) == ListType:
       self._fetch._table._check_len_(data)
       qdata = {}
-      for l in range(len(self._cols)):
-        if data[l] != None: qdata[self._cols[l]] = data[l]
+      #TS 20080412 deleted this test. it is done in _do_query
+      #for l in range(len(self._cols)):
+        #if data[l] != None: qdata[self._cols[l]] = data[l]
+        #  qdata[self._cols[l]] = data[l]
+      qdata[self._cols[l]] = data[l]
     else:
       raise TypeError, 'dictionary or list argument expected'
     query = ["UPDATE `%s` SET" % self._fetch._table._name]
@@ -967,18 +994,21 @@ class Result(object):
         query.append("`%s`='%s' AND " % (self._cols[i], _qstr(self._data[i])))
       return join(query)[:-5]
 
-  def _do_query(self, query, ex_mode=0):
+  def _do_query(self, query, ex_mode=True):
     # This method does the actual queries. If more or less rows than desired
     # are affected, it will raise an exception.
     # ex_mode is introduced for queries that actually change a value to itself.
     # For such queries it might not be desireable to raise an exception because
     # they are perfectly legal.
+    #20080412 changed the ex_mode default to True
     try:
-      
       ####################################################################
       #CANGES 19.02.07 support for NULL
-      if query.find("'NULL'") > - 1:
+      if query.find("'NULL'") > -1:
           query = query.replace("'NULL'", "NULL")
+      #TS 20080412 change None to NULL
+      if query.find("None") > -1:
+          query = query.replace("None", "NULL")
       ####################################################################    
  
       num = self._fetch._table._db._c.execute(query)

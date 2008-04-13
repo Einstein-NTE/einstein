@@ -11,13 +11,16 @@ from einstein.modules.interfaces import Interfaces
 ] = [wx.NewId() for _init_ctrls in range(5)]
 
 class ManualAddDialog(wx.Dialog):
-    def __init__(self, prnt, qid):
+    def __init__(self, prnt, eqId):
 	self.prnt = prnt
         wx.Dialog.__init__(self, id=-1, name=u'ManualAddDialog',
               parent=prnt, pos=wx.Point(0, 0), size=wx.Size(800, 600),
               style=wx.DEFAULT_DIALOG_STYLE, title='Manual equipment add')
 	# load the Q4 panel, extracted from main.
-	self.p4 = PanelQ4(self, qid)
+
+#HS2004-04-13 call to p4 changed
+	self.p4 = PanelQ4(self, prnt, eqId)
+	self.eqId = eqId
 
 
 class AddEquipment(wx.Dialog):
@@ -85,8 +88,11 @@ class AddEquipment(wx.Dialog):
 	    # this should be cleaned somewhat
 	    self.theId = self.dbe.theId
 	    print "addEquipment popup (Database button): ", self.theId
+	    print "addEquipment popup (Database button): equipe = ",self.prnt.equipe.Equipment
+
 	    try:
-		self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
+                print "trying to set equipment row in DB "
+		self.module.setEquipmentFromDB(self.prnt.equipe, self.prnt.equipeC, self.theId)
 		self.prnt.mode = "DB"
 		print "addEquipment popup (Database button): equipment added to Q/C"
 	    except:

@@ -14,11 +14,14 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Last revised by:    Stoyan Danov 07/04/2008
+#       Revised by:         Stoyan Danov     11/04/2008
 #
 #       Changes to previous version:
 #	28/03/08:   functions draw_ ... moved to panel
 #	28/03/08:   changed functions draw... to use numpy arrays,
 #       07/04/08:   adapted to use data from sql, not checked
+#       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
+#                       Return to original state later!
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -111,7 +114,15 @@ class ModuleEA6(object):
         matrix = transpose(TableColumnList)
         data = array(matrix)
 
-        self.interface.setGraphicsData(self.keys[0], data)
+        dummydata = array([['Heavy fuel oil',   0.0,    0.00],
+                      ['Natural gas'   ,  50.0,   28.17],
+                      ['Gas oil'       ,  25.0,   14.08],
+                      ['LPG'           ,  75.0,   42.25],
+                      ['Other'         ,   0.0,    0.00],
+                      ['Electricity'   ,  27.5,   15.49],
+                      ['Total'         , 177.5,  100.00]])
+
+        self.interface.setGraphicsData(self.keys[0], dummydata)
 
         #print "ModuleEA6 graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0], repr(Interfaces.GData[self.keys[0]))

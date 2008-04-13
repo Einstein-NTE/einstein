@@ -26,6 +26,7 @@
 #                           Hans Schweiger          03/04/2008
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          07/04/2008
+#                           Hans Schweiger          13/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -34,6 +35,8 @@
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
 #                   slight change to OK and Cancel buttons, to show the right icons
 #       07/04/08:   adapted for changes in heat pump module
+#       13/04/08:   Small changes in AddButton
+#                   introduction of function "display"
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -50,28 +53,30 @@ import wx.grid
 #from einstein.modules.heatPump.moduleHP import *
 from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
+from einstein.GUI.panelQ4 import PanelQ4
+
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
 from numpy import *
-from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
+from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 
 
 
 [wxID_PANELHP, wxID_PANELHPBUTTONPAGEHEATPUMPADD, 
  wxID_PANELHPBUTTONPAGEHEATPUMPBACK, wxID_PANELHPBUTTONPAGEHEATPUMPCANCEL, 
  wxID_PANELHPBUTTONPAGEHEATPUMPFWD, wxID_PANELHPBUTTONPAGEHEATPUMPOK, 
- wxID_PANELHPCB1PAGEHEATPUMP, wxID_PANELHPCHOICEPAGEHEATPUMP, 
+ wxID_PANELHPCBCONFIG1, wxID_PANELHPCHOICECONFIG2, 
  wxID_PANELHPGRIDPAGEHP, wxID_PANELHPHPCALCULATE, 
  wxID_PANELHPST10PAGEHEATPUMP, wxID_PANELHPST11PAGEHEATPUMP, 
  wxID_PANELHPST12PAGEHEATPUMP, wxID_PANELHPST1PAGEHEATPUMP, 
- wxID_PANELHPST2PAGEHEATPUMP, wxID_PANELHPST3PAGEHEATPUMP, 
- wxID_PANELHPST4PAGEHEATPUMP, wxID_PANELHPST5PAGEHEATPUMP, 
- wxID_PANELHPST6PAGEHEATPUMP, wxID_PANELHPST7PAGEHEATPUMP, 
- wxID_PANELHPST8PAGEHEATPUMP, wxID_PANELHPST9PAGEHEATPUMP, 
- wxID_PANELHPSTATICBOX1, wxID_PANELHPTC1PAGEHEATPUMP, 
- wxID_PANELHPTC2PAGEHEATPUMP, wxID_PANELHPTC3PAGEHEATPUMP, 
- wxID_PANELHPTC4PAGEHEATPUMP, wxID_PANELHPTC5PAGEHEATPUMP, 
- wxID_PANELHPTC6PAGEHEATPUMP, wxID_PANELHPTC7PAGEHEATPUMP,
+ wxID_PANELHPSTCONFIG, wxID_PANELHPSTCONFIG1, 
+ wxID_PANELHPSTCONFIG2, wxID_PANELHPSTCONFIG3, 
+ wxID_PANELHPSTCONFIG4, wxID_PANELHPSTCONFIG5, 
+ wxID_PANELHPSTCONFIG6, wxID_PANELHPSTCONFIG7, 
+ wxID_PANELHPSTATICBOX1, wxID_PANELHPTCCONFIG3, 
+ wxID_PANELHPTCCONFIG4, wxID_PANELHPTCCONFIG5, 
+ wxID_PANELHPTCCONFIG6, wxID_PANELHPTCCONFIG7, 
+ wxID_PANELHPTCINFO1, wxID_PANELHPTCINFO2,
  wxID_PANELHPFIG
 ] = [wx.NewId() for _init_ctrls in range(31)]
 
@@ -84,6 +89,8 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+
+MAXROWS = 50
 
 
 #------------------------------------------------------------------------------		
@@ -117,26 +124,30 @@ class PanelHP(wx.Panel):
 #   Panel of the heat pump design assistant
 #------------------------------------------------------------------------------		
 
-    def __init__(self, parent, id, pos, size, style, name, sql, db):
+    def __init__(self, parent, main, id, pos, size, style, name, sql, db):
 
+        print "PanelHP (__init__)"
+        self.prnt = parent
+        self.main = main
+        
         self.sql = sql
         self.db = db
 
-        self.info = Interfaces.GData["HP Info"]
-        self.config = Interfaces.GData["HP Config"]
+#        self.info = Interfaces.GData["HP Info"]
+#        self.config = Interfaces.GData["HP Config"]
         
         self._init_ctrls(parent)
 
-	keys = ['HP Table']
-        self.modHP = Status.mod.moduleHP
-        print "PanelHP (__init__): modHP created",self.modHP
+	self.keys = ['HP Table']
+        self.mod = Status.mod.moduleHP
+#        print "PanelHP (__init__): mod created",self.mod
 
 #   graphic: Cumulative heat demand by hours
         labels_column = 0
         ignoredrows = []
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : keys[0],                # key for Interface
+                   'key'         : self.keys[0],                # key for Interface
                    'title'       : 'Some title',           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
@@ -153,47 +164,45 @@ class PanelHP(wx.Panel):
         # method is rewritten by Boa each time.
         #
         # data cell attributes
+        print "PanelHP (__init__): creating grid"
+
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        key = keys[0]
+        key = self.keys[0]
         data = Interfaces.GData[key]
-        print "PanelHP (__init__): data = ",data
+        print "data = ",data
         (rows,cols) = data.shape
-        self.gridPageHP.CreateGrid(max(rows,20), cols)
+#        self.gridPageHP.CreateGrid(max(rows,20), cols)
+        self.grid.CreateGrid(MAXROWS, cols)
 
-        self.gridPageHP.EnableGridLines(True)
-        self.gridPageHP.SetDefaultRowSize(20)
-        self.gridPageHP.SetRowLabelSize(30)
-        self.gridPageHP.SetColSize(0,115)
-        self.gridPageHP.EnableEditing(False)
-        self.gridPageHP.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.gridPageHP.SetColLabelValue(0, "Short name")
-        self.gridPageHP.SetColLabelValue(1, "Year")
-        self.gridPageHP.SetColLabelValue(2, "Type")
-        self.gridPageHP.SetColLabelValue(3, "Operating\nhours")
-        self.gridPageHP.SetColLabelValue(4, "Power")
-        self.gridPageHP.SetColLabelValue(5, "Temperature")
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetColSize(0,115)
+        self.grid.EnableEditing(False)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid.SetColLabelValue(0, "Short name")
+        self.grid.SetColLabelValue(1, "Year")
+        self.grid.SetColLabelValue(2, "Type")
+        self.grid.SetColLabelValue(3, "Operating\nhours")
+        self.grid.SetColLabelValue(4, "Power")
+        self.grid.SetColLabelValue(5, "Temperature")
         #
         # copy values from dictionary to grid
         #
         for r in range(rows):
-            self.gridPageHP.SetRowAttr(r, attr)
+            self.grid.SetRowAttr(r, attr)
             for c in range(cols):
-                self.gridPageHP.SetCellValue(r, c, data[r][c])
+                self.grid.SetCellValue(r, c, data[r][c])
                 if c == labels_column:
-                    self.gridPageHP.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
-                    self.gridPageHP.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.gridPageHP.SetGridCursor(0, 0)
-
-        print "Panel HP (__init__): getting info data"
-
-        info = Interfaces.GData["HP Info"]
-        print "Panel HP (__init__): info data = ",info
+        self.grid.SetGridCursor(0, 0)
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -220,12 +229,12 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # Grid for display of existing heat pumps
 
-        self.gridPageHP = wx.grid.Grid(id=wxID_PANELHPGRIDPAGEHP,
+        self.grid = wx.grid.Grid(id=wxID_PANELHPGRIDPAGEHP,
               name='gridpageHP', parent=self, pos=wx.Point(40, 48),
               size=wx.Size(376, 168), style=0)
-        self.gridPageHP.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPageHPGridCellLeftDclick, id=wxID_PANELHPGRIDPAGEHP)
-        self.gridPageHP.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridPageHPGridCellRightClick, id=wxID_PANELHPGRIDPAGEHP)
 
 
@@ -258,122 +267,134 @@ class PanelHP(wx.Panel):
 #       Configuration design assistant
 #------------------------------------------------------------------------------		
 
-        self.st2pageHeatPump = wx.StaticText(id=-1,
-              label='Design assistant options:', name='st2pageHeatPump',
+        self.stConfig = wx.StaticText(id=-1,
+              label='Design assistant options:', name='stConfig',
               parent=self, pos=wx.Point(40, 272), style=0)
-        self.st2pageHeatPump.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
+        self.stConfig.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, 'Tahoma'))
 
 #..............................................................................
 # 1. Maintain existing equipment ?
 
-        self.st3pageHeatPump = wx.StaticText(id=-1,
-              label='Maintain existing equipment ?', name='st3pageHeatPump',
+        self.stConfig1 = wx.StaticText(id=-1,
+              label='Maintain existing equipment ?', name='stConfig1',
               parent=self, pos=wx.Point(40, 304), style=0)
 
-        self.cb1pageHeatPump = wx.CheckBox(id=-1, label='',
-              name='cb1pageHeatPump', parent=self, pos=wx.Point(288, 308),
+        self.cbConfig1 = wx.CheckBox(id=-1, label='',
+              name='cbConfig1', parent=self, pos=wx.Point(288, 308),
               size=wx.Size(24, 13), style=0)
-        self.cb1pageHeatPump.SetValue(self.config[0])
 
 #..............................................................................
 # 2. Heat pump type 
 
-        self.st4pageHeatPump = wx.StaticText(id=-1, label='Type of heat pump',
-              name='st4pageHeatPump', parent=self, pos=wx.Point(40, 344),
+        self.stConfig2 = wx.StaticText(id=-1, label='Type of heat pump',
+              name='stConfig2', parent=self, pos=wx.Point(40, 344),
               style=0)
 
-        self.choicepageHeatPump = wx.Choice(choices=["compression",
+        self.choiceConfig2 = wx.Choice(choices=["compression",
               "absorption"], id=-1, name='choicepageHeatPump', parent=self,
               pos=wx.Point(288, 336), size=wx.Size(130, 21), style=0)
-#HS 2008-04-07 XXX does not work !!!        self.choicepageHeatPump.SetValue(self.config[1])
 
 #..............................................................................
 # 3. Minimum operating hours
 
-        self.st5pageHeatPump = wx.StaticText(id=-1,
+        self.stConfig3 = wx.StaticText(id=-1,
               label='Minimum desired annual operation hours, h',
-              name='st5pageHeatPump', parent=self, pos=wx.Point(40, 384),
+              name='stConfig3', parent=self, pos=wx.Point(40, 384),
               style=0)
 
-        self.tc1pageHeatPump = wx.TextCtrl(id=-1, name='tc1pageHeatPump',
+        self.tcConfig3 = wx.TextCtrl(id=-1, name='tcConfig3',
               parent=self, pos=wx.Point(288, 376), size=wx.Size(128, 21),
-              style=0, value=str(self.config[2]))
+              style=wx.TE_PROCESS_ENTER, value="")
+
+        self.tcConfig3.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig3TextEnter,
+              id=-1)
+
 
 #..............................................................................
 # 4. Temperature lift
 
-        self.st6pageHeatPump = wx.StaticText(id=-1,
+        self.stConfig4 = wx.StaticText(id=-1,
               label='Maximum desired temperature lift, \xbaC',
-              name='st6pageHeatPump', parent=self, pos=wx.Point(40, 424),
+              name='stConfig4', parent=self, pos=wx.Point(40, 424),
               style=0)
 
-        self.tc2pageHeatPump = wx.TextCtrl(id=-1, name='tc2pageHeatPump',
+        self.tcConfig4 = wx.TextCtrl(id=-1, name='tcConfig4',
               parent=self, pos=wx.Point(288, 416), size=wx.Size(128, 21),
-              style=0, value=str(self.config[3]))
+              style=wx.TE_PROCESS_ENTER, value="")
 
+        self.tcConfig4.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig4TextEnter,
+              id=-1)
 
 #..............................................................................
 # 5. condensing temperature
 
-        self.st7pageHeatPump = wx.StaticText(id=-1,
+        self.stConfig5 = wx.StaticText(id=-1,
               label='Maximum desired condensing temperature, \xbaC',
-              name='st7pageHeatPump', parent=self, pos=wx.Point(40, 464),
+              name='stConfig5', parent=self, pos=wx.Point(40, 464),
               style=0)
 
-        self.tc3pageHeatPump = wx.TextCtrl(id=-1, name='tc3pageHeatPump',
+        self.tcConfig5 = wx.TextCtrl(id=-1, name='tcConfig5',
               parent=self, pos=wx.Point(288, 456), size=wx.Size(128, 21),
-              style=0, value=str(self.config[4]))
+              style=wx.TE_PROCESS_ENTER, value="")
 
+        self.tcConfig5.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig5TextEnter,
+              id=-1)
 
 #..............................................................................
 # 6. evaporating temperature
 
-        self.st8pageHeatPump = wx.StaticText(id=-1,
+        self.stConfig6 = wx.StaticText(id=-1,
               label='Minimum desired evaporating temperature, \xbaC',
-              name='st8pageHeatPump', parent=self, pos=wx.Point(40, 504),
+              name='stConfig6', parent=self, pos=wx.Point(40, 504),
               style=0)
 
-        self.tc4pageHeatPump = wx.TextCtrl(id=-1, name='tc4pageHeatPump',
+        self.tcConfig6 = wx.TextCtrl(id=-1, name='tcConfig6',
               parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 21),
-              style=0, value=str(self.config[4]))
+              style=wx.TE_PROCESS_ENTER, value="")
+
+        self.tcConfig6.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig6TextEnter,
+              id=-1)
 
 #..............................................................................
 # 7. condensing temperature: inlet temp.
 
-        self.st9pageHeatPump = wx.StaticText(id=-1,
-              label='Only for absorption type:', name='st9pageHeatPump',
+        self.stConfig7a = wx.StaticText(id=-1,
+              label='Only for absorption type:', name='stConfig7a',
               parent=self, pos=wx.Point(40, 536), style=0)
 
-        self.st10pageHeatPump = wx.StaticText(id=-1,
+        self.stConfig7b = wx.StaticText(id=-1,
               label='Inlet temperature of heating fluid in generator, \xbaC',
-              name='st10pageHeatPump', parent=self, pos=wx.Point(40, 552),
+              name='stConfig7b', parent=self, pos=wx.Point(40, 552),
               style=0)
 
-        self.tc5pageHeatPump = wx.TextCtrl(id=-1, name='tc5pageHeatPump',
+        self.tcConfig7 = wx.TextCtrl(id=-1, name='tcConfig7',
               parent=self, pos=wx.Point(288, 544), size=wx.Size(128, 21),
-              style=0, value=str(self.config[5]))
+              style=wx.TE_PROCESS_ENTER, value="")
+
+        self.tcConfig7.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig7TextEnter,
+              id=-1)
 
 #------------------------------------------------------------------------------		
 #       Display field at the right
 #------------------------------------------------------------------------------		
 
 
-        self.st11pageHeatPump = wx.StaticText(id=-1,
-              label='Pinch temperature \xb0C', name='st11pageHeatPump',
+        self.stInfo1 = wx.StaticText(id=-1,
+              label='Pinch temperature \xb0C', name='stInfo1',
               parent=self, pos=wx.Point(440, 424), style=0)
 
-        self.tc6pageHeatPump = wx.TextCtrl(id=-1, name='tc6pageHeatPump',
+        self.tcInfo1 = wx.TextCtrl(id=-1, name='tcInfo1',
               parent=self, pos=wx.Point(640, 416), size=wx.Size(128, 21),
-              style=0, value=str(self.info[0]))
+              style=0, value="")
 
-        self.st12pageHeatPump = wx.StaticText(id=-1,
-              label='Temperature gap \xb0K', name='st12pageHeatPump',
+        self.stInfo2 = wx.StaticText(id=-1,
+              label='Temperature gap \xb0K', name='stInfo2',
               parent=self, pos=wx.Point(440, 464), style=0)
 
-        self.tc7pageHeatPump = wx.TextCtrl(id=-1, name='tc7pageHeatPump',
+        self.tcInfo2 = wx.TextCtrl(id=-1, name='tcInfo2',
               parent=self, pos=wx.Point(640, 456), size=wx.Size(128, 21),
-              style=0, value=str(self.info[1]))
+              style=0, value="")
 
 
 
@@ -411,7 +432,48 @@ class PanelHP(wx.Panel):
               id=wxID_PANELHPBUTTONPAGEHEATPUMPBACK)
 
 #------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   function activated on each entry into the panel from the tree
+#------------------------------------------------------------------------------		
+        self.mod.initPanel()        # prepares data for plotting
 
+#..............................................................................
+# update of equipment table
+
+        data = Interfaces.GData[self.keys[0]]
+        (rows,cols) = data.shape
+        for r in range(rows):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, data[r][c])
+
+#XXX Here better would be updating the grid and showing less rows ... ????
+        for r in range(rows,MAXROWS):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, "")
+
+#..............................................................................
+# update of design assistant parameters
+
+        self.config = Interfaces.GData["HP Config"]
+        self.cbConfig1.SetValue(self.config[0])
+#HS 2008-04-07 XXX does not work !!!        self.choiceConfig2.SetValue(self.config[1])
+        self.tcConfig3.SetValue(str(self.config[2]))
+        self.tcConfig4.SetValue(str(self.config[3]))
+        self.tcConfig5.SetValue(str(self.config[4]))
+        self.tcConfig6.SetValue(str(self.config[5]))
+        self.tcConfig7.SetValue(str(self.config[6]))
+        
+#..............................................................................
+# update of info-values
+
+        self.info = Interfaces.GData["HP Info"]
+        
+        self.tcInfo1.SetValue(str(self.info[0]))
+        self.tcInfo2.SetValue(str(self.info[1]))
+
+        self.Show()
+        
 #==============================================================================
 #   Event handlers
 #==============================================================================
@@ -425,24 +487,33 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # Step 1 design assistant: gets a preselected list of possible heat pumps
 
-        (mode,HPList) = self.modHP.designAssistant1()
+        (mode,HPList) = self.mod.designAssistant1()
         
 #..............................................................................
 # In interactive mode open DB Edidor Heat pump and select manually
 
         if (mode == "MANUAL"):
-            print "PanelHP (OnHpCalculateButton): here I should edit the data base"
-            HPId = 11
+            self.dbe = DBEditFrame(self,
+                            'Select heat pump from preselected list', # title for the dialogs
+			    'dbheatpump',              # database table
+			    0,                         # column to be returned
+			    False,
+                            preselection = HPList)      # database table can be edited in DBEditFrame?
+            if self.dbe.ShowModal() == wx.ID_OK:
+                HPId = self.dbe.theId
+            else:
+                HPId = -1
+                print "PanelHP: no HP selected after DA1 -> check whether this works"
+
         elif (mode == "AUTOMATIC"):
-            HPId = HPList[0]
+            HPId = HPList[0]    #in automatic mode just take first in the list
 
 #..............................................................................
 # Step 2 design assistant: add selected equipment to the list
         
-        self.modHP.designAssistant2(HPId)
-        self.modHP.updatePanel()
-
-        #updatePlots ???
+        self.mod.designAssistant2(HPId)
+#        self.mod.updatePanel()
+        self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -450,11 +521,10 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
-	#TS20080405 had to put the try because I get index errors here ...
-        try:
-            #creates space for new equipment in Q/C
-	    (self.equipe,self.equipeC) = self.modHP.addEquipmentDummy()
+        try:                #creates space for new equipment in Q/C
+	    (self.equipe,self.equipeC) = self.mod.addEquipmentDummy()
 	except:
+            print "PanelHP (HPAddButton): could not create equipment dummy"
 	    pass
         
         #show pop-up menu for adding equipment
@@ -478,7 +548,7 @@ class PanelHP(wx.Panel):
 	#
 
         pu1 =  AddEquipment(self,                      # pointer to this panel
-			    self.modHP,                # pointer to the associated module
+			    self.mod,                # pointer to the associated module
 			    'Add Heat Pump equipment', # title for the dialogs
 			    'dbheatpump',              # database table
 			    0,                         # column to be returned
@@ -489,89 +559,117 @@ class PanelHP(wx.Panel):
         else:
             self.equipe.delete()         #delete the space created before, if not accepted
             self.equipeC.delete()
-            print 'Cancelled'
-            
-        #Status.SQL.commit() # TS it is already committed in DBEditFrame
-        self.modHP.updatePanel()
+            Status.SQL.commit()
+
+#        self.mod.calculateCascade()    
+        self.display()
 
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
     def OnGridPageHPGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
-#   adds an equipment to he 
+#       edits the selected equipment
 #------------------------------------------------------------------------------		
         print "Grid - left button Dclick: here I should call the Q4H"
-        ret = "ok"
-        if (ret=="ok"):
-#            ret = self.modBB.calculateCascade()
-            pass
-        #updatePlots
+        rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
+        EqId = self.mod.getEqId(rowNo)
+        print "now editing equipment in row %s with id = "%rowNo,EqId
+#        self.Hide()
+	dialog = ManualAddDialog(self, EqId)
 
+#Tom: here should be a link between the outcome of the dialog and what continues
+        if (dialog.ShowModal() ==wx.ID_OK):
+            print "PanelHP (OnGridLeftDclick) - OK"
+#            ret = self.mod.calculateCascade()
+
+        self.display()
+
+#------------------------------------------------------------------------------		
     def OnGridPageHPGridCellRightClick(self, event):
+#------------------------------------------------------------------------------		
+#   right double click
+#   XXX for the moment only DELETE foreseen !!!
+#------------------------------------------------------------------------------		
         print "Grid - right button click: scroll-up should appear"
         #here a scroll-up should appear with some options: edit, delete,...
-        RowNo = 1 #number of the selected boiler should be detected depending on the selected row
         ret = "delete"
+
+        rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
+        print "row to be deleted = ",rowNo
+
         if (ret=="delete"):
             # a pop-up should confirm.
             ret = "ok"
             if (ret == "ok"):
-                ret = self.modHP.delete(RowNo)
-                ret = self.modHP.calculateCascade()
+                ret = self.mod.deleteEquipment(rowNo)
+#                ret = self.mod.calculateCascade()
         elif (ret == "edit"):
             OnGridPageBBGridCellLeftDclick(self,event)
+        self.display()
         
+#------------------------------------------------------------------------------		
+#   Event handlers: parameter change in design assistant
+#------------------------------------------------------------------------------		
 
-        
-    def OnButton1Button(self, event):
-        event.Skip()
+    def OnCbConfig1Checkbox(self, event):
+        self.config[0] = self.cbConfig1.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnChoiceConfig2Choice(self, event):
+        self.config[1] = self.choiceConfig2.GetSelection()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnTcConfig3TextEnter(self, event):
+        self.config[2] = self.tcConfig3.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnTcConfig4TextEnter(self, event):
+        self.config[3] = self.tcConfig3.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnTcConfig5TextEnter(self, event):
+        self.config[4] = self.tcConfig3.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnTcConfig6TextEnter(self, event):
+        self.config[5] = self.tcConfig3.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
+
+    def OnTcConfig7TextEnter(self, event):
+        self.config[6] = self.tcConfig3.GetValue()
+        Interfaces.GData["HP Config"] = self.config
+        self.mod.setUserDefinedParamHP()
 
 #------------------------------------------------------------------------------		
 #   Default event handlers: FWD / BACK / OK / Cancel - Buttons
 #------------------------------------------------------------------------------		
 
     def OnButtonpageHeatPumpBackButton(self, event):
+        self.Hide
+        self.main.tree.SelectItem(self.main.qHC, select=True)
         event.Skip()
 
     def OnButtonpageHeatPumpFwdButton(self, event):
+        self.Hide
+        self.main.tree.SelectItem(self.main.qBB, select=True)
         event.Skip()
 
     def OnButtonpageBBOkButton(self, event):
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
         self.Hide()
-        print "Button exitModuleOK: now I should go back to HC"
+        self.main.tree.SelectItem(self.main.qHC, select=True)
+        event.Skip()
 
     def OnButtonpageBBCancelButton(self, event):
-        #warning: do you want to leave w/o saving ???
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
-        self.Hide()
-        print "Button exitModuleCancel: now I should go back to HC"
+        print "Button exitModuleCancel: CANCEL Option not yet foreseen"
 
+#============================================================================== 				
 
         
-
-    def OnCb1pageBBCheckbox(self, event):
-        self.modBB.storeModulePars()
-
-    def OnChoicepageBBChoice(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTc1pageBBTextEnter(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTc2pageBBTextEnter(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTc3pageBBTextEnter(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTc4pageBBTextEnter(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTc5pageBBTextEnter(self, event):
-        self.modBB.storeModulePars()
-
 

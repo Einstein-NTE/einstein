@@ -77,12 +77,11 @@ class Status(object):
 
   #------------------------------------------------------------------------------		
   # Tool configuration
-  TimeStep = 1
-  TemperatureInterval = 10
-  MaximumTemperature = 100
+  TimeStep = 1.0
+  TemperatureInterval = 10.0
+  MaximumTemperature = 100.0
   NT = (int) (MaximumTemperature / TemperatureInterval)
-  #Nt = 8760/TimeStep
-  Nt = 24
+  Nt = 168 #1 week simulation for testing
 
   
   #------------------------------------------------------------------------------		

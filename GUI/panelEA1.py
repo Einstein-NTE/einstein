@@ -56,9 +56,16 @@ GRID_LETTER_COLOR = '#000060'      # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF'  # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+MAXROWS = 20
+
 
 class PanelEA1(wx.Panel):
+
+#------------------------------------------------------------------------------
     def __init__(self, parent, id, pos, size, style, name):
+#------------------------------------------------------------------------------
+#   basic initialisation at build-up of the GUI
+#------------------------------------------------------------------------------
         self._init_ctrls(parent)
 
         ##### start of graphics setup ####################################
@@ -71,9 +78,9 @@ class PanelEA1(wx.Panel):
         #    in the panel. In the present case there is only one, so
         #    it's a list of 1 element.
         #
-        keys = ['EA1'] 
+        self.keys = ['EA1'] 
         # 0.1 loads and initializes the respective data-processing module
-        self.mod = ModuleEA1(keys)
+        self.mod = ModuleEA1(self.keys)
 
         # 0.2 where the labels are in the data matrix
         
@@ -84,7 +91,7 @@ class PanelEA1(wx.Panel):
         # 1. the last row (totals) has to be ignored for both the graphics in this panel
         #    we have to find its row number (in this case it's simple: the last row)
 
-        (rows,cols) = Interfaces.GData[keys[0]].shape
+        (rows,cols) = Interfaces.GData[self.keys[0]].shape
 
         # make a list of ignored rows. In the general case, these rows could be
         # several and in different places
@@ -112,7 +119,7 @@ class PanelEA1(wx.Panel):
         #
         paramList={'labels'      : labels_column,     # labels column                    Default: 0
                    'data'        : data_column,       # data column for this graph       No default
-                   'key'         : keys[0],           # key for Interface                No default
+                   'key'         : self.keys[0],      # key for Interface                No default
                    'title'       : title,             # title of the graph.              Default: none
                    'backcolor'   : backcolor,         # graph background color.          Default: white
                    'tickfontsize': ticklabelfontsize, # tick label fontsize.             Default: 9
@@ -133,7 +140,7 @@ class PanelEA1(wx.Panel):
 
         paramList={'labels'      : 0,                 # labels column
                    'data'        : 4,                 # data column for this graph
-                   'key'         : keys[0],           # key for Interface
+                   'key'         : self.keys[0],      # key for Interface
                    'title'       : 'FET by fuel',     # title of the graph
                    'backcolor'   : backcolor,         # graph background color
                    'tickfontsize': ticklabelfontsize, # tick label fontsize
@@ -158,10 +165,12 @@ class PanelEA1(wx.Panel):
         #
 
         # extract the data for presenting
-        
-        data = Interfaces.GData[keys[0]]
+
+#xxxHS here could be simplified. in principle only no. of columns has to be known     
+        data = Interfaces.GData[self.keys[0]]
         (rows,cols) = data.shape
-        self.grid.CreateGrid(max(rows,20), cols)
+#        self.grid.CreateGrid(max(rows,20), cols)
+        self.grid.CreateGrid(MAXROWS, cols)
 
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
@@ -185,7 +194,7 @@ class PanelEA1(wx.Panel):
         for r in range(rows):
             self.grid.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid.SetCellValue(r, c, data[r][c])
+#                self.grid.SetCellValue(r, c, data[r][c])
                 if c == labels_column:
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -236,3 +245,24 @@ class PanelEA1(wx.Panel):
               style=0)
         self.staticText3.SetFont(wx.Font(9, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'Sans'))
+
+#------------------------------------------------------------------------------
+    def display(self):
+#------------------------------------------------------------------------------
+#   function executed on entering from tree (or from panelEnergy)
+#------------------------------------------------------------------------------
+        self.mod.initPanel()
+        
+        data = Interfaces.GData[self.keys[0]]
+        (rows,cols) = data.shape
+        for r in range(rows):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, data[r][c])
+
+#XXX Here better would be updating the grid and showing less rows ... ????
+        for r in range(rows,MAXROWS):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, "")
+
+        self.Show()
+       

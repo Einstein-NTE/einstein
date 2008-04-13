@@ -1,24 +1,59 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ0: Questionnaire page 4
+#
+#==============================================================================
+#
+#	Version No.: 0.02
+#	Created by: 	    Tom Sobota	April 2008
+#       Revised by:         Hans Schweiger 13/04/2008
+#
+#       Changes to previous version:
+#       13/04/08:       Additional inputs in init: selection
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 import wx
 import pSQL
 import HelperClass
 from status import Status
-#
-# this is the Questionnaire 4 panel, extracted from einsteinMain,
-# together with all its methods
-# should be instantiated:
-#
-# p4 = PanelQ4(self, activeQid)
 
 
 class PanelQ4(wx.Panel):
-    def __init__(self, parent, qid):
+    def __init__(self, parent, main, eqId):
+        print "PanelQ4 (__init__)"
+	self.parent = parent
+	self.main = main
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
-	self.activeQid = qid
         self._init_ctrls(parent)
 
-    def _init_ctrls(self, prnt):
-        wx.Panel.__init__(self, id=-1, name='Panelq4', parent=prnt,
+#HS2004-04-13 added
+        if eqId is not None:
+            equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].QGenerationHC_ID[eqId][0]
+            self.display(equipe)
+
+
+    def _init_ctrls(self, parent):
+#------------------------------------------------------------------------------
+#--- UI setup
+#------------------------------------------------------------------------------		
+
+        wx.Panel.__init__(self, id=-1, name='PanelQ4', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
         self.stInfo1 = wx.StaticText(id=-1,
@@ -45,6 +80,7 @@ class PanelQ4(wx.Panel):
 						    pos=wx.Point(24, 40),
 						    size=wx.Size(200, 216),
 						    style=0)
+        self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentClick, self.listBoxEquipment)
 
 
         self.buttonDeleteEquipment = wx.Button(id=-1,
@@ -54,6 +90,7 @@ class PanelQ4(wx.Panel):
 						    pos=wx.Point(32, 264),
 						    size=wx.Size(192, 32),
 						    style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
 
         self.buttonAddEquipment = wx.Button(id=-1,
 						 label=self.PList["X062"][1],
@@ -62,6 +99,7 @@ class PanelQ4(wx.Panel):
 						 pos=wx.Point(520, 464),
 						 size=wx.Size(192, 32),
 						 style=0)
+        self.Bind(wx.EVT_BUTTON,self.OnButtonAddEquipment, self.buttonAddEquipment)
 
         self.buttonClear = wx.Button(id=-1,
 					  label=self.PList["X028"][1],
@@ -70,6 +108,7 @@ class PanelQ4(wx.Panel):
 					  pos=wx.Point(280, 464),
 					  size=wx.Size(192, 32),
 					  style=0)
+        self.Bind(wx.EVT_BUTTON,self.OnButtonClear, self.buttonClear)
         
 
         self.btnCancel = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
@@ -382,20 +421,19 @@ class PanelQ4(wx.Panel):
 				     style=0, value='')
 
 
-        self.Bind(wx.EVT_LISTBOX,
-		  self.OnListBoxEquipmentClick, self.listBoxEquipment)
-        self.Bind(wx.EVT_BUTTON,
-		  self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
-        self.Bind(wx.EVT_BUTTON,
-		  self.OnButtonAddEquipment, self.buttonAddEquipment)
-        self.Bind(wx.EVT_BUTTON,
-		  self.OnButtonClear, self.buttonClear)
-
-
+#------------------------------------------------------------------------------
+#--- UI actions
+#------------------------------------------------------------------------------		
     
     def OnListBoxEquipmentClick(self, event):
-        q = Status.DB.qgenerationhc.Questionnaire_id[self.activeQid].Equipment[\
+        equipe = Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid].Equipment[\
 	    str(self.listBoxEquipment.GetStringSelection())][0]
+        self.display(equipe)
+        event.Skip()
+
+#HS2004-04-13 function display added
+        
+    def display(self,q):
         self.tc1.SetValue(str(q.Equipment))
         self.tc2.SetValue(str(q.Manufact))
         self.tc3.SetValue(str(q.YearManufact))
@@ -418,7 +456,6 @@ class PanelQ4(wx.Panel):
         if q.DBFuel_id <> None:
             self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(\
 		    str(Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id][0].FuelName)))
-        #event.Skip()
 
     def OnButtonDeleteEquipment(self, event):
         event.Skip()
@@ -426,15 +463,15 @@ class PanelQ4(wx.Panel):
 
 
     def OnButtonAddEquipment(self, event):        
-        if self.activeQid <> 0:
+        if self.main.activeQid <> 0:
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    self.activeQid]) == 0:
+		    self.main.activeQid]) == 0:
                 dbfid = Status.DB.dbfuel.FuelName[\
 		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                      
         
                 tmp = {
-                    "Questionnaire_id":self.activeQid,
+                    "Questionnaire_id":self.main.activeQid,
                     "Equipment":self.check(self.tc1.GetValue()), 
                     "Manufact":self.check(self.tc2.GetValue()), 
                     "YearManufact":self.check(self.tc3.GetValue()), 
@@ -464,7 +501,7 @@ class PanelQ4(wx.Panel):
 
             elif self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    self.activeQid]) == 1:
+		    self.main.activeQid]) == 1:
                 dbfid = Status.DB.dbfuel.FuelName[\
 		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                       
         
@@ -492,7 +529,7 @@ class PanelQ4(wx.Panel):
                     "IsAlternative":0
                     }
                 q = Status.DB.qgenerationhc.Equipment[\
-		    self.tc1.GetValue()].Questionnaire_id[self.activeQid][0]
+		    self.tc1.GetValue()].Questionnaire_id[self.main.activeQid][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillEquipmentList()
@@ -505,6 +542,37 @@ class PanelQ4(wx.Panel):
     def OnButtonClear(self, event):
         self.clear()
         event.Skip()
+
+
+#------------------------------------------------------------------------------
+#--- Public methods
+#------------------------------------------------------------------------------		
+
+#HS2004-04-13 function display extracted from event handler
+        
+    def display(self,q):
+        self.tc1.SetValue(str(q.Equipment))
+        self.tc2.SetValue(str(q.Manufact))
+        self.tc3.SetValue(str(q.YearManufact))
+        self.tc4.SetValue(str(q.Model))
+        self.tc5.SetValue(str(q.EquipType))
+        self.tc6.SetValue(str(q.NumEquipUnits))
+        self.tc9.SetValue(str(q.HCGPnom))
+        self.tc10.SetValue(str(q.FuelConsum))
+        self.tc11.SetValue(str(q.UnitsFuelConsum))
+        self.tc12.SetValue(str(q.ElectriConsum))
+        self.tc13.SetValue(str(q.HCGTEfficiency))
+        self.tc14.SetValue(str(q.HCGEEfficiency))
+        self.tc15.SetValue(str(q.ElectriProduction))
+        self.tc16.SetValue(str(q.TExhaustGas))
+        self.tc17.SetValue(str(q.PartLoad))
+        self.tc18.SetValue(str(q.HPerDayEq))
+        self.tc19.SetValue(str(q.NDaysEq))
+        self.tc20.SetValue(str(q.PipeDuctEquip))
+        self.tc8.SetValue(str(q.CoolTowerType))
+        if q.DBFuel_id <> None:
+            self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(\
+		    str(Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id][0].FuelName)))
 
     def clear(self):
         self.tc1.SetValue('')
@@ -529,8 +597,8 @@ class PanelQ4(wx.Panel):
         
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()
-        if len(Status.DB.qgenerationhc.Questionnaire_id[self.activeQid]) > 0:
-            for n in Status.DB.qgenerationhc.Questionnaire_id[self.activeQid]:
+        if len(Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]) > 0:
+            for n in Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]:
                 self.listBoxEquipment.Append (str(n.Equipment))
 
 
@@ -540,3 +608,44 @@ class PanelQ4(wx.Panel):
         for n in Status.DB.dbfuel.FuelName["%"]:
             self.choiceOfDBFuel.Append (n.FuelName)
         self.choiceOfDBFuel.SetSelection(0)
+
+
+    def fillPage(self):
+	if self.main.activeQid != 0:
+	    self.fillEquipmentList()
+
+    def showError(self, message):
+        dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+
+    def showInfo(self, message):
+        dlg = wx.MessageDialog(None, message, 'Info', wx.OK)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+
+    def check(self, value):
+        if value <> "" and value <> "None":
+            return value
+        else:
+            return 'NULL'
+
+
+if __name__ == '__main__':
+    import pSQL
+    import MySQLdb
+    class Main(object):
+	def __init__(self,qid):
+	    self.activeQid = qid
+
+    DBName = 'einstein'
+    Status.SQL = MySQLdb.connect(host='localhost', user='root', passwd='tom.tom', db=DBName)
+    Status.DB =  pSQL.pSQL(Status.SQL, DBName)
+
+    app = wx.PySimpleApp()
+    frame = wx.Frame(parent=None, id=-1, size=wx.Size(800, 600), title="Einstein - panelQ4")
+    main = Main(1)
+    panel = PanelQ4(frame, main)
+
+    frame.Show(True)
+    app.MainLoop()

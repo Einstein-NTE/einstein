@@ -1,3 +1,34 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ0: Questionnaire page 0
+#
+#==============================================================================
+#
+#	Version No.: 0.02
+#	Created by: 	    Tom Sobota	April 2008
+#       Revised by:         Hans Schweiger 12/04/2008
+#
+#       Changes to previous version:
+#       12/04/08:       Link to functions in Project (open project)
+#                       all searches in SQL passed to functions of class Project
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
+
 import wx
 import pSQL
 from status import Status
@@ -71,15 +102,19 @@ class PanelQ0(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def OnListBoxQuestionnairesDclick(self, event):
-        self.selectQuestionnaire()
+        projectName = self.listBoxQuestionnaires.GetStringSelection()
+        Status.prj.setActiveProject(projectName)
+        self.main.tree.SelectItem(self.main.qPage1, select=True)
         event.Skip()
 
     def OnButtonNewQuestionnaire(self, event):
         event.Skip()
 
     def OnButtonOpenQuestionnaire(self, event):
-        self.selectQuestionnaire()
-        event.Skip()
+        projectName = self.listBoxQuestionnaires.GetStringSelection()
+        Status.prj.setActiveProject(projectName)
+        self.main.tree.SelectItem(self.main.qPage1, select=True)
+#        self.selectQuestionnaire()
 
     def OnButtonDeleteQuestionnaire(self, event):
         event.Skip()
@@ -90,21 +125,21 @@ class PanelQ0(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------		
 
-    def SetQuestionnaireList(self):
+    def SetProjectList(self,projectList):
         self.listBoxQuestionnaires.Clear()
-        for n in Status.DB.questionnaire.Name["%"]:
-            self.listBoxQuestionnaires.Append(n.Name)
+        for n in projectList:
+            self.listBoxQuestionnaires.Append(n)
 
-
-    def GetID(self):
-	return self.listBoxQuestionnaires.GetStringSelection()[0].Questionnaire_ID
+#HS eliminated, no longer used.
+#    def GetID(self):
+#	return Status.DB.questionnaire.Name[self.listBoxQuestionnaires.GetStringSelection()][0].Questionnaire_ID
 
 
     def clear(self):
 	pass
 
     def fillPage(self):
-	self.SetQuestionnaireList()
+	self.SetProjectList(Status.prj.getProjectList())
 
 
 if __name__ == '__main__':

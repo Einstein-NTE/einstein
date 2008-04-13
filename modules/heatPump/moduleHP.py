@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.12
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -29,6 +29,9 @@
 #                           Stoyan Danov            03/04/2008
 #                           Stoyan Danov            04/04/2008
 #                           Hans Schweiger          07/04/2008
+#                           Stoyan Danov            09/04/2008
+#                           Stoyan Danov            10/04/2008
+#                           Hans Schweiger          13/04/2008
 #   
 #
 #       Changes to previous version:
@@ -41,6 +44,12 @@
 #       03/04/2008 SD: addEquipmentDummy, setEquipmentFromDB
 #       04/04/2008 SD: initPanel - graphics to interfaces, screenEquipments add:if..or..or
 #       07/04/2008 HS: adaptación init_panel / update_panel
+#       09/04/2008 SD: screenEquipments, updatePanel: changes HPList-HPTableDataList - data shown in table, setEquipmentFromDB: new adds
+#       10/04/2008 SD: setEquipmentFromDB - new parameters added (the commented are still missing in sql, to be added)
+#       10/04/2008 SD: def setUserDefinedParamHP() - writes the user-defined parameters in UheatPump
+#       13/04/2008 HS: getEqId added.
+#                      deleteEquipment: rowNo as input instead of Id.
+#                      cascadeIndex -> unified from 1...N
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -117,6 +126,23 @@ class ModuleHP():
         self.interface.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
                                                      uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
 
+#------------------------------------------------------------------------------
+    def setUserDefinedParamHP(self):
+#------------------------------------------------------------------------------
+
+        UDList = self.interface.GData['HP Config']
+
+        row = self.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0] #row in UHeatPump
+
+#        row.MaintainExisting = UDList[0] # to add in UHeatPump
+        row.UHPType = UDList[1]
+        row.UHPMinHop = UDList[2]
+        row.UHPDTMax = UDList[3]
+        row.UHPmaxT = UDList[4]
+        row.UHPminT = UDList[5]
+        row.UHPTgenIn = UDList[6]
+
+        Status.SQL.commit()
 
 #------------------------------------------------------------------------------
     def initUserDefinedParamHP(self):
@@ -168,21 +194,36 @@ class ModuleHP():
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        self.interface.getEquipmentCascade()
-        HPList = []
-        for row in self.interface.cascade:
-            if row['equipeType'] == 'Heat pump' or row['equipeType'] == 'HeatPump' or row['equipeType'] == 'Heat Pump' or row['equipeType'] == 'HP COMP':
-                HPList.append(row)
+        HPTypes = ["Heat pump","HeatPump","Heat Pump","HP COMP","Compression","compression","Absorption","absorption","COMP"]
 
-        if(len(HPList)>0):
-            self.cascadeIndex = len(HPList)-1 #by default sets selection to last HP in cascade
+        self.interface.getEquipmentCascade()
+        self.HPList = []
+        for row in self.interface.cascade:
+        #    if row['equipeType'] == 'Heat pump' or row['equipeType'] == 'HeatPump' or row['equipeType'] == 'Heat Pump' or row['equipeType'] == 'HP COMP':
+            if row["equipeType"] in HPTypes:
+                self.HPList.append(row)
+
+        HPTableDataList = []
+        for row in self.interface.EquipTableDataList:
+#            if row[2] == 'Heat pump' or row[2] == 'HeatPump' or row[2] == 'Heat Pump' or row[2] == 'HP COMP':
+            if row[2] in HPTypes:
+                HPTableDataList.append(row)
+
+        #screen list and substitute None with "not available"
+        for i in range(len(HPTableDataList)):
+            for j in range(len(HPTableDataList[i])):
+                if HPTableDataList[i][j] == None:
+                    HPTableDataList[i][j] = 'not available'        
+
+        if(len(self.HPList)>0):
+            self.cascadeIndex = len(self.HPList) #by default sets selection to last HP in cascade
         else:
             self.cascadeIndex = 0
 #XXXHS2008-04-02: he puesto cascadeIndex a 0 en vez de None: check que sea consistente esto ...
 
 #        print '\n cascadeIndex =', self.cascadeIndex
         
-        return HPList
+        return (self.HPList,HPTableDataList)
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -194,16 +235,23 @@ class ModuleHP():
 #............................................................................................
 # 1. List of equipments
 
-        HPList = self.screenEquipments()
+        (HPList,HPTableDataList) = self.screenEquipments()
+##        print 'updatePanel: HPList =', HPList
+
+##        matrix = []
+##        for i in range(len(HPList)):
+##            row = [HPList[i]['equipeID'],HPList[i]['equipeNo'],HPList[i]['equipeType'],HPList[i]['equipePnom']]
+##            matrix.append(row)
+##        print '\n Stoyan, matrix =', matrix
+
         matrix = []
-        for i in range(len(HPList)):
-            row = [HPList[i]['equipeID'],HPList[i]['equipeNo'],HPList[i]['equipeType'],HPList[i]['equipePnom']] 
+        for row in HPTableDataList:
             matrix.append(row)
 
         data = array(matrix)
 
         self.interface.setGraphicsData('HP Table',data)
-        print "ModuleHP (updatePanel): HP Table written to GData. ",data
+#        print "ModuleHP (updatePanel): HP Table written to GData. ",data
 
 #............................................................................................
 # 2. XY Plot
@@ -264,7 +312,18 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def deleteE(self,HPid):
+    def getEqId(self,rowNo):
+#------------------------------------------------------------------------------
+#   gets the EqId from the rowNo in the HPList
+#------------------------------------------------------------------------------
+
+        HPId = self.HPList[rowNo]["equipeID"]
+        return HPId
+
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def deleteEquipment(self,rowNo):
 #------------------------------------------------------------------------------
         """
         deletes the selected heat pump in the current alternative
@@ -273,6 +332,8 @@ class ModuleHP():
         print "deleteHP: function not yet defined"
 
         #--> delete HP from the equipment list under current alternative #from C&QGenerationHC under ANo
+        HPid = self.getEqId(rowNo)
+        print "Module HP (delete): id to be deleted = ",HPid
         
         eq = self.equipments.QGenerationHC_ID[HPid][0] #select the corresponding rows to HPid in both tables
         eqC = self.equipmentsC.QGenerationHC_id[HPid][0]
@@ -284,10 +345,7 @@ class ModuleHP():
         #actuallise the cascade list: define deleteFromCascade
         self.deleteFromCascade(self.interface.cascade, HPid)
 
-        #actuallize the CascadeIndex & EqNo in C,QGen..HC tables
-
-        #change self.cascadeIndex -> to appoint the next in list
-        
+        self.NEquipe -= 1
 
 #------------------------------------------------------------------------------
     def deleteFromCascade(self, cascade, HPid):
@@ -297,7 +355,7 @@ class ModuleHP():
         """
 #-----------------------------------------------------------------------------
 
-        print '\n deleteFromCascade():', 'cascade =', cascade
+#        print '\n deleteFromCascade():', 'cascade =', cascade
 
         idx = -1
         new_cascade = cascade
@@ -310,11 +368,11 @@ class ModuleHP():
         for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
             eqC = self.equipmentsC.QGenerationHC_id[new_cascade[i]['equipeID']][0]
             eqC.CascadeIndex = i+1
-            print '\n new_CascadeIndex', eqC.CascadeIndex
+#            print '\n new_CascadeIndex', eqC.CascadeIndex
             
 #        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
 
-        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
+#        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
 
 
         
@@ -327,7 +385,7 @@ class ModuleHP():
 
 #        self.sql.commit() #to be activated, SD
 
-
+        self.interface.deleteCascadeArrays(self.NEquipe)
 
 
 #------------------------------------------------------------------------------
@@ -337,42 +395,34 @@ class ModuleHP():
 #       position in the cascade 
 #------------------------------------------------------------------------------
 
-#XXX    Here some function adding a row to the QGenerationHC and CGenerationHC
-#       in the SQL
-#XXX    Cascade index should be set by default to something reasonable,
-#       depending if the equipment is a base load equipment or a peak load one
-
-#for the moment the HP Module works always on Eq. 0 / CI 0
         print 'moduleHP (addEquipmentDummy): cascade Arrays initialised '
-##
-##        self.cascadeIndex = 0
-##        self.equipe = self.equipments[0]
-##        self.equipeC = self.equipmentsC[0]
-##        return(self.equipe,self.equipeC)
+        self.cascadeIndex = self.NEquipe + 1
+        EqNo = self.NEquipe + 1
+        print 'ModuleHP (addEquipmentDummy): CascadeIndex', self.cascadeIndex
+        print 'ModuleHP (addEquipmentDummy): EqNo', EqNo
 
         self.neweqs += 1 #No of last equip added
-
-        CascadeIndex = self.NEquipe + 1
-
         NewEquipmentName = "New heat pump %s"%(self.neweqs)
         
         EqNo = self.NEquipe + 1
-        print 'CascadeIndex', CascadeIndex
-        dic = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"HeatPump"}
-        QGid = self.DB.qgenerationhc.insert(dic)
-        dicC = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"QGenerationHC_id":QGid,"CascadeIndex":CascadeIndex}
-        CGid = self.DB.cgenerationhc.insert(dicC)
+        print 'ModuleHP (addEquipmentDummy): CascadeIndex', self.cascadeIndex
+        print 'ModuleHP (addEquipmentDummy): EqNo', EqNo
+        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"HeatPump"}
+        QGid = self.DB.qgenerationhc.insert(equipe)
+        equipeC = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"QGenerationHC_id":QGid,"CascadeIndex":self.cascadeIndex}
+        CGid = self.DB.cgenerationhc.insert(equipeC)
 
         Status.SQL.commit()
 
-        print "new equip row created"
-        
-        self.cascadeIndex = CascadeIndex - 1 #appoints the last (cascadeIndex starts from 0, CascadeIndex starts from 1)
+        self.interface.getEquipmentCascade()
+        self.interface.addCascadeArrays()
 
-        print "self.cascadeIndex", self.cascadeIndex
+        print "ModuleHP (addEquipmentDummy): new equip row created"
+        print "ModuleHP (addEquipmentDummy): self.cascadeIndex", self.cascadeIndex
 
         self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
         self.equipeC = self.equipmentsC.CGenerationHC_ID[CGid][0]
+
         return(self.equipe,self.equipeC)
 
 #------------------------------------------------------------------------------
@@ -396,60 +446,31 @@ class ModuleHP():
 
         model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
 
-##        tmpEquipe = {
-##            "HCGPnom":model.HPHeatCap,
-##            "HCGTEfficiency":model.HPThHeatCOP,
-##            "Manufact":model.HPManufacturer,
-##            "Model":model.HPModel,
-##            "ElectriConsum":model.HPElectConsum,
-##            "EquipTypeFromDB":model.HPType,
-##            "EquipIDFromDB":model.DBHeatPump_ID
-##            }
-##        equipe.update(tmpEquipe)
-##        Status.SQL.commit()
-##
-##        tmpEquipeC = {
-##            "HPSubType":model.HPSubType,
-##            "HPWorkFluid":model.HPWorkFluid,
-##            "HPExHeatCOP":model.HPExHeatCOP,
-##            "HPThHeatCOP":model.HPThHeatCOP
-####            "HPAbsTinH":model.HPAbsTinH, #to consider if leaving
-####            "HPCondTinH":model.HPCondTinH, #to consider if leaving
-####            "HPGenTinH":model.HPGenTinH, #to consider if leaving
-####            "HPLimDT":model.HPLimDT, #to consider if leaving
-####            "HPPrice":model.HPPrice, #change to generic - without HP in sqlDB
-####            "HPTurnKeyPrice":model.HPTurnKeyPrice, #change to generic - without HP in sqlDB
-####            "HPOandMvar":model.HPOandMvar #change to generic - without HP in sqlDB
-##            }
-##        equipeC.update(tmpEquipeC)
-##        Status.SQL.commit()
-
-
-        
+        print "ModuleHP(setEquipmentFromDB): updating parameters in SQL"        
         equipe.update({"HCGPnom":model.HPHeatCap})
-        equipe.update({"HCGTEfficiency":model.HPThHeatCOP})
+        equipe.update({"HCGTEfficiency":model.HPHeatCOP}) #changed from HPThHeatCOP,SD
         equipe.update({"Manufact":model.HPManufacturer})
+        equipe.update({"YearManufact":model.HPYearUpdate})
         equipe.update({"Model":model.HPModel})
-##        equipe.update({"ElectriConsum":model.HPElectConsum})
-##        equipe.update({"EquipTypeFromDB":model.HPType})
-##        equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
+        equipe.update({"EquipType":model.HPType})
+        equipe.update({"NumEquipUnits":1})
+#        equipe.update({"DBFuel_id":model.DBFuel_id}) #to be added in DBHeatPump
+#        equipe.update({"FuelConsum":model.HPFuelConsum}) #to be added in DBHeatPump
+#        equipe.update({"UnitsFuelConsum":model.HPUnitsFuelConsum}) #to be added in DBHeatPump
+        if model.HPElectConsum != None: equipe.update({"ElectriConsum":model.HPElectConsum})
+        equipe.update({"IsSelectedFromDB":1})
+        equipe.update({"DatabaseNameSelection":"DBHeatPump"})
+        equipe.update({"EquipTypeFromDB":model.HPType})
+        equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
         Status.SQL.commit()
 
         
-##        equipeC.update({"HPSubType":model.HPSubType})
-##        equipeC.update({"HPWorkFluid":model.HPWorkFluid})
-##        equipeC.update({"HPExHeatCOP":model.HPExHeatCOP})
-##        equipeC.update({"HPThHeatCOP":model.HPThHeatCOP})
-##        Status.SQL.commit()            
-
-##        tmpEquipe = {"HCGPnom":model.HPHeatCap,"HCGTEfficiency":model.HPThHeatCOP,"Manufact":model.HPManufacturer,
-##            "Model":model.HPModel,"ElectriConsum":model.HPElectConsum,"EquipTypeFromDB":model.HPType,"EquipIDFromDB":model.DBHeatPump_ID}
-##        equipe.update(tmpEquipe)
-##        Status.SQL.commit()
-##
-##        tmpEquipeC = {"HPSubType":model.HPSubType,"HPWorkFluid":model.HPWorkFluid,"HPExHeatCOP":model.HPExHeatCOP,"HPThHeatCOP":model.HPThHeatCOP}
-##        equipeC.update(tmpEquipeC)
-##        Status.SQL.commit()
+##        equipeC.update({"HPExHeatCOP":model.HPExHeatCOP}) #to be added in CGenerationHC
+##        equipeC.update({"Price":model.HPPrice}) #to be added in CGenerationHC
+##        equipeC.update({"TurnKeyPrice":model.HPTurnKeyPrice}) #to be added in CGenerationHC
+##        equipeC.update({"OandMvar":model.HPOandMvar}) #to be added in CGenerationHC
+##        equipeC.update({"OandMfix":model.HPOandMfix}) #to be added in CGenerationHC
+##        Status.SQL.commit()       
 
 
 
@@ -551,8 +572,8 @@ class ModuleHP():
 #............................................................................................
 #   analyze heat demand for previous checks
 
-            TMinD = self.getTMinD(self.interface.QD_T_mod[self.cascadeIndex])
-            TMaxA = self.getTMaxA(self.interface.QA_T_mod[self.cascadeIndex])
+            TMinD = self.getTMinD(self.interface.QD_T_mod[self.cascadeIndex-1])
+            TMaxA = self.getTMaxA(self.interface.QA_T_mod[self.cascadeIndex-1])
             DTMin = TMinD - TMaxA   #minimum necessary temperature lift
 
             print "ModuleHP (designAssistant1): TMinD,TMaxA,DTMin",TMinD,TMaxA,DTMin
@@ -583,7 +604,7 @@ class ModuleHP():
 # Initial selection: maximum reasonable power for a heat pump
 # From the annual Heat demand curve (QDa): calculate the necesary heating capacity (starting value)
 
-                Qh0 = interpolateList(Th0/Status.TemperatureInterval,self.interface.QD_T_mod[self.cascadeIndex]) #calculates the annual energy demand for the Th_o from QDa
+                Qh0 = interpolateList(Th0/Status.TemperatureInterval,self.interface.QD_T_mod[self.cascadeIndex-1]) #calculates the annual energy demand for the Th_o from QDa
                 dotQh0 = Qh0/CONST.YEAR*10       #the initial heat capacity of the heat pump is obtained dividing by the hours of year
 
                 print 'ModuleHP (designAssistant1): Initial Annual energy demand Qh0 =', Qh0
@@ -613,7 +634,8 @@ class ModuleHP():
                     HOp = USHj/equipe.HCGPnom
 
                     print "ModuleHP (designAssistant1): USH: ",USHj," HOp: ",HOp
-                    
+                    print "ModuleHP (designAssistant1): UHPMinHop: ",DA.UHPMinHop
+                   
                     if (HOp >= DA.UHPMinHop):
                         self.preselection.append(modelID)
                         PNomMax = max(PNomMax,equipe.HCGPnom)
@@ -687,14 +709,21 @@ class ModuleHP():
 # get equipment data from equipment list in SQL
 
         HPModel = equipe.Model
-        print equipe.Model
+        print "ModuleHP (calculateEnergyFlows): model",equipe.Model
         HPType = equipe.EquipType
+        print "ModuleHP (calculateEnergyFlows): type",equipe.EquipType
         PNom = equipe.HCGPnom
+        print "ModuleHP (calculateEnergyFlows): PNom",equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
+        print "ModuleHP (calculateEnergyFlows): COP",equipe.HCGTEfficiency
 #        COPex = equipeC.HCGCOPex       XXX To be introduced in DB
         COPex = 0.3 
 
-        EquipmentNo = self.interface.cascade[cascadeIndex]["equipeNo"]
+        for i in range(cascadeIndex+1):
+            print "cascade[%s]: "%i,self.interface.cascade[i-1]["equipeNo"]
+        
+        EquipmentNo = self.interface.cascade[cascadeIndex-1]["equipeNo"]
+        print "ModuleHP (calculateEnergyFlows): eqno",EquipmentNo
 
 #..............................................................................
 # design assistant parameters
@@ -723,8 +752,8 @@ class ModuleHP():
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex]
-        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex]
+        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex-1]
+        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex-1]
         
         USHj_Tt = self.interface.createQ_Tt()
         USHj_t = self.interface.createQ_t()
@@ -853,18 +882,18 @@ class ModuleHP():
         print "ModuleHP (calculateEnergyFlows): now storing final results"
         
 # remaining heat demand and availability for next equipment in cascade
-        Interfaces.QD_Tt_mod[cascadeIndex+1] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex+1] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex+1] = self.interface.calcQ_T(QA_Tt)
+        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Interfaces.QD_T_mod[cascadeIndex] = self.interface.calcQ_T(QD_Tt)
+        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Interfaces.QA_T_mod[cascadeIndex] = self.interface.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment                            
-        Interfaces.USHj_Tt[cascadeIndex] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex] = self.interface.calcQ_T(USHj_Tt)
+        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Interfaces.USHj_T[cascadeIndex-1] = self.interface.calcQ_T(USHj_Tt)
 
 # waste heat absorbed by present equipment                            
-        Interfaces.QHXj_Tt[cascadeIndex] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex] = self.interface.calcQ_T(QHXj_Tt)
+        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Interfaces.QHXj_T[cascadeIndex-1] = self.interface.calcQ_T(QHXj_Tt)
 
 #        equipeC.USHj = USHj
 #        equipeC.QHXj = QHXj    #XXX to be defined in data base
@@ -889,11 +918,11 @@ if __name__ == "__main__":
     Status.SQL = MySQLdb.connect(user="root", db="einstein")
     Status.DB = pSQL.pSQL(Status.SQL, "einstein")
     
-    Status.PId = 1
+    Status.PId = 2
     Status.ANo = 0
     Status.SetUpId = 1 #this is PSetUpData_ID
 
-    HPid = 6
+    HPid = 31
     
     interf = Interfaces()
 
@@ -903,7 +932,11 @@ if __name__ == "__main__":
     mod = ModuleHP(keys)
 ##    mod.updatePanel()
     mod.initPanel()
-##    mod.addEquipmentDummy()
+##    (equipe,equipeC) = mod.addEquipmentDummy()
+##    mod.setEquipmentFromDB(equipe,equipeC,HPid)
 ##    mod.deleteE(HPid)
 ##    mod.designAssistant1()
 ##    mod.designAssistant2(12)
+
+##    Interfaces.setGraphicsData(interf,'HP Config',[99., 'HP COMP',99.,99.,99.,99.,99.])
+##    mod.setUserDefinedParamHP()
