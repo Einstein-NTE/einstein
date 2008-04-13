@@ -58,6 +58,8 @@
 #                   Function "OnEnterHeatPump" changed
 #                   Function Show substituted by display added by opening EA-Panels
 #                   Function Show substituted by display added by opening HP-Panel
+#                   Event-handlers scroll-up "view" added
+#                   Event-handlers scroll-up "user-interaction level"
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -231,8 +233,9 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, PList["X107"][1])
 
-        self.PresentState = self.menuView.AppendRadioItem(-1, "Present state")
-        self.Aternative1 = self.menuView.AppendRadioItem(-1, "Alternative 1")
+        self.PresentStateQ = self.menuView.AppendRadioItem(-1, "Present state (original data)")
+        self.PresentState = self.menuView.AppendRadioItem(-1, "Present state (checked data)")
+        self.Alternative1 = self.menuView.AppendRadioItem(-1, "Alternative 1")
         
 
         self.EditDBCHP = self.subnenuEquipments.Append(-1, PList["X111"][1])
@@ -427,6 +430,10 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
 
+        self.Bind(wx.EVT_MENU, self.OnMenuPresentState, self.PresentState)
+        self.Bind(wx.EVT_MENU, self.OnMenuPresentStateQ, self.PresentStateQ)
+        self.Bind(wx.EVT_MENU, self.OnMenuAlternative1, self.Alternative1)
+
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
@@ -437,6 +444,10 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)     
+
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
         
         #--- binding the Tree
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
@@ -685,6 +696,19 @@ class EinsteinFrame(wx.Frame):
     def OnMenuExit(self, event):
         wx.Exit()
     
+#..............................................................................		
+# Scroll-up menu "VIEW"
+
+    def OnMenuPresentStateQ(self, event):
+        Status.prj.setActiveAlternative(-1)
+
+    def OnMenuPresentState(self, event):
+        Status.prj.setActiveAlternative(0)
+        
+    def OnMenuAlternative1(self, event):
+        Status.prj.setActiveAlternative(1)
+
+#..............................................................................		
 
     def OnMenuEditDBBenchmark(self, event):
         frameEditDBBenchmark = DBEditFrame.wxFrame(None, "Edit DBBenchmark", Status.DB.dbbenchmark, Status.SQL)
@@ -717,6 +741,17 @@ class EinsteinFrame(wx.Frame):
         frameEditDBChiller = DBEditFrame.wxFrame(None, "Edit DBChiller", Status.DB.dbchiller, Status.SQL)
         frameEditDBChiller.Show() 
 
+#..............................................................................		
+# Scroll-up menu "USER SELECT LEVEL 1 - 3"
+
+    def OnMenuUserSelectLevel1(self, event):
+        Status.prj.setUserInteractionLevel(1)
+    def OnMenuUserSelectLevel2(self, event):
+        Status.prj.setUserInteractionLevel(2)
+    def OnMenuUserSelectLevel3(self, event):
+        Status.prj.setUserInteractionLevel(3)
+
+#..............................................................................		
 
        
 

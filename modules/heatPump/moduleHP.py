@@ -649,7 +649,7 @@ class ModuleHP():
 #............................................................................................
 # Automatic final selection:
 
-            if Status.InteractionLevel == "interactive" or Status.InteractionLevel == "semi-automatic":
+            if Status.UserInteractionLevel == "interactive" or Status.UserInteractionLevel == "semi-automatic":
                 print "ModuleHP (designAssistant1): return to GUI for manual selection "
                 return("MANUAL",self.preselection)
 
