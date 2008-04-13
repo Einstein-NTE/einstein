@@ -31,6 +31,7 @@
 #                           Tom Sobota                          06/04/2008
 #                           Hans Schweiger                      08/04/2008
 #                           Tom Sobota                          09/04/2008
+#                           Hans Schweiger                      12/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -52,6 +53,11 @@
 #                   can be called from other places
 #       08/04/2008  Panels BM1-3 added (Benchmark modules)
 #       09/04/2008  Extracted Page 1 to Page 9 and all related code as external modules.
+#       12/04/2008  Instance of class Project created
+#                   Minor changes event handlers panelQ0
+#                   Function "OnEnterHeatPump" changed
+#                   Function Show substituted by display added by opening EA-Panels
+#                   Function Show substituted by display added by opening HP-Panel
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -73,6 +79,7 @@ import BridgeClass
 
 #--- popup frames
 from status import Status #processing status of the tool
+from einstein.modules.project import Project #functions for handling of PId/ANo
 
 #--- popup frames
 import DBEditFrame
@@ -349,21 +356,21 @@ class EinsteinFrame(wx.Frame):
         self.qOptiProHX = self.tree.AppendItem (self.qOptiProDesign, "HX network")
 
             #H&C Supply
-        self.qOptiProSupply = self.tree.AppendItem (self.qOptiProDesign, "H&C Supply")
+        self.qHC = self.tree.AppendItem (self.qOptiProDesign, "H&C Supply")
                 #H&C Storage
-        self.qOptiProSupply1 = self.tree.AppendItem (self.qOptiProSupply, "H&C Storage")
+        self.qOptiProSupply1 = self.tree.AppendItem (self.qHC, "H&C Storage")
                 #CHP
-        self.qOptiProSupply2 = self.tree.AppendItem (self.qOptiProSupply, "CHP")
+        self.qOptiProSupply2 = self.tree.AppendItem (self.qHC, "CHP")
                 #Solar Thermal
-        self.qOptiProSupply3 = self.tree.AppendItem (self.qOptiProSupply, "Solar Thermal")
+        self.qOptiProSupply3 = self.tree.AppendItem (self.qHC, "Solar Thermal")
                 #Heat Pumps
-        self.qOptiProSupply4 = self.tree.AppendItem (self.qOptiProSupply, "Heat Pumps")
+        self.qHP = self.tree.AppendItem (self.qHC, "Heat Pumps")
                 #Biomass
-        self.qOptiProSupply5 = self.tree.AppendItem (self.qOptiProSupply, "Biomass")
+        self.qOptiProSupply5 = self.tree.AppendItem (self.qHC, "Biomass")
                 #Chillers
-        self.qOptiProSupply6 = self.tree.AppendItem (self.qOptiProSupply, "Chillers")
+        self.qOptiProSupply6 = self.tree.AppendItem (self.qHC, "Chillers")
                 #Boilers & burners
-        self.qOptiProSupply7 = self.tree.AppendItem (self.qOptiProSupply, "Boilers & burners")
+        self.qBB = self.tree.AppendItem (self.qHC, "Boilers & burners")
         
             #H&C Distribution
         self.qOptiProDistribution = self.tree.AppendItem (self.qOptiProDesign, "H&C Distribution")
@@ -514,7 +521,8 @@ class EinsteinFrame(wx.Frame):
 
         
         ####----PAGE 4
-        self.Page4 = PanelQ4(self.leftpanel2, self)
+#HS2008-04-13 None as argument added.
+        self.Page4 = PanelQ4(self.leftpanel2, self, None)
         self.Page4.Hide()
 
 
@@ -637,7 +645,7 @@ class EinsteinFrame(wx.Frame):
         ####--- End op pageHeatPump
 
         ####--- PanelHP
-        self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
+        self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
         self.panelHP.Hide()
         ####--- End op panelHP
 
@@ -836,7 +844,8 @@ class EinsteinFrame(wx.Frame):
         #qStatisticYPage1 'Primary energy - Yearly'
         elif select == PList["X137"][1]:
             self.hidePages()
-            self.panelEA1.Show()
+            self.panelEA1.display()
+#            self.panelEA1.Show()
         #qStatisticYPage2 'Final energy by fuels - Yearly'
         elif select == PList["X138"][1]:
             self.hidePages()
@@ -922,8 +931,9 @@ class EinsteinFrame(wx.Frame):
             ret = self.OnEnterHeatPumpPage()
             if  ret == 0:
                 self.hidePages()
-                self.panelHP.modHP.initPanel()
-                self.panelHP.Show()
+#                self.panelHP.modHP.initPanel()
+#                self.panelHP.Show()
+                self.panelHP.display()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
 ###HS2008-03-07
@@ -962,12 +972,12 @@ class EinsteinFrame(wx.Frame):
 #--- Eventhandlers DataCheck
 #------------------------------------------------------------------------------		
     def OnEnterHeatPumpPage(self):
-        if self.activeQid <> 0:
+        if Status.PId <> 0:
             #ret = self.ModBridge.StartpanelHP(Status.SQL, DB, self.activeQid)
             #self.showInfo("Return of StartpanelHP %s" %(ret))
             return 0
         else:
-            self.showError("Select Questionnaire first!")
+            self.showError("Select project first!")
             return 1
 
 
@@ -1040,15 +1050,15 @@ class EinsteinFrame(wx.Frame):
             return 'NULL'
 
 
-###HS2008-04-02 changed status into Status, alternative-no set to 0
-    def selectQuestionnaire(self):
-        id = Page0.GetID()
-        self.activeQid = Status.DB.questionnaire.Name[id]
-        Status.PId = self.activeQid
-        self.activeANo = 0
-        Status.ANo = self.activeANo
+###HS2008-04-12 no longer needed
+#    def selectQuestionnaire(self):
+#        id = Page0.GetID()
+#        self.activeQid = Status.DB.questionnaire.Name[id]
+#        Status.PId = self.activeQid
+#        self.activeANo = 0
+#        Status.ANo = self.activeANo
         
-        self.tree.SelectItem(self.qPage1, select=True)
+#        self.tree.SelectItem(self.qPage1, select=True)
         #self.tc1Page1.SetValue(self.listBoxQuestionnaresPage0.GetStringSelection())
         #self.tc1Page1.SetValue(str(self.activeQid))
 
@@ -1072,6 +1082,7 @@ if __name__ == '__main__':
     interf = None
 
     Status.mod = Modules()
+    Status.prj = Project()
 
     app = wx.PySimpleApp()
     frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
