@@ -1,0 +1,67 @@
+--update einstein database: Update 003 - 11.04.2008, Stoyan Danov
+USE einstein;
+
+-- add new columns to CGenerationHC
+ALTER TABLE cgenerationhc ADD COLUMN QHXEq DOUBLE COMMENT 'Waste heat used in equipment' AFTER FETj;
+ALTER TABLE cgenerationhc ADD COLUMN HPerYearEq DOUBLE COMMENT 'Yearly operating hours of equipment = HperDayEq*NDaysEq' AFTER CascadeIndex;
+ALTER TABLE cgenerationhc ADD COLUMN HPExHeatCOP DOUBLE COMMENT 'HeatPump Exergetic Heating COP' AFTER HPerYearEq;
+ALTER TABLE cgenerationhc ADD COLUMN Price DOUBLE COMMENT 'Price' AFTER HPExHeatCOP;
+ALTER TABLE cgenerationhc ADD COLUMN TurnKeyPrice DOUBLE COMMENT 'Turn Key Price' AFTER Price;
+ALTER TABLE cgenerationhc ADD COLUMN OandMvar DOUBLE COMMENT 'Ratio O&M costs variable [euro/MWh year, heating]' AFTER TurnKeyPrice;
+ALTER TABLE cgenerationhc ADD COLUMN OandMfix DOUBLE COMMENT 'Ratio O&M costs fixed [euro/kW year, heating]' AFTER OandMvar;
+
+
+--add new columns to DBHeatPump
+ALTER TABLE dbheatpump ADD COLUMN HPYearManufact DOUBLE COMMENT 'Year of manufacturing' AFTER HPModel;
+--consider if this parameter should be included, or to use HPYearUpdate in turn of HPYearManufact, delete this comment later
+
+ALTER TABLE dbheatpump ADD COLUMN DBFuel_id INTEGER UNSIGNED COMMENT 'Type of fuel used - id' AFTER HPModel;
+--consider: in the DBHeatPump window to add predefined list of fuels, delete this comment later
+--consider adding in DBFuel also hot water and steam LP/HP, exhaust gas as fuels for absorption machines, delete this comment later
+
+ALTER TABLE dbheatpump ADD COLUMN HPFuelConsum DOUBLE COMMENT 'Fuel consumption of HP' AFTER DBFuel_id;
+ALTER TABLE dbheatpump ADD COLUMN HPUnitsFuelConsum VARCHAR(45) COMMENT 'Fuel consumption of HP' AFTER HPFuelConsum;
+
+
+
+--add new table
+CREATE TABLE qheatexchanger (
+	QHeatExchanger_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	HXName VARCHAR(45) COMMENT 'Short name of heat exchanger',
+	HXType VARCHAR(45) COMMENT 'Heat exchanger type',
+	QdotHX DOUBLE COMMENT 'Heat transfer rate',
+	HXLMTD DOUBLE COMMENT 'Log. Mean Temperature Diff. (LMTD)',
+	QHX DOUBLE COMMENT 'Total heat transfered',
+	HXSourceInlet VARCHAR(45) COMMENT 'Heat source (process [+outflow no.], equipment, ...)',
+	HXTSourceInlet DOUBLE COMMENT 'Inlet temperature (source)',
+	HXhSourceInlet DOUBLE COMMENT 'Inlet specific enthalpy (source)',
+	HXTSourceOutlet DOUBLE COMMENT 'Outlet temperature (source)',
+	HXhSourceOutlet DOUBLE COMMENT 'Outlet specific enthalpy (source)',
+	HXSink VARCHAR(45) COMMENT 'Heat sink (process, pipe/duct)',
+	HXTSinkInlet DOUBLE COMMENT 'Inlet temperature (sink)',
+	HXTSinkOutlet DOUBLE COMMENT 'Outlet temperature (sink)',
+	PRIMARY KEY (QHeatExchanger_ID)
+);
+
+
+--add new table
+CREATE TABLE qwasteheatelequip (
+	QWasteHeatElEquip_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	WHEEName VARCHAR(45) COMMENT 'Short name of electrical equipment',
+	WHEEEqType VARCHAR(45) COMMENT 'Equipment type',
+	WHEEWasteHeatType VARCHAR(45) COMMENT 'Waste heat type',
+	QWHEE DOUBLE COMMENT 'Available waste heat',
+	WHEEMedium VARCHAR(45) COMMENT 'Medium',
+	WHEEFlow DOUBLE COMMENT 'Flow rate',
+	WHEETOutlet DOUBLE COMMENT 'waste heat temperature',
+	WHEEPresentUse VARCHAR(45) COMMENT 'present use of waste heat',
+	HPerDayWHEE DOUBLE COMMENT 'hours of  operation per day',
+	NBatchWHEE DOUBLE COMMENT 'number of batches per day',
+	HBatchWHEE DOUBLE COMMENT 'duration of 1 batch',
+	NDaysWHEE DOUBLE COMMENT 'days of process operation per year',
+	PRIMARY KEY (QWasteHeatElEquip_ID)
+);
+
+
+
+
