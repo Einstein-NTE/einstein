@@ -15,9 +15,12 @@ class FrameHelpUserManual(wx.Dialog):
 	    self.html.SetStandardFonts()
 
 	if os.access(manualfile,os.R_OK):
+            print "FrameHelpUserManual: Manual File found: ", manualfile
 	    # if possible, load local manual
 	    self.html.LoadFile(manualfile)
 	else:
+            print "FrameHelpUserManual: Manual File not found: ", manualfile
+	    
 	    # else, go to einstein site
 	    self.html.LoadPage("http://www.iee-einstein.org")
 

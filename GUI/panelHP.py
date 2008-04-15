@@ -469,7 +469,11 @@ class PanelHP(wx.Panel):
 
         self.config = Interfaces.GData["HP Config"]
         self.cbConfig1.SetValue(self.config[0])
-        self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
+        try:        #try-except necessary if there comes a string that is not in list.
+            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
+        except:
+            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
+            pass
         self.tcConfig3.SetValue(str(self.config[2]))
         self.tcConfig4.SetValue(str(self.config[3]))
         self.tcConfig5.SetValue(str(self.config[4]))

@@ -226,7 +226,7 @@ class EinsteinFrame(wx.Frame):
         self.treepanel = wx.Panel(self.splitter, -1)
 
         ####---- Upper info panel
-	self.panelinfo = PanelInfo(self,
+        self.panelinfo = PanelInfo(self,
 				   self,
 				   name = 'EnerCHEESEexperts Barcelona',
 				   project = 'Biomass based cogeneration and substitution of old boiler')
@@ -235,10 +235,10 @@ class EinsteinFrame(wx.Frame):
         self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS)
 
         #----- add menu
-	self.CreateMenu()
+        self.CreateMenu()
         
         #----- create tree control
-	self.CreateTree()
+        self.CreateTree()
 
      
 	#----- error log window
@@ -246,7 +246,7 @@ class EinsteinFrame(wx.Frame):
 				   name='message',
 				   parent=self.splitter2,
 				   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
-	self.message.InsertColumn(0, 'Message log')
+        self.message.InsertColumn(0, 'Message log')
         self.message.SetBackgroundColour('white')
 
 
@@ -254,15 +254,15 @@ class EinsteinFrame(wx.Frame):
         self.DoLayout ()
 
         #----- set binding events
-	self.BindEvents()
+        self.BindEvents()
 
 	#----- generate and initialize the panels
-	self.CreatePanels()
+        self.CreatePanels()
 
 	#----- initial message
-	self.logMessage('einstein started')
-	self.logWarning('an example of a warning')
-	self.logError('an example of an error')
+        self.logMessage('einstein started')
+        self.logWarning('an example of a warning')
+        self.logError('an example of an error')
  
         ############################################
         #
@@ -271,14 +271,14 @@ class EinsteinFrame(wx.Frame):
         ############################################
 #------------------------------------------------------------------------------
     def _log(self,fcolor,bcolor,text):
-	tl = time.localtime()
-	now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+        tl = time.localtime()
+        now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
         item = wx.ListItem()
-	item.SetText(now + text)
-	item.SetTextColour(fcolor)
-	item.SetBackgroundColour(bcolor)
-	item.SetColumn(0)
-	self.message.InsertItem(item)
+        item.SetText(now + text)
+        item.SetTextColour(fcolor)
+        item.SetBackgroundColour(bcolor)
+        item.SetColumn(0)
+        self.message.InsertItem(item)
 
     def logMessage(self,text):
         self._log('#00A000','#FFFFFF',text)
@@ -318,9 +318,9 @@ class EinsteinFrame(wx.Frame):
         self.splitter.SetSashPosition(250)
 
 	# find the width of message panel
-	w = self.splitter2.GetWindow1()
-	(width,height) = w.GetClientSizeTuple()
-	self.message.SetColumnWidth(0, width-10)
+        w = self.splitter2.GetWindow1()
+        (width,height) = w.GetClientSizeTuple()
+        self.message.SetColumnWidth(0, width-10)
 
 ######################################################################################        
 
@@ -601,11 +601,11 @@ class EinsteinFrame(wx.Frame):
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
         frameUserManual = FrameHelpUserManual(self, 'einstein_manual.html')
-	frameUserManual.Show()
+        frameUserManual.Show()
 
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
-	frameAbout.Show()
+        frameAbout.Show()
 
 #------------------------------------------------------------------------------		
 #--- Eventhandlers Tree
@@ -1161,8 +1161,8 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
 
-	self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
-	self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
+        self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
+        self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
 
         #--- binding the Tree
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)

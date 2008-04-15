@@ -15,9 +15,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #
 #       Created by:     Hans Schweiger      02/04/2008
+#       Revised by:     Hans Schweiger      15/04/2008
+#
+#       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,21 +41,40 @@ class Project(object):
 #        NoAlternatives = ???
 
 #------------------------------------------------------------------------------
-    def createNewAlternative(copyFrom = None):
+    def createNewAlternative(self,originalANo = 0):
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
- 
-        if (copyFrom == None):
+
+        DB = Status.DB
+
+#XXX assignment for testing only
+        Status.NoOfAlternatives = 5
+        Status.NoOfAlternatives +=1
+        ANo = Status.NoOfAlternatives
+#..............................................................................
+# create a copy of present state ...
+
+        if (originalANo == 0):
+
 #XXX init project information with defaults where necessary
 #            initAlternative()
              pass
             
+#..............................................................................
+# ... create a new alternative copying from an existing one
         else:
             pass
-#XXX here all relevant project information should be copied in SQL
-#       from ANo = copyFrom to newANo
-#       all tables Q and C, tables U, ...
 
+#..............................................................................
+# copying Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,originalANo)
+        row = DB.cgeneraldata.sql_select(sqlQuery)
+        print "row[0] = ",row[0]
+        newID = DB.cgeneraldata.insert(row[0])
+        new = DB.cgeneraldata.CGeneralData_ID[newID]
+        new.AlternativeProposalNo = ANo
+        Status.SQL.commit()
+        print "Project (createNewAlternative): newId = %s row = "%newId,new
 
 #------------------------------------------------------------------------------
     def getActiveAlternatives():

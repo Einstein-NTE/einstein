@@ -19,14 +19,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	    03/04/2008
 #	Revised by:    
 #                           Tom Sobota              05/04/2008
+#                           Hans Schweiger          15/04/2008
 #
 #       Changes to previous version:
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
 #                   slight change to OK and Cancel buttons, to show the right icons
+#       15/04/08 HS copy and delete buttons added. event handler "Generate New" linked
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -231,17 +233,23 @@ class PanelA(wx.Panel):
             modA.calculateCascade()
             #updatePlots
         
+#------------------------------------------------------------------------------		
     def OnGenerateNewButton(self, event):
+#------------------------------------------------------------------------------		
+
+        print "PanelA (GenerateNew-Button): calling function createNewAlternative"
+        Status.prj.createNewAlternative(0)
+        
         #show pop-up menu for adding equipment
         #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
 	#right table when it is created
-        pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
-        if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelA AddEquipment accepted. Id='+str(pu1.theId)
+#        pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
+#        if pu1.ShowModal() == wx.ID_OK:
+#            print 'PanelA AddEquipment accepted. Id='+str(pu1.theId)
 #            ret = self.modA.add(AId)
-            #update plots
-        else:
-            print 'Cancelled'
+        
+#        else:
+#            print 'Cancelled'
 
     def OnGridPageAGridCellLeftDclick(self, event):
         print "Grid - left button Dclick: here I should call the Q4H"
