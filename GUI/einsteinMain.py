@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.67
+#	Version No.: 0.69
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -32,6 +32,7 @@
 #                           Hans Schweiger                      08/04/2008
 #                           Tom Sobota                          09/04/2008
 #                           Hans Schweiger                      12/04/2008
+#                           Tom Sobota                          15/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -60,6 +61,10 @@
 #                   Function Show substituted by display added by opening HP-Panel
 #                   Event-handlers scroll-up "view" added
 #                   Event-handlers scroll-up "user-interaction level"
+#       15/04/2008  Upper info panel implemented.
+#                   Help and User manual logic (not the manual!) implemented
+#                   Message panel operative
+#                   General housekeeping
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -74,6 +79,7 @@
 #-----  Imports
 import wx
 import wx.grid
+import time
 import pSQL, MySQLdb
 import exceptions
 import HelperClass
@@ -120,13 +126,18 @@ from panelEM2 import *
 from panelBM1 import *
 from panelBM2 import *
 from panelBM3 import *
+#TS2008-04-15 panelInfo added
+from panelInfo import *
 
+#TS2008-04-15 help frame added
+from UserHelp import *
 
 #-----  Global variables 
 PList = {}      # PList stores the Parameterlist
 
 #----- Constants
-qPageSize = (800, 600) # this would be better in Status?
+qPageSize = (800, 600)
+KFramesize = (1024, 740)
 
 def connectToDB():
     
@@ -152,7 +163,20 @@ def connectToDB():
 #------------------------------------------------------------------------------		
 class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------		
-#   Main frame definition
+#   Main frame structure:
+#
+#   EinsteinFrame -------- menubar
+#                      |
+#                      |-- panelinfo
+#                      |
+#                      |-- splitter --x-- treepanel ----- tree
+#                      |              |
+#                      |              |-- splitter2 --x-- leftpanel2
+#                      |                              |
+#                      |                              |
+#                      |                              |-- message
+#                      |
+#                      |-- statusbar
 #------------------------------------------------------------------------------		
     
     def __init__(self, parent, id, title):
@@ -168,20 +192,9 @@ class EinsteinFrame(wx.Frame):
 
         global activeQid
         self.activeQid = 0
-#        DBHost = conf.get('DB', 'DBHost')
-#        DBUser = conf.get('DB', 'DBUser')
-#        DBPass = conf.get('DB', 'DBPass')
-#        DBName = conf.get('DB', 'DBName')
         LANGUAGE = conf.get('GUI', 'LANGUAGE')
         doLog.LogThis('Reading config done')
         
-        #----- Connect to the Database
-#        Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
-#        Status.DB =  pSQL.pSQL(Status.SQL, DBName)
-#        print "database assigned to status variable " + repr(Status.DB)
-        
-#        doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
-
         #----- Import the Parameterfile
         global PList
         ParamList = HelperClass.ParameterDataHelper()
@@ -196,299 +209,122 @@ class EinsteinFrame(wx.Frame):
         ############################################
 
         #----- Initialise the Frame
-        wx.Frame.__init__(self, parent, id, title, size=(1024, 740), pos=(0,0))
+        wx.Frame.__init__(self, parent, id, title, size=KFramesize, pos=(0,0))
+
         #----- add statusbar
         self.CreateStatusBar()
 
+        #----- create splitters
+        self.splitter = wx.SplitterWindow(self,
+					  style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
 
-
-        #----- add menu
-        self.menuBar = wx.MenuBar()
-        
-        self.menuFile = wx.Menu()
-        self.menuView = wx.Menu()
-        self.menuDatabase = wx.Menu()
-        self.menuSettings = wx.Menu()        
-        self.menuHelp = wx.Menu()
-
-        self.submenuPrint = wx.Menu()
-        self.submenuEditDB = wx.Menu()
-                
-        self.subnenuEquipments = wx.Menu()
-        self.submenuUserLevel = wx.Menu()
-        self.submenuClassification = wx.Menu()
-        
-
-        self.PrintFullReport = self.submenuPrint.Append(-1, "full report")
-        self.PrintQuestionnaire = self.submenuPrint.Append(-1, "questionnaire")
-
-        self.NewProject = self.menuFile.Append(-1, PList["X103"][1])
-        self.OpenProject = self.menuFile.Append(-1, "&Open Project")
-        self.ImportProject = self.menuFile.Append(-1, PList["X104"][1])
-        self.ExportProject = self.menuFile.Append(-1, PList["X105"][1])
-        self.menuFile.AppendSeparator()
-        self.ImportQ = self.menuFile.Append(-1, PList["X106"][1])
-        self.menuFile.AppendSeparator()
-        self.Print = self.menuFile.AppendMenu(-1, "&Print", self.submenuPrint)
-        self.menuFile.AppendSeparator()
-        self.ExitApp = self.menuFile.Append(-1, PList["X107"][1])
-
-        self.PresentStateQ = self.menuView.AppendRadioItem(-1, "Present state (original data)")
-        self.PresentState = self.menuView.AppendRadioItem(-1, "Present state (checked data)")
-        self.Alternative1 = self.menuView.AppendRadioItem(-1, "Alternative 1")
-        
-
-        self.EditDBCHP = self.subnenuEquipments.Append(-1, PList["X111"][1])
-        self.EditDBHeatPump = self.subnenuEquipments.Append(-1, PList["X112"][1])
-        self.EditDBChiller = self.subnenuEquipments.Append(-1, PList["X117"][1])
-        self.EditDBBoiler = self.subnenuEquipments.Append(-1, PList["X115"][1])
-        self.EditDBStorage = self.subnenuEquipments.Append(-1, PList["X116"][1])
-        self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, PList["X116"][1])
-
-        self.EditSubDB = self.menuDatabase.AppendMenu(-1, "Equipments", self.subnenuEquipments)
-        self.EditDBFuel = self.menuDatabase.Append(-1, PList["X114"][1])
-        self.EditDBFluid = self.menuDatabase.Append(-1, PList["X113"][1])
-        self.EditDBBenchmark = self.menuDatabase.Append(-1, PList["X108"][1])
-        self.EditDBBAT = self.menuDatabase.Append(-1, "Best available technologies")
-        
-        self.EditDBNaceCode = self.submenuClassification.Append(-1, PList["X109"][1])
-        self.EditDBUnitOperation = self.submenuClassification.Append(-1, PList["X110"][1])       
-               
-
-        self.UserSelectLevel1 = self.submenuUserLevel.AppendRadioItem(-1, PList["X120"][1])
-        self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(-1, PList["X121"][1])
-        self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(-1, PList["X122"][1])
-        self.UserLevel = self.menuSettings.AppendMenu(-1, PList["X123"][1], self.submenuUserLevel)
-        self.Classification = self.menuSettings.AppendMenu(-1, "Classification", self.submenuClassification)
-        self.Preferences = self.menuSettings.Append(-1, PList["X119"][1])
-        self.Language = self.menuSettings.Append(-1, "Language")
-
-        self.HelpHelp = self.menuHelp.Append(-1, PList["X126"][1])
-        self.menuHelp.AppendSeparator()
-        self.HelpAbout = self.menuHelp.Append(-1, PList["X127"][1])
-
-        self.menuBar.Append(self.menuFile, PList["X128"][1])
-        self.menuBar.Append(self.menuView, "View")
-        self.menuBar.Append(self.menuDatabase, "Database")
-        self.menuBar.Append(self.menuSettings, PList["X130"][1])
-        self.menuBar.Append(self.menuHelp, PList["X132"][1])
-        
-        self.SetMenuBar(self.menuBar)
-
-        
-        #----- add the widgets ...
-        self.panel1=wx.Panel (self, -1)
-        self.panel1.SetBackgroundColour ("white")
-
-        #----- create splitter windows
-        self.splitter = wx.SplitterWindow(self, style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D)
-        self.splitter2 = wx.SplitterWindow(self.splitter, -1, style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D)
-        self.mainpanel = wx.Panel(self.splitter, -1)
-        self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS) # this ist main gui panel containing qPages
-        self.mainpanel.SetBackgroundColour ("white")
+        self.splitter2 = wx.SplitterWindow(self.splitter,
+					   -1,
+					   style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
         self.splitter2.SetBackgroundColour (wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
 
+        self.treepanel = wx.Panel(self.splitter, -1)
+
+        ####---- Upper info panel
+	self.panelinfo = PanelInfo(self,
+				   self,
+				   name = 'EnerCHEESEexperts Barcelona',
+				   project = 'Biomass based cogeneration and substitution of old boiler')
+
+	####---- panel containing qPages
+        self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS)
+
+        #----- add menu
+	self.CreateMenu()
+        
         #----- create tree control
-        self.tree = wx.TreeCtrl(self.mainpanel, -1, wx.Point(0, 0), wx.Size(200, 740),
-                                wx.TR_DEFAULT_STYLE | wx.NO_BORDER)
-        self.qRoot = self.tree.AddRoot(PList["X001"][1])
-        self.qPage0 = self.tree.AppendItem (self.qRoot, PList["X018"][1],0)
-        self.qPage1 = self.tree.AppendItem (self.qPage0, PList["X010"][1],0)
-        self.qPage2 = self.tree.AppendItem (self.qPage0, PList["X011"][1],0)
-        self.qPage3 = self.tree.AppendItem (self.qPage0, PList["X012"][1],0)
-        self.qPage4 = self.tree.AppendItem (self.qPage0, PList["X013"][1],0)
-        self.qPage5 = self.tree.AppendItem (self.qPage0, PList["X014"][1],0)
-        self.qPage5_1 = self.tree.AppendItem (self.qPage0, "Heat recovery",0)
-        self.qPage6 = self.tree.AppendItem (self.qPage0, PList["X015"][1],0)
-        self.qPage7 = self.tree.AppendItem (self.qPage0, PList["X016"][1],0)
-        self.qPage8 = self.tree.AppendItem (self.qPage0, PList["X017"][1],0)
-        
-        self.qDataCheck = self.tree.AppendItem (self.qRoot, PList["X133"][1])
-        self.qDataCheckPage1 = self.tree.AppendItem (self.qDataCheck, PList["X134"][1])
-        self.qDataCheckPage2 = self.tree.AppendItem (self.qDataCheck, PList["X135"][1])
-        self.qDataCheckPage3 = self.tree.AppendItem (self.qDataCheck, "Check list for visit")
-        
-        #
-        # statistics subtree
-        #
-        self.qStatistics = self.tree.AppendItem (self.qRoot, PList["X136"][1])
-        self.qStatisticsAnnual = self.tree.AppendItem (self.qStatistics, 'Annual data')
-        self.qStatisticsMonthly = self.tree.AppendItem (self.qStatistics, 'Monthly data')
-        self.qStatisticsHourly = self.tree.AppendItem (self.qStatistics, 'Hourly performance data')
-        # annual statistics subtree
-        self.qStatisticYPage1 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X137"][1])
-        self.qStatisticYPage2 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X138"][1])
-        self.qStatisticYPage3 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X139"][1])
-        self.qStatisticYPage4 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X140"][1])
-        self.qStatisticYPage5 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X141"][1])
-        self.qStatisticYPage6 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X142"][1])
-        # monthly statistics subtree
-        self.qStatisticMPage1 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly demand')
-        self.qStatisticMPage2 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly supply')
-        # hourly statistics subtree
-        self.qStatisticHPage1 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly demand')
-        self.qStatisticHPage2 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly supply')
+	self.CreateTree()
 
-        
-        self.qBenchmarkCheck = self.tree.AppendItem (self.qRoot, PList["X143"][1])
-        self.qBenchmarkCheckPage1 = self.tree.AppendItem (self.qBenchmarkCheck, PList["X144"][1])
-        self.qBenchmarkCheckPage2 = self.tree.AppendItem (self.qBenchmarkCheck, "Global energy intensity")
-        self.qBenchmarkCheckPage3 = self.tree.AppendItem (self.qBenchmarkCheck, "SEC by product")
-        self.qBenchmarkCheckProduct = self.tree.AppendItem (self.qBenchmarkCheckPage3, "product name")
-        self.qBenchmarkCheckPage4 = self.tree.AppendItem (self.qBenchmarkCheck, "SEC by process")
-        self.qBenchmarkCheckProcess = self.tree.AppendItem (self.qBenchmarkCheckPage4, "process name")
-        
-
-        self.qOptimisationProposals = self.tree.AppendItem (self.qRoot, PList["X145"][1])
-        #Design
-        self.qOptiProDesign = self.tree.AppendItem (self.qOptimisationProposals, PList["X146"][1])
-        
-        #Process optimisation
-        self.qOptiProProcess = self.tree.AppendItem (self.qOptiProDesign, "Process optimisation")
-        #Process optimisation interface 1
-        self.qOptiProProcess1 = self.tree.AppendItem(self.qOptiProProcess, "Process optimisation interface 1")
-                #Process optimisation interface 2
-        self.qOptiProProcess2 = self.tree.AppendItem(self.qOptiProProcess, "Process optimisation interface 2")
-            #Pinch analysis
-        self.qOptiProPinch = self.tree.AppendItem(self.qOptiProDesign, "Pinch analysis")
-                #Pinch interface 1
-        self.qOptiProPinch1 = self.tree.AppendItem(self.qOptiProPinch, "Pinch interface 1")
-                #Pinch interface 2
-        self.qOptiProPinch2 = self.tree.AppendItem(self.qOptiProPinch, "Pinch interface 2")
-            #HX network
-        self.qOptiProHX = self.tree.AppendItem (self.qOptiProDesign, "HX network")
-
-            #H&C Supply
-        self.qHC = self.tree.AppendItem (self.qOptiProDesign, "H&C Supply")
-                #H&C Storage
-        self.qOptiProSupply1 = self.tree.AppendItem (self.qHC, "H&C Storage")
-                #CHP
-        self.qOptiProSupply2 = self.tree.AppendItem (self.qHC, "CHP")
-                #Solar Thermal
-        self.qOptiProSupply3 = self.tree.AppendItem (self.qHC, "Solar Thermal")
-                #Heat Pumps
-        self.qHP = self.tree.AppendItem (self.qHC, "Heat Pumps")
-                #Biomass
-        self.qOptiProSupply5 = self.tree.AppendItem (self.qHC, "Biomass")
-                #Chillers
-        self.qOptiProSupply6 = self.tree.AppendItem (self.qHC, "Chillers")
-                #Boilers & burners
-        self.qBB = self.tree.AppendItem (self.qHC, "Boilers & burners")
-        
-            #H&C Distribution
-        self.qOptiProDistribution = self.tree.AppendItem (self.qOptiProDesign, "H&C Distribution")
-
-        #Energy performance
-        self.qOptiProEnergy = self.tree.AppendItem (self.qOptimisationProposals, "Energy performance")
-            #Detailed energy flows 1
-#HS2008-03-12: subdivision energy cancelled out
-#        self.qOptiProEnergy1 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 1")
-            #Detailed energy flows 2
-#        self.qOptiProEnergy2 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 2")
-
-        #Economic analysis
-        self.qOptiProEconomic = self.tree.AppendItem (self.qOptimisationProposals, "Economic analysis")
-            #Economics 1
-        self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, "Economics 1")
-            #Economics 2
-        self.qOptiProEconomic2 = self.tree.AppendItem (self.qOptiProEconomic, "Economics 2")
+     
+	#----- error log window
+        self.message = wx.ListCtrl(id=-1,
+				   name='message',
+				   parent=self.splitter2,
+				   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
+	self.message.InsertColumn(0, 'Message log')
+        self.message.SetBackgroundColour('white')
 
 
-        #Comparative analysis
-        self.qOptiProComparative = self.tree.AppendItem (self.qOptimisationProposals, "Comparative analysis")
-            #Comparative study – Detail Info 1
-        self.qOptiProComparative1 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 1")
-            #Comparative study – Detail Info 2
-        self.qOptiProComparative2 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 2")
-            #Comparative study – Detail Info 3
-        self.qOptiProComparative3 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 3")
-
-
-        self.qFinalReport = self.tree.AppendItem (self.qRoot, PList["X147"][1])
-        self.qFinalReportPage1 = self.tree.AppendItem (self.qFinalReport, PList["X148"][1])
-        self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, PList["X149"][1])
-        self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, PList["X150"][1])
-        
-        self.tree.Expand(self.qRoot)
-        self.tree.Expand(self.qPage0)
-        self.tree.Expand(self.qDataCheck)
-        self.tree.Expand(self.qStatistics)
-        self.tree.Expand(self.qBenchmarkCheck)
-        self.tree.Expand(self.qOptimisationProposals)
-        self.tree.Expand(self.qFinalReport)
-
-
+	#----- configure sizers and splitters
         self.DoLayout ()
 
-        
-        
-        #----- binding the EVENTS
+        #----- set binding events
+	self.BindEvents()
 
-        
-        #--- binding the menu
-        self.Bind(wx.EVT_MENU, self.NewQuestionnaire, self.NewProject)
-        self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
-        self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
+	#----- generate and initialize the panels
+	self.CreatePanels()
 
-        self.Bind(wx.EVT_MENU, self.OnMenuPresentState, self.PresentState)
-        self.Bind(wx.EVT_MENU, self.OnMenuPresentStateQ, self.PresentStateQ)
-        self.Bind(wx.EVT_MENU, self.OnMenuAlternative1, self.Alternative1)
+	#----- initial message
+	self.logMessage('einstein started')
+	self.logWarning('an example of a warning')
+	self.logError('an example of an error')
+ 
+        ############################################
+        #
+        # Methods
+        #
+        ############################################
+#------------------------------------------------------------------------------
+    def _log(self,fcolor,bcolor,text):
+	tl = time.localtime()
+	now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+        item = wx.ListItem()
+	item.SetText(now + text)
+	item.SetTextColour(fcolor)
+	item.SetBackgroundColour(bcolor)
+	item.SetColumn(0)
+	self.message.InsertItem(item)
 
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBCHP, self.EditDBCHP)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBHeatPump, self.EditDBHeatPump)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBFluid, self.EditDBFluid)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)     
+    def logMessage(self,text):
+        self._log('#00A000','#FFFFFF',text)
 
-        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
-        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
-        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
-        
-        #--- binding the Tree
-        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
+    def logWarning(self,text):
+        self._log('#0000FF','#FFFF80',text)
 
-        #--- bindings pageDataCheck
-###HS2008-03-07        self.Bind(wx.EVT_BUTTON, self.OnButtonDataCheck, self.buttonDataCheck)        
+    def logError(self,text):
+        self._log('#FFFFFF','#FF0000',text)
 
 #------------------------------------------------------------------------------		
-    def DoLayout (self):
+    def DoLayout(self):
 #------------------------------------------------------------------------------		
 #       Layout of main frame and panels 
-#------------------------------------------------------------------------------		
-        
-        # add other widgets
-        self.help = wx.TextCtrl(self.splitter2, -1, style = wx.TE_MULTILINE|wx.TE_READONLY | wx.HSCROLL)
-        
-        # sizers
-        mainsizer = wx.BoxSizer(wx.VERTICAL)
-        panelsizer = wx.BoxSizer(wx.VERTICAL)
-        sizer1 = wx.BoxSizer(wx.VERTICAL)
-        sizer2 = wx.BoxSizer(wx.VERTICAL)
-      
-        # add widgets to sizers
-        panelsizer.Add(self.splitter, 1, wx.EXPAND, 0)
-        sizer1.Add(self.tree, 1, wx.EXPAND)
-        #sizer2.Add(self.staticBoxPage0, 1, wx.BOTTOM|wx.EXPAND|wx.ALIGN_BOTTOM, 60 )
-    
+#------------------------------------------------------------------------------
+
         # set sizers
-        self.mainpanel.SetSizer(sizer1)
-        self.leftpanel2.SetSizer(sizer2)
+        panelsizer = wx.BoxSizer(wx.VERTICAL)
+        panelsizer.Add(self.panelinfo, 0, wx.EXPAND, 5)
+        panelsizer.Add(self.splitter, 1, wx.EXPAND, 0)
         self.SetSizer(panelsizer)
-        mainsizer.Layout()
+
+	# this sizer allows the horiz.expansion of the tree
+        sizer1 = wx.BoxSizer(wx.VERTICAL)
+        sizer1.Add(self.tree, 1, wx.EXPAND)
+        self.treepanel.SetSizer(sizer1)
+
+        sizer2 = wx.BoxSizer(wx.VERTICAL)
+        sizer2.Add(self.leftpanel2, 1, wx.EXPAND, 0)
+        self.splitter2.SetSizer(sizer2)
+      
         self.Layout()
 
         # set splitters
-        self.splitter.SplitVertically(self.mainpanel, self.splitter2, 200)
-        self.splitter2.SplitHorizontally(self.leftpanel2, self.help, -80)
-        self.splitter.SetSashPosition (200)
+        self.splitter.SplitVertically(self.treepanel, self.splitter2, 200)
+        self.splitter2.SplitHorizontally(self.leftpanel2, self.message, -80)
+        self.splitter.SetSashPosition(250)
+
+	# find the width of message panel
+	w = self.splitter2.GetWindow1()
+	(width,height) = w.GetClientSizeTuple()
+	self.message.SetColumnWidth(0, width-10)
 
 ######################################################################################        
 
+    def CreatePanels(self):
         #----- set Panel Pages
 
         ####----PAGE Title
@@ -509,7 +345,7 @@ class EinsteinFrame(wx.Frame):
                                              size=wx.Size(400, 500),
                                              style=0)
         
-        
+        #return
      
         ####----PAGE 0
         self.Page0 = PanelQ0(self.leftpanel2, self)
@@ -655,6 +491,7 @@ class EinsteinFrame(wx.Frame):
         self.panelHC.Hide()
         ####--- End op pageHeatPump
 
+
         ####--- PanelHP
         self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
         self.panelHP.Hide()
@@ -760,18 +597,27 @@ class EinsteinFrame(wx.Frame):
         framePreferences.Show()
         #event.Skip()
         
+#..............................................................................		
+# Scroll-up menu "HELP" and "About ..."
+    def OnMenuHelpUserManual(self, event):
+        frameUserManual = FrameHelpUserManual(self, 'einstein_manual.html')
+	frameUserManual.Show()
+
+    def OnMenuHelpAbout(self, event):
+        frameAbout = FrameHelpAbout(self)
+	frameAbout.Show()
+
 #------------------------------------------------------------------------------		
 #--- Eventhandlers Tree
 #------------------------------------------------------------------------------		
         
     def OnTreeSelChanged(self, event):
-        global qPageSize
         self.item = event.GetItem()
         select = self.tree.GetItemText(self.item)
 
         #if self.item:
         #    str1 = "Selected item = %s\n" % select
-        #    self.help.SetValue(str1)
+        #    self.logMessage(str1)
         print 'select='+select
         #PageTitle
         if select == "Einstein":
@@ -781,13 +627,13 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X018"][1]: #Edit Industry Data
             self.hidePages()
             self.Page0.Show()
-            self.help.SetValue(PList["0101"][1])
+            self.logMessage(PList["0101"][1])
             self.Page0.fillPage()
         #Page1
         elif select == PList["X010"][1]: #General data
             self.hidePages()
             self.Page1.Show()
-            self.help.SetValue(PList["0101"][1])
+            self.logMessage(PList["0101"][1])
             self.Page1.clear()
             self.Page1.fillChoiceOfNaceCode()
             self.Page1.fillPage()
@@ -795,7 +641,7 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X011"][1]: #Energy consumption
             self.hidePages()
             self.Page2.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page2.clear()
             self.Page2.fillChoiceOfDBFuelType()
             self.Page2.fillPage()
@@ -803,7 +649,7 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X012"][1]: #Processes data
             self.hidePages()
             self.Page3.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page3.fillChoiceOfDBUnitOperation()
             self.Page3.fillChoiceOfPMDBFluid()
             self.Page3.fillChoiceOfSMDBFluid()
@@ -814,7 +660,7 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X013"][1]: #Generation of heat and cold
             self.hidePages()
             self.Page4.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page4.clear()
             self.Page4.fillChoiceOfDBFuel()
             self.Page4.fillPage()
@@ -822,7 +668,7 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X014"][1]: #Distribution of heat and cold
             self.hidePages()
             self.Page5.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page5.clear()
             self.Page5.fillchoiceOfEquipment()
             self.Page5.fillPage()
@@ -831,7 +677,7 @@ class EinsteinFrame(wx.Frame):
         elif select == "Heat recovery": #Heat recovery
             self.hidePages()
             self.Page6.Show()
-            self.help.SetValue(PList["Not available yet"][1])
+            self.logMessage("Not available yet")
             self.Page6.clear()
             self.Page6.fillPage()
 
@@ -839,21 +685,21 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X015"][1]: # Renewable energies
             self.hidePages()
             self.Page7.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page7.clear()
             self.Page7.fillPage()
         #Page8
         elif select == PList["X016"][1]: #Buildings
             self.hidePages()
             self.Page8.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page8.clear()
             self.Page8.fillPage()
         #Page9
         elif select == PList["X017"][1]: #Economic parameters
             self.hidePages()
             self.Page9.Show()
-            self.help.SetValue(PList["0102"][1])
+            self.logMessage(PList["0102"][1])
             self.Page9.clear()
             self.Page9.fillPage()
         #qDataCheck
@@ -1085,24 +931,247 @@ class EinsteinFrame(wx.Frame):
             return 'NULL'
 
 
-###HS2008-04-12 no longer needed
-#    def selectQuestionnaire(self):
-#        id = Page0.GetID()
-#        self.activeQid = Status.DB.questionnaire.Name[id]
-#        Status.PId = self.activeQid
-#        self.activeANo = 0
-#        Status.ANo = self.activeANo
+
+    def CreateMenu(self):
+        self.menuBar = wx.MenuBar()
         
-#        self.tree.SelectItem(self.qPage1, select=True)
-        #self.tc1Page1.SetValue(self.listBoxQuestionnaresPage0.GetStringSelection())
-        #self.tc1Page1.SetValue(str(self.activeQid))
+        self.menuFile = wx.Menu()
+        self.menuView = wx.Menu()
+        self.menuDatabase = wx.Menu()
+        self.menuSettings = wx.Menu()        
+        self.menuHelp = wx.Menu()
 
-
+        self.submenuPrint = wx.Menu()
+        self.submenuEditDB = wx.Menu()
                 
-#============================================================================== 				
-#------------------------------------------------------------------------------		
+        self.subnenuEquipments = wx.Menu()
+        self.submenuUserLevel = wx.Menu()
+        self.submenuClassification = wx.Menu()
+        
+
+        self.PrintFullReport = self.submenuPrint.Append(-1, "full report")
+        self.PrintQuestionnaire = self.submenuPrint.Append(-1, "questionnaire")
+
+        self.NewProject = self.menuFile.Append(-1, PList["X103"][1])
+        self.OpenProject = self.menuFile.Append(-1, "&Open Project")
+        self.ImportProject = self.menuFile.Append(-1, PList["X104"][1])
+        self.ExportProject = self.menuFile.Append(-1, PList["X105"][1])
+        self.menuFile.AppendSeparator()
+        self.ImportQ = self.menuFile.Append(-1, PList["X106"][1])
+        self.menuFile.AppendSeparator()
+        self.Print = self.menuFile.AppendMenu(-1, "&Print", self.submenuPrint)
+        self.menuFile.AppendSeparator()
+        self.ExitApp = self.menuFile.Append(-1, PList["X107"][1])
+
+        self.PresentStateQ = self.menuView.AppendRadioItem(-1, "Present state (original data)")
+        self.PresentState = self.menuView.AppendRadioItem(-1, "Present state (checked data)")
+        self.Alternative1 = self.menuView.AppendRadioItem(-1, "Alternative 1")
+        
+
+        self.EditDBCHP = self.subnenuEquipments.Append(-1, PList["X111"][1])
+        self.EditDBHeatPump = self.subnenuEquipments.Append(-1, PList["X112"][1])
+        self.EditDBChiller = self.subnenuEquipments.Append(-1, PList["X117"][1])
+        self.EditDBBoiler = self.subnenuEquipments.Append(-1, PList["X115"][1])
+        self.EditDBStorage = self.subnenuEquipments.Append(-1, PList["X116"][1])
+        self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, PList["X116"][1])
+
+        self.EditSubDB = self.menuDatabase.AppendMenu(-1, "Equipments", self.subnenuEquipments)
+        self.EditDBFuel = self.menuDatabase.Append(-1, PList["X114"][1])
+        self.EditDBFluid = self.menuDatabase.Append(-1, PList["X113"][1])
+        self.EditDBBenchmark = self.menuDatabase.Append(-1, PList["X108"][1])
+        self.EditDBBAT = self.menuDatabase.Append(-1, "Best available technologies")
+        
+        self.EditDBNaceCode = self.submenuClassification.Append(-1, PList["X109"][1])
+        self.EditDBUnitOperation = self.submenuClassification.Append(-1, PList["X110"][1])       
+               
+
+        self.UserSelectLevel1 = self.submenuUserLevel.AppendRadioItem(-1, PList["X120"][1])
+        self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(-1, PList["X121"][1])
+        self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(-1, PList["X122"][1])
+        self.UserLevel = self.menuSettings.AppendMenu(-1, PList["X123"][1], self.submenuUserLevel)
+        self.Classification = self.menuSettings.AppendMenu(-1, "Classification", self.submenuClassification)
+        self.Preferences = self.menuSettings.Append(-1, PList["X119"][1])
+        self.Language = self.menuSettings.Append(-1, "Language")
+
+        self.HelpUserManual = self.menuHelp.Append(-1, PList["X126"][1])
+        self.menuHelp.AppendSeparator()
+        self.HelpAbout = self.menuHelp.Append(-1, PList["X127"][1])
+
+        self.menuBar.Append(self.menuFile, PList["X128"][1])
+        self.menuBar.Append(self.menuView, "View")
+        self.menuBar.Append(self.menuDatabase, "Database")
+        self.menuBar.Append(self.menuSettings, PList["X130"][1])
+        self.menuBar.Append(self.menuHelp, PList["X132"][1])
+        
+        self.SetMenuBar(self.menuBar)
+
+
+    def CreateTree(self):
+        self.tree = wx.TreeCtrl(self.treepanel, -1, wx.Point(0, 0), wx.Size(200, 740),
+                                wx.TR_DEFAULT_STYLE | wx.NO_BORDER)
+        self.qRoot = self.tree.AddRoot(PList["X001"][1])
+        self.qPage0 = self.tree.AppendItem (self.qRoot, PList["X018"][1],0)
+        self.qPage1 = self.tree.AppendItem (self.qPage0, PList["X010"][1],0)
+        self.qPage2 = self.tree.AppendItem (self.qPage0, PList["X011"][1],0)
+        self.qPage3 = self.tree.AppendItem (self.qPage0, PList["X012"][1],0)
+        self.qPage4 = self.tree.AppendItem (self.qPage0, PList["X013"][1],0)
+        self.qPage5 = self.tree.AppendItem (self.qPage0, PList["X014"][1],0)
+        self.qPage5_1 = self.tree.AppendItem (self.qPage0, "Heat recovery",0)
+        self.qPage6 = self.tree.AppendItem (self.qPage0, PList["X015"][1],0)
+        self.qPage7 = self.tree.AppendItem (self.qPage0, PList["X016"][1],0)
+        self.qPage8 = self.tree.AppendItem (self.qPage0, PList["X017"][1],0)
+        
+        self.qDataCheck = self.tree.AppendItem (self.qRoot, PList["X133"][1])
+        self.qDataCheckPage1 = self.tree.AppendItem (self.qDataCheck, PList["X134"][1])
+        self.qDataCheckPage2 = self.tree.AppendItem (self.qDataCheck, PList["X135"][1])
+        self.qDataCheckPage3 = self.tree.AppendItem (self.qDataCheck, "Check list for visit")
+        
+        #
+        # statistics subtree
+        #
+        self.qStatistics = self.tree.AppendItem (self.qRoot, PList["X136"][1])
+        self.qStatisticsAnnual = self.tree.AppendItem (self.qStatistics, 'Annual data')
+        self.qStatisticsMonthly = self.tree.AppendItem (self.qStatistics, 'Monthly data')
+        self.qStatisticsHourly = self.tree.AppendItem (self.qStatistics, 'Hourly performance data')
+        # annual statistics subtree
+        self.qStatisticYPage1 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X137"][1])
+        self.qStatisticYPage2 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X138"][1])
+        self.qStatisticYPage3 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X139"][1])
+        self.qStatisticYPage4 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X140"][1])
+        self.qStatisticYPage5 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X141"][1])
+        self.qStatisticYPage6 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X142"][1])
+        # monthly statistics subtree
+        self.qStatisticMPage1 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly demand')
+        self.qStatisticMPage2 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly supply')
+        # hourly statistics subtree
+        self.qStatisticHPage1 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly demand')
+        self.qStatisticHPage2 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly supply')
+
+        
+        self.qBenchmarkCheck = self.tree.AppendItem (self.qRoot, PList["X143"][1])
+        self.qBenchmarkCheckPage1 = self.tree.AppendItem (self.qBenchmarkCheck, PList["X144"][1])
+        self.qBenchmarkCheckPage2 = self.tree.AppendItem (self.qBenchmarkCheck, "Global energy intensity")
+        self.qBenchmarkCheckPage3 = self.tree.AppendItem (self.qBenchmarkCheck, "SEC by product")
+        self.qBenchmarkCheckProduct = self.tree.AppendItem (self.qBenchmarkCheckPage3, "product name")
+        self.qBenchmarkCheckPage4 = self.tree.AppendItem (self.qBenchmarkCheck, "SEC by process")
+        self.qBenchmarkCheckProcess = self.tree.AppendItem (self.qBenchmarkCheckPage4, "process name")
+        
+
+        self.qOptimisationProposals = self.tree.AppendItem (self.qRoot, PList["X145"][1])
+        #Design
+        self.qOptiProDesign = self.tree.AppendItem (self.qOptimisationProposals, PList["X146"][1])
+        
+        #Process optimisation
+        self.qOptiProProcess = self.tree.AppendItem (self.qOptiProDesign, "Process optimisation")
+        #Process optimisation interface 1
+        self.qOptiProProcess1 = self.tree.AppendItem(self.qOptiProProcess, "Process optimisation interface 1")
+                #Process optimisation interface 2
+        self.qOptiProProcess2 = self.tree.AppendItem(self.qOptiProProcess, "Process optimisation interface 2")
+            #Pinch analysis
+        self.qOptiProPinch = self.tree.AppendItem(self.qOptiProDesign, "Pinch analysis")
+                #Pinch interface 1
+        self.qOptiProPinch1 = self.tree.AppendItem(self.qOptiProPinch, "Pinch interface 1")
+                #Pinch interface 2
+        self.qOptiProPinch2 = self.tree.AppendItem(self.qOptiProPinch, "Pinch interface 2")
+            #HX network
+        self.qOptiProHX = self.tree.AppendItem (self.qOptiProDesign, "HX network")
+
+            #H&C Supply
+        self.qHC = self.tree.AppendItem (self.qOptiProDesign, "H&C Supply")
+                #H&C Storage
+        self.qOptiProSupply1 = self.tree.AppendItem (self.qHC, "H&C Storage")
+                #CHP
+        self.qOptiProSupply2 = self.tree.AppendItem (self.qHC, "CHP")
+                #Solar Thermal
+        self.qOptiProSupply3 = self.tree.AppendItem (self.qHC, "Solar Thermal")
+                #Heat Pumps
+        self.qHP = self.tree.AppendItem (self.qHC, "Heat Pumps")
+                #Biomass
+        self.qOptiProSupply5 = self.tree.AppendItem (self.qHC, "Biomass")
+                #Chillers
+        self.qOptiProSupply6 = self.tree.AppendItem (self.qHC, "Chillers")
+                #Boilers & burners
+        self.qBB = self.tree.AppendItem (self.qHC, "Boilers & burners")
+        
+            #H&C Distribution
+        self.qOptiProDistribution = self.tree.AppendItem (self.qOptiProDesign, "H&C Distribution")
+
+        #Energy performance
+        self.qOptiProEnergy = self.tree.AppendItem (self.qOptimisationProposals, "Energy performance")
+            #Detailed energy flows 1
+#HS2008-03-12: subdivision energy cancelled out
+#        self.qOptiProEnergy1 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 1")
+            #Detailed energy flows 2
+#        self.qOptiProEnergy2 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 2")
+
+        #Economic analysis
+        self.qOptiProEconomic = self.tree.AppendItem (self.qOptimisationProposals, "Economic analysis")
+            #Economics 1
+        self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, "Economics 1")
+            #Economics 2
+        self.qOptiProEconomic2 = self.tree.AppendItem (self.qOptiProEconomic, "Economics 2")
+
+
+        #Comparative analysis
+        self.qOptiProComparative = self.tree.AppendItem (self.qOptimisationProposals, "Comparative analysis")
+            #Comparative study – Detail Info 1
+        self.qOptiProComparative1 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 1")
+            #Comparative study – Detail Info 2
+        self.qOptiProComparative2 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 2")
+            #Comparative study – Detail Info 3
+        self.qOptiProComparative3 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 3")
+
+
+        self.qFinalReport = self.tree.AppendItem (self.qRoot, PList["X147"][1])
+        self.qFinalReportPage1 = self.tree.AppendItem (self.qFinalReport, PList["X148"][1])
+        self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, PList["X149"][1])
+        self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, PList["X150"][1])
+        
+        self.tree.Expand(self.qRoot)
+        self.tree.Expand(self.qPage0)
+        self.tree.Expand(self.qDataCheck)
+        self.tree.Expand(self.qStatistics)
+        self.tree.Expand(self.qBenchmarkCheck)
+        self.tree.Expand(self.qOptimisationProposals)
+        self.tree.Expand(self.qFinalReport)
+
+
+    def BindEvents(self):
+        #--- binding the menu
+        self.Bind(wx.EVT_MENU, self.NewQuestionnaire, self.NewProject)
+        self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
+        self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
+
+        self.Bind(wx.EVT_MENU, self.OnMenuPresentState, self.PresentState)
+        self.Bind(wx.EVT_MENU, self.OnMenuPresentStateQ, self.PresentStateQ)
+        self.Bind(wx.EVT_MENU, self.OnMenuAlternative1, self.Alternative1)
+
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBCHP, self.EditDBCHP)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBHeatPump, self.EditDBHeatPump)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBFluid, self.EditDBFluid)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)     
+
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
+        self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
+
+	self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
+	self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
+
+        #--- binding the Tree
+        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
+
+
+#==============================================================================
+#------------------------------------------------------------------------------
 #   Application start
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
         
 if __name__ == '__main__':
     from einstein.modules.interfaces import Interfaces

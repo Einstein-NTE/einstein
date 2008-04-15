@@ -47,6 +47,7 @@ import einstein.modules.matPanel as mP
 class ModuleEA6(object):
 
     def __init__(self, keys):
+        print "ModuleEA6 (__init__)"
         self.keys = keys
         self.interface = Interfaces()
 #.....................................................................
