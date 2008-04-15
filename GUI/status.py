@@ -22,6 +22,7 @@
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Last revised by:    Hans Schweiger      20/03/2008
 #                           Hans Schweiger      05/04/2008
+#                           Stoyan Danov        14/04/2008
 #
 #       Changes in last update:
 #       - NT and Nt added
@@ -29,6 +30,7 @@
 #       05/04/08:     some renaming (see ParameterList v0.31);
 #                     identification of data blocks that should
 #                     be included in SQL in future versions
+#       14/04/08:     InteractionLevel changed to UserInteractionLevel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -58,7 +60,7 @@ class Status(object):
   #------------------------------------------------------------------------------		
   # Tool interface configuration [==> SQL Table STATUS]
 
-  InteractionLevel = "interactive" # Selected level of user interaction
+  UserInteractionLevel = "interactive" # Selected level of user interaction
   LanguageTool = "english"         # Selected language for tool interface
   Units = "SI"                     # System of units (default: SI)
   Country = "Spain"                # Configuration for country specific aids ... NOT USED AT PRESENT

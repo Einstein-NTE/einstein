@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.09
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
@@ -27,6 +27,8 @@
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          07/04/2008
 #                           Hans Schweiger          13/04/2008
+#                           Stoyan Danov            14/04/2008
+#                           Hans Schweiger          15/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -37,6 +39,9 @@
 #       07/04/08:   adapted for changes in heat pump module
 #       13/04/08:   Small changes in AddButton
 #                   introduction of function "display"
+#       14/04/08:   in OnButtonpageHPAddButton substitute equipe.delete() with deleteEquipment(rowNo)
+#       15/04/08:   Bugs in event-handlers corrected. EVT_TEXT_ENTER substituted
+#                   by EVT_KILL_FOCUS. 
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -91,6 +96,8 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
+
+TYPELIST = ["compression","absorption"]
 
 
 #------------------------------------------------------------------------------		
@@ -284,6 +291,9 @@ class PanelHP(wx.Panel):
               name='cbConfig1', parent=self, pos=wx.Point(288, 308),
               size=wx.Size(24, 13), style=0)
 
+        self.cbConfig1.Bind(wx.EVT_CHECKBOX, self.OnCbConfig1Checkbox,
+              id=-1)
+
 #..............................................................................
 # 2. Heat pump type 
 
@@ -291,9 +301,11 @@ class PanelHP(wx.Panel):
               name='stConfig2', parent=self, pos=wx.Point(40, 344),
               style=0)
 
-        self.choiceConfig2 = wx.Choice(choices=["compression",
-              "absorption"], id=-1, name='choicepageHeatPump', parent=self,
+        self.choiceConfig2 = wx.Choice(choices=TYPELIST, id=-1, name='choicepageHeatPump', parent=self,
               pos=wx.Point(288, 336), size=wx.Size(130, 21), style=0)
+
+        self.choiceConfig2.Bind(wx.EVT_CHOICE, self.OnChoiceConfig2Choice,
+              id=-1)
 
 #..............................................................................
 # 3. Minimum operating hours
@@ -307,7 +319,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(288, 376), size=wx.Size(128, 21),
               style=wx.TE_PROCESS_ENTER, value="")
 
-        self.tcConfig3.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig3TextEnter,
+        self.tcConfig3.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig3TextEnter,
               id=-1)
 
 
@@ -323,7 +335,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(288, 416), size=wx.Size(128, 21),
               style=wx.TE_PROCESS_ENTER, value="")
 
-        self.tcConfig4.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig4TextEnter,
+        self.tcConfig4.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig4TextEnter,
               id=-1)
 
 #..............................................................................
@@ -338,7 +350,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(288, 456), size=wx.Size(128, 21),
               style=wx.TE_PROCESS_ENTER, value="")
 
-        self.tcConfig5.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig5TextEnter,
+        self.tcConfig5.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig5TextEnter,
               id=-1)
 
 #..............................................................................
@@ -353,7 +365,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 21),
               style=wx.TE_PROCESS_ENTER, value="")
 
-        self.tcConfig6.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig6TextEnter,
+        self.tcConfig6.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig6TextEnter,
               id=-1)
 
 #..............................................................................
@@ -372,7 +384,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(288, 544), size=wx.Size(128, 21),
               style=wx.TE_PROCESS_ENTER, value="")
 
-        self.tcConfig7.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig7TextEnter,
+        self.tcConfig7.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig7TextEnter,
               id=-1)
 
 #------------------------------------------------------------------------------		
@@ -457,7 +469,7 @@ class PanelHP(wx.Panel):
 
         self.config = Interfaces.GData["HP Config"]
         self.cbConfig1.SetValue(self.config[0])
-#HS 2008-04-07 XXX does not work !!!        self.choiceConfig2.SetValue(self.config[1])
+        self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
         self.tcConfig3.SetValue(str(self.config[2]))
         self.tcConfig4.SetValue(str(self.config[3]))
         self.tcConfig5.SetValue(str(self.config[4]))
@@ -557,8 +569,11 @@ class PanelHP(wx.Panel):
         if pu1.ShowModal() == wx.ID_OK:
             print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
         else:
-            self.equipe.delete()         #delete the space created before, if not accepted
-            self.equipeC.delete()
+##            self.equipe.delete()         #delete the space created before, if not accepted
+##            self.equipeC.delete()
+
+            rowNo = event.GetRow() #gets the No of the selected row
+            self.mod.deleteEquipment(rowNo)
             Status.SQL.commit()
 
 #        self.mod.calculateCascade()    
@@ -614,36 +629,43 @@ class PanelHP(wx.Panel):
 
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
+        print "new config[%s] value: "%0,self.config[0]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnChoiceConfig2Choice(self, event):
-        self.config[1] = self.choiceConfig2.GetSelection()
+        self.config[1] = TYPELIST[self.choiceConfig2.GetSelection()]
+        print "new config[%s] value: "%1,self.config[1]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig3TextEnter(self, event):
+        print "new config[%s] value: "%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig4TextEnter(self, event):
-        self.config[3] = self.tcConfig3.GetValue()
+        self.config[3] = self.tcConfig4.GetValue()
+        print "new config[%s] value: "%3,self.config[3]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig5TextEnter(self, event):
-        self.config[4] = self.tcConfig3.GetValue()
+        self.config[4] = self.tcConfig5.GetValue()
+        print "new config[%s] value: "%4,self.config[4]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig6TextEnter(self, event):
-        self.config[5] = self.tcConfig3.GetValue()
+        self.config[5] = self.tcConfig6.GetValue()
+        print "new config[%s] value: "%5,self.config[5]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig7TextEnter(self, event):
-        self.config[6] = self.tcConfig3.GetValue()
+        self.config[6] = self.tcConfig7.GetValue()
+        print "new config[%s] value: "%6,self.config[6]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
