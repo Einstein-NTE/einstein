@@ -48,23 +48,11 @@ class ModuleA(object):
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
         self.interface = Interfaces()
-
         self.DB = Status.DB
         self.sql = Status.SQL
         
-#        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
-#        self.alternatives = self.DB.qgenerationhc.sql_select(sqlQuery)
-#        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery)
-#        self.NEquipe = len(self.equipments)
-#        print "ModuleHC (__init__): %s equipes found"%self.NEquipe
-
-
-#............................................................................................
-#XXXHS2008-03-22: here for testing purposes.
-#   -> initPanel should be activated by event handler on entry into panel
-
-        self.initPanel()
         self.updatePanel()
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
@@ -73,33 +61,8 @@ class ModuleA(object):
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-#        AList = self.screenEquipments()
-        
-#............................................................................................
-#XXX FOR TESTING PURPOSES ONLY: load default demand
-# here it should be assured that heat demand and availability for position in cascade
-# of presently existing heat pumps is already defined
-
-#        self.interface.initCascadeArrays(self.NEquipe)
-       
-#............................................................................................
-#returns HPList to the GUI for displaying in window
-        
-            pass
-#        return (HCList)
+        self.updatePanel()
     
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-    def screenAlterntatives(self):
-#------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
-#------------------------------------------------------------------------------
-
-        pass
-#        self.interface.getEquipmentCascade()
-#        self.cascadeIndex = 0
-        
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def updatePanel(self):
@@ -109,22 +72,24 @@ class ModuleA(object):
 
         print "ModuleA (updatePanel): data for panel are copied to interface"
         
-        # plot to be displayed
-	# this is how the data should be set up
-	# (this data are just an example!)
-        data = array([['A 1', 2004, 'Type 1', 3000, 100, 120],
-		      ['A 2', 2006, 'Type 1', 4500, 120, 140],
-                      ['A 3', 2007, 'Type 2', 5000,  80, 130]])
+        alternativeList = [[-1, "Present State (original)",
+                            "original data as delivered in questionnaire",
+                            "---","---","---"],
+                            [0,"Present State (checked)",
+                            "complete data set for present state after cross-checking and data estimation",
+                            "---","---","---"]]
 
-
+        for ANo in range(1,Status.NoOfAlternatives+1):
+            try:
+                a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
+                print "alternative[%s]: "%ANo,a
+                alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
+            except:
+                pass
+            
+        data = array(alternativeList)
+        print "list of alternatives = ",data
         self.interface.setGraphicsData(self.keys[0], data)
-
-        try:
-	    self.interface.setGraphicsData('A Info',{"noseque":55})
-
-            self.interface.setGraphicsData('A List',self.interface.cascade)
-        except:
-            pass
 
 #------------------------------------------------------------------------------
 

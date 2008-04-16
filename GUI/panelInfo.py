@@ -1,44 +1,66 @@
 import wx
 
-assistantList = ['Interactive','Semi-automatic','Automatic']
+ASSISTANTLIST = ['Interactive','Semi-automatic','Automatic']
 
-class PanelInfo(wx.Panel):
+class PanelInfo(wx.StatusBar):
     def __init__(self, parent, main, name='', project=''):
+	self.main = main
+	self.parent = parent
 	self.main = main
 
 #------------------------------------------------------------------------------
 #--- UI setup
 #------------------------------------------------------------------------------
 
-        wx.Panel.__init__(self, id=-1, name='PanelInfo', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(800, 32), style=0)
+        wx.StatusBar.__init__(self, id=-1, name='PanelInfo', parent=parent, style=wx.SUNKEN_BORDER)
+	self.SetFieldsCount(3)
+        self.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 
-        self.SetBackgroundColour ("#909090")
+	self.SetStatusText('Project',0)
+        self.t0 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(60,0),size=wx.Size(270, 21),
+			      value=name, style=wx.TE_READONLY)
+        self.t0.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
+	self.t0.Center(direction=wx.VERTICAL)
 
-        self.s1 = wx.StaticText(id=-1, label='Project', parent=self, pos=wx.Point(10, 8))
-        self.t1 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(60,4),size=wx.Size(250, 28),
-			      value=name)
+	self.SetStatusText('Alternative',1)
+        self.t1 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(416, 0),size=wx.Size(260, 21),
+			      value=project, style=wx.TE_READONLY)
+        self.t1.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
+	self.t1.Center(direction=wx.VERTICAL)
 
-        self.s2 = wx.StaticText(id=-1, label='Alternative 3', parent=self, pos=wx.Point(320, 8))
-        self.t2 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(420, 4),size=wx.Size(300, 28),
-			      value=project)
+	self.SetStatusText('Design assistant',2)
+        self.choiceAssistant = wx.Choice(choices=ASSISTANTLIST,
+              id=-1, name='choiceAssistant', parent=self, pos=wx.Point(800, 0),size=wx.Size(200,21))
+        self.choiceAssistant.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
+	self.choiceAssistant.Center(direction=wx.VERTICAL)
 
-        self.s3 = wx.StaticText(id=-1, label='Design\nassistant', parent=self, pos=wx.Point(730, 2))
-        self.choiceAssistant = wx.Choice(choices=assistantList,
-              id=-1, name='choiceAssistant', parent=self, pos=wx.Point(800, 4),size=wx.Size(200,28))
-
+        self.Bind(wx.EVT_SIZE, self.OnSize, self)
         self.Bind(wx.EVT_CHOICE, self.OnChoiceAssistant, self.choiceAssistant)
 
 
 #------------------------------------------------------------------------------
 #--- UI actions
 #------------------------------------------------------------------------------		
+    def _szpos(self,index,control,labelwidth):
+	rect=self.GetFieldRect(index)
+	end = rect.x + rect.width
+	p = control.GetPosition()
+	sz = control.GetSize()
+	sz.width = rect.width-labelwidth
+	npos = wx.Point(end-sz.width,p.y)
+	control.SetPosition(npos)
+	control.SetSize(sz)
 
     def OnChoiceAssistant(self, event):
 	i = self.choiceAssistant.GetCurrentSelection()
-	self.main.logWarning('Design assistant changed to '+repr(assistantList[i]))
+	self.main.logWarning('Design assistant changed to '+repr(ASSISTANTLIST[i]))
         event.Skip()
 
+    def OnSize(self, event):
+	self._szpos(0,self.t0,60)
+	self._szpos(1,self.t1,80)
+	self._szpos(2,self.choiceAssistant,140)
+	#print 'SIZE 0 x=%s y=%s w=%s' % (r.x,r.y,r.width)
 
 if __name__ == '__main__':
 

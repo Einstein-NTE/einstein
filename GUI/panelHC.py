@@ -19,12 +19,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	    03/04/2008
-#	Last revised by:              ---
+#	Last revised by:    Hans Schweiger          16/04/2008
 #                           
 #
 #       Changes to previous version:
+#       16/04/2008  HS  main as argument in __init__
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -65,7 +66,8 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 class PanelHC(wx.Panel):
 
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent, main, id, pos, size, style, name):
+        self.main = main
         self._init_ctrls(parent)
 	keys = ['HC Table']
 #        self.modHC = ModuleHC(keys)  #creates and initialises module
@@ -278,31 +280,27 @@ class PanelHC(wx.Panel):
     def OnTc5pageHCTextEnter(self, event):
         self.modHC.storeModulePars()
 
+#==============================================================================
+#   <<< OK Cancel >>>
+#==============================================================================
+
     def OnButtonpageHCOkButton(self, event):
-        saveOption = "save"
-        self.modHC.exitModule(saveOption)
         self.Hide()
+        self.main.tree.SelectItem(self.main.qA, select=True)
         print "Button exitModuleOK: now I should go back to HC"
 
     def OnButtonpageHCCancelButton(self, event):
-        #warning: do you want to leave w/o saving ???
-        saveOption = "save"
-        self.modHC.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleCancel: now I should go back to HC"
 
     def OnButtonpageHCBackButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modHC.exitModule(saveOption)
         self.Hide()
+        self.main.tree.SelectItem(self.main.qA, select=True)
         print "Button exitModuleBack: now I should show another window"
 
     def OnButtonpageHCFwdButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modHC.exitModule(saveOption)
         self.Hide()
+        self.main.tree.SelectItem(self.main.qHP, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
     def OnButton5Button(self, event):

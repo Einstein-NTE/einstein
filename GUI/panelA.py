@@ -41,6 +41,7 @@
 #============================================================================== 
 
 import wx
+import wx.grid
 from einstein.GUI.graphics import drawPiePlot
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
@@ -49,15 +50,17 @@ from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
+from einstein.GUI.dialogA import *
+from einstein.GUI.dialogOK import *
 
 
 [wxID_PANELA, wxID_PANELABUTTONPAGEABACK, wxID_PANELABUTTONPAGEACANCEL, 
- wxID_PANELABUTTONPAGEAFWD, wxID_PANELABUTTONPAGEAOK, wxID_PANELADESIGNHC, 
- wxID_PANELADESIGNHX, wxID_PANELADESIGNPA, wxID_PANELADESIGNPO, 
- wxID_PANELAGENERATENEW, wxID_PANELAGRIDPAGEA, wxID_PANELAPANELAFIG, 
- wxID_PANELAST1PAGEA, wxID_PANELAST3PAGEA, wxID_PANELASTTITLEPAGEA,
- wxID_PANELAFIG
-] = [wx.NewId() for _init_ctrls in range(16)]
+ wxID_PANELABUTTONPAGEAFWD, wxID_PANELABUTTONPAGEAOK, wxID_PANELACOPYPROPOSAL, 
+ wxID_PANELADELETEPROPOSAL, wxID_PANELADESIGNHC, wxID_PANELADESIGNHX, 
+ wxID_PANELADESIGNPA, wxID_PANELADESIGNPO, wxID_PANELAGENERATENEW, 
+ wxID_PANELAGRID, wxID_PANELAPANELAFIG, wxID_PANELAST1PAGEA, 
+ wxID_PANELAST3PAGEA, wxID_PANELASTTITLEPAGEA, 
+] = [wx.NewId() for _init_ctrls in range(17)]
 
 # constants
 #
@@ -67,15 +70,20 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGA
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+MAXROWS = 10
 
 class PanelA(wx.Panel):
 
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent, main, id, pos, size, style, name):
         self._init_ctrls(parent)
-	keys = ['A Table']
+	keys = ['A Table','A Plot']
+	self.keys = keys
+	self.main = main
 #        self.modA = ModuleA(keys)  #creates and initialises module
-        self.modA = Status.mod.moduleA
-        
+        self.mod = Status.mod.moduleA
+        self.shortName = "new alternative"
+        self.description = "describe shortly the main differential features of the new alternative"
+        self.ANo = Status.ANo
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
 #==============================================================================
@@ -108,33 +116,39 @@ class PanelA(wx.Panel):
         key = keys[0]
         data = Interfaces.GData[key]
         (rows,cols) = data.shape
-        self.gridPageA.CreateGrid(max(rows,20), cols)
+        self.grid.CreateGrid(max(rows,MAXROWS), cols)
 
-        self.gridPageA.EnableGridLines(True)
-        self.gridPageA.SetDefaultRowSize(20)
-        self.gridPageA.SetRowLabelSize(30)
-        self.gridPageA.SetColSize(0,115)
-        self.gridPageA.EnableEditing(False)
-        self.gridPageA.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.gridPageA.SetColLabelValue(0, "Alterntative No.")
-        self.gridPageA.SetColLabelValue(1, "Name")
-        self.gridPageA.SetColLabelValue(2, "Description")
-        self.gridPageA.SetColLabelValue(3, "Primary energy consumption")
-        self.gridPageA.SetColLabelValue(4, "Total annual energy cost")
-        self.gridPageA.SetColLabelValue(5, "---")
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetDefaultColSize(80)
+        self.grid.SetColSize(0,40)
+        self.grid.SetColSize(1,160)
+        self.grid.SetColSize(2,320)
+        self.grid.SetColSize(3,40)
+        
+        self.grid.EnableEditing(False)
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid.SetColLabelValue(0, "Alternative No")
+        self.grid.SetColLabelValue(1, "Name")
+        self.grid.SetColLabelValue(2, "Description")
+        self.grid.SetColLabelValue(3, "State of processing")
+        self.grid.SetColLabelValue(4, "Primary energy consumption\n[MWh/a]")
+        self.grid.SetColLabelValue(5, "Total annual energy cost\n[€/a]")
         #
         # copy values from dictionary to grid
         #
-        for r in range(rows):
-            self.gridPageA.SetRowAttr(r, attr)
+        for r in range(MAXROWS):
+            self.grid.SetRowAttr(r, attr)
             for c in range(cols):
-                self.gridPageA.SetCellValue(r, c, data[r][c])
+#                self.grid.SetCellValue(r, c, "")
                 if c == labels_column:
-                    self.gridPageA.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
-                    self.gridPageA.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.gridPageA.SetGridCursor(0, 0)
+        self.grid.SetGridCursor(0, 0)
 
         self.stTitlePageA.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
     
@@ -144,7 +158,7 @@ class PanelA(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(808, 634), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
-        self.panelAFig = wx.Panel(id=wxID_PANELAFIG, name='panelAFigure',
+        self.panelAFig = wx.Panel(id=wxID_PANELAPANELAFIG, name='panelAFigure',
               parent=self, pos=wx.Point(26, 346), size=wx.Size(382, 220),
               style=wx.TAB_TRAVERSAL)
 
@@ -154,13 +168,15 @@ class PanelA(wx.Panel):
         self.DesignPA.Bind(wx.EVT_BUTTON, self.OnDesignPAButton,
               id=wxID_PANELADESIGNPA)
 
-        self.gridPageA = wx.grid.Grid(id=wxID_PANELAGRIDPAGEA, name='gridpageA',
+        self.grid = wx.grid.Grid(id=wxID_PANELAGRID, name='gridpageA',
               parent=self, pos=wx.Point(24, 56), size=wx.Size(752, 216),
               style=0)
-        self.gridPageA.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
-              self.OnGridPageAGridCellLeftDclick, id=wxID_PANELAGRIDPAGEA)
-        self.gridPageA.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
-              self.OnGridPageAGridCellRightClick, id=wxID_PANELAGRIDPAGEA)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
+              self.OnGridPageAGridCellLeftDclick, id=wxID_PANELAGRID)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+              self.OnGridPageAGridCellRightClick, id=wxID_PANELAGRID)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
+              self.OnGridPageAGridCellLeftClick)
 
         self.st1pageA = wx.StaticText(id=-1, label='Existing alternatives',
               name='st1pageA', parent=self, pos=wx.Point(24, 40), style=0)
@@ -177,9 +193,9 @@ class PanelA(wx.Panel):
         self.buttonpageAOk.Bind(wx.EVT_BUTTON, self.OnButtonpageAOkButton,
               id=wx.ID_OK)
 
-        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL,
-              label='Cancel', name='buttonpageACancel', parent=self,
-              pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
+        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+              name='buttonpageACancel', parent=self, pos=wx.Point(616, 544),
+              size=wx.Size(75, 23), style=0)
         self.buttonpageACancel.Bind(wx.EVT_BUTTON,
               self.OnButtonpageACancelButton, id=wx.ID_CANCEL)
 
@@ -197,7 +213,7 @@ class PanelA(wx.Panel):
 
         self.GenerateNew = wx.Button(id=wxID_PANELAGENERATENEW,
               label='generate new proposal', name='GenerateNew', parent=self,
-              pos=wx.Point(24, 280), size=wx.Size(184, 24), style=0)
+              pos=wx.Point(24, 280), size=wx.Size(136, 24), style=0)
         self.GenerateNew.Bind(wx.EVT_BUTTON, self.OnGenerateNewButton,
               id=wxID_PANELAGENERATENEW)
 
@@ -224,103 +240,136 @@ class PanelA(wx.Panel):
         self.DesignPO.Bind(wx.EVT_BUTTON, self.OnDesignPOButton,
               id=wxID_PANELADESIGNPO)
 
-    def OnACalculateButton(self, event):
-        ret = self.modA.designAssistant1()
-        if (ret == "ManualFinalSelection"):
-            print "here I should edit the data base"
-        ret = self.modA.designAssistant2()
-        if ret == "changed":
-            modA.calculateCascade()
-            #updatePlots
+        self.copyProposal = wx.Button(id=wxID_PANELACOPYPROPOSAL,
+              label='copy proposal', name='copyProposal', parent=self,
+              pos=wx.Point(176, 280), size=wx.Size(136, 24), style=0)
+        self.copyProposal.Bind(wx.EVT_BUTTON, self.OnCopyProposalButton,
+              id=wxID_PANELACOPYPROPOSAL)
+
+        self.deleteProposal = wx.Button(id=wxID_PANELADELETEPROPOSAL,
+              label='delete proposal', name='deleteProposal', parent=self,
+              pos=wx.Point(328, 280), size=wx.Size(136, 24), style=0)
+        self.deleteProposal.Bind(wx.EVT_BUTTON, self.OnDeleteProposalButton,
+              id=wxID_PANELADELETEPROPOSAL)
+
+#------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   function activated on each entry into the panel from the tree
+#------------------------------------------------------------------------------		
+        self.mod.initPanel()        # prepares data for plotting
+
+#..............................................................................
+# update of alternatives table
+
+        data = Interfaces.GData[self.keys[0]]
+        print "data = ",data
+        (rows,cols) = data.shape
+        print rows,cols
+        for r in range(rows):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, data[r][c])
+
+#XXX Here better would be updating the grid and showing less rows ... ????
+        for r in range(rows,MAXROWS):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, "")
+
+        self.Show()
         
+#------------------------------------------------------------------------------		
+
+#==============================================================================
+#   EVENT HANDLERS
+#==============================================================================
+
 #------------------------------------------------------------------------------		
     def OnGenerateNewButton(self, event):
 #------------------------------------------------------------------------------		
+#   Generate new alterantive proposal
+#------------------------------------------------------------------------------		
+
+        self.shortName = "New Proposal %s"%(Status.NoOfAlternatives+1)
+        self.description = "based on present state"
+        
+        pu1 =  DialogA(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print "PanelA - OK",self.shortName,self.description
+            print "PanelA (GenerateNew-Button): calling function createNewAlternative"
+
+            Status.prj.createNewAlternative(0,self.shortName,self.description)
+            self.display()
+
+        elif pu1.ShowModal() == wx.ID_Cancel:
+            print "PanelA - Cancel"
+        else:
+            print "PanelA ???"
 
         print "PanelA (GenerateNew-Button): calling function createNewAlternative"
         Status.prj.createNewAlternative(0)
+        self.display()
         
-        #show pop-up menu for adding equipment
-        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
-	#right table when it is created
-#        pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
-#        if pu1.ShowModal() == wx.ID_OK:
-#            print 'PanelA AddEquipment accepted. Id='+str(pu1.theId)
-#            ret = self.modA.add(AId)
-        
-#        else:
-#            print 'Cancelled'
+#------------------------------------------------------------------------------		
+    def OnCopyProposalButton(self, event):
+#------------------------------------------------------------------------------		
+#   Generate new porposal copying from existing alternative
+#------------------------------------------------------------------------------		
+        self.shortName = self.grid.GetCellValue(self.selectedRow,1)+"(mod.)"
+        self.description = self.grid.GetCellValue(self.selectedRow,2)+"(modified alternative based on "+self.grid.GetCellValue(self.selectedRow,1)+")"
 
+        pu1 =  DialogA(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print "PanelA - OK",self.shortName,self.description
+            print "PanelA (GenerateNew-Button): calling function createNewAlternative"
+
+            Status.prj.createNewAlternative(self.ANo,self.shortName,self.description)
+            self.display()
+
+        elif pu1.ShowModal() == wx.ID_Cancel:
+            print "PanelA - Cancel"
+        else:
+            print "PanelA - ???"
+
+#------------------------------------------------------------------------------		
+    def OnDeleteProposalButton(self, event):
+#------------------------------------------------------------------------------		
+#   Delete alternative proposal
+#------------------------------------------------------------------------------		
+
+        pu2 =  DialogOK(self,"delete alternative","do you really want to delete this alternative ?")
+        if pu2.ShowModal() == wx.ID_OK:
+            if self.ANo > 0:
+                Status.prj.deleteAlternative(self.ANo)
+                self.display()
+            elif self.ANo in [-1,0]:
+                print "PanelA (DeleteButton): cannot delete alternative ",self.ANo
+            else:
+                print "PanelA (DeleteButton): erroneous alternative number ",self.ANo
+
+#------------------------------------------------------------------------------		
+    def OnGridPageAGridCellLeftClick(self, event):
+#------------------------------------------------------------------------------		
+#   Detects selected row
+#------------------------------------------------------------------------------		
+	self.selectedRow = event.GetRow()
+	self.ANo = self.selectedRow - 1
+        Status.prj.setActiveAlternative(self.ANo)
+
+        print "PanelA (GridCellLeftClick): row, ANo = ",self.selectedRow,self.ANo	    
+        event.Skip()
+
+#------------------------------------------------------------------------------		
     def OnGridPageAGridCellLeftDclick(self, event):
-        print "Grid - left button Dclick: here I should call the Q4H"
-        ret = "ok"
-        if (ret=="ok"):
-            ret = self.modA.calculateCascade()
-        #updatePlots
+#------------------------------------------------------------------------------		
+        OnGridPageAGridCellLeftClick(event)
+        event.Skip()
 
     def OnGridPageAGridCellRightClick(self, event):
-        print "Grid - right button click: scroll-up should appear"
-        #here a scroll-up should appear with some options: edit, delete,...
-        RowNo = 1 #number of the selected boiler should be detected depending on the selected row
-        ret = "delete"
-        if (ret=="delete"):
-            # a pop-up should confirm.
-            ret = "ok"
-            if (ret == "ok"):
-                ret = self.modA.delete(RowNo)
-                ret = self.modA.calculateCascade()
-        elif (ret == "edit"):
-            OnGridPageAGridCellLeftDclick(self,event)
-        
+        event.Skip()        
 
-    def OnCb1pageACheckbox(self, event):
-        self.modA.storeModulePars()
-
-    def OnChoicepageAChoice(self, event):
-        self.modA.storeModulePars()
-
-    def OnTc1pageATextEnter(self, event):
-        self.modA.storeModulePars()
-
-    def OnTc2pageATextEnter(self, event):
-        self.modA.storeModulePars()
-
-    def OnTc3pageATextEnter(self, event):
-        self.modA.storeModulePars()
-
-    def OnTc4pageATextEnter(self, event):
-        self.modA.storeModulePars()
-
-    def OnTc5pageATextEnter(self, event):
-        self.modA.storeModulePars()
-
-    def OnButtonpageAOkButton(self, event):
-        saveOption = "save"
-        self.modA.exitModule(saveOption)
-        self.Hide()
-        print "Button exitModuleOK: now I should go back to HC"
-
-    def OnButtonpageACancelButton(self, event):
-        #warning: do you want to leave w/o saving ???
-        saveOption = "save"
-        self.modA.exitModule(saveOption)
-        self.Hide()
-        print "Button exitModuleCancel: now I should go back to HC"
-
-    def OnButtonpageABackButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modA.exitModule(saveOption)
-        self.Hide()
-        print "Button exitModuleBack: now I should show another window"
-
-    def OnButtonpageAFwdButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modA.exitModule(saveOption)
-        self.Hide()
-        print "Button exitModuleFwd: now I should show another window"
-
+#==============================================================================
+#   EVENT HANDLERS BUTTONS TO DESIGN ASSISTANTS
+#==============================================================================
     def OnDesignPAButton(self, event):
         event.Skip()
 
@@ -328,7 +377,31 @@ class PanelA(wx.Panel):
         event.Skip()
 
     def OnDesignHCButton(self, event):
-        event.Skip()
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHC, select=True)
 
     def OnDesignPOButton(self, event):
         event.Skip()
+
+#------------------------------------------------------------------------------		
+#   <<< OK Cancel >>>
+#------------------------------------------------------------------------------		
+    def OnButtonpageAOkButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHC, select=True)
+        print "Button exitModuleOK: now I should go back to HC"
+
+    def OnButtonpageACancelButton(self, event):
+        #warning: do you want to leave w/o saving ???
+        print "Button exitModuleCancel: now I should go back to HC"
+
+    def OnButtonpageABackButton(self, event):
+        self.Hide()
+        print "Button exitModuleBack: now I should show another window"
+
+    def OnButtonpageAFwdButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHC, select=True)
+        print "Button exitModuleFwd: now I should show another window"
+
+

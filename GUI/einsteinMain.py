@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.69
+#	Version No.: 0.71
 #	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
 #	Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -33,6 +33,7 @@
 #                           Tom Sobota                          09/04/2008
 #                           Hans Schweiger                      12/04/2008
 #                           Tom Sobota                          15/04/2008
+#                           Hans Schweiger                      16/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -65,6 +66,11 @@
 #                   Help and User manual logic (not the manual!) implemented
 #                   Message panel operative
 #                   General housekeeping
+#       16/04/2008  Change in call to panelA (display instead of Show())
+#                   Order of instantiation of Project() and Module() changed
+#                   Including main as argument in panels A,HC,HP,BB,Energy
+#                   Tree item qOptimisationsProposals renamed to qA
+#                   Tree item qOptiProEnergy renamed to qEnergy
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -226,7 +232,7 @@ class EinsteinFrame(wx.Frame):
         self.treepanel = wx.Panel(self.splitter, -1)
 
         ####---- Upper info panel
-        self.panelinfo = PanelInfo(self,
+	self.panelinfo = PanelInfo(self,
 				   self,
 				   name = 'EnerCHEESEexperts Barcelona',
 				   project = 'Biomass based cogeneration and substitution of old boiler')
@@ -235,10 +241,10 @@ class EinsteinFrame(wx.Frame):
         self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS)
 
         #----- add menu
-        self.CreateMenu()
+	self.CreateMenu()
         
         #----- create tree control
-        self.CreateTree()
+	self.CreateTree()
 
      
 	#----- error log window
@@ -246,7 +252,7 @@ class EinsteinFrame(wx.Frame):
 				   name='message',
 				   parent=self.splitter2,
 				   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
-        self.message.InsertColumn(0, 'Message log')
+	self.message.InsertColumn(0, 'Message log')
         self.message.SetBackgroundColour('white')
 
 
@@ -254,15 +260,15 @@ class EinsteinFrame(wx.Frame):
         self.DoLayout ()
 
         #----- set binding events
-        self.BindEvents()
+	self.BindEvents()
 
 	#----- generate and initialize the panels
-        self.CreatePanels()
+	self.CreatePanels()
 
 	#----- initial message
-        self.logMessage('einstein started')
-        self.logWarning('an example of a warning')
-        self.logError('an example of an error')
+	self.logMessage('einstein started')
+	self.logWarning('an example of a warning')
+	self.logError('an example of an error')
  
         ############################################
         #
@@ -271,14 +277,14 @@ class EinsteinFrame(wx.Frame):
         ############################################
 #------------------------------------------------------------------------------
     def _log(self,fcolor,bcolor,text):
-        tl = time.localtime()
-        now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+	tl = time.localtime()
+	now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
         item = wx.ListItem()
-        item.SetText(now + text)
-        item.SetTextColour(fcolor)
-        item.SetBackgroundColour(bcolor)
-        item.SetColumn(0)
-        self.message.InsertItem(item)
+	item.SetText(now + text)
+	item.SetTextColour(fcolor)
+	item.SetBackgroundColour(bcolor)
+	item.SetColumn(0)
+	self.message.InsertItem(item)
 
     def logMessage(self,text):
         self._log('#00A000','#FFFFFF',text)
@@ -296,10 +302,6 @@ class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------
 
         # set sizers
-        panelsizer = wx.BoxSizer(wx.VERTICAL)
-        panelsizer.Add(self.panelinfo, 0, wx.EXPAND, 5)
-        panelsizer.Add(self.splitter, 1, wx.EXPAND, 0)
-        self.SetSizer(panelsizer)
 
 	# this sizer allows the horiz.expansion of the tree
         sizer1 = wx.BoxSizer(wx.VERTICAL)
@@ -310,6 +312,16 @@ class EinsteinFrame(wx.Frame):
         sizer2.Add(self.leftpanel2, 1, wx.EXPAND, 0)
         self.splitter2.SetSizer(sizer2)
       
+        panelsizer = wx.BoxSizer(wx.VERTICAL)
+        #panelsizer.Add(self.panelinfo, 0, wx.FIXED_MINSIZE, 0)
+        panelsizer.Add(self.panelinfo, 0, wx.EXPAND)
+        panelsizer.Add(self.splitter, 1, wx.EXPAND, 0)
+
+	infobar = self.FindWindowByName("PanelInfo")
+	infobar.SetMinSize((0,26))
+
+        self.SetSizer(panelsizer)
+
         self.Layout()
 
         # set splitters
@@ -318,9 +330,9 @@ class EinsteinFrame(wx.Frame):
         self.splitter.SetSashPosition(250)
 
 	# find the width of message panel
-        w = self.splitter2.GetWindow1()
-        (width,height) = w.GetClientSizeTuple()
-        self.message.SetColumnWidth(0, width-10)
+	w = self.splitter2.GetWindow1()
+	(width,height) = w.GetClientSizeTuple()
+	self.message.SetColumnWidth(0, width-10)
 
 ######################################################################################        
 
@@ -482,12 +494,12 @@ class EinsteinFrame(wx.Frame):
         ####--- End of pageHeatRecoveryTargets
 
         ####--- Page Alternatives
-        self.panelA = PanelA(id=-1, name='panelA', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelA = PanelA(id=-1, name='panelA', parent=self.leftpanel2, main = self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelA.Hide()
         ####--- End op pageHeatPump
 
         ####--- Page H&C Supply
-        self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelHC.Hide()
         ####--- End op pageHeatPump
 
@@ -498,12 +510,12 @@ class EinsteinFrame(wx.Frame):
         ####--- End op panelHP
 
         ####--- Page Boilers
-        self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2, main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelBB.Hide()
         ####--- End op panelHP
 
         ####--- Panel Energy
-        self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+        self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
         self.panelEnergy.Hide()
         ####--- End op panelEnergy
 
@@ -601,11 +613,11 @@ class EinsteinFrame(wx.Frame):
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
         frameUserManual = FrameHelpUserManual(self, 'einstein_manual.html')
-        frameUserManual.Show()
+	frameUserManual.Show()
 
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
-        frameAbout.Show()
+	frameAbout.Show()
 
 #------------------------------------------------------------------------------		
 #--- Eventhandlers Tree
@@ -785,10 +797,10 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelBM3.Show()
 
-        #qOptimisationProposals
+        #qA
         elif select == PList["X145"][1]:        #generation of alternatives
             self.hidePages()
-            self.panelA.Show()
+            self.panelA.display()
 
         elif select == PList["X147"][1]:
             #TS 2008-3-26 No action here
@@ -812,8 +824,6 @@ class EinsteinFrame(wx.Frame):
             ret = self.OnEnterHeatPumpPage()
             if  ret == 0:
                 self.hidePages()
-#                self.panelHP.modHP.initPanel()
-#                self.panelHP.Show()
                 self.panelHP.display()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
@@ -861,7 +871,6 @@ class EinsteinFrame(wx.Frame):
             self.showError("Select project first!")
             return 1
 
-
 #------------------------------------------------------------------------------		
 # Auxiliary Functions
 #------------------------------------------------------------------------------		
@@ -877,7 +886,7 @@ class EinsteinFrame(wx.Frame):
         self.Page3.Hide()
         self.Page4.Hide()
         self.Page5.Hide()
-        #self.Page6.Hide()
+        self.Page6.Hide()
         self.Page7.Hide()
         self.Page8.Hide()
         self.Page9.Hide()
@@ -1057,9 +1066,9 @@ class EinsteinFrame(wx.Frame):
         self.qBenchmarkCheckProcess = self.tree.AppendItem (self.qBenchmarkCheckPage4, "process name")
         
 
-        self.qOptimisationProposals = self.tree.AppendItem (self.qRoot, PList["X145"][1])
+        self.qA = self.tree.AppendItem (self.qRoot, PList["X145"][1])
         #Design
-        self.qOptiProDesign = self.tree.AppendItem (self.qOptimisationProposals, PList["X146"][1])
+        self.qOptiProDesign = self.tree.AppendItem (self.qA, PList["X146"][1])
         
         #Process optimisation
         self.qOptiProProcess = self.tree.AppendItem (self.qOptiProDesign, "Process optimisation")
@@ -1097,15 +1106,15 @@ class EinsteinFrame(wx.Frame):
         self.qOptiProDistribution = self.tree.AppendItem (self.qOptiProDesign, "H&C Distribution")
 
         #Energy performance
-        self.qOptiProEnergy = self.tree.AppendItem (self.qOptimisationProposals, "Energy performance")
+        self.qEnergy = self.tree.AppendItem (self.qA, "Energy performance")
             #Detailed energy flows 1
 #HS2008-03-12: subdivision energy cancelled out
-#        self.qOptiProEnergy1 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 1")
+#        self.qEnergy1 = self.tree.AppendItem (self.qEnergy, "Detailed energy flows 1")
             #Detailed energy flows 2
-#        self.qOptiProEnergy2 = self.tree.AppendItem (self.qOptiProEnergy, "Detailed energy flows 2")
+#        self.qEnergy2 = self.tree.AppendItem (self.qEnergy, "Detailed energy flows 2")
 
         #Economic analysis
-        self.qOptiProEconomic = self.tree.AppendItem (self.qOptimisationProposals, "Economic analysis")
+        self.qOptiProEconomic = self.tree.AppendItem (self.qA, "Economic analysis")
             #Economics 1
         self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, "Economics 1")
             #Economics 2
@@ -1113,7 +1122,7 @@ class EinsteinFrame(wx.Frame):
 
 
         #Comparative analysis
-        self.qOptiProComparative = self.tree.AppendItem (self.qOptimisationProposals, "Comparative analysis")
+        self.qOptiProComparative = self.tree.AppendItem (self.qA, "Comparative analysis")
             #Comparative study – Detail Info 1
         self.qOptiProComparative1 = self.tree.AppendItem (self.qOptiProComparative, "Comparative study – Detail Info 1")
             #Comparative study – Detail Info 2
@@ -1132,7 +1141,7 @@ class EinsteinFrame(wx.Frame):
         self.tree.Expand(self.qDataCheck)
         self.tree.Expand(self.qStatistics)
         self.tree.Expand(self.qBenchmarkCheck)
-        self.tree.Expand(self.qOptimisationProposals)
+        self.tree.Expand(self.qA)
         self.tree.Expand(self.qFinalReport)
 
 
@@ -1161,12 +1170,11 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
 
-        self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
-        self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
+	self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
+	self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
 
         #--- binding the Tree
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
-
 
 #==============================================================================
 #------------------------------------------------------------------------------
@@ -1185,8 +1193,8 @@ if __name__ == '__main__':
     interf = Interfaces()       
     interf = None
 
-    Status.mod = Modules()
     Status.prj = Project()
+    Status.mod = Modules()
 
     app = wx.PySimpleApp()
     frame = EinsteinFrame(parent=None, id=-1, title="Einstein")

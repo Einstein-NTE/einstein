@@ -12,15 +12,17 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger
 #       Revised by:         Tom Sobota 31/03/2008
 #                           Tom Sobota 31/03/2008
 #                           Hans Schweiger  03/04/2008
+#                           Hans Schweiger  16/04/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
 #       03/04/08:           moduleEnergy passed from Interfaces
+#       16/04/08:   HS      main as argument in __init__
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -62,7 +64,8 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 class PanelEnergy(wx.Panel):
 
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent, main,id, pos, size, style, name):
+        self.main = main
         self._init_ctrls(parent)
         keys = ['ENERGY'] 
 #        self.mod = ModuleEnergy(keys)

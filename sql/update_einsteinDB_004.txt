@@ -1,0 +1,68 @@
+--update einstein database: Update status tables 16.04.08, Hans Schweiger
+USE einstein;
+
+
+--add new table
+CREATE TABLE salternatives (
+	SAlternative_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	ProjectID INTEGER COMMENT 'Project ID',
+	AlternativeProposalNo INTEGER COMMENT 'Alternative Proposal Number',
+	ShortName VARCHAR(45) COMMENT 'Short name of alternative',
+	Description VARCHAR(100) COMMENT 'Description of alternative',
+	StatusA INTEGER COMMENT 'Processing status alternative',
+	StatusPO INTEGER COMMENT 'Processing status PO',
+	StatusPI INTEGER COMMENT 'Processing status PI',
+	StatusHX INTEGER COMMENT 'Processing status HX',
+	StatusHC INTEGER COMMENT 'Processing status HC',
+	StatusEnergy INTEGER COMMENT 'Processing status Energy calculation',
+	StatusECO INTEGER COMMENT 'Processing status Economic calculation',
+	PRIMARY KEY (SAlternative_ID)
+);
+
+
+--add new table
+CREATE TABLE sproject (
+	SProject_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	ProjectID INTEGER COMMENT 'Project ID',
+	NoOfAlternatives INTEGER COMMENT' Number of alternative proposals',
+	ActiveAlternative INTEGER COMMENT 'Last active alternative',
+	FinalAlternative INTEGER COMMENT 'Finally selected alternative',
+	WriteProtected INTEGER COMMENT 'Write protection level',
+	StatusQ INTEGER COMMENT 'Processing status questionnaire',
+	StatusCC INTEGER COMMENT 'Processing status CC',
+	StatusCA INTEGER COMMENT 'Processing status CS',
+	StatusR INTEGER COMMENT 'Processing status report',
+	LanguageReport VARCHAR(45) COMMENT 'language used in report',
+	UnitsReport VARCHAR(45) COMMENT 'units used in report',
+	Auditor_ID INTEGER COMMENT 'identity of responsible auditor',
+	PRIMARY KEY (SProject_ID)
+);
+
+CREATE TABLE stool (
+	STool_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	ActiveProject INTEGER COMMENT 'ID of last opened project',
+	UserType VARCHAR(45) COMMENT 'type of user last working',
+	Auditor_ID INTEGER COMMENT 'identity of last auditor working',
+	UserInteractionLevel VARCHAR(45) COMMENT 'last user interaction level used',
+	LanguageTool VARCHAR(45) COMMENT 'last language used in tool interface',
+	UnitsTool VARCHAR(45) COMMENT 'units used in tool',
+	PRIMARY KEY (STool_ID)
+);
+
+CREATE TABLE auditor (
+	Auditor_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Principal identifier',
+	Name VARCHAR(45) COMMENT 'name of the auditor',
+	City VARCHAR(45) COMMENT 'city',
+	Country VARCHAR(45) COMMENT 'country',
+	Company VARCHAR(45) COMMENT 'company',
+	CompanyType VARCHAR(45) COMMENT 'company type',
+	Adress VARCHAR(100) COMMENT 'adress',
+	Phone VARCHAR(45) COMMENT 'phone',
+	Fax VARCHAR(45) COMMENT 'fax',
+	EMail VARCHAR(45) COMMENT 'e-mail',
+	Web VARCHAR(45) COMMENT 'web',
+	PRIMARY KEY (Auditor_ID)
+);
+
+
+

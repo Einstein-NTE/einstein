@@ -19,17 +19,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
 #                           Hans Schweiger          03/04/2008
 #                           Tom Sobota              05/04/2008
+#                           Hans Schweiger          16/04/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
 #       03/04/2008:         Adaptation to structure Modules
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
 #                   slight change to OK and Cancel buttons, to show the right icons
+#       16/04/2008: HS  main as argument in __init__
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -75,7 +77,8 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 class PanelBB(wx.Panel):
 
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent, main, id, pos, size, style, name):
+        self.main = main
         self._init_ctrls(parent)
 	keys = ['BB Table']
 #        self.modBB = ModuleBB(keys)  #creates and initialises module
@@ -377,29 +380,26 @@ class PanelBB(wx.Panel):
     def OnTc5pageBBTextEnter(self, event):
         self.modBB.storeModulePars()
 
+
+#==============================================================================
+#   <<< OK Cancel >>>
+#==============================================================================
+
     def OnButtonpageBBOkButton(self, event):
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
+        self.main.tree.SelectItem(self.main.qHC, select=True)
         self.Hide()
         print "Button exitModuleOK: now I should go back to HC"
 
     def OnButtonpageBBCancelButton(self, event):
-        #warning: do you want to leave w/o saving ???
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleCancel: now I should go back to HC"
 
     def OnButtonpageBBBackButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
+        self.main.tree.SelectItem(self.main.qHP, select=True)
         self.Hide()
         print "Button exitModuleBack: now I should show another window"
 
     def OnButtonpageBBFwdButton(self, event):
-        #pop-up: to save or not to save ...
-        saveOption = "save"
-        self.modBB.exitModule(saveOption)
+        self.main.tree.SelectItem(self.main.qEnergy, select=True)
         self.Hide()
         print "Button exitModuleFwd: now I should show another window"
