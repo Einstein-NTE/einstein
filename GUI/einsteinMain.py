@@ -3,24 +3,24 @@
 
 #==============================================================================
 #
-#	E I N S T E I N
+#   E I N S T E I N
 #
 #       Expert System for an Intelligent Supply of Thermal Energy in Industry
 #       (www.iee-einstein.org)
 #
 #------------------------------------------------------------------------------
 #
-#	EINSTEIN Main 
-#			
+#   EINSTEIN Main 
+#           
 #------------------------------------------------------------------------------
-#			
-#	GUI Main routines
+#           
+#   GUI Main routines
 #
 #==============================================================================
 #
-#	Version No.: 0.71
-#	Created by: 	    Heiko Henning (Imsai e-soft)	February 2008
-#	Revisions:          Tom Sobota                          12/03/2008
+#   Version No.: 0.71
+#   Created by:         Heiko Henning (Imsai e-soft)    February 2008
+#   Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
 #                           Tom Sobota                          23/03/2008
 #                           Hans Schweiger                      24/03/2008
@@ -71,14 +71,14 @@
 #                   Including main as argument in panels A,HC,HP,BB,Energy
 #                   Tree item qOptimisationsProposals renamed to qA
 #                   Tree item qOptiProEnergy renamed to qEnergy
-#	
-#------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
-#	www.energyxperts.net / info@energyxperts.net
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
 #
-#	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
-#	Software Foundation (www.gnu.org).
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
 #
 #==============================================================================
 
@@ -166,9 +166,9 @@ def connectToDB():
         doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
 
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 class EinsteinFrame(wx.Frame):
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #   Main frame structure:
 #
 #   EinsteinFrame -------- menubar
@@ -183,7 +183,7 @@ class EinsteinFrame(wx.Frame):
 #                      |                              |-- message
 #                      |
 #                      |-- statusbar
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
     
     def __init__(self, parent, id, title):
         ############################################
@@ -222,53 +222,49 @@ class EinsteinFrame(wx.Frame):
 
         #----- create splitters
         self.splitter = wx.SplitterWindow(self,
-					  style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
+                                          style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
 
-        self.splitter2 = wx.SplitterWindow(self.splitter,
-					   -1,
-					   style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
-        self.splitter2.SetBackgroundColour (wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
+        self.splitter2 = wx.SplitterWindow(self.splitter,-1,
+                                           style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D| wx.SP_3DSASH)
+        self.splitter2.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
 
         self.treepanel = wx.Panel(self.splitter, -1)
 
         ####---- Upper info panel
-	self.panelinfo = PanelInfo(self,
-				   self,
-				   name = 'EnerCHEESEexperts Barcelona',
-				   project = 'Biomass based cogeneration and substitution of old boiler')
+        self.panelinfo = PanelInfo(self,self,name = 'EnerCHEESEexperts Barcelona',project = 'Biomass based cogeneration and substitution of old boiler')
 
-	####---- panel containing qPages
+        ####---- panel containing qPages
         self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS)
 
         #----- add menu
-	self.CreateMenu()
+        self.CreateMenu()
         
         #----- create tree control
-	self.CreateTree()
+        self.CreateTree()
 
      
-	#----- error log window
+        #----- error log window
         self.message = wx.ListCtrl(id=-1,
-				   name='message',
-				   parent=self.splitter2,
-				   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
-	self.message.InsertColumn(0, 'Message log')
+                   name='message',
+                   parent=self.splitter2,
+                   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
+        self.message.InsertColumn(0, 'Message log')
         self.message.SetBackgroundColour('white')
 
 
-	#----- configure sizers and splitters
+        #----- configure sizers and splitters
         self.DoLayout ()
 
         #----- set binding events
-	self.BindEvents()
+        self.BindEvents()
 
-	#----- generate and initialize the panels
-	self.CreatePanels()
+        #----- generate and initialize the panels
+        self.CreatePanels()
 
-	#----- initial message
-	self.logMessage('einstein started')
-	self.logWarning('an example of a warning')
-	self.logError('an example of an error')
+        #----- initial message
+        self.logMessage('einstein started')
+        self.logWarning('an example of a warning')
+        self.logError('an example of an error')
  
         ############################################
         #
@@ -277,14 +273,14 @@ class EinsteinFrame(wx.Frame):
         ############################################
 #------------------------------------------------------------------------------
     def _log(self,fcolor,bcolor,text):
-	tl = time.localtime()
-	now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+        tl = time.localtime()
+        now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
         item = wx.ListItem()
-	item.SetText(now + text)
-	item.SetTextColour(fcolor)
-	item.SetBackgroundColour(bcolor)
-	item.SetColumn(0)
-	self.message.InsertItem(item)
+        item.SetText(now + text)
+        item.SetTextColour(fcolor)
+        item.SetBackgroundColour(bcolor)
+        item.SetColumn(0)
+        self.message.InsertItem(item)
 
     def logMessage(self,text):
         self._log('#00A000','#FFFFFF',text)
@@ -295,15 +291,15 @@ class EinsteinFrame(wx.Frame):
     def logError(self,text):
         self._log('#FFFFFF','#FF0000',text)
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
     def DoLayout(self):
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #       Layout of main frame and panels 
 #------------------------------------------------------------------------------
 
         # set sizers
 
-	# this sizer allows the horiz.expansion of the tree
+        # this sizer allows the horiz.expansion of the tree
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         sizer1.Add(self.tree, 1, wx.EXPAND)
         self.treepanel.SetSizer(sizer1)
@@ -317,8 +313,8 @@ class EinsteinFrame(wx.Frame):
         panelsizer.Add(self.panelinfo, 0, wx.EXPAND)
         panelsizer.Add(self.splitter, 1, wx.EXPAND, 0)
 
-	infobar = self.FindWindowByName("PanelInfo")
-	infobar.SetMinSize((0,26))
+        infobar = self.FindWindowByName("PanelInfo")
+        infobar.SetMinSize((0,26))
 
         self.SetSizer(panelsizer)
 
@@ -329,10 +325,10 @@ class EinsteinFrame(wx.Frame):
         self.splitter2.SplitHorizontally(self.leftpanel2, self.message, -80)
         self.splitter.SetSashPosition(250)
 
-	# find the width of message panel
-	w = self.splitter2.GetWindow1()
-	(width,height) = w.GetClientSizeTuple()
-	self.message.SetColumnWidth(0, width-10)
+        # find the width of message panel
+        w = self.splitter2.GetWindow1()
+        (width,height) = w.GetClientSizeTuple()
+        self.message.SetColumnWidth(0, width-10)
 
 ######################################################################################        
 
@@ -535,9 +531,9 @@ class EinsteinFrame(wx.Frame):
 #--- Eventhandlers Application
 #==============================================================================
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #--- Eventhandlers Menu
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 
     def OnMenuOpenProject(self, event):
         self.tree.SelectItem(self.qPage0, select=True)
@@ -545,7 +541,7 @@ class EinsteinFrame(wx.Frame):
     def OnMenuExit(self, event):
         wx.Exit()
     
-#..............................................................................		
+#..............................................................................     
 # Scroll-up menu "VIEW"
 
     def OnMenuPresentStateQ(self, event):
@@ -557,7 +553,7 @@ class EinsteinFrame(wx.Frame):
     def OnMenuAlternative1(self, event):
         Status.prj.setActiveAlternative(1)
 
-#..............................................................................		
+#..............................................................................     
 
     def OnMenuEditDBBenchmark(self, event):
         frameEditDBBenchmark = DBEditFrame.wxFrame(None, "Edit DBBenchmark", Status.DB.dbbenchmark, Status.SQL)
@@ -590,7 +586,7 @@ class EinsteinFrame(wx.Frame):
         frameEditDBChiller = DBEditFrame.wxFrame(None, "Edit DBChiller", Status.DB.dbchiller, Status.SQL)
         frameEditDBChiller.Show() 
 
-#..............................................................................		
+#..............................................................................     
 # Scroll-up menu "USER SELECT LEVEL 1 - 3"
 
     def OnMenuUserSelectLevel1(self, event):
@@ -600,7 +596,7 @@ class EinsteinFrame(wx.Frame):
     def OnMenuUserSelectLevel3(self, event):
         Status.prj.setUserInteractionLevel(3)
 
-#..............................................................................		
+#..............................................................................     
 
        
 
@@ -609,19 +605,19 @@ class EinsteinFrame(wx.Frame):
         framePreferences.Show()
         #event.Skip()
         
-#..............................................................................		
+#..............................................................................     
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
         frameUserManual = FrameHelpUserManual(self, 'einstein_manual.html')
-	frameUserManual.Show()
+        frameUserManual.Show()
 
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
-	frameAbout.Show()
+        frameAbout.Show()
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #--- Eventhandlers Tree
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
         
     def OnTreeSelChanged(self, event):
         self.item = event.GetItem()
@@ -848,9 +844,9 @@ class EinsteinFrame(wx.Frame):
             self.panelHC.Show()
 
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #--- Eventhandlers DataCheck
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
     def OnButtonDataCheck(self, event):
         if self.activeQid <> 0:
             #ret = self.ModBridge.FunctionOneDataCheck(Status.SQL, DB, self.activeQid)
@@ -859,9 +855,9 @@ class EinsteinFrame(wx.Frame):
         else:
             self.showError("Select Questionnaire first!")
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 #--- Eventhandlers DataCheck
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
     def OnEnterHeatPumpPage(self):
         if Status.PId <> 0:
             #ret = self.ModBridge.StartpanelHP(Status.SQL, DB, self.activeQid)
@@ -871,9 +867,9 @@ class EinsteinFrame(wx.Frame):
             self.showError("Select project first!")
             return 1
 
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
 # Auxiliary Functions
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------     
     def NewQuestionnaire(self):
         self.activeQid = 0
         self.tree.SelectItem(self.qPage1, select=True)
@@ -1170,8 +1166,8 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
 
-	self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
-	self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
+        self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
+        self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
 
         #--- binding the Tree
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
@@ -1198,6 +1194,7 @@ if __name__ == '__main__':
 
     app = wx.PySimpleApp()
     frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
+    Status.main = frame
     
     frame.Show(True)
     app.MainLoop()
