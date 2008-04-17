@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.09
+#	Version No.: 0.10
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
@@ -29,6 +29,7 @@
 #                           Hans Schweiger          13/04/2008
 #                           Stoyan Danov            14/04/2008
 #                           Hans Schweiger          15/04/2008
+#                           Hans Schweiger          17/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -41,7 +42,8 @@
 #                   introduction of function "display"
 #       14/04/08:   in OnButtonpageHPAddButton substitute equipe.delete() with deleteEquipment(rowNo)
 #       15/04/08:   Bugs in event-handlers corrected. EVT_TEXT_ENTER substituted
-#                   by EVT_KILL_FOCUS. 
+#                   by EVT_KILL_FOCUS.
+#       17/04/08:   DialogOK added for delete equipment
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -59,6 +61,7 @@ import wx.grid
 from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
 from einstein.GUI.panelQ4 import PanelQ4
+from einstein.GUI.dialogOK import *
 
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
@@ -608,24 +611,26 @@ class PanelHP(wx.Panel):
     def OnGridPageHPGridCellRightClick(self, event):
 #------------------------------------------------------------------------------		
 #   right double click
-#   XXX for the moment only DELETE foreseen !!!
+#   --> for the moment only DELETE foreseen !!!
 #------------------------------------------------------------------------------		
+
+        rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
+
         print "Grid - right button click: scroll-up should appear"
         #here a scroll-up should appear with some options: edit, delete,...
         ret = "delete"
 
-        rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
-        print "row to be deleted = ",rowNo
+#..............................................................................
+# "delete" selected:
 
         if (ret=="delete"):
-            # a pop-up should confirm.
-            ret = "ok"
-            if (ret == "ok"):
-                ret = self.mod.deleteEquipment(rowNo)
-#                ret = self.mod.calculateCascade()
+            pu2 =  DialogOK(self,"delete equipment","do you really want to delete this equipment ?")
+            if pu2.ShowModal() == wx.ID_OK:
+                self.mod.deleteEquipment(rowNo)
+                self.display()
+                
         elif (ret == "edit"):
             OnGridPageBBGridCellLeftDclick(self,event)
-        self.display()
         
 #------------------------------------------------------------------------------		
 #   Event handlers: parameter change in design assistant

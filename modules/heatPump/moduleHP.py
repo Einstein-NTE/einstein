@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -32,6 +32,7 @@
 #                           Stoyan Danov            09/04/2008
 #                           Stoyan Danov            10/04/2008
 #                           Hans Schweiger          13/04/2008
+#                           Stoyan Danov            16/04/2008
 #   
 #
 #       Changes to previous version:
@@ -50,6 +51,8 @@
 #       13/04/2008 HS: getEqId added.
 #                      deleteEquipment: rowNo as input instead of Id.
 #                      cascadeIndex -> unified from 1...N
+#       16/04/2008 SD: deleteFromCascade: activated sql.commit()
+#                      designAssistant1: control (in Automatic preselection: if self.preselection ==[]: delete dummy equip added)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -368,11 +371,11 @@ class ModuleHP():
         for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
             eqC = self.equipmentsC.QGenerationHC_id[new_cascade[i]['equipeID']][0]
             eqC.CascadeIndex = i+1
-#            print '\n new_CascadeIndex', eqC.CascadeIndex
+            print '\n new_CascadeIndex', eqC.CascadeIndex
             
-#        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
+        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
 
-#        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
+        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
 
 
         
@@ -383,7 +386,7 @@ class ModuleHP():
         for i in range(len(equipments)): #assign new EqNo in QGenerationHC table
             equipments[i].EqNo = i+1
 
-#        self.sql.commit() #to be activated, SD
+        self.sql.commit() #to be activated, SD
 
         self.interface.deleteCascadeArrays(self.NEquipe)
 
@@ -618,6 +621,7 @@ class ModuleHP():
 
                 print 'ModuleHP (designAssistant1): ListIndex =', listIndex, 'dotQh0 = ', dotQh0
 
+
 #............................................................................................
 # Check appropriateness for several heat pumps (preselection)
 
@@ -651,6 +655,12 @@ class ModuleHP():
 
             if Status.UserInteractionLevel == "interactive" or Status.UserInteractionLevel == "semi-automatic":
                 print "ModuleHP (designAssistant1): return to GUI for manual selection "
+                if self.preselection == []: #SD:if equipment is not selected, deletes the last dummy equipment added
+                    (HPL, EQL) = self.screenEquipments()
+                    print 'HPL=',HPL
+                    rowNo = len(HPL)-1
+                    self.deleteEquipment(rowNo)   
+
                 return("MANUAL",self.preselection)
 
             else:   
@@ -662,9 +672,15 @@ class ModuleHP():
                         bestModelID = modelID
                         maxCOP = model.HPHeatCOP
                 self.preselection = [bestModelID]
+                if self.preselection == []: #SD:if equipment is not selected, deletes the last dummy equipment added
+                    (HPL, EQL) = self.screenEquipments() 
+                    print 'HPL=',HPL
+                    rowNo = len(HPL)-1
+                    self.deleteEquipment(rowNo)   
+
                 print "ModuleHP (designAssistant1): return to GUI (equipment automatically selected)",self.preselection
                 return ("AUTOMATIC",self.preselection)
-                                                    
+                                             
 #............................................................................................
         except Exception, designAssistant1: #in case of an error
             print 'design assistant 1', designAssistant1
@@ -934,8 +950,7 @@ if __name__ == "__main__":
     mod.initPanel()
 ##    (equipe,equipeC) = mod.addEquipmentDummy()
 ##    mod.setEquipmentFromDB(equipe,equipeC,HPid)
-##    mod.deleteE(HPid)
-##    mod.designAssistant1()
+    mod.designAssistant1()
 ##    mod.designAssistant2(12)
 
 ##    Interfaces.setGraphicsData(interf,'HP Config',[99., 'HP COMP',99.,99.,99.,99.,99.])
