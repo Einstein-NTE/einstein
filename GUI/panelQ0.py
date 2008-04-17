@@ -7,17 +7,19 @@
 #
 #------------------------------------------------------------------------------
 #
-#	PanelQ0: Questionnaire page 0
+#	PanelQ0: Tool main page (page 0) -> project selection
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger 12/04/2008
+#                           Hans Schweiger 17/04/2008
 #
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
 #                       all searches in SQL passed to functions of class Project
+#       17/04/08: HS    Adaptation to changes in module Project. 
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,6 +34,7 @@
 import wx
 import pSQL
 from status import Status
+from dialogP import DialogP
 
 class PanelQ0(wx.Panel):
     def __init__(self, parent, main):
@@ -48,47 +51,57 @@ class PanelQ0(wx.Panel):
         wx.Panel.__init__(self, id=-1, name='PanelQ0', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
-        self.listBoxQuestionnaires = wx.ListBox(id=-1,
+        self.listBoxProjects = wx.ListBox(id=-1,
 					       choices=[],
-					       name='listBoxQuestionnaires',
+					       name='listBoxProjects',
 					       parent=self,
 					       pos=wx.Point(32, 64),
 					       size=wx.Size(131, 312),
 					       style=0)
-        self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxQuestionnairesDclick, self.listBoxQuestionnaires)
+        self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxProjectsDclick, self.listBoxProjects)
 
-        self.buttonNewQuestionnaire = wx.Button(id=-1,
-						label='new questionnaire',
-						name='buttonNewQuestionnaire',
-						parent=self,
-						pos=wx.Point(224, 72),
-						size=wx.Size(192, 32),
-						style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonNewQuestionnaire, self.buttonNewQuestionnaire)
-
-
-        self.buttonOpenQuestionnaire = wx.Button(id=-1,
-						 label='open questionnaire',
-						 name='buttonOpenQuestionnaire',
+        self.buttonCopyProject = wx.Button(id=-1,
+						 label='copy project',
+						 name='buttonCopyProject',
 						 parent=self,
-						 pos=wx.Point(224, 112),
+						 pos=wx.Point(224,152),
 						 size=wx.Size(192, 32),
 						 style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonOpenQuestionnaire, self.buttonOpenQuestionnaire)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCopyProject, self.buttonCopyProject)
 
 
-        self.buttonDeleteQuestionnaire = wx.Button(id=-1,
-						   label='delete questionnaire',
-						   name='buttonDeleteQuestionnaire',
+        self.buttonNewProject = wx.Button(id=-1,
+						label='new project',
+						name='buttonNewProject',
+						parent=self,
+						pos=wx.Point(224, 192),
+						size=wx.Size(192, 32),
+						style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonNewProject, self.buttonNewProject)
+
+
+        self.buttonOpenProject = wx.Button(id=-1,
+						 label='open project',
+						 name='buttonOpenProject',
+						 parent=self,
+						 pos=wx.Point(224, 72),
+						 size=wx.Size(192, 32),
+						 style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOpenProject, self.buttonOpenProject)
+
+
+        self.buttonDeleteProject = wx.Button(id=-1,
+						   label='delete project',
+						   name='buttonDeleteProject',
 						   parent=self,
-						   pos=wx.Point(224, 152),
+						   pos=wx.Point(224, 272),
 						   size=wx.Size(192, 32),
 						   style=0)        
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteQuestionnaire, self.buttonDeleteQuestionnaire)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProject, self.buttonDeleteProject)
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-				     label='Questionnaire list',
+				     label='Project list',
 				     name='stInfo1',
 				     parent=self,
 				     pos=wx.Point(32, 48),
@@ -101,24 +114,80 @@ class PanelQ0(wx.Panel):
 #--- Eventhandlers
 #------------------------------------------------------------------------------		
 
-    def OnListBoxQuestionnairesDclick(self, event):
-        projectName = self.listBoxQuestionnaires.GetStringSelection()
-        Status.prj.setActiveProject(projectName)
+#------------------------------------------------------------------------------		
+    def OnListBoxProjectsDclick(self, event):
+#------------------------------------------------------------------------------		
+#   double click also opens a new Project
+#------------------------------------------------------------------------------		
+        self.OnButtonOpenProject(event)
+#------------------------------------------------------------------------------		
+
+#------------------------------------------------------------------------------		
+    def OnButtonNewProject(self, event):
+#------------------------------------------------------------------------------		
+#   define a new project
+#------------------------------------------------------------------------------		
+        self.shortName = "New Project"
+        self.description = "give here a short description of your project"
+        
+        pu1 =  DialogP(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print "PanelP - OK",self.shortName,self.description
+            print "PanelP (GenerateNew-Button): calling function createNewProject"
+
+            Status.prj.createNewProject(-1,self.shortName,self.description)
+            self.fillPage()
+
+        elif pu1.ShowModal() == wx.ID_Cancel:
+            print "PanelP - Cancel"
+        else:
+            print "PanelP ???"
+
+#------------------------------------------------------------------------------		
+
+#------------------------------------------------------------------------------		
+    def OnButtonCopyProject(self, event):
+#------------------------------------------------------------------------------		
+#   copies a project
+#------------------------------------------------------------------------------		
+
+        projectName = self.listBoxProjects.GetStringSelection()
+        self.shortName = projectName+"(copy)"
+        self.description = "new project copied from "+projectName
+        
+        pu1 =  DialogP(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print "PanelP - OK",self.shortName,self.description
+            print "PanelP (GenerateNew-Button): calling function createNewProject"
+
+            Status.prj.createNewProject(-1,self.shortName,self.description,originalName=projectName)
+            self.fillPage()
+
+        elif pu1.ShowModal() == wx.ID_Cancel:
+            print "PanelP - Cancel"
+        else:
+            print "PanelP ???"
+
+#------------------------------------------------------------------------------		
+
+#------------------------------------------------------------------------------		
+    def OnButtonOpenProject(self, event):
+#------------------------------------------------------------------------------		
+#   opens an existing Project
+#------------------------------------------------------------------------------		
+        projectName = self.listBoxProjects.GetStringSelection()
+        Status.prj.setActiveProject(-1,name=projectName)
         self.main.tree.SelectItem(self.main.qPage1, select=True)
-        event.Skip()
+#------------------------------------------------------------------------------		
 
-    def OnButtonNewQuestionnaire(self, event):
-        event.Skip()
-
-    def OnButtonOpenQuestionnaire(self, event):
-        projectName = self.listBoxQuestionnaires.GetStringSelection()
-        Status.prj.setActiveProject(projectName)
-        self.main.tree.SelectItem(self.main.qPage1, select=True)
-#        self.selectQuestionnaire()
-
-    def OnButtonDeleteQuestionnaire(self, event):
-        event.Skip()
-
+#------------------------------------------------------------------------------		
+    def OnButtonDeleteProject(self, event):
+#------------------------------------------------------------------------------		
+        projectName = self.listBoxProjects.GetStringSelection()
+        print "PanelQ0 (ButtonDelete): deleting ",projectName
+        Status.prj.deleteProject(-1,name=projectName)
+        self.fillPage()
+#------------------------------------------------------------------------------		
 
 
 #------------------------------------------------------------------------------
@@ -126,14 +195,9 @@ class PanelQ0(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def SetProjectList(self,projectList):
-        self.listBoxQuestionnaires.Clear()
+        self.listBoxProjects.Clear()
         for n in projectList:
-            self.listBoxQuestionnaires.Append(n)
-
-#HS eliminated, no longer used.
-#    def GetID(self):
-#	return Status.DB.questionnaire.Name[self.listBoxQuestionnaires.GetStringSelection()][0].Questionnaire_ID
-
+            self.listBoxProjects.Append(n)
 
     def clear(self):
 	pass
@@ -141,6 +205,7 @@ class PanelQ0(wx.Panel):
     def fillPage(self):
 	self.SetProjectList(Status.prj.getProjectList())
 
+#==============================================================================
 
 if __name__ == '__main__':
     import pSQL

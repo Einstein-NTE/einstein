@@ -35,3 +35,8 @@
 INFINITE = 1.e99
 YEAR = 8760.
 KELVIN = 273.15
+
+#------------------------------------------------------------------------------		
+#default values for status variables
+EINSTEIN_OK = 1
+EINSTEIN_NOTOK = 0
