@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.12
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
@@ -30,6 +30,8 @@
 #                           Stoyan Danov            14/04/2008
 #                           Hans Schweiger          15/04/2008
 #                           Hans Schweiger          17/04/2008
+#                           Stoyan Danov            17/04/2008
+#                           Hans Schweiger          18/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -44,6 +46,9 @@
 #       15/04/08:   Bugs in event-handlers corrected. EVT_TEXT_ENTER substituted
 #                   by EVT_KILL_FOCUS.
 #       17/04/08:   DialogOK added for delete equipment
+#       17/04/08:   OnHpCalculateButton: mode = CANCEL option added
+#       18/04/08:   Determination of panel-operation mode shifted to design.ass.1
+#                   Robustness of panel against empty data sets in GData
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -65,6 +70,7 @@ from einstein.GUI.dialogOK import *
 
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
+from einstein.modules.constants import *
 from numpy import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 
@@ -88,7 +94,6 @@ from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
  wxID_PANELHPFIG
 ] = [wx.NewId() for _init_ctrls in range(31)]
 
-#XXX HS2008-04-02: block copied from panelBB
 #
 # constants
 #
@@ -99,8 +104,9 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
+TABLECOLS = 6
 
-TYPELIST = ["compression","absorption"]
+TYPELIST = HPTYPES
 
 
 #------------------------------------------------------------------------------		
@@ -182,9 +188,9 @@ class PanelHP(wx.Panel):
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         key = self.keys[0]
-        data = Interfaces.GData[key]
-        print "data = ",data
-        (rows,cols) = data.shape
+#        data = Interfaces.GData[key]
+#        print "data = ",data
+        (rows,cols) = (MAXROWS,TABLECOLS)
 #        self.gridPageHP.CreateGrid(max(rows,20), cols)
         self.grid.CreateGrid(MAXROWS, cols)
 
@@ -206,7 +212,7 @@ class PanelHP(wx.Panel):
         for r in range(rows):
             self.grid.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid.SetCellValue(r, c, data[r][c])
+                self.grid.SetCellValue(r, c, "")
                 if c == labels_column:
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -456,8 +462,13 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # update of equipment table
 
-        data = Interfaces.GData[self.keys[0]]
-        (rows,cols) = data.shape
+        try:
+            data = Interfaces.GData[self.keys[0]]
+            (rows,cols) = data.shape
+        except:
+            rows = 0
+            cols = TABLECOLS
+            
         for r in range(rows):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, data[r][c])
@@ -527,11 +538,15 @@ class PanelHP(wx.Panel):
         elif (mode == "AUTOMATIC"):
             HPId = HPList[0]    #in automatic mode just take first in the list
 
+        elif (mode == "CANCEL"):
+            HPId = -1 #make designAssistant2 to understand that
+        else:
+            print "PanelHP (DesignAssistant-Button): erroneous panel mode: ",mode
+
 #..............................................................................
-# Step 2 design assistant: add selected equipment to the list
+# Step 2 design assistant: add selected equipment to the list and update display
         
         self.mod.designAssistant2(HPId)
-#        self.mod.updatePanel()
         self.display()
 
 #------------------------------------------------------------------------------		
@@ -576,12 +591,7 @@ class PanelHP(wx.Panel):
         if pu1.ShowModal() == wx.ID_OK:
             print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
         else:
-##            self.equipe.delete()         #delete the space created before, if not accepted
-##            self.equipeC.delete()
-
-            rowNo = event.GetRow() #gets the No of the selected row
-            self.mod.deleteEquipment(rowNo)
-            Status.SQL.commit()
+            self.mod.deleteEquipment(None)
 
 #        self.mod.calculateCascade()    
         self.display()
