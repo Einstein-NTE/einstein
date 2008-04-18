@@ -45,6 +45,8 @@
 class Status(object):
   PId = None #Active project identity [==> SQL: ActiveProject]
   ANo = None #Active alternative under processing [==> SQL: ActiveAlternative]
+  ActiveAlternativeName = ""
+  ActiveProjectName = ""
   SetUpId = 0 #Active configuration
   DB = None
   SQL = None
