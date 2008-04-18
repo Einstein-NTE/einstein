@@ -1,12 +1,19 @@
+#   18/04/2008  HS  function "update added" and import of Status added.
 import wx
 
-ASSISTANTLIST = ['Interactive','Semi-automatic','Automatic']
+from einstein.GUI.status import Status
+from einstein.modules.constants import *
+ASSISTANTLIST = INTERACTIONLEVELS
 
 class PanelInfo(wx.StatusBar):
-    def __init__(self, parent, main, name='', project=''):
+    def __init__(self, parent, main):
 	self.main = main
 	self.parent = parent
 	self.main = main
+	
+	project = Status.ActiveProjectName
+	alternative = Status.ActiveAlternativeName
+	level = Status.UserInteractionLevel
 
 #------------------------------------------------------------------------------
 #--- UI setup
@@ -18,13 +25,13 @@ class PanelInfo(wx.StatusBar):
 
 	self.SetStatusText('Project',0)
         self.t0 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(60,0),size=wx.Size(270, 21),
-			      value=name, style=wx.TE_READONLY)
+			      value=project, style=wx.TE_READONLY)
         self.t0.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t0.Center(direction=wx.VERTICAL)
 
 	self.SetStatusText('Alternative',1)
         self.t1 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(416, 0),size=wx.Size(260, 21),
-			      value=project, style=wx.TE_READONLY)
+			      value=alternative, style=wx.TE_READONLY)
         self.t1.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t1.Center(direction=wx.VERTICAL)
 
@@ -37,6 +44,14 @@ class PanelInfo(wx.StatusBar):
         self.Bind(wx.EVT_SIZE, self.OnSize, self)
         self.Bind(wx.EVT_CHOICE, self.OnChoiceAssistant, self.choiceAssistant)
 
+        self.update()
+
+    def update(self):
+        print "PanelInfo (update) running"
+        self.t0.SetValue(Status.ActiveProjectName)
+        self.t1.SetValue(Status.ActiveAlternativeName)
+        self.choiceAssistant.SetSelection(ASSISTANTLIST.index(Status.UserInteractionLevel))
+       
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -54,6 +69,8 @@ class PanelInfo(wx.StatusBar):
     def OnChoiceAssistant(self, event):
 	i = self.choiceAssistant.GetCurrentSelection()
 	self.main.logWarning('Design assistant changed to '+repr(ASSISTANTLIST[i]))
+        print "PanelInfo: setting UserInteractionLevel"
+	Status.prj.setUserInteractionLevel(ASSISTANTLIST[i])
         event.Skip()
 
     def OnSize(self, event):

@@ -19,7 +19,8 @@
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
 #                       all searches in SQL passed to functions of class Project
-#       17/04/08: HS    Adaptation to changes in module Project. 
+#       17/04/08: HS    Adaptation to changes in module Project.
+#       18/04/08: HS    Update of panelInfo included
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -178,6 +179,8 @@ class PanelQ0(wx.Panel):
         projectName = self.listBoxProjects.GetStringSelection()
         Status.prj.setActiveProject(-1,name=projectName)
         self.main.tree.SelectItem(self.main.qPage1, select=True)
+        self.main.panelinfo.update()
+
 #------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
@@ -204,6 +207,7 @@ class PanelQ0(wx.Panel):
 
     def fillPage(self):
 	self.SetProjectList(Status.prj.getProjectList())
+        self.main.panelinfo.update()
 
 #==============================================================================
 

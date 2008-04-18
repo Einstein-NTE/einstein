@@ -19,9 +19,11 @@
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
-#                                               in work
+#                                           18/04/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
+#       18/04/08: HS    Functions Add-, Copy-, Delete-Project
+#                       UserInteractionLevel
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -261,6 +263,8 @@ class Project(object):
 
         if (n>=-1) and n <= Status.NoOfAlternatives:
             Status.ANo = n
+            Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
+
             Status.DB.sproject.ProjectID[Status.PId][0].ActiveAlternative = n
             Status.SQL.commit()
             print "Project (setActiveAlternative): ",n
@@ -315,6 +319,8 @@ class Project(object):
             print "now checking for none or <= 0"                
             if (PId <= 0 or (PId is None)):
                 Status.PId = -1
+                Status.ActiveProjectName = "---"
+                
 #                Status.DB.stool.STool_ID[1][0].ActiveProject = PId
                 print "Project (setActiveProject): active project set to ",PId
 
@@ -323,6 +329,7 @@ class Project(object):
             else:
                 print "now looking for project parameters in sproject"                
 
+                Status.ActiveProjectName = Status.DB.questionnaire.Questionnaire_ID[PId][0].Name
                 sproject = Status.DB.sproject.ProjectID[PId][0]
                 
                 Status.NoOfAlternatives = sproject.NoOfAlternatives
@@ -507,11 +514,11 @@ class Project(object):
 #------------------------------------------------------------------------------
     def setUserInteractionLevel(self,level):
 #------------------------------------------------------------------------------
-        levels = ["interactive","semi-automatic","automatic"]
-        if level in range(1,4):
+        
+        if level in INTERACTIONLEVELS:
             Status.UserInteractionLevel = level
-            Status.DB.stool.STool_ID[1][0].UserInteractioinLevel = level
-            print "Project (setUserInteractionLevel): ",levels[level-1]
+            Status.DB.stool.STool_ID[1][0].UserInteractionLevel = level
+            print "Project (setUserInteractionLevel): ",level
         else:
             print "Project (setUserInteractionLevel): ERROR in level ",level
 

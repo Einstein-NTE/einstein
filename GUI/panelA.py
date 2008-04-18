@@ -276,7 +276,8 @@ class PanelA(wx.Panel):
                 self.grid.SetCellValue(r, c, "")
 
         self.Show()
-        
+        self.main.panelinfo.update()
+       
 #------------------------------------------------------------------------------		
 
 #==============================================================================
@@ -305,8 +306,6 @@ class PanelA(wx.Panel):
         else:
             print "PanelA ???"
 
-        print "PanelA (GenerateNew-Button): calling function createNewAlternative"
-        Status.prj.createNewAlternative(0)
         self.display()
         
 #------------------------------------------------------------------------------		
@@ -354,6 +353,9 @@ class PanelA(wx.Panel):
 	self.selectedRow = event.GetRow()
 	self.ANo = self.selectedRow - 1
         Status.prj.setActiveAlternative(self.ANo)
+
+        print "PanelA - updating panelinfo"
+        self.main.panelinfo.update()
 
         print "PanelA (GridCellLeftClick): row, ANo = ",self.selectedRow,self.ANo	    
         event.Skip()

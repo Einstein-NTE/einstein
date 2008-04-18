@@ -34,6 +34,7 @@
 #                           Hans Schweiger                      12/04/2008
 #                           Tom Sobota                          15/04/2008
 #                           Hans Schweiger                      16/04/2008
+#                           Hans Schweiger                      18/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -71,6 +72,7 @@
 #                   Including main as argument in panels A,HC,HP,BB,Energy
 #                   Tree item qOptimisationsProposals renamed to qA
 #                   Tree item qOptiProEnergy renamed to qEnergy
+#       18/04/2008  Instance of Interfaces created as attribute of Status
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -231,7 +233,8 @@ class EinsteinFrame(wx.Frame):
         self.treepanel = wx.Panel(self.splitter, -1)
 
         ####---- Upper info panel
-        self.panelinfo = PanelInfo(self,self,name = 'EnerCHEESEexperts Barcelona',project = 'Biomass based cogeneration and substitution of old boiler')
+#HS2008-04-18: argument list shortened. new function update in infopanel directly linked to status
+        self.panelinfo = PanelInfo(self,self)
 
         ####---- panel containing qPages
         self.leftpanel2 = wx.Panel(self.splitter2, -1, style=wx.WANTS_CHARS)
@@ -1181,14 +1184,12 @@ if __name__ == '__main__':
     from einstein.modules.interfaces import Interfaces
     from einstein.modules.modules import Modules
 
-    Status.PId=2 # just for testing!
-    Status.ANo=0
-
     connectToDB()
 
-    interf = Interfaces()       
-    interf = None
+    Status.mod = None
 
+    Status.int = Interfaces()
+    
     Status.prj = Project()
     Status.mod = Modules()
 

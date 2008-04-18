@@ -24,6 +24,7 @@
 #                           Hans Schweiger      02/04/2008
 #                           Hans Schweiger      03/04/2008
 #                           Hans Schweiger      13/04/2008
+#                           Hans Schweiger      18/04/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -33,6 +34,7 @@
 #       02/04/2008 Small change in instantiatio of ModuleHP (key included)
 #       03/04/2008 Link to modules via parent (= Modules)
 #       13/04/2008 CascadeIndex corrected: now from 1 to N
+#       18/04/2008 Reference to Status.int
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -73,8 +75,7 @@ class ModuleEnergy(object):
 
     def __init__(self, keys):
         self.keys = keys
-        self.interface = Interfaces()
-
+        
 #..............................................................................
 # getting list of equipment in SQL
 
@@ -102,7 +103,7 @@ class ModuleEnergy(object):
                       ['Total',          585.0,   20.0, 19.5],
                       ['Energy savings',  65.0,   10.0,  3.0]])
 
-        self.interface.setGraphicsData(self.keys[0], data)
+        Status.int.setGraphicsData(self.keys[0], data)
 
         #print "ModuleEnergy graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
@@ -155,7 +156,7 @@ class ModuleEnergy(object):
 
         PNom = equipe.HCGPnom
         EqName = equipe.Equipment
-        EquipmentNo = self.interface.cascade[cascadeIndex-1]["equipeNo"]
+        EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
         
         NT = Status.NT
         DT = Status.TemperatureInterval
@@ -168,17 +169,17 @@ class ModuleEnergy(object):
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = self.interface.QD_Tt_mod[cascadeIndex-1]
-        QA_Tt = self.interface.QA_Tt_mod[cascadeIndex-1]
+        QD_Tt = Status.int.QD_Tt_mod[cascadeIndex-1]
+        QA_Tt = Status.int.QA_Tt_mod[cascadeIndex-1]
         
-        USHj_Tt = self.interface.createQ_Tt()
-        USHj_t = self.interface.createQ_t()
-        USHj_T = self.interface.createQ_T()
+        USHj_Tt = Status.int.createQ_Tt()
+        USHj_t = Status.int.createQ_t()
+        USHj_T = Status.int.createQ_T()
 
         
-        QHXj_Tt = self.interface.createQ_Tt()
-        QHXj_t = self.interface.createQ_t()
-        QHXj_T = self.interface.createQ_T()
+        QHXj_Tt = Status.int.createQ_Tt()
+        QHXj_t = Status.int.createQ_t()
+        QHXj_T = Status.int.createQ_T()
 
 #..............................................................................
 # start simulation
@@ -207,17 +208,17 @@ class ModuleEnergy(object):
 
 # remaining heat demand and availability for next equipment in cascade
         Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex] = self.interface.calcQ_T(QD_Tt)
+        Interfaces.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
         Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex] = self.interface.calcQ_T(QA_Tt)
+        Interfaces.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment                            
         Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex-1] = self.interface.calcQ_T(USHj_Tt)
+        Interfaces.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
 
 # waste heat absorbed by present equipment                            
         Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex-1] = self.interface.calcQ_T(QHXj_Tt)
+        Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
 #        equipeC.USHj = USHj
 #        equipeC.QHXj = QHXj    #XXX to be defined in data base
@@ -236,7 +237,7 @@ class ModuleEnergy(object):
 # updates the energy flows for the full equipment cascade
 #------------------------------------------------------------------------------
         try:
-            print "ModuleEnergy (runSimulation): QD_T", Interfaces.QD_T,self.interface.QD_T
+            print "ModuleEnergy (runSimulation): QD_T", Interfaces.QD_T,Status.int.QD_T
             NT = Status.NT
             print "Running system simulation..."
 
@@ -256,21 +257,21 @@ class ModuleEnergy(object):
             Interfaces.QHXj_Tt = []
             Interfaces.QHXj_T = []
 
-            Interfaces.QD_Tt_mod.append(self.interface.QD_Tt)       
-            Interfaces.QD_T_mod.append(self.interface.QD_T)
-            Interfaces.QA_Tt_mod.append(self.interface.QA_Tt)      
-            Interfaces.QA_T_mod.append(self.interface.QA_T)
+            Interfaces.QD_Tt_mod.append(Status.int.QD_Tt)       
+            Interfaces.QD_T_mod.append(Status.int.QD_T)
+            Interfaces.QA_Tt_mod.append(Status.int.QA_Tt)      
+            Interfaces.QA_T_mod.append(Status.int.QA_T)
 
             for j in range(self.NEquipe):
-                Interfaces.QD_Tt_mod.append(self.interface.createQ_Tt)      
-                Interfaces.QD_T_mod.append(self.interface.createQ_T)
-                Interfaces.QA_Tt_mod.append(self.interface.createQ_Tt)    
-                Interfaces.QA_T_mod.append(self.interface.createQ_T)
+                Interfaces.QD_Tt_mod.append(Status.int.createQ_Tt)      
+                Interfaces.QD_T_mod.append(Status.int.createQ_T)
+                Interfaces.QA_Tt_mod.append(Status.int.createQ_Tt)    
+                Interfaces.QA_T_mod.append(Status.int.createQ_T)
 
-                Interfaces.USHj_Tt.append(self.interface.createQ_Tt)
-                Interfaces.USHj_T.append(self.interface.createQ_T)
-                Interfaces.QHXj_Tt.append(self.interface.createQ_Tt)
-                Interfaces.QHXj_T.append(self.interface.createQ_T)
+                Interfaces.USHj_Tt.append(Status.int.createQ_Tt)
+                Interfaces.USHj_T.append(Status.int.createQ_T)
+                Interfaces.QHXj_Tt.append(Status.int.createQ_Tt)
+                Interfaces.QHXj_T.append(Status.int.createQ_T)
                                        
 
 #..............................................................................
@@ -278,7 +279,7 @@ class ModuleEnergy(object):
 # call the calculation modules for each equipment
 
             for cascadeIndex in range(1,self.NEquipe+1):
-                equipeID = self.interface.cascade[cascadeIndex-1]["equipeID"]
+                equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
 
                 equipe = self.equipments.QGenerationHC_ID[equipeID][0]
                 equipeC = self.equipmentsC.QGenerationHC_ID[equipeID][0]

@@ -40,6 +40,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
+from einstein.modules.constants import *
 
 class ModuleHC(object):
 
@@ -47,7 +48,6 @@ class ModuleHC(object):
     
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
-        self.interface = Interfaces()
 
         self.DB = Status.DB
         self.sql = Status.SQL
@@ -80,7 +80,7 @@ class ModuleHC(object):
 # here it should be assured that heat demand and availability for position in cascade
 # of presently existing heat pumps is already defined
 
-        self.interface.initCascadeArrays(self.NEquipe)
+        Status.int.initCascadeArrays(self.NEquipe)
        
 #............................................................................................
 #returns HPList to the GUI for displaying in window
@@ -95,7 +95,7 @@ class ModuleHC(object):
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        self.interface.getEquipmentCascade()
+        Status.int.getEquipmentCascade()
         self.cascadeIndex = 0
         
 #------------------------------------------------------------------------------
@@ -115,19 +115,19 @@ class ModuleHC(object):
                       ['HC 3', 2007, 'Type 2', 5000,  80, 130]])
 
 
-        self.interface.setGraphicsData(self.keys[0], data)
+        Status.int.setGraphicsData(self.keys[0], data)
 
         try:
-	    #    self.interface.setGraphicsData('BB Plot',[self.interface.T,
-	    #                                              self.interface.QD_T_mod[self.cascadeIndex],
-	    #                                              self.interface.QA_T_mod[self.cascadeIndex],
-	    #                                              self.interface.QD_T_mod[self.cascadeIndex+1],
-	    #                                              self.interface.QA_T_mod[self.cascadeIndex+1]])
+	    #    Status.int.setGraphicsData('BB Plot',[Status.int.T,
+	    #                                              Status.int.QD_T_mod[self.cascadeIndex],
+	    #                                              Status.int.QA_T_mod[self.cascadeIndex],
+	    #                                              Status.int.QD_T_mod[self.cascadeIndex+1],
+	    #                                              Status.int.QA_T_mod[self.cascadeIndex+1]])
 	    # info for text boxes in right side of panel
-	    self.interface.setGraphicsData('HC Info',{"noseque":55})
+	    Status.int.setGraphicsData('HC Info',{"noseque":55})
 
             # list of equipments in cascade for Table
-            self.interface.setGraphicsData('HC List',self.interface.cascade)
+            Status.int.setGraphicsData('HC List',Status.int.cascade)
         except:
             pass
 
@@ -148,7 +148,8 @@ class ModuleHC(object):
 
         return "ok"
 
-#==============================================================================
+            
+#------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     pass

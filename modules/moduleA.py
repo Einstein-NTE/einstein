@@ -15,11 +15,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	03/04/2008
-#	Last revised by:    
+#	Last revised by:    Hans Schweiger      18/04/2008  
 #
 #       Changes to previous version:
+#       18/04/2008 HS   Reference to Status.int
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -47,7 +48,6 @@ class ModuleA(object):
     
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
-        self.interface = Interfaces()
         self.DB = Status.DB
         self.sql = Status.SQL
         
@@ -82,14 +82,14 @@ class ModuleA(object):
         for ANo in range(1,Status.NoOfAlternatives+1):
             try:
                 a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
-                print "alternative[%s]: "%ANo,a
+#                print "alternative[%s]: "%ANo,a
                 alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
             except:
                 pass
             
         data = array(alternativeList)
-        print "list of alternatives = ",data
-        self.interface.setGraphicsData(self.keys[0], data)
+#        print "list of alternatives = ",data
+        Status.int.setGraphicsData(self.keys[0], data)
 
 #------------------------------------------------------------------------------
 

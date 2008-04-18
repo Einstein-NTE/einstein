@@ -15,11 +15,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	08/04/2008
-#	Last revised by:    
+#	Last revised by:    Hans Schweiger      18/04/2008
 #
 #       Changes to previous version:
+#       18/04/2008 HS   Reference to Status.int
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -47,7 +48,6 @@ class ModuleBM(object):
     
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
-        self.interface = Interfaces()
 
         self.DB = Status.DB
         self.sql = Status.SQL
@@ -80,7 +80,7 @@ class ModuleBM(object):
 # here it should be assured that heat demand and availability for position in cascade
 # of presently existing heat pumps is already defined
 
-#        self.interface.initCascadeArrays(self.NEquipe)
+#        Status.int.initCascadeArrays(self.NEquipe)
        
 #............................................................................................
 #returns HPList to the GUI for displaying in window
@@ -105,14 +105,14 @@ class ModuleBM(object):
                       ['BM 3', 2007, 'Type 2', 5000,  80, 130, 5000,  80, 130, 5000,  80, 130]])
 
 
-        self.interface.setGraphicsData("BM1 Table", data)
-        self.interface.setGraphicsData("BM2 Table", data)
-        self.interface.setGraphicsData("BM3 Table", data)
+        Status.int.setGraphicsData("BM1 Table", data)
+        Status.int.setGraphicsData("BM2 Table", data)
+        Status.int.setGraphicsData("BM3 Table", data)
 
         try:
-	    self.interface.setGraphicsData('BM Info',{"noseque":55})
+	    Status.int.setGraphicsData('BM Info',{"noseque":55})
 
-            self.interface.setGraphicsData('BM List',self.interface.cascade)
+            Status.int.setGraphicsData('BM List',Status.int.cascade)
         except:
             pass
 
