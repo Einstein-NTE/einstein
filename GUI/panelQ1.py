@@ -1,3 +1,11 @@
+# v0.02
+#   Revised by:     Hans Schweiger      19/04/2008
+#
+#   Changes:
+#   19/04/2008: HS  activeQid substituted by Status.PId; only positive values of PId allowed
+#                   PId = -1 or PId = None means "no project open"
+
+
 import wx
 import pSQL
 import HelperClass
@@ -579,10 +587,11 @@ class PanelQ1(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def OnButtonStoreData(self, event):
-        if self.main.activeQid == 0:
+        if Status.PId == 0:
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())]) == 0:
-                self.main.activeQid = Status.DB.questionnaire.insert({"Name":self.check(self.tc1.GetValue())})
+                newID = Status.DB.questionnaire.insert({"Name":self.check(self.tc1.GetValue())})
+                print "PANELQ1: HERE SOMETHING SHOULD BE CHANGED. CREATION OF NEW PROJECT ONLY IN Q0 ???!!!"
                 Status.SQL.commit()
                 
                 tmp = {
@@ -614,17 +623,17 @@ class PanelQ1(wx.Panel):
                     tmp["DBNaceCode_id"] = Status.DB.dbnacecode.CodeNACE[\
 			str(self.choiceOfNaceCode.GetStringSelection())][0].DBNaceCode_ID
                 
-                q = Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid][0]
+                q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
                 Status.SQL.commit()
                           
             else:
                 self.showError("Name have to be an uniqe value!")
                 
-        elif self.main.activeQid <> 0:
+        elif Status.PId > 0:       #project already existing. positive PId required !!!
             
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
-		    Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == self.main.activeQid:
+		    Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
                 tmp = {
                     "Name":self.check(self.tc1.GetValue()),
                     "City":self.check(self.tc2.GetValue()),
@@ -654,7 +663,7 @@ class PanelQ1(wx.Panel):
                 if str(self.choiceOfNaceCode.GetStringSelection()) <> 'None':
                     tmp["DBNaceCode_id"] = Status.DB.dbnacecode.CodeNACE[str(self.choiceOfNaceCode.GetStringSelection())][0].DBNaceCode_ID
                 
-                q = Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid][0]
+                q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
                 Status.SQL.commit()
                           
@@ -664,10 +673,10 @@ class PanelQ1(wx.Panel):
 
 
     def OnButtonAddProduct(self, event):
-        if self.main.activeQid <> 0:
-            if self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[self.main.activeQid]) == 0:
+        if Status.PId > 0:
+            if self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId]) == 0:
                 tmp = {
-                    "Questionnaire_id":self.main.activeQid,
+                    "Questionnaire_id":Status.PId,
                     "Product":self.check(self.tc26.GetValue()),
                     "ProductCode":self.check(self.tc27.GetValue()),
                     "QProdYear":self.check(self.tc28.GetValue()),
@@ -681,7 +690,7 @@ class PanelQ1(wx.Panel):
                 Status.SQL.commit()
                 self.fillProductList()
 
-            elif self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[self.main.activeQid]) == 1:
+            elif self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId]) == 1:
                 tmp = {
                     "Product":self.check(self.tc26.GetValue()),
                     "ProductCode":self.check(self.tc27.GetValue()),
@@ -692,7 +701,7 @@ class PanelQ1(wx.Panel):
                     "FuelProd":self.check(self.tc31.GetValue())
                     }
                 q = Status.DB.qproduct.Product[\
-		    self.tc26.GetValue()].Questionnaire_id[self.main.activeQid][0]
+		    self.tc26.GetValue()].Questionnaire_id[Status.PId][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillProductList()
@@ -702,7 +711,7 @@ class PanelQ1(wx.Panel):
 
     def OnListBoxProductsListboxClick(self, event):
         p = Status.DB.qproduct.Questionnaire_id[\
-	    self.main.activeQid].Product[str(self.listBoxProducts.GetStringSelection())][0]
+	    status.PId].Product[str(self.listBoxProducts.GetStringSelection())][0]
         self.tc26.SetValue(str(p.Product))
         self.tc27.SetValue(str(p.ProductCode))
         self.tc28.SetValue(str(p.QProdYear))
@@ -734,9 +743,9 @@ class PanelQ1(wx.Panel):
 
 
     def fillPage(self):
-	if self.main.activeQid == 0:
+	if Status.PId == 0:
 	    return
-	q = Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid][0]
+	q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
 	self.tc1.SetValue(str(q.Name))
 	self.tc2.SetValue(str(q.City))
 	self.tc9.SetValue(str(q.DescripIndustry))
@@ -770,10 +779,11 @@ class PanelQ1(wx.Panel):
 
     def fillProductList(self):
         self.listBoxProducts.Clear()
-        if len(Status.DB.qproduct.Questionnaire_id[self.main.activeQid]) > 0:
-            for n in Status.DB.qproduct.Questionnaire_id[self.main.activeQid]:
+        if len(Status.DB.qproduct.Questionnaire_id[Status.PId]) > 0:
+            for n in Status.DB.qproduct.Questionnaire_id[Status.PId]:
                 self.listBoxProducts.Append(n.Product)
 
+#XXX This functions should be substituted by the general message-logger functions !!!!
     def showError(self, message):
         dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
         ret = dlg.ShowModal()
@@ -794,14 +804,14 @@ class PanelQ1(wx.Panel):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc9.SetValue('')
-        self.tc10.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
+        self.tc9.SetValue('')
+        self.tc10.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
         self.tc16.SetValue('')
@@ -826,9 +836,10 @@ class PanelQ1(wx.Panel):
 if __name__ == '__main__':
     import pSQL
     import MySQLdb
+
     class Main(object):
 	def __init__(self,qid):
-	    self.activeQid = qid
+	    Status.PId = qid
 
     DBName = 'einstein'
     Status.SQL = MySQLdb.connect(host='localhost', user='root', passwd='tom.tom', db=DBName)
