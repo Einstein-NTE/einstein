@@ -11,16 +11,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger 12/04/2008
 #                           Hans Schweiger 17/04/2008
+#                           Tom Sobota 21/04/2008
 #
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
 #                       all searches in SQL passed to functions of class Project
 #       17/04/08: HS    Adaptation to changes in module Project.
 #       18/04/08: HS    Update of panelInfo included
+#       21/04/08  TS    Separated NewProject from the button, so it can be called also from main.
+#                       set 1st item from listbox as selected initially
+#
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,20 +56,39 @@ class PanelQ0(wx.Panel):
         wx.Panel.__init__(self, id=-1, name='PanelQ0', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
+        self.stInfo1 = wx.StaticText(id=-1,
+				     label='Project list',
+				     name='stInfo1',
+				     parent=self,
+				     pos=wx.Point(32, 48),
+				     style=0)
+        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
         self.listBoxProjects = wx.ListBox(id=-1,
 					       choices=[],
 					       name='listBoxProjects',
 					       parent=self,
 					       pos=wx.Point(32, 64),
-					       size=wx.Size(131, 312),
-					       style=0)
+					       size=wx.Size(300, 312),
+					       style=wx.LB_SINGLE|wx.LB_SORT)
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxProjectsDclick, self.listBoxProjects)
+
+
+        self.buttonOpenProject = wx.Button(id=-1,
+						 label='open project',
+						 name='buttonOpenProject',
+						 parent=self,
+						 pos=wx.Point(350, 64),
+						 size=wx.Size(192, 32),
+						 style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOpenProject, self.buttonOpenProject)
+
 
         self.buttonCopyProject = wx.Button(id=-1,
 						 label='copy project',
 						 name='buttonCopyProject',
 						 parent=self,
-						 pos=wx.Point(224,152),
+						 pos=wx.Point(350, 100),
 						 size=wx.Size(192, 32),
 						 style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonCopyProject, self.buttonCopyProject)
@@ -75,39 +98,20 @@ class PanelQ0(wx.Panel):
 						label='new project',
 						name='buttonNewProject',
 						parent=self,
-						pos=wx.Point(224, 192),
+						pos=wx.Point(350, 136),
 						size=wx.Size(192, 32),
 						style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonNewProject, self.buttonNewProject)
-
-
-        self.buttonOpenProject = wx.Button(id=-1,
-						 label='open project',
-						 name='buttonOpenProject',
-						 parent=self,
-						 pos=wx.Point(224, 72),
-						 size=wx.Size(192, 32),
-						 style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonOpenProject, self.buttonOpenProject)
 
 
         self.buttonDeleteProject = wx.Button(id=-1,
 						   label='delete project',
 						   name='buttonDeleteProject',
 						   parent=self,
-						   pos=wx.Point(224, 272),
+						   pos=wx.Point(350, 172),
 						   size=wx.Size(192, 32),
 						   style=0)        
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProject, self.buttonDeleteProject)
-
-
-        self.stInfo1 = wx.StaticText(id=-1,
-				     label='Project list',
-				     name='stInfo1',
-				     parent=self,
-				     pos=wx.Point(32, 48),
-				     style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
 
 
@@ -127,22 +131,8 @@ class PanelQ0(wx.Panel):
     def OnButtonNewProject(self, event):
 #------------------------------------------------------------------------------		
 #   define a new project
-#------------------------------------------------------------------------------		
-        self.shortName = "New Project"
-        self.description = "give here a short description of your project"
-        
-        pu1 =  DialogP(self)
-        if pu1.ShowModal() == wx.ID_OK:
-            print "PanelP - OK",self.shortName,self.description
-            print "PanelP (GenerateNew-Button): calling function createNewProject"
-
-            Status.prj.createNewProject(-1,self.shortName,self.description)
-            self.fillPage()
-
-        elif pu1.ShowModal() == wx.ID_Cancel:
-            print "PanelP - Cancel"
-        else:
-            print "PanelP ???"
+#------------------------------------------------------------------------------
+        self.NewProject()
 
 #------------------------------------------------------------------------------		
 
@@ -164,11 +154,6 @@ class PanelQ0(wx.Panel):
             Status.prj.createNewProject(-1,self.shortName,self.description,originalName=projectName)
             self.fillPage()
 
-        elif pu1.ShowModal() == wx.ID_Cancel:
-            print "PanelP - Cancel"
-        else:
-            print "PanelP ???"
-
 #------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
@@ -187,9 +172,10 @@ class PanelQ0(wx.Panel):
     def OnButtonDeleteProject(self, event):
 #------------------------------------------------------------------------------		
         projectName = self.listBoxProjects.GetStringSelection()
-        print "PanelQ0 (ButtonDelete): deleting ",projectName
-        Status.prj.deleteProject(-1,name=projectName)
-        self.fillPage()
+        if self.main.askConfirmation('Delete project %s ?' % (projectName,)) == wx.ID_YES:
+            print "PanelQ0 (ButtonDelete): deleting ",projectName
+            Status.prj.deleteProject(-1,name=projectName)
+            self.fillPage()
 #------------------------------------------------------------------------------		
 
 
@@ -197,13 +183,27 @@ class PanelQ0(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------		
 
+    def NewProject(self):
+        self.shortName = "New Project"
+        self.description = "give here a short description of your project"
+        
+        pu1 =  DialogP(self)
+        if pu1.ShowModal() == wx.ID_OK:
+            print "PanelP - OK",self.shortName,self.description
+            print "PanelP (GenerateNew-Button): calling function createNewProject"
+
+            Status.prj.createNewProject(-1,self.shortName,self.description)
+            self.fillPage()
+
     def SetProjectList(self,projectList):
         self.listBoxProjects.Clear()
         for n in projectList:
             self.listBoxProjects.Append(n)
+        self.listBoxProjects.SetSelection(0)
 
     def clear(self):
-	pass
+        self.listBoxProjects.Clear()
+
 
     def fillPage(self):
 	self.SetProjectList(Status.prj.getProjectList())

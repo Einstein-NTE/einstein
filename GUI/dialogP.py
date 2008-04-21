@@ -1,4 +1,7 @@
 #Boa:Dialog:DialogP
+# v0.02
+#
+# 21/04/2008 Tom
 
 import wx
 
@@ -23,17 +26,17 @@ class DialogP(wx.Dialog):
               pos=wx.Point(24, 16), size=wx.Size(56, 13), style=0)
         self.stDialog1.Center(wx.HORIZONTAL)
 
-        self.buttonOK = wx.Button(id=wxID_DIALOGPBUTTONOK, label='OK',
+        #TS20080421 changed ID
+        self.buttonOK = wx.Button(id=wx.ID_OK, label='OK',
               name='buttonOK', parent=self, pos=wx.Point(176, 112),
               size=wx.Size(91, 23), style=0)
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton,
-              id=wxID_DIALOGPBUTTONOK)
+              id=wx.ID_OK)
 
-        self.buttonCancel = wx.Button(id=wxID_DIALOGPBUTTONCANCEL,
-              label='cancel', name='buttonCancel', parent=self,
+        #TS20080421 changed ID. Deleted innecessary bind
+        self.buttonCancel = wx.Button(id=wx.ID_CANCEL,
+              label='Cancel', name='buttonCancel', parent=self,
               pos=wx.Point(280, 112), size=wx.Size(91, 23), style=0)
-        self.buttonCancel.Bind(wx.EVT_BUTTON, self.OnButtonCancelButton,
-              id=wxID_DIALOGPBUTTONCANCEL)
 
         self.stDescription = wx.StaticText(id=wxID_DIALOGPSTDESCRIPTION,
               label='description:', name='stDescription', parent=self,
@@ -42,12 +45,12 @@ class DialogP(wx.Dialog):
 
         self.tcShortName = wx.TextCtrl(id=wxID_DIALOGPTCSHORTNAME,
               name='tcShortName', parent=self, pos=wx.Point(96, 16),
-              size=wx.Size(280, 16), style=0, value='new alternative')
+              size=wx.Size(280, 21), style=0, value='New alternative')
 
         self.tcDescription = wx.TextCtrl(id=wxID_DIALOGPTCDESCRIPTION,
               name='tcDescription', parent=self, pos=wx.Point(96, 40),
-              size=wx.Size(280, 56), style=0,
-              value='describe briefly the new alternative')
+              size=wx.Size(280, 64), style=wx.TE_MULTILINE,
+              value='Describe briefly the new alternative')
 
     def __init__(self, parent):
         self._init_ctrls(parent)
@@ -59,6 +62,3 @@ class DialogP(wx.Dialog):
         self.prnt.shortName = self.tcShortName.GetValue()
         self.prnt.description = self.tcDescription.GetValue()
         self.EndModal(wx.ID_OK)
-
-    def OnButtonCancelButton(self, event):
-        self.EndModal(wx.Cancel)

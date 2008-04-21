@@ -1,5 +1,39 @@
 #Boa:Frame:DBEditFrame
-#HS 2008-04-13: preselection added as input
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#	DBEditFrame
+#			
+#------------------------------------------------------------------------------
+#			
+#	Data base editing window
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning	February 2008
+#	Last revised by:    Hans Schweiger      13/04/2008
+#                           Tom Sobota          21/04/2008
+#
+#       Changes in last update:
+#       13/04/08:       preselection added as input
+#       21/04/08: TS    Intercepted error when non existing table
+#
+#------------------------------------------------------------------------------		
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	www.energyxperts.net / info@energyxperts.net
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
@@ -66,18 +100,26 @@ class DBEditFrame(wx.Dialog):
         self.lastEditRow = 0
         self.lastEditCol = 0
 
-        self.initDatabase()
-        self.SetupGrid()
-	self.displayData()
+        if self.initDatabase():
+            self.SetupGrid()
+            self.displayData()
 
 #HS2008-04-13: possibility of preselection-list added in DB Editor.
     def initDatabase(self):
-        self.table = pSQL.Table(Status.DB, self.tablename)
-#HS        sqlTable = pSQL.Table(Status.DB, self.tablename)
-#HS        self.table = self.preSelected(sqlTable,self.preselection)
-        self.rows = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
-#HS        self.rows = len(self.table)
-#HS        self.keys = sqlTable.keys()
+        try:
+            self.table = pSQL.Table(Status.DB, self.tablename)
+            #HS         sqlTable = pSQL.Table(Status.DB, self.tablename)
+            #HS         self.table = self.preSelected(sqlTable,self.preselection)
+            self.rows = len(self.table.sql_select("%s > 0" % (self.table.keys()[0])))
+            #HS         self.rows = len(self.table)
+            #HS         self.keys = sqlTable.keys()
+            return True
+        except:
+            dlg = wx.MessageDialog(None, 'Error accessing table '+self.tablename,
+                                   'Error', wx.OK | wx.ICON_ERROR)
+            dlg.ShowModal()
+            dlg.Destroy()
+            return False
         
     def preSelected(self,sqlTable,preselection):
         pTable = []

@@ -251,19 +251,22 @@ class Project(object):
     def getAlternativeList(self):
 #------------------------------------------------------------------------------
 
-        alternativeList = [[-1, "Present State (original)",
+        defaultList = [[-1, "Present State (original)",
                             "original data as delivered in questionnaire",
                             "---","---","---"],
                             [0,"Present State (checked)",
                             "complete data set for present state after cross-checking and data estimation",
                             "---","---","---"]]
 
-        for ANo in range(1,Status.NoOfAlternatives+1):
+        alternativeList = []
+        
+        for ANo in range(-1,Status.NoOfAlternatives+1):
             try:
                 a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
-#                print "alternative[%s]: "%ANo,a
                 alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
             except:
+                if ANo in [-1,0]:
+                    alternativeList.append(defaultList[ANo+1])
                 pass
         return alternativeList
             
@@ -272,12 +275,16 @@ class Project(object):
 #------------------------------------------------------------------------------
 
         if (n>=-1) and n <= Status.NoOfAlternatives:
-            Status.ANo = n
-            Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
+            try:
+                Status.DB.sproject.ProjectID[Status.PId][0].ActiveAlternative = n
+                Status.SQL.commit()
+                Status.ANo = n
+                Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
+                print "Project (setActiveAlternative): set alternative to",n
 
-            Status.DB.sproject.ProjectID[Status.PId][0].ActiveAlternative = n
-            Status.SQL.commit()
-            print "Project (setActiveAlternative): ",n
+            except:
+                print "Project (setActiveAlternative): error trying to set alternative to ",n
+                pass
         else:
             print "Project (setActiveAlternative): alternative number out of range"
             

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.73
+#   Version No.: 0.74
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -36,6 +36,7 @@
 #                           Hans Schweiger                      16/04/2008
 #                           Hans Schweiger                      18/04/2008
 #                           Tom Sobota                          19/04/2008
+#                           Tom Sobota                          20/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -77,6 +78,14 @@
 #       19/04/2008  Implemented logic for conditionally inhibiting certain branches of the
 #                   action tree
 #       20/04/2008  Implemented basis for internationalization of program
+#       21/04/2008  New askConfirmation procedure to use before deleting things
+#                   Added main menu functionality for Open/New project
+#                   Added fallback language to avoid errors on inexistent translations
+#                   and related errors
+#                   main menu 'Database Equipments' now allows the editing of tables.
+#                   View menu loads dynamically alternatives list
+#
+#
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -89,13 +98,17 @@
 #==============================================================================
 
 #-----  Imports
-import wx
-import wx.grid
+import sys
 import time
 import gettext
-import pSQL, MySQLdb
 import exceptions
+import wx
+import wx.grid
+import pSQL, MySQLdb
 import HelperClass
+
+from einstein.modules.interfaces import Interfaces
+from einstein.modules.modules import Modules
 
 #--- popup frames
 from status import Status #processing status of the tool
@@ -217,9 +230,10 @@ class EinsteinFrame(wx.Frame):
         #Read the LANGUAGE parameter from einstein.ini
         #For now, only 'es' (Spanish) and 'en' (English) are available
         #in the panel General Data
+        #TS20080120 added fallback to avoid errors on inexistent translations
         #
         gettext.install("einstein", "locale", unicode=False)
-        language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)])
+        language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)], fallback=True)
         language.install()
 
         ############################################
@@ -327,6 +341,12 @@ class EinsteinFrame(wx.Frame):
         ret = dlg.ShowModal()
         dlg.Destroy()
 
+    def askConfirmation(self, text):
+        self.logMessage(text)
+        dlg = wx.MessageDialog(None, text, 'Confirm', wx.YES_NO | wx.ICON_QUESTION)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+        return ret
 
 #------------------------------------------------------------------------------     
     def DoLayout(self):
@@ -572,56 +592,68 @@ class EinsteinFrame(wx.Frame):
 #--- Eventhandlers Menu
 #------------------------------------------------------------------------------     
 
+    def OnMenuNewProject(self,event):
+        #TS20080421 Add project on main menu Opens panel Q1 
+        self.activeQid = 0
+        self.hidePages()
+        self.Page0.fillPage()
+        self.Page0.Show()
+        #self.logMessage(PList["0101"][1])
+        self.Page0.NewProject()
+
     def OnMenuOpenProject(self, event):
-        self.tree.SelectItem(self.qPage0, select=True)
+        self.hidePages()
+        self.Page0.fillPage()
+        self.Page0.Show()
+        #self.logMessage(PList["0101"][1])
 
     def OnMenuExit(self, event):
-        wx.Exit()
+        #TS20080421 Ask before exiting
+        if self.askConfirmation('Do you really want to exit?') == wx.ID_YES:
+            wx.Exit()
     
 #..............................................................................     
 # Scroll-up menu "VIEW"
 
-    def OnMenuPresentStateQ(self, event):
-        Status.prj.setActiveAlternative(-1)
-
+#TS20080421 Dynamic alternatives menu
     def OnMenuPresentState(self, event):
-        Status.prj.setActiveAlternative(0)
-        
-    def OnMenuAlternative1(self, event):
-        Status.prj.setActiveAlternative(1)
+        i = event.GetId()- self.iid[0]
+        apNo = self.altList[i][0]
+        print 'SELECTED I='+str(i)+' APNO='+repr(apNo)+' DESCR='+self.altList[i][1]
+        Status.prj.setActiveAlternative(apNo)
+        self.panelinfo.update()
 
 #..............................................................................     
-
     def OnMenuEditDBBenchmark(self, event):
-        frameEditDBBenchmark = DBEditFrame.wxFrame(None, "Edit DBBenchmark", Status.DB.dbbenchmark, Status.SQL)
-        frameEditDBBenchmark.Show()
+        frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
+        frameEditDBBenchmark.ShowModal()
     def OnMenuEditDBNaceCode(self, event):
-        frameEditDBNaceCode = DBEditFrame.wxFrame(None, "Edit DBNaceCode", Status.DB.dbnacecode, Status.SQL)
-        frameEditDBNaceCode.Show()
+        frameEditDBNaceCode = DBEditFrame(None, "Edit DBNaceCode", 'dbnacecode', 0, True)
+        frameEditDBNaceCode.ShowModal()
     def OnMenuEditDBUnitOperation(self, event):
-        frameEditDBUnitOperation = DBEditFrame.wxFrame(None, "Edit DBUnitOperation", Status.DB.dbunitoperation, Status.SQL)
-        frameEditDBUnitOperation.Show()
+        frameEditDBUnitOperation = DBEditFrame(None, "Edit DBUnitOperation", 'dbunitoperation', 0, True)
+        frameEditDBUnitOperation.ShowModal()
     def OnMenuEditDBCHP(self, event):
-        frameEditDBCHP = DBEditFrame.wxFrame(None, "Edit DBCHP", Status.DB.dbchp, Status.SQL)
-        frameEditDBCHP.Show()
+        frameEditDBCHP = DBEditFrame(None, "Edit DBCHP", 'dbchp', 0, True)
+        frameEditDBCHP.ShowModal()
     def OnMenuEditDBHeatPump(self, event):
-        frameEditDBHeatPump = DBEditFrame.wxFrame(None, "Edit DBHeatPump", Status.DB.dbheatpump, Status.SQL)
-        frameEditDBHeatPump.Show()
+        frameEditDBHeatPump = DBEditFrame(self, "Edit DBHeatPump", 'dbheatpump', 0, True)
+        frameEditDBHeatPump.ShowModal()
     def OnMenuEditDBFluid(self, event):
-        frameEditDBFluid = DBEditFrame.wxFrame(None, "Edit DBFluid", Status.DB.dbfluid, Status.SQL)
-        frameEditDBFluid.Show()
+        frameEditDBFluid = DBEditFrame(None, "Edit DBFluid", 'dbfluid', 0, True)
+        frameEditDBFluid.ShowModal()
     def OnMenuEditDBFuel(self, event):
-        frameEditDBFuel = DBEditFrame.wxFrame(None, "Edit DBFuel", Status.DB.dbfuel, Status.SQL)
-        frameEditDBFuel.Show()
+        frameEditDBFuel = DBEditFrame(None, "Edit DBFuel", 'dbfuel', 0, True)
+        frameEditDBFuel.ShowModal()
     def OnMenuEditDBBoiler(self, event):
-        frameEditDBBoiler = DBEditFrame.wxFrame(None, "Edit DBBoiler", Status.DB.dbboiler, Status.SQL)
-        frameEditDBBoiler.Show()
+        frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
+        frameEditDBBoiler.ShowModal()
     def OnMenuEditDBSolarEquip(self, event):
-        frameEditDBSolarEquip = DBEditFrame.wxFrame(None, "Edit DBSolarEquip", Status.DB.dbsolarequip, Status.SQL)
-        frameEditDBSolarEquip.Show()
+        frameEditDBSolarEquip = DBEditFrame(None, "Edit DBSolarEquip", 'dbsolarequip', 0, True)
+        frameEditDBSolarEquip.ShowModal()
     def OnMenuEditDBChiller(self, event):
-        frameEditDBChiller = DBEditFrame.wxFrame(None, "Edit DBChiller", Status.DB.dbchiller, Status.SQL)
-        frameEditDBChiller.Show() 
+        frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
+        frameEditDBChiller.ShowModal() 
 
 #..............................................................................     
 # Scroll-up menu "USER SELECT LEVEL 1 - 3"
@@ -920,6 +952,7 @@ class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------     
 
     def _traverse(self, root, cookie=0, close=False, inhibit=False, event=None):
+        # traverse the tree, performing some action
         label = self.tree.GetItemText(root)
         #print ('*' * self.traverselevel) +label
         try:
@@ -967,10 +1000,6 @@ class EinsteinFrame(wx.Frame):
 
     def CanOpenAlternatives(self):
         return Status.ConsistencyCheckOK
-
-    def NewQuestionnaire(self):
-        self.activeQid = 0
-        self.tree.SelectItem(self.qPage1, select=True)
 
     def hidePages(self):
         self.pageTitle.Hide()
@@ -1050,10 +1079,15 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, PList["X107"][1])
 
-        self.PresentStateQ = self.menuView.AppendRadioItem(-1, "Present state (original data)")
-        self.PresentState = self.menuView.AppendRadioItem(-1, "Present state (checked data)")
-        self.Alternative1 = self.menuView.AppendRadioItem(-1, "Alternative 1")
-        
+        self.altList = Status.prj.getAlternativeList()
+        id0 = wx.NewId()
+        id1 = id0
+        for al in self.altList:
+            #self.PresentState = self.menuView.AppendRadioItem(id1, al[1])
+            self.menuView.AppendRadioItem(id1, al[1])
+            id1 = wx.NewId()
+            
+        self.iid = (id0,id1-1)
 
         self.EditDBCHP = self.subnenuEquipments.Append(-1, PList["X111"][1])
         self.EditDBHeatPump = self.subnenuEquipments.Append(-1, PList["X112"][1])
@@ -1244,13 +1278,11 @@ class EinsteinFrame(wx.Frame):
 
     def BindEvents(self):
         #--- binding the menu
-        self.Bind(wx.EVT_MENU, self.NewQuestionnaire, self.NewProject)
+        self.Bind(wx.EVT_MENU, self.OnMenuNewProject, self.NewProject)
         self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
 
-        self.Bind(wx.EVT_MENU, self.OnMenuPresentState, self.PresentState)
-        self.Bind(wx.EVT_MENU, self.OnMenuPresentStateQ, self.PresentStateQ)
-        self.Bind(wx.EVT_MENU, self.OnMenuAlternative1, self.Alternative1)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnMenuPresentState, id=self.iid[0], id2=self.iid[1])
 
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
@@ -1279,27 +1311,66 @@ class EinsteinFrame(wx.Frame):
 
 #==============================================================================
 #------------------------------------------------------------------------------
+#   Application module
+#------------------------------------------------------------------------------
+class EinsteinApp(wx.App):
+    def __init__(self):
+        wx.App.__init__(self, redirect=False);
+        
+    def OnInit(self):
+        self.initializeEinstein()
+
+        self.Bind(wx.EVT_QUERY_END_SESSION , self._onQueryEndSession )
+        self.Bind(wx.EVT_END_SESSION       , self._onEndSession )
+        self.frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
+        Status.main = self.frame
+        self.frame.Show();
+        self.frame.Bind(wx.EVT_CLOSE, self._onFrameClose);
+        self.SetTopWindow(self.frame);
+
+        return True;
+    #
+    #TS20080421 Some testing code that will magically disappear later
+    #
+    def OnExit(self):
+        print "OnExit"
+        sys.stdout.flush();
+    
+    def OnQueryEndSession(self):
+        print "OnQueryEndSession"
+        sys.stdout.flush();
+        
+    def _onQueryEndSession(self,event):
+        print "_onQueryEndSession"
+        sys.stdout.flush();
+                
+    def _onEndSession(self,event):
+        print "_onEndSession"
+        sys.stdout.flush();
+
+    def _onFrameClose(self, event):
+        print ("_onFrameClose");
+        sys.stdout.flush();
+        self.frame.Destroy();
+        wx.Exit()
+
+    def initializeEinstein(self):
+        connectToDB()
+        Status.mod = None
+        Status.int = Interfaces()
+        Status.prj = Project()
+        Status.mod = Modules()
+
+
+
+#------------------------------------------------------------------------------
 #   Application start
 #------------------------------------------------------------------------------
         
 if __name__ == '__main__':
-    from einstein.modules.interfaces import Interfaces
-    from einstein.modules.modules import Modules
 
-    connectToDB()
-
-    Status.mod = None
-
-    Status.int = Interfaces()
-    
-    Status.prj = Project()
-    Status.mod = Modules()
-
-    app = wx.PySimpleApp()
-    frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
-    Status.main = frame
-    
-    frame.Show(True)
+    app = EinsteinApp();
     app.MainLoop()
+
 
 #==============================================================================
