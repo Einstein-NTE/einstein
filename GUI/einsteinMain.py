@@ -651,10 +651,6 @@ class EinsteinFrame(wx.Frame):
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
         frameAbout.Show()
-        #TS20080419 This changing the value of consistency check is just for a
-        #           fast test of the tree inhibiting process
-        #           it should be taken out after that
-        Status.ConsistencyCheckOK = True
 
 #------------------------------------------------------------------------------     
 #--- Eventhandlers Tree

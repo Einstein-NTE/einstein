@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.14
+#	Version No.: 0.15
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -34,6 +34,7 @@
 #                           Hans Schweiger          13/04/2008
 #                           Stoyan Danov            16/04/2008
 #                           Hans Schweiger          18/04/2008
+#                           Stoyan Danov            18/04/2008
 #   
 #
 #       Changes to previous version:
@@ -62,6 +63,7 @@
 #                      use of functions getEquipmentClass and getEquipmentSubClass (defined in moduleHC)
 #                      some unused functions deleted (housekeeping)
 #                      interfaces - instance imported from Status
+#       18/04/2008 SD: getUserDefinedParamHP: control query added, avoid reference to empty list member
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -131,11 +133,19 @@ class ModuleHP():
 #   gets the user defined data from UHeatPump and stores it to interfaces to be shown in HP panel
 #------------------------------------------------------------------------------
 
-        uHP = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+        uHProws = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
-        #returns to the GUI the default user-defined data to be shown in HP panel
-        maintainExisting = True
-        Status.int.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
+        if len(uHProws) == 0:
+            print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
+            print 'Error: confusion in PId and ANo'
+            maintainExisting = True
+            Status.int.setGraphicsData('HP Config',[maintainExisting, 'not available',0.0,0.0,0.0,0.0,0.0])            
+
+        else:
+            uHP = uHProws[0]
+            #returns to the GUI the default user-defined data to be shown in HP panel
+            maintainExisting = True
+            Status.int.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
                                                      uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
 
 #------------------------------------------------------------------------------

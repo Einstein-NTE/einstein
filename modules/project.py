@@ -343,6 +343,9 @@ class Project(object):
 #                logTrack("Project (setActiveProject): active alternative %s"&Status.ANo)
 
             Status.SQL.commit()
+
+#HS2008-04-21: here just for TESTING. should later be assigned to real value.
+            Status.ConsistencyCheckOK = True
             
             
         except:
