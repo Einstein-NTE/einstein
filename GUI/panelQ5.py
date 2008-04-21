@@ -401,7 +401,7 @@ class PanelQ5(wx.Panel):
 
     def OnListBoxDistributionListListboxClick(self, event):
         p = Status.DB.qdistributionhc.Questionnaire_id[\
-	    self.main.activeQid].Pipeduct[str(self.listBoxDistributionList.GetStringSelection())][0]
+	    Status.PId].Pipeduct[str(self.listBoxDistributionList.GetStringSelection())][0]
         self.tc1.SetValue(str(p.Pipeduct))
         #self.tc2.SetValue(str(p.HeatFromQGenerationHC_id))
         if len(Status.DB.qgenerationhc.QGenerationHC_ID[p.HeatFromQGenerationHC_id]) <> 0:
@@ -436,17 +436,17 @@ class PanelQ5(wx.Panel):
         event.Skip()
 
     def OnButtonAddDistribution(self, event):
-        if self.main.activeQid == 0:
+        if Status.PId == 0:
 	    return
 
 	if self.check(self.tc1.GetValue()) <> 'NULL' and \
 		len(Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 0:
+		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
 	    qgid = Status.DB.qgenerationhc.Equipment[\
 		str(self.choiceOfEquipment.GetStringSelection())][0].QGenerationHC_ID                      
         
 	    tmp = {
-		"Questionnaire_id":self.main.activeQid,
+		"Questionnaire_id":Status.PId,
 		"Pipeduct":self.check(self.tc1.GetValue()),
 		"HeatFromQGenerationHC_id":qgid,
 		"HeatDistMedium":self.check(self.tc3.GetValue()), 
@@ -475,7 +475,7 @@ class PanelQ5(wx.Panel):
 
 	elif self.check(self.tc1.GetValue()) <> 'NULL' and \
 		len(Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 1:
+		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
 	    qgid = Status.DB.qgenerationhc.Equipment[\
 		str(self.choiceOfEquipment.GetStringSelection())][0].QGenerationHC_ID                       
         
@@ -502,7 +502,7 @@ class PanelQ5(wx.Panel):
 		"IsAlternative":0
 		}
 	    q = Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[self.main.activeQid][0]
+		self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
 	    q.update(tmp)               
 	    Status.SQL.commit()
 	    self.fillDistributionList()
@@ -517,17 +517,17 @@ class PanelQ5(wx.Panel):
     def fillchoiceOfEquipment(self):
         self.choiceOfEquipment.Clear()
         self.choiceOfEquipment.Append("None")
-        if self.main.activeQid <> 0:
-            if len(Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]) <> 0:
-                for n in Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]:
+        if Status.PId <> 0:
+            if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId]) <> 0:
+                for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId]:
                     self.choiceOfEquipment.Append(n.Equipment)
         self.choiceOfEquipment.SetSelection(0)
 
 
     def fillPage(self):
         self.listBoxDistributionList.Clear()
-        if len(Status.DB.qdistributionhc.Questionnaire_id[self.main.activeQid]) > 0:
-            for n in Status.DB.qdistributionhc.Questionnaire_id[self.main.activeQid]:
+        if len(Status.DB.qdistributionhc.Questionnaire_id[Status.PId]) > 0:
+            for n in Status.DB.qdistributionhc.Questionnaire_id[Status.PId]:
                 self.listBoxDistributionList.Append (str(n.Pipeduct))
 
 

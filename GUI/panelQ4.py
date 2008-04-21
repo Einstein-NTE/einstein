@@ -426,7 +426,7 @@ class PanelQ4(wx.Panel):
 #------------------------------------------------------------------------------		
     
     def OnListBoxEquipmentClick(self, event):
-        equipe = Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid].Equipment[\
+        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].Equipment[\
 	    str(self.listBoxEquipment.GetStringSelection())][0]
         self.display(equipe)
         event.Skip()
@@ -463,15 +463,15 @@ class PanelQ4(wx.Panel):
 
 
     def OnButtonAddEquipment(self, event):        
-        if self.main.activeQid <> 0:
+        if Status.PId <> 0:
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    self.main.activeQid]) == 0:
+		    Status.PId]) == 0:
                 dbfid = Status.DB.dbfuel.FuelName[\
 		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                      
         
                 tmp = {
-                    "Questionnaire_id":self.main.activeQid,
+                    "Questionnaire_id":Status.PId,
                     "Equipment":self.check(self.tc1.GetValue()), 
                     "Manufact":self.check(self.tc2.GetValue()), 
                     "YearManufact":self.check(self.tc3.GetValue()), 
@@ -501,7 +501,7 @@ class PanelQ4(wx.Panel):
 
             elif self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    self.main.activeQid]) == 1:
+		    Status.PId]) == 1:
                 dbfid = Status.DB.dbfuel.FuelName[\
 		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                       
         
@@ -529,7 +529,7 @@ class PanelQ4(wx.Panel):
                     "IsAlternative":0
                     }
                 q = Status.DB.qgenerationhc.Equipment[\
-		    self.tc1.GetValue()].Questionnaire_id[self.main.activeQid][0]
+		    self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillEquipmentList()
@@ -597,8 +597,8 @@ class PanelQ4(wx.Panel):
         
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()
-        if len(Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]) > 0:
-            for n in Status.DB.qgenerationhc.Questionnaire_id[self.main.activeQid]:
+        if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId]) > 0:
+            for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId]:
                 self.listBoxEquipment.Append (str(n.Equipment))
 
 
@@ -611,7 +611,7 @@ class PanelQ4(wx.Panel):
 
 
     def fillPage(self):
-	if self.main.activeQid != 0:
+	if Status.PId != 0:
 	    self.fillEquipmentList()
 
     def showError(self, message):

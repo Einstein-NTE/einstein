@@ -542,7 +542,7 @@ class PanelQ7(wx.Panel):
 
     def OnButtonStoreData(self, event):
         
-        if self.main.activeQid == 0:
+        if Status.PId == 0:
 	    return
 
 
@@ -574,16 +574,16 @@ class PanelQ7(wx.Panel):
 	    "NDaysBiomassRegion":self.check(self.tc24.GetValue())
 	    }                
 
-	if len(Status.DB.qrenewables.Questionnaire_id[self.main.activeQid]) == 0:
+	if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
 	    # register does not exist, so store also id
-	    tmp["Questionnaire_id"] = self.main.activeQid
+	    tmp["Questionnaire_id"] = Status.PId
            
 	    Status.DB.qrenewables.insert(tmp)
 	    Status.SQL.commit()
        
 	else:
 	    # register does exist              
-	    q = Status.DB.qrenewables.Questionnaire_id[self.main.activeQid][0]
+	    q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
 	    q.update(tmp)
 	    Status.SQL.commit()
                           
@@ -628,11 +628,11 @@ class PanelQ7(wx.Panel):
 
 
     def fillPage(self):
-	if self.main.activeQid == 0:
+	if Status.PId == 0:
 	    return
 
-	if len(Status.DB.qrenewables.Questionnaire_id[self.main.activeQid]) > 0:
-	    p = Status.DB.qrenewables.Questionnaire_id[self.main.activeQid][0]
+	if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) > 0:
+	    p = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
 	    if p.REInterest is None:
 		self.checkBox1.SetValue(False)
 	    else:

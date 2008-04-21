@@ -1,0 +1,235 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2008-04-20 16:50+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: panelQ1.py:27 panelQ1.py:33
+msgid "General information"
+msgstr "Información general"
+
+#: panelQ1.py:28 panelQ1.py:211
+msgid "Statistical and economical data"
+msgstr "Datos estadísticos y económicos"
+
+#: panelQ1.py:29 panelQ1.py:439
+msgid "Information on products"
+msgstr "Información sobre productos"
+
+#: panelQ1.py:41
+msgid "Name of the company"
+msgstr "Nombre de la compañía"
+
+#: panelQ1.py:56
+msgid "City / Country"
+msgstr "Ciudad/País"
+
+#: panelQ1.py:71
+msgid "Name of contact person"
+msgstr "Persona de contacto"
+
+#: panelQ1.py:86
+msgid ""
+"Role of contact person\n"
+"in the company"
+msgstr "Cargo de la persona de contacto"
+
+#: panelQ1.py:101
+msgid "Address"
+msgstr "Dirección"
+
+#: panelQ1.py:116
+msgid "Telephone No"
+msgstr "Teléfono"
+
+#: panelQ1.py:132
+msgid "Fax No"
+msgstr "Fax"
+
+#: panelQ1.py:147
+msgid "E-mail"
+msgstr "Correo electrónico"
+
+#: panelQ1.py:162
+msgid "Description of the industry"
+msgstr "Descripción de la industria"
+
+#: panelQ1.py:177
+msgid "Branch"
+msgstr "Sucursal"
+
+#: panelQ1.py:192
+msgid "NACE code"
+msgstr "Código NACE"
+
+#: panelQ1.py:219
+msgid "Number of employees"
+msgstr "Número de empleados"
+
+#: panelQ1.py:234
+msgid "Annual turnover (M?/year)"
+msgstr "Producción anual (M?/año)"
+
+#: panelQ1.py:249
+msgid ""
+"Annual production cost\n"
+"(M?/year)"
+msgstr ""
+"Costos de producción anuales\n"
+"(M?/año)"
+
+#: panelQ1.py:264
+msgid "Base year for ec. Data"
+msgstr "Año base para datos ???"
+
+#: panelQ1.py:279
+msgid ""
+"Growth rate of the production volume\n"
+"foreseen for the next 5 years (%/year)"
+msgstr ""
+"Crecimiento del volumen de producción\n"
+"previsto para los próximos 5 años (% anual)"
+
+#: panelQ1.py:294
+msgid ""
+"Is the company independent?\n"
+"(yes/no)"
+msgstr ""
+"La compañía es independiente?\n"
+"(si/no)"
+
+#: panelQ1.py:309
+msgid "Yearly O&M heat & cold (?/year)"
+msgstr "Frío & calor anual O&M (?/año)"
+
+#: panelQ1.py:324
+msgid "Yearly O&M electrical (?/year)"
+msgstr "Electricidad anual O&M (?/año)"
+
+#: panelQ1.py:341
+msgid "Period of operation"
+msgstr "Período de operación"
+
+#: panelQ1.py:349
+msgid ""
+"Total hours of operation\n"
+"per working day (h/day)"
+msgstr ""
+"Horas totales de operación\n"
+"por día laboral (hrs/día)"
+
+#: panelQ1.py:364
+msgid "Number of shifts"
+msgstr "Número de turnos"
+
+#: panelQ1.py:379
+msgid ""
+"Days of production /\n"
+"Operation per year (days)"
+msgstr ""
+"Días de producción/\n"
+"días de operación anuales"
+
+#: panelQ1.py:394
+msgid "Principal period of holidays or stops for maintenance"
+msgstr "Período principal de vacaciones o paradas por mantenimiento"
+
+#: panelQ1.py:400
+msgid "Start date"
+msgstr "Fecha inicial"
+
+#: panelQ1.py:405
+msgid "End date"
+msgstr "Fecha final"
+
+#: panelQ1.py:428
+msgid "Store data"
+msgstr "Guardar datos"
+
+#: panelQ1.py:448
+msgid "Type of product"
+msgstr "Tipo de producto"
+
+#: panelQ1.py:463
+msgid "Product code"
+msgstr "Código de producto"
+
+#: panelQ1.py:478
+msgid ""
+"Quantity of product(s) per\n"
+"year (product-units/year)"
+msgstr ""
+"Cantidad de producto(s) por\n"
+"año (unidades de producto/año)"
+
+#: panelQ1.py:493
+msgid ""
+"Measurement unit for\n"
+"product quantity"
+msgstr ""
+"Unidad de medida para\n"
+"la cantidad de producto"
+
+#: panelQ1.py:508
+msgid ""
+"Electricity consumption per\n"
+"product (MWh / year)"
+msgstr ""
+"Consumo de electricidad por\n"
+"producto (MWh/año)"
+
+#: panelQ1.py:524
+msgid "Energy consumption by product"
+msgstr "Consumo de energía por producto"
+
+#: panelQ1.py:532
+msgid ""
+"Fuel consumption per\n"
+"product (MWh/year) (LCV)"
+msgstr ""
+"Consumo de combustible por\n"
+"producto (MWh/año) (LCV)"
+
+#: panelQ1.py:547
+msgid ""
+"Anual turnover per\n"
+"product (M?/year)"
+msgstr ""
+"Producción anual por\n"
+"producto (M?/año)"
+
+#: panelQ1.py:565
+msgid "Product list"
+msgstr "Lista de productos"
+
+#: panelQ1.py:583
+msgid "Add product"
+msgstr "Agregar producto"
+
+#: panelQ1.py:592
+msgid "Delete product"
+msgstr "Borrar producto"
+
+#: panelQ1.py:602
+msgid "Clear"
+msgstr "Borrar casillas"
+
+#: panelQ1.py:655 panelQ1.py:695
+msgid "Name has to be an unique value!"
+msgstr "El nombre debe tener un valor único!"
+
+#: panelQ1.py:733
+msgid "Product must be an unique value!"
+msgstr "El producto debe tener un valor único!"
+

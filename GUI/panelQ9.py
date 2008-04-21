@@ -256,8 +256,8 @@ class PanelQ9(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def OnButtonStoreData(self, event):
-        if self.main.activeQid <> 0 and \
-		len(Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid]) == 1:            
+        if Status.PId <> 0 and \
+		len(Status.DB.questionnaire.Questionnaire_ID[Status.PId]) == 1:            
             tmp = {
                 "InflationRate":self.check(self.tc1.GetValue()),
                 "FuelPriceRate":self.check(self.tc2.GetValue()),
@@ -286,7 +286,7 @@ class PanelQ9(wx.Panel):
                 "OMTotalFung":self.check(self.tc14_4.GetValue())               
                   }                
               
-            q = Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid][0]
+            q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
             q.update(tmp)
             Status.SQL.commit()
 
@@ -326,10 +326,10 @@ class PanelQ9(wx.Panel):
         
 
     def fillPage(self):
-	if self.main.activeQid == 0:
+	if Status.PId == 0:
 	    return
 
-	q = Status.DB.questionnaire.Questionnaire_ID[self.main.activeQid][0]
+	q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
 	self.tc1.SetValue(str(q.InflationRate))
 	self.tc2.SetValue(str(q.FuelPriceRate))
 	self.tc3.SetValue(str(q.InterestExtFinancing))

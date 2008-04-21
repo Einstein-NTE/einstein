@@ -517,12 +517,12 @@ class PanelQ3(wx.Panel):
 
 
     def OnButtonAddProcess(self, event):
-        if self.main.activeQid == 0:
+        if Status.PId == 0:
 	    return
 
 	if self.check(self.tc1.GetValue()) != 'NULL' and \
 		len(Status.DB.qprocessdata.Process[\
-		self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 0:
+		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
 	    dbuid = Status.DB.dbunitoperation.UnitOperation[\
 		str(self.choiceOfDBUnitOperation.GetStringSelection())][0].DBUnitOperation_ID
 	    dbpmfid = Status.DB.dbfluid.FluidName[\
@@ -531,7 +531,7 @@ class PanelQ3(wx.Panel):
 		str(self.choiceOfSMDBFluid.GetStringSelection())][0].DBFluid_ID                       
         
 	    tmp = {
-		"Questionnaire_id":self.main.activeQid,
+		"Questionnaire_id":Status.PId,
 		"Process":self.check(self.tc1.GetValue()),
 		"DBUnitOperation_id":dbuid,
 		"ProcType":self.check(self.tc2.GetValue()),	
@@ -566,7 +566,7 @@ class PanelQ3(wx.Panel):
 
 	elif self.check(self.tc1.GetValue()) <> 'NULL' and \
 		len(Status.DB.qprocessdata.Process[\
-		self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 1:
+		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
 	    dbuid = Status.DB.dbunitoperation.UnitOperation[\
 		str(self.choiceOfDBUnitOperation.GetStringSelection())][0].DBUnitOperation_ID
 	    dbpmfid = Status.DB.dbfluid.FluidName[\
@@ -602,7 +602,7 @@ class PanelQ3(wx.Panel):
 		"SupplyMedFlow":self.check(self.tc25.GetValue()), 
 		"UPHtotQ":self.check(self.tc26.GetValue()) 
 		}
-	    q = Status.DB.qprocessdata.Process[self.tc1.GetValue()].Questionnaire_id[self.main.activeQid][0]
+	    q = Status.DB.qprocessdata.Process[self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
 	    q.update(tmp)               
 	    Status.SQL.commit()
 	    self.fillPage()
@@ -617,7 +617,7 @@ class PanelQ3(wx.Panel):
 
     def OnListBoxProcessesClick(self, event):
         q = Status.DB.qprocessdata.Questionnaire_id[\
-	    self.main.activeQid].Process[str(self.listBoxProcesses.GetStringSelection())][0]
+	    Status.PId].Process[str(self.listBoxProcesses.GetStringSelection())][0]
         self.tc1.SetValue(str(q.Process))
         self.tc2.SetValue(str(q.ProcType))
         self.tc5.SetValue(str(q.PT))
@@ -689,8 +689,8 @@ class PanelQ3(wx.Panel):
 
     def fillPage(self):
         self.listBoxProcesses.Clear()
-        if len(Status.DB.qprocessdata.Questionnaire_id[self.main.activeQid]) > 0:
-            for n in Status.DB.qprocessdata.Questionnaire_id[self.main.activeQid]:
+        if len(Status.DB.qprocessdata.Questionnaire_id[Status.PId]) > 0:
+            for n in Status.DB.qprocessdata.Questionnaire_id[Status.PId]:
                 self.listBoxProcesses.Append (str(n.Process))
 
 

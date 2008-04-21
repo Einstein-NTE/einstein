@@ -45,6 +45,6 @@ class PanelQ6(wx.Panel):
 
 
     def fillPage(self):
-	if self.main.activeQid == 0:
+	if Status.PId == 0:
 	    return
 

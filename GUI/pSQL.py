@@ -14,6 +14,9 @@
 #                                                                            #
 #----------------------------------------------------------------------------#
 # Changes made for the Einstein Project
+#
+# v0.03
+#
 # Tom Sobota 2008-04-12 Global replacing of None by NULL
 #                       changed the default value of Force flag to True so that
 #                       updates that don't actually change the value will not
@@ -26,6 +29,8 @@
 # and also with this form:
 # row = t.select({'id':1})
 # row[0].update({'field1':None})
+#
+# TS20080418 fix for auto-escaping characters in 'insert' method
 #
 ##############################################################################
 
@@ -73,6 +78,7 @@ class pSQL(object):
         escape = connection._db.escape_string
       except:
         try:
+          # this is the escape used
           escape = connection.escape_string
         except:
           print "pSQL WARNING: you are not using a supported MySQL module"
@@ -209,7 +215,9 @@ class Table(object):
     val = ""
     for key in data:
 	col += key + ", "
-	val += "'" + str(data[key]) + "', "
+        #TS20080418 change for auto-escaping characters
+	#val += "'" + str(data[key]) + "', "
+	val += "'" + _qstr(data[key]) + "', "
     query = "INSERT INTO `%s`(%s) VALUES (%s)" % (self._name, col[:-2], val[:-2])
     ####################################################################
     #CANGES 19.02.07 support for NULL

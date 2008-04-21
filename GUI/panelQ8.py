@@ -197,7 +197,7 @@ class PanelQ8(wx.Panel):
 
 
     def OnListBoxBuildingListClick(self, event):
-        q = Status.DB.qbuildings.Questionnaire_id[self.main.activeQid].BuildName[str(self.listBoxBuildingList.GetStringSelection())][0]
+        q = Status.DB.qbuildings.Questionnaire_id[Status.PId].BuildName[str(self.listBoxBuildingList.GetStringSelection())][0]
         self.tc1.SetValue(str(q.BuildName))
         self.tc2.SetValue(str(q.BuildConstructSurface))
         self.tc3.SetValue(str(q.BuildUsefulSurface))
@@ -225,11 +225,11 @@ class PanelQ8(wx.Panel):
         event.Skip()
 
     def OnButtonAddBuilding(self, event):
-        if self.main.activeQid <> 0:
-            if self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 0:
+        if Status.PId <> 0:
+            if self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
 
                 tmp = {
-                    "Questionnaire_id":self.main.activeQid,
+                    "Questionnaire_id":Status.PId,
                     "BuildName":self.check(self.tc1.GetValue()), 
                     "BuildConstructSurface":self.check(self.tc2.GetValue()), 
                     "BuildUsefulSurface":self.check(self.tc3.GetValue()), 
@@ -253,7 +253,7 @@ class PanelQ8(wx.Panel):
                 Status.SQL.commit()
                 self.fillBuildingList()
 
-            elif self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[self.main.activeQid]) == 1:
+            elif self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
 
                 tmp = {
                     "BuildName":self.check(self.tc1.GetValue()), 
@@ -274,7 +274,7 @@ class PanelQ8(wx.Panel):
                     "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()), 
                     "BuildAirCondPeriodStop":self.check(self.tc14_2.GetValue())
                     }
-                q = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[self.main.activeQid][0]
+                q = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillBuildingList()
@@ -289,8 +289,8 @@ class PanelQ8(wx.Panel):
 
     def fillBuildingList(self):
         self.listBoxBuildingList.Clear()
-        if len(Status.DB.qbuildings.Questionnaire_id[self.main.activeQid]) > 0:
-            for n in Status.DB.qbuildings.Questionnaire_id[self.main.activeQid]:
+        if len(Status.DB.qbuildings.Questionnaire_id[Status.PId]) > 0:
+            for n in Status.DB.qbuildings.Questionnaire_id[Status.PId]:
                 self.listBoxBuildingList.Append (str(n.BuildName))
 
 

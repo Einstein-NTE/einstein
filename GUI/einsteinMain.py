@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.71
+#   Version No.: 0.73
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -35,6 +35,7 @@
 #                           Tom Sobota                          15/04/2008
 #                           Hans Schweiger                      16/04/2008
 #                           Hans Schweiger                      18/04/2008
+#                           Tom Sobota                          19/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -73,6 +74,9 @@
 #                   Tree item qOptimisationsProposals renamed to qA
 #                   Tree item qOptiProEnergy renamed to qEnergy
 #       18/04/2008  Instance of Interfaces created as attribute of Status
+#       19/04/2008  Implemented logic for conditionally inhibiting certain branches of the
+#                   action tree
+#       20/04/2008  Implemented basis for internationalization of program
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -88,10 +92,10 @@
 import wx
 import wx.grid
 import time
+import gettext
 import pSQL, MySQLdb
 import exceptions
 import HelperClass
-import BridgeClass
 
 #--- popup frames
 from status import Status #processing status of the tool
@@ -148,24 +152,23 @@ qPageSize = (800, 600)
 KFramesize = (1024, 740)
 
 def connectToDB():
-    
-        doLog = HelperClass.LogHelper()
-        conf = HelperClass.ConfigHelper()
-        doLog.LogThis('Starting program')
+    doLog = HelperClass.LogHelper()
+    conf = HelperClass.ConfigHelper()
+    doLog.LogThis('Starting program')
 
-        DBHost = conf.get('DB', 'DBHost')
-        DBUser = conf.get('DB', 'DBUser')
-        DBPass = conf.get('DB', 'DBPass')
-        DBName = conf.get('DB', 'DBName')
-        LANGUAGE = conf.get('GUI', 'LANGUAGE')
-        doLog.LogThis('Reading config done')
+    DBHost = conf.get('DB', 'DBHost')
+    DBUser = conf.get('DB', 'DBUser')
+    DBPass = conf.get('DB', 'DBPass')
+    DBName = conf.get('DB', 'DBName')
+    LANGUAGE = conf.get('GUI', 'LANGUAGE')
+    doLog.LogThis('Reading config done')
         
-        #----- Connect to the Database
-        Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
-        Status.DB =  pSQL.pSQL(Status.SQL, DBName)
-        print "database assigned to status variable " + repr(Status.DB)
+    #----- Connect to the Database
+    Status.SQL = MySQLdb.connect(host=DBHost, user=DBUser, passwd=DBPass, db=DBName)
+    Status.DB =  pSQL.pSQL(Status.SQL, DBName)
+    print "database assigned to status variable " + repr(Status.DB)
         
-        doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
+    doLog.LogThis('Connected to database %s @ %s' % (DBName, DBHost))
 
 
 #------------------------------------------------------------------------------     
@@ -209,6 +212,15 @@ class EinsteinFrame(wx.Frame):
         PList = ParamList.ReadParameterData()
         doLog.LogThis('Import Parameterfile done')
 
+        #----- I18N
+        #TS20080120 Installed runtime text translation infrastructure
+        #Read the LANGUAGE parameter from einstein.ini
+        #For now, only 'es' (Spanish) and 'en' (English) are available
+        #in the panel General Data
+        #
+        gettext.install("einstein", "locale", unicode=False)
+        language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)])
+        language.install()
 
         ############################################
         #
@@ -242,15 +254,15 @@ class EinsteinFrame(wx.Frame):
         #----- add menu
         self.CreateMenu()
         
-        #----- create tree control
+        #----- create tree control and close branches that conditionally cannot be yet activated
         self.CreateTree()
+        self.treeCloseConditionalBranches()
 
-     
         #----- error log window
         self.message = wx.ListCtrl(id=-1,
                    name='message',
                    parent=self.splitter2,
-                   style=wx.HSCROLL | wx.VSCROLL | wx.RAISED_BORDER | wx.LC_HRULES | wx.LC_REPORT)
+                   style=wx.VSCROLL | wx.RAISED_BORDER | wx.LC_REPORT)
         self.message.InsertColumn(0, 'Message log')
         self.message.SetBackgroundColour('white')
 
@@ -266,8 +278,8 @@ class EinsteinFrame(wx.Frame):
 
         #----- initial message
         self.logMessage('einstein started')
-        self.logWarning('an example of a warning')
-        self.logError('an example of an error')
+        #self.logWarning('an example of a warning')
+        #self.logError('an example of an error')
  
         ############################################
         #
@@ -283,6 +295,9 @@ class EinsteinFrame(wx.Frame):
         item.SetTextColour(fcolor)
         item.SetBackgroundColour(bcolor)
         item.SetColumn(0)
+        f = item.GetFont()
+        f.SetPointSize(8)
+        item.SetFont(f)
         self.message.InsertItem(item)
 
     def logMessage(self,text):
@@ -293,6 +308,25 @@ class EinsteinFrame(wx.Frame):
 
     def logError(self,text):
         self._log('#FFFFFF','#FF0000',text)
+
+    def showError(self, text):
+        self.logError(text)
+        dlg = wx.MessageDialog(None, text, 'Error', wx.OK | wx.ICON_ERROR)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+
+    def showWarning(self, text):
+        self.logWarning(text)
+        dlg = wx.MessageDialog(None, text, 'Warning', wx.OK | wx.ICON_EXCLAMATION)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+
+    def showInfo(self, text):
+        self.logMessage(text)
+        dlg = wx.MessageDialog(None, text, 'Info', wx.OK | wx.ICON_INFORMATION)
+        ret = dlg.ShowModal()
+        dlg.Destroy()
+
 
 #------------------------------------------------------------------------------     
     def DoLayout(self):
@@ -326,7 +360,7 @@ class EinsteinFrame(wx.Frame):
         # set splitters
         self.splitter.SplitVertically(self.treepanel, self.splitter2, 200)
         self.splitter2.SplitHorizontally(self.leftpanel2, self.message, -80)
-        self.splitter.SetSashPosition(250)
+        self.splitter.SetSashPosition(222)
 
         # find the width of message panel
         w = self.splitter2.GetWindow1()
@@ -342,9 +376,9 @@ class EinsteinFrame(wx.Frame):
         self.pageTitle = wx.Panel(id=-1, name='pageTitle', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
         self.pageTitle.Show()
         self.st1Title = wx.StaticText(id=-1,
-              label='Welcome to EINSTEIN energy audit tool',
-              name='st1Title', parent=self.pageTitle, pos=wx.Point(295, 30),
-              size=wx.Size(222, 13), style=0)
+                                      label='Welcome to EINSTEIN energy audit tool',
+                                      name='st1Title', parent=self.pageTitle, pos=wx.Point(295, 30),
+                                      size=wx.Size(222, 13), style=0)
         self.st1Title.Center(wx.HORIZONTAL)
         self.st1Title.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
@@ -617,11 +651,26 @@ class EinsteinFrame(wx.Frame):
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
         frameAbout.Show()
+        #TS20080419 This changing the value of consistency check is just for a
+        #           fast test of the tree inhibiting process
+        #           it should be taken out after that
+        Status.ConsistencyCheckOK = True
 
 #------------------------------------------------------------------------------     
 #--- Eventhandlers Tree
 #------------------------------------------------------------------------------     
         
+    def _interceptActivation(self, evt):
+        root = self.tree.GetRootItem()
+        self.traverselevel = 0
+        self._traverse(root,inhibit=True,event=evt)
+
+    def OnTreeItemExpanding(self, event):
+        self._interceptActivation(event)
+
+    def OnTreeSelChanging(self, event):
+        self._interceptActivation(event)
+
     def OnTreeSelChanged(self, event):
         self.item = event.GetItem()
         select = self.tree.GetItemText(self.item)
@@ -629,7 +678,7 @@ class EinsteinFrame(wx.Frame):
         #if self.item:
         #    str1 = "Selected item = %s\n" % select
         #    self.logMessage(str1)
-        print 'select='+select
+        #print 'select='+select
         #PageTitle
         if select == "Einstein":
             self.hidePages()
@@ -873,6 +922,56 @@ class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------     
 # Auxiliary Functions
 #------------------------------------------------------------------------------     
+
+    def _traverse(self, root, cookie=0, close=False, inhibit=False, event=None):
+        label = self.tree.GetItemText(root)
+        #print ('*' * self.traverselevel) +label
+        try:
+            # get associated conditional data on this tree branch
+            (test,errtxt) = self.tree.GetPyData(root)
+            if close:
+                # close this branch and sub-branches
+                self.tree.CollapseAllChildren(root)
+            elif inhibit:
+                # if this item is the same that produced the event, test
+                # the associated boolean variable or function.
+                # if the result is false, inhibit this tree item
+                item = event.GetItem()
+                inhibitedlabel = self.tree.GetItemText(item)
+                if (label == inhibitedlabel):
+                    if callable(test):
+                        if not test():
+                            self.showWarning(errtxt)
+                            event.Veto()
+                    else:
+                        self.showError('The condition test for '+label+' is not a function')
+
+        except TypeError:
+            # no associated data
+            pass
+        # step in subtree if there are items
+        if self.tree.ItemHasChildren(root):
+            # process first child
+            firstchild, cookie = self.tree.GetFirstChild(root)
+            #self.traverselevel += 1
+            self._traverse(firstchild,cookie,close,inhibit,event)
+            #self.traverselevel -= 1
+            # process rest of children
+            child,cookie = self.tree.GetNextChild(root,cookie)
+            while child:
+                #self.traverselevel += 1
+                self._traverse(child, cookie,close,inhibit,event)
+                #self.traverselevel -= 1
+                child,cookie = self.tree.GetNextChild(root,cookie)
+
+    def treeCloseConditionalBranches(self):
+        root = self.tree.GetRootItem()
+        #self.traverselevel = 0
+        self._traverse(root,close=True)
+
+    def CanOpenAlternatives(self):
+        return Status.ConsistencyCheckOK
+
     def NewQuestionnaire(self):
         self.activeQid = 0
         self.tree.SelectItem(self.qPage1, select=True)
@@ -922,22 +1021,6 @@ class EinsteinFrame(wx.Frame):
 
         self.pageFinalReport.Hide()
 
-    def showError(self, message):
-        dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
-    def showInfo(self, message):
-        dlg = wx.MessageDialog(None, message, 'Info', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
-    def check(self, value):
-        if value <> "" and value <> "None":
-            return value
-        else:
-            return 'NULL'
-
 
 
     def CreateMenu(self):
@@ -980,7 +1063,7 @@ class EinsteinFrame(wx.Frame):
         self.EditDBHeatPump = self.subnenuEquipments.Append(-1, PList["X112"][1])
         self.EditDBChiller = self.subnenuEquipments.Append(-1, PList["X117"][1])
         self.EditDBBoiler = self.subnenuEquipments.Append(-1, PList["X115"][1])
-        self.EditDBStorage = self.subnenuEquipments.Append(-1, PList["X116"][1])
+        self.EditDBStorage = self.subnenuEquipments.Append(-1, PList["X115a"][1])
         self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, PList["X116"][1])
 
         self.EditSubDB = self.menuDatabase.AppendMenu(-1, "Equipments", self.subnenuEquipments)
@@ -997,8 +1080,8 @@ class EinsteinFrame(wx.Frame):
         self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(-1, PList["X121"][1])
         self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(-1, PList["X122"][1])
         self.UserLevel = self.menuSettings.AppendMenu(-1, PList["X123"][1], self.submenuUserLevel)
-        self.Classification = self.menuSettings.AppendMenu(-1, "Classification", self.submenuClassification)
-        self.Preferences = self.menuSettings.Append(-1, PList["X119"][1])
+        self.Preferences = self.menuSettings.Append(-1, PList["X119"][1])#preferences
+        self.Classification = self.menuSettings.AppendMenu(-1, PList["X123a"][1], self.submenuClassification)
         self.Language = self.menuSettings.Append(-1, "Language")
 
         self.HelpUserManual = self.menuHelp.Append(-1, PList["X126"][1])
@@ -1014,9 +1097,16 @@ class EinsteinFrame(wx.Frame):
         self.SetMenuBar(self.menuBar)
 
 
+    def Cond(self,test,errtext):
+        d = []
+        d.append(test)
+        d.append(errtext)
+        return wx.TreeItemData(d)
+   
     def CreateTree(self):
         self.tree = wx.TreeCtrl(self.treepanel, -1, wx.Point(0, 0), wx.Size(200, 740),
-                                wx.TR_DEFAULT_STYLE | wx.NO_BORDER)
+                                wx.TR_DEFAULT_STYLE | wx.TR_NO_LINES | \
+                                wx.TR_FULL_ROW_HIGHLIGHT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
         self.qRoot = self.tree.AddRoot(PList["X001"][1])
         self.qPage0 = self.tree.AppendItem (self.qRoot, PList["X018"][1],0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, PList["X010"][1],0)
@@ -1028,7 +1118,7 @@ class EinsteinFrame(wx.Frame):
         self.qPage6 = self.tree.AppendItem (self.qPage0, PList["X015"][1],0)
         self.qPage7 = self.tree.AppendItem (self.qPage0, PList["X016"][1],0)
         self.qPage8 = self.tree.AppendItem (self.qPage0, PList["X017"][1],0)
-        
+
         self.qDataCheck = self.tree.AppendItem (self.qRoot, PList["X133"][1])
         self.qDataCheckPage1 = self.tree.AppendItem (self.qDataCheck, PList["X134"][1])
         self.qDataCheckPage2 = self.tree.AppendItem (self.qDataCheck, PList["X135"][1])
@@ -1040,7 +1130,7 @@ class EinsteinFrame(wx.Frame):
         self.qStatistics = self.tree.AppendItem (self.qRoot, PList["X136"][1])
         self.qStatisticsAnnual = self.tree.AppendItem (self.qStatistics, 'Annual data')
         self.qStatisticsMonthly = self.tree.AppendItem (self.qStatistics, 'Monthly data')
-        self.qStatisticsHourly = self.tree.AppendItem (self.qStatistics, 'Hourly performance data')
+        self.qStatisticsHourly = self.tree.AppendItem (self.qStatistics, 'Hourly performance\ndata')
         # annual statistics subtree
         self.qStatisticYPage1 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X137"][1])
         self.qStatisticYPage2 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X138"][1])
@@ -1064,8 +1154,20 @@ class EinsteinFrame(wx.Frame):
         self.qBenchmarkCheckPage4 = self.tree.AppendItem (self.qBenchmarkCheck, "SEC by process")
         self.qBenchmarkCheckProcess = self.tree.AppendItem (self.qBenchmarkCheckPage4, "process name")
         
+        #TS20080419 Example of a conditional tree branch.
+        # the argument 'data=' is a list of two members:
+        #                      a. a boolean function for testing the condition.
+        #                         If the function returns False, the tree branch is not activated
+        #                      b. a text. When the tree branch cannot be activated, this text is
+        #                         presented as a message to the user.
+        # When the tree is first shown, all the branches that have this argument will be shown collapsed.
+        # There is a Cond utility function to help loading the data argument.
+        #
+        #
+        self.qA = self.tree.AppendItem (self.qRoot, PList["X145"][1], # alternatives
+                                        data=self.Cond(self.CanOpenAlternatives,
+                                                       'Cannot open Alt. Proposals before Consistency check'))
 
-        self.qA = self.tree.AppendItem (self.qRoot, PList["X145"][1])
         #Design
         self.qOptiProDesign = self.tree.AppendItem (self.qA, PList["X146"][1])
         
@@ -1174,6 +1276,10 @@ class EinsteinFrame(wx.Frame):
 
         #--- binding the Tree
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
+        self.Bind(wx.EVT_TREE_SEL_CHANGING, self.OnTreeSelChanging, self.tree)
+        self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnTreeItemExpanding, self.tree)
+
+
 
 #==============================================================================
 #------------------------------------------------------------------------------
