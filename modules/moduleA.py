@@ -70,25 +70,8 @@ class ModuleA(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
-        print "ModuleA (updatePanel): data for panel are copied to interface"
-        
-        alternativeList = [[-1, "Present State (original)",
-                            "original data as delivered in questionnaire",
-                            "---","---","---"],
-                            [0,"Present State (checked)",
-                            "complete data set for present state after cross-checking and data estimation",
-                            "---","---","---"]]
-
-        for ANo in range(1,Status.NoOfAlternatives+1):
-            try:
-                a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
-#                print "alternative[%s]: "%ANo,a
-                alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
-            except:
-                pass
-            
+        alternativeList = Status.prj.getAlternativeList()            
         data = array(alternativeList)
-#        print "list of alternatives = ",data
         Status.int.setGraphicsData(self.keys[0], data)
 
 #------------------------------------------------------------------------------

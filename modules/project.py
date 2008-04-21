@@ -248,14 +248,24 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getActiveAlternatives():
+    def getAlternativeList(self):
 #------------------------------------------------------------------------------
 
-        listOfAlternatives = ["present state"]
-        for i in range(1,Status.NoOfALternatives+1):
-        #XXX get here name of all existing alternatives
-            listOfAlternatives.append("???")
-        return listOfAlternatives
+        alternativeList = [[-1, "Present State (original)",
+                            "original data as delivered in questionnaire",
+                            "---","---","---"],
+                            [0,"Present State (checked)",
+                            "complete data set for present state after cross-checking and data estimation",
+                            "---","---","---"]]
+
+        for ANo in range(1,Status.NoOfAlternatives+1):
+            try:
+                a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
+#                print "alternative[%s]: "%ANo,a
+                alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
+            except:
+                pass
+        return alternativeList
             
 #------------------------------------------------------------------------------
     def setActiveAlternative(self,n):
