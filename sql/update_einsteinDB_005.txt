@@ -24,7 +24,7 @@ ALTER TABLE qgenerationhc ADD COLUMN QHXEq DOUBLE COMMENT 'Waste heat used in eq
 ALTER TABLE qgenerationhc ADD COLUMN USHj DOUBLE COMMENT 'Useful Supply Heat by equipment' AFTER QHXEq;
 ALTER TABLE qgenerationhc ADD COLUMN FETj DOUBLE COMMENT 'Final energy for thermal use (consumed by each equipment)' AFTER USHj;
 ALTER TABLE qgenerationhc ADD COLUMN HGEffAvg DOUBLE COMMENT 'Average conversion efficiency from final energy to useful supply heat' AFTER FETj;
-ALTER TABLE qgenerationhc ADD COLUMN CascadeIndex INTEGER NOT NULL COMMENT 'No. of equipment for cascade evaluation sequence' AFTER HGEffAvg;
+ALTER TABLE qgenerationhc ADD COLUMN CascadeIndex INTEGER COMMENT 'No. of equipment for cascade evaluation sequence' AFTER HGEffAvg;
 ALTER TABLE qgenerationhc ADD COLUMN HPerYearEq DOUBLE COMMENT 'Yearly operating hours of equipment = HperDayEq*NDaysEq' AFTER CascadeIndex;
 ALTER TABLE qgenerationhc ADD COLUMN HPExHeatCOP DOUBLE COMMENT 'HeatPump Exergetic Heating COP' AFTER HPerYearEq;
 ALTER TABLE qgenerationhc ADD COLUMN Price DOUBLE COMMENT 'Price' AFTER HPExHeatCOP;
