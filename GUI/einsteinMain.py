@@ -11,14 +11,14 @@
 #------------------------------------------------------------------------------
 #
 #   EINSTEIN Main 
-#           
+#
 #------------------------------------------------------------------------------
 #           
 #   GUI Main routines
 #
 #==============================================================================
 #
-#   Version No.: 0.74
+#   Version No.: 0.75
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -156,6 +156,8 @@ from panelInfo import *
 
 #TS2008-04-15 help frame added
 from UserHelp import *
+#TS2008-04-22 language selection dialog added
+from dialogLanguage import *
 
 #-----  Global variables 
 PList = {}      # PList stores the Parameterlist
@@ -418,8 +420,9 @@ class EinsteinFrame(wx.Frame):
 
 
         ####----PAGE 1
-        self.Page1 = PanelQ1(self.leftpanel2, self)
-        self.Page1.Hide()
+        # TS20080422 quitado para probar carga dinámica del panel
+        #self.Page1 = PanelQ1(self.leftpanel2, self)
+        #self.Page1.Hide()
 
 
         ####----PAGE 2
@@ -673,6 +676,16 @@ class EinsteinFrame(wx.Frame):
         framePreferences = PreferencesFrame.wxFrame(None)
         framePreferences.Show()
         #event.Skip()
+
+    def OnMenuSettingsLanguage(self,event):
+        dialogLang = DialogLanguage(self)
+        if dialogLang.ShowModal() == wx.ID_OK:
+            newlang = dialogLang.GetLanguage()
+            language = gettext.translation("einstein", "locale",
+                                           languages=['%s' % (newlang,)], fallback=True)
+            language.install()
+
+        dialogLang.Destroy()
         
 #..............................................................................     
 # Scroll-up menu "HELP" and "About ..."
@@ -720,6 +733,9 @@ class EinsteinFrame(wx.Frame):
         #Page1
         elif select == PList["X010"][1]: #General data
             self.hidePages()
+            # TS20080422 agrregada próxima línea para probar carga dinámica del panel
+            self.Page1 = PanelQ1(self.leftpanel2, self)
+            print 'Page1 created'
             self.Page1.Show()
             self.logMessage(PList["0101"][1])
             self.Page1.clear()
@@ -1004,7 +1020,13 @@ class EinsteinFrame(wx.Frame):
     def hidePages(self):
         self.pageTitle.Hide()
         self.Page0.Hide()
-        self.Page1.Hide()
+        # TS20080422 modificado para probar carga dinámica del panel
+        #self.Page1.Hide()
+        try:
+            self.Page1.Destroy()
+            print 'Page1 destroyed'
+        except:
+            pass
         self.Page2.Hide()
         self.Page3.Hide()
         self.Page4.Hide()
@@ -1104,7 +1126,6 @@ class EinsteinFrame(wx.Frame):
         
         self.EditDBNaceCode = self.submenuClassification.Append(-1, PList["X109"][1])
         self.EditDBUnitOperation = self.submenuClassification.Append(-1, PList["X110"][1])       
-               
 
         self.UserSelectLevel1 = self.submenuUserLevel.AppendRadioItem(-1, PList["X120"][1])
         self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(-1, PList["X121"][1])
@@ -1298,6 +1319,8 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
+
+        self.Bind(wx.EVT_MENU, self.OnMenuSettingsLanguage, self.Language)
 
         self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
         self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        
