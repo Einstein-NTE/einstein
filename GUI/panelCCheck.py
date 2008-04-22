@@ -2,7 +2,7 @@
 
 import wx
 import wx.grid
-import einstein.modules.ccheck.ccheck as CC
+#import einstein.modules.ccheck.ccheck as CC
 
 
 [wxID_PANELCC, wxID_PANELCCBUTTONPAGECCHECKBACK, 
@@ -10,8 +10,8 @@ import einstein.modules.ccheck.ccheck as CC
  wxID_PANELCCBUTTONPAGECCHECKOK, wxID_PANELCCCALCULATE, 
  wxID_PANELCCCB1PAGECCHECK, wxID_PANELCCCHOICEPAGECCHECK, 
  wxID_PANELCCGRIDPAGECCHECK, wxID_PANELCCST1PAGECCHECK, 
- wxID_PANELCCST2PAGECCHECK, 
-] = [wx.NewId() for _init_ctrls in range(11)]
+ wxID_PANELCCST2PAGECCHECK,wxID_PANELCCPIC1 
+] = [wx.NewId() for _init_ctrls in range(12)]
 
 class PanelCC(wx.Panel):
 
@@ -22,7 +22,7 @@ class PanelCC(wx.Panel):
         
         self._init_ctrls(parent)
 
-        self.CCheck = CC.CCheck()
+#        self.CCheck = CC.CCheck()
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -82,7 +82,8 @@ class PanelCC(wx.Panel):
               self.OnButtonpageCCheckBackButton,
               id=wxID_PANELCCBUTTONPAGECCHECKBACK)
 
-        self.CCheck = CC.CCheck()
+
+#        self.CCheck = CC.CCheck()
 
 
     def OnCalculateButton(self, event):

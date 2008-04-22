@@ -1,0 +1,174 @@
+--update einstein database: Copy of columns from C to Q tables.
+--New parameters included from ParameterList_v35 22.04.08, Stoyan Danov
+USE einstein;
+
+
+ALTER TABLE qdistributionhc ADD COLUMN HDEffAvg DOUBLE COMMENT 'Average distribution efficiency' AFTER IsAlternative;
+ALTER TABLE qdistributionhc ADD COLUMN PipeDuctNo INTEGER COMMENT 'Number of pipe or duct' AFTER AlternativeProposalNo;
+
+--
+
+ALTER TABLE qelectricity ADD COLUMN ELECTRICITY_Type DOUBLE COMMENT 'Electricity by type of use' AFTER ElSalesYearCHP;
+
+--
+
+ALTER TABLE qfuel ADD COLUMN FECFuel DOUBLE COMMENT 'Final energy consumption per fuels' AFTER FuelCostYear;
+ALTER TABLE qfuel ADD COLUMN FETFuel DOUBLE COMMENT 'Final energy consumption for thermal use per fuels' AFTER FECFuel;
+-- FECi, FETi ommited from cfuel -> substituted with FECFuel, FETFuel
+
+ALTER TABLE qfuel ADD COLUMN ProdCO2Fuel DOUBLE COMMENT 'Production of CO2 per fuel type' AFTER FETFuel;
+
+--
+
+ALTER TABLE qgenerationhc ADD COLUMN QHXEq DOUBLE COMMENT 'Waste heat used in equipment' AFTER EqNo;
+ALTER TABLE qgenerationhc ADD COLUMN USHj DOUBLE COMMENT 'Useful Supply Heat by equipment' AFTER QHXEq;
+ALTER TABLE qgenerationhc ADD COLUMN FETj DOUBLE COMMENT 'Final energy for thermal use (consumed by each equipment)' AFTER USHj;
+ALTER TABLE qgenerationhc ADD COLUMN HGEffAvg DOUBLE COMMENT 'Average conversion efficiency from final energy to useful supply heat' AFTER FETj;
+ALTER TABLE qgenerationhc ADD COLUMN CascadeIndex INTEGER NOT NULL COMMENT 'No. of equipment for cascade evaluation sequence' AFTER HGEffAvg;
+ALTER TABLE qgenerationhc ADD COLUMN HPerYearEq DOUBLE COMMENT 'Yearly operating hours of equipment = HperDayEq*NDaysEq' AFTER CascadeIndex;
+ALTER TABLE qgenerationhc ADD COLUMN HPExHeatCOP DOUBLE COMMENT 'HeatPump Exergetic Heating COP' AFTER HPerYearEq;
+ALTER TABLE qgenerationhc ADD COLUMN Price DOUBLE COMMENT 'Price' AFTER HPExHeatCOP;
+ALTER TABLE qgenerationhc ADD COLUMN TurnKeyPrice DOUBLE COMMENT 'Turn Key Price' AFTER Price;
+ALTER TABLE qgenerationhc ADD COLUMN OandMvar DOUBLE COMMENT 'Ratio O&M costs variable [euro/MWh year, heating]' AFTER TurnKeyPrice;
+ALTER TABLE qgenerationhc ADD COLUMN OandMfix DOUBLE COMMENT 'Ratio O&M costs fixed [euro/kW year, heating]' AFTER OandMvar;
+
+--
+
+
+ALTER TABLE qprocessdata ADD COLUMN UPH DOUBLE COMMENT 'TOTAL- Useful process heat (per process - UPHk)' AFTER UPHtotQ;
+ALTER TABLE qprocessdata ADD COLUMN UPHc DOUBLE COMMENT 'circulation / renovation' AFTER UPH;
+ALTER TABLE qprocessdata ADD COLUMN UPHm DOUBLE COMMENT 'maintenance' AFTER UPHc;
+ALTER TABLE qprocessdata ADD COLUMN UPHs DOUBLE COMMENT 'preheating at start-up' AFTER UPHm;
+ALTER TABLE qprocessdata ADD COLUMN UPHw DOUBLE COMMENT 'available waste heat from processes' AFTER UPHs;
+ALTER TABLE qprocessdata ADD COLUMN UPHp DOUBLE COMMENT 'preheating from waste heat' AFTER UPHw;
+ALTER TABLE qprocessdata ADD COLUMN UPHmin DOUBLE COMMENT 'minimum required heat demand with heat recovery' AFTER UPHp;
+ALTER TABLE qprocessdata ADD COLUMN ProcHC INTEGER COMMENT 'Heating (1) or Cooling (-1)' AFTER UPHmin;
+ALTER TABLE qprocessdata ADD COLUMN UPCtot DOUBLE COMMENT 'total process cooling demand' AFTER ProcHC;
+ALTER TABLE qprocessdata ADD COLUMN UPCnet DOUBLE COMMENT 'total process cooling demand after heat recovery' AFTER UPCtot;
+ALTER TABLE qprocessdata ADD COLUMN PMU VARCHAR(45) COMMENT 'measurement unit for process medium (pmu)' AFTER UPCnet;
+ALTER TABLE qprocessdata ADD COLUMN MProcMed DOUBLE COMMENT 'yearly quantity of medimum processed' AFTER PMU;		
+ALTER TABLE qprocessdata ADD COLUMN PE_SEC DOUBLE COMMENT 'Specific energy consumption (primary energy)' AFTER MProcMed;
+ALTER TABLE qprocessdata ADD COLUMN EL_SEC DOUBLE COMMENT 'Specific energy consumption (electricity)' AFTER PE_SEC;	
+ALTER TABLE qprocessdata ADD COLUMN UPH_SEC DOUBLE COMMENT 'Specific energy consumption (UPH)' AFTER EL_SEC;
+ALTER TABLE qprocessdata ADD COLUMN TEnvProc DOUBLE COMMENT 'Temperature for calculation of heat losses under operation' AFTER UPH_SEC;
+ALTER TABLE qprocessdata ADD COLUMN QdotProc_c DOUBLE COMMENT 'power demand of process while operating circulation / renovation' AFTER TEnvProc;
+ALTER TABLE qprocessdata ADD COLUMN QdotProc_m DOUBLE COMMENT 'power demand of process while operating maintenance' AFTER QdotProc_c;
+ALTER TABLE qprocessdata ADD COLUMN QdotProc_s DOUBLE COMMENT 'power demand of process while operating preheating at start-up' AFTER QdotProc_m;
+ALTER TABLE qprocessdata ADD COLUMN QdotProc_w DOUBLE COMMENT 'power demand of process while operating waste heat recovery' AFTER QdotProc_s;
+
+--
+
+ALTER TABLE qproduct ADD COLUMN PE_SEC DOUBLE COMMENT 'Specific energy consumption (primary energy)' AFTER FuelProd;
+ALTER TABLE qproduct ADD COLUMN EL_SEC DOUBLE COMMENT 'Specific energy consumption (electricity)' AFTER PE_SEC;
+ALTER TABLE qproduct ADD COLUMN FUEL_SEC DOUBLE COMMENT 'Specific energy consumption (fuel)' AFTER EL_SEC;
+
+
+
+
+
+--###########################################################
+
+--parameters moved from questionnaire - repetitive by ANo
+ALTER TABLE cgeneraldata ADD COLUMN OMThermal DOUBLE COMMENT 'Yearly O&M heat & cold' AFTER AlternativeProposalNo;
+ALTER TABLE cgeneraldata ADD COLUMN OMElectrical DOUBLE COMMENT 'Yearly O&M electrical' AFTER OMThermal;
+ALTER TABLE cgeneraldata ADD COLUMN HPerDayInd DOUBLE COMMENT 'total hours of operation per working day' AFTER OMElectrical;
+ALTER TABLE cgeneraldata ADD COLUMN NShifts DOUBLE COMMENT 'number of shifts' AFTER HPerDayInd;
+ALTER TABLE cgeneraldata ADD COLUMN NDaysInd DOUBLE COMMENT 'days of production / operation per year' AFTER NShifts;
+ALTER TABLE cgeneraldata ADD COLUMN NoProdStart VARCHAR(6) COMMENT 'principal period of holidays or stops for maintenance - start date' AFTER NDaysInd;
+ALTER TABLE cgeneraldata ADD COLUMN NoProdStop VARCHAR(6) COMMENT 'principal period of holidays or stops for maintenance - end date' AFTER NoProdStart;
+ALTER TABLE cgeneraldata ADD COLUMN PercentElTotcost DOUBLE COMMENT 'Percentage of electricity cost  on overall production cost' AFTER NoProdStop;
+ALTER TABLE cgeneraldata ADD COLUMN PercentFuelTotcost DOUBLE COMMENT 'Percentage of fuel cost on overall production cost' AFTER PercentElTotcost;
+ALTER TABLE cgeneraldata ADD COLUMN InflationRate DOUBLE COMMENT 'General inflation rate' AFTER PercentFuelTotcost;
+ALTER TABLE cgeneraldata ADD COLUMN FuelPriceRate DOUBLE COMMENT 'Rate of increment of energy prices' AFTER InflationRate;
+ALTER TABLE cgeneraldata ADD COLUMN InterestExtFinancing DOUBLE COMMENT 'Nominal rate of interest for external financing of installations' AFTER FuelPriceRate;
+ALTER TABLE cgeneraldata ADD COLUMN PercentExtFinancing DOUBLE COMMENT 'Percentage of external financing for installations' AFTER InterestExtFinancing;
+ALTER TABLE cgeneraldata ADD COLUMN AmortisationTime DOUBLE COMMENT 'Time for economic amortisation of installations' AFTER PercentExtFinancing;		
+ALTER TABLE cgeneraldata ADD COLUMN PublicFundType VARCHAR(45) COMMENT 'Type (credit, subvention)' AFTER AmortisationTime;
+ALTER TABLE cgeneraldata ADD COLUMN OMGenTot DOUBLE COMMENT 'General maintenance - total costs' AFTER PublicFundType;
+ALTER TABLE cgeneraldata ADD COLUMN OMGenOP DOUBLE COMMENT 'General maintenance - own personnel' AFTER OMGenTot;
+ALTER TABLE cgeneraldata ADD COLUMN OMGenEP DOUBLE COMMENT 'General maintenance - external personnel' AFTER OMGenOP;
+ALTER TABLE cgeneraldata ADD COLUMN OMGenFung DOUBLE COMMENT 'General maintenance - fungible assets' AFTER OMGenEP;		
+ALTER TABLE cgeneraldata ADD COLUMN OMBuildTot DOUBLE COMMENT 'Buildings - total costs' AFTER OMGenFung;
+ALTER TABLE cgeneraldata ADD COLUMN OMBuildOP DOUBLE COMMENT 'Buildings - own personnel' AFTER OMBuildTot;
+ALTER TABLE cgeneraldata ADD COLUMN OMBuildEP DOUBLE COMMENT 'Buildings - external personnel' AFTER OMBuildOP;
+ALTER TABLE cgeneraldata ADD COLUMN OMBiuildFung DOUBLE COMMENT 'Buildings - fungible assets' AFTER OMBuildEP;
+ALTER TABLE cgeneraldata ADD COLUMN OMMachEquipTot DOUBLE COMMENT 'Machines and equipment - total costs' AFTER OMBiuildFung;
+ALTER TABLE cgeneraldata ADD COLUMN OMMachEquipOP DOUBLE COMMENT 'Machines and equipment - own personnel' AFTER OMMachEquipTot;
+ALTER TABLE cgeneraldata ADD COLUMN OMMachEquipEP DOUBLE COMMENT 'Machines and equipment  - external personnel' AFTER OMMachEquipOP;
+ALTER TABLE cgeneraldata ADD COLUMN OMMachEquipFung DOUBLE COMMENT 'Machines and equipment  - fungible assets' AFTER OMMachEquipEP;
+ALTER TABLE cgeneraldata ADD COLUMN OMHCGenDistTot DOUBLE COMMENT 'Generation and distribution of heat and cold - total costs' AFTER OMMachEquipFung;
+ALTER TABLE cgeneraldata ADD COLUMN OMHCGenDistOP DOUBLE COMMENT 'Generation and distribution of heat and cold - own personnel' AFTER OMHCGenDistTot;
+ALTER TABLE cgeneraldata ADD COLUMN OMHCGenDistEP DOUBLE COMMENT 'Generation and distribution of heat and cold  - external personnel' AFTER OMHCGenDistOP;
+ALTER TABLE cgeneraldata ADD COLUMN OMHCGenDistFung DOUBLE COMMENT 'Generation and Distribution of heat and cold  - fungible assets' AFTER OMHCGenDistEP;	
+ALTER TABLE cgeneraldata ADD COLUMN OMTotalTot DOUBLE COMMENT 'Total - total costs' AFTER OMHCGenDistFung;
+ALTER TABLE cgeneraldata ADD COLUMN OMTotalOP DOUBLE COMMENT 'Total - own personnel' AFTER OMTotalTot;
+ALTER TABLE cgeneraldata ADD COLUMN OMTotalEP DOUBLE COMMENT 'Total - external personnel' AFTER OMTotalOP;
+ALTER TABLE cgeneraldata ADD COLUMN OMTotalFung DOUBLE COMMENT 'Total - fungible assets' AFTER OMTotalEP;
+ALTER TABLE cgeneraldata ADD COLUMN NPipeDuct INTEGER COMMENT 'Number of pipes or ducts' AFTER OMTotalFung;
+ALTER TABLE cgeneraldata ADD COLUMN NEquipe INTEGER COMMENT 'Number of supply equipments of each type(boilers, …) / No. of units' AFTER NPipeDuct;
+
+--new parameters added from ParameterList - v35
+ALTER TABLE cgeneraldata ADD COLUMN ElectricityGen DOUBLE COMMENT '' AFTER FET;
+ALTER TABLE cgeneraldata ADD COLUMN ElectricitySales DOUBLE COMMENT '' AFTER ElectricityGen;
+ALTER TABLE cgeneraldata ADD COLUMN FEO DOUBLE COMMENT '' AFTER ElectricitySales;
+ALTER TABLE cgeneraldata ADD COLUMN FEOel DOUBLE COMMENT '' AFTER FEO;
+ALTER TABLE cgeneraldata ADD COLUMN PEC DOUBLE COMMENT '' AFTER FEOel;
+ALTER TABLE cgeneraldata ADD COLUMN PET DOUBLE COMMENT '' AFTER PEC;
+ALTER TABLE cgeneraldata ADD COLUMN PEO DOUBLE COMMENT '' AFTER PET;
+ALTER TABLE cgeneraldata ADD COLUMN PECel DOUBLE COMMENT '' AFTER PEO;
+ALTER TABLE cgeneraldata ADD COLUMN PETel DOUBLE COMMENT '' AFTER PECel;
+
+--
+
+ALTER TABLE qfuel ADD COLUMN FEOFuel DOUBLE COMMENT '' AFTER FETFuel;
+ALTER TABLE qfuel ADD COLUMN PECFuel DOUBLE COMMENT '' AFTER FEOFuel;
+ALTER TABLE qfuel ADD COLUMN PETFuel DOUBLE COMMENT '' AFTER PECFuel;
+
+--
+
+ALTER TABLE qgenerationhc ADD COLUMN ExcessAirRatio DOUBLE COMMENT '' AFTER EqNo;
+ALTER TABLE qgenerationhc ADD COLUMN HeatSourceLT DOUBLE COMMENT '' AFTER ExcessAirRatio;
+ALTER TABLE qgenerationhc ADD COLUMN HeatSourceHT DOUBLE COMMENT '' AFTER HeatSourceLT;
+ALTER TABLE qgenerationhc ADD COLUMN ThermalConsum DOUBLE COMMENT '' AFTER HeatSourceHT;
+ALTER TABLE qgenerationhc ADD COLUMN THeatSourceHT DOUBLE COMMENT '' AFTER ThermalConsum;
+ALTER TABLE qgenerationhc ADD COLUMN Refrigerant DOUBLE COMMENT '' AFTER THeatSourceHT;
+ALTER TABLE qgenerationhc ADD COLUMN DestinationWasteHeat DOUBLE COMMENT '' AFTER Refrigerant;
+ALTER TABLE qgenerationhc ADD COLUMN TemperatureReCooling DOUBLE COMMENT '' AFTER DestinationWasteHeat;
+ALTER TABLE qgenerationhc ADD COLUMN FlowExhaustGas DOUBLE COMMENT '' AFTER TemperatureReCooling;
+ALTER TABLE qgenerationhc ADD COLUMN QExhaustGas DOUBLE COMMENT '' AFTER FlowExhaustGas;
+
+--
+
+ALTER TABLE qprocessdata ADD COLUMN PTInMax DOUBLE COMMENT '' AFTER UPHtotQ;
+ALTER TABLE qprocessdata ADD COLUMN QOpProc DOUBLE COMMENT '' AFTER PTInMax;
+ALTER TABLE qprocessdata ADD COLUMN ProcMedOut DOUBLE COMMENT '' AFTER QOpProc;
+ALTER TABLE qprocessdata ADD COLUMN HOutFlow DOUBLE COMMENT '' AFTER ProcMedOut;
+ALTER TABLE qprocessdata ADD COLUMN QEvapProc DOUBLE COMMENT '' AFTER HOutFlow;
+ALTER TABLE qprocessdata ADD COLUMN HPerYearProc DOUBLE COMMENT '' AFTER QEvapProc;
+ALTER TABLE qprocessdata ADD COLUMN QHXProcInt DOUBLE COMMENT '' AFTER HPerYearProc;
+ALTER TABLE qprocessdata ADD COLUMN UPHcGross DOUBLE COMMENT '' AFTER QHXProcInt;
+
+
+-- 
+
+ALTER TABLE questionnaire ADD COLUMN Country VARCHAR(45) COMMENT '' AFTER City;
+
+
+-- 
+
+CREATE TABLE projectinfo (
+	ProjectInfo_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '',
+	ProjectID INTEGER UNSIGNED COMMENT '',
+	ProjectCreationDate DATE COMMENT '',
+	ProjectFinalisationDate DATE COMMENT '',
+	LastModificationDate DATE COMMENT '',
+	Auditor_ID INTEGER UNSIGNED COMMENT '',
+	OriginalProjectID INTEGER UNSIGNED COMMENT 'original project-ID for imported projects',
+	Campaign VARCHAR(45) COMMENT '',
+	ConfidentialityLevel INTEGER COMMENT '',
+	ToolVersion VARCHAR(45) COMMENT '',
+	PRIMARY KEY (ProjectInfo_ID)
+);
+
+
+
