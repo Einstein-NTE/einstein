@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.15
+#	Version No.: 0.16
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -35,6 +35,7 @@
 #                           Stoyan Danov            16/04/2008
 #                           Hans Schweiger          18/04/2008
 #                           Stoyan Danov            18/04/2008
+#                           Stoyan Danov            22/04/2008
 #   
 #
 #       Changes to previous version:
@@ -60,10 +61,11 @@
 #                       storing of dummyEqId for posterior undo
 #                      changes in DA1 (selection of panel mode) and DA2 (delete of dummy)
 #                      introduction of default Equipment and HP Types in CONSTANTS
-#                      use of functions getEquipmentClass and getEquipmentSubClass (defined in moduleHC)
+#                      use of functions getEquipmentClass and getEquipmentSubClass (defined in constants.py)
 #                      some unused functions deleted (housekeeping)
 #                      interfaces - instance imported from Status
 #       18/04/2008 SD: getUserDefinedParamHP: control query added, avoid reference to empty list member
+#       22/04/2008 SD: define: calcTPinchAndTGap() and call it in updatePanel() - fills HP Info fields in panel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -248,6 +250,21 @@ class ModuleHP():
         return (self.HPList,HPTableDataList)
         
 #------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def calcTPinchAndTGap(self):
+#------------------------------------------------------------------------------
+        iD = firstNonZero(Status.int.QD_T)
+
+        iA = lastNonZero(Status.int.QA_T)
+
+        TminD = (iD-1)*Status.TemperatureInterval
+        TmaxA = (iA+1)*Status.TemperatureInterval
+
+        TPinch = 0.5*(TminD + TmaxA)
+        TGap = TminD - TmaxA
+
+        return(TPinch,TGap)
 #------------------------------------------------------------------------------
     def updatePanel(self):
 #------------------------------------------------------------------------------
@@ -286,10 +303,10 @@ class ModuleHP():
 
 #............................................................................................
 # 4. additional information
-
+        (TPinch,TGap) = self.calcTPinchAndTGap()
         info = []
-        info.append(999.01)  #first value to be displayed
-        info.append(999.02)  #second value to be displayed
+        info.append(TPinch)  #first value to be displayed
+        info.append(TGap)  #second value to be displayed
 
         Status.int.setGraphicsData('HP Info',info)
 
@@ -779,7 +796,7 @@ class ModuleHP():
             Tc_i = max(DA.UHPminT,Th_i-DA.UHPDTMax)  
             COPh_i = COPex*self.calculateCOPh_Carnot(Th_i + HPTDROP,Tc_i - HPTDROP,Tg)
 
-            print "initial estimates (Th,Tc,COP): ",Th_i,Tc_i,Tg,COPh_i
+            print "initial estimates (Th,Tc,Tg,COP): ",Th_i,Tc_i,Tg,COPh_i
 
 #..............................................................................
 # Special case: zero demand -> assign Q = 0 and go to next timestep
@@ -907,15 +924,18 @@ if __name__ == "__main__":
     
     interf = Interfaces()
 
+    Status.int = Interfaces()
+
 #    modE = ModuleEnergy()
 #    modE.runSimulation()
     keys = ["HP Table","HP Plot","HP UserDef"]
     mod = ModuleHP(keys)
 ##    mod.updatePanel()
     mod.initPanel()
+    mod.calcTPinchAndTGap()
 ##    (equipe,equipeC) = mod.addEquipmentDummy()
 ##    mod.setEquipmentFromDB(equipe,equipeC,HPid)
-    mod.designAssistant1()
+##    mod.designAssistant1()
 ##    mod.designAssistant2(12)
 
 ##    Interfaces.setGraphicsData(interf,'HP Config',[99., 'HP COMP',99.,99.,99.,99.,99.])

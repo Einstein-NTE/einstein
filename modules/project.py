@@ -15,15 +15,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
-#                                           18/04/2008
+#                       Hans Schweiger      18/04/2008
+#                       Hans Schweiger      23/04/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
 #                       UserInteractionLevel
+#       23/04/08: HS    Completed list of data tables to be created in
+#                       createNewProject
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -175,8 +178,18 @@ class Project(object):
 
         copySQLRows(DB.salternatives,sqlQuery,"SAlternative_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.cgeneraldata,sqlQueryQ,"CGeneralData_ID","AlternativeProposalNo",ANo)
+
+        copySQLRows(DB.qbuildings,sqlQueryQ,"QBuildings_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qdistributionhc,sqlQueryQ,"QDistributionHC_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qelectricity,sqlQueryQ,"QElectricity_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qfuel,sqlQueryQ,"QFuel_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.qgenerationhc,sqlQueryQ,"QGenerationHC_ID","AlternativeProposalNo",ANo)
-        copySQLRows(DB.cgenerationhc,sqlQueryQ,"CGenerationHC_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","AlternativeProposalNo",ANo)
+        copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","AlternativeProposalNo",ANo)
 
 #..............................................................................
 # rename alternative
@@ -214,8 +227,19 @@ class Project(object):
 
         deleteSQLRows(DB.salternatives,sqlQuery)
         deleteSQLRows(DB.cgeneraldata,sqlQueryQ)
+
+        deleteSQLRows(DB.qbuildings,sqlQueryQ)
+        deleteSQLRows(DB.qdistributionhc,sqlQueryQ)
+        deleteSQLRows(DB.qelectricity,sqlQueryQ)
+        deleteSQLRows(DB.qfuel,sqlQueryQ)
         deleteSQLRows(DB.qgenerationhc,sqlQueryQ)
-        deleteSQLRows(DB.cgenerationhc,sqlQueryQ)
+        deleteSQLRows(DB.qheatexchanger,sqlQuery)
+        deleteSQLRows(DB.qprocessdata,sqlQueryQ)
+        deleteSQLRows(DB.qproduct,sqlQueryQ)
+        deleteSQLRows(DB.qrenewables,sqlQueryQ)
+        deleteSQLRows(DB.qwasteheatelequip,sqlQuery)
+        deleteSQLRows(DB.uheatpump,sqlQueryQ)
+
 
 #..............................................................................
 # changing ANos in all rows with ANo higher than the deleted one
@@ -230,8 +254,18 @@ class Project(object):
             
             shiftANoInSQLRows(DB.salternatives,sqlQuery,-1)
             shiftANoInSQLRows(DB.cgeneraldata,sqlQueryQ,-1)
+
+            shiftANoInSQLRows(DB.qbuildings,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qdistributionhc,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qelectricity,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qfuel,sqlQueryQ,-1)
             shiftANoInSQLRows(DB.qgenerationhc,sqlQueryQ,-1)
-            shiftANoInSQLRows(DB.cgenerationhc,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qheatexchanger,sqlQuery,-1)
+            shiftANoInSQLRows(DB.qprocessdata,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qproduct,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qrenewables,sqlQueryQ,-1)
+            shiftANoInSQLRows(DB.qwasteheatelequip,sqlQuery,-1)
+            shiftANoInSQLRows(DB.uheatpump,sqlQueryQ,-1)
 
 
 #..............................................................................
@@ -419,7 +453,7 @@ class Project(object):
 
             sqlQuery = "ProjectID = '%s'"%originalPId
             #additional query necessary for old tables who still have Questionnaire_id instead of ProjectID
-            sqlQueryQ_id = "Questionnaire_id = '%s'"%originalPId
+            sqlQueryQ = "Questionnaire_id = '%s'"%originalPId
             sqlQueryQ_ID = "Questionnaire_ID = '%s'"%originalPId
             print "Project (createNewProject: trying to insert copy of project %s: "%originalPId
 
@@ -431,21 +465,23 @@ class Project(object):
 #..............................................................................
 # copying project data tables
 
-            sqlQuery = "ProjectID = '%s'"%originalPId
-            #additional query necessary for old tables who still have Questionnaire_id instead of ProjectID
-            sqlQueryQ = "Questionnaire_id = '%s'"%originalPId
-
-            print "copying sproject"
             copySQLRows(DB.sproject,sqlQuery,"SProject_ID","ProjectID",newID)
-            print "copying salternatives"
             copySQLRows(DB.salternatives,sqlQuery,"SAlternative_ID","ProjectID",newID)
             
-            print "copying cgeneraldata"
-            copySQLRows(DB.cgeneraldata,sqlQueryQ_id,"CGeneralData_ID","Questionnaire_id",newID)
-            print "copying qgenerationhc"
-            copySQLRows(DB.qgenerationhc,sqlQueryQ_id,"QGenerationHC_ID","Questionnaire_id",newID)
-            print "copying cgenerationhc"
-            copySQLRows(DB.cgenerationhc,sqlQueryQ_id,"CGenerationHC_ID","Questionnaire_id",newID)
+            copySQLRows(DB.cgeneraldata,sqlQueryQ,"CGeneralData_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qelectricity,sqlQueryQ,"QElectricity_ID","Questionnaire_id",newID)
+
+            copySQLRows(DB.qbuildings,sqlQueryQ,"QBuildings_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qdistributionhc,sqlQueryQ,"QDistributionHC_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qelectricity,sqlQueryQ,"QElectricity_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qfuel,sqlQueryQ,"QFuel_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qgenerationhc,sqlQueryQ,"QGenerationHC_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","Questionnaire_id",newID)
+            copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","Questionnaire_id",newID)
 
 #..............................................................................
 # rename project
@@ -500,8 +536,18 @@ class Project(object):
         deleteSQLRows(DB.salternatives,sqlQuery)
                    
         deleteSQLRows(DB.cgeneraldata,sqlQueryQ)
+
+        deleteSQLRows(DB.qbuildings,sqlQueryQ)
+        deleteSQLRows(DB.qdistributionhc,sqlQueryQ)
+        deleteSQLRows(DB.qelectricity,sqlQueryQ)
+        deleteSQLRows(DB.qfuel,sqlQueryQ)
         deleteSQLRows(DB.qgenerationhc,sqlQueryQ)
-        deleteSQLRows(DB.cgenerationhc,sqlQueryQ)
+        deleteSQLRows(DB.qheatexchanger,sqlQuery)
+        deleteSQLRows(DB.qprocessdata,sqlQueryQ)
+        deleteSQLRows(DB.qproduct,sqlQueryQ)
+        deleteSQLRows(DB.qrenewables,sqlQueryQ)
+        deleteSQLRows(DB.qwasteheatelequip,sqlQuery)
+        deleteSQLRows(DB.uheatpump,sqlQueryQ)
 
 #..............................................................................
 # book-keeping: reduce number of alernatives in the system

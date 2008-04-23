@@ -18,13 +18,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.07
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni     9/04/2008
 #                           Hans Schweiger      09/04/2008
 #                           Claudia Vannoni     16/04/2008
 #                           Claudia Vannoni     17/04/2008
 #                           Hans Schweiger      18/04/2008
+#                           Hans Schweiger      23/04/2008
+#
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
 #                   def init
@@ -36,6 +38,7 @@
 #       18/04/08 HS valMin and valMax included in most functions
 #                   constraints actually applied (function "constrain" in CCPar)
 #                   general testing and correction of several bugs
+#       23/04/08 HS method setValue added in CCPar
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -49,6 +52,7 @@
 
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
+DEFAULT_SQERR = 1.e-4 # default value for sqerr assigned to questionnaire values
 
 CONFIDENCE = 2      #maximum relation between statistical square error and abs.min/max
 
@@ -59,7 +63,7 @@ DEBUG = "BASIC" #Set to:
                 #"BASIC": basic debugging (not yet implemented)
                 #"OFF" or any other value ...: doesn't print anything
 
-TEST = True
+TEST = False
 TESTCASE = 3
                 
 from math import *
@@ -88,6 +92,21 @@ class CCPar():
         self.sqerr = new.sqerr
         self.valMin = new.valMin
         self.valMax = new.valMax
+
+#------------------------------------------------------------------------------
+    def setValue(self,val,err=DEFAULT_SQERR):
+#------------------------------------------------------------------------------
+#   function to be used for setting values from data questionnaire
+#   sets default values to errors
+#------------------------------------------------------------------------------
+        self.val = val
+        if val is None:
+            self.sqerr = INFINITE
+        elif val == 0:
+            self.sqerr = 0
+        else:
+            self.sqerr = err
+        self.constrain
 
 #------------------------------------------------------------------------------
     def constrain(self):

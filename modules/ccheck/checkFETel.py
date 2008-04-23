@@ -38,12 +38,12 @@
 EPSILON = 1.e-3     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 
-DEBUG = False
-TEST = True
-TESTCASE = 3
-
 from math import *
 from ccheckFunctions import *
+
+#libraries necessary for SQL access:
+from einstein.GUI.status import *
+import einstein.GUI.pSQL as pSQL, MySQLdb
 
 #------------------------------------------------------------------------------
 class CheckFETel():
@@ -66,19 +66,136 @@ class CheckFETel():
         self.FETel2 = CCPar("FETel2")
         self.FETel = CCPar("FETel")
         
-        if TEST:
+        if TEST==True:
             self.importTestData()
         else:
-#            self.importData()
+            self.importData()
+
+        if DEBUG:
+            self.showAllFETel()
+
+
+#------------------------------------------------------------------------------
+    def importData(self):  
+#------------------------------------------------------------------------------
+#   imports data from SQL tables (from AlternativeProposalNo = -1)
+#------------------------------------------------------------------------------
+
+        ANo = -1
+        
+#..............................................................................
+# assign empty CCPar to all necessary parameters
+
+        self.ElectricityGen = CCPar("ElectricityGen")
+        self.ElectricitySales = CCPar("ElectricitySales")
+        self.ElectricityTotYear = CCPar("ElectricityTotYear")
+        #self.ElProd electricty required per product, has to be defined as vector
+        self.ElectricityMotors = CCPar("ElectricityMotors")
+        self.ElectricityChem = CCPar("ElectricityChem")
+        self.ElectricityLight = CCPar("ElectricityLight")
+        self.ElectricityRef = CCPar("ElectricityRef")
+        self.ElectricityAC = CCPar("ElectricityAC")
+        self.ElectricityThOther = CCPar("ElectricityThOther")
+
+#..............................................................................
+# reading data from table "cgeneraldata"
+        try:
+            cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+            if len(cgeneraldataTable) > 0:
+                cgeneraldata = cgeneraldataTable[0]
+
+                self.ElectricityGen.setValue(cgeneraldata.ElectricityGen)
+                self.ElectricitySales.setValue(cgeneraldata.ElectricitySales)
+                
+        except:
+            print "CheckFETel (importData): error reading data from cgeneraldata"
             pass
 
-    def importTestData(self):  #later on should import data from SQL. now simply sets to some value
+#..............................................................................
+# reading data from table "qelectricity"
 
-# Old Step 0: Assign all a priori known values to variables.
-#   -> here manually. in tool values substituted by import from SQL
+        try:
+            qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+            if len(qelectricityTable) > 0:
+                qelectricity = qelectricityTable[0]
+
+                self.ElectricityTotYear.setValue(qelectricity.ElectricityTotYear)
+                self.ElectricityMotors.setValue(qelectricity.ElectricityMotors)
+                self.ElectricityChem.setValue(qelectricity.ElectricityChem)
+                self.ElectricityLight.setValue(qelectricity.ElectricityLight)
+                self.ElectricityRef.setValue(qelectricity.ElectricityRef)
+                self.ElectricityAC.setValue(qelectricity.ElectricityAC)
+                self.ElectricityThOther.setValue(qelectricity.ElectricityThOther)
+                
+        except:
+            print "CheckFETel (importData): error reading data from qelectricity"
+            pass
+
+#..............................................................................
+# xxx something missing -> later to be added ...
+
+        #self.ElProd electricty required per product, has to be defined as vector
+
+#------------------------------------------------------------------------------
+    def exportData(self):  
+#------------------------------------------------------------------------------
+#   stores corrected data in SQL (under AlternativeProposalNo = 0)
+#------------------------------------------------------------------------------
+
+        ANo = 0
+        
+#..............................................................................
+# writing data from table "cgeneraldata"
+        try:
+            cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+            if len(cgeneraldataTable) > 0:
+                print "exporting data to cgeneraldata"
+                cgeneraldata = cgeneraldataTable[0]
+
+                cgeneraldata.ElectricityGen = self.ElectricityGen.val
+                cgeneraldata.ElectricitySales = self.ElectricitySales.val
+
+                Status.SQL.commit()
+                
+        except:
+            print "CheckFETel (exportData): error writing data to cgeneraldata"
+            pass
+
+#..............................................................................
+# writing data to table "qelectricity"
+
+        try:
+            qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+            if len(qelectricityTable) > 0:
+                print "exporting data to qelectricity"
+                qelectricity = qelectricityTable[0]
+
+                qelectricity.ElectricityTotYear = self.ElectricityTotYear.val
+                qelectricity.ElectricityMotors = self.ElectricityMotors.val
+                qelectricity.ElectricityChem = self.ElectricityChem.val
+                qelectricity.ElectricityLight = self.ElectricityLight.val
+                qelectricity.ElectricityRef = self.ElectricityRef.val
+                qelectricity.ElectricityAC = self.ElectricityAC.val
+                qelectricity.ElectricityThOther = self.ElectricityThOther.val
+                qelectricity.ElGenera = 99.99
+
+                Status.SQL.commit()
+                
+        except:
+            print "CheckFETel (exportData): error writing data to qelectricity"
+            pass
+
+        #self.ElProd electricty required per product, has to be defined as vector
+
+#------------------------------------------------------------------------------
+    def importTestData(self):  #later on should import data from SQL. now simply sets to some value
+#------------------------------------------------------------------------------
+#   manual assignment of data. for testing purposes only ...
+#   dummy for function importData
+#------------------------------------------------------------------------------
 
         if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.ElectricityGen = CCPar(" ElectricityGen")
+            self.ElectricityGen = CCPar("ElectricityGen")
             self.ElectricityGen.val = 50
             self.ElectricityGen.sqerr = 0.01
 
@@ -117,7 +234,7 @@ class CheckFETel():
             self.ElectricityThOther.sqerr = 0.05
 
         elif TESTCASE == 3:       #Test case for overall algoritm
-            self.ElectricityGen = CCPar(" ElectricityGen")
+            self.ElectricityGen = CCPar("ElectricityGen")
             self.ElectricityGen.val = 0.0
             self.ElectricityGen.sqerr = 0.0
 
@@ -158,8 +275,6 @@ class CheckFETel():
         else:
             print "CheckFETel: WARNING - don't have input data for this test case no. ",TESTCASE
 
-        if DEBUG:
-            self.showAllFETel()
 
     def showAllFETel(self):
         print "====================="
@@ -265,8 +380,18 @@ class CheckFETel():
 #==============================================================================
 
 if __name__ == "__main__":
+
+# direct connecting to SQL database w/o GUI. for testing only
+    stat = Status("testCheckFETel")
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    Status.PId = 41
+    Status.ANo = -1
+
+#..............................................................................
     
     ccFETel = CheckFETel()       # creates an instance of class CCheck
     ccFETel.check()
+    ccFETel.exportData()
     
 #==============================================================================

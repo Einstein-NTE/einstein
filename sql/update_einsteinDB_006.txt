@@ -1,0 +1,18 @@
+--update einstein database: allow for -1 in AlternativeProposalNo. add projectID and AlternaiveProposalNo where missing
+USE einstein;
+
+ALTER TABLE cgeneraldata MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qbuildings MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qdistributionhc MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qelectricity MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qfuel MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qgenerationhc MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qheatexchanger ADD COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal' AFTER QHeatExchanger_ID;
+ALTER TABLE qheatexchanger ADD COLUMN ProjectID INTEGER COMMENT 'project ID' AFTER QHeatExchanger_ID;
+ALTER TABLE qheatexchanger ADD COLUMN HXNo INTEGER COMMENT 'consecutive number of HX in the project' AFTER AlternativeProposalNo;
+ALTER TABLE qprocessdata MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qproduct MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qrenewables MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
+ALTER TABLE qwasteheatelequip ADD COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal' AFTER QWasteHeatElEquip_ID;
+ALTER TABLE qwasteheatelequip ADD COLUMN ProjectID INTEGER COMMENT 'project ID' AFTER QWasteHeatElEquip_ID;
+ALTER TABLE uheatpump MODIFY COLUMN AlternativeProposalNo INTEGER COMMENT 'number of alternative proposal';
