@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.75
+#   Version No.: 0.76
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                           Hans Schweiger                      22/03/2008
@@ -37,6 +37,7 @@
 #                           Hans Schweiger                      18/04/2008
 #                           Tom Sobota                          19/04/2008
 #                           Tom Sobota                          20/04/2008
+#                           Hans Schweiger                      23/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -84,6 +85,7 @@
 #                   and related errors
 #                   main menu 'Database Equipments' now allows the editing of tables.
 #                   View menu loads dynamically alternatives list
+#       23/04/2008  Changes in call to panelCC
 #
 #
 #   
@@ -119,7 +121,7 @@ import DBEditFrame
 import PreferencesFrame
 
 #--- Module Panels
-from panelCCheck import *
+from panelCC import *
 from panelA import *
 from panelHC import *
 from panelHP import *
@@ -473,10 +475,8 @@ class EinsteinFrame(wx.Frame):
         self.pageDataCheck.Hide()
         ####--- End of pageDataCheck
 
-###HS2008-03-07: Page substituted by PanelCCheck
-
         ####----PAGE pageDataCheckPage1
-        self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0, sql = Status.SQL, db = Status.DB) #TS 2008-03-13
+        self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0) #TS 2008-03-13
         #self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0, sql = MySql, db = DB)
         self.pageDataCheckPage1.Hide()
         ####--- End of pageDataCheckPage1
@@ -815,7 +815,7 @@ class EinsteinFrame(wx.Frame):
         #qDataCheckPage1
         elif select == PList["X134"][1]:
             self.hidePages()
-            self.pageDataCheckPage1.Show()        
+            self.pageDataCheckPage1.display()   #HS2008-04-23: Show() substituted by display()     
         #qDataCheckPage2
         elif select == PList["X135"][1]:
             self.hidePages()

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.08
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni     9/04/2008
 #                           Hans Schweiger      09/04/2008
@@ -26,6 +26,7 @@
 #                           Claudia Vannoni     17/04/2008
 #                           Hans Schweiger      18/04/2008
 #                           Hans Schweiger      23/04/2008
+#                           Hans Schweiger      24/04/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -39,6 +40,7 @@
 #                   constraints actually applied (function "constrain" in CCPar)
 #                   general testing and correction of several bugs
 #       23/04/08 HS method setValue added in CCPar
+#       24/04/08 HS added method "screen" in CCPar
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,6 +56,7 @@ EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 DEFAULT_SQERR = 1.e-4 # default value for sqerr assigned to questionnaire values
 NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
+MAX_SQERR = 1       # critical square error for screening
 
 CONFIDENCE = 2      #maximum relation between statistical square error and abs.min/max
 
@@ -66,8 +69,6 @@ DEBUG = "BASIC" #Set to:
 
 TEST = True
 TESTCASE = 3
-
-screenList = []
                 
 from math import *
 
@@ -196,11 +197,13 @@ class CCPar():
 #------------------------------------------------------------------------------
 #   creates a register entry if the parameter is None or with a high error
 #------------------------------------------------------------------------------
+        CCScreen.nScreened += 1
+        
         if (self.val == None):
-            screenList.append([self.name,"not defined"])
+            CCScreen.screenList.append([self.name,self.val,"-"])
         elif (self.sqerr > MAX_SQERR):
             err = pow(self.sqerr,0.5)*100
-            screenList.append([self.name,str(err)])
+            CCScreen.screenList.append([self.name,self.val, str(err)+"%"])
 #------------------------------------------------------------------------------
 
 
@@ -229,6 +232,28 @@ def CCOne():
     one.valMax = 1.0
     
     return one
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+class CCScreen():
+#------------------------------------------------------------------------------
+#   module for screening of errors and missing data
+#------------------------------------------------------------------------------
+
+    screenList = []
+    nScreened = 0
+    
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        CCScreen.screenList = []
+        CCScreen.nScreened = 0
+
+    def show(self):
+        print "CCScreen: %s parameters screened"%len(CCScreen.screenList)
+        for i in range(len(CCScreen.screenList)):
+            print i+1, CCScreen.screenList[i]
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 class Cycle():

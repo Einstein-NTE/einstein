@@ -302,7 +302,32 @@ class CheckFETel():
                 
         print "====================="
     
+#------------------------------------------------------------------------------
+    def screen(self):  
+#------------------------------------------------------------------------------
+#   screens all variables in the block
+#------------------------------------------------------------------------------
+
+        self.ElectricityNet.screen()
+        self.ElectricityGen.screen()
+        self.ElectricitySales.screen()
+        self.ElectricityTotYear.screen()
+        #self.ElProd.show()
+        self.FECel.screen()
+        self.ElectricityMotors.screen()
+        self.ElectricityChem.screen()
+        self.ElectricityLight.screen()
+        self.ElectricityRef.screen()
+        self.ElectricityAC.screen()
+        self.ElectricityThOther.screen()
+        self.FEOel.screen()
+        self.FETel.screen()
+
+#------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
+#------------------------------------------------------------------------------
+#   main function carrying out the check of the block
+#------------------------------------------------------------------------------
         for n in range(3):
 
             if DEBUG in ["ALL"]:
@@ -376,7 +401,6 @@ class CheckFETel():
         if DEBUG in ["ALL","BASIC"]:
             self.showAllFETel()
 
-
 #==============================================================================
 
 if __name__ == "__main__":
@@ -387,11 +411,15 @@ if __name__ == "__main__":
     Status.DB = pSQL.pSQL(Status.SQL, "einstein")
     Status.PId = 41
     Status.ANo = -1
-
 #..............................................................................
+    
+    screen = CCScreen()
     
     ccFETel = CheckFETel()       # creates an instance of class CCheck
     ccFETel.check()
     ccFETel.exportData()
+
+    ccFETel.screen()
+    screen.show()
     
 #==============================================================================

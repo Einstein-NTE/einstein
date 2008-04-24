@@ -17,17 +17,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	30/01/2008
 #	Revised by:         Tom Sobota          12/03/2008
 #                           Hans Schweiger      21/03/2008
-#       Last revised by:    Stoyan Danov        28/03/2008
+#                           Stoyan Danov        28/03/2008
+#                           Hans Schweiger      24/04/2008
 #
 #       Changes:
 #       - introduction of function frange
 #	20/03/08: HP specific functions eliminated. abstract nomenclature of
 #                   list and table interpolation functions
 #       28/03/2008 added: transpose(), firstHigher()
+#       24/04/2008  function "noneFilter" added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -215,6 +217,17 @@ def frange(start, end, inc=None):
         L.append(next)
         
     return L
+
+#------------------------------------------------------------------------------		
+def noneFilter(datalist,substitute=" "):   
+#------------------------------------------------------------------------------
+#   A range function with float arguments
+#------------------------------------------------------------------------------		
+
+    for i in range(len(datalist)):
+        if datalist[i] is None:
+            datalist[i] = substitute
+    return datalist
 
 #==============================================================================
 

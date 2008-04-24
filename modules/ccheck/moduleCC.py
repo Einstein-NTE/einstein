@@ -53,7 +53,7 @@ class ModuleCC(object):
 #   basic initialisation at the start-up of the tool
 #------------------------------------------------------------------------------
 
-        self.keys = ["CC Table","CC Plot"] # the key to the data is sent by the panel
+        self.keys = ["CC Table","CC Info"] # the key to the data is sent by the panel
 
 #..............................................................................
 # creates an empty space for the different check-blocks
@@ -66,6 +66,8 @@ class ModuleCC(object):
         
         self.ccProc = []
         self.NProc = 0
+
+        self.screen = CCScreen()
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -83,10 +85,24 @@ class ModuleCC(object):
 #   function that updates the information on the CC panel on the GUI
 #------------------------------------------------------------------------------
 
-        CCList =["some text","dont know what to display at the GUI","???"]
+        CCList = []
+        for entry in CCScreen.screenList:
+            row = [entry[0],
+                   "here should be the description",
+                   entry[1],
+                   entry[2],
+                   "revise questionnaire"]
+            CCList.append(noneFilter(row))
             
         data = array(CCList)
         Status.int.setGraphicsData(self.keys[0], data)  #sends the data to the GUI
+
+        nMissingVars = len(CCScreen.screenList)
+        nScreenedVars = CCScreen.nScreened
+        CCList = [nScreenedVars,"---",nMissingVars]
+
+        Status.int.setGraphicsData(self.keys[1], CCList)  #sends the data to the GUI
+        
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -284,6 +300,13 @@ class ModuleCC(object):
 
             for k in range(1,NK):
                 self.ccProc[k].UPHProc.update(self.UPHProck[k])
+
+#..............................................................................
+# At the end of the checking, screen the modules
+
+        self.screen.reset()
+        self.ccFET[0].screen()
+        self.screen.show()
 
 #==============================================================================
 
