@@ -53,10 +53,7 @@ class ModuleCC(object):
 #   basic initialisation at the start-up of the tool
 #------------------------------------------------------------------------------
 
-        self.keys = "CC" # the key to the data is sent by the panel
-
-        self.DB = Status.DB
-        self.sql = Status.SQL
+        self.keys = ["CC Table","CC Plot"] # the key to the data is sent by the panel
 
 #..............................................................................
 # creates an empty space for the different check-blocks
@@ -137,7 +134,7 @@ class ModuleCC(object):
 
         self.NThProc = 3
         NK = self.NThProc
-        self.UPHk = CCRow("UPHk",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+        self.UPHProck = CCRow("UPHk",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
         self.QHXk = CCRow("QHXk",NK)     #creates the space for intermediate storge towards matrix
 
         for k in range(NK):
@@ -167,7 +164,7 @@ class ModuleCC(object):
         UPHLink[1][1] = 1
         UPHLink[2][1] = 1
 
-        self.UPHMatrix = CheckMatrix("UPH Matrix",self.USHj,self.UPHk,UPHLink)   
+        self.UPHMatrix = CheckMatrix("UPH Matrix",self.USHj,self.UPHProck,UPHLink)   
 
 
 #------------------------------------------------------------------------------
@@ -193,7 +190,7 @@ class ModuleCC(object):
             print "ModuleCC: starting cycle"
             print "===================================================="
         
-        NCycles = 100
+        NCycles = 10
         for cycle in range(NCycles):
 #..............................................................................
 # Step 1: do an independent checking of all the blocks as initialisation
@@ -259,7 +256,7 @@ class ModuleCC(object):
                 print "checking process no. %s"%k
                 self.ccProc[k].check()             # ejecuta la función check para proceso k
 
-                self.UPHk[k].update(self.ccProc[k].UPH)      #obtain results 
+                self.UPHProck[k].update(self.ccProc[k].UPHProc)      #obtain results 
 
 #..............................................................................
 # Step 2: now check the link of all the blocks via the matrix checking function
@@ -286,11 +283,20 @@ class ModuleCC(object):
                 self.ccEq[j].USH.update(self.USHj[j])
 
             for k in range(1,NK):
-                self.ccProc[k].UPH.update(self.UPHk[k])
+                self.ccProc[k].UPHProc.update(self.UPHProck[k])
 
 #==============================================================================
 
 if __name__ == "__main__":
 
+# direct connecting to SQL database w/o GUI. for testing only
+    stat = Status("testModuleCC")
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    Status.PId = 2
+    Status.ANo = 0
+
+#..............................................................................
+    
     CC = ModuleCC()       # creates an instance of class CCheck
     CC.basicCheck()

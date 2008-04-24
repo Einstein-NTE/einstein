@@ -59,8 +59,8 @@ class CheckFETfuel():
         if TEST:
             self.importTestData(i)
         else:
-#            self.importData()
-            pass
+#            self.importData(i) #should be this one, once method is created
+            self.importTestData(i)
 
     def importTestData(self,i):  #later on should import data from SQL. now simply sets to some value
 

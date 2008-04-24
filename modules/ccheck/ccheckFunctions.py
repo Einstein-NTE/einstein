@@ -53,6 +53,7 @@
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 DEFAULT_SQERR = 1.e-4 # default value for sqerr assigned to questionnaire values
+NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
 
 CONFIDENCE = 2      #maximum relation between statistical square error and abs.min/max
 
@@ -63,8 +64,10 @@ DEBUG = "BASIC" #Set to:
                 #"BASIC": basic debugging (not yet implemented)
                 #"OFF" or any other value ...: doesn't print anything
 
-TEST = False
+TEST = True
 TESTCASE = 3
+
+screenList = []
                 
 from math import *
 
@@ -112,7 +115,7 @@ class CCPar():
     def constrain(self):
 #------------------------------------------------------------------------------
 
-        if (self.valMin > self.valMax):
+        if (self.valMin > self.valMax + NUMERIC_ERR):
 
             print "======================================================"
             print "======================================================"
@@ -186,6 +189,18 @@ class CCPar():
     def show(self):
 #------------------------------------------------------------------------------
         print "%s = "%self.name,self.val,"(sqerr: %s)"%self.sqerr,"[%s"%self.valMin,",%s"%self.valMax,"]"
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def screen(self):
+#------------------------------------------------------------------------------
+#   creates a register entry if the parameter is None or with a high error
+#------------------------------------------------------------------------------
+        if (self.val == None):
+            screenList.append([self.name,"not defined"])
+        elif (self.sqerr > MAX_SQERR):
+            err = pow(self.sqerr,0.5)*100
+            screenList.append([self.name,str(err)])
 #------------------------------------------------------------------------------
 
 

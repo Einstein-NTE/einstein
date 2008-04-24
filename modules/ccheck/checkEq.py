@@ -70,6 +70,7 @@ class CheckEq():
             self.importTestData(j)
         else:
 #            self.importData()
+            self.importTestData(j)
             pass
 
     def importTestData(self,j):  #later on should import data from SQL. now simply sets to some value
@@ -128,7 +129,7 @@ class CheckEq():
                 
                 self.HCGPnom = CCPar("HCGPnom")
                 self.HCGPnom.val = 2.0
-                self.HCGPnom.sqerr = 0.0   #example: nominal power is exactly given (manufacturer parameter !)€
+                self.HCGPnom.sqerr = 0.001   #example: nominal power is exactly given (manufacturer parameter !)€
                 
                 self.FuelConsum = CCPar("FuelConsum")
                 self.FuelConsum.val = None
@@ -136,11 +137,11 @@ class CheckEq():
                 
                 self.NDaysEq = CCPar("NDaysEq")
                 self.NDaysEq.val = 250 # 5 days/week
-                self.NDaysEq.sqerr = 0.0  #example: big uncertainty in operating hours
+                self.NDaysEq.sqerr = 0.001  #example: big uncertainty in operating hours
 
                 self.HPerDayEq = CCPar("HPerDayEq")
                 self.HPerDayEq.val = 16
-                self.HPerDayEq.sqerr = 0.0  #example: uncertainty in operating hours
+                self.HPerDayEq.sqerr = 0.001  #example: uncertainty in operating hours
 
                 self.TOp = CCPar("TOp")
                 self.TOp.val = None

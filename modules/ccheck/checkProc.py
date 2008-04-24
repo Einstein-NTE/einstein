@@ -115,6 +115,7 @@ class CheckProc():
             self.importTestData(k)
         else:
 #            self.importData()
+            self.importTestData(k)
             pass
 
     def importTestData(self,k):  #later on should import data from SQL. now simply sets to some value
