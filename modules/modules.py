@@ -33,6 +33,7 @@
 #
 #==============================================================================
 
+from einstein.modules.ccheck.moduleCC import ModuleCC
 from einstein.modules.moduleBM import ModuleBM
 from einstein.modules.moduleA import ModuleA
 from einstein.modules.energy.moduleEnergy import ModuleEnergy
@@ -45,34 +46,25 @@ class Modules(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
+
+        self.moduleCC = ModuleCC()
+        
         keys = ['BM Table'] 
-        print "Modules (__init__): BM - starting"
         self.moduleBM = ModuleBM(keys)
-        print "Modules (__init__): BM",self.moduleBM
         
         keys = ['A Table'] 
-        print "Modules (__init__): A - starting"
         self.moduleA = ModuleA(keys)
-        print "Modules (__init__): A",self.moduleA
         
         keys = ['ENERGY'] 
-        print "Modules (__init__): energy - starting"
         self.moduleEnergy = ModuleEnergy(keys)
-        print "Modules (__init__): energy",self.moduleEnergy
 
         keys = ['HC Table'] 
-        print "Modules (__init__): HC - starting"
         self.moduleHC = ModuleHC(keys)
-        print "Modules (__init__): HC",self.moduleHC
         
         keys = ['HP Table'] 
-        print "Modules (__init__): HP - starting"
         self.moduleHP = ModuleHP(keys)
-        print "Modules (__init__): HP",self.moduleHP
         
         keys = ['BB Table'] 
-        print "Modules (__init__): BB - starting"
         self.moduleBB = ModuleBB(keys)
-        print "Modules (__init__): energy",self.moduleBB
        
 #------------------------------------------------------------------------------		
