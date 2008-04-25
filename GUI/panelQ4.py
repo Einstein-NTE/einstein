@@ -11,12 +11,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota	April 2008
-#       Revised by:         Hans Schweiger 13/04/2008
+#       Revised by:         Hans Schweiger  13/04/2008
+#                           Stoyan Danov    25/04/2008
+#                           Hans Schweiger  25/05/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
+#       25/04/08:       line 50, change query, unnecessary large: there is a problem with eqId !!! (add HP manually)
+#                   HS  Alternative proposal no. introduced ...
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -34,7 +38,7 @@ from status import Status
 
 
 class PanelQ4(wx.Panel):
-    def __init__(self, parent, main, eqId):
+    def __init__(self, parent, main, eqId,prefill=None):
         print "PanelQ4 (__init__)"
 	self.parent = parent
 	self.main = main
@@ -42,10 +46,17 @@ class PanelQ4(wx.Panel):
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
 
-#HS2004-04-13 added
+        print 'panelQ4 (__init__): eqId =', eqId, 'Status.PId =', Status.PId, 'Status.ANo =', Status.ANo
         if eqId is not None:
-            equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].QGenerationHC_ID[eqId][0]
+            equipe = Status.DB.qgenerationhc.QGenerationHC_ID[eqId][0]
             self.display(equipe)
+
+        try:
+            for key in prefill:
+                if key=="EquipeType":
+                    self.tc5.SetValue(prefill[key])
+        except:
+            pass
 
 
     def _init_ctrls(self, parent):
@@ -426,7 +437,7 @@ class PanelQ4(wx.Panel):
 #------------------------------------------------------------------------------		
     
     def OnListBoxEquipmentClick(self, event):
-        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].Equipment[\
+        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Equipment[\
 	    str(self.listBoxEquipment.GetStringSelection())][0]
         self.display(equipe)
         event.Skip()
@@ -462,16 +473,32 @@ class PanelQ4(wx.Panel):
 
 
 
+#------------------------------------------------------------------------------
     def OnButtonAddEquipment(self, event):        
+#------------------------------------------------------------------------------
+#   Adds an equipment depending on the equipment name given
+#------------------------------------------------------------------------------
+
+        print "PanelQ4 (add button): add equipment event handler starting "
+
         if Status.PId <> 0:
+#..............................................................................
+# 1. equipment with this name not yet existing
+
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    Status.PId]) == 0:
-                dbfid = Status.DB.dbfuel.FuelName[\
-		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                      
+		    Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
+                
+                if len(Status.DB.dbfuel.FuelName[\
+		    str(self.choiceOfDBFuel.GetStringSelection())])>0:
+                    dbfid = Status.DB.dbfuel.FuelName[\
+                        str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID
+                else:
+                    dbfid = None
         
                 tmp = {
                     "Questionnaire_id":Status.PId,
+                    "AlternativeProposalNo":Status.ANo,
                     "Equipment":self.check(self.tc1.GetValue()), 
                     "Manufact":self.check(self.tc2.GetValue()), 
                     "YearManufact":self.check(self.tc3.GetValue()), 
@@ -491,19 +518,27 @@ class PanelQ4(wx.Panel):
                     "HPerDayEq":self.check(self.tc18.GetValue()), 
                     "NDaysEq":self.check(self.tc19.GetValue()), 
                     "PipeDuctEquip":self.check(self.tc20.GetValue()), 
-                    "CoolTowerType":self.check(self.tc8.GetValue()),
-                    "IsAlternative":0
+                    "CoolTowerType":self.check(self.tc8.GetValue())
+#                    "IsAlternative":0
                     }
 
                 Status.DB.qgenerationhc.insert(tmp)               
                 Status.SQL.commit()
                 self.fillEquipmentList()
 
+#..............................................................................
+# 2. overwrite data of existing equipment
+
             elif self.check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    Status.PId]) == 1:
-                dbfid = Status.DB.dbfuel.FuelName[\
-		    str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                       
+		    Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
+
+                if len(Status.DB.dbfuel.FuelName[\
+		    str(self.choiceOfDBFuel.GetStringSelection())])>0:
+                    dbfid = Status.DB.dbfuel.FuelName[\
+                        str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID                       
+                else:
+                    dbfid = None
         
                 tmp = {
                     "Equipment":self.check(self.tc1.GetValue()), 
@@ -525,11 +560,12 @@ class PanelQ4(wx.Panel):
                     "HPerDayEq":self.check(self.tc18.GetValue()), 
                     "NDaysEq":self.check(self.tc19.GetValue()), 
                     "PipeDuctEquip":self.check(self.tc20.GetValue()), 
-                    "CoolTowerType":self.check(self.tc8.GetValue()),
-                    "IsAlternative":0
+                    "CoolTowerType":self.check(self.tc8.GetValue())
+#                    "IsAlternative":0
                     }
+                
                 q = Status.DB.qgenerationhc.Equipment[\
-		    self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
+		    self.tc1.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillEquipmentList()
@@ -537,6 +573,8 @@ class PanelQ4(wx.Panel):
             else:
                 self.showError("Equipment has to be an unique value!")
         
+            print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
+            self.parent.equipeType = self.check(self.tc5.GetValue())
         
 
     def OnButtonClear(self, event):
@@ -597,8 +635,8 @@ class PanelQ4(wx.Panel):
         
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()
-        if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId]:
+        if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) > 0:
+            for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
                 self.listBoxEquipment.Append (str(n.Equipment))
 
 

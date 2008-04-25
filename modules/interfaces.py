@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.11
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Revised by:         Hans Schweiger      13/03/2008
 #	                    Tom Sobota          17/03/2008
@@ -24,6 +24,7 @@
 #                           Stoyan Danov        27/03/2008
 #                           Hans Schweiger      02/04/2008
 #                           Stoyan Danov        09/04/2008
+#                           Stoyan Danov        24/04/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -35,6 +36,7 @@
 #       27/03/2008 getEquipmentCascade(self): adaptation
 #       02/04/2008 corrections in getEquipmentCascade
 #       09/04/2008 getEquipmentCascade: add filling EquipTableDataList-data fields shown in Table panel
+#       24/04/2008 getEquipmentCascade: add filling EquipTableDataList-changed
 #
 #	
 #------------------------------------------------------------------------------		
@@ -241,13 +243,15 @@ class Interfaces(object):
                             "equipeType":self.equipments[j].EquipType,\
                             "equipePnom":self.equipments[j].HCGPnom})
 
+
         self.EquipTableDataList = []
         for j in range(self.NEquipe):
-            self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].YearManufact, \
-                                            self.equipments[j].EquipType, self.equipmentsC[j].USHj, \
-                                           self.equipments[j].HCGPnom, self.equipments[j].HCGPnom]) #SD change later USHj to HOp when added to sql
-                                                                                        #SD change HCGPnom (last) to Temperature(??) 09/04/2008
+            self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
+                                            self.equipments[j].EquipType, self.equipmentsC[j].HPerYearEq, self.equipments[j].YearManufact])
+                                                
         
+        
+
 
 #------------------------------------------------------------------------------		
     def setGraphicsData(self,key, data):

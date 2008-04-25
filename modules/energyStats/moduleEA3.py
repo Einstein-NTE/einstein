@@ -65,7 +65,10 @@ class ModuleEA3(object):
 
         self.cgenerationhc = Status.DB.cgenerationhc.sql_select(sqlQuery)
 #................................................................
-        self.initModule()
+        try:
+            self.initModule()
+        except:
+            pass
 
     def initModule(self):
 #------------------------------------------------------------------------------

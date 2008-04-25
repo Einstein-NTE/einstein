@@ -49,6 +49,7 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+MAXCOLS = 10
 
 class PanelEA3(wx.Panel):
     def __init__(self, parent, id, pos, size, style, name):
@@ -60,7 +61,13 @@ class PanelEA3(wx.Panel):
         #
         # upper graph: FET by equipment
         #
-        (rows,cols) = Interfaces.GData[keys[0]].shape
+        try:
+            (rows,cols) = Interfaces.GData[keys[0]].shape
+        except:
+            print "PanelEA3: crash during initialisation avoided -> check this"
+            rows = 1 #xxx dummy for avoiding crash
+            cols = MAXCOLS #xxx dummy for avoiding crash
+
         ignoredrows = []
         ignoredrows.append(rows-1)
 
@@ -78,7 +85,13 @@ class PanelEA3(wx.Panel):
         #
         # lower graph: USH by equipment
         #
-        (rows,cols) = Interfaces.GData[keys[1]].shape
+        try:
+            (rows,cols) = Interfaces.GData[keys[1]].shape
+        except:
+            print "PanelEA3: crash during initialisation avoided -> check this"
+            rows = 1 #xxx dummy for avoiding crash
+            cols = MAXCOLS #xxx dummy for avoiding crash
+            
         ignoredrows = []
         ignoredrows.append(rows-1)
 
@@ -105,8 +118,15 @@ class PanelEA3(wx.Panel):
         #
         # set upper grid
         #
-        data = Interfaces.GData[keys[0]]
-        (rows,cols) = data.shape
+        try:
+            data = Interfaces.GData[keys[0]]
+            (rows,cols) = data.shape
+        except:
+            data = [[0,0,0,0,0,0,0,0,0,0]]
+            print "PanelEA3: crash during initialisation avoided -> check this"
+            rows = 1 #xxx dummy for avoiding crash
+            cols = MAXCOLS #xxx dummy for avoiding crash
+
         self.grid1.CreateGrid(max(rows,20), cols)
 
         self.grid1.EnableGridLines(True)
@@ -126,7 +146,10 @@ class PanelEA3(wx.Panel):
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid1.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -136,8 +159,15 @@ class PanelEA3(wx.Panel):
         #
         # set lower grid
         #
-        data = Interfaces.GData[keys[1]]
-        (rows,cols) = data.shape
+        try:
+            data = Interfaces.GData[keys[1]]
+            (rows,cols) = data.shape
+        except:
+            data = [[0,0,0,0,0,0,0,0,0,0]]
+            print "PanelEA3: crash during initialisation avoided -> check this"
+            rows = 1 #xxx dummy for avoiding crash
+            cols = MAXCOLS #xxx dummy for avoiding crash
+
         self.grid2.CreateGrid(max(rows,20), cols)
 
         self.grid2.EnableGridLines(True)
@@ -155,7 +185,10 @@ class PanelEA3(wx.Panel):
         for r in range(rows):
             self.grid2.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid2.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid2.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
                 if c == labels_column:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:

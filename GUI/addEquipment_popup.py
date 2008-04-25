@@ -1,4 +1,37 @@
 #Boa:Dialog:AddEquipment_popup
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#	DBEditFrame
+#			
+#------------------------------------------------------------------------------
+#			
+#	Data base editing window
+#
+#==============================================================================
+#
+#	Version No.: 0.02
+#	Created by: 	    Tom Sobota	    April 2008
+#	Last revised by:    Hans Schweiger      25/04/2008
+#
+#       Changes in last update:
+#       25/04/08:       preselection added as input
+#
+#------------------------------------------------------------------------------		
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	www.energyxperts.net / info@energyxperts.net
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 
 import wx
 from einstein.GUI.DBEditFrame import DBEditFrame
@@ -16,11 +49,13 @@ class ManualAddDialog(wx.Dialog):
         wx.Dialog.__init__(self, id=-1, name=u'ManualAddDialog',
               parent=prnt, pos=wx.Point(0, 0), size=wx.Size(800, 600),
               style=wx.DEFAULT_DIALOG_STYLE, title='Manual equipment add')
-	# load the Q4 panel, extracted from main.
 
-#HS2004-04-13 call to p4 changed
+        print "AddEquipment_popup (ManualAddDialog): eqId = ",eqId
+        self.equipeType = None
+        
 	self.p4 = PanelQ4(self, prnt, eqId)
 	self.eqId = eqId
+	print "AddEquipment_popup (ManualAddDialog): new type = ",self.equipeType
 
 
 class AddEquipment(wx.Dialog):
@@ -62,22 +97,28 @@ class AddEquipment(wx.Dialog):
               name=u'btnAccept', parent=self, pos=wx.Point(312, 408),
               size=wx.Size(104, 32), style=0)
 
+#------------------------------------------------------------------------------		
     def __init__(self, parent, module, title, tablename, col_returned, can_edit):
+#------------------------------------------------------------------------------		
 	self.module = module
 	self.title = title
 	self.tablename = tablename
+
 	# the column that would be returned by DBEditFrame
 	self.col_returned = col_returned
 	self.can_edit = can_edit
-#HS2008-04-02: storing parent for event handlers ...
+
         self.prnt = parent
 	self.theId = -1
         self._init_ctrls(parent)
 
         # create a list of previously deleted equipment for display
-        self.RetrieveDeleted()
+#        self.RetrieveDeleted()
 
+#------------------------------------------------------------------------------		
     def OnBtnSelectFromDatabaseButton(self, event):
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
         self.dbe = DBEditFrame(self, self.title, self.tablename, self.col_returned, self.can_edit)
         if self.dbe.ShowModal() == wx.ID_OK:
 	    # the user has accepted a selection from the database dialog
@@ -100,22 +141,28 @@ class AddEquipment(wx.Dialog):
 
 	    # close this dialog
 	    self.EndModal(wx.ID_OK)
+        else:
+            self.EndModal(wx.ID_CANCEL)
 
+#------------------------------------------------------------------------------		
     def OnBtnEnterManuallyButton(self, event):
-	#XXX Tom: here page 4 from the questionnaire should be opened with a pointer
-	#       to the row for the new equipment.
-	#       Options of Q4:
-	#       Equipment type: constrained to heat pumps
-	#       OpenQ4(self.prnt.equipe)
+#------------------------------------------------------------------------------		
+#   Manual entry selected
+#------------------------------------------------------------------------------		
         self.prnt.mode = "Manual"
-	activeQid = 1 # Hans, is this the pointer to the new equipment?
-	self.dMan = ManualAddDialog(self, activeQid)
+        print "AddEquipment_popup (Manual Button): adding equipe ID", self.prnt.equipe.QGenerationHC_ID
+	self.dMan = ManualAddDialog(self, self.prnt.equipe.QGenerationHC_ID)
         if self.dMan.ShowModal() == wx.ID_OK:
-	    pass
+            print "AddEquipment_popup (Manual Button): OK"
+	    self.EndModal(wx.ID_OK)
+	else:
+            print "AddEquipment_popup (Manual Button): Cancelled"
+            self.EndModal(wx.ID_CANCEL)
 
-        event.Skip()
-
+#------------------------------------------------------------------------------		
     def RetrieveDeleted(self):
+#------------------------------------------------------------------------------		
         print 'RetrieveDeleted() not yet implemented'
+#------------------------------------------------------------------------------		
 
     

@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.16
+#	Version No.: 0.17
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -36,6 +36,7 @@
 #                           Hans Schweiger          18/04/2008
 #                           Stoyan Danov            18/04/2008
 #                           Stoyan Danov            22/04/2008
+#                           Stoyan Danov            24/04/2008
 #   
 #
 #       Changes to previous version:
@@ -66,6 +67,9 @@
 #                      interfaces - instance imported from Status
 #       18/04/2008 SD: getUserDefinedParamHP: control query added, avoid reference to empty list member
 #       22/04/2008 SD: define: calcTPinchAndTGap() and call it in updatePanel() - fills HP Info fields in panel
+#       24/04/2008 SD: screenEquipment(): changes in HPTableDataList - table data shown in panel
+#                       setEquipmentFromDB(): activate updates, more controls
+#                       calculateEnergyFlows(): assignment of exergetic COP from DB
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -230,7 +234,7 @@ class ModuleHP():
         HPTableDataList = []
         for row in Status.int.EquipTableDataList:
 #            if row[2] == 'Heat pump' or row[2] == 'HeatPump' or row[2] == 'Heat Pump' or row[2] == 'HP COMP':
-            if getEquipmentClass(row[2]) == "HP":
+            if getEquipmentClass(row[3]) == "HP":
                 HPTableDataList.append(row)
 
         #screen list and substitute None with "not available"
@@ -330,7 +334,7 @@ class ModuleHP():
         deletes the selected heat pump in the current alternative
         """
 #------------------------------------------------------------------------------
-        print "deleteHP: function not yet defined"
+        print "deleteEquipment: start"
 
         if rowNo == None:   #indicates to delete last added equipment dummy
             HPid = self.dummyEqId
@@ -424,6 +428,7 @@ class ModuleHP():
 
         print "ModuleHP (addEquipmentDummy): new equip row created"
         print "ModuleHP (addEquipmentDummy): self.cascadeIndex", self.cascadeIndex
+        print "ModuleHP (addEquipmentDummy): dummyEqId", self.dummyEqId
 
         self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
         self.equipeC = self.equipmentsC.CGenerationHC_ID[CGid][0]
@@ -441,20 +446,21 @@ class ModuleHP():
         model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
 
         print "ModuleHP(setEquipmentFromDB): updating parameters in SQL"        
-        equipe.update({"HCGPnom":model.HPHeatCap})
-        equipe.update({"HCGTEfficiency":model.HPHeatCOP}) #changed from HPThHeatCOP,SD
-        equipe.update({"Manufact":model.HPManufacturer})
-        equipe.update({"YearManufact":model.HPYearUpdate})
-        equipe.update({"Model":model.HPModel})
+        if model.HPHeatCap != None: equipe.update({"HCGPnom":model.HPHeatCap})
+        if model.HPHeatCOP != None: equipe.update({"HCGTEfficiency":model.HPHeatCOP}) #changed from HPThHeatCOP,SD
+        if model.HPManufacturer != None: equipe.update({"Manufact":model.HPManufacturer})
+        if model.HPYearUpdate != None: equipe.update({"YearManufact":model.HPYearUpdate})
+        if model.HPModel != None: equipe.update({"Model":model.HPModel})
         equipe.update({"EquipType":getEquipmentType("HP",model.HPType)})
         equipe.update({"NumEquipUnits":1})
-#        equipe.update({"DBFuel_id":model.DBFuel_id}) #to be added in DBHeatPump
-#        equipe.update({"FuelConsum":model.HPFuelConsum}) #to be added in DBHeatPump
-#        equipe.update({"UnitsFuelConsum":model.HPUnitsFuelConsum}) #to be added in DBHeatPump
+        if model.DBFuel_id != None: equipe.update({"DBFuel_id":model.DBFuel_id})
+        if model.HPFuelConsum != None: equipe.update({"FuelConsum":model.HPFuelConsum})
+        if model.HPUnitsFuelConsum != None: equipe.update({"UnitsFuelConsum":model.HPUnitsFuelConsum})
         if model.HPElectConsum != None: equipe.update({"ElectriConsum":model.HPElectConsum})
+        if model.HPExHeatCOP != None: equipe.update({"HPExHeatCOP":model.HPExHeatCOP})
         equipe.update({"IsSelectedFromDB":1})
         equipe.update({"DatabaseNameSelection":"DBHeatPump"})
-        equipe.update({"EquipTypeFromDB":model.HPType})
+        if model.HPType != None: equipe.update({"EquipTypeFromDB":model.HPType})
         equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
 
         Status.SQL.commit()
@@ -496,7 +502,7 @@ class ModuleHP():
     def calculateCOPh_Carnot(self,Th,Tc,Tg = None):
 #----------------------------------------------------------------------------
 #   Calculates the theoretical Carnot COP.
-#XXX Pending the application of temperature corrections for secondary fluids !!!
+#XXX Pending the application of temperature corrections for secondary fluids !!! -> corrected when argument passed:+-HPTDROP
 #----------------------------------------------------------------------------
 
         if (Th<=Tc):
@@ -504,7 +510,7 @@ class ModuleHP():
             
         elif Tg==None:                              # compression heat pumps
                 COPh_Carnot = (Th+KELVIN)/(Th-Tc)
-                print "COP: ",Th,Tc,COPh_Carnot
+                print "Th, Tc, COPh_Carnot: ",Th,Tc,COPh_Carnot
                 
         else:                                       # absorption heat pumps
             COPh_Carnot = ((Tc+KELVIN)*(Tg-Th))/((Tg+KELVIN)*(Th-Tc))+1
@@ -631,7 +637,7 @@ class ModuleHP():
                     USHj = self.calculateEnergyFlows(equipe,equipeC,self.cascadeIndex)
                     HOp = USHj/equipe.HCGPnom
 
-                    print "ModuleHP (designAssistant1): USH: ",USHj," HOp: ",HOp
+                    print "\nModuleHP (designAssistant1): USH: ",USHj," HOp: ",HOp
                     print "ModuleHP (designAssistant1): UHPMinHop: ",DA.UHPMinHop
                    
                     if (HOp >= DA.UHPMinHop):
@@ -714,8 +720,11 @@ class ModuleHP():
         print "ModuleHP (calculateEnergyFlows): PNom",equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
         print "ModuleHP (calculateEnergyFlows): COP",equipe.HCGTEfficiency
-#        COPex = equipeC.HCGCOPex       XXX To be introduced in DB
-        COPex = 0.3 
+        if equipeC.HPExHeatCOP is None or NULL:
+            print 'Exergetic COP (heating) =', equipeC.HPExHeatCOP
+            COPex = 0.3
+        else:
+            COPex = equipeC.HPExHeatCOP
 
         for i in range(cascadeIndex+1):
             print "cascade[%s]: "%i,Status.int.cascade[i-1]["equipeNo"]
@@ -920,7 +929,7 @@ if __name__ == "__main__":
     Status.ANo = 0
     Status.SetUpId = 1 #this is PSetUpData_ID
 
-    HPid = 31
+##    HPid = 31
     
     interf = Interfaces()
 
@@ -932,7 +941,7 @@ if __name__ == "__main__":
     mod = ModuleHP(keys)
 ##    mod.updatePanel()
     mod.initPanel()
-    mod.calcTPinchAndTGap()
+##    mod.calcTPinchAndTGap()
 ##    (equipe,equipeC) = mod.addEquipmentDummy()
 ##    mod.setEquipmentFromDB(equipe,equipeC,HPid)
 ##    mod.designAssistant1()
@@ -940,3 +949,41 @@ if __name__ == "__main__":
 
 ##    Interfaces.setGraphicsData(interf,'HP Config',[99., 'HP COMP',99.,99.,99.,99.,99.])
 ##    mod.setUserDefinedParamHP()
+
+    # Step 1 design assistant: gets a preselected list of possible heat pumps
+
+    (mode,HPList) = mod.designAssistant1()
+        
+#..............................................................................
+# In interactive mode open DB Edidor Heat pump and select manually
+
+    print 'Mode of selection:', mode
+
+    if (mode == "MANUAL"):
+
+        print 'Select heat pump from preselected list' # title for the dialogs
+        print 'preselected HPList =', HPList
+
+        if len(HPList) > 0:
+            HPId = HPList[0]
+        else:
+            HPId = -1
+            print "PanelHP: no HP selected after DA1 -> check whether this works"
+
+    elif (mode == "AUTOMATIC"):
+        HPId = HPList[0]    #in automatic mode just take first in the list
+
+    elif (mode == "CANCEL"):
+        HPId = -1 #make designAssistant2 to understand that
+    else:
+        print "PanelHP (DesignAssistant-Button): erroneous panel mode: ",mode
+
+##..............................................................................
+## Step 2 design assistant: add selected equipment to the list and update display
+
+    print 'Selected HPId =', HPId
+    
+    mod.designAssistant2(HPId)
+
+
+
