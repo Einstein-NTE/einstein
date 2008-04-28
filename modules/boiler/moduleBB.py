@@ -60,6 +60,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
+from einstein.modules.constants import *
 
 class ModuleBB(object):
 
