@@ -11,13 +11,12 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
-#
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -50,6 +49,9 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+COLNO = 8
+MAXROWS = 50
+
 
 class PanelEA5(wx.Panel):
     def __init__(self, parent, id, pos, size, style, name):
@@ -74,7 +76,12 @@ class PanelEA5(wx.Panel):
         #
         # lower grid: SEC by product
         #
-        (rows,cols) = Interfaces.GData[keys[1]].shape
+        try:
+            (rows,cols) = Interfaces.GData[keys[1]].shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         ignoredrows = []
         ignoredrows.append(rows-1)
 
@@ -101,8 +108,13 @@ class PanelEA5(wx.Panel):
         #
         # set upper grid
         #
-        data = Interfaces.GData[keys[0]]
-        (rows,cols) = data.shape
+        try:
+            data = Interfaces.GData[keys[0]]
+            (rows,cols) = data.shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         self.grid1.CreateGrid(rows, cols)
 
         self.grid1.EnableGridLines(True)
@@ -120,7 +132,10 @@ class PanelEA5(wx.Panel):
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r][c])
+                try:    
+                    self.grid1.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -130,8 +145,14 @@ class PanelEA5(wx.Panel):
         #
         # set lower grid
         #
-        data = Interfaces.GData[keys[1]]
-        (rows,cols) = data.shape
+
+        try:
+            data = Interfaces.GData[keys[1]]
+            (rows,cols) = data.shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         self.grid2.CreateGrid(max(rows,20), cols)
 
         self.grid2.EnableGridLines(True)
@@ -154,7 +175,10 @@ class PanelEA5(wx.Panel):
         for r in range(rows):
             self.grid2.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid2.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid2.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
                 if c == labels_column:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:

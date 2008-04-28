@@ -18,10 +18,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Claudia Vannoni 	17/04/2008
-#                           
+#                           Claudia Vannoni 	25/04/2008
+#                           Claudia Vannoni 	27/04/2008
 #       Changes in last update:
+#                           complete export data, arrange parameters and labels
 #       
 #
 #	
@@ -48,12 +50,12 @@ import einstein.GUI.pSQL as pSQL, MySQLdb
 #------------------------------------------------------------------------------
 class CheckFETel():
 #------------------------------------------------------------------------------
-#   Carries out consistency checking for process k
+#   Carries out consistency checking 
 #------------------------------------------------------------------------------
 
     def __init__(self):     #function that is called at the beginning when object is created
 
-# assign a variable to all intermediate values needed
+# assign a variable to all intermediate/calculated values needed
         
         self.ElectricityNet = CCPar("ElectricityNet") 
         self.ElectricityNet1 = CCPar("ElectricityNet1")
@@ -84,7 +86,7 @@ class CheckFETel():
         ANo = -1
         
 #..............................................................................
-# assign empty CCPar to all necessary parameters
+# assign empty CCPar to all questionnaire parameters
 
         self.ElectricityGen = CCPar("ElectricityGen")
         self.ElectricitySales = CCPar("ElectricitySales")
@@ -145,7 +147,7 @@ class CheckFETel():
         ANo = 0
         
 #..............................................................................
-# writing data from table "cgeneraldata"
+# writing data to table "cgeneraldata"
         try:
             cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
             if len(cgeneraldataTable) > 0:
@@ -154,6 +156,11 @@ class CheckFETel():
 
                 cgeneraldata.ElectricityGen = self.ElectricityGen.val
                 cgeneraldata.ElectricitySales = self.ElectricitySales.val
+                cgeneraldata.ElectricityNet = self.ElectricityNet.val
+                cgeneraldata.FECel = self.FECel.val
+                cgeneraldata.FEOel = self.FEOel.val
+                cgeneraldata.FETel = self.FETel.val
+                
 
                 Status.SQL.commit()
                 
@@ -187,6 +194,7 @@ class CheckFETel():
 
         #self.ElProd electricty required per product, has to be defined as vector
 
+        
 #------------------------------------------------------------------------------
     def importTestData(self):  #later on should import data from SQL. now simply sets to some value
 #------------------------------------------------------------------------------
@@ -328,6 +336,10 @@ class CheckFETel():
 #------------------------------------------------------------------------------
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
+        if DEBUG in ["ALL"]:
+            print "-------------------------------------------------"
+            print " Process checking"
+            print "-------------------------------------------------"
         for n in range(3):
 
             if DEBUG in ["ALL"]:
@@ -380,11 +392,10 @@ class CheckFETel():
             if DEBUG in ["ALL"]:
                 self.showAllFETel()
 
-# Step 4: Adjust the variables (inverse of calculation routines)
+# Step 4: second cross check the variables
 
-                print "Step 3: calculating from right to left (ADJUST)"
-
-
+                print "Step 4: second cross checking"
+               
             ccheck1(self.ElectricityNet,self.ElectricityNet1)
     #            ccheck2(self.FECel,self.FECel1,self.FECel2)
             ccheck1(self.FECel,self.FECel1)

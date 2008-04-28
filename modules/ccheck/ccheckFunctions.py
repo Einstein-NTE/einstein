@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
+#	Version No.: 0.09
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni     9/04/2008
 #                           Hans Schweiger      09/04/2008
@@ -27,6 +27,7 @@
 #                           Hans Schweiger      18/04/2008
 #                           Hans Schweiger      23/04/2008
 #                           Hans Schweiger      24/04/2008
+#                           Hans Schweiger      25/04/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -41,6 +42,7 @@
 #                   general testing and correction of several bugs
 #       23/04/08 HS method setValue added in CCPar
 #       24/04/08 HS added method "screen" in CCPar
+#       25/04/08 HS tracking of conflicts in ccheck-functions 
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -60,14 +62,14 @@ MAX_SQERR = 1       # critical square error for screening
 
 CONFIDENCE = 2      #maximum relation between statistical square error and abs.min/max
 
-DEBUG = "BASIC" #Set to:
+DEBUG = "OFF" #Set to:
                 #"ALL": highest level,
                 #"CALC": only debug in CALC Functions
                 #"ADJUST": only debug in ADJUST Functions
                 #"BASIC": basic debugging (not yet implemented)
                 #"OFF" or any other value ...: doesn't print anything
 
-TEST = True
+TEST = False
 TESTCASE = 3
                 
 from math import *
@@ -89,6 +91,8 @@ class CCPar():
         self.valMin = 0         #default: non-negative values !!!!
         self.valMax = INFINITE
 
+        self.track = [self.name]
+
 #------------------------------------------------------------------------------
     def update(self,new):
 #------------------------------------------------------------------------------
@@ -96,6 +100,22 @@ class CCPar():
         self.sqerr = new.sqerr
         self.valMin = new.valMin
         self.valMax = new.valMax
+
+        newtrack = new.track
+        self.track = []
+        self.track.extend(newtrack)
+
+#------------------------------------------------------------------------------
+    def cleanUp(self):
+#------------------------------------------------------------------------------
+#   cleans the track from double entries
+#------------------------------------------------------------------------------
+
+        cleanTrack = []
+        for entry in self.track:            
+            if entry not in cleanTrack:
+                cleanTrack.append(entry)
+        self.track = cleanTrack
 
 #------------------------------------------------------------------------------
     def setValue(self,val,err=DEFAULT_SQERR):
@@ -189,7 +209,7 @@ class CCPar():
 #------------------------------------------------------------------------------
     def show(self):
 #------------------------------------------------------------------------------
-        print "%s = "%self.name,self.val,"(sqerr: %s)"%self.sqerr,"[%s"%self.valMin,",%s"%self.valMax,"]"
+        print "%s = "%self.name,self.val,"(sqerr: %s)"%self.sqerr,"[%s"%self.valMin,",%s"%self.valMax,"]",self.track
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -204,6 +224,10 @@ class CCPar():
         elif (self.sqerr > MAX_SQERR):
             err = pow(self.sqerr,0.5)*100
             CCScreen.screenList.append([self.name,self.val, str(err)+"%"])
+
+        if DEBUG in ["ALL","BASIC"]:
+            print "CCPar (screen): screening parameter"
+            self.show()
 #------------------------------------------------------------------------------
 
 
@@ -253,6 +277,39 @@ class CCScreen():
         print "CCScreen: %s parameters screened"%len(CCScreen.screenList)
         for i in range(len(CCScreen.screenList)):
             print i+1, CCScreen.screenList[i]
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+class CCConflict():
+#------------------------------------------------------------------------------
+#   module for screening of conflicts between data
+#------------------------------------------------------------------------------
+
+    conflictList = []
+    nConflictChecked = 0
+    nConflicts = 0
+    
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        CCConflict.conflictList = []
+        CCConflict.nConflictChecked = 0
+        CCConflict.nConflicts = 0
+
+    def show(self):
+        print "CCConflict: %s parameters screened for possible conflicts"%len(CCConflict.conflictList)
+        for i in range(len(CCConflict.conflictList)):
+            print i+1, CCConflict.conflictList[i]
+
+    def screen(self,y1,y2,dif,maxDif):
+
+        y1err = pow(y1.sqerr,0.5)
+        y2err = pow(y2.sqerr,0.5)
+        
+        row = [dif,maxDif,y1.name,y1.track,y1.val,y1err,y2.name,y2.track,y2.val,y2err]
+        CCConflict.conflictList.append(row)
+        CCConflict.nConflicts += 1
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -327,6 +384,11 @@ def calcK(yname,a,x1):
     y.valMax = min(INFINITE,a*x1.valMax)
     y.constrain()
 
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.cleanUp()
+
     return y
 
 #------------------------------------------------------------------------------
@@ -350,6 +412,12 @@ def calcProd(yname,x1,x2):
     y.valMin = x1.valMin * x2.valMin
     y.valMax = min(INFINITE,x1.valMax*x2.valMax)
     y.constrain()
+
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.track.extend(x2.track)
+        y.cleanUp()
 
     if DEBUG in ["ALL","CALC"]:
         print "CalcProd(x1,x2)____________________________________"
@@ -382,6 +450,12 @@ def calcProdC(yname,a,x1,x2):
     y.valMax = min(INFINITE,a*x1.valMax*x2.valMax)
     y.constrain()
 
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.track.extend(x2.track)
+        y.cleanUp()
+
     if DEBUG in ["ALL","CALC"]:
         print "CalcProdC(x1,x2)___________________________________"
         x1.show()
@@ -413,6 +487,12 @@ def calcSum(yname,x1,x2):
     y.valMin = min(INFINITE,x1.valMin + x2.valMin)
     y.valMax = min(INFINITE,x1.valMax + x2.valMax)
     y.constrain()
+
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.track.extend(x2.track)
+        y.cleanUp()
 
     if DEBUG in ["ALL","CALC"]:
         print "CalcSum(x1,x2)_____________________________________"
@@ -447,6 +527,13 @@ def calcSum3(yname,x1,x2,x3): # To be replaced by the matrixsumcalc
     y.valMax = min(INFINITE,x1.valMax+x2.valMax+x3.valMax)
 
     y.constrain()
+
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.track.extend(x2.track)
+        y.track.extend(x3.track)
+        y.cleanUp()
 
     if DEBUG in ["ALL","CALC"]:
         print "CalcSum3(x1,x2,x3)_________________________________"
@@ -501,6 +588,13 @@ def calcRowSum(name,row,m):
 
     y.constrain()
 
+    if y.val is not None:
+        y.track = []
+        for i in range(len(row)):
+            y.track.extend(row[i].track)
+
+        y.cleanUp()
+
     if DEBUG in ["ALL","CALC"]:
         print "CalcRowSum(y,row)__________________________________"
         for i in range(len(row)):
@@ -536,6 +630,13 @@ def calcDiff(yname,x1,x2):
 
     y.constrain()
     
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.track.extend(x2.track)
+
+        y.cleanUp()
+
     if DEBUG in ["ALL","CALC"]:
         print "CalcDiff(x1,x2)____________________________________"
         x1.show()
@@ -596,6 +697,12 @@ def adjustcalcK(y,a,x1):
     x1.valMax = min(y.valMax/a,INFINITE)
 
     x1.constrain()
+
+    if y.val is not None:
+        x1.track = []
+        x1.track.extend(y.track)
+
+        x1.cleanUp()
         
 #------------------------------------------------------------------------------
 def adjustProd(y,x1,x2):
@@ -651,13 +758,30 @@ def adjustProd(y,x1,x2):
     x1.constrain()
     x2.constrain()
 
+    if y.val is not None:
+
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
+
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustProd_________________________________________"
         y.show()
         x1.show()
         x2.show()
         print "___________________________________________________"
-
             
 #------------------------------------------------------------------------------
 def adjustProdS(y,x1,x2):
@@ -672,7 +796,7 @@ def adjustProdS(y,x1,x2):
         x1.show()
         x2.show()
     
-    if not (y.val == None):
+    if y.val is not None:
 #..............................................................................
 #Case 1: both x1 and x2 unknown
         
@@ -767,13 +891,30 @@ def adjustProdS(y,x1,x2):
     x1.constrain()
     x2.constrain()
 
+    if y.val is not None:
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
+
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustProdS final result..........................."
         y.show()
         x1.show()
         x2.show()
         print "___________________________________________________"
-    
+
 #------------------------------------------------------------------------------
 def adjustProdC(y,a,x1,x2):
 #------------------------------------------------------------------------------
@@ -787,7 +928,7 @@ def adjustProdC(y,a,x1,x2):
         x1.show()
         x2.show()
     
-    if not (y.val == None):
+    if y.val is not None:
         if not (x1.val == None) and ((x1.sqerr < x2.sqerr) or (x2.val == None)):
             if (x1.val ==0):
                 if y.val > 0:
@@ -827,6 +968,23 @@ def adjustProdC(y,a,x1,x2):
 
     x1.constrain()
     x2.constrain()
+
+    if y.val is not None:
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
 
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustProdC________________________________________"
@@ -893,6 +1051,23 @@ def adjustSum(y,x1,x2):
     x1.constrain()
     x2.constrain()
 
+    if y.val is not None:
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
+
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustSum after adjustment",x1.name,x2.name
         y.show()
@@ -920,6 +1095,23 @@ def adjustSumS (y,x1,x2): #Adjusting simultaneously both values, not only the wo
     x1.update(row[0])
     x2.update(row[1])
 
+    if y.val is not None:
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
+
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustSumS after adjustment",x1.name,x2.name
         y.show()
@@ -944,7 +1136,7 @@ def adjustSum3(y,x1,x2,x3): #Adjusting any value not only the worst
     row = [x1,x2,x3]
         
     adjRowSum("adjustSum3",y,row,3)
-    
+
     x1.update(row[0])
     x2.update(row[1])
     x3.update(row[2])
@@ -1081,15 +1273,21 @@ def adjRowSum(name,y,row,m):
                                 
         diff = abs(Sum - y.val)
 
-    if DEBUG in ["ALL","ADJUST"]:
-        print "results before constraint:_________________________"
-        y.show()
-        for i in range(m):
-            row[i].show()  
-        print "___________________________________________________"
-        
     for i in range(m):
         row[i].constrain()
+
+    if y.val is not None:
+        newtrack = []
+        for i in range(m):
+            newtrack.append([])
+            newtrack[i].extend(y.track)
+            for j in range(m):
+                if not (i==j) and row[i].val is not None:
+                    newtrack[i].extend(row[i].track)
+        for i in range(m):
+            row[i].track = []
+            row[i].track.extend(newtrack[i])
+            row[i].cleanUp()
 
     if DEBUG in ["ALL","ADJUST"]:
         print "results:___________________________________________"
@@ -1155,12 +1353,30 @@ def adjustDiff(y,x1,x2):
         x1.constrain()
         x2.constrain()
 
+    if y.val is not None:
+        newtrackx1 = []
+        newtrackx1.extend(y.track)
+        if x2.val is not None:
+            newtrackx1.extend(x2.track)
+
+        newtrackx2 = []
+        newtrackx2.extend(y.track)
+        if x1.val is not None:
+            newtrackx2.extend(x1.track)
+
+        x1.track = newtrackx1
+        x2.track = newtrackx2
+
+        x1.cleanUp()
+        x2.cleanUp()
+
     if DEBUG in ["ALL","ADJUST"]:
         print "results:___________________________________________"
         y.show()
         x1.show()
         x2.show()
         print "___________________________________________________"
+
 
 #------------------------------------------------------------------------------
 def adjustFlow(Qdot,cp,m,T1,T0,DT,DT1):
@@ -1211,13 +1427,7 @@ def ccheck1(y0,y1):
                
     else: #case 4 Pnom1 = ok, Pnom2 = ok
         y = meanValueOf(y0,y1)
-        
-        if not isequal(y.val,y1.val):
-            pass
- 
-        if not isequal(y.val,y0.val):
-            pass
-             
+                     
 #..............................................................................
 # Updating values
 
@@ -1321,19 +1531,7 @@ def ccheck2(y0,y1,y2):
 # Case 8:USH3 known, USH1 known,USH2 known,
 
                     y = meanValueOf3(y0,y1,y2)
-                                                        
-                    if not isequal(y.val,y1.val):
-#                        print " Case8: USH1, USH2, USH3 known and USH1 to be adjusted"
-                        pass
-             
-                    if not isequal(y.val,y2.val):
-#                        print "Case8: USH1, USH2, USH3 known and USH2 to be adjusted"
-                        pass
-                    
-                    if not isequal(y.val,y0.val):
-#                        print "Case8: USH1, USH2, USH3 known and USH3 to be adjusted"
-                        pass
-                    
+                                                                            
 #..............................................................................
 # Updating values
 
@@ -1363,11 +1561,11 @@ def ccheck3(y0,y1,y2,y3):
     row = CCRow("ccheck3-row",4)
     y = CCPar("ccheck3-y")
     
-    row[0].update(y0)
-    row[1].update(y1)
-    row[2].update(y2)
-    row[3].update(y3)
-
+    row[0] = y0
+    row[1] = y1
+    row[2] = y2
+    row[3] = y3
+                
     y = meanOfRow(row,4)
 
     y0.update(y)
@@ -1376,6 +1574,71 @@ def ccheck3(y0,y1,y2,y3):
     y3.update(y)
 
     
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+def checkIfConflict(y1,y2):
+#------------------------------------------------------------------------------
+#   Checks if there is a conflict between values and error ranges of y1 and y2
+#------------------------------------------------------------------------------
+#..............................................................................
+
+    dif=abs(y1.val-y2.val)
+    maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
+    
+    if dif > maxDif + NUMERIC_ERR:
+        print "======================================================"
+        print "WARNING !!!! "
+        print "CCheckFunctions (checkIfConflict): contradiction found"
+        y1.show()
+        y2.show()
+        print "dif = ",dif," maxDif = ",maxDif
+        print "======================================================"
+        conflict.screen(y1,y2,dif,maxDif)
+        
+
+    
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+def trackBestOf(y1,y2):
+#------------------------------------------------------------------------------
+#   takes the track of the best
+#------------------------------------------------------------------------------
+
+    if (y1.sqerr < y2.sqerr):
+            return y1.track
+    else:
+            return y2.track
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+def trackBestOf3(y1,y2,y3):
+#------------------------------------------------------------------------------
+#   takes the track of the best
+#------------------------------------------------------------------------------
+
+    if (y1.sqerr < y2.sqerr and y1.sqerr < y3.sqerr):
+            return y1.track
+    elif (y2.sqerr < y3.sqerr):
+            return y2.track
+    else:
+            return y3.track
+
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+def trackBestOfRow(row,m):
+#------------------------------------------------------------------------------
+#   takes the track of the best
+#------------------------------------------------------------------------------
+
+    best = INFINITE
+    track = []
+    for i in range(m):
+        if row[i].sqerr <= best:
+            best = row[i].sqerr
+            track = row[i].track
+    return track            
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 def bestOf(y1,y2):
@@ -1418,6 +1681,7 @@ def meanValueOf(y1,y2):
 #------------------------------------------------------------------------------
 
     mean = CCPar("meanValueOf")
+    mean.track = trackBestOf(y1,y2)
 
     if DEBUG=="ALL":
         print "meanValueOf", y1.val, y1.sqerr, y2.val, y2.sqerr
@@ -1430,11 +1694,11 @@ def meanValueOf(y1,y2):
 
     else:
         mean.val=0.5*(y1.val+y2.val)
-    
+
     dif=abs(y1.val-y2.val)
     maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
     
-    if dif > maxDif:
+    if dif > maxDif + NUMERIC_ERR:
         print "======================================================"
         print "WARNING !!!! "
         print "CCheckFunctions (meanValueOf): contradiction found"
@@ -1448,6 +1712,8 @@ def meanValueOf(y1,y2):
     mean.valMax = min(y1.valMax,y2.valMax)
     
     mean.constrain()
+
+    checkIfConflict(y1,y2)
     
     return mean   
 
@@ -1460,6 +1726,8 @@ def meanValueOf3(y1,y2,y3):
 #------------------------------------------------------------------------------
 
     mean = CCPar("meanValueOf3")
+    mean.track = trackBestOf3(y1,y2,y3)
+
     if DEBUG=="ALL":
         print "meanValueOf", y1.val, y1.sqerr, y2.val, y2.sqerr, y3.val, y3.sqerr
 
@@ -1502,6 +1770,10 @@ def meanValueOf3(y1,y2,y3):
             
     mean.constrain()
 
+    checkIfConflict(y1,y2)
+    checkIfConflict(y1,y3)
+    checkIfConflict(y2,y3)
+
     return mean   
 
 #------------------------------------------------------------------------------
@@ -1512,6 +1784,8 @@ def meanOfRow(row,m):
 #------------------------------------------------------------------------------
 
     mean = CCPar("meanOfRow")
+    mean.track = trackBestOfRow(row,m)
+
     if DEBUG in ["ALL","ADJUST"]:
         print "meanOfRow__________________________________________"
         for i in range(m):
@@ -1539,6 +1813,13 @@ def meanOfRow(row,m):
         mean.val = sumVal/sumWeight
 
     mean.constrain()
+
+    for i in range(m):
+        if row[i].val is not None:
+            for j in range(i+1,m):
+                if row[j].val is not None:
+                    checkIfConflict(row[i],row[j])
+    
     if DEBUG in ["ALL","ADJUST"]:
         mean.show()
         print "___________________________________________________"
@@ -1590,8 +1871,6 @@ def countNones(row):
             
     return (noneCounter,isnone)
           
-
-
 #==============================================================================
 
 #creates a Cycle-instance for being used in cycle checking
@@ -1599,4 +1878,5 @@ def countNones(row):
 cycle = Cycle(10,1.e-3,1.e-5,3)     #basic cycle set-up for cycle class
 
 #==============================================================================
-
+conflict = CCConflict()     #instance for access to CCConflict functions
+screen = CCScreen()

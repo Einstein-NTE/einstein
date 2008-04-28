@@ -18,17 +18,21 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.06
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni      7/04/2008
 #                           Claudia Vannoni      16/04/2008
 #                           Hans Schweiger      19/04/2008
+#                           Claudia Vannoni      25/04/2008
+#                           Claudia Vannoni      27/04/2008
+#                    
 #
 #       Changes in last update: 
 #       v004:adjustSum3
 #           Nones eliminated in initialisation of sqerr
 #       19/04/2008: HS  PT1,2,3 and PTInFlow1 added as tmp-variables
-#
+#       v005: import from SQL, PT, ccheck of USHProc1
+#       v0.06: small changes in labels,added the connection to the DB.
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -46,7 +50,9 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 from math import *
 from ccheckFunctions import *
 
-
+#libraries necessary for SQL access:
+from einstein.GUI.status import *
+import einstein.GUI.pSQL as pSQL, MySQLdb
 
 #------------------------------------------------------------------------------
 class CheckProc():
@@ -61,18 +67,21 @@ class CheckProc():
 
     def __init__(self,k):     #function that is called at the beginning when object is created
 
-# assign a variable to all intermediate values needed
+
+# assign a variable to all intermediate/calculated values needed
         
-        self.PT1 = CCPar("PT1") #HS2008-04-18 additional variable added
-        self.PT2 = CCPar("PT2") #HS2008-04-18 additional variable added        
-        self.PT3 = CCPar("PT3") #HS2008-04-18 additional variable added
-        self.PTInFlow1 = CCPar("PTInFlow1") #HS2008-04-19 added
-        self.TOpProc1 = CCPar("TOpProc1") 
+        self.PT1 = CCPar("PT1") 
+        self.PT2 = CCPar("PT2")         
+        self.PT3 = CCPar("PT3") 
+        self.PTInFlow1 = CCPar("PTInFlow1")
+        self.PTInFlowRec1 = CCPar("PTInFlowRec1")
+        self.HperYearProc1 = CCPar("HperYearProc1")
+        self.HperYearProc = CCPar("HperYearProc")
         self.DTLoss1=CCPar("DTLoss1")
         self.DTLoss=CCPar("DTLoss")
-        self.VInFlowDay1 = CCPar("VInFlowDay1") #HS2008-04-19 additional variable added
-        self.VInFlowDay2 = CCPar("VInFlowDay1") #HS2008-04-19 additional variable added
-        self.VInFlowDay3 = CCPar("VInFlowDay1") #HS2008-04-19 additional variable added
+        self.VInFlowDay1 = CCPar("VInFlowDay1") 
+        self.VInFlowDay2 = CCPar("VInFlowDay1") 
+        self.VInFlowDay3 = CCPar("VInFlowDay1")
         self.QLoss = CCPar("QLoss")
         self.QLoss1 = CCPar("QLoss1")
         self.QOpProc1 = CCPar("QOpProc1")
@@ -106,17 +115,137 @@ class CheckProc():
         self.UPH1 = CCPar("UPH1")
         self.UPH2 = CCPar("UPH2")
         self.UPH = CCPar("UPH")
-        
+        self.UPHProc1 = CCPar("UPHProc1")
+        self.QHXProc1 = CCPar("QHXProc1")
+        self.UAProc = CCPar("UAProc")
+        self.QEvapProc = CCPar("UAProc")
         self.UPHcGross = CCPar("UPHcGross")
         self.QHXProcInt = CCPar("QHXProcInt")
 
 
-        if TEST:
+        if TEST==True:
             self.importTestData(k)
         else:
-#            self.importData()
-            self.importTestData(k)
+            self.importData(k)
+
+        if DEBUG in ["ALL","BASIC"]:
+            self.showAllUPH()
+#------------------------------------------------------------------------------
+    def importData(self,k):  
+#------------------------------------------------------------------------------
+#   imports data from SQL tables (from AlternativeProposalNo = -1)
+#------------------------------------------------------------------------------
+
+        ANo = -1
+        
+#..............................................................................
+# assign empty CCPar to all questionnaire parameters
+
+        self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
+        self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+
+        self.PTInFlow = CCPar("PTInFlow")
+        self.PT = CCPar("PT")
+        self.PTOutFlow = CCPar("PTOutFlow")# assumed to be Tpor
+        self.PTOutFlowRec = CCPar("PTOutFlowRec") # It is not defined in the questionnaire. it has to be estimated
+        self.PTInFlowRec = CCPar("PTInFlowRec")
+        self.PTStartUp = CCPar("PTStartUp")
+        self.VInFlowDay = CCPar("VInFlowDay ")
+        self.VolProcMed = CCPar("VolProcMed")
+        self.VolProcMed = CCPar("VolProcMed")
+        self.NDaysProc = CCPar("NDaysProc")
+        self.HPerDayProc = CCPar("HPerDay")
+        self.NBatch = CCPar("NBatch")
+        self.TEnvProc = CCPar("TEnvProc")
+        self.QOpProc = CCPar("QOpProc")
+        self.UPHProc = CCPar("UPHProc")
+
+        self.QHXProc = CCPar("QHXProc")# It comes from the matrix (and from calculation from questionnaire??)
+        
+        
+#..............................................................................
+# reading data from table "qprocessdata"
+        try:
+            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[k+1]
+            
+            if len(qprocessdataTable) > 0:
+                qprocessdata = qprocessdataTable[0]
+
+
+                self.PTInFlow.setValue(qprocessdata.PTInFlow)
+                self.PT.setValue(qprocessdata.PT)
+                self.PTOutFlow.setValue(qprocessdata.PTOutFlow)
+#                self.PTOutFlowRec.setValue(qprocessdata.PTOutFlowRec)  #does not exist yet
+                self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
+                self.PTStartUp.setValue(qprocessdata.PTStartUp)
+                self.VInFlowDay.setValue(qprocessdata.VInFlowDay) 
+                self.VolProcMed.setValue(qprocessdata.VolProcMed) 
+                self.NDaysProc.setValue(qprocessdata.NDaysProc)
+                self.HPerDayProc.setValue(qprocessdata.HPerDayProc) 
+                self.NBatch.setValue(qprocessdata.NBatch) 
+                self.TEnvProc.setValue(qprocessdata.TEnvProc)
+                self.QOpProc.setValue(qprocessdata.QOpProc) 
+                self.UPHProc.setValue(qprocessdata.UPHProc) 
+
+                self.QHXProc.setValue(0.0)  
+               
+        except:
+            print "CheckProc(importData): error reading data from qprocessdata"
             pass
+
+#------------------------------------------------------------------------------
+    def exportData(self,k):  
+#------------------------------------------------------------------------------
+#   stores corrected data in SQL (under AlternativeProposalNo = 0)
+#------------------------------------------------------------------------------
+
+        ANo = 0
+        
+#..............................................................................
+# writing data into table " qprocessdata"
+        try:
+            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[k+1]
+            if len(qprocessdataTable) > 0:
+                print "exporting data to qprocessdata"
+                qprocessdata = qprocessdataTable[0]
+
+        
+                qprocessdata.PTInFlow = self.PTInFlow.val
+                qprocessdata.PT = self.PT.val
+                qprocessdata.PTOutFlow = self.PTOutFlow.val
+                qprocessdata.PTOutFlowRec = self.PTOutFlowRec.val #do not exist yet
+                qprocessdata.PTInFlowRec = self.PTInFlowRec.val
+                qprocessdata.PTStartUp = self.PTStartUp.val
+                qprocessdata.VInFlowDay = self.VInFlowDay.val
+                qprocessdata.VolProcMed = self.VolProcMed.val
+                qprocessdata.NDaysProc = self.NDaysProc.val
+                qprocessdata.HPerDayProc = self.HPerDayProc.val
+                qprocessdata.NBatch = self.NBatch.val
+                qprocessdata.TEnvProc = self.TEnvProc.val
+                qprocessdata.QOpProc = self.QOpProc.val
+                qprocessdata.UPHProc = self.UPHProc.val
+                qprocessdata.HperYearProc = self.HperYearProc.val
+                qprocessdata.UAProc = self.UAProc.val
+                qprocessdata.QEvapProc = self.QEvapProc.val
+                qprocessdata.UPHcGross = self.UPHcGross.val
+                qprocessdata.QHXProcint = self.QHXProcInt.val
+                qprocessdata.UPHm = self.UPHm.val
+                qprocessdata.UPHs = self.UPHs.val
+                qprocessdata.UPHc = self.UPHc.val
+                qprocessdata.UPH = self.UPH.val
+
+
+        # QLoss, UPHcdotGross, UPHcdot, QHXdotProcInt, NBatchPerYear, UPHsdot not into the qprocessdat DB and not exported yet 
+         
+                                       
+
+                Status.SQL.commit()
+                
+        except:
+            print "CheckProc (exportData): error writing data to qprocessdata"
+            pass
+
+
 
     def importTestData(self,k):  #later on should import data from SQL. now simply sets to some value
 
@@ -137,9 +266,9 @@ class CheckProc():
             self.PTOutFlow.val = 37
             self.PTOutFlow.sqerr = 0.5
 
-            self.PTpo = CCPar("PTpo") # It si not defined in the questionnaire. it has to be estimated
-            self.PTpo.val = 35
-            self.PTpo.sqerr = 0.5
+            self.PTOutFlowRec = CCPar("PTOutFlowRec") # It is not defined in the questionnaire. it has to be estimated
+            self.PTOutFlowRec.val = 35
+            self.PTOutFlowRec.sqerr = 0.5
 
             self.PTInFlowRec = CCPar("PTInFlowRec")
             self.PTInFlowRec.val = 50
@@ -169,19 +298,15 @@ class CheckProc():
             self.NBatch.val = 5
             self.NBatch.sqerr = 0.0
 
-            self.TOpProc = CCPar("TOpProc")
-            self.TOpProc.val = 6000
-            self.TOpProc.sqerr = 0.5  #example: big uncertainty in operating hours
-
-            self.UAProc = CCPar("UAProc")
-            self.UAProc.val = 100
-            self.UAProc.sqerr = 0.7
+            self.HperYearProc = CCPar("HperYearProc")
+            self.HperYearProc.val = None
+            self.HperYearProc.sqerr = INFINITE  
 
             self.TEnvProc = CCPar("TEnvProc")
             self.TEnvProc.val = 20
             self.TEnvProc.sqerr = 0.0
 
-            self.QEvapProc = CCPar("QEvapProc")
+            self.QEvapProc = CCPar("QEvapProc")# not into questionnaire only for test
             self.QEvapProc.val = 30000
             self.QEvapProc.sqerr = INFINITE
             
@@ -216,9 +341,9 @@ class CheckProc():
                 self.PTOutFlow.val = None
                 self.PTOutFlow.sqerr = INFINITE
 
-                self.PTpo = CCPar("PTpo") # It si not defined in the questionnaire. it has to be estimated
-                self.PTpo.val = 50
-                self.PTpo.sqerr = 0.0
+                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
+                self.PTOutFlowRec.val = 50
+                self.PTOutFlowRec.sqerr = 0.0
 
                 self.PTInFlowRec = CCPar("PTInFlowRec")
                 self.PTInFlowRec.val = 50
@@ -248,22 +373,16 @@ class CheckProc():
                 self.NBatch.val = 5
                 self.NBatch.sqerr = 0.0
 
-                self.TOpProc = CCPar("TOpProc")
-                self.TOpProc.val = 4000
-                self.TOpProc.sqerr = 0.0  #example: big uncertainty in operating hours
+                self.HperYearProc = CCPar("HperYearProc")
+                self.HperYearProc.val = None
+                self.HperYearProc.sqerr = INFINITE  
 
-                self.UAProc = CCPar("UAProc")
-                self.UAProc.val = 0.0
-                self.UAProc.sqerr = 0.0
-
+                
                 self.TEnvProc = CCPar("TEnvProc")
                 self.TEnvProc.val = 20
                 self.TEnvProc.sqerr = 0.0
 
-                self.QEvapProc = CCPar("QEvapProc")
-                self.QEvapProc.val = None
-                self.QEvapProc.sqerr = INFINITE
-                
+                                
                 self.QOpProc = CCPar("QOpProc")
                 self.QOpProc.val = 0.0
                 self.QOpProc.sqerr = 0.0
@@ -293,9 +412,9 @@ class CheckProc():
                 self.PTOutFlow.val = None
                 self.PTOutFlow.sqerr = INFINITE
 
-                self.PTpo = CCPar("PTpo") # It si not defined in the questionnaire. it has to be estimated
-                self.PTpo.val = 50
-                self.PTpo.sqerr = 0.0
+                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
+                self.PTOutFlowRec.val = 50
+                self.PTOutFlowRec.sqerr = 0.0
 
                 self.PTInFlowRec = CCPar("PTInFlowRec")
                 self.PTInFlowRec.val = 50
@@ -325,22 +444,16 @@ class CheckProc():
                 self.NBatch.val = 5
                 self.NBatch.sqerr = 0.0
 
-                self.TOpProc = CCPar("TOpProc")
-                self.TOpProc.val = 4000
-                self.TOpProc.sqerr = 0.0  #example: big uncertainty in operating hours
+                self.HperYearProc = CCPar("HperYearProc")
+                self.HperYearProc.val = None
+                self.HperYearProc.sqerr = INFINITE  
 
-                self.UAProc = CCPar("UAProc")
-                self.UAProc.val = 0.0
-                self.UAProc.sqerr = 0.0
-
+                
                 self.TEnvProc = CCPar("TEnvProc")
                 self.TEnvProc.val = 20
                 self.TEnvProc.sqerr = 0.0
 
-                self.QEvapProc = CCPar("QEvapProc")
-                self.QEvapProc.val = None
-                self.QEvapProc.sqerr = INFINITE
-                
+                                
                 self.QOpProc = CCPar("QOpProc")
                 self.QOpProc.val = 0.0
                 self.QOpProc.sqerr = 0.0
@@ -350,8 +463,9 @@ class CheckProc():
                 self.UPHProc.sqerr = 0.0    #example: quantity of heat required is well known
 
                 self.QHXProc = CCPar("QHXProc")# It comes from the matrix not from the questionnaire
-                self.QHXProc.val = 0
-                self.QHXProc.sqerr = 0
+                self.QHXProc.val = None
+                self.QHXProc.sqerr = INFINITE
+
                 
             elif (k==2):
                 self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
@@ -370,9 +484,9 @@ class CheckProc():
                 self.PTOutFlow.val = None
                 self.PTOutFlow.sqerr = INFINITE
 
-                self.PTpo = CCPar("PTpo") # It si not defined in the questionnaire. it has to be estimated
-                self.PTpo.val = 50
-                self.PTpo.sqerr = 0.0
+                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
+                self.PTOutFlowRec.val = 50
+                self.PTOutFlowRec.sqerr = 0.0
 
                 self.PTInFlowRec = CCPar("PTInFlowRec")
                 self.PTInFlowRec.val = 50
@@ -402,63 +516,72 @@ class CheckProc():
                 self.NBatch.val = 5
                 self.NBatch.sqerr = 0.0
 
-                self.TOpProc = CCPar("TOpProc")
-                self.TOpProc.val = 4000
-                self.TOpProc.sqerr = 0.0  #example: big uncertainty in operating hours
+                self.HperYearProc = CCPar("HperYearProc")
+                self.HperYearProc.val = None
+                self.HperYearProc.sqerr = INFINITE  
 
-                self.UAProc = CCPar("UAProc")
-                self.UAProc.val = 0.0
-                self.UAProc.sqerr = 0.0
-
+                
                 self.TEnvProc = CCPar("TEnvProc")
                 self.TEnvProc.val = 20
                 self.TEnvProc.sqerr = 0.0
 
-                self.QEvapProc = CCPar("QEvapProc")
-                self.QEvapProc.val = None
-                self.QEvapProc.sqerr = INFINITE
                 
                 self.QOpProc = CCPar("QOpProc")
                 self.QOpProc.val = 0.0
                 self.QOpProc.sqerr = 0.0
                 
-                self.UPHProc = CCPar("UPHProc")
+                self.UPHProc = CCPar("UPHProc")# It comes from the questionnaire
                 self.UPHProc.val = None
-                self.UPHProc.sqerr = INFINITE    #example: quantity of heat required is well known
+                self.UPHProc.sqerr = INFINITE
 
-                self.QHXProc = CCPar("QHXProc")# It comes from the matrix not from the questionnaire
-                self.QHXProc.val = 0.0
-                self.QHXProc.sqerr = 0.0
+
+                self.QHXProc = CCPar("QHXProc")# It comes from the matrix 
+                self.QHXProc.val = None
+                self.QHXProc.sqerr = INFINITE
 
         else:
-            print "CheckUSH: WARNING - don't have input data for this test case no. ",TESTCASE
+            print "CheckUPH: WARNING - don't have input data for this test case no. ",TESTCASE
 
         if DEBUG in ["ALL"]:
             self.showAllUPH()
 
     def showAllUPH(self):
         print "====================="
+
         self.UPH.show()
         self.UPH1.show()
         self.UPH2.show()
         self.UPHm.show()
+        self.UPHm1.show()
         self.UPHs.show()
+        self.UPHs1.show()
+        self.UPHsdot.show()
+        self.UPHsdot1.show()
+        self.UPHProc.show()
+        self.UPHProc1.show()
+        self.QHXProc.show()
+        self.QHXProc1.show()
         self.UPHc.show()
         self.UPHc1.show()
         self.UPHcdot.show()
+        self.UPHcdot1.show()
+        self.UPHcdot2.show()
         self.UPHcdotGross.show()
-        self.UPHcGross.show()
-        self.DTUPHcGross.show()
+        self.UPHcdotGross1.show()#For convention UPH and UPHc are net!
         self.UPHcGross.show()
         self.QHXProcInt.show()
+        self.DTUPHcGross.show()
         self.QOpProc.show()
         self.QOpProc1.show()
         self.VolProcMed.show()
-        self.TOpProc.show()
-        self.TOpProc1.show()
+        self.HperYearProc.show()
+        self.HperYearProc1.show()
         self.HPerDayProc.show()
         self.NDaysProc.show()
         self.VInFlowDay.show()
+        self.VInFlowDay1.show()
+        self.VInFlowDay2.show()
+        self.VInFlowDay3.show()
         self.PTInFlow.show()
         self.PTInFlow1.show()
         self.PT.show()
@@ -466,9 +589,10 @@ class CheckProc():
         self.PT2.show()
         self.PT3.show()
         self.PTInFlowRec.show()
+        self.PTInFlowRec1.show()
         self.PTOutFlow.show()
         self.PTStartUp.show()
-        self.PTpo.show()
+        self.PTOutFlowRec.show()
         self.NBatch.show()
         self.UAProc.show()
         self.QEvapProc.show()
@@ -477,10 +601,8 @@ class CheckProc():
         self.DTLoss.show()
         self.QLoss.show()
         self.QLoss1.show()
-        self.UPHm1.show()
         self.DTUPHcGross1.show()
         self.DTUPHcGross.show()
-        self.UPHcdotGross1.show()#For convention UPH and UPHc are net!
         self.DTQHX1.show()
         self.DTQHX2.show()
         self.DTQHX.show()
@@ -491,18 +613,47 @@ class CheckProc():
         self.NBatchPerYear.show()
         self.DTUPHcNet1.show()
         self.DTUPHcNet.show()
-        self.UPHcdot1.show()
-        self.UPHcdot2.show()
-        self.UPHcdot.show()
         self.DTUPHs1.show()
         self.DTUPHs.show()
-        self.UPHsdot1.show()
-        self.UPHsdot.show()
-        self.UPHs1.show()
-                
+        
+
         print "====================="
+#-----------------------------------------------------------------------------
+    def screen(self):  
+#------------------------------------------------------------------------------
+#   screens all variables in the block
+#------------------------------------------------------------------------------
+
+        self.PTInFlow.screen()
+        self.PT.screen()
+        self.PTOutFlow.screen()
+        self.PTOutFlowRec.screen() #do not exist yet
+        self.PTInFlowRec.screen()
+        self.PTStartUp.screen()
+        self.VInFlowDay.screen()
+        self.VolProcMed.screen()
+        self.NDaysProc.screen()
+        self.HPerDayProc.screen()
+        self.NBatch.screen()
+        self.TEnvProc.screen()
+        self.QOpProc.screen()
+        self.UPHProc.screen()
+        self.HperYearProc.screen()
+        self.UAProc.screen()
+        self.QEvapProc.screen()
+        self.UPHcGross.screen()
+        self.QHXProcInt.screen()
+        self.UPHm.screen()
+        self.UPHs.screen()
+        self.UPHc.screen()
+        self.UPH.screen()
     
+#------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
+#------------------------------------------------------------------------------
+#   main function carrying out the check of the block
+#------------------------------------------------------------------------------
+
         if DEBUG in ["ALL"]:
             print "-------------------------------------------------"
             print " Process checking"
@@ -522,17 +673,17 @@ class CheckProc():
                 print "Step 1: calculating from left to right (CALC)"
                 print "-------------------------------------------------"
                 
-            self.TOpProc1 = calcProd("TOpProc1",self.NDaysProc,self.HPerDayProc)
+            self.HperYearProc1 = calcProd("HperYearProc1",self.NDaysProc,self.HPerDayProc)
             self.DTLoss1 = calcDiff("DTLoss1",self.PT,self.TEnvProc)
             self.QLoss1 = calcProd("QLoss1",self.UAProc,self.DTLoss)
             # UA: add suggestion how to calculate
             self.QOpProc1 = calcSum("QOpProc1",self.QLoss,self.QEvapProc)
-            self.UPHm1 = calcProd("UPHm1",self.QOpProc,self.TOpProc)
+            self.UPHm1 = calcProd("UPHm1",self.QOpProc,self.HPerDayProc)
             self.UPHcdotGross1 = calcFlow("UPHcdotGross1",self.FluidCp,self.VInFlowDay,self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)
-            self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidCp,self.VInFlowDay1,self.PTpo,self.PTOutFlow,self.DTQHX,self.DTQHX1)
+            self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidCp,self.VInFlowDay1,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
             self.QHXdotProcInt2 = calcFlow("QHXdotProcInt2",self.FluidCp,self.VInFlowDay2,self.PTInFlowRec,self.PTInFlow1,self.DTQHX,self.DTQHX2)
             self.UPHcdot1 = calcDiff("UPHcdot1",self.UPHcdotGross,self.QHXdotProcInt)
-            self.UPHcdot2 = calcFlow("UPHcdot2",self.FluidCp,self.VInFlowDay3,self.PT2,self.PTInFlowRec,self.DTUPHcNet,self.DTUPHcNet1)
+            self.UPHcdot2 = calcFlow("UPHcdot2",self.FluidCp,self.VInFlowDay3,self.PT2,self.PTInFlowRec1,self.DTUPHcNet,self.DTUPHcNet1)
             self.UPHc1 = calcProd("UPHc1",self.UPHcdot,self.NDaysProc)
             self.UPHsdot1 = calcFlow("UPHsdot1",(self.FluidCp*self.FluidDensity),self.VolProcMed,self.PT3,self.PTStartUp,self.DTUPHs,self.DTUPHs1)
             self.NBatchPerYear1 =calcProd("NbatchPeryear1",self.NDaysProc,self.NBatch)
@@ -550,11 +701,12 @@ class CheckProc():
                 print "Step 2: cross checking"
                 print "-------------------------------------------------"
                 
-            ccheck3(self.PT,self.PT1,self.PT2,self.PT3)  #HS2008-04-18 -> brings into coincidence the different PT's
+            ccheck3(self.PT,self.PT1,self.PT2,self.PT3)
             ccheck1(self.PTInFlow,self.PTInFlow1)
+            ccheck1(self.PTInFlowRec,self.PTInFlowRec1)
             ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
             
-            ccheck1(self.TOpProc,self.TOpProc1)
+            ccheck1(self.HperYearProc,self.HperYearProc1)
             ccheck1(self.DTLoss,self.DTLoss1)
             ccheck1(self.QLoss,self.QLoss1)
             ccheck1(self.QOpProc,self.QOpProc1)
@@ -566,6 +718,8 @@ class CheckProc():
             ccheck1(self.UPHsdot,self.UPHsdot1)
             ccheck1(self.NBatchPerYear,self.NBatchPerYear1)
             ccheck1(self.UPHs,self.UPHs1)
+            ccheck1(self.UPHProc,self.UPHProc1)
+            ccheck1(self.QHXProc,self.QHXProc1)
             ccheck2(self.UPH,self.UPH1,self.UPH2)
             
 
@@ -586,13 +740,13 @@ class CheckProc():
             adjustFlow(self.UPHcdot2,self.FluidCp,self.VInFlowDay3,self.PT2,self.PTInFlowRec,self.DTUPHcNet,self.DTUPHcNet1)
             adjustDiff(self.UPHcdot1,self.UPHcdotGross,self.QHXdotProcInt)
             adjustFlow(self.QHXdotProcInt2,self.FluidCp,self.VInFlowDay2,self.PTInFlowRec,self.PTInFlow1,self.DTQHX,self.DTQHX2)
-            adjustFlow(self.QHXdotProcInt1,self.FluidCp,self.VInFlowDay1,self.PTpo,self.PTOutFlow,self.DTQHX,self.DTQHX1)
+            adjustFlow(self.QHXdotProcInt1,self.FluidCp,self.VInFlowDay1,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
             adjustFlow(self.UPHcdotGross1,self.FluidCp,self.VInFlowDay,self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)
-            adjustProd(self.UPHm1,self.QOpProc,self.TOpProc)
+            adjustProd(self.UPHm1,self.QOpProc,self.HPerDayProc)
             adjustSum(self.QOpProc1,self.QLoss,self.QEvapProc)
             adjustProd(self.QLoss1,self.UAProc,self.DTLoss)
             adjustDiff(self.DTLoss1,self.PT,self.TEnvProc)
-            adjustProd(self.TOpProc1,self.NDaysProc,self.HPerDayProc)
+            adjustProd(self.HperYearProc1,self.NDaysProc,self.HPerDayProc)
             
             if DEBUG in ["ALL"]:
                 self.showAllUPH()
@@ -603,11 +757,12 @@ class CheckProc():
                 print "Step 4: cross checking"
                 print "-------------------------------------------------"
                 
-            ccheck3(self.PT,self.PT1,self.PT2,self.PT3)  #HS2008-04-18 -> brings into coincidence the different PT's
+            ccheck3(self.PT,self.PT1,self.PT2,self.PT3)  
             ccheck1(self.PTInFlow,self.PTInFlow1)
+            ccheck1(self.PTInFlowRec,self.PTInFlowRec1)
             ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
             
-            ccheck1(self.TOpProc,self.TOpProc1)
+            ccheck1(self.HperYearProc,self.HperYearProc1)
             ccheck1(self.DTLoss,self.DTLoss1)
             ccheck1(self.QLoss,self.QLoss1)
             ccheck1(self.QOpProc,self.QOpProc1)
@@ -619,6 +774,8 @@ class CheckProc():
             ccheck1(self.UPHsdot,self.UPHsdot1)
             ccheck1(self.NBatchPerYear,self.NBatchPerYear1)
             ccheck1(self.UPHs,self.UPHs1)
+            ccheck1(self.UPHProc,self.UPHProc1)
+            ccheck1(self.QHXProc,self.QHXProc1)
             ccheck2(self.UPH,self.UPH1,self.UPH2)
             
 
@@ -638,5 +795,21 @@ class CheckProc():
 #==============================================================================
 if __name__ == "__main__":
     
-    ccProc = CheckProc(2)       # creates an instance of class CCheck
+# direct connecting to SQL database w/o GUI. for testing only
+    stat = Status("testCheckProc")
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    Status.PId = 41
+    Status.ANo = -1
+#..............................................................................
+    
+    screen = CCScreen()
+    
+    ccProc = CheckProc(1)       # creates an instance of class CCheck
     ccProc.check()
+    ccProc.exportData(1)
+
+    ccProc.screen()
+    screen.show()
+    
+#==============================================================================

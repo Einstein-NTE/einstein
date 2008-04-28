@@ -57,7 +57,11 @@ class ModuleEA4(object):
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
         self.qprocessdata = Status.DB.qprocessdata.sql_select(sqlQuery)
 #.........................................................................
-        self.initModule()
+
+        try:
+            self.initModule()
+        except:
+            pass
 
     def initModule(self):
 #------------------------------------------------------------------------------

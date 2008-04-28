@@ -58,7 +58,10 @@ class ModuleEA5(object):
         self.cproduct = Status.DB.cproduct.sql_select(sqlQuery)
         self.qproduct = Status.DB.qproduct.sql_select(sqlQuery)
 #....................................................................
-        self.initModule()
+        try:
+            self.initModule()
+        except:
+            pass
 
     def initModule(self):
 #------------------------------------------------------------------------------

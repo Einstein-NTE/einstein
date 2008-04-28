@@ -18,11 +18,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Claudia Vannoni	10/04/2008
 #	Last revised by:    Claudia Vannoni      17/04/2008
+#                           Claudia Vannoni      27/04/2008
 #
 #       Changes in last update:
+#                   v003: import from SQL, ccheck,labels
 #
 #	
 #------------------------------------------------------------------------------		
@@ -41,6 +43,10 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 from math import *
 from ccheckFunctions import *
 
+#libraries necessary for SQL access:
+from einstein.GUI.status import *
+import einstein.GUI.pSQL as pSQL, MySQLdb
+
 #------------------------------------------------------------------------------
 class CheckFETfuel():
 #------------------------------------------------------------------------------
@@ -50,17 +56,86 @@ class CheckFETfuel():
 
     def __init__(self,i):     #function that is called at the beginning when object is created
 
-# assign a variable to all intermediate values needed
+# assign a variable to all intermediate/calculated values needed
 
         self.FETFuel = CCPar("FETFuel")
         self.FETFuel1 = CCPar("FETFuel1") 
         self.FECFuel1 = CCPar("FECFuel1") 
         
-        if TEST:
+        if TEST==True:
             self.importTestData(i)
         else:
-#            self.importData(i) #should be this one, once method is created
-            self.importTestData(i)
+            self.importData(i)
+
+        if DEBUG in ["ALL","BASIC"]:
+            self.showAllFETfuel()
+#------------------------------------------------------------------------------
+    def importData(self,i):  
+#------------------------------------------------------------------------------
+#   imports data from SQL tables (from AlternativeProposalNo = -1)
+#   i = 1 ... NFuels: number of fuel
+#------------------------------------------------------------------------------
+
+        ANo = -1
+        
+#..............................................................................
+# assign empty CCPar to all questionnaire parameters
+
+        self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
+
+        self.MFuelYear = CCPar("MFuelYear")
+        self.FECFuel = CCPar("FECFuel")
+        self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
+        
+
+#..............................................................................
+# reading data from table "qfuel"
+        print "CheckFETFuel: trying to read database"
+        try:
+            qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[i]
+            print "CheckFETFuel: number of fuels = ",len(qfuelTable)
+            
+            if len(qfuelTable) > 0:
+                qfuel = qfuelTable[0]
+
+
+                self.MFuelYear.setValue(qfuel.MFuelYear)
+                self.FECFuel.setValue(qfuel.FECFuel)
+                
+                self.FEOFuel.val = 0
+                self.FEOFuel.sqerr = 0.0
+        except:
+            print "CheckFETfuel(importData): error reading data from qfuel"
+            pass
+
+#------------------------------------------------------------------------------
+    def exportData(self,i):  
+#------------------------------------------------------------------------------
+#   stores corrected data in SQL (under AlternativeProposalNo = 0)
+#------------------------------------------------------------------------------
+
+        ANo = 0
+        
+#..............................................................................
+# writing data into table " qfuel"
+        try:
+            qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[i+1]
+            if len(qfuelTable) > 0:
+                print "exporting data to qfuel"
+                qfuel = qfuelTable[0]
+
+        
+                qfuel.MFuelYear = self.MFuelYear.val
+                qfuel.FEOFuel = self.FEOFuel.val
+                qfuel.FECFuel = self.FECFuel.val
+                qfuel.FETFuel = self.FETFuel.val
+                
+                Status.SQL.commit()
+                
+        except:
+            print "CheckFETfuel (exportData): error writing data to qfuel"
+            pass
+                              
 
     def importTestData(self,i):  #later on should import data from SQL. now simply sets to some value
 
@@ -102,18 +177,41 @@ class CheckFETfuel():
     def showAllFETfuel(self):
         
         print "====================="
-
-        self.FETFuel.show()
-        self.FETFuel1.show()
+      
+        self.MFuelYear.show()
         self.FECFuel1.show()
         self.FECFuel.show()
-        self.MFuelYear.show()
         self.FEOFuel.show()
+        self.FETFuel.show()
+        self.FETFuel1.show()
                 
         print "====================="
-    
+#-----------------------------------------------------------------------------
+    def screen(self):  
+#------------------------------------------------------------------------------
+#   screens all variables in the block
+#------------------------------------------------------------------------------
+
+        print "CheckFETFuel (screen): screening"
+        self.MFuelYear.screen()
+        self.FECFuel.screen()
+        self.FEOFuel.screen()
+        self.FETFuel.screen()
+
+#------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
+#------------------------------------------------------------------------------
+#   main function carrying out the check of the block
+#------------------------------------------------------------------------------
+
+        if DEBUG in ["ALL"]:
+            print "-------------------------------------------------"
+            print " FETfuel checking"
+            print "-------------------------------------------------"
+
+        
         for n in range(10):
+            
             if DEBUG in ["ALL"]:
                 print "-------------------------------------------------"
                 print "Ciclo %s"%n
@@ -170,8 +268,24 @@ class CheckFETfuel():
 
 
 #==============================================================================
-
 if __name__ == "__main__":
     
-    ccFETfuel = CheckFETfuel(0)       # creates an instance of class CCheck
+# direct connecting to SQL database w/o GUI. for testing only
+    stat = Status("testCheckProc")
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    Status.PId = 41
+    Status.ANo = -1
+#..............................................................................
+    
+    screen = CCScreen()
+    
+    ccFETfuel = CheckFETfuel(1)       # creates an instance of class CCheck
     ccFETfuel.check()
+    ccFETfuel.exportData(1)
+
+    ccFETfuel.screen()
+    screen.show()
+    
+#==============================================================================
+

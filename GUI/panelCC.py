@@ -40,13 +40,12 @@
 
 import wx
 import wx.grid
-from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
 
 
 from einstein.modules.interfaces import *
-from einstein.GUI.dialogA import *
 from einstein.GUI.dialogOK import *
+from einstein.GUI.conflictFrame import *
 
 
 [wxID_PANELCC, wxID_PANELCCBASICCHECK, wxID_PANELCCBUTTONPANELBACK, 
@@ -109,7 +108,7 @@ class PanelCC(wx.Panel):
         self.grid.SetDefaultColSize(80)
         self.grid.SetColSize(0,120)
         self.grid.SetColSize(1,240)
-        self.grid.SetColSize(4,200)
+        self.grid.SetColSize(4,180)
         
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
@@ -290,8 +289,12 @@ class PanelCC(wx.Panel):
 #   Generate new alterantive proposal
 #------------------------------------------------------------------------------		
 
-        self.mod.basicCheck()
+        nc = self.mod.basicCheck(matrixCheck=False)
         self.display()
+
+        if nc > 0:
+            self.pu1 = conflictFrame(self)
+            self.pu1.Show()
         
 #------------------------------------------------------------------------------		
     def OnEstimateDataButton(self, event):

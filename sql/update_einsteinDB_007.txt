@@ -1,0 +1,7 @@
+--update einstein database: add FuelNo and ProcNo
+USE einstein;
+
+ALTER TABLE qfuel ADD COLUMN FuelNo INTEGER COMMENT 'number of fuel' AFTER AlternativeProposalNo;
+ALTER TABLE qprocessdata ADD COLUMN ProcNo INTEGER COMMENT 'number of process' AFTER AlternativeProposalNo;
+ALTER TABLE qprocessdata ADD COLUMN PTOutFlowRec DOUBLE COMMENT 'process temperature after int. heat rec.' AFTER PTOutFLow;
+ALTER TABLE qprocessdata ADD COLUMN UPHProc DOUBLE COMMENT 'process heat supplied from external system' AFTER UPH;

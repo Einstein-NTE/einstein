@@ -50,6 +50,9 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+COLNO = 8
+MAXROWS = 50
+
 
 class PanelEA4(wx.Panel):
     def __init__(self, parent, id, pos, size, style, name):
@@ -61,7 +64,12 @@ class PanelEA4(wx.Panel):
         #
         # upper graphic: UPH demand by process
         #
-        (rows,cols) = Interfaces.GData[keys[0]].shape
+        try:
+            (rows,cols) = Interfaces.GData[keys[0]].shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         ignoredrows = [rows-1]
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
@@ -101,8 +109,13 @@ class PanelEA4(wx.Panel):
         # set upper grid
         #
         key = keys[0]
-        data = Interfaces.GData[key]
-        (rows,cols) = data.shape
+        try:
+            data = Interfaces.GData[key]
+            (rows,cols) = data.shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         self.grid1.CreateGrid(max(rows,20), cols)
 
         self.grid1.EnableGridLines(True)
@@ -120,7 +133,11 @@ class PanelEA4(wx.Panel):
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid1.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
+                
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -131,8 +148,14 @@ class PanelEA4(wx.Panel):
         # set lower grid
         #
         key = keys[1]
-        data = Interfaces.GData[key]
-        (rows,cols) = data.shape
+
+        try:
+            data = Interfaces.GData[key]
+            (rows,cols) = data.shape
+        except:
+            rows = MAXROWS
+            cols = COLNO
+            
         self.grid2.CreateGrid(max(rows,20), cols)
 
         self.grid2.EnableGridLines(True)
@@ -154,7 +177,10 @@ class PanelEA4(wx.Panel):
         for r in range(rows):
             self.grid2.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid2.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid2.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
                 if c == labels_column:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:

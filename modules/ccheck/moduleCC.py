@@ -66,8 +66,6 @@ class ModuleCC(object):
         
         self.ccProc = []
         self.NProc = 0
-
-        self.screen = CCScreen()
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -84,6 +82,9 @@ class ModuleCC(object):
 #------------------------------------------------------------------------------
 #   function that updates the information on the CC panel on the GUI
 #------------------------------------------------------------------------------
+
+#..............................................................................
+# export screening data
 
         CCList = []
         for entry in CCScreen.screenList:
@@ -102,7 +103,50 @@ class ModuleCC(object):
         CCList = [nScreenedVars,"---",nMissingVars]
 
         Status.int.setGraphicsData(self.keys[1], CCList)  #sends the data to the GUI
+
+#..............................................................................
+# export conflict data to panel
         
+        conflictReport = []
+
+        conflictPairs = []
+        n = len(conflict.conflictList)
+        
+#        for i in range(n):
+#            index = n - i - 1
+#            entry = conflict.conflictList[index]
+
+        for entry in conflict.conflictList:
+            
+            pair = str(entry[2])+"/"+str(entry[6])
+                                         
+            if pair not in conflictPairs:
+                conflictPairs.append(pair)
+
+                row0 = [str(entry[2])+"/"+str(entry[6]),"",""]
+
+                origin1 = ""
+                for parname in entry[3]:
+                    origin1 = origin1 + str(parname) + "; "
+
+                row1 = [str(entry[4]),
+                        "+/- "+str(entry[5])+"%",
+                        origin1]
+
+                origin2 = ""
+                for parname in entry[7]:
+                    origin2 = origin2 + str(parname) + "; "
+
+                row2 = [str(entry[8]),
+                        "+/- "+str(entry[9])+"%",
+                        origin2]
+                       
+                conflictReport.append(noneFilter(row0))
+                conflictReport.append(noneFilter(row1))
+                conflictReport.append(noneFilter(row2))
+                                         
+        data = array(conflictReport)
+        Status.int.setGraphicsData("CC Conflict", data)  #sends the data to the GUI
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -185,7 +229,7 @@ class ModuleCC(object):
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def basicCheck(self):
+    def basicCheck(self,matrixCheck = True):
 #------------------------------------------------------------------------------
 #   runs the first basic Check
 #   (basic = still without estimation procedures for missing data)
@@ -246,7 +290,7 @@ class ModuleCC(object):
                 print "checking equipment no. %s"%j
                 self.ccEq[j].check()               # ejecuta la función check para equipo j
 
-                self.USHj[j].update(self.ccEq[j].USH)      #obtain results 
+                self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
         
 #..............................................................................
@@ -277,36 +321,47 @@ class ModuleCC(object):
 #..............................................................................
 # Step 2: now check the link of all the blocks via the matrix checking function
 
+            if matrixCheck == True:
 #..............................................................................
 # link of fuels and equipment
 
-            self.FETMatrix.check()
+                self.FETMatrix.check()
 
-            self.ccFET[0].FETel.update(self.FETi[0])
-            for i in range(1,NI):
-                self.ccFET[i].FETFuel.update(self.FETi[i])
+                self.ccFET[0].FETel.update(self.FETi[0])
+                for i in range(1,NI):
+                    self.ccFET[i].FETFuel.update(self.FETi[i])
 
-            for j in range(NJ):
-                self.ccEq[j].FETj.update(self.FETj[j])
+                for j in range(NJ):
+                    self.ccEq[j].FETj.update(self.FETj[j])
 
         
 #..............................................................................
 # link of equipment and processes
 
-            self.UPHMatrix.check()
+                self.UPHMatrix.check()
 
-            for j in range(NJ):
-                self.ccEq[j].USH.update(self.USHj[j])
+                for j in range(NJ):
+                    self.ccEq[j].USHj.update(self.USHj[j])
 
-            for k in range(1,NK):
-                self.ccProc[k].UPHProc.update(self.UPHProck[k])
+                for k in range(1,NK):
+                    self.ccProc[k].UPHProc.update(self.UPHProck[k])
 
 #..............................................................................
 # At the end of the checking, screen the modules
 
-        self.screen.reset()
-        self.ccFET[0].screen()
-        self.screen.show()
+        screen.reset()
+
+        for i in range(0,NI):       #then check all the Nfuels = NI-1 fuels
+            self.ccFET[i].screen()
+        for j in range(0,NJ):       #then check all the Nfuels = NI-1 fuels
+            self.ccEq[j].screen()
+        for k in range(0,NK):       #then check all the Nfuels = NI-1 fuels
+            self.ccProc[k].screen()
+            
+        screen.show()
+        conflict.show()
+
+        return conflict.nConflicts
 
 #==============================================================================
 
