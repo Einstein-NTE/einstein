@@ -71,7 +71,7 @@ MAXCOLS = 5
 
 class PanelCC(wx.Panel):
 
-    def __init__(self, parent, main, id, pos, size, style, name):
+    def __init__(self, parent, main, id, pos, size, name):
         self._init_ctrls(parent)
 	keys = ['CC Table','CC Info']
 	self.keys = keys

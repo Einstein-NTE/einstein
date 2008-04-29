@@ -40,6 +40,7 @@
 #                       Hans Schweiger                      23/04/2008
 #                       Tom Sobota                          28/04/2008
 #                       Hans Schweiger                      29/04/2008
+#                       Tom Sobota                          29/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -90,6 +91,7 @@
 #       23/04/2008  Changes in call to panelCC
 #       28/04/2008  Loading of panels is now on demand
 #       29/04/2008  method display also for panels BB,Energy and HC
+#       29/04/2008  TS: Dynamic set up of PYTHONPATH. Effective only for this run
 #
 #
 #   
@@ -105,12 +107,17 @@
 
 #-----  Imports
 import sys
+import os
 import time
 import gettext
 import exceptions
 import wx
 import wx.grid
 import pSQL, MySQLdb
+#TS20080429 dynamical setting of pythonpath
+# fix pythonpath for this run
+# before loading Einstein modules
+sys.path.append(os.path.abspath('../..'))
 import HelperClass
 
 from einstein.modules.interfaces import Interfaces
@@ -657,13 +664,13 @@ class EinsteinFrame(wx.Frame):
             #self.hidePages()
             #self.pageDataCheck.Show()
             pass
-        #qDataCheckPage1
+        #qCC
         elif select == PList["X134"][1]:
             self.hidePages()
-            self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1',
-                                              parent=self.leftpanel2, main=self,
-                                              pos=wx.Point(0, 0), size=wx.Size(800, 600)) #TS 2008-03-13
-            self.pageDataCheckPage1.display()   #HS2008-04-23: Show() substituted by display()     
+            self.panelCC = PanelCC(id=-1, name='panelCC',
+                                   parent=self.leftpanel2, main=self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600))
+            self.panelCC.display()        
         #qDataCheckPage2
         elif select == PList["X135"][1]:
             self.hidePages()
@@ -924,7 +931,7 @@ class EinsteinFrame(wx.Frame):
 
         try:self.pageDataCheck.Destroy()
         except:pass
-        try:self.pageDataCheckPage1.Destroy()
+        try:self.panelCC.Destroy()
         except:pass
         try:self.pageDataCheckPage2.Destroy()
         except:pass
@@ -1077,7 +1084,7 @@ class EinsteinFrame(wx.Frame):
         self.qPage8 = self.tree.AppendItem (self.qPage0, PList["X017"][1],0)
 
         self.qDataCheck = self.tree.AppendItem (self.qRoot, PList["X133"][1])
-        self.qDataCheckPage1 = self.tree.AppendItem (self.qDataCheck, PList["X134"][1])
+        self.qCC = self.tree.AppendItem (self.qDataCheck, PList["X134"][1])
         self.qDataCheckPage2 = self.tree.AppendItem (self.qDataCheck, PList["X135"][1])
         self.qDataCheckPage3 = self.tree.AppendItem (self.qDataCheck, "Check list for visit")
         
