@@ -14,9 +14,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
+#       28/04/2008          created method display
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,7 +50,7 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 
 class PanelEA6(wx.Panel):
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent):
         self._init_ctrls(parent)
         keys = ['EA6'] 
         self.mod = ModuleEA6(keys)
@@ -131,3 +133,7 @@ class PanelEA6(wx.Panel):
         self.panelGraphCO2.SetBackgroundColour(wx.Colour(77, 77, 77))
 
 
+    def display(self):
+        self.panelGraphCO2.draw()
+        self.Show()
+        

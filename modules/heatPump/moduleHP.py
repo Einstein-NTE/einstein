@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.17
+#	Version No.: 0.18
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -37,6 +37,7 @@
 #                           Stoyan Danov            18/04/2008
 #                           Stoyan Danov            22/04/2008
 #                           Stoyan Danov            24/04/2008
+#                           Hans Schweiger          29/04/2008
 #   
 #
 #       Changes to previous version:
@@ -70,6 +71,7 @@
 #       24/04/2008 SD: screenEquipment(): changes in HPTableDataList - table data shown in panel
 #                       setEquipmentFromDB(): activate updates, more controls
 #                       calculateEnergyFlows(): assignment of exergetic COP from DB
+#       29/04/2008 HS: call to initPanel and updatePanel eliminated in __init__
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -125,13 +127,6 @@ class ModuleHP():
 
 #        self.initUserDefinedParamHP() #puts the user defined parameters from PSetUpData to UHeatPump
 #XXX problems with this function in einsteinMain
-
-#............................................................................................
-#XXXHS2008-03-22: here for testing purposes.
-#   -> initPanel should be activated by event handler on entry into panel
-
-        self.initPanel()
-        self.updatePanel()
 
 #------------------------------------------------------------------------------
     def getUserDefinedParamHP(self):

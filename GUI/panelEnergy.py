@@ -12,17 +12,19 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger
 #       Revised by:         Tom Sobota 31/03/2008
 #                           Tom Sobota 31/03/2008
 #                           Hans Schweiger  03/04/2008
 #                           Hans Schweiger  16/04/2008
+#                           Hans Schweiger  29/04/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
 #       03/04/08:           moduleEnergy passed from Interfaces
 #       16/04/08:   HS      main as argument in __init__
+#       29/04/08:   HS      method display added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -36,7 +38,6 @@
 
 import wx
 from status import Status
-#from einstein.modules.energy.moduleEnergy import *
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
 from einstein.GUI.graphics import drawPiePlot
@@ -62,19 +63,21 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+MAXROWS = 50
+COLNO = 8
+
 class PanelEnergy(wx.Panel):
 
     def __init__(self, parent, main,id, pos, size, style, name):
         self.main = main
         self._init_ctrls(parent)
         keys = ['ENERGY'] 
-#        self.mod = ModuleEnergy(keys)
         self.mod = Status.mod.moduleEnergy
         labels_column = 0
 
         # remaps drawing methods to the wx widgets.
         #
-        (rows,cols) = Interfaces.GData[keys[0]].shape
+        (rows,cols) = (MAXROWS,COLNO)
         ignoredrows = [rows-1,rows-2] # ignore totals and savings
 
         # left graphic: Energy demand
@@ -114,35 +117,31 @@ class PanelEnergy(wx.Panel):
         #
         # set grid
         #
-        key = keys[0]
-        data = Interfaces.GData[key]
-        (rows,cols) = data.shape
-        self.grid1.CreateGrid(max(rows,20), cols)
+        self.grid.CreateGrid(MAXROWS, COLNO)
 
-        self.grid1.EnableGridLines(True)
-        self.grid1.SetDefaultRowSize(20)
-        self.grid1.SetRowLabelSize(30)
-        self.grid1.SetDefaultColSize(115)
-        self.grid1.EnableEditing(False)
-        self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, "Equipment\ntype")
-        self.grid1.SetColLabelValue(1, "Useful supply\nheat/cold")
-        self.grid1.SetColLabelValue(2, "Primary energy\nconsumption")
-        self.grid1.SetColLabelValue(3, "CO2 generation")
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetDefaultColSize(115)
+        self.grid.EnableEditing(False)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid.SetColLabelValue(0, "Equipment\ntype")
+        self.grid.SetColLabelValue(1, "Useful supply\nheat/cold")
+        self.grid.SetColLabelValue(2, "Primary energy\nconsumption")
+        self.grid.SetColLabelValue(3, "CO2 generation")
         #
         # copy values from dictionary to grid
         #
-        for r in range(rows):
-            self.grid1.SetRowAttr(r, attr)
-            for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r][c])
+        for r in range(MAXROWS):
+            self.grid.SetRowAttr(r, attr)
+            for c in range(COLNO):
                 if c == labels_column:
-                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
-                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.grid1.EnableEditing(False)
-        self.grid1.SetGridCursor(0, 0)
+        self.grid.EnableEditing(False)
+        self.grid.SetGridCursor(0, 0)
 
 
     def _init_ctrls(self, prnt):
@@ -157,7 +156,7 @@ class PanelEnergy(wx.Panel):
         self.monthly.Bind(wx.EVT_BUTTON, self.OnMonthlyButton,
               id=wxID_PANELENERGYMONTHLY)
 
-        self.grid1 = wx.grid.Grid(id=wxID_PANELENERGYGRID, name='grid1',
+        self.grid = wx.grid.Grid(id=wxID_PANELENERGYGRID, name='grid',
               parent=self, pos=wx.Point(16, 104), size=wx.Size(504, 168),
               style=0)
 
@@ -246,6 +245,59 @@ class PanelEnergy(wx.Panel):
               pos=wx.Point(424, 312), size=wx.Size(344, 192),
               style=wx.TAB_TRAVERSAL)
         
+#------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   function activated on each entry into the panel from the tree
+#------------------------------------------------------------------------------		
+        self.mod.initPanel()        # prepares data for plotting
+
+#..............................................................................
+# update of equipment table
+
+        try:
+            data = Interfaces.GData[self.keys[0]]
+            (rows,cols) = data.shape
+        except:
+            rows = 0
+            cols = COLNO
+            
+        for r in range(rows):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, data[r][c])
+
+#XXX Here better would be updating the grid and showing less rows ... ????
+        for r in range(rows,MAXROWS):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, "")
+
+#..............................................................................
+# update of design assistant parameters
+
+#        self.config = Interfaces.GData["BB Config"]
+#        self.cbConfig1.SetValue(self.config[0])
+#        try:        #try-except necessary if there comes a string that is not in list.
+#            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
+#        except:
+#            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
+#            pass
+#        self.tcConfig3.SetValue(str(self.config[2]))
+#        self.tcConfig4.SetValue(str(self.config[3]))
+#        self.tcConfig5.SetValue(str(self.config[4]))
+#        self.tcConfig6.SetValue(str(self.config[5]))
+#        self.tcConfig7.SetValue(str(self.config[6]))
+        
+#..............................................................................
+# update of info-values
+
+#        self.info = Interfaces.GData["HP Info"]
+        
+#        self.tcInfo1.SetValue(str(self.info[0]))
+#        self.tcInfo2.SetValue(str(self.info[1]))
+
+        self.panelComPerformance.draw()
+        self.Show()
+
     def OnButtonRunSimulationButton(self, event):
         self.mod.runSimulation()
 

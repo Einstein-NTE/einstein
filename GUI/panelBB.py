@@ -25,6 +25,7 @@
 #                           Hans Schweiger          03/04/2008
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          16/04/2008
+#                           Hans Schweiger          29/04/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
@@ -32,6 +33,7 @@
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
 #                   slight change to OK and Cancel buttons, to show the right icons
 #       16/04/2008: HS  main as argument in __init__
+#       29/04/2008: HS  method draw for panelBBFig
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008

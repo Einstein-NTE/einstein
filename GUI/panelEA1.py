@@ -16,10 +16,12 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Hans Schweiger 28/03/2008
 #                           Tom Sobota 29/03/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
 #       28/03/08:           included functions draw ... (before in module)
 #       29/03/08:           mod. to use external graphics module
+#       28/04/2008          changed method display to display graphics the first time
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -62,7 +64,7 @@ MAXROWS = 20
 class PanelEA1(wx.Panel):
 
 #------------------------------------------------------------------------------
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent=None):
 #------------------------------------------------------------------------------
 #   basic initialisation at build-up of the GUI
 #------------------------------------------------------------------------------
@@ -264,5 +266,8 @@ class PanelEA1(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
 
+        #TS20080428 to draw the graphics the first time
+        self.panelGraphFEC.draw()
+        self.panelGraphFET.draw()
         self.Show()
        

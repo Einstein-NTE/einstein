@@ -15,9 +15,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	16/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
+#       28/04/2008          created method display
 #
 #	
 #------------------------------------------------------------------------------		
@@ -52,7 +54,7 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 
 class PanelEM1(wx.Panel):
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent):
         self._init_ctrls(parent)
         keys = ['EM1'] 
         self.mod = ModuleEM1(keys)
@@ -149,6 +151,9 @@ class PanelEM1(wx.Panel):
         self.btnForward.Bind(wx.EVT_BUTTON, self.OnBtnForwardButton,
               id=wxID_PANELEM1BTNFORWARD)
 
+    def display(self):
+        self.panelGraphMPHD.draw()
+        self.Show()
 
     def OnBtnOKButton(self, event):
         event.Skip()

@@ -19,16 +19,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    03/04/2008
 #	Revised by:    
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          15/04/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
 #                   slight change to OK and Cancel buttons, to show the right icons
 #       15/04/08 HS copy and delete buttons added. event handler "Generate New" linked
+#       28/04/2008  added 'draw' to method display
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -74,12 +76,11 @@ MAXROWS = 10
 
 class PanelA(wx.Panel):
 
-    def __init__(self, parent, main, id, pos, size, style, name):
+    def __init__(self, parent, main):
         self._init_ctrls(parent)
 	keys = ['A Table','A Plot']
 	self.keys = keys
 	self.main = main
-#        self.modA = ModuleA(keys)  #creates and initialises module
         self.mod = Status.mod.moduleA
         self.shortName = "new alternative"
         self.description = "describe shortly the main differential features of the new alternative"
@@ -275,6 +276,7 @@ class PanelA(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
 
+        self.panelAFig.draw()
         self.Show()
         self.main.panelinfo.update()
        

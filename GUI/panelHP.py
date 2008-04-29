@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Revised by:         Hans Schweiger          20/03/2008
 #                           Hans Schweiger          02/04/2008
@@ -32,6 +32,8 @@
 #                           Hans Schweiger          17/04/2008
 #                           Stoyan Danov            17/04/2008
 #                           Hans Schweiger          18/04/2008
+#                           Hans Schweiger          25/04/2008
+#                           Hans Schweiger          29/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -49,6 +51,8 @@
 #       17/04/08:   OnHpCalculateButton: mode = CANCEL option added
 #       18/04/08:   Determination of panel-operation mode shifted to design.ass.1
 #                   Robustness of panel against empty data sets in GData
+#       25/04/08:   Some clean-up in adding HP manually
+#       29/04/08:   call to method "draw" for panelHPFig added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -502,6 +506,7 @@ class PanelHP(wx.Panel):
         self.tcInfo1.SetValue(str(self.info[0]))
         self.tcInfo2.SetValue(str(self.info[1]))
 
+        self.panelHPFig.draw()
         self.Show()
         
 #==============================================================================
@@ -557,44 +562,23 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
         try:                #creates space for new equipment in Q/C
 	    (self.equipe,self.equipeC) = self.mod.addEquipmentDummy()
+
+            pu1 =  AddEquipment(self,                      # pointer to this panel
+                                self.mod,                # pointer to the associated module
+                                'Add Heat Pump equipment', # title for the dialogs
+                                'dbheatpump',              # database table
+                                0,                         # column to be returned
+                                False)                     # database table can be edited in DBEditFrame?
+
+            if pu1.ShowModal() == wx.ID_OK:
+                print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
+            else:
+                self.mod.deleteEquipment(None)
+
+            self.display()
 	except:
             print "PanelHP (HPAddButton): could not create equipment dummy"
 	    pass
-        
-        #show pop-up menu for adding equipment
-        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
-	#right table when it is created
-	# the args are:
-	# 1. the module address
-	# 2. Title for the dialogs (for both AddEquipment and DBEditFrame)
-	# 3. The name of the db table (for DBEditFrame)
-	# 4. The column from a table whose value will be eventually returned by DBEditFrame. Must
-	#    be an integer.
-	# 5. If the database can be edited in DBEditFrame
-	#
-	# On return, the value in the specified column (arg 4) in the selected row is available
-	# in pu1.theId, if a selection from the grid was made. If not, pu1.theId is -1. 
-	# The selection is made clicking once in any field of the grid and then clicking on the
-	# 'ok' button, or just double-clicking on any field.
-	#
-	# If the database is editable in DBEditFrame (arg 5), the background color of the
-	# grid will be a tone of Yellow. If not, a tone of Cyan.
-	#
-
-        pu1 =  AddEquipment(self,                      # pointer to this panel
-			    self.mod,                # pointer to the associated module
-			    'Add Heat Pump equipment', # title for the dialogs
-			    'dbheatpump',              # database table
-			    0,                         # column to be returned
-			    False)                     # database table can be edited in DBEditFrame?
-
-        if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
-        else:
-            self.mod.deleteEquipment(None)
-
-#        self.mod.calculateCascade()    
-        self.display()
 
 
 #------------------------------------------------------------------------------		

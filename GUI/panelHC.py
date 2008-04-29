@@ -50,7 +50,7 @@ from einstein.modules.interfaces import *
 
 [wxID_PANELHC, wxID_PANELHCAUTODESIGN, wxID_PANELHCBUTTONPAGEHCBACK, 
  wxID_PANELHCBUTTONPAGEHCCANCEL, wxID_PANELHCBUTTONPAGEHCFWD, 
- wxID_PANELHCBUTTONPAGEHCOK, wxID_PANELHCGRIDPAGEHC, wxID_PANELHCHCADD, 
+ wxID_PANELHCBUTTONPAGEHCOK, wxID_PANELHCGRID, wxID_PANELHCHCADD, 
  wxID_PANELHCMOVEDOWNWARDS, wxID_PANELHCMOVETOBOTTOM, wxID_PANELHCMOVETOTOP, 
  wxID_PANELHCMOVEUPWARDS, wxID_PANELHCST1PAGEHC, wxID_PANELHCSTATICTEXT1, 
 ] = [wx.NewId() for _init_ctrls in range(14)]
@@ -63,6 +63,8 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGHC
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+MAXROWS = 50
+COLNO = 8
 
 class PanelHC(wx.Panel):
 
@@ -70,8 +72,7 @@ class PanelHC(wx.Panel):
         self.main = main
         self._init_ctrls(parent)
 	keys = ['HC Table']
-#        self.modHC = ModuleHC(keys)  #creates and initialises module
-        self.modHC = Status.mod.moduleHC
+        self.mod = Status.mod.moduleHC
         
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
@@ -102,36 +103,32 @@ class PanelHC(wx.Panel):
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        key = keys[0]
-        data = Interfaces.GData[key]
-        (rows,cols) = data.shape
-        self.gridPageHC.CreateGrid(max(rows,20), cols)
+        self.grid.CreateGrid(MAXROWS, COLNO)
 
-        self.gridPageHC.EnableGridLines(True)
-        self.gridPageHC.SetDefaultRowSize(20)
-        self.gridPageHC.SetRowLabelSize(30)
-        self.gridPageHC.SetColSize(0,115)
-        self.gridPageHC.EnableEditing(False)
-        self.gridPageHC.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.gridPageHC.SetColLabelValue(0, "Index in HC Supply Cascade")
-        self.gridPageHC.SetColLabelValue(1, "Equipment No.")
-        self.gridPageHC.SetColLabelValue(2, "Type")
-        self.gridPageHC.SetColLabelValue(3, "Nominal power [kW]")
-        self.gridPageHC.SetColLabelValue(4, "Heat Supplied to pipe/duct no.")
-        self.gridPageHC.SetColLabelValue(5, "---")
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetColSize(0,115)
+        self.grid.EnableEditing(False)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid.SetColLabelValue(0, "Index in HC Supply Cascade")
+        self.grid.SetColLabelValue(1, "Equipment No.")
+        self.grid.SetColLabelValue(2, "Type")
+        self.grid.SetColLabelValue(3, "Nominal power [kW]")
+        self.grid.SetColLabelValue(4, "Heat Supplied to pipe/duct no.")
+        self.grid.SetColLabelValue(5, "---")
         #
         # copy values from dictionary to grid
         #
-        for r in range(rows):
-            self.gridPageHC.SetRowAttr(r, attr)
-            for c in range(cols):
-                self.gridPageHC.SetCellValue(r, c, data[r][c])
+        for r in range(MAXROWS):
+            self.grid.SetRowAttr(r, attr)
+            for c in range(COLNO):
                 if c == labels_column:
-                    self.gridPageHC.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
-                    self.gridPageHC.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.gridPageHC.SetGridCursor(0, 0)
+        self.grid.SetGridCursor(0, 0)
 
         self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
     
@@ -146,13 +143,13 @@ class PanelHC(wx.Panel):
               size=wx.Size(144, 24), style=0)
         self.HCAdd.Bind(wx.EVT_BUTTON, self.OnHCAddButton, id=wxID_PANELHCHCADD)
 
-        self.gridPageHC = wx.grid.Grid(id=wxID_PANELHCGRIDPAGEHC,
+        self.grid = wx.grid.Grid(id=wxID_PANELHCGRID,
               name='gridpageHC', parent=self, pos=wx.Point(40, 96),
               size=wx.Size(616, 328), style=0)
-        self.gridPageHC.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
-              self.OnGridPageHCGridCellLeftDclick, id=wxID_PANELHCGRIDPAGEHC)
-        self.gridPageHC.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
-              self.OnGridPageHCGridCellRightClick, id=wxID_PANELHCGRIDPAGEHC)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
+              self.OnGridGridCellLeftDclick, id=wxID_PANELHCGRID)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+              self.OnGridGridCellRightClick, id=wxID_PANELHCGRID)
 
         self.st1pageHC = wx.StaticText(id=-1, label='Order equipment cascade',
               name='st1pageHC', parent=self, pos=wx.Point(664, 128), style=0)
@@ -217,13 +214,68 @@ class PanelHC(wx.Panel):
               label='Existing equipment in the system',
               name='staticText1', parent=self, pos=wx.Point(40, 72), style=0)
 
+#------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   function activated on each entry into the panel from the tree
+#------------------------------------------------------------------------------		
+        self.mod.initPanel()        # prepares data for plotting
+
+#..............................................................................
+# update of equipment table
+
+        try:
+            data = Interfaces.GData[self.keys[0]]
+            (rows,cols) = data.shape
+        except:
+            rows = 0
+            cols = COLNO
+            
+        for r in range(rows):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, data[r][c])
+
+#XXX Here better would be updating the grid and showing less rows ... ????
+        for r in range(rows,MAXROWS):
+            for c in range(cols):
+                self.grid.SetCellValue(r, c, "")
+
+#..............................................................................
+# update of design assistant parameters
+
+#        self.config = Interfaces.GData["BB Config"]
+#        self.cbConfig1.SetValue(self.config[0])
+#        try:        #try-except necessary if there comes a string that is not in list.
+#            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
+#        except:
+#            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
+#            pass
+#        self.tcConfig3.SetValue(str(self.config[2]))
+#        self.tcConfig4.SetValue(str(self.config[3]))
+#        self.tcConfig5.SetValue(str(self.config[4]))
+#        self.tcConfig6.SetValue(str(self.config[5]))
+#        self.tcConfig7.SetValue(str(self.config[6]))
+        
+#..............................................................................
+# update of info-values
+
+#        self.info = Interfaces.GData["HP Info"]
+        
+#        self.tcInfo1.SetValue(str(self.info[0]))
+#        self.tcInfo2.SetValue(str(self.info[1]))
+
+        self.Show()
+
+#------------------------------------------------------------------------------		
     def OnHCCalculateButton(self, event):
-        ret = self.modHC.designAssistant1()
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+        ret = self.mod.designAssistant1()
         if (ret == "ManualFinalSelection"):
             print "here I should edit the data base"
-        ret = self.modHC.designAssistant2()
+        ret = self.mod.designAssistant2()
         if ret == "changed":
-            modHC.calculateCascade()
+            mod.calculateCascade()
             #updatePlots
         
     def OnButtonpageHCAddButton(self, event):
@@ -237,14 +289,14 @@ class PanelHC(wx.Panel):
 #        else:
 #            print 'Cancelled'
 
-    def OnGridPageHCGridCellLeftDclick(self, event):
+    def OnGridGridCellLeftDclick(self, event):
         print "Grid - left button Dclick: here I should call the Q4H"
         ret = "ok"
         if (ret=="ok"):
-            ret = self.modHC.calculateCascade()
+            ret = self.mod.calculateCascade()
         #updatePlots
 
-    def OnGridPageHCGridCellRightClick(self, event):
+    def OnGridGridCellRightClick(self, event):
         print "Grid - right button click: scroll-up should appear"
         #here a scroll-up should appear with some options: edit, delete,...
         RowNo = 1 #number of the selected boiler should be detected depending on the selected row
@@ -253,10 +305,10 @@ class PanelHC(wx.Panel):
             # a pop-up should confirm.
             ret = "ok"
             if (ret == "ok"):
-                ret = self.modHC.delete(RowNo)
-                ret = self.modHC.calculateCascade()
+                ret = self.mod.delete(RowNo)
+                ret = self.mod.calculateCascade()
         elif (ret == "edit"):
-            OnGridPageHCGridCellLeftDclick(self,event)
+            OnGridGridCellLeftDclick(self,event)
         
 
     def OnCb1pageHCCheckbox(self, event):

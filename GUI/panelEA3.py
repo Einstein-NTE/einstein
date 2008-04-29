@@ -14,9 +14,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
+#       28/04/2008          created method display
 #
 #	
 #------------------------------------------------------------------------------		
@@ -52,7 +54,7 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 MAXCOLS = 10
 
 class PanelEA3(wx.Panel):
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent):
         self._init_ctrls(parent)
         keys = ['EA3_FET', 'EA3_USH'] 
         self.mod = ModuleEA3(keys)
@@ -247,3 +249,7 @@ class PanelEA3(wx.Panel):
 
 
 
+    def display(self):
+        self.panelGraphFET.draw()
+        self.panelGraphUSH.draw()
+        self.Show()

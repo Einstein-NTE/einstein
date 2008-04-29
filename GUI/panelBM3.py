@@ -20,10 +20,11 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	    08/04/2008
-#	Revised by:    
+#       Revised by:         Tom Sobota  28/04/2008
 #                           
 #
 #       Changes to previous version:
+#       28/04/2008          created method display
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -72,7 +73,7 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 class PanelBM3(wx.Panel):
 
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent):
         self._init_ctrls(parent)
 	keys = ['BM3 Table']
         self.mod = Status.mod.moduleBM
@@ -272,6 +273,12 @@ class PanelBM3(wx.Panel):
               value='drying')
         self.comboUnitOperation.SetLabel('drying')
 
+
+    def display(self):
+        self.panelFig.draw()
+        self.Show()
+
+        
     def OnACalculateButton(self, event):
         ret = self.modA.designAssistant1()
         if (ret == "ManualFinalSelection"):

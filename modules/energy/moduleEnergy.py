@@ -80,10 +80,9 @@ class ModuleEnergy(object):
 # getting list of equipment in SQL
 
         self.getEquipmentList()
-        self.initModule()
 
 #------------------------------------------------------------------------------
-    def initModule(self):
+    def initPanel(self):
 #------------------------------------------------------------------------------
         
         """

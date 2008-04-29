@@ -18,26 +18,28 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.76
+#   Version No.: 0.78
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
-#                           Hans Schweiger                      22/03/2008
-#                           Tom Sobota                          23/03/2008
-#                           Hans Schweiger                      24/03/2008
-#                           Hans Schweiger                      25/03/2008
-#                           Tom Sobota                          26/03/2008
-#                           Hans Schweiger                      02/04/2008
-#                           Hans Schweiger                      03/04/2008
-#                           Tom Sobota                          06/04/2008
-#                           Hans Schweiger                      08/04/2008
-#                           Tom Sobota                          09/04/2008
-#                           Hans Schweiger                      12/04/2008
-#                           Tom Sobota                          15/04/2008
-#                           Hans Schweiger                      16/04/2008
-#                           Hans Schweiger                      18/04/2008
-#                           Tom Sobota                          19/04/2008
-#                           Tom Sobota                          20/04/2008
-#                           Hans Schweiger                      23/04/2008
+#                       Hans Schweiger                      22/03/2008
+#                       Tom Sobota                          23/03/2008
+#                       Hans Schweiger                      24/03/2008
+#                       Hans Schweiger                      25/03/2008
+#                       Tom Sobota                          26/03/2008
+#                       Hans Schweiger                      02/04/2008
+#                       Hans Schweiger                      03/04/2008
+#                       Tom Sobota                          06/04/2008
+#                       Hans Schweiger                      08/04/2008
+#                       Tom Sobota                          09/04/2008
+#                       Hans Schweiger                      12/04/2008
+#                       Tom Sobota                          15/04/2008
+#                       Hans Schweiger                      16/04/2008
+#                       Hans Schweiger                      18/04/2008
+#                       Tom Sobota                          19/04/2008
+#                       Tom Sobota                          20/04/2008
+#                       Hans Schweiger                      23/04/2008
+#                       Tom Sobota                          28/04/2008
+#                       Hans Schweiger                      29/04/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -86,6 +88,8 @@
 #                   main menu 'Database Equipments' now allows the editing of tables.
 #                   View menu loads dynamically alternatives list
 #       23/04/2008  Changes in call to panelCC
+#       28/04/2008  Loading of panels is now on demand
+#       29/04/2008  method display also for panels BB,Energy and HC
 #
 #
 #   
@@ -291,8 +295,8 @@ class EinsteinFrame(wx.Frame):
         #----- set binding events
         self.BindEvents()
 
-        #----- generate and initialize the panels
-        self.CreatePanels()
+        #----- create title page
+        self.CreateTitlePage()
 
         #----- initial message
         self.logMessage('einstein started')
@@ -393,9 +397,7 @@ class EinsteinFrame(wx.Frame):
 
 ######################################################################################        
 
-    def CreatePanels(self):
-        #----- set Panel Pages
-
+    def CreateTitlePage(self):
         ####----PAGE Title
         self.pageTitle = wx.Panel(id=-1, name='pageTitle', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
         self.pageTitle.Show()
@@ -414,178 +416,6 @@ class EinsteinFrame(wx.Frame):
                                              size=wx.Size(400, 500),
                                              style=0)
         
-        #return
-     
-        ####----PAGE 0
-        self.Page0 = PanelQ0(self.leftpanel2, self)
-        self.Page0.Hide()
-
-
-        ####----PAGE 1
-        # TS20080422 quitado para probar carga dinámica del panel
-        #self.Page1 = PanelQ1(self.leftpanel2, self)
-        #self.Page1.Hide()
-
-
-        ####----PAGE 2
-        self.Page2 = PanelQ2(self.leftpanel2, self)
-        self.Page2.Hide()
-
-
-        ####----PAGE 3
-        self.Page3 = PanelQ3(self.leftpanel2, self)
-        self.Page3.Hide()
-
-        
-        ####----PAGE 4
-#HS2008-04-13 None as argument added.
-        self.Page4 = PanelQ4(self.leftpanel2, self, None)
-        self.Page4.Hide()
-
-
-        ####----PAGE 5
-        self.Page5 = PanelQ5(self.leftpanel2, self)
-        self.Page5.Hide()
-
-
-        ####----PAGE 6 (Missing. This panel is empty)
-        self.Page6 = PanelQ6(self.leftpanel2, self)
-        self.Page6.Hide()
-
-
-        ####----PAGE 7
-        self.Page7 = PanelQ7(self.leftpanel2, self)
-        self.Page7.Hide()
-        
-
-
-        ####----PAGE 8
-        self.Page8 = PanelQ8(self.leftpanel2, self)
-        self.Page8.Hide()
-
-        ####----PAGE 9
-        self.Page9 = PanelQ9(self.leftpanel2, self)
-        self.Page9.Hide()
-
-
-
-
-        ####----PAGE pageDataCheck
-        self.pageDataCheck = wx.Panel(id=-1, name='pageDataCheck', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageDataCheck.Hide()
-        ####--- End of pageDataCheck
-
-        ####----PAGE pageDataCheckPage1
-        self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0) #TS 2008-03-13
-        #self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0, sql = MySql, db = DB)
-        self.pageDataCheckPage1.Hide()
-        ####--- End of pageDataCheckPage1
-
-
-
-        ####----PAGE pageDataCheckPage2
-        self.pageDataCheckPage2 = wx.Panel(id=-1, name='pageDataCheckPage2', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageDataCheckPage2.Hide()
-        ####--- End of pageDataCheckPage2
-
-
-
-        ####----PAGE pageStatistics
-        #self.pageStatistics = wx.Panel(id=-1, name='pageStatistics', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        #self.pageStatistics.Hide()
-        ####--- End of pageStatistics
-
-
-        ####----PAGE pageStatisticPages
-
-        #TS2008-03-23 changed this, added panels EA1-EA6, EM1
-
-        #self.pageStatisticPages = wx.Panel(id=-1, name='pageStatisticPages', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        #self.pageStatisticPages.Hide()
-        self.panelEA1 = PanelEA1(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA1')
-        self.panelEA1.Hide()
-
-        self.panelEA2 = PanelEA2(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA2')
-        self.panelEA2.Hide()
-        
-        self.panelEA3 = PanelEA3(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA3')
-        self.panelEA3.Hide()
-        
-        self.panelEA4 = PanelEA4(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA4')
-        self.panelEA4.Hide()
-        
-        self.panelEA5 = PanelEA5(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA5')
-        self.panelEA5.Hide()
-
-        self.panelEA6 = PanelEA6(parent=self.leftpanel2, id=-1, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, name='pageEA6')
-        self.panelEA6.Hide()
-
-        self.panelEM1 = PanelEM1(id=-1, name='pageEM1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelEM1.Hide()
-
-        #TS2008-03-29 changed this, added panels EM2, EH1, EH2
-        self.panelEM2 = PanelEM2(id=-1, name='pageEM2', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelEM2.Hide()
-
-        ####--- End of pageStatisticPages
-
-
-        ####----PAGE pageBenchmarkCheck
-        self.pageBenchmarkCheck = wx.Panel(id=-1, name='pageBenchmarkCheck', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageBenchmarkCheck.Hide()
-        ####--- End of pageBenchmarkCheck
-
-#HS2008-04-08 Benchmark Check
-        ####--- End of pageBenchmarkCheck
-        self.panelBM1 = PanelBM1(id=-1, name='panelBM1', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.panelBM1.Hide()
-        self.panelBM2 = PanelBM2(id=-1, name='panelBM2', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.panelBM2.Hide()
-        self.panelBM3 = PanelBM3(id=-1, name='panelBM3', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.panelBM3.Hide()
-
-        ####----PAGE pageHeatRecoveryTargets
-        #self.pageHeatRecoveryTargets = wx.Panel(id=-1, name='pageHeatRecoveryTargets', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        #self.pageHeatRecoveryTargets.Hide()
-        ####--- End of pageHeatRecoveryTargets
-
-        ####--- Page Alternatives
-        self.panelA = PanelA(id=-1, name='panelA', parent=self.leftpanel2, main = self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelA.Hide()
-        ####--- End op pageHeatPump
-
-        ####--- Page H&C Supply
-        self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelHC.Hide()
-        ####--- End op pageHeatPump
-
-
-        ####--- PanelHP
-        self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
-        self.panelHP.Hide()
-        ####--- End op panelHP
-
-        ####--- Page Boilers
-        self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2, main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelBB.Hide()
-        ####--- End op panelHP
-
-        ####--- Panel Energy
-        self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy', parent=self.leftpanel2, main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
-        self.panelEnergy.Hide()
-        ####--- End op panelEnergy
-
-        ####----PAGE pageFinalReport
-        self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageFinalReport.Hide()
-        ####--- End of pageFinalReport
-
-
-        ####----PAGE pageDataCheck
-        self.pageDataCheck = wx.Panel(id=-1, name='pageDataCheck', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)        
-        self.pageDataCheck.Hide()
-        ####--- End of pageDataCheck
-
 
 #==============================================================================
 #--- Eventhandlers Application
@@ -599,6 +429,8 @@ class EinsteinFrame(wx.Frame):
         #TS20080421 Add project on main menu Opens panel Q1 
         self.activeQid = 0
         self.hidePages()
+        #TS20080428 Modified for loading on demand
+        self.Page0 = PanelQ0(self.leftpanel2, self)
         self.Page0.fillPage()
         self.Page0.Show()
         #self.logMessage(PList["0101"][1])
@@ -606,6 +438,8 @@ class EinsteinFrame(wx.Frame):
 
     def OnMenuOpenProject(self, event):
         self.hidePages()
+        #TS20080428 Modified for loading on demand
+        self.Page0 = PanelQ0(self.leftpanel2, self)
         self.Page0.fillPage()
         self.Page0.Show()
         #self.logMessage(PList["0101"][1])
@@ -713,6 +547,9 @@ class EinsteinFrame(wx.Frame):
         self._interceptActivation(event)
 
     def OnTreeSelChanged(self, event):
+        #
+        #TS20080428 Most items modified for loading on demand
+        #
         self.item = event.GetItem()
         select = self.tree.GetItemText(self.item)
 
@@ -727,23 +564,23 @@ class EinsteinFrame(wx.Frame):
         #Page0
         elif select == PList["X018"][1]: #Edit Industry Data
             self.hidePages()
+            self.Page0 = PanelQ0(self.leftpanel2, self)
             self.Page0.Show()
             self.logMessage(PList["0101"][1])
             self.Page0.fillPage()
         #Page1
         elif select == PList["X010"][1]: #General data
             self.hidePages()
-            # TS20080422 agrregada próxima línea para probar carga dinámica del panel
             self.Page1 = PanelQ1(self.leftpanel2, self)
-            print 'Page1 created'
             self.Page1.Show()
             self.logMessage(PList["0101"][1])
             self.Page1.clear()
             self.Page1.fillChoiceOfNaceCode()
             self.Page1.fillPage()
-        #Page2    
+        #Page2
         elif select == PList["X011"][1]: #Energy consumption
             self.hidePages()
+            self.Page2 = PanelQ2(self.leftpanel2, self)
             self.Page2.Show()
             self.logMessage(PList["0102"][1])
             self.Page2.clear()
@@ -752,6 +589,7 @@ class EinsteinFrame(wx.Frame):
         #Page3
         elif select == PList["X012"][1]: #Processes data
             self.hidePages()
+            self.Page3 = PanelQ3(self.leftpanel2, self)
             self.Page3.Show()
             self.logMessage(PList["0102"][1])
             self.Page3.fillChoiceOfDBUnitOperation()
@@ -763,6 +601,8 @@ class EinsteinFrame(wx.Frame):
         #Page4
         elif select == PList["X013"][1]: #Generation of heat and cold
             self.hidePages()
+            #HS2008-04-13 None as argument added.
+            self.Page4 = PanelQ4(self.leftpanel2, self, None)
             self.Page4.Show()
             self.logMessage(PList["0102"][1])
             self.Page4.clear()
@@ -771,6 +611,7 @@ class EinsteinFrame(wx.Frame):
         #Page5
         elif select == PList["X014"][1]: #Distribution of heat and cold
             self.hidePages()
+            self.Page5 = PanelQ5(self.leftpanel2, self)
             self.Page5.Show()
             self.logMessage(PList["0102"][1])
             self.Page5.clear()
@@ -780,6 +621,7 @@ class EinsteinFrame(wx.Frame):
         #Page6 (Heat Recovery Missing)
         elif select == "Heat recovery": #Heat recovery
             self.hidePages()
+            self.Page6 = PanelQ6(self.leftpanel2, self)
             self.Page6.Show()
             self.logMessage("Not available yet")
             self.Page6.clear()
@@ -788,6 +630,7 @@ class EinsteinFrame(wx.Frame):
         #Page7
         elif select == PList["X015"][1]: # Renewable energies
             self.hidePages()
+            self.Page7 = PanelQ7(self.leftpanel2, self)
             self.Page7.Show()
             self.logMessage(PList["0102"][1])
             self.Page7.clear()
@@ -795,6 +638,7 @@ class EinsteinFrame(wx.Frame):
         #Page8
         elif select == PList["X016"][1]: #Buildings
             self.hidePages()
+            self.Page8 = PanelQ8(self.leftpanel2, self)
             self.Page8.Show()
             self.logMessage(PList["0102"][1])
             self.Page8.clear()
@@ -802,6 +646,7 @@ class EinsteinFrame(wx.Frame):
         #Page9
         elif select == PList["X017"][1]: #Economic parameters
             self.hidePages()
+            self.Page9 = PanelQ9(self.leftpanel2, self)
             self.Page9.Show()
             self.logMessage(PList["0102"][1])
             self.Page9.clear()
@@ -815,10 +660,16 @@ class EinsteinFrame(wx.Frame):
         #qDataCheckPage1
         elif select == PList["X134"][1]:
             self.hidePages()
+            self.pageDataCheckPage1 = PanelCC(id=-1, name='pageDataCheckPage1',
+                                              parent=self.leftpanel2, main=self,
+                                              pos=wx.Point(0, 0), size=wx.Size(800, 600)) #TS 2008-03-13
             self.pageDataCheckPage1.display()   #HS2008-04-23: Show() substituted by display()     
         #qDataCheckPage2
         elif select == PList["X135"][1]:
             self.hidePages()
+            self.pageDataCheckPage2 = wx.Panel(id=-1, name='pageDataCheckPage2',
+                                               parent=self.leftpanel2, pos=wx.Point(0, 0),
+                                               size=wx.Size(800, 600))
             self.pageDataCheckPage2.Show()
         #qStatistics
         elif select == PList["X136"][1]:
@@ -829,43 +680,53 @@ class EinsteinFrame(wx.Frame):
         #qStatisticYPage1 'Primary energy - Yearly'
         elif select == PList["X137"][1]:
             self.hidePages()
+            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
             self.panelEA1.display()
-#            self.panelEA1.Show()
+
         #qStatisticYPage2 'Final energy by fuels - Yearly'
         elif select == PList["X138"][1]:
             self.hidePages()
-            self.panelEA2.Show()
+            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
+            self.panelEA2.display()
         #qStatisticYPage3 'Final energy by equipment - Yearly'
         elif select == PList["X139"][1]:
             self.hidePages()
-            self.panelEA3.Show()
+            self.panelEA3 = PanelEA3(parent=self.leftpanel2)
+            self.panelEA3.display()
         #qStatisticYPage4 'Process heat - Yearly'
         elif select == PList["X140"][1]:
             self.hidePages()
-            self.panelEA4.Show()
+            self.panelEA4 = PanelEA4(parent=self.leftpanel2)
+            self.panelEA4.display()
         #qStatisticYPage5 'Energy intensity - Yearly'
         elif select == PList["X141"][1]:
             self.hidePages()
-            self.panelEA5.Show()
+            self.panelEA5 = PanelEA5(parent=self.leftpanel2)
+            self.panelEA5.display()
         #qStatisticYPage6 'Production of CO2 - Yearly'
         elif select == PList["X142"][1]:
             self.hidePages()
-            self.panelEA6.Show()
+            self.panelEA6 = PanelEA6(parent=self.leftpanel2)
+            self.panelEA6.display()
         #qStatisticMPage1 'Energy performance - Monthly'
         elif select == 'Monthly demand':
             self.hidePages()
-            self.panelEM1.Show()
+            self.panelEM1 = PanelEM1(parent=self.leftpanel2)
+            self.panelEM1.display()
         #qStatisticMPage2 'Heat supply - Monthly'
         elif select == 'Monthly supply':
             self.hidePages()
-            self.panelEM2.Show()
+            self.panelEM2 = PanelEM2(parent=self.leftpanel2)
+            self.panelEM2.display()
         #qStatisticHPage1 'Energy performance - Hourly'
         elif select == 'Hourly demand':
             self.hidePages()
+            #self.panelEH1 = PanelEH1(parent=self.leftpanel2)
             #self.panelEH1.Show()
         #qStatisticHPage2 'Heat supply - Hourly'
         elif select == 'Hourly supply':
             self.hidePages()
+            #self.panelEH2 = PanelEH2(parent=self.leftpanel2)
             #self.panelEH2.Show()
         #
         #
@@ -873,25 +734,32 @@ class EinsteinFrame(wx.Frame):
         elif select == PList["X143"][1]:
             #TS 2008-3-26 No action here
             #self.hidePages()
+            #self.pageBenchmarkCheck = wx.Panel(id=-1, name='pageBenchmarkCheck',
+            #                                   parent=self.leftpanel2, pos=wx.Point(0, 0),
+            #                                   size=wx.Size(800, 600), style=0)        
             #self.pageBenchmarkCheck.Show()
             pass
 
 #XXXHS2008-04-08
         elif select == "Global energy intensity":
             self.hidePages()
-            self.panelBM1.Show()
+            self.panelBM1 = PanelBM1(parent=self.leftpanel2)
+            self.panelBM1.display()
             
         elif select == "SEC by product":
             self.hidePages()
-            self.panelBM2.Show()
+            self.panelBM2 = PanelBM2(parent=self.leftpanel2)
+            self.panelBM2.display()
             
         elif select == "SEC by process":
             self.hidePages()
-            self.panelBM3.Show()
+            self.panelBM3 = PanelBM3(parent=self.leftpanel2)
+            self.panelBM3.display()
 
         #qA
         elif select == PList["X145"][1]:        #generation of alternatives
             self.hidePages()
+            self.panelA = PanelA(parent=self.leftpanel2,main=self)
             self.panelA.display()
 
         elif select == PList["X147"][1]:
@@ -902,42 +770,58 @@ class EinsteinFrame(wx.Frame):
         #qFinalReportPage1
         elif select == PList["X148"][1]:
             self.hidePages()
+            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
+                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
+                                            size=wx.Size(800, 600), style=0)        
             self.pageFinalReport.Show()
         #qFinalReportPage2
         elif select == PList["X149"][1]:
             self.hidePages()
+            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
+                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
+                                            size=wx.Size(800, 600), style=0)        
             self.pageFinalReport.Show()
         #qPrintReport
         elif select == PList["X150"][1]:
             self.hidePages()
+            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
+                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
+                                            size=wx.Size(800, 600), style=0)        
             self.pageFinalReport.Show()
         #panelHP
         elif select == "Heat Pumps":
             ret = self.OnEnterHeatPumpPage()
             if  ret == 0:
                 self.hidePages()
+                self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2,
+                                       main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600),
+                                       style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
                 self.panelHP.display()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
-###HS2008-03-07
         #pageBoilers
         elif select == "Boilers & burners":
-            ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-            self.panelBB.modBB.initPanel()
-            self.panelBB.Show()
-###HS2008-03-12
+            self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2,
+                                   main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),
+                                   style=wx.TAB_TRAVERSAL)
+            self.panelBB.display()
         #panelEnergy
         elif select == "Energy performance":
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
-            #self.panelEnergy.mod.initPanel()
-            self.panelEnergy.Show()
+            self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy',
+                                           parent=self.leftpanel2, main=self,
+                                           pos=wx.Point(0, 0), size=wx.Size(800, 600),
+                                           style=wx.TAB_TRAVERSAL)
+            self.panelEnergy.display()
 
-###HS2008-04-03
+        #panelHC
         elif select == "H&C Supply":
             self.hidePages()
-            self.panelHC.Show()
+            self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelHC.display()
 
 
 #------------------------------------------------------------------------------     
@@ -951,9 +835,6 @@ class EinsteinFrame(wx.Frame):
         else:
             self.showError("Select Questionnaire first!")
 
-#------------------------------------------------------------------------------     
-#--- Eventhandlers DataCheck
-#------------------------------------------------------------------------------     
     def OnEnterHeatPumpPage(self):
         if Status.PId <> 0:
             #ret = self.ModBridge.StartpanelHP(Status.SQL, DB, self.activeQid)
@@ -1018,55 +899,80 @@ class EinsteinFrame(wx.Frame):
         return Status.ConsistencyCheckOK
 
     def hidePages(self):
+        #TS20080428 Modified for loading on demand
         self.pageTitle.Hide()
-        self.Page0.Hide()
-        # TS20080422 modificado para probar carga dinámica del panel
-        #self.Page1.Hide()
-        try:
-            self.Page1.Destroy()
-            print 'Page1 destroyed'
-        except:
-            pass
-        self.Page2.Hide()
-        self.Page3.Hide()
-        self.Page4.Hide()
-        self.Page5.Hide()
-        self.Page6.Hide()
-        self.Page7.Hide()
-        self.Page8.Hide()
-        self.Page9.Hide()
+        try:self.Page0.Destroy()
+        except:pass
+        try:self.Page1.Destroy()
+        except:pass
+        try:self.Page2.Destroy()
+        except:pass
+        try:self.Page3.Destroy()
+        except:pass
+        try:self.Page4.Destroy()
+        except:pass
+        try:self.Page5.Destroy()
+        except:pass
+        try:self.Page6.Destroy()
+        except:pass
+        try:self.Page7.Destroy()
+        except:pass
+        try:self.Page8.Destroy()
+        except:pass
+        try:self.Page9.Destroy()
+        except:pass
 
-        self.pageDataCheck.Hide()
-        self.pageDataCheckPage1.Hide()
-        self.pageDataCheckPage2.Hide()
+        try:self.pageDataCheck.Destroy()
+        except:pass
+        try:self.pageDataCheckPage1.Destroy()
+        except:pass
+        try:self.pageDataCheckPage2.Destroy()
+        except:pass
 
-        #self.pageStatistics.Hide()
-        self.panelEA1.Hide()
-        self.panelEA2.Hide()
-        self.panelEA3.Hide()
-        self.panelEA4.Hide()
-        self.panelEA5.Hide()
-        self.panelEA6.Hide()
-        self.panelEM1.Hide()
-        self.panelEM2.Hide()
+        #try:self.pageStatistics.Destroy()
+        #except:pass
 
-#HS2008-04-08        
-        self.pageBenchmarkCheck.Hide()
-        self.panelBM1.Hide()
-        self.panelBM2.Hide()
-        self.panelBM3.Hide()
+        try:self.panelEA1.Destroy()
+        except:pass
+        try:self.panelEA2.Destroy()
+        except:pass
+        try:self.panelEA3.Destroy()
+        except:pass
+        try:self.panelEA4.Destroy()
+        except:pass
+        try:self.panelEA5.Destroy()
+        except:pass
+        try:self.panelEA6.Destroy()
+        except:pass
+        try:self.panelEM1.Destroy()
+        except:pass
+        try:self.panelEM2.Destroy()
+        except:pass
+
+        #HS2008-04-08        
+        try:self.pageBenchmarkCheck.Destroy()
+        except:pass
+        try:self.panelBM1.Destroy()
+        except:pass
+        try:self.panelBM2.Destroy()
+        except:pass
+        try:self.panelBM3.Destroy()
+        except:pass
 
         #self.pageHeatRecoveryTargets.Hide()
 
-        self.panelA.Hide()
-
-        self.panelHC.Hide()
-        self.panelHP.Hide()
-        self.panelBB.Hide()
-        self.panelEnergy.Hide()
-        self.panelHC.Hide()
-
-        self.pageFinalReport.Hide()
+        try:self.panelA.Destroy()
+        except:pass
+        try:self.panelHC.Destroy()
+        except:pass
+        try:self.panelHP.Destroy()
+        except:pass
+        try:self.panelBB.Destroy()
+        except:pass
+        try:self.panelEnergy.Destroy()
+        except:pass
+        try:self.pageFinalReport.Destroy()
+        except:pass
 
 
 

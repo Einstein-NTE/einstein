@@ -14,8 +14,10 @@
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	28/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
+#       28/04/2008          created method display
 #
 #	
 #------------------------------------------------------------------------------		
@@ -50,7 +52,7 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 
 class PanelEM2(wx.Panel):
-    def __init__(self, parent, id, pos, size, style, name):
+    def __init__(self, parent):
         self._init_ctrls(parent)
         keys = ['EM2'] 
         self.mod = ModuleEM2(keys)
@@ -147,6 +149,10 @@ class PanelEM2(wx.Panel):
               id=wxID_PANELEM2BTNFORWARD)
 
 
+    def display(self):
+        self.panelGraphMPHS.draw()
+        self.Show()
+    
     def OnBtnOKButton(self, event):
         event.Skip()
 
