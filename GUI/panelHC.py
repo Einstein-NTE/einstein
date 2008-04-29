@@ -64,15 +64,16 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-COLNO = 8
+COLNO = 6
 
 class PanelHC(wx.Panel):
 
     def __init__(self, parent, main, id, pos, size, style, name):
         self.main = main
         self._init_ctrls(parent)
-	keys = ['HC Table']
+	self.keys = ['HC Table']
         self.mod = Status.mod.moduleHC
+        self.selectedRow = 0
         
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
@@ -81,7 +82,7 @@ class PanelHC(wx.Panel):
         ignoredrows = []
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : keys[0],                # key for Interface
+                   'key'         : self.keys[0],                # key for Interface
                    'title'       : 'Some title',           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
@@ -105,6 +106,7 @@ class PanelHC(wx.Panel):
 
         self.grid.CreateGrid(MAXROWS, COLNO)
 
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
@@ -221,12 +223,16 @@ class PanelHC(wx.Panel):
 #------------------------------------------------------------------------------		
         self.mod.initPanel()        # prepares data for plotting
 
+        data = Interfaces.GData[self.keys[0]]
+        print "PanelHC (display): data",data
+
 #..............................................................................
 # update of equipment table
 
         try:
             data = Interfaces.GData[self.keys[0]]
             (rows,cols) = data.shape
+            print "PanelHC (display): data",data
         except:
             rows = 0
             cols = COLNO
@@ -289,12 +295,15 @@ class PanelHC(wx.Panel):
 #        else:
 #            print 'Cancelled'
 
+#------------------------------------------------------------------------------		
     def OnGridGridCellLeftDclick(self, event):
-        print "Grid - left button Dclick: here I should call the Q4H"
-        ret = "ok"
-        if (ret=="ok"):
-            ret = self.mod.calculateCascade()
-        #updatePlots
+#------------------------------------------------------------------------------		
+        self.selectedRow = event.GetRow()
+
+#------------------------------------------------------------------------------		
+    def OnGridGridCellLeftClick(self, event):
+#------------------------------------------------------------------------------		
+	self.selectedRow = event.GetRow()
 
     def OnGridGridCellRightClick(self, event):
         print "Grid - right button click: scroll-up should appear"
@@ -355,22 +364,40 @@ class PanelHC(wx.Panel):
         self.main.tree.SelectItem(self.main.qHP, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
+#==============================================================================
+#   Bottom Down Up Top
+#==============================================================================
+    def OnMoveToBottomButton(self, event):
+        ci = self.selectedRow + 1
+        print "PanelHC (move to bottom)",ci
+        self.mod.cascadeMoveToBottom(ci)
+        self.display()
+
+    def OnMoveDownwardsButton(self, event):
+        ci = self.selectedRow + 1
+        print "PanelHC (move down)",ci
+        self.mod.cascadeMoveDown(ci)
+        self.display()
+
+    def OnMoveUpwardsButton(self, event):
+        ci = self.selectedRow + 1
+        print "PanelHC (move up)",ci
+        self.mod.cascadeMoveUp(ci)
+        self.display()
+
+    def OnMoveToTopButton(self, event):
+        ci = self.selectedRow + 1
+        print "PanelHC (move to top)",ci
+        self.mod.cascadeMoveToTop(ci)   
+        self.display()
+
+#==============================================================================
+#   dont know what's this
+#==============================================================================
     def OnButton5Button(self, event):
         event.Skip()
 
     def OnHCAddButton(self, event):
-        event.Skip()
-
-    def OnMoveToBottomButton(self, event):
-        event.Skip()
-
-    def OnMoveDownwardsButton(self, event):
-        event.Skip()
-
-    def OnMoveUpwardsButton(self, event):
-        event.Skip()
-
-    def OnMoveToTopButton(self, event):
         event.Skip()
 
     def OnAutoDesignButton(self, event):

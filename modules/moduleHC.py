@@ -1,33 +1,34 @@
 # -*- coding: cp1252 -*-
 #==============================================================================#
-#	E I N S T E I N
+#   E I N S T E I N
 #
 #       Expert System for an Intelligent Supply of Thermal Energy in Industry
 #       (www.iee-einstein.org)
 #
 #------------------------------------------------------------------------------
 #
-#	ModuleHC (Heat and Cold Supply)
-#			
+#   ModuleHC (Heat and Cold Supply)
+#           
 #------------------------------------------------------------------------------
-#			
-#	Module for design of HC Supply cascade
+#           
+#   Module for design of HC Supply cascade
 #
 #==============================================================================
 #
-#	Version No.: 0.01
-#	Created by: 	    Hans Schweiger	03/04/2008
-#	Last revised by:    
+#   Version No.: 0.01
+#   Created by:         Hans Schweiger  03/04/2008
+#   Last revised by:    Stoyan Danov    29/04/2008
 #
 #       Changes to previous version:
-#	
-#------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
-#	www.energyxperts.net / info@energyxperts.net
+#   29/04/2008 SD: added: cascadeMoveUp, cascadeMoveDown, cascadeMoveToTop, ...
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
 #
-#	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
-#	Software Foundation (www.gnu.org).
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
 #
 #============================================================================== 
 
@@ -58,13 +59,6 @@ class ModuleHC(object):
         self.NEquipe = len(self.equipments)
         print "ModuleHC (__init__): %s equipes found"%self.NEquipe
 
-
-#............................................................................................
-#XXXHS2008-03-22: here for testing purposes.
-#   -> initPanel should be activated by event handler on entry into panel
-
-        self.initPanel()
-        self.updatePanel()
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
@@ -73,7 +67,8 @@ class ModuleHC(object):
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        HCList = self.screenEquipments()
+        Status.int.getEquipmentCascade()
+        self.cascadeIndex = 0
         
 #............................................................................................
 #XXX FOR TESTING PURPOSES ONLY: load default demand
@@ -84,20 +79,9 @@ class ModuleHC(object):
        
 #............................................................................................
 #returns HPList to the GUI for displaying in window
-        
-        return (HCList)
-    
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-    def screenEquipments(self):
-#------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
-#------------------------------------------------------------------------------
 
-        Status.int.getEquipmentCascade()
-        self.cascadeIndex = 0
-        
+        self.updatePanel()
+    
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def updatePanel(self):
@@ -106,28 +90,26 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 
         print "ModuleHC (updatePanel): data for panel are copied to interface"
-        
-        # plot to be displayed
-	# this is how the data should be set up
-	# (this data are just an example!)
-        data = array([['HC 1', 2004, 'Type 1', 3000, 100, 120],
-		      ['HC 2', 2006, 'Type 1', 4500, 120, 140],
-                      ['HC 3', 2007, 'Type 2', 5000,  80, 130]])
 
+        dataList = []
+        for i in range(self.NEquipe):
+            row = Status.int.cascade[i]
+            print row
+            print row["equipeNo"]
+            dataList.append(noneFilter([i+1,row["equipeNo"],row["equipeType"],row["equipePnom"],"???","???"]))
+        data = array(dataList)
 
         Status.int.setGraphicsData(self.keys[0], data)
 
         try:
-	    #    Status.int.setGraphicsData('BB Plot',[Status.int.T,
-	    #                                              Status.int.QD_T_mod[self.cascadeIndex],
-	    #                                              Status.int.QA_T_mod[self.cascadeIndex],
-	    #                                              Status.int.QD_T_mod[self.cascadeIndex+1],
-	    #                                              Status.int.QA_T_mod[self.cascadeIndex+1]])
-	    # info for text boxes in right side of panel
-	    Status.int.setGraphicsData('HC Info',{"noseque":55})
+        #    Status.int.setGraphicsData('BB Plot',[Status.int.T,
+        #                                              Status.int.QD_T_mod[self.cascadeIndex],
+        #                                              Status.int.QA_T_mod[self.cascadeIndex],
+        #                                              Status.int.QD_T_mod[self.cascadeIndex+1],
+        #                                              Status.int.QA_T_mod[self.cascadeIndex+1]])
+        # info for text boxes in right side of panel
+            Status.int.setGraphicsData('HC Info',{"noseque":55})
 
-            # list of equipments in cascade for Table
-            Status.int.setGraphicsData('HC List',Status.int.cascade)
         except:
             pass
 
@@ -148,8 +130,161 @@ class ModuleHC(object):
 
         return "ok"
 
-            
+#------------------------------------------------------------------------------
+    def cascadeMoveUp(self,actualCascadeIndex):
+#------------------------------------------------------------------------------
+#        moves equipment up in the cascade sequence
+#------------------------------------------------------------------------------
+
+        print 'moduleHC: cascadeMoveUp'
+
+#        print 'equipments =', self.equipments
+
+        idx = 0
+        for i in range(self.NEquipe):
+            if self.equipments[i]['CascadeIndex'] == actualCascadeIndex:
+                idx = self.equipments[i]['CascadeIndex']
+
+        if idx == 0:
+            print 'modulHC: cascadeMoveUp: there is no equipe with CascadeIndex =', actualCascadeIndex
+            return 0
+
+        elif idx == 1:
+            print 'modulHC: cascadeMoveUp: equipe cannot be moved up, actualCascadeIndex =', actualCascadeIndex
+            return 1            
+
+        else:
+            try:
+                actualEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex][0]
+                upEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex - 1][0]
+                print 'Before: CascadeIndex =', actualEquip.CascadeIndex
+
+                actualEquip.CascadeIndex = actualCascadeIndex - 1
+                upEquip.CascadeIndex = actualCascadeIndex          
+                Status.SQL.commit()
+                print 'After: CascadeIndex =', actualEquip.CascadeIndex
+            except:
+                print "ModuleHC (cascadeMoveUp): severe error - couldn't find equipe"
+                
+            Status.int.getEquipmentCascade()
+
+            return actualEquip.CascadeIndex
+
+
+#------------------------------------------------------------------------------
+    def cascadeMoveDown(self,actualCascadeIndex):
+#------------------------------------------------------------------------------
+#        moves equipment down in the cascade sequence
+#------------------------------------------------------------------------------
+        print 'modulHC: cascadeMoveDown'
+
+#        print 'equipments =', self.equipments
+
+        idx = 0
+        for i in range(self.NEquipe):
+            if self.equipments[i]['CascadeIndex'] == actualCascadeIndex:
+                idx = self.equipments[i]['CascadeIndex']
+
+        if idx == 0:
+            print 'modulHC: cascadeMoveDown: there is no equip with CascadeIndex =', actualCascadeIndex
+            return 0
+
+        elif idx == self.NEquipe:
+            print 'modulHC: cascadeMoveDown: equip cannot be moved down, actualCascadeIndex =', actualCascadeIndex, 'from totalEquips =',self.NEquipe
+            return self.NEquipe
+
+        else:
+            try:
+                actualEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex][0]
+                downEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex + 1][0]
+                print 'Before: CascadeIndex =', actualEquip.CascadeIndex
+
+                actualEquip.CascadeIndex = actualCascadeIndex + 1
+                downEquip.CascadeIndex = actualCascadeIndex          
+                Status.SQL.commit()
+                print 'After: CascadeIndex =', actualEquip.CascadeIndex
+            except:
+                print "ModuleHC (cascadeMoveDown): severe error - couldn't find equipe"
+
+            Status.int.getEquipmentCascade()
+            print 'cascade =', Status.int.cascade
+
+            return actualEquip.CascadeIndex
+
+#------------------------------------------------------------------------------
+    def cascadeMoveToTop(self,actualCascadeIndex):
+#------------------------------------------------------------------------------
+#   moves equipment to top in cascade sequence
+#------------------------------------------------------------------------------
+        print 'modulHC: cascadeMoveToTop'
+
+        for i in range(actualCascadeIndex,1,-1):
+            newIndex = self.cascadeMoveUp(i)
+
+        return newIndex
+
+#------------------------------------------------------------------------------
+    def cascadeMoveToBottom(self,actualCascadeIndex):
+#------------------------------------------------------------------------------
+#   moves equipment to bottom in cascade sequence
+#------------------------------------------------------------------------------
+        print 'modulHC: cascadeMoveToBottom'
+
+        for i in range(actualCascadeIndex,self.NEquipe):
+            newIndex = self.cascadeMoveDown(i)
+
+        return newIndex
+
+#------------------------------------------------------------------------------
+    def cascadeMoveTo(self,actualIndex,finalIndex):
+#------------------------------------------------------------------------------
+#   moves equipment to a userdefined finalIndex position in cascade sequence
+#------------------------------------------------------------------------------
+        print 'modulHC: cascadeMoveTo'
+
+        if (finalIndex > actualIndex and finalIndex <= self.NEquipe):
+            for i in range (actualIndex,finalIndex):
+                newIndex = self.cascadeMoveDown(i)
+
+        elif (finalIndex < actualIndex and finalIndex > 0):
+            for i in range (actualIndex,finalIndex,-1):
+                newIndex = self.cascadeMoveUp(i)
+
+        return newIndex
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    pass
+    print "Testing ModuleHC"
+    import einstein.GUI.pSQL as pSQL, MySQLdb
+    from einstein.modules.interfaces import *
+    from einstein.modules.energy.moduleEnergy import *
+    stat = Status("testModuleHC")
+
+    Status.SQL = MySQLdb.connect(user="root", db="einstein")
+    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
+    
+    Status.PId = 99
+    Status.ANo = 0
+    Status.SetUpId = 1 #this is PSetUpData_ID
+    
+    Status.int = Interfaces()
+    keys = ["HP Table","HP Plot","HP UserDef"]
+
+    mod = ModuleHC(keys)
+    
+##    cascadeIndxUp = mod.cascadeMoveUp(3)
+##    print 'cascadeIndxUp =', cascadeIndxUp
+
+##    cascadeIndxDown = mod.cascadeMoveDown(5)
+##    print 'cascadeIndxDown =', cascadeIndxDown
+
+##    cascadeIndxToTop = mod.cascadeMoveToTop(5)
+##    print 'cascadeIndxToTop =', cascadeIndxToTop
+
+##    cascadeIndxToBottom = mod.cascadeMoveToBottom(1)
+##    print 'cascadeIndxToBottom =', cascadeIndxToBottom
+
+##    cascadeIndxTo = mod.cascadeMoveTo(4,1)
+##    print 'cascadeIndxTo =', cascadeIndxTo
+    
