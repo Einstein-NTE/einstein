@@ -826,11 +826,11 @@ class ModuleHP():
                         COPh0_i = COPh_i;
                         Tc0_i = Tc_i 
                                         
-                        dotQh_i = interpolateTable(Th_i,Status.int.T,QD_T)  #gets heat demand corresponding to Th_i
+                        dotQh_i = interpolateTable(Th_i,Status.int.T,QD_T)/Status.TimeStep  #gets heat demand corresponding to Th_i
                         dotQw_i = (dotQh_i/COPh_i)              #heat pump input power (mechanical or thermal)
                         dotQc_i = dotQh_i - dotQw_i             #heat pump cooling power
 
-                        Tc_i = interpolateTable(dotQc_i*Status.TimeStep,QA_T,Status.int.T) #calc. the temp. corresp. to dotQc_i in QAh[i] curve
+                        Tc_i = interpolateTable(dotQc_i*C,QA_T,Status.int.T) #calc. the temp. corresp. to dotQc_i in QAh[i] curve
 
                         if Tc_i == 0.0:     #no heat availability -> assign Fpl_i=0
                             break #goes out of the while-loop 3/ continues in the while-loop 2

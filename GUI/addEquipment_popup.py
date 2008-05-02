@@ -133,11 +133,11 @@ class AddEquipment(wx.Dialog):
 
 	    try:
                 print "trying to set equipment row in DB "
-		self.module.setEquipmentFromDB(self.prnt.equipe, self.prnt.equipeC, self.theId)
+		self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
 		self.prnt.mode = "DB"
 		print "addEquipment popup (Database button): equipment added to Q/C"
 	    except:
-		print 'setEquipmentFromDB from module did not execute'
+		print 'addEquipment popup (Database button): setEquipmentFromDB from module did not execute'
 
 	    # close this dialog
 	    self.EndModal(wx.ID_OK)
