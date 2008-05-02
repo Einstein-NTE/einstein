@@ -1,3 +1,33 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ3: Process data
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota March/April 2008
+#                           Hans Schweiger 02/05/2008
+#
+#       Changes to previous version:
+#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 import wx
 import pSQL
 import HelperClass
@@ -520,18 +550,35 @@ class PanelQ3(wx.Panel):
         if Status.PId == 0:
 	    return
 
-	if self.check(self.tc1.GetValue()) != 'NULL' and \
-		len(Status.DB.qprocessdata.Process[\
-		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
-	    dbuid = Status.DB.dbunitoperation.UnitOperation[\
-		str(self.choiceOfDBUnitOperation.GetStringSelection())][0].DBUnitOperation_ID
-	    dbpmfid = Status.DB.dbfluid.FluidName[\
-		str(self.choiceOfPMDBFluid.GetStringSelection())][0].DBFluid_ID
-	    dbsmfid = Status.DB.dbfluid.FluidName[\
-		str(self.choiceOfSMDBFluid.GetStringSelection())][0].DBFluid_ID                       
-        
+        processName = self.check(self.tc1.GetValue())
+        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+	if processName != 'NULL' and \
+		len(processes.Process[processName]) == 0:
+
+            selectedUnitOps = Status.DB.dbunitoperation.UnitOperation[\
+		str(self.choiceOfDBUnitOperation.GetStringSelection())]
+            if len(selectedUnitOps) > 0:
+                dbuid = selectedUnitOps[0].DBUnitOperation_ID
+            else: dbuid = None
+            
+            selectedFluids = Status.DB.dbfluid.FluidName[\
+		str(self.choiceOfPMDBFluid.GetStringSelection())]
+            if len(selectedFluids) > 0:
+                dbpmfid = Status.DB.dbfluid.FluidName[\
+                    str(self.choiceOfPMDBFluid.GetStringSelection())][0].DBFluid_ID
+            else: dbpmfid = None
+            
+            selectedFluids = Status.DB.dbfluid.FluidName[\
+		str(self.choiceOfSMDBFluid.GetStringSelection())]
+            if len(selectedFluids) > 0:
+                dbsmfid = selectedFluids[0].DBFluid_ID                       
+            else: dbsmfid = None
+
+            newID = Status.prj.addProcessDummy()
+                        
 	    tmp = {
 		"Questionnaire_id":Status.PId,
+		"AlternativeProposalNo":Status.ANo,
 		"Process":self.check(self.tc1.GetValue()),
 		"DBUnitOperation_id":dbuid,
 		"ProcType":self.check(self.tc2.GetValue()),	
@@ -560,13 +607,14 @@ class PanelQ3(wx.Panel):
 		"UPHtotQ":self.check(self.tc26.GetValue()) 
 		}
 
-	    Status.DB.qprocessdata.insert(tmp)               
+            q = Status.DB.qprocessdata.QProcessData_ID[newID][0]
+            q.update(tmp)               
+
 	    Status.SQL.commit()
 	    self.fillPage()
 
-	elif self.check(self.tc1.GetValue()) <> 'NULL' and \
-		len(Status.DB.qprocessdata.Process[\
-		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
+	elif processName <> 'NULL' and \
+		len(processes.Process[processName]) == 1:
 	    dbuid = Status.DB.dbunitoperation.UnitOperation[\
 		str(self.choiceOfDBUnitOperation.GetStringSelection())][0].DBUnitOperation_ID
 	    dbpmfid = Status.DB.dbfluid.FluidName[\
@@ -602,7 +650,7 @@ class PanelQ3(wx.Panel):
 		"SupplyMedFlow":self.check(self.tc25.GetValue()), 
 		"UPHtotQ":self.check(self.tc26.GetValue()) 
 		}
-	    q = Status.DB.qprocessdata.Process[self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
+	    q = Status.DB.qprocessdata.Process[processName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
 	    q.update(tmp)               
 	    Status.SQL.commit()
 	    self.fillPage()
@@ -613,11 +661,16 @@ class PanelQ3(wx.Panel):
 
 
     def OnButtonDeleteProcess(self, event):
-        event.Skip()
+        Status.prj.deleteProcess(self.selectedProcessID)
+        self.clear()
+        self.fillPage()
 
     def OnListBoxProcessesClick(self, event):
-        q = Status.DB.qprocessdata.Questionnaire_id[\
-	    Status.PId].Process[str(self.listBoxProcesses.GetStringSelection())][0]
+        self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
+        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        q = processes.Process[self.selectedProcessName][0]
+        self.selectedProcessID = q.QProcessData_ID
+
         self.tc1.SetValue(str(q.Process))
         self.tc2.SetValue(str(q.ProcType))
         self.tc5.SetValue(str(q.PT))
@@ -653,13 +706,9 @@ class PanelQ3(wx.Panel):
             self.choiceOfSMDBFluid.SetSelection(\
 		self.choiceOfSMDBFluid.FindString(\
 		    str(Status.DB.dbfluid.DBFluid_ID[q.SupplyMedDBFluid_id][0].FluidName)))
-        event.Skip()
 
     def OnButtonClear(self, event):
         self.clear()
-        event.Skip()
-
-
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -689,10 +738,10 @@ class PanelQ3(wx.Panel):
 
     def fillPage(self):
         self.listBoxProcesses.Clear()
-        if len(Status.DB.qprocessdata.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qprocessdata.Questionnaire_id[Status.PId]:
+        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if len(processes) > 0:
+            for n in processes:
                 self.listBoxProcesses.Append (str(n.Process))
-
 
     def showError(self, message):
         dlg = wx.MessageDialog(None, message, 'Error', wx.OK)

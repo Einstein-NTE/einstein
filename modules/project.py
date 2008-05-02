@@ -27,7 +27,8 @@
 #                       UserInteractionLevel
 #       23/04/08: HS    Completed list of data tables to be created in
 #                       createNewProject
-#       02/05/08: HS    deleteProduct added
+#       02/05/08: HS    deleteProduct, deleteFuel, deleteProcess
+#                       and addFuel/ProcessDummy added
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -659,6 +660,63 @@ class Project(object):
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
         generaldata[0].Nfuels = len(fuels)
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def addProcessDummy(self):
+#------------------------------------------------------------------------------
+#   deletes all entries for the original ANo
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+
+        processes = Status.DB.qprocessdata.sql_select(sqlQuery)
+        NThProc = len(processes)
+        tmp = {
+            "Questionnaire_id":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "ProcNo": NThProc+1
+            }          
+        newID = Status.DB.qprocessdata.insert(tmp)
+
+        NThProc += 1
+
+        generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        generaldata[0].NThProc = NThProc
+
+        Status.SQL.commit()
+
+        return newID
+
+#------------------------------------------------------------------------------
+    def deleteProcess(self,processID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given fuel type
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QProcessData_ID = '%s'"\
+                    %(Status.PId,Status.ANo,processID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qprocessdata,sqlQueryQ)
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
+        processes = Status.DB.qprocessdata.sql_select(sqlQuery)
+
+        for i in range(len(processes)): #assign new EqNo in QGenerationHC table
+            processes[i].ProcNo = i+1
+
+        
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        generaldata[0].NThProc = len(processes)
 
         Status.SQL.commit()
 
