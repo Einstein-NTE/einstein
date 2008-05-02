@@ -1,3 +1,34 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ0: Tool main page (page 0) -> project selection
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota March/April 2008
+#                           Hans Schweiger 02/05/2008
+#
+#       Changes to previous version:
+#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
+
 import wx
 import pSQL
 import HelperClass
@@ -10,6 +41,7 @@ class PanelQ1(wx.Notebook):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+        self.fillPage()
 
     def _init_ctrls(self, parent):
 
@@ -611,6 +643,13 @@ class PanelQ1(wx.Notebook):
 #------------------------------------------------------------------------------      
     def OnButtonStoreData(self, event):
         if Status.PId == 0:
+
+#******************************************************************************
+# this part can be eliminated.
+# Should be assured that project is existing before Q1 is opened
+# (Although project might be empty !!!)
+#******************************************************************************
+
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
                  len(Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())]) == 0:
                 Status.PId = Status.DB.questionnaire.insert({"Name":self.check(self.tc1.GetValue())})
@@ -652,7 +691,6 @@ class PanelQ1(wx.Notebook):
                 self.showError(_("Name has to be an unique value!"))
                 
         elif Status.PId <> 0:
-            
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
                  Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
                 tmp = {
@@ -693,11 +731,15 @@ class PanelQ1(wx.Notebook):
             
 
 
+#HS2008-05-02: Products are depending on ANo
     def OnButtonAddProduct(self, event):
         if Status.PId <> 0:
-            if self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId]) == 0:
+            if self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].\
+                                                                  Questionnaire_id[Status.PId].\
+                                                                  AlternativeProposalNo[Status.ANo]) == 0:
                 tmp = {
                     "Questionnaire_id":Status.PId,
+                    "AlternativeProposalNo":Status.ANo,
                     "Product":self.check(self.tc26.GetValue()),
                     "ProductCode":self.check(self.tc27.GetValue()),
                     "QProdYear":self.check(self.tc28.GetValue()),
@@ -711,7 +753,9 @@ class PanelQ1(wx.Notebook):
                 Status.SQL.commit()
                 self.fillProductList()
 
-            elif self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId]) == 1:
+            elif self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].\
+                                                                    Questionnaire_id[Status.PId].\
+                                                                    AlternativeProposalNo[Status.ANo]) == 1:
                 tmp = {
                     "Product":self.check(self.tc26.GetValue()),
                     "ProductCode":self.check(self.tc27.GetValue()),
@@ -721,16 +765,18 @@ class PanelQ1(wx.Notebook):
                     "ElProd":self.check(self.tc32.GetValue()),
                     "FuelProd":self.check(self.tc31.GetValue())
                     }
-                q = Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId][0]
+                q = Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillProductList()
+                self.productName = self.tc26.GetValue()
                           
             else:
                 self.showError(_("Product must be an unique value!"))
 
     def OnListBoxProductsListboxClick(self, event):
-        p = Status.DB.qproduct.Questionnaire_id[Status.PId].Product[str(self.listBoxProducts.GetStringSelection())][0]
+        self.productName = str(self.listBoxProducts.GetStringSelection())
+        p = Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Product[str(self.listBoxProducts.GetStringSelection())][0]
         self.tc26.SetValue(str(p.Product))
         self.tc27.SetValue(str(p.ProductCode))
         self.tc28.SetValue(str(p.QProdYear))
@@ -741,10 +787,13 @@ class PanelQ1(wx.Notebook):
         event.Skip()
 
     def OnButtonDeleteProduct(self, event):
-        event.Skip()
+        Status.prj.deleteProduct(self.productName)
+        self.clear()
+        self.fillPage()
 
     def OnButtonClear(self, event):
         self.clear()
+        self.productName = ""
         event.Skip()
 
 
@@ -802,14 +851,14 @@ class PanelQ1(wx.Notebook):
         self.tc25_2.SetValue(str(q.NoProdStop))
         if q.DBNaceCode_id <> None:
             self.choiceOfNaceCode.SetSelection(self.choiceOfNaceCode.FindString(str(Status.DB.dbnacecode.DBNaceCode_ID[q.DBNaceCode_id][0].CodeNACE)))
-            self.fillProductList()
+        self.fillProductList()
 
 
 
     def fillProductList(self):
         self.listBoxProducts.Clear()
         if len(Status.DB.qproduct.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qproduct.Questionnaire_id[Status.PId]:
+            for n in Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
                 self.listBoxProducts.Append(n.Product)
 
     def showError(self, message):

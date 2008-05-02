@@ -15,7 +15,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.06
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
@@ -27,6 +27,7 @@
 #                       UserInteractionLevel
 #       23/04/08: HS    Completed list of data tables to be created in
 #                       createNewProject
+#       02/05/08: HS    deleteProduct added
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -587,6 +588,25 @@ class Project(object):
             print "Project (setUserInteractionLevel): ",level
         else:
             print "Project (setUserInteractionLevel): ERROR in level ",level
+
+#------------------------------------------------------------------------------
+    def deleteProduct(self,productName):
+#------------------------------------------------------------------------------
+#   deletes all entries for the original ANo
+#------------------------------------------------------------------------------
+
+        print "Project (deleteProduct) - project %s, alternative %s, deleting product %s "%(Status.PId,Status.ANo,productName)
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND Product = '%s'"\
+                    %(Status.PId,Status.ANo,productName)
+
+        deleteSQLRows(DB.qproduct,sqlQueryQ)
+
+#==============================================================================
 
 
         
