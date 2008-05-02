@@ -1,3 +1,34 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ5: Pipes and ducts
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota March/April 2008
+#                           Hans Schweiger 02/05/2008
+#
+#       Changes to previous version:
+#       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
+
 import wx
 import pSQL
 import HelperClass
@@ -10,6 +41,8 @@ class PanelQ5(wx.Panel):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+
+        self.pipeID = None
 
     def _init_ctrls(self, parent):
 
@@ -400,8 +433,13 @@ class PanelQ5(wx.Panel):
 
 
     def OnListBoxDistributionListListboxClick(self, event):
-        p = Status.DB.qdistributionhc.Questionnaire_id[\
-	    Status.PId].Pipeduct[str(self.listBoxDistributionList.GetStringSelection())][0]
+        self.pipeName = str(self.listBoxDistributionList.GetStringSelection())
+        pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Pipeduct[self.pipeName]
+
+        p = pipes[0]
+        self.pipeNo = p.PipeDuctNo
+        self.pipeID = p.QDistributionHC_ID
+        
         self.tc1.SetValue(str(p.Pipeduct))
         #self.tc2.SetValue(str(p.HeatFromQGenerationHC_id))
         if len(Status.DB.qgenerationhc.QGenerationHC_ID[p.HeatFromQGenerationHC_id]) <> 0:
@@ -433,17 +471,25 @@ class PanelQ5(wx.Panel):
         #event.Skip()
 
     def OnButtonDeleteDistribution(self, event):
+        Status.prj.deletePipe(self.pipeID)
+        self.clear()
+        self.fillPage()
         event.Skip()
 
     def OnButtonAddDistribution(self, event):
         if Status.PId == 0:
 	    return
 
-	if self.check(self.tc1.GetValue()) <> 'NULL' and \
-		len(Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
-	    qgid = Status.DB.qgenerationhc.Equipment[\
-		str(self.choiceOfEquipment.GetStringSelection())][0].QGenerationHC_ID                      
+        pipeName = self.check(self.tc1.GetValue())
+        pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+	if pipeName <> 'NULL' and len(pipes) == 0:
+
+            newID = Status.prj.addPipeDummy()
+            
+            eqTable = Status.DB.qgenerationhc.Equipment[str(self.choiceOfEquipment.GetStringSelection())].\
+                      Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+            if len(eqTable) >0: qgid = eqTable[0].QGenerationHC_ID
+            else: qgid = None
         
 	    tmp = {
 		"Questionnaire_id":Status.PId,
@@ -469,15 +515,19 @@ class PanelQ5(wx.Panel):
 		"IsAlternative":0
 		}
 
-	    Status.DB.qdistributionhc.insert(tmp)               
+            q = Status.DB.qdistributionhc.QDistributionHC_ID[newID][0]
+	    q.update(tmp)               
 	    Status.SQL.commit()
-	    self.fillDistributionList()
+	    self.fillPage()
 
-	elif self.check(self.tc1.GetValue()) <> 'NULL' and \
-		len(Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
-	    qgid = Status.DB.qgenerationhc.Equipment[\
-		str(self.choiceOfEquipment.GetStringSelection())][0].QGenerationHC_ID                       
+	elif pipeName <> 'NULL' and len(pipes) == 1:
+
+            eqTable = Status.DB.qgenerationhc.Equipment[\
+		str(self.choiceOfEquipment.GetStringSelection())].\
+		Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+
+            if len(eqTable) >0: qgid = eqTable[0].QGenerationHC_ID                       
+            else: qgid = None
         
 	    tmp = {
 		"Pipeduct":self.check(self.tc1.GetValue()),
@@ -501,11 +551,11 @@ class PanelQ5(wx.Panel):
 		"TmaxStorage":self.check(self.tc19.GetValue()),
 		"IsAlternative":0
 		}
-	    q = Status.DB.qdistributionhc.Pipeduct[\
-		self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
+	    
+	    q = pipes[0]
 	    q.update(tmp)               
 	    Status.SQL.commit()
-	    self.fillDistributionList()
+	    self.fillPage()
                           
 	else:
 	    self.showError("Pipeduct have to be an uniqe value!")
@@ -518,18 +568,26 @@ class PanelQ5(wx.Panel):
         self.choiceOfEquipment.Clear()
         self.choiceOfEquipment.Append("None")
         if Status.PId <> 0:
-            if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId]) <> 0:
-                for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId]:
-                    self.choiceOfEquipment.Append(n.Equipment)
+            equipments = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+            if len(equipments) <> 0:
+                for equipe in equipments:
+                    self.choiceOfEquipment.Append(equipe.Equipment)
         self.choiceOfEquipment.SetSelection(0)
 
 
     def fillPage(self):
         self.listBoxDistributionList.Clear()
-        if len(Status.DB.qdistributionhc.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qdistributionhc.Questionnaire_id[Status.PId]:
-                self.listBoxDistributionList.Append (str(n.Pipeduct))
+        pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if len(pipes) > 0:
+            for pipe in pipes:
+                self.listBoxDistributionList.Append (str(pipe.Pipeduct))
 
+
+    def check(self, value):
+        if value <> "" and value <> "None":
+            return value
+        else:
+            return 'NULL'
 
     def clear(self):
         self.tc1.SetValue('')

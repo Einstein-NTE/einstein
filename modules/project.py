@@ -721,6 +721,65 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
+    def addPipeDummy(self):
+#------------------------------------------------------------------------------
+#   adds a new empty pipe field in table qdistributionhc
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+
+        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
+        NPipes = len(pipes)
+        tmp = {
+            "Questionnaire_id":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "PipeDuctNo": NPipes+1
+            }          
+        newID = Status.DB.qdistributionhc.insert(tmp)
+
+        NPipes += 1
+
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        cgeneraldata[0].NPipeDuct = NPipes
+
+        Status.SQL.commit()
+
+        return newID
+
+#------------------------------------------------------------------------------
+    def deletePipe(self,pipeID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given fuel type
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QDistributionHC_ID = '%s'"\
+                    %(Status.PId,Status.ANo,pipeID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qdistributionhc,sqlQueryQ)
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
+        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
+
+        for i in range(len(pipes)): #assign new EqNo in QGenerationHC table
+            pipes[i].PipeDuctNo = i+1
+            pass
+
+        
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
+        cgeneraldata[0].NPipeDuct = len(pipes)
+
+        Status.SQL.commit()
+
+#==============================================================================
+#------------------------------------------------------------------------------
     def addBuildingDummy(self):
 #------------------------------------------------------------------------------
 #   deletes all entries for the original ANo
