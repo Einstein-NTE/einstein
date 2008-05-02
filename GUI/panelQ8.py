@@ -1,3 +1,33 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ8: Building data
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota March/April 2008
+#                           Hans Schweiger 02/05/2008
+#
+#       Changes to previous version:
+#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 import wx
 import pSQL
 import HelperClass
@@ -10,6 +40,8 @@ class PanelQ8(wx.Panel):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+
+        self.buildingID = None
 
     def _init_ctrls(self, parent):
 
@@ -197,7 +229,11 @@ class PanelQ8(wx.Panel):
 
 
     def OnListBoxBuildingListClick(self, event):
-        q = Status.DB.qbuildings.Questionnaire_id[Status.PId].BuildName[str(self.listBoxBuildingList.GetStringSelection())][0]
+        self.buildingName = str(self.listBoxBuildingList.GetStringSelection())
+        buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]        
+        q = buildings.BuildName[self.buildingName][0]
+        self.buildingID = q.QBuildings_ID
+        
         self.tc1.SetValue(str(q.BuildName))
         self.tc2.SetValue(str(q.BuildConstructSurface))
         self.tc3.SetValue(str(q.BuildUsefulSurface))
@@ -222,14 +258,23 @@ class PanelQ8(wx.Panel):
         #event.Skip()
 
     def OnButtonDeleteBuilding(self, event):
+        Status.prj.deleteBuilding(self.buildingID)
+        self.clear()
+        self.fillPage()
         event.Skip()
 
     def OnButtonAddBuilding(self, event):
         if Status.PId <> 0:
-            if self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 0:
+
+            buildingName = self.check(self.tc1.GetValue())
+            buildings = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+            if buildingName <> 'NULL' and len(buildings) == 0:
+
+                newID = Status.prj.addBuildingDummy()
 
                 tmp = {
                     "Questionnaire_id":Status.PId,
+                    "AlternativeProposalNo":Status.ANo,
                     "BuildName":self.check(self.tc1.GetValue()), 
                     "BuildConstructSurface":self.check(self.tc2.GetValue()), 
                     "BuildUsefulSurface":self.check(self.tc3.GetValue()), 
@@ -249,11 +294,12 @@ class PanelQ8(wx.Panel):
                     "BuildAirCondPeriodStop":self.check(self.tc14_2.GetValue())
                     }
 
-                Status.DB.qbuildings.insert(tmp)               
+                q = Status.DB.qbuildings.QBuildings_ID[newID][0]
+                q.update(tmp)               
                 Status.SQL.commit()
                 self.fillBuildingList()
 
-            elif self.check(self.tc1.GetValue()) <> 'NULL' and len(Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId]) == 1:
+            elif buildingName <> 'NULL' and len(buildings) == 1:
 
                 tmp = {
                     "BuildName":self.check(self.tc1.GetValue()), 
@@ -274,7 +320,7 @@ class PanelQ8(wx.Panel):
                     "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()), 
                     "BuildAirCondPeriodStop":self.check(self.tc14_2.GetValue())
                     }
-                q = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId][0]
+                q = buildings[0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillBuildingList()
@@ -289,14 +335,21 @@ class PanelQ8(wx.Panel):
 
     def fillBuildingList(self):
         self.listBoxBuildingList.Clear()
-        if len(Status.DB.qbuildings.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qbuildings.Questionnaire_id[Status.PId]:
-                self.listBoxBuildingList.Append (str(n.BuildName))
+        buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if len(buildings) > 0:
+            for building in buildings:
+                self.listBoxBuildingList.Append (str(building.BuildName))
 
 
     def fillPage(self):
 	self.fillBuildingList()
             
+    def check(self, value):
+        if value <> "" and value <> "None":
+            return value
+        else:
+            return 'NULL'
+
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')

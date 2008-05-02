@@ -720,5 +720,68 @@ class Project(object):
 
         Status.SQL.commit()
 
+#------------------------------------------------------------------------------
+    def addBuildingDummy(self):
+#------------------------------------------------------------------------------
+#   deletes all entries for the original ANo
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+
+        buildings = Status.DB.qbuildings.sql_select(sqlQuery)
+        NBuildings = len(buildings)
+        tmp = {
+            "Questionnaire_id":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+#            "BuildingNo": NBuildings+1
+            }          
+        newID = Status.DB.qbuildings.insert(tmp)
+
+        NBuildings += 1
+
+        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
+        questionnaire = Status.DB.questionnaire.sql_select(sqlQuery)
+        questionnaire[0].NBuild = NBuildings
+
+        Status.SQL.commit()
+
+        return newID
+
+#------------------------------------------------------------------------------
+    def deleteBuilding(self,buildingID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given fuel type
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QBuildings_ID = '%s'"\
+                    %(Status.PId,Status.ANo,buildingID)  #query is redundant, but maintained as is for security
+
+        print "Project (deleteBuilding): query"
+        print sqlQueryQ
+        
+        deleteSQLRows(DB.qbuildings,sqlQueryQ)
+
+#        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY BuildingNo ASC"%(Status.PId,Status.ANo)
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        buildings = Status.DB.qbuildings.sql_select(sqlQuery)
+
+        for i in range(len(buildings)): #assign new EqNo in QGenerationHC table
+#            buildings[i].BuildingNo = i+1
+            pass
+
+        
+        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
+        questionnaire = Status.DB.questionnaire.sql_select(sqlQuery)
+        questionnaire[0].NBuild = len(buildings)
+
+        Status.SQL.commit()
+
 #==============================================================================
 
