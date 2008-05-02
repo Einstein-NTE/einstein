@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.78
+#   Version No.: 0.79
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -41,6 +41,7 @@
 #                       Tom Sobota                          28/04/2008
 #                       Hans Schweiger                      29/04/2008
 #                       Tom Sobota                          29/04/2008
+#                       Tom Sobota                          01/05/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -92,6 +93,9 @@
 #       28/04/2008  Loading of panels is now on demand
 #       29/04/2008  method display also for panels BB,Energy and HC
 #       29/04/2008  TS: Dynamic set up of PYTHONPATH. Effective only for this run
+#        1/05/2008  TS: Images are taken from folder 'img'
+#                       Report pages are simplified to 1
+#                       panel for report generation built
 #
 #
 #   
@@ -171,6 +175,8 @@ from panelInfo import *
 from UserHelp import *
 #TS2008-04-22 language selection dialog added
 from dialogLanguage import *
+#TS2008-05-01 report generation
+from panelReport import *
 
 #-----  Global variables 
 PList = {}      # PList stores the Parameterlist
@@ -415,7 +421,8 @@ class EinsteinFrame(wx.Frame):
         self.st1Title.Center(wx.HORIZONTAL)
         self.st1Title.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(u'zunge.jpg',wx.BITMAP_TYPE_JPEG),
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','zunge.jpg'),
+                                             wx.BITMAP_TYPE_JPEG),
                                              id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
                                              name='staticBitmap1',
                                              parent=self.pageTitle,
@@ -555,7 +562,7 @@ class EinsteinFrame(wx.Frame):
 
     def OnTreeSelChanged(self, event):
         #
-        #TS20080428 Most items modified for loading on demand
+        #TS20080428 Most items below were modified for loading on demand
         #
         self.item = event.GetItem()
         select = self.tree.GetItemText(self.item)
@@ -775,26 +782,26 @@ class EinsteinFrame(wx.Frame):
             #self.pageFinalReport.Show()
             pass
         #qFinalReportPage1
-        elif select == PList["X148"][1]:
+        #TS20080501 changed 'Report page 1' to 'Report generation'
+        elif select == 'Report generation':
             self.hidePages()
-            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
-                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
-                                            size=wx.Size(800, 600), style=0)        
+            self.pageFinalReport = PanelReport(parent=self.leftpanel2, main=self)
             self.pageFinalReport.Show()
+        #TS20080501 took out this
         #qFinalReportPage2
-        elif select == PList["X149"][1]:
-            self.hidePages()
-            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
-                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
-                                            size=wx.Size(800, 600), style=0)        
-            self.pageFinalReport.Show()
+        #elif select == PList["X149"][1]:
+        #    self.hidePages()
+        #    self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
+        #                                    parent=self.leftpanel2, pos=wx.Point(0, 0),
+        #                                    size=wx.Size(800, 600), style=0)        
+        #    self.pageFinalReport.Show()
         #qPrintReport
-        elif select == PList["X150"][1]:
-            self.hidePages()
-            self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
-                                            parent=self.leftpanel2, pos=wx.Point(0, 0),
-                                            size=wx.Size(800, 600), style=0)        
-            self.pageFinalReport.Show()
+        #elif select == PList["X150"][1]:
+        #    self.hidePages()
+        #    self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
+        #                                    parent=self.leftpanel2, pos=wx.Point(0, 0),
+        #                                    size=wx.Size(800, 600), style=0)        
+        #    self.pageFinalReport.Show()
         #panelHP
         elif select == "Heat Pumps":
             ret = self.OnEnterHeatPumpPage()
@@ -907,6 +914,7 @@ class EinsteinFrame(wx.Frame):
 
     def hidePages(self):
         #TS20080428 Modified for loading on demand
+        # but pageTitle is not destroyed, just hidden
         self.pageTitle.Hide()
         try:self.Page0.Destroy()
         except:pass
@@ -1197,9 +1205,9 @@ class EinsteinFrame(wx.Frame):
 
 
         self.qFinalReport = self.tree.AppendItem (self.qRoot, PList["X147"][1])
-        self.qFinalReportPage1 = self.tree.AppendItem (self.qFinalReport, PList["X148"][1])
-        self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, PList["X149"][1])
-        self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, PList["X150"][1])
+        self.qFinalReport = self.tree.AppendItem (self.qFinalReport, 'Report generation')
+        #self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, PList["X149"][1])
+        #self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, PList["X150"][1])
         
         self.tree.Expand(self.qRoot)
         self.tree.Expand(self.qPage0)

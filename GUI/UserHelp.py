@@ -65,8 +65,8 @@ class FrameHelpAbout(wx.Dialog):
 	    self.html.SetStandardFonts()
 
 	self.html.SetPage("<html><head><title>Einstein</title></head>"
-		     "<body background=\"einstein_logo_bg.jpg\"><center>"
-		     "<img src=\"einstein_logo.png\" width=\"580\", height=\"150\">"
+		     "<body background=\"img/einstein_logo_bg.jpg\"><center>"
+		     "<img src=\"img/einstein_logo.png\" width=\"580\", height=\"150\">"
 		     "<br><br>"
 		     "<b>Expert System for an Intelligent Supply of Thermal Energy in Industry</b><br>"
 		     "<a href=\"http://www.iee-einstein.org\">www.iee-einstein.org</a>"
