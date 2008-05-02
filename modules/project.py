@@ -606,13 +606,61 @@ class Project(object):
 
         deleteSQLRows(DB.qproduct,sqlQueryQ)
 
-#==============================================================================
+#------------------------------------------------------------------------------
+    def addFuelDummy(self):
+#------------------------------------------------------------------------------
+#   deletes all entries for the original ANo
+#------------------------------------------------------------------------------
 
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        fuels = Status.DB.qfuel.sql_select(sqlQuery)
+        NFuels = len(fuels)
+        tmp = {
+            "Questionnaire_id":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "FuelNo": NFuels+1
+            }          
+        newID = Status.DB.qfuel.insert(tmp)
+
+        NFuels += 1
+
+        generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        generaldata[0].Nfuels = NFuels
+
+        Status.SQL.commit()
+
+        return newID
+
+#------------------------------------------------------------------------------
+    def deleteFuel(self,DBFuel_id):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given fuel type
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND DBFuel_id = '%s'"\
+                    %(Status.PId,Status.ANo,DBFuel_id)
+
+        deleteSQLRows(DB.qfuel,sqlQueryQ)
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        fuels = Status.DB.qfuel.sql_select(sqlQuery)
+
+        for i in range(len(fuels)): #assign new EqNo in QGenerationHC table
+            fuels[i].FuelNo = i+1
 
         
-           
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        generaldata[0].Nfuels = len(fuels)
 
+        Status.SQL.commit()
 
-    
-    
+#==============================================================================
 

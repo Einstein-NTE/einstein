@@ -1,3 +1,34 @@
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ0: Tool main page (page 0) -> project selection
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota March/April 2008
+#                           Hans Schweiger 02/05/2008
+#
+#       Changes to previous version:
+#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
+
 import wx
 import wx.grid
 import pSQL
@@ -84,8 +115,8 @@ class PanelQ2(wx.Panel):
         #self.scrolledWindow.SetScrollbars(1,1, 950,240)
 
         self.buttonStore = wx.Button(id=-1, label=self.PList["X019"][1],
-              name='buttonStore', parent=self, pos=wx.Point(696,
-              560), size=wx.Size(192, 32), style=0)
+              name='buttonStore', parent=self, pos=wx.Point(600,
+              520), size=wx.Size(192, 32), style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonStore, self.buttonStore)
 
 
@@ -104,16 +135,16 @@ class PanelQ2(wx.Panel):
 				 name='grid',
 				 parent=self,
 				 pos=wx.Point(0, 268),
-				 size=wx.Size(940, 240),
+				 size=wx.Size(800, 240),
 				 style=0)
         
         self.grid.EnableGridLines(True)
         self.grid.CreateGrid(9, 6)
 
-        self.grid.SetDefaultColSize(120, resizeExistingCols=False)
+        self.grid.SetDefaultColSize(100, resizeExistingCols=False)
         self.grid.SetDefaultRowSize(23, resizeExistingRows=False)
 
-        self.grid.SetRowLabelSize(220)
+        self.grid.SetRowLabelSize(200)
         
         
         attr = wx.grid.GridCellAttr()
@@ -209,29 +240,12 @@ class PanelQ2(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def OnButtonAddFuel(self, event):
-        if Status.PId <> 0 and self.choiceOfDBFuelType.GetStringSelection <> 'None':
-            
-            if len(Status.DB.qfuel.Questionnaire_id[Status.PId].DBFuel_id[Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID]) == 0:
-                dbfid = Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID
-                print "INSERT"
-                tmp = {
-                    "Questionnaire_id":Status.PId,
-                    "FuelUnit":self.check(self.tc2.GetValue()),
-                    "DBFuel_id":dbfid,
-                    "MFuelYear":self.check(self.tc3.GetValue()), 
-                    "FuelOwn":self.check(self.tc4.GetValue()),
-                    "FuelTariff":self.check(self.tc5.GetValue()),
-                    "FuelCostYear":self.check(self.tc6.GetValue())                   
-                    }
-                
-                Status.DB.qfuel.insert(tmp)               
-                Status.SQL.commit()
-                self.fillFuelList()
-
-
-            elif len(Status.DB.qfuel.Questionnaire_id[Status.PId].DBFuel_id[Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID]) == 1:
-                dbfid = Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID
-                print "UPDATE"
+        fuelName = str(self.choiceOfDBFuelType.GetStringSelection())
+        fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if Status.PId <> 0 and fuelName <> 'None':
+            dbfid = Status.DB.dbfuel.FuelName[fuelName][0].DBFuel_ID
+            if len(fuels.DBFuel_id[dbfid]) == 0:
+                newID = Status.prj.addFuelDummy()
                 tmp = {
                     "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
@@ -241,7 +255,24 @@ class PanelQ2(wx.Panel):
                     "FuelCostYear":self.check(self.tc6.GetValue())
                     }
                 
-                q = Status.DB.qfuel.DBFuel_id[dbfid].Questionnaire_id[Status.PId][0]
+                q = Status.DB.qfuel.QFuel_ID[newID][0]
+                q.update(tmp)               
+                Status.SQL.commit()
+                
+                self.fillFuelList()
+
+
+            elif len(fuels.DBFuel_id[dbfid]) == 1:
+                tmp = {
+                    "FuelUnit":self.check(self.tc2.GetValue()),
+                    "DBFuel_id":dbfid,
+                    "MFuelYear":self.check(self.tc3.GetValue()), 
+                    "FuelOwn":self.check(self.tc4.GetValue()),
+                    "FuelTariff":self.check(self.tc5.GetValue()),
+                    "FuelCostYear":self.check(self.tc6.GetValue())
+                    }
+                
+                q = Status.DB.qfuel.DBFuel_id[dbfid].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillFuelList()
@@ -251,14 +282,18 @@ class PanelQ2(wx.Panel):
 
 
     def OnButtonRemoveFuelFromList(self, event):
-        event.Skip()
+        print "PanelQ2 (remove fuel): removing fuel no ",self.selectedFuelID
+        Status.prj.deleteFuel(self.selectedFuelID)
+        self.clear()
+        self.fillPage()
 
 
     def OnButtonStore(self, event):
         if Status.PId <> 0:
-            if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 0:
+            if len(Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
                 tmp = {
                     "Questionnaire_id":Status.PId,
+                    "AlternativeProposalNo":Status.ANo,
                     "PowerContrTot":self.check(self.grid.GetCellValue(1, 3)),
                     "PowerContrStd":self.check(self.grid.GetCellValue(1, 1)),
                     "PowerContrPeak":self.check(self.grid.GetCellValue(1, 0)),
@@ -300,8 +335,8 @@ class PanelQ2(wx.Panel):
                 Status.DB.qelectricity.insert(tmp)
                 Status.SQL.commit()                      
 
-            elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 1:
-                q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
+            elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
+                q = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 tmp = {                    
                     "PowerContrTot":self.check(self.grid.GetCellValue(1, 3)),
                     "PowerContrStd":self.check(self.grid.GetCellValue(1, 1)),
@@ -345,13 +380,15 @@ class PanelQ2(wx.Panel):
 
                 
     def OnFuelListBoxClick(self, event):
-        q = Status.DB.qfuel.Questionnaire_id[Status.PId].DBFuel_id[Status.DB.dbfuel.FuelName[str(self.fuelListBox.GetStringSelection())][0].DBFuel_ID][0]
+        self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
+        self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
+        q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
         self.tc2.SetValue(str(q.FuelUnit))
         self.tc3.SetValue(str(q.MFuelYear))
         self.tc4.SetValue(str(q.FuelOwn))
         self.tc5.SetValue(str(q.FuelTariff))
         self.tc6.SetValue(str(q.FuelCostYear))
-        self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(str(self.fuelListBox.GetStringSelection())))
+        self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))
         event.Skip()
 
     def OnButtonClear(self, event):
@@ -378,7 +415,7 @@ class PanelQ2(wx.Panel):
 	if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) <= 0:
 	    return
 
-	q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
+	q = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
 	self.grid.SetCellValue(1, 3, str(q.PowerContrTot))
 	self.grid.SetCellValue(1, 1, str(q.PowerContrStd))
 	self.grid.SetCellValue(1, 0, str(q.PowerContrPeak))
@@ -419,9 +456,15 @@ class PanelQ2(wx.Panel):
 
     def fillFuelList(self):
         self.fuelListBox.Clear()
-        if len(Status.DB.qfuel.Questionnaire_id[Status.PId]) > 0:
-            for n in Status.DB.qfuel.Questionnaire_id[Status.PId]:
-                self.fuelListBox.Append (str(Status.DB.dbfuel.DBFuel_ID[n.DBFuel_id][0].FuelName))
+        fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if len(fuels) > 0:
+            for n in fuels:
+                dbfid = n.DBFuel_id
+                try:
+                    fuelName = str(Status.DB.dbfuel.DBFuel_ID[n.DBFuel_id][0].FuelName)
+                except:
+                    fuelName = "unknown fuel"
+                self.fuelListBox.Append(fuelName)
 
     def showError(self, message):
         dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
