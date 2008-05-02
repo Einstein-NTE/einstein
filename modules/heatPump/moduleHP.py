@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.18
+#	Version No.: 0.20
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -38,6 +38,8 @@
 #                           Stoyan Danov            22/04/2008
 #                           Stoyan Danov            24/04/2008
 #                           Hans Schweiger          29/04/2008
+#                           Stoyan Danov            30/04/2008
+#                           Hans Schweiger          30/04/2008
 #   
 #
 #       Changes to previous version:
@@ -72,6 +74,10 @@
 #                       setEquipmentFromDB(): activate updates, more controls
 #                       calculateEnergyFlows(): assignment of exergetic COP from DB
 #       29/04/2008 HS: call to initPanel and updatePanel eliminated in __init__
+#       30/04/2008 SD: eliminating reference to C tables and related, functions affected:
+#                       deleteEquipment,deleteFromCascade,addEquipmentDummy,setEquipmentFromDB,
+#                       designAssistant1,designAssistant2,calculateEnergyFlows
+#                   HS: some security featers added (setUserDefined)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -121,7 +127,7 @@ class ModuleHP():
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery)
+#        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
         self.NEquipe = len(self.equipments)
         print "ModuleHP (__init__): %s equipes found"%self.NEquipe
 
@@ -155,7 +161,15 @@ class ModuleHP():
 
         UDList = Status.int.GData['HP Config']
 
-        row = self.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0] #row in UHeatPump
+        uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
+        
+        if len(uhp)==0:
+            print "ModuleHP(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
+            dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
+            Status.DB.uheatpump.insert(dummy)
+            uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
+            
+        row = uhp[0]
 
 #        row.MaintainExisting = UDList[0] # to add in UHeatPump
         row.UHPType = UDList[1]
@@ -339,10 +353,10 @@ class ModuleHP():
             print "Module HP (delete): id to be deleted = ",HPid
         
         eq = self.equipments.QGenerationHC_ID[HPid][0] #select the corresponding rows to HPid in both tables
-        eqC = self.equipmentsC.QGenerationHC_id[HPid][0]
+#        eqC = self.equipmentsC.QGenerationHC_id[HPid][0] #SD change 30/04.2008
 
         eq.delete() #deletes the rows in both tables
-        eqC.delete()
+#        eqC.delete() #SD change 30/04.2008
         self.sql.commit()
 
         self.deleteFromCascade(Status.int.cascade, HPid) #actuallise the cascade list
@@ -367,10 +381,10 @@ class ModuleHP():
 
         new_cascade.pop(idx)           
 
-        for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
-            eqC = self.equipmentsC.QGenerationHC_id[new_cascade[i]['equipeID']][0]
-            eqC.CascadeIndex = i+1
-            print '\n new_CascadeIndex', eqC.CascadeIndex
+        for i in range(len(new_cascade)): #assign new CascadeIndex in QGenerationHC table
+            eq = self.equipments.QGenerationHC_ID[new_cascade[i]['equipeID']][0] #SD change 30/04.2008
+            eq.CascadeIndex = i+1 #SD change 30/04.2008
+            print '\n new_CascadeIndex', eq.CascadeIndex #SD change 30/04.2008
             
         self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
 
@@ -409,10 +423,9 @@ class ModuleHP():
         EqNo = self.NEquipe + 1
         print 'ModuleHP (addEquipmentDummy): CascadeIndex', self.cascadeIndex
         print 'ModuleHP (addEquipmentDummy): EqNo', EqNo
-        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"HeatPump (specify subtype)"}
+        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,
+                  "EquipType":"HeatPump (specify subtype)","CascadeIndex":self.cascadeIndex} #SD change 30/04.2008
         QGid = self.DB.qgenerationhc.insert(equipe)
-        equipeC = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"QGenerationHC_id":QGid,"CascadeIndex":self.cascadeIndex}
-        CGid = self.DB.cgenerationhc.insert(equipeC)
 
         self.dummyEqId = QGid #temporary storage of the equipment ID for undo if necessary
         
@@ -426,13 +439,12 @@ class ModuleHP():
         print "ModuleHP (addEquipmentDummy): dummyEqId", self.dummyEqId
 
         self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
-        self.equipeC = self.equipmentsC.CGenerationHC_ID[CGid][0]
 
-        return(self.equipe,self.equipeC)
+        return(self.equipe) #SD change 30/04.2008
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def setEquipmentFromDB(self,equipe,equipeC,modelID):
+    def setEquipmentFromDB(self,equipe,modelID): #SD change 30/04.2008
 #------------------------------------------------------------------------------
 #   takes an equipment from the data base and stores it under a given Id in
 #   the equipment data base
@@ -459,16 +471,6 @@ class ModuleHP():
         equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
 
         Status.SQL.commit()
-
-        
-##        equipeC.update({"HPExHeatCOP":model.HPExHeatCOP}) #to be added in CGenerationHC
-##        equipeC.update({"Price":model.HPPrice}) #to be added in CGenerationHC
-##        equipeC.update({"TurnKeyPrice":model.HPTurnKeyPrice}) #to be added in CGenerationHC
-##        equipeC.update({"OandMvar":model.HPOandMvar}) #to be added in CGenerationHC
-##        equipeC.update({"OandMfix":model.HPOandMfix}) #to be added in CGenerationHC
-##        Status.SQL.commit()       
-
-
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -565,7 +567,7 @@ class ModuleHP():
 #            if (MaintainExistingEquipment == False):
 #                deleteAllHeatPumps()
 
-            (equipe,equipeC) = self.addEquipmentDummy()
+            equipe = self.addEquipmentDummy() #SD change 30/04.2008
 
 #............................................................................................
 #   analyze heat demand for previous checks
@@ -626,10 +628,10 @@ class ModuleHP():
                     modelID = HPList[listIndex] #a row in the DBHeatPump corresponding to j
                     print 'ModuleHP (designAssistant1): modelID = ', modelID
                                         
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list #SD change 30/04.2008
                     print "ModuleHP (designAssistant1): equipment stored"
                     
-                    USHj = self.calculateEnergyFlows(equipe,equipeC,self.cascadeIndex)
+                    USHj = self.calculateEnergyFlows(equipe,self.cascadeIndex) #SD change 30/04.2008
                     HOp = USHj/equipe.HCGPnom
 
                     print "\nModuleHP (designAssistant1): USH: ",USHj," HOp: ",HOp
@@ -687,7 +689,7 @@ class ModuleHP():
             self.deleteEquipment(None)   #delete the dummy equipment previously created
 
         else:                        
-            self.setEquipmentFromDB(self.equipe,self.equipeC,modelID) #add selected equipment to the equipment list
+            self.setEquipmentFromDB(self.equipe,modelID) #add selected equipment to the equipment list #SD change 30/04.2008
             print "ModuleHP: heat pump added. model no: ",modelID
 
 #        Status.mod.moduleEnergy.runSimulation()
@@ -696,7 +698,7 @@ class ModuleHP():
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def calculateEnergyFlows(self,equipe,equipeC,cascadeIndex):
+    def calculateEnergyFlows(self,equipe,cascadeIndex): #SD change 30/04.2008
 #------------------------------------------------------------------------------
 #
 # updates the energy flows in the newly added heat pump
@@ -715,11 +717,11 @@ class ModuleHP():
         print "ModuleHP (calculateEnergyFlows): PNom",equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
         print "ModuleHP (calculateEnergyFlows): COP",equipe.HCGTEfficiency
-        if equipeC.HPExHeatCOP is None or NULL:
-            print 'Exergetic COP (heating) =', equipeC.HPExHeatCOP
+        if equipe.HPExHeatCOP is None or 'NULL': #SD change 30/04.2008
+            print 'Exergetic COP (heating) =', equipe.HPExHeatCOP #SD change 30/04.2008
             COPex = 0.3
         else:
-            COPex = equipeC.HPExHeatCOP
+            COPex = equipe.HPExHeatCOP #SD change 30/04.2008
 
         for i in range(cascadeIndex+1):
             print "cascade[%s]: "%i,Status.int.cascade[i-1]["equipeNo"]
@@ -897,8 +899,8 @@ class ModuleHP():
         Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
         Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
-#        equipeC.USHj = USHj
-#        equipeC.QHXj = QHXj    #XXX to be defined in data base
+#        equipe.USHj = USHj #SD change 30/04.2008: from table C->Q
+#        equipe.QHXEq = QHXj #SD change 30/04.2008, also name changed (QHXEq)
 
         print "Total energy supplied by equipment ",USHj, " MWh"
         print "Total waste heat input  ",QHXj, " MWh"
@@ -937,8 +939,8 @@ if __name__ == "__main__":
 ##    mod.updatePanel()
     mod.initPanel()
 ##    mod.calcTPinchAndTGap()
-##    (equipe,equipeC) = mod.addEquipmentDummy()
-##    mod.setEquipmentFromDB(equipe,equipeC,HPid)
+##    equipe = mod.addEquipmentDummy() #SD change 30/04.2008
+##    mod.setEquipmentFromDB(equipe,HPid) #SD change 30/04.2008
 ##    mod.designAssistant1()
 ##    mod.designAssistant2(12)
 
@@ -947,7 +949,7 @@ if __name__ == "__main__":
 
     # Step 1 design assistant: gets a preselected list of possible heat pumps
 
-    (mode,HPList) = mod.designAssistant1()
+##    (mode,HPList) = mod.designAssistant1()
         
 #..............................................................................
 # In interactive mode open DB Edidor Heat pump and select manually

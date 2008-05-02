@@ -25,6 +25,7 @@
 #                           Hans Schweiger      02/04/2008
 #                           Stoyan Danov        09/04/2008
 #                           Stoyan Danov        24/04/2008
+#                           Stoyan Danov        30/04/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -37,6 +38,7 @@
 #       02/04/2008 corrections in getEquipmentCascade
 #       09/04/2008 getEquipmentCascade: add filling EquipTableDataList-data fields shown in Table panel
 #       24/04/2008 getEquipmentCascade: add filling EquipTableDataList-changed
+#       30/04/2008 eliminate references to C tables, function affected: getEquipmentCascade
 #
 #	
 #------------------------------------------------------------------------------		
@@ -227,15 +229,15 @@ class Interfaces(object):
 
 
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
-        self.equipmentsC = Status.DB.cgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipmentsC)
+        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
+        self.NEquipe = len(self.equipments) #SD change 30/04.2008
         print "Interfaces (getEquipmentCascade): %s equipes found" % self.NEquipe
 
 
-        self.equipments = []
-        for rowC in self.equipmentsC:
-            row = Status.DB.qgenerationhc.QGenerationHC_ID[rowC.QGenerationHC_id][0]
-            self.equipments.append(row)
+##        self.equipments = [] #SD change 30/04.2008
+##        for rowC in self.equipmentsC:
+##            row = Status.DB.qgenerationhc.QGenerationHC_ID[rowC.QGenerationHC_id][0]
+##            self.equipments.append(row)
 
         self.cascade = []
         for j in range(self.NEquipe):
@@ -247,7 +249,7 @@ class Interfaces(object):
         self.EquipTableDataList = []
         for j in range(self.NEquipe):
             self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
-                                            self.equipments[j].EquipType, self.equipmentsC[j].HPerYearEq, self.equipments[j].YearManufact])
+                                            self.equipments[j].EquipType, self.equipments[j].HPerYearEq, self.equipments[j].YearManufact]) #SD change 30/04.2008
                                                 
         
         

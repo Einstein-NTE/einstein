@@ -15,12 +15,14 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.01
+#   Version No.: 0.03
 #   Created by:         Hans Schweiger  03/04/2008
 #   Last revised by:    Stoyan Danov    29/04/2008
+#                       Stoyan Danov    30/04/2008
 #
 #       Changes to previous version:
 #   29/04/2008 SD: added: cascadeMoveUp, cascadeMoveDown, cascadeMoveToTop, ...
+#   30/04/2008 SD: reference to cgenerationhc commented -> line 60
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -55,7 +57,7 @@ class ModuleHC(object):
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery)
+#        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
         self.NEquipe = len(self.equipments)
         print "ModuleHC (__init__): %s equipes found"%self.NEquipe
 

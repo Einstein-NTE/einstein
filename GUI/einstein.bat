@@ -1,0 +1,1 @@
+einsteinMain.py > einsteinMSG.txt

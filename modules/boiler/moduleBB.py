@@ -25,6 +25,7 @@
 #                           Enrico Facci        09/04/2008
 #                           Stoyan Danov        16/04/2008
 #                           Enrico Facci        24/04/2008
+#                           Hans Schweiger      30/04/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -40,6 +41,7 @@
 #       24/04/2008  functions added: designAssistant,automDeleteBoiler, designBB80, designBB140, designBBmaxTemp
 #                   findmaxTemp. screenEquipments arranged in analogy with moduleHP.
 #                   (HS: some clean-up of non-used functions and old comments)
+#       30/04/2008  references to cgenerationhc data base eliminated (substituted by qgenerationhc)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -77,7 +79,6 @@ class ModuleBB(object):
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery)
         self.NEquipe = len(self.equipments)
         print "ModuleBB (__init__): %s equipes found"%self.NEquipe
 
@@ -122,13 +123,11 @@ class ModuleBB(object):
         Status.int.getEquipmentCascade()
         self.BBList = []
         for row in Status.int.cascade:
-        #    if row['equipeType'] == 'Heat pump' or row['equipeType'] == 'HeatPump' or row['equipeType'] == 'Heat Pump' or row['equipeType'] == 'HP COMP':
             if getEquipmentClass(row["equipeType"]) == "BB":
                 self.BBList.append(row)
 
         BBTableDataList = []
         for row in Status.int.EquipTableDataList:
-#            if row[2] == 'Heat pump' or row[2] == 'HeatPump' or row[2] == 'Heat Pump' or row[2] == 'HP COMP':
             if getEquipmentClass(row[2]) == "BB":
                 BBTableDataList.append(row)
 
@@ -226,10 +225,8 @@ class ModuleBB(object):
 
         
         eq = self.equipments.QGenerationHC_ID[BBid][0] #select the corresponding rows to HPid in both tables
-        eqC = self.equipmentsC.QGenerationHC_id[BBid][0]
-
         eq.delete() #deletes the rows in both tables, to be activated later, SD
-        eqC.delete()
+
         self.sql.commit()
 
         #actuallise the cascade list: define deleteFromCascade
@@ -240,9 +237,9 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
     def deleteFromCascade(self, cascade, BBid):
 #------------------------------------------------------------------------------
-        """
-        deletes from the actual list casade and re-assigns the CascadeIndex values in CGenerationHC table
-        """
+#
+#   deletes from the actual list casade and re-assigns the CascadeIndex values in QGenerationHC table
+#        
 #-----------------------------------------------------------------------------
 
 #        print '\n deleteFromCascade():', 'cascade =', cascade
@@ -255,9 +252,9 @@ class ModuleBB(object):
 
         new_cascade.pop(idx)           
 
-        for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
-            eqC = self.equipmentsC.QGenerationHC_id[new_cascade[i]['equipeID']][0]
-            eqC.CascadeIndex = i+1
+        for i in range(len(new_cascade)): #assign new CascadeIndex in QGenerationHC table
+            eq = self.equipments.QGenerationHC_id[new_cascade[i]['equipeID']][0]
+            eq.CascadeIndex = i+1
 #            print '\n new_CascadeIndex', eqC.CascadeIndex
             
         self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
@@ -296,10 +293,9 @@ class ModuleBB(object):
 
         EqNo = self.NEquipe + 1
 
-        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"Boiler"}
+        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,"EquipType":"Boiler",\
+                  "CascadeIndex":self.cascadeIndex}
         QGid = self.DB.qgenerationhc.insert(equipe)
-        equipeC = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"QGenerationHC_id":QGid,"CascadeIndex":self.cascadeIndex}
-        CGid = self.DB.cgenerationhc.insert(equipeC)
 
         self.dummyEqId = QGid #temporary storage of the equipment ID for undo if necessary
         
@@ -312,14 +308,13 @@ class ModuleBB(object):
         print "ModuleBB (addEquipmentDummy): self.cascadeIndex", self.cascadeIndex
 
         self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
-        self.equipeC = self.equipmentsC.CGenerationHC_ID[CGid][0]
 
-        return(self.equipe,self.equipeC)
+        return self.equipe
 
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def setEquipmentFromDB(self,equipe,equipeC,modelID):
+    def setEquipmentFromDB(self,equipe,modelID):
 #------------------------------------------------------------------------------
 #   takes an equipment from the data base and stores it under a given Id in
 #   the equipment data base
@@ -569,25 +564,25 @@ class ModuleBB(object):
 
                         selectBB((QDh_descending[0]*securityMargin))  #select the right bb from the database.                        
 #HS line not valid code                        selectBB((QDh_descending[0]*securityMargin),...)  #select the right bb from the database.
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
 #HS: elif requires a condition !!!                    elif:
                     else:
                         selectBB(QDh_descending[minOpTime])    #  select the base load boiler from DB
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                         
                         if QDh_descending[0]*securityMargin - equipeC['HCGPnom']>= 2*minPow:
                             selectBB((QDh_descending[0]*securityMargin - equipeC['HCGPnom'])/2)
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                         else:
 #HS: elif requires a condition !!!                        elif:
                             selectBB(QDh_descending[0]*securityMargin - equipeC['HCGPnom'])
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                 else:
 #HS: elif requires a condition !!!                elif:
                     selectBB(QD_descending[0]*securityMargin)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
 #HS: use "==" in comparisons in if, not "=" -> makes an assignment, not a comparison!!!
 #HS: False is a standard key-word of python and has to be written uppercase
@@ -595,13 +590,13 @@ class ModuleBB(object):
 #HS: here a condition is missing !!!
                 what = True
                 if what:#in the list of previously deleted equipmen exist a boiler with nominal power >= than all the bb in the equipment list :
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
                 else:
 #HS: elif requires a condition !!!                elif:
 #HS: do not use python code for commenting
                     selectBB() #maximum nominal power of the boiler in list)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
                 
                         
@@ -625,35 +620,35 @@ class ModuleBB(object):
 #                   has probably to be corrected throughout the code ... !!!!
 #                        selectBB((QDh_descending[0]*securityMargin)) # ,...)  #select the right bb from the database.
                         self.selectBB((QDh_descending[0]*securityMargin)) # ,...)  #select the right bb from the database.
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
                     else:
 #HS: elif requires a condition !!!                    elif:
                         self.selectBB(QDh_descending[minOpTime])    #  select the base load boiler from DB
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
                         
                         if QDh_descending[0]*securityMargin - equipeC['HCGPnom']>= 2*minPow:
                             selectBB((QDh_descending[0]*securityMargin - equipeC['HCGPnom'])/2)
 #twice the same ?? for being sure, if the first time fails ???                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                         else:
 #HS: elif requires a condition !!!                        elif:
                             selectBB(QDh_descending[0]*securityMargin - equipeC['HCGPnom'])
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                 else:
 #HS: elif requires a condition !!!                elif:
                     selectBB(QD_descending[0]*securityMargin)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 #HS: off==False instead of off=false
             if off==False:
                 what = True
                 if what: #in the list of previously deleted equipmen exist a boiler with nominal power >= than all the bb in the equipment list :
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                 else:
 #HS: elif requires a condition !!!                elif:
                     selectBB() #maximum nominal power of the boiler in list)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
 
 #------------------------------------------------------------------------------
@@ -665,38 +660,38 @@ class ModuleBB(object):
         if QDh_descending[0]*securityMargin>=2*minPow:
             if QDh_descending[0]*securityMargin < QDh_descending[minOpTime]*1.2:
                 selectBB((QDh_descending[0]*securityMargin)) #HS....,...)  #select the right bb from the database.
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
             else:
 #HS            elif what????:
                 selectBB(QDh_descending[minOpTime])    #  select the base load boiler from DB
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
-                if QDh_descending[0]*securityMargin - equipeC['HCGPnom']>= 2*minPow:
-                    selectBB((QDh_descending[0]*securityMargin - equipeC['HCGPnom'])/2)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                if QDh_descending[0]*securityMargin - equipe['HCGPnom']>= 2*minPow:
+                    selectBB((QDh_descending[0]*securityMargin - equipe['HCGPnom'])/2)
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 #HS: elif requires a condition !!!                elif:
                 else:
-                    selectBB(QDh_descending[0]*securityMargin - equipeC['HCGPnom'])
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    selectBB(QDh_descending[0]*securityMargin - equipe['HCGPnom'])
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 #HS: elif requires a condition !!!        elif:
         else:
             selectBB(QD_descending[0]*securityMargin)
-            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
 #HSsame error than above ...
         if off==False:
             what = True
             if what: #HS ??? #in the list of previously deleted equipmen exist a boiler with nominal power >= than all the bb in the equipment list :
    #add the previously deleted boiler to the list for redundancy
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
 #HS: elif requires a condition !!!            elif:
             else:
                 selectBB() #maximum nominal power of the boiler in list)
                      #   select from the bb database a boiler to be used for redundancy
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
     
 #------------------------------------------------------------------------------
     def designAssistant(self):
@@ -836,8 +831,8 @@ if __name__ == "__main__":
     
     keys = ["BB Table","BB Plot","BB UserDef"]
     mod = ModuleBB(keys)
-    (equipe,equipeC) = mod.addEquipmentDummy()
-    mod.calculateEnergyFlows(equipe,equipeC,mod.cascadeIndex)
+    equipe = mod.addEquipmentDummy()
+    mod.calculateEnergyFlows(equipe,mod.cascadeIndex)
                     
 
 #    mod.designAssistant1()

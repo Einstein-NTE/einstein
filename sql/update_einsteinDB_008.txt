@@ -1,0 +1,14 @@
+--update einstein database: change ID Type in UHeatpump
+USE einstein;
+
+ALTER TABLE uheatpump MODIFY COLUMN UHeatPump_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID';
+DROP TABLE cgenerationhc;
+DROP TABLE cbuildings;
+DROP TABLE cdistributionhc;
+DROP TABLE celectricity;
+DROP TABLE cfuel;
+DROP TABLE cprocessdata;
+DROP TABLE cproduct;
+DROP TABLE crenewables;
+DROP TABLE hpannualinternaldata;
+DROP TABLE hphourlyinternaldata;

@@ -34,6 +34,7 @@
 #                           Hans Schweiger          18/04/2008
 #                           Hans Schweiger          25/04/2008
 #                           Hans Schweiger          29/04/2008
+#                           Stoyan Danov            30/04/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -53,6 +54,7 @@
 #                   Robustness of panel against empty data sets in GData
 #       25/04/08:   Some clean-up in adding HP manually
 #       29/04/08:   call to method "draw" for panelHPFig added
+#       30/04/08:   in OnButtonpageHPAddButton: delete equipeC in assignment of addEquipmentDummy
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -199,6 +201,7 @@ class PanelHP(wx.Panel):
         self.grid.CreateGrid(MAXROWS, cols)
 
         self.grid.EnableGridLines(True)
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
         self.grid.SetColSize(0,115)
@@ -561,7 +564,7 @@ class PanelHP(wx.Panel):
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
         try:                #creates space for new equipment in Q/C
-	    (self.equipe,self.equipeC) = self.mod.addEquipmentDummy()
+	    self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
 
             pu1 =  AddEquipment(self,                      # pointer to this panel
                                 self.mod,                # pointer to the associated module

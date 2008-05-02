@@ -121,6 +121,7 @@ class PanelBB(wx.Panel):
         self.gridPageBB.CreateGrid(max(rows,20), cols)
 
         self.gridPageBB.EnableGridLines(True)
+        self.gridPageBB.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.gridPageBB.SetDefaultRowSize(20)
         self.gridPageBB.SetRowLabelSize(30)
         self.gridPageBB.SetColSize(0,115)
