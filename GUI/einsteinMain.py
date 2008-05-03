@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.79
+#   Version No.: 0.78
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -297,10 +297,12 @@ class EinsteinFrame(wx.Frame):
         self.message = wx.ListCtrl(id=-1,
                    name='message',
                    parent=self.splitter2,
-                   style=wx.VSCROLL | wx.RAISED_BORDER | wx.LC_REPORT)
+                   style= wx.RAISED_BORDER | wx.LC_REPORT | wx.LC_NO_HEADER)
         self.message.InsertColumn(0, 'Message log')
         self.message.SetBackgroundColour('white')
-
+        # show/hide is a main menu action
+        # ini. state is hidden
+        self.message.Show()
 
         #----- configure sizers and splitters
         self.DoLayout ()
@@ -400,7 +402,7 @@ class EinsteinFrame(wx.Frame):
 
         # set splitters
         self.splitter.SplitVertically(self.treepanel, self.splitter2, 200)
-        self.splitter2.SplitHorizontally(self.leftpanel2, self.message, -80)
+        self.splitter2.SplitHorizontally(self.leftpanel2, self.message, -50) # initially open
         self.splitter.SetSashPosition(222)
 
         # find the width of message panel
@@ -534,7 +536,15 @@ class EinsteinFrame(wx.Frame):
             language.install()
 
         dialogLang.Destroy()
-        
+
+    def OnMenuSettingsViewMessages(self,event):
+        if self.menuBar.IsChecked(event.GetId()):
+            self.splitter2.SetSashPosition(-50)
+            self.message.Show()
+        else:
+            self.splitter2.SetSashPosition(-1)
+            self.message.Hide()
+
 #..............................................................................     
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
@@ -1056,6 +1066,9 @@ class EinsteinFrame(wx.Frame):
         self.Classification = self.menuSettings.AppendMenu(-1, PList["X123a"][1], self.submenuClassification)
         self.Language = self.menuSettings.Append(-1, "Language")
 
+        i = wx.NewId()
+        self.ViewMessages = self.menuSettings.AppendCheckItem(i, 'View message log')
+        
         self.HelpUserManual = self.menuHelp.Append(-1, PList["X126"][1])
         self.menuHelp.AppendSeparator()
         self.HelpAbout = self.menuHelp.Append(-1, PList["X127"][1])
@@ -1067,7 +1080,7 @@ class EinsteinFrame(wx.Frame):
         self.menuBar.Append(self.menuHelp, PList["X132"][1])
         
         self.SetMenuBar(self.menuBar)
-
+        self.menuBar.Check(i,True)
 
     def Cond(self,test,errtext):
         d = []
@@ -1242,6 +1255,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
 
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsLanguage, self.Language)
+        self.Bind(wx.EVT_MENU, self.OnMenuSettingsViewMessages, self.ViewMessages)
 
         self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)        
         self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)        

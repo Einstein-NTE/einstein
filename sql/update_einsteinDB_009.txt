@@ -1,0 +1,10 @@
+--update einstein database: change ID Type in UHeatpump
+USE einstein;
+
+ALTER TABLE qbuildings ADD COLUMN BuildingNo INTEGER UNSIGNED COMMENT 'no of building' AFTER AlternativeProposalNo;
+
+ALTER TABLE qheatexchanger CHANGE COLUMN HXSourceInlet HXSource VARCHAR(45) COMMENT 'heat source';
+ALTER TABLE qwasteheatelequip ADD COLUMN WHEENo INTEGER UNSIGNED COMMENT 'no of WHEE' AFTER AlternativeProposalNo;
+
+ALTER TABLE cgeneraldata ADD COLUMN NHX INTEGER UNSIGNED COMMENT 'total no of HX' AFTER NProducts;
+ALTER TABLE cgeneraldata ADD COLUMN NWHEE INTEGER UNSIGNED COMMENT 'total no of WHEE' AFTER NHX;

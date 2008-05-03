@@ -842,5 +842,198 @@ class Project(object):
 
         Status.SQL.commit()
 
+#------------------------------------------------------------------------------
+    def addHXDummy(self):
+#------------------------------------------------------------------------------
+#   adds a new empty HX field in table qgenerationhc
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+
+        hxes = Status.DB.qheatexchanger.sql_select(sqlQuery)
+        NHX = len(hxes)
+        tmp = {
+            "ProjectID":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "HXNo": NHX+1
+            }          
+        newID = Status.DB.qheatexchanger.insert(tmp)
+        newhx = Status.DB.qheatexchanger.QHeatExchanger_ID[newID]
+
+        NHX += 1
+
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        cgeneraldata[0].NHX = NHX
+
+        Status.SQL.commit()
+
+        return newhx
+
+#------------------------------------------------------------------------------
+    def deleteHX(self,HXID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given heat exchanger
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' AND QHeatExchanger_ID = '%s'"\
+                    %(Status.PId,Status.ANo,HXID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qheatexchanger,sqlQuery)
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY HXNo ASC"%(Status.PId,Status.ANo)
+        hxes = Status.DB.qheatexchanger.sql_select(sqlQuery)
+
+        for i in range(len(hxes)): #assign new EqNo in QGenerationHC table
+            hxes[i].HXNo = i+1
+            pass
+
+        
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
+        cgeneraldata[0].NHX = len(hxes)
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def getHXList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY HXNo ASC"%(Status.PId,Status.ANo)
+        hxes = Status.DB.qheatexchanger.sql_select(sqlQuery)
+        
+        HXList = []
+        for hx in hxes:
+            HXList.append(hx[key])
+
+        return HXList
+
+#------------------------------------------------------------------------------
+    def addWHEEDummy(self):
+#------------------------------------------------------------------------------
+#   adds a new empty WHEE field in table qwasteheatelequip
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+
+        whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
+        NWHEE = len(whees)
+        tmp = {
+            "ProjectID":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "WHEENo": NWHEE+1
+            }          
+        newID = Status.DB.qwasteheatelequip.insert(tmp)
+        newwhee = Status.DB.qwasteheatelequip.QWasteHeatElEquip_ID[newID]
+
+        NWHEE += 1
+
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        cgeneraldata[0].NWHEE = NWHEE
+
+        Status.SQL.commit()
+
+        return newwhee
+
+#------------------------------------------------------------------------------
+    def deleteWHEE(self,WHEEID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given heat exchanger
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' AND QWasteHeatElEquip_ID = '%s'"\
+                    %(Status.PId,Status.ANo,WHEEID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qwasteheatelequip,sqlQuery)
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
+        whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
+
+        for i in range(len(whees)): #assign new EqNo in QGenerationHC table
+            whees[i].WHEENo = i+1
+            pass
+
+        
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
+        cgeneraldata[0].NWHEE = len(whees)
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def getWHEEList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
+        whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
+        
+        WHEEList = []
+        for whee in whees:
+            WHEEList.append(whee[key])
+
+        return WHEEList
+
+#------------------------------------------------------------------------------
+    def getEqList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        eqs = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        
+        eqList = []
+        for eq in eqs:
+            eqList.append(eq[key])
+
+        return eqList
+
+#------------------------------------------------------------------------------
+    def getProcessList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
+        processes = Status.DB.qprocessdata.sql_select(sqlQuery)
+        
+        processList = []
+        for process in processes:
+            processList.append(process[key])
+
+        return processList
+
+#------------------------------------------------------------------------------
+    def getPipeList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
+        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
+        
+        pipeList = []
+        for pipe in pipes:
+            pipeList.append(pipe[key])
+
+        return pipeList
+
 #==============================================================================
 
