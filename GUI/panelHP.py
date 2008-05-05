@@ -208,11 +208,11 @@ class PanelHP(wx.Panel):
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid.SetColLabelValue(0, "Short name")
-        self.grid.SetColLabelValue(1, "Year")
-        self.grid.SetColLabelValue(2, "Type")
-        self.grid.SetColLabelValue(3, "Operating\nhours")
-        self.grid.SetColLabelValue(4, "Power")
-        self.grid.SetColLabelValue(5, "Temperature")
+        self.grid.SetColLabelValue(1, "Nom. power")
+        self.grid.SetColLabelValue(2, "COP")
+        self.grid.SetColLabelValue(3, "Type")
+        self.grid.SetColLabelValue(4, "Operating\nhours")
+        self.grid.SetColLabelValue(5, "Year manufact.")
         #
         # copy values from dictionary to grid
         #
