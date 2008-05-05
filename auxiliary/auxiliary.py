@@ -23,6 +23,7 @@
 #                           Hans Schweiger      21/03/2008
 #                           Stoyan Danov        28/03/2008
 #                           Hans Schweiger      24/04/2008
+#                           Stoyan Danov        05/05/2008
 #
 #       Changes:
 #       - introduction of function frange
@@ -30,6 +31,7 @@
 #                   list and table interpolation functions
 #       28/03/2008 added: transpose(), firstHigher()
 #       24/04/2008  function "noneFilter" added
+#       05/05/2008 bug corrected in interpolateList (yList was used instead of ylist)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -120,7 +122,7 @@ def interpolateList(xi,ylist):
     i1 = int(floor(xi)) # math.floor and math.ceil return DOUBLEs -> int() should be applied then
     i0 = int(ceil(xi))
     if i0 == i1: #avoid division to zero
-        y = yList[i1]
+        y = ylist[i1]# SD: error yList en vez de ylist, 05/05/2008
         #print 'interp...1'
     else:
         #print 'interp...2'
