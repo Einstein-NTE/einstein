@@ -19,10 +19,12 @@
 #   Created by:         Hans Schweiger  03/04/2008
 #   Last revised by:    Stoyan Danov    29/04/2008
 #                       Stoyan Danov    30/04/2008
+#                       Stoyan Danov    05/05/2008
 #
 #       Changes to previous version:
 #   29/04/2008 SD: added: cascadeMoveUp, cascadeMoveDown, cascadeMoveToTop, ...
 #   30/04/2008 SD: reference to cgenerationhc commented -> line 60
+#   05/05/2008 SD: move query PId,ANo from __init__ to initPanel
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,15 +54,6 @@ class ModuleHC(object):
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
 
-        self.DB = Status.DB
-        self.sql = Status.SQL
-        
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-#        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
-        self.NEquipe = len(self.equipments)
-        print "ModuleHC (__init__): %s equipes found"%self.NEquipe
-
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
@@ -68,6 +61,13 @@ class ModuleHC(object):
 #       screens existing equipment, whether there are already heat pumps
 #       XXX to be implemented
 #------------------------------------------------------------------------------
+
+        self.DB = Status.DB
+        self.sql = Status.SQL
+        
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
 
         Status.int.getEquipmentCascade()
         self.cascadeIndex = 0
@@ -91,46 +91,19 @@ class ModuleHC(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
-        print "ModuleHC (updatePanel): data for panel are copied to interface"
-
         dataList = []
         for i in range(self.NEquipe):
             row = Status.int.cascade[i]
-            print row
-            print row["equipeNo"]
-            dataList.append(noneFilter([i+1,row["equipeNo"],row["equipeType"],row["equipePnom"],"???","???"]))
+            equipmentName=Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0].Equipment
+            dataList.append(noneFilter([i+1,row["equipeNo"],equipmentName,row["equipeType"],row["equipePnom"],"???"]))
         data = array(dataList)
 
         Status.int.setGraphicsData(self.keys[0], data)
 
         try:
-        #    Status.int.setGraphicsData('BB Plot',[Status.int.T,
-        #                                              Status.int.QD_T_mod[self.cascadeIndex],
-        #                                              Status.int.QA_T_mod[self.cascadeIndex],
-        #                                              Status.int.QD_T_mod[self.cascadeIndex+1],
-        #                                              Status.int.QA_T_mod[self.cascadeIndex+1]])
-        # info for text boxes in right side of panel
             Status.int.setGraphicsData('HC Info',{"noseque":55})
-
         except:
             pass
-
-#------------------------------------------------------------------------------
-
-    def exitModule(self,exit_option):
-        """
-        carries out any calculations necessary previous to displaying the HP
-        design assitant window
-        """
-        if exit_option == "save":
-            print "exitModule: here I should save the current configuration"
-        elif exit_option == "cancel":
-            print "exitModule: here I should retreive the previous configuration"
-            
-
-        print "exitModule: function not yet defined"
-
-        return "ok"
 
 #------------------------------------------------------------------------------
     def cascadeMoveUp(self,actualCascadeIndex):
@@ -138,33 +111,27 @@ class ModuleHC(object):
 #        moves equipment up in the cascade sequence
 #------------------------------------------------------------------------------
 
-        print 'moduleHC: cascadeMoveUp'
-
-#        print 'equipments =', self.equipments
-
         idx = 0
         for i in range(self.NEquipe):
             if self.equipments[i]['CascadeIndex'] == actualCascadeIndex:
                 idx = self.equipments[i]['CascadeIndex']
 
         if idx == 0:
-            print 'modulHC: cascadeMoveUp: there is no equipe with CascadeIndex =', actualCascadeIndex
+            print 'moduleHC: cascadeMoveUp: there is no equipe with CascadeIndex =', actualCascadeIndex
             return 0
 
         elif idx == 1:
-            print 'modulHC: cascadeMoveUp: equipe cannot be moved up, actualCascadeIndex =', actualCascadeIndex
+            print 'moduleHC: cascadeMoveUp: equipe cannot be moved up, actualCascadeIndex =', actualCascadeIndex
             return 1            
 
         else:
             try:
                 actualEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex][0]
                 upEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex - 1][0]
-                print 'Before: CascadeIndex =', actualEquip.CascadeIndex
 
                 actualEquip.CascadeIndex = actualCascadeIndex - 1
                 upEquip.CascadeIndex = actualCascadeIndex          
                 Status.SQL.commit()
-                print 'After: CascadeIndex =', actualEquip.CascadeIndex
             except:
                 print "ModuleHC (cascadeMoveUp): severe error - couldn't find equipe"
                 
@@ -178,9 +145,6 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 #        moves equipment down in the cascade sequence
 #------------------------------------------------------------------------------
-        print 'modulHC: cascadeMoveDown'
-
-#        print 'equipments =', self.equipments
 
         idx = 0
         for i in range(self.NEquipe):
@@ -188,28 +152,23 @@ class ModuleHC(object):
                 idx = self.equipments[i]['CascadeIndex']
 
         if idx == 0:
-            print 'modulHC: cascadeMoveDown: there is no equip with CascadeIndex =', actualCascadeIndex
             return 0
 
         elif idx == self.NEquipe:
-            print 'modulHC: cascadeMoveDown: equip cannot be moved down, actualCascadeIndex =', actualCascadeIndex, 'from totalEquips =',self.NEquipe
             return self.NEquipe
 
         else:
             try:
                 actualEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex][0]
                 downEquip = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[actualCascadeIndex + 1][0]
-                print 'Before: CascadeIndex =', actualEquip.CascadeIndex
 
                 actualEquip.CascadeIndex = actualCascadeIndex + 1
                 downEquip.CascadeIndex = actualCascadeIndex          
                 Status.SQL.commit()
-                print 'After: CascadeIndex =', actualEquip.CascadeIndex
             except:
                 print "ModuleHC (cascadeMoveDown): severe error - couldn't find equipe"
 
             Status.int.getEquipmentCascade()
-            print 'cascade =', Status.int.cascade
 
             return actualEquip.CascadeIndex
 
@@ -218,7 +177,6 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 #   moves equipment to top in cascade sequence
 #------------------------------------------------------------------------------
-        print 'modulHC: cascadeMoveToTop'
 
         for i in range(actualCascadeIndex,1,-1):
             newIndex = self.cascadeMoveUp(i)
@@ -230,7 +188,6 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 #   moves equipment to bottom in cascade sequence
 #------------------------------------------------------------------------------
-        print 'modulHC: cascadeMoveToBottom'
 
         for i in range(actualCascadeIndex,self.NEquipe):
             newIndex = self.cascadeMoveDown(i)
@@ -242,7 +199,6 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 #   moves equipment to a userdefined finalIndex position in cascade sequence
 #------------------------------------------------------------------------------
-        print 'modulHC: cascadeMoveTo'
 
         if (finalIndex > actualIndex and finalIndex <= self.NEquipe):
             for i in range (actualIndex,finalIndex):
@@ -251,6 +207,8 @@ class ModuleHC(object):
         elif (finalIndex < actualIndex and finalIndex > 0):
             for i in range (actualIndex,finalIndex,-1):
                 newIndex = self.cascadeMoveUp(i)
+
+        else: newIndex = actualIndex
 
         return newIndex
 
@@ -274,19 +232,4 @@ if __name__ == "__main__":
     keys = ["HP Table","HP Plot","HP UserDef"]
 
     mod = ModuleHC(keys)
-    
-##    cascadeIndxUp = mod.cascadeMoveUp(3)
-##    print 'cascadeIndxUp =', cascadeIndxUp
-
-##    cascadeIndxDown = mod.cascadeMoveDown(5)
-##    print 'cascadeIndxDown =', cascadeIndxDown
-
-##    cascadeIndxToTop = mod.cascadeMoveToTop(5)
-##    print 'cascadeIndxToTop =', cascadeIndxToTop
-
-##    cascadeIndxToBottom = mod.cascadeMoveToBottom(1)
-##    print 'cascadeIndxToBottom =', cascadeIndxToBottom
-
-##    cascadeIndxTo = mod.cascadeMoveTo(4,1)
-##    print 'cascadeIndxTo =', cascadeIndxTo
     

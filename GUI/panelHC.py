@@ -74,24 +74,8 @@ class PanelHC(wx.Panel):
 	self.keys = ['HC Table']
         self.mod = Status.mod.moduleHC
         self.selectedRow = 0
-        
-#==============================================================================
-#   graphic: Cumulative heat demand by hours
-#==============================================================================
         labels_column = 0
-        ignoredrows = []
-        paramList={'labels'      : labels_column,          # labels column
-                   'data'        : 3,                      # data column for this graph
-                   'key'         : self.keys[0],                # key for Interface
-                   'title'       : 'Some title',           # title of the graph
-                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
-                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
-
-#        dummy = Mp.MatPanel(self.panelHCFig,
-#                            wx.Panel,
-#                            drawPiePlot,
-#                            paramList)
-
+        
         #
         # additional widgets setup
         # here, we modify some widgets attributes that cannot be changed
@@ -110,15 +94,18 @@ class PanelHC(wx.Panel):
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
-        self.grid.SetColSize(0,115)
+        self.grid.SetDefaultColSize(60)
+        self.grid.SetColSize(2,160)
+        self.grid.SetColSize(3,160)
+
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Index in HC Supply Cascade")
+        self.grid.SetColLabelValue(0, "Cascade index")
         self.grid.SetColLabelValue(1, "Equipment No.")
-        self.grid.SetColLabelValue(2, "Type")
-        self.grid.SetColLabelValue(3, "Nominal power [kW]")
-        self.grid.SetColLabelValue(4, "Heat Supplied to pipe/duct no.")
-        self.grid.SetColLabelValue(5, "---")
+        self.grid.SetColLabelValue(2, "Equipment")
+        self.grid.SetColLabelValue(3, "Type")
+        self.grid.SetColLabelValue(4, "Nominal power [kW]")
+        self.grid.SetColLabelValue(5, "Heat Supplied to pipe/duct no.")
         #
         # copy values from dictionary to grid
         #
@@ -126,9 +113,9 @@ class PanelHC(wx.Panel):
             self.grid.SetRowAttr(r, attr)
             for c in range(COLNO):
                 if c == labels_column:
-                    self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
                 else:
-                    self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.grid.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.grid.SetGridCursor(0, 0)
 
@@ -140,16 +127,13 @@ class PanelHC(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
-        self.HCAdd = wx.Button(id=wxID_PANELHCHCADD, label='add equipment',
-              name='HCAdd', parent=self, pos=wx.Point(40, 448),
-              size=wx.Size(144, 24), style=0)
-        self.HCAdd.Bind(wx.EVT_BUTTON, self.OnHCAddButton, id=wxID_PANELHCHCADD)
-
         self.grid = wx.grid.Grid(id=wxID_PANELHCGRID,
               name='gridpageHC', parent=self, pos=wx.Point(40, 96),
               size=wx.Size(616, 328), style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridGridCellLeftDclick, id=wxID_PANELHCGRID)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
+              self.OnGridGridCellLeftClick, id=wxID_PANELHCGRID)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridGridCellRightClick, id=wxID_PANELHCGRID)
 
@@ -224,7 +208,6 @@ class PanelHC(wx.Panel):
         self.mod.initPanel()        # prepares data for plotting
 
         data = Interfaces.GData[self.keys[0]]
-        print "PanelHC (display): data",data
 
 #..............................................................................
 # update of equipment table
@@ -232,7 +215,6 @@ class PanelHC(wx.Panel):
         try:
             data = Interfaces.GData[self.keys[0]]
             (rows,cols) = data.shape
-            print "PanelHC (display): data",data
         except:
             rows = 0
             cols = COLNO
@@ -246,101 +228,27 @@ class PanelHC(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
 
-#..............................................................................
-# update of design assistant parameters
-
-#        self.config = Interfaces.GData["BB Config"]
-#        self.cbConfig1.SetValue(self.config[0])
-#        try:        #try-except necessary if there comes a string that is not in list.
-#            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
-#        except:
-#            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
-#            pass
-#        self.tcConfig3.SetValue(str(self.config[2]))
-#        self.tcConfig4.SetValue(str(self.config[3]))
-#        self.tcConfig5.SetValue(str(self.config[4]))
-#        self.tcConfig6.SetValue(str(self.config[5]))
-#        self.tcConfig7.SetValue(str(self.config[6]))
-        
-#..............................................................................
-# update of info-values
-
-#        self.info = Interfaces.GData["HP Info"]
-        
-#        self.tcInfo1.SetValue(str(self.info[0]))
-#        self.tcInfo2.SetValue(str(self.info[1]))
-
         self.Show()
-
-#------------------------------------------------------------------------------		
-    def OnHCCalculateButton(self, event):
-#------------------------------------------------------------------------------		
-#------------------------------------------------------------------------------		
-        ret = self.mod.designAssistant1()
-        if (ret == "ManualFinalSelection"):
-            print "here I should edit the data base"
-        ret = self.mod.designAssistant2()
-        if ret == "changed":
-            mod.calculateCascade()
-            #updatePlots
-        
-    def OnButtonpageHCAddButton(self, event):
-        pass
-        #show pop-up menu 1: add from where ???
-#        pu1 = HCPopUp1(self)
-#        if pu1.ShowModal() == wx.ID_OK:
-#            print 'Accepted'
-#            ret = self.modHC.add(HCId)
-#            #update plots
-#        else:
-#            print 'Cancelled'
 
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
         self.selectedRow = event.GetRow()
+        print "PanelHC (GridLeftDclick): selected row = ",self.selectedRow
+        event.Skip()
 
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftClick(self, event):
 #------------------------------------------------------------------------------		
 	self.selectedRow = event.GetRow()
+        print "PanelHC (GridLeftClick): selected row = ",self.selectedRow
+        event.Skip()
 
     def OnGridGridCellRightClick(self, event):
-        print "Grid - right button click: scroll-up should appear"
-        #here a scroll-up should appear with some options: edit, delete,...
-        RowNo = 1 #number of the selected boiler should be detected depending on the selected row
-        ret = "delete"
-        if (ret=="delete"):
-            # a pop-up should confirm.
-            ret = "ok"
-            if (ret == "ok"):
-                ret = self.mod.delete(RowNo)
-                ret = self.mod.calculateCascade()
-        elif (ret == "edit"):
-            OnGridGridCellLeftDclick(self,event)
+	self.selectedRow = event.GetRow()
+        print "PanelHC (GridRightClick): selected row = ",self.selectedRow
+        event.Skip()
         
-
-    def OnCb1pageHCCheckbox(self, event):
-        self.modHC.storeModulePars()
-
-    def OnChoicepageHCChoice(self, event):
-        self.modHC.storeModulePars()
-
-    def OnTc1pageHCTextEnter(self, event):
-        self.modHC.storeModulePars()
-
-    def OnTc2pageHCTextEnter(self, event):
-        self.modHC.storeModulePars()
-
-    def OnTc3pageHCTextEnter(self, event):
-        self.modHC.storeModulePars()
-
-    def OnTc4pageHCTextEnter(self, event):
-        self.modHC.storeModulePars()
-
-    def OnTc5pageHCTextEnter(self, event):
-        self.modHC.storeModulePars()
-
 #==============================================================================
 #   <<< OK Cancel >>>
 #==============================================================================
@@ -390,15 +298,8 @@ class PanelHC(wx.Panel):
         print "PanelHC (move to top)",ci
         self.mod.cascadeMoveToTop(ci)   
         self.display()
-
 #==============================================================================
-#   dont know what's this
-#==============================================================================
-    def OnButton5Button(self, event):
-        event.Skip()
-
-    def OnHCAddButton(self, event):
-        event.Skip()
 
     def OnAutoDesignButton(self, event):
         event.Skip()
+

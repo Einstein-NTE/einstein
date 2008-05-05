@@ -26,6 +26,7 @@
 #                           Stoyan Danov        09/04/2008
 #                           Stoyan Danov        24/04/2008
 #                           Stoyan Danov        30/04/2008
+#                           Hans Schweiger      05/05/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -39,6 +40,7 @@
 #       09/04/2008 getEquipmentCascade: add filling EquipTableDataList-data fields shown in Table panel
 #       24/04/2008 getEquipmentCascade: add filling EquipTableDataList-changed
 #       30/04/2008 eliminate references to C tables, function affected: getEquipmentCascade
+#       05/05/2008  autocorrection of equipment cascade introduced
 #
 #	
 #------------------------------------------------------------------------------		
@@ -231,19 +233,17 @@ class Interfaces(object):
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
         self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
         self.NEquipe = len(self.equipments) #SD change 30/04.2008
-        print "Interfaces (getEquipmentCascade): %s equipes found" % self.NEquipe
-
-
-##        self.equipments = [] #SD change 30/04.2008
-##        for rowC in self.equipmentsC:
-##            row = Status.DB.qgenerationhc.QGenerationHC_ID[rowC.QGenerationHC_id][0]
-##            self.equipments.append(row)
 
         self.cascade = []
         for j in range(self.NEquipe):
             self.cascade.append({"equipeID":self.equipments[j].QGenerationHC_ID,"equipeNo":self.equipments[j].EqNo,\
                             "equipeType":self.equipments[j].EquipType,\
                             "equipePnom":self.equipments[j].HCGPnom})
+            if (self.equipments[j].CascadeIndex != j+1):
+                print "Interfaces (getEquipmentCascade): error in SQL data - cascade index %s corrected to new index %s"%\
+                      (self.equipments[j].CascadeIndex,j+1)
+                self.equipments[j].CascadeIndex = j+1
+                Status.SQL.commit()
 
 
         self.EquipTableDataList = []
