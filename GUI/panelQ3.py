@@ -203,14 +203,14 @@ class PanelQ3(wx.Panel):
         self.st17 = Label(self.page1,self.tc17,_("Daily outflow"),
 				  _("Daily outflow of process medium (mü)"))
 
-        self.tc18 = wx.TextCtrl(self.page1,-1,'')
-        self.st18 = Label(self.page1,self.tc18,_("Can heat be recovered?"),
+        self.choiceHeatRecovered = wx.Choice(self.page1,-1,choices=[_('No'),_('Yes')])
+        self.st18 = Label(self.page1,self.choiceHeatRecovered,_("Can heat be recovered?"),
 				  _("Can heat be recovered from the outflowing medium ? (yes/no)"))
 
         # waste heat recovery
 
-        self.tc19 = wx.TextCtrl(self.page1,-1,'')
-        self.st19 = Label(self.page1,self.tc19,_("Exists heat?"),
+        self.choiceExistsHeat = wx.Choice(self.page1,-1,choices=[_('No'),_('Yes')])
+        self.st19 = Label(self.page1,self.choiceExistsHeat,_("Exists heat?"),
 				  _("Exists heat from heat recovery for the process ? (yes/no)"))
 
         self.tc20 = wx.TextCtrl(self.page1,-1,'')
@@ -334,13 +334,13 @@ class PanelQ3(wx.Panel):
         grid_sizer_3.Add(self.st17, 0, flagLabel, 0)
         grid_sizer_3.Add(self.tc17, 0, flagText, 0)
         grid_sizer_3.Add(self.st18, 0, flagLabel, 0)
-        grid_sizer_3.Add(self.tc18, 0, flagText, 0)
+        grid_sizer_3.Add(self.choiceHeatRecovered, 0, flagText, 0)
 
         sizer_11.Add(grid_sizer_3, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_11, 1, wx.EXPAND, 0)
         
         grid_sizer_4.Add(self.st19, 0, flagLabel, 0)
-        grid_sizer_4.Add(self.tc19, 0, flagText, 0)
+        grid_sizer_4.Add(self.choiceExistsHeat, 0, flagText, 0)
         grid_sizer_4.Add(self.st20, 0, flagLabel, 0)
         grid_sizer_4.Add(self.tc20, 0, flagText, 0)
         grid_sizer_4.Add(self.st21, 0, flagLabel, 0)
@@ -363,8 +363,8 @@ class PanelQ3(wx.Panel):
         sizer_13.Add(grid_sizer_5, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
         self.page1.SetSizer(sizer_10)
-        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))
-        self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
+        self.notebook.AddPage(self.page0, _('Process data'))
+        self.notebook.AddPage(self.page1, _('Heat supply and waste heat'))
         sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
         sizer_3.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizer_3.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
@@ -407,8 +407,9 @@ class PanelQ3(wx.Panel):
         self.tc15.SetValue(str(q.PTOutFlow))
         self.tc16.SetValue(str(q.PTFinal))
         self.tc17.SetValue(str(q.VOutFlow))
-        self.tc18.SetValue(str(q.HeatRecOK))
-        self.tc19.SetValue(str(q.HeatRecExist))
+        #self.tc18.SetValue(str(q.HeatRecOK))
+        self.choiceHeatRecovered.SetSelection(q.HeatRecOK)
+        self.choiceExistsHeat.SetSelection(q.HeatRecExist)
         self.tc20.SetValue(str(q.SourceWasteHeat))	
         self.tc21.SetValue(str(q.PTInFlowRec))
         self.tc23.SetValue(str(q.PipeDuctProc))
@@ -482,8 +483,8 @@ class PanelQ3(wx.Panel):
 		"PTOutFlow":self.check(self.tc15.GetValue()), 
 		"PTFinal":self.check(self.tc16.GetValue()), 
 		"VOutFlow":self.check(self.tc17.GetValue()), 
-		"HeatRecOK":self.check(self.tc18.GetValue()), 
-		"HeatRecExist":self.check(self.tc19.GetValue()), 
+                "HeatRecOK":self.check(self.choiceHeatRecovered.GetSelection()),
+		"HeatRecExist":self.check(self.choiceExistsHeat.GetSelection()), 
 		"SourceWasteHeat":self.check(self.tc20.GetValue()), 	
 		"PTInFlowRec":self.check(self.tc21.GetValue()), 
 		"SupplyMedDBFluid_id":dbsmfid,
@@ -526,9 +527,9 @@ class PanelQ3(wx.Panel):
 		"PTOutFlow":self.check(self.tc15.GetValue()), 
 		"PTFinal":self.check(self.tc16.GetValue()), 
 		"VOutFlow":self.check(self.tc17.GetValue()), 
-		"HeatRecOK":self.check(self.tc18.GetValue()), 
-		"HeatRecExist":self.check(self.tc19.GetValue()), 
-		"SourceWasteHeat":self.check(self.tc20.GetValue()), 	
+		"HeatRecOK":self.check(self.choiceHeatRecovered.GetSelection()), 
+		"HeatRecExist":self.check(self.choiceExistsHeat.GetSelection()), 
+		"SourceWasteHeat":self.check(self.tc20.GetValue()),
 		"PTInFlowRec":self.check(self.tc21.GetValue()), 
 		"SupplyMedDBFluid_id":dbsmfid,
 		"PipeDuctProc":self.check(self.tc23.GetValue()), 
@@ -600,8 +601,8 @@ class PanelQ3(wx.Panel):
         self.tc15.SetValue('')
         self.tc16.SetValue('')
         self.tc17.SetValue('')
-        self.tc18.SetValue('')
-        self.tc19.SetValue('')
+        #self.tc18.SetValue('')
+        #self.tc19.SetValue('')
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc23.SetValue('')
