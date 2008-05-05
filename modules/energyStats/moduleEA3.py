@@ -15,6 +15,7 @@
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Stoyan Danov  07/04/2008
 #       Revised by:         Stoyan Danov     11/04/2008
+#       Revised by:         Stoyan Danov     02/05/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
@@ -22,6 +23,8 @@
 #       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
 #                       Return to original state later!
 #                       Control for DBFluid_id = None, to be checked.
+#       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int; None resistance control, avoid ZeroDivision
+#       05/05/2008: HS  check of Fuel-id eliminated. not necessary here
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -47,28 +50,29 @@ class ModuleEA3(object):
 
     def __init__(self, keys):
         self.keys = keys # two grids, so a list of (2) keys
-        self.interface = Interfaces()
-#...............................................................
-        PId = Status.PId
-        ANo = Status.ANo
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
-        self.equipements = Status.DB.qgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipements)
-        print "%s equipes found" % self.NEquipe
+        dummydata1 = array([['Equipname 1', 'Natural gas',  90.0,   16.36],
+                      ['Equipname 2', 'Natural gas',  90.0,   16.36],
+                      ['Equipname 3', 'Gas oil'    ,  50.0,  9.09],
+                      ['Equipname 4', 'LPG'        , 150.0, 27.27],
+                      ['Equipname 5', 'LPG'        , 150.0, 27.27],
+                      ['Equipname 6', 'Electricity',  20.0,  3.64],
+                      ['Total'      , ''           , 550.0, 100.00]])        
+                          
+        Status.int.setGraphicsData(self.keys[0], dummydata1)
 
-        self.fuels = Status.DB.qfuel.sql_select(sqlQuery)
-        self.NFuels = len(self.fuels)
-        print "%s fuels found" % self.NFuels
+        dummydata2 = array([['Equipname 1',  76.5,  16.29],
+                      ['Equipname 2',  76.5,  16.29],
+                      ['Equipname 3',  42.5,   9.05],
+                      ['Equipname 4', 127.5,  27.16],
+                      ['Equipname 5', 127.5,  27.16],
+                      ['Equipname 6',  19.0 ,  4.05],
+                      ['Total'      , 469.5, 100.00]])
 
-        self.cfuel = Status.DB.cfuel.sql_select(sqlQuery)
+        Status.int.setGraphicsData(self.keys[1], dummydata2)
 
-        self.cgenerationhc = Status.DB.cgenerationhc.sql_select(sqlQuery)
-#................................................................
-        try:
-            self.initModule()
-        except:
-            pass
+        self.initModule()
+
 
     def initModule(self):
 #------------------------------------------------------------------------------
@@ -78,6 +82,16 @@ class ModuleEA3(object):
         """
 #------------------------------------------------------------------------------
 
+        PId = Status.PId
+        ANo = Status.ANo
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
+        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
+
+        dbfuel = Status.DB.dbfuel
+        NDBFuel = len(dbfuel)
+
 # Final energy consumption by equipments 
 
         TotalFETj = 0.0
@@ -86,41 +100,38 @@ class ModuleEA3(object):
         FETj = []
         USHj = []
         FuelType = []
-        
-        for row in self.cgenerationhc:
-            Equipment = Status.DB.qgenerationhc.QGenerationHC_ID[row.QGenerationHC_id][0].Equipment
+
+        for equipe in self.equipments:
+            Equipment = equipe.Equipment
             EquipName.append(Equipment)
 
-            Fuel_id = Status.DB.qgenerationhc.QGenerationHC_ID[row.QGenerationHC_id][0].DBFuel_id
-            print "EA3: Fuel_id = ",Fuel_id
-##            FuelName = Status.DB.dbfuel.DBFuel_ID[Fuel_id][0].FuelName #here the error is produced when None, SD
-##            FuelType.append(FuelName) #pensar como hacer un if para evitarlo
-##            
-##            TotalFETj += row.FETj
-##            FETj.append(row.FETj)
-##
-##            TotalUSHj += row.USHj
-##            USHj.append(row.USHj)
+
 #................................................................................
-            if Fuel_id is None: #new condition added, SD, 11/04/2008
-                
-                FuelName = 'not available'
-                FuelType.append(FuelName)
-            
+            if equipe.FETj is None:#SD: None control added
                 TotalFETj += 0.0
                 FETj.append(0.0)
+            else:
+                TotalFETj += equipe.FETj
+                FETj.append(equipe.FETj)
 
+            if equipe.USHj is None:
                 TotalUSHj += 0.0
                 USHj.append(0.0)
             else:
-                FuelName = Status.DB.dbfuel.DBFuel_ID[Fuel_id][0].FuelName
-                FuelType.append(FuelName)
-            
-                TotalFETj += row.FETj
-                FETj.append(row.FETj)
+                TotalUSHj += equipe.USHj
+                USHj.append(equipe.USHj)
 
-                TotalUSHj += row.USHj
-                USHj.append(row.USHj)
+
+            DBFuel_id = equipe.DBFuel_id
+            if DBFuel_id is None or NDBFuel==0: 
+                FuelName = 'not available'
+            else:
+                try:
+                    FuelName = dbfuel.DBFuel_ID[DBFuel_id][0].FuelName
+                except:
+                    FuelName = 'not available'
+            FuelType.append(FuelName)
+
 #.................................................................................           
 
 #        print 'TotalFET (calculated from CGenerationHC) = ', TotalFETj
@@ -129,8 +140,15 @@ class ModuleEA3(object):
         USHjPercentage = []
 
         for i in range (self.NEquipe):
-            FETjPercentage.append(FETj[i]*100.0/TotalFETj)
-            USHjPercentage.append(USHj[i]*100.0/TotalUSHj)
+            if TotalFETj > 0.0: #SD avoid division by zero
+                FETjPercentage.append(FETj[i]*100.0/TotalFETj)
+            else:
+                FETjPercentage.append(0.0)
+
+            if TotalUSHj > 0.0:
+                USHjPercentage.append(USHj[i]*100.0/TotalUSHj)
+            else:
+                USHjPercentage.append(0.0)
 
 
 #.............................................................................
@@ -140,15 +158,15 @@ class ModuleEA3(object):
         FETj.append(TotalFETj)
         USHj.append(TotalUSHj)
 
-        suma = 0
+        sum = 0
         for i in FETjPercentage:
-            suma += i
-        FETjPercentage.append(suma)
+            sum += i
+        FETjPercentage.append(sum)
 
-        suma = 0
+        sum = 0
         for i in USHjPercentage:
-            suma += i
-        USHjPercentage.append(suma)
+            sum += i
+        USHjPercentage.append(sum)
 #.........................................................
             
 
@@ -164,17 +182,9 @@ class ModuleEA3(object):
                     TableColumnList1[i][j] = 0           
         
         matrix1 = transpose(TableColumnList1)
-        data1 = array(matrix1)
-
-        dummydata1 = array([['Equipname 1', 'Natural gas',  90.0,   16.36],
-                      ['Equipname 2', 'Natural gas',  90.0,   16.36],
-                      ['Equipname 3', 'Gas oil'    ,  50.0,  9.09],
-                      ['Equipname 4', 'LPG'        , 150.0, 27.27],
-                      ['Equipname 5', 'LPG'        , 150.0, 27.27],
-                      ['Equipname 6', 'Electricity',  20.0,  3.64],
-                      ['Total'      , ''           , 550.0, 100.00]])        
+        data1 = array(matrix1)     
                           
-        self.interface.setGraphicsData(self.keys[0], dummydata1)
+        Status.int.setGraphicsData(self.keys[0], data1)
         #
         # lower grid USH by equipment
         #
@@ -189,33 +199,7 @@ class ModuleEA3(object):
         matrix2 = transpose(TableColumnList2)
         data2 = array(matrix2)
 
-        dummydata2 = array([['Equipname 1',  76.5,  16.29],
-                      ['Equipname 2',  76.5,  16.29],
-                      ['Equipname 3',  42.5,   9.05],
-                      ['Equipname 4', 127.5,  27.16],
-                      ['Equipname 5', 127.5,  27.16],
-                      ['Equipname 6',  19.0 ,  4.05],
-                      ['Total'      , 469.5, 100.00]])
-
-        self.interface.setGraphicsData(self.keys[1], dummydata2)
-
-#------------------------------------------------------------------------------
-    def exitModule(self,exit_option):
-#------------------------------------------------------------------------------
-        """
-        carries out any calculations necessary previous to displaying the HP
-        design assitant window
-        """
-#------------------------------------------------------------------------------
-        if exit_option == "save":
-            print "exitModule: here I should save the current configuration"
-        elif exit_option == "cancel":
-            print "exitModule: here I should retreive the previous configuration"
-            
-
-        print "exitModule: function not yet defined"
-
-        return "ok"
+        Status.int.setGraphicsData(self.keys[1], data2)
 
 #------------------------------------------------------------------------------
 
