@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 #==============================================================================
 #
 #	E I N S T E I N
@@ -14,10 +15,14 @@
 #	Version No.: 0.03
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger 02/05/2008
+#                           Hans Schweiger  02/05/2008
+#                           Tom Sobota      04/05/2008
+#                           Hans Schweiger  05/05/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#       04/05/2008      Changed display format etc.
+#       05/05/2008: HS  Event handlers changed
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,7 +37,42 @@ import wx
 import pSQL
 import HelperClass
 from status import Status
+from GUITools import *
 
+
+
+# constants
+LABELWIDTH=180
+TEXTENTRYWIDTH=280
+    
+class Label(wx.lib.stattext.GenStaticText):
+    # auxiliary class for labels (static text)
+    # will show a short descriptive string and
+    # generate a longer tooltip.
+    # the tooltip is also associated to the text control
+    #
+    w0 = None
+    w1 = None
+    def __init__(self,parent,txtctrl,text,tip,width0=None,width1=None):
+        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
+                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
+        self.SetLabel(text)
+        self.SetToolTip(wx.ToolTip(tip))
+        txtctrl.SetToolTip(wx.ToolTip(tip))
+        h = self.GetMinHeight()
+        if width0 is None:
+            if Label.w0 is not None:
+                self.SetMinSize((Label.w0, h))
+        else:
+            Label.w0 = width0
+            self.SetMinSize((Label.w0, h))
+        if width1 is None:
+            if Label.w1 is not None:
+                txtctrl.SetMinSize((Label.w1, h))
+        else:
+            txtctrl.SetMinSize((width1, h))
+            Label.w1 = width1
+    
 
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
@@ -40,506 +80,298 @@ class PanelQ3(wx.Panel):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+        self.__do_layout()
+
 
     def _init_ctrls(self, parent):
 
 #------------------------------------------------------------------------------
 #--- UI setup
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
 
         wx.Panel.__init__(self, id=-1, name='PanelQ3', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.notebook = wx.Notebook(self, -1, style=0)
 
-        self.tc1 = wx.TextCtrl(id=-1,
-			       name='tc1',
-			       parent=self,
-			       pos=wx.Point(16, 352),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
+        self.page0 = wx.Panel(self.notebook)
+        self.page1 = wx.Panel(self.notebook)
 
-        self.st1 = wx.StaticText(id=-1,
-				 label=self.PList["0301"][1] + ' ' + self.PList["0301"][2],
-				 name='st1',
-				 parent=self,
-				 pos=wx.Point(16, 336),
-				 style=0)
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Process list"))
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.st2 = wx.StaticText(id=-1,
-				 label=self.PList["0303"][1] + ' ' + self.PList["0303"][2],
-				 name='st2',
-				 parent=self,
-				 pos=wx.Point(16, 376),
-				 style=0)
+        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Processes description"))
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.tc2 = wx.TextCtrl(id=-1,
-			       name='tc2',
-			       parent=self,
-			       pos=wx.Point(16, 392),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
+        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("Schedule"))
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+        self.sizer_11_staticbox = wx.StaticBox(self.page1, -1,_("Waste heat (heat available for recovery)"))
+        self.sizer_11_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.st3 = wx.StaticText(id=-1,
-				 label=self.PList["0302"][1] + ' ' + self.PList["0302"][2],
-				 name='st3',
-				 parent=self,
-				 pos=wx.Point(16, 416),
-				 style=0)
+        self.sizer_12_staticbox = wx.StaticBox(self.page1, -1, _("Waste heat recovery for this process"))
+        self.sizer_12_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        #self.tc3 = wx.TextCtrl(id=-1, name='tc3',
-        #      parent=self, pos=wx.Point(16, 432), size=wx.Size(200, 21),
-        #      style=0, value='')
+        self.sizer_13_staticbox = wx.StaticBox(self.page1, -1,
+                                               _("Data of existing heat (or cold) supply to the process"))
+        self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        #
+        # left panel controls
+        #
 
-        self.choiceOfDBUnitOperation = wx.Choice(choices=[],
-						 id=-1,
-						 name='choiceOfDBUnitOperation',
-						 parent=self,
-						 pos=wx.Point(16, 432),
-						 size=wx.Size(200, 21),
-						 style=0)
-
-        self.st4 = wx.StaticText(id=-1,
-				 label=self.PList["0304"][1] + ' ' + self.PList["0304"][2],
-				 name='st4',
-				 parent=self,
-				 pos=wx.Point(16, 456),
-				 style=0)
-
-        #self.tc4 = wx.TextCtrl(id=-1, name='tc4',
-        #      parent=self, pos=wx.Point(16, 472), size=wx.Size(200, 21),
-        #      style=0, value='')
-
-        self.choiceOfPMDBFluid = wx.Choice(choices=[],
-					   id=-1,
-					   name='choiceOfPMDBFluid',
-					   parent=self,
-					   pos=wx.Point(16, 472),
-					   size=wx.Size(200, 21),
-					   style=0)        
-
-        self.st5 = wx.StaticText(id=-1,
-				 label=self.PList["0305"][1] + ' ' + self.PList["0305"][2],
-				 name='st5',
-				 parent=self,
-				 pos=wx.Point(16, 496),
-				 style=0)
-
-        self.tc5 = wx.TextCtrl(id=-1,
-			       name='tc5',
-			       parent=self,
-			       pos=wx.Point(16, 512),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
-
-        self.st6 = wx.StaticText(id=-1,
-				 label=self.PList["0306"][1] + ' ' + self.PList["0306"][2],
-				 name='st6',
-				 parent=self,
-				 pos=wx.Point(16, 536),
-				 style=0)
-
-        self.tc6 = wx.TextCtrl(id=-1,
-			       name='tc6',
-			       parent=self,
-			       pos=wx.Point(16, 552),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
-
-        self.st7 = wx.StaticText(id=-1,
-				 label=self.PList["0307"][1] + ' ' + self.PList["0307"][2],
-				 name='st7',
-				 parent=self,
-				 pos=wx.Point(240, 40),
-				 style=0)
-
-        self.tc7 = wx.TextCtrl(id=-1,
-			       name='tc7',
-			       parent=self,
-			       pos=wx.Point(240, 56),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
-
-        self.st8 = wx.StaticText(id=-1,
-				 label=self.PList["0308"][1] + ' ' + self.PList["0308"][2],
-				 name='st8',
-				 parent=self,
-				 pos=wx.Point(240, 80),
-				 style=0)
-
-        self.tc8 = wx.TextCtrl(id=-1,
-			       name='tc8',
-			       parent=self,
-			       pos=wx.Point(240, 96),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
-
-        self.st9 = wx.StaticText(id=-1,
-				 label=self.PList["0309"][1] + ' ' + self.PList["0309"][2],
-				 name='st9',
-				 parent=self,
-				 pos=wx.Point(240, 120),
-				 style=0)
-
-        self.tc9 = wx.TextCtrl(id=-1,
-			       name='tc9',
-			       parent=self,
-			       pos=wx.Point(240, 136),
-			       size=wx.Size(200, 21),
-			       style=0,
-			       value='')
-
-        self.st10 = wx.StaticText(id=-1,
-				  label=self.PList["0310"][1] + ' ' + self.PList["0310"][2],
-				  name='st10',
-				  parent=self,
-				  pos=wx.Point(240, 160),
-				  style=0)
-
-        self.tc10 = wx.TextCtrl(id=-1,
-				name='tc10',
-				parent=self,
-				pos=wx.Point(240, 176),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st11 = wx.StaticText(id=-1,
-				  label=self.PList["0312"][1] + ' ' + self.PList["0312"][2],
-				  name='st11',
-				  parent=self,
-				  pos=wx.Point(240, 232),
-				  style=0)
-
-        self.tc11 = wx.TextCtrl(id=-1,
-				name='tc11',
-				parent=self,
-				pos=wx.Point(240, 248),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st12 = wx.StaticText(id=-1,
-				  label=self.PList["0313"][1] + ' ' + self.PList["0313"][2],
-				  name='st12',
-				  parent=self,
-				  pos=wx.Point(240, 272),
-				  style=0)
-
-        self.tc12 = wx.TextCtrl(id=-1,
-				name='tc12',
-				parent=self,
-				pos=wx.Point(240, 288),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st13 = wx.StaticText(id=-1,
-				  label=self.PList["0314"][1] + ' ' + self.PList["0314"][2],
-				  name='st13',
-				  parent=self,
-				  pos=wx.Point(240, 312),
-				  style=0)
-
-        self.tc13 = wx.TextCtrl(id=-1,
-				name='tc13',
-				parent=self,
-				pos=wx.Point(240, 328),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st14 = wx.StaticText(id=-1,
-				  label=self.PList["0315"][1] + ' ' + self.PList["0315"][2],
-				  name='st14',
-				  parent=self,
-				  pos=wx.Point(240, 352),
-				  style=0)
-
-        self.tc14 = wx.TextCtrl(id=-1,
-				name='tc14',
-				parent=self,
-				pos=wx.Point(240, 368),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st15 = wx.StaticText(id=-1,
-				  label=self.PList["0317"][1] + ' ' + self.PList["0317"][2],
-				  name='st15',
-				  parent=self,
-				  pos=wx.Point(240, 432),
-				  style=0)
-
-        self.tc15 = wx.TextCtrl(id=-1,
-				name='tc15',
-				parent=self,
-				pos=wx.Point(240, 448),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st16 = wx.StaticText(id=-1,
-				  label=self.PList["0318"][1] + ' ' + self.PList["0318"][2],
-				  name='st16',
-				  parent=self,
-				  pos=wx.Point(240, 472),
-				  style=0)
-
-        self.tc16 = wx.TextCtrl(id=-1,
-				name='tc16',
-				parent=self,
-				pos=wx.Point(240, 488),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st17 = wx.StaticText(id=-1,
-				  label=self.PList["0319"][1] + ' ' + self.PList["0319"][2],
-				  name='st17',
-				  parent=self,
-				  pos=wx.Point(240, 512),
-				  style=0)
-
-        self.tc17 = wx.TextCtrl(id=-1,
-				name='tc17',
-				parent=self,
-				pos=wx.Point(240, 528),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st18 = wx.StaticText(id=-1,
-				  label=self.PList["0320"][1] + ' ' + self.PList["0320"][2],
-				  name='st18',
-				  parent=self,
-				  pos=wx.Point(240, 552),
-				  style=0)
-
-        self.tc18 = wx.TextCtrl(id=-1,
-				name='tc18',
-				parent=self,
-				pos=wx.Point(240, 568),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st19 = wx.StaticText(id=-1,
-				  label=self.PList["0322"][1] + ' ' + self.PList["0322"][2],
-				  name='st19',
-				  parent=self,
-				  pos=wx.Point(488, 40),
-				  style=0)
-	
-        self.tc19 = wx.TextCtrl(id=-1,
-				name='tc19',
-				parent=self,
-				pos=wx.Point(488, 56),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st20 = wx.StaticText(id=-1,
-				  label=self.PList["0323"][1] + ' ' + self.PList["0323"][2],
-				  name='st20',
-				  parent=self,
-				  pos=wx.Point(488, 80),
-				  style=0)
-
-        self.tc20 = wx.TextCtrl(id=-1,
-				name='tc20',
-				parent=self,
-				pos=wx.Point(488, 96),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st21 = wx.StaticText(id=-1,
-				  label=self.PList["0324"][1] + ' ' + self.PList["0324"][2],
-				  name='st21',
-				  parent=self,
-				  pos=wx.Point(488, 120),
-				  style=0)
-
-        self.tc21 = wx.TextCtrl(id=-1,
-				name='tc21',
-				parent=self,
-				pos=wx.Point(488, 136),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st22 = wx.StaticText(id=-1,
-				  label=self.PList["0327"][1] + ' ' + self.PList["0327"][2],
-				  name='st22',
-				  parent=self,
-				  pos=wx.Point(488, 216),
-				  style=0)
-
-        #self.tc22 = wx.TextCtrl(id=-1, name='tc22',
-        #      parent=self, pos=wx.Point(488, 232), size=wx.Size(200, 21),
-        #      style=0, value='')
-
-        self.choiceOfSMDBFluid = wx.Choice(choices=[],
-					   id=-1,
-					   name='choiceOfSMDBFluid',
-					   parent=self,
-					   pos=wx.Point(488, 232),
-					   size=wx.Size(200, 21),
-					   style=0)
-
-        self.st23 = wx.StaticText(id=-1,
-				  label=self.PList["0328"][1] + ' ' + self.PList["0328"][2],
-				  name='st23',
-				  parent=self,
-				  pos=wx.Point(488, 256),
-				  style=0)
-
-        self.tc23 = wx.TextCtrl(id=-1,
-				name='tc23',
-				parent=self,
-				pos=wx.Point(488, 272),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st24 = wx.StaticText(id=-1,
-				  label=self.PList["0329"][1] + ' ' + self.PList["0329"][2],
-				  name='st24',
-				  parent=self,
-				  pos=wx.Point(488, 296),
-				  style=0)
-
-        self.tc24 = wx.TextCtrl(id=-1,
-				name='tc24',
-				parent=self,
-				pos=wx.Point(488, 312),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st25 = wx.StaticText(id=-1,
-				  label=self.PList["0330"][1] + ' ' + self.PList["0330"][2],
-				  name='st25',
-				  parent=self,
-				  pos=wx.Point(488, 336),
-				  style=0)
-	
-        self.tc25 = wx.TextCtrl(id=-1,
-				name='tc25',
-				parent=self,
-				pos=wx.Point(488, 352),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.st26 = wx.StaticText(id=-1,
-				  label=self.PList["0331"][1] + ' ' + self.PList["0331"][2],
-				  name='st26',
-				  parent=self,
-				  pos=wx.Point(488, 376),
-				  style=0)
-
-        self.tc26 = wx.TextCtrl(id=-1,
-				name='tc26',
-				parent=self,
-				pos=wx.Point(488, 392),
-				size=wx.Size(200, 21),
-				style=0,
-				value='')
-
-        self.stInfo2 = wx.StaticText(id=-1,
-				     label=self.PList["0300"][1],
-				     name='stInfo2',
-				     parent=self,
-				     pos=wx.Point(16, 312),
-				     style=0)
-        self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.stInfo3 = wx.StaticText(id=-1,
-				     label=self.PList["0311"][1],
-				     name='stInfo3',
-				     parent=self,
-				     pos=wx.Point(240, 208),
-				     style=0)
-        self.stInfo3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.stInfo4 = wx.StaticText(id=-1,
-				     label=self.PList["0316"][1],
-				     name='stInfo4',
-				     parent=self,
-				     pos=wx.Point(240, 408),
-				     style=0)
-        self.stInfo4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.stInfo5 = wx.StaticText(id=-1,
-				     label=self.PList["0321"][1],
-				     name='stInfo5',
-				     parent=self,
-				     pos=wx.Point(488, 16),
-				     style=0)
-        self.stInfo5.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-        
-        self.stInfo6 = wx.StaticText(id=-1,
-				     label=self.PList["0326"][1],
-				     name='stInfo6',
-				     parent=self,
-				     pos=wx.Point(488, 192),
-				     style=0)
-        self.stInfo6.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.buttonAddProcess = wx.Button(id=-1,
-					  label=self.PList["X057"][1],
-					  name='buttonAddProcess',
-					  parent=self,
-					  pos=wx.Point(600, 568),
-					  size=wx.Size(192, 32),
-					  style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddProcess, self.buttonAddProcess)
-
-
-        self.listBoxProcesses = wx.ListBox(choices=[],
-					   id=-1,
-					   name='listBoxProcesses',
-					   parent=self,
-					   pos=wx.Point(16, 40),
-					   size=wx.Size(200, 216),
-					   style=0)
+        # process list
+        self.listBoxProcesses = wx.ListBox(self.page0,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxProcessesClick, self.listBoxProcesses)
 
-        self.stInfo1 = wx.StaticText(id=-1,
-				     label=self.PList["X059"][1],
-				     name='stInfo1',
-				     parent=self,
-				     pos=wx.Point(16, 24),
-				     size=wx.Size(64, 13),
-				     style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        #
+        # Processes description
+        #
+        self.tc1 = wx.TextCtrl(self.page0,-1,'')
+        self.st1 = Label(self.page0,self.tc1,_("Short name"),
+                         _("Short name of the process"), LABELWIDTH, TEXTENTRYWIDTH)
 
-        self.buttonDeleteProcess = wx.Button(id=-1,
-					     label=self.PList["X058"][1],
-					     name='buttonDeleteProcess',
-					     parent=self,
-					     pos=wx.Point(136, 264),
-					     size=wx.Size(192, 32),
-					     style=0)
+        self.tc2 = wx.TextCtrl(self.page0,-1,'')
+        self.st2 = Label(self.page0,self.tc2,_("Process type"),
+                         _("Process type continuous / batch"))
+
+        self.choiceOfDBUnitOperation = wx.Choice(self.page0,-1,choices=[])
+        self.st3 = Label(self.page0,self.choiceOfDBUnitOperation,_("Unit operation type"),
+                         _("Unit operation type"))
+
+        self.choiceOfPMDBFluid = wx.Choice(self.page0,-1,choices=[])
+        self.st4 = Label(self.page0,self.choiceOfPMDBFluid,_("Process medium"),
+                         _("Product or process medium (water, oil, air, lye ...)"))
+
+        self.tc5 = wx.TextCtrl(self.page0,-1,'')
+        self.st5 = Label(self.page0,self.tc5,_("Typical temperature"),
+                         _("Typical (final) temperature of the process medium during operation in ºC"))
+
+        self.tc6 = wx.TextCtrl(self.page0,-1,'')
+        self.st6 = Label(self.page0,self.tc6,_("Inlet temperature"),
+                                 _("Inlet temperature of the process medium (before heat recovery) in ºC"))
+
+        self.tc7 = wx.TextCtrl(self.page0,-1,'')
+        self.st7 = Label(self.page0,self.tc7,_("Start-up temperature"),
+                                 _("Start-up temperature of process medium after breaks in ºC"))
+
+        self.tc8 = wx.TextCtrl(self.page0,-1,'')
+        self.st8 = Label(self.page0,self.tc8,_("Daily inflow"),
+                                 _("Daily inflow of process medium (mü)"))
+
+        self.tc9 = wx.TextCtrl(self.page0,-1,'')
+        self.st9 = Label(self.page0,self.tc9,_("Volume process medium"),
+                                 _("Volume of the process medium within the equipment or storage (mü)"))
+
+        self.tc10 = wx.TextCtrl(self.page0,-1,'')
+        self.st10 = Label(self.page0,self.tc10,_("Heat loss"),
+                                  _("Thermal heat loss coefficient of the process (kW/K)"))
+
+        #
+        # schedule
+        #
+        self.tc11 = wx.TextCtrl(self.page0,-1,'')
+        self.st11 = Label(self.page0,self.tc11,_("Hours per day"),
+				  _("Hours of process operation per day (hrs/day)"))
+
+        self.tc12 = wx.TextCtrl(self.page0,-1,'')
+        self.st12 = Label(self.page0,self.tc12,_("Number of batches"),
+				  _("Number of batches per day"))
+
+        self.tc13 = wx.TextCtrl(self.page0,-1,'')
+        self.st13 = Label(self.page0,self.tc13,_("Duration of 1 batch"),
+                                  _("Duration of 1 batch (h)"))
+
+
+        self.tc14 = wx.TextCtrl(self.page0,-1,'')
+        self.st14 = Label(self.page0,self.tc14,_("Days of operation"),
+				  _("Days of operation per year (days / year)"))
+
+
+        # Right panel controls
+
+        #
+        # waste heat
+        #
+        self.tc15 = wx.TextCtrl(self.page1,-1,'')
+        self.st15 = Label(self.page1,self.tc15,_("Outlet temperature"),
+				  _("Outlet temperature of waste heat flows (ºC)"))
+
+        self.tc16 = wx.TextCtrl(self.page1,-1,'')
+        self.st16 = Label(self.page1,self.tc16,_("Final temperature"),
+				  _("Final temperature of waste heat flows (ºC)"))
+
+        self.tc17 = wx.TextCtrl(self.page1,-1,'')
+        self.st17 = Label(self.page1,self.tc17,_("Daily outflow"),
+				  _("Daily outflow of process medium (mü)"))
+
+        self.tc18 = wx.TextCtrl(self.page1,-1,'')
+        self.st18 = Label(self.page1,self.tc18,_("Can heat be recovered?"),
+				  _("Can heat be recovered from the outflowing medium ? (yes/no)"))
+
+        # waste heat recovery
+
+        self.tc19 = wx.TextCtrl(self.page1,-1,'')
+        self.st19 = Label(self.page1,self.tc19,_("Exists heat?"),
+				  _("Exists heat from heat recovery for the process ? (yes/no)"))
+
+        self.tc20 = wx.TextCtrl(self.page1,-1,'')
+        self.st20 = Label(self.page1,self.tc20,_("Source of waste heat"),
+				  _("Source of waste heat"))
+
+        self.tc21 = wx.TextCtrl(self.page1,-1,'')
+        self.st21 = Label(self.page1,self.tc21,_("Inlet temperature"),
+				  _("Inlet temperature of the process medium (after heat recovery) (ºC)"))
+
+
+        # Data of existing heat ...
+        
+        self.choiceOfSMDBFluid = wx.Choice(self.page1,-1,choices=[])
+        self.st22 = Label(self.page1,self.choiceOfSMDBFluid,_("H/C supply medium"),
+				  _("Heat or cold supply medium (water, steam, air)"))
+
+        self.tc23 = wx.TextCtrl(self.page1,-1,'')
+        self.st23 = Label(self.page1,self.tc23,_("H/C supply to process"),
+				  _("Heat or cold supply to the process from distribution line / branch No."))
+
+        self.tc24 = wx.TextCtrl(self.page1,-1,'')
+        self.st24 = Label(self.page1,self.tc24,_("Temp. of supply"),
+				  _("Temperature of the heat or cold supply (ºC)"))
+
+        self.tc25 = wx.TextCtrl(self.page1,-1,'')
+        self.st25 = Label(self.page1,self.tc25,_("Flow rate"),
+				  _("Flow rate (mü/h)"))
+
+        self.tc26 = wx.TextCtrl(self.page1,-1,'')
+        self.st26 = Label(self.page1,self.tc26,_("UPH"),
+				  _("UPH from questionnaire (annual) (MWh / year)"))
+
+
+        self.buttonAddProcess = wx.Button(self.page0,-1,_("Add process"))
+        self.buttonAddProcess.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddProcess, self.buttonAddProcess)
+
+        self.buttonDeleteProcess = wx.Button(self.page0,-1,_("Delete process"))
+        self.buttonDeleteProcess.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProcess, self.buttonDeleteProcess)
 
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
+        self.buttonCancel.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.buttonClear = wx.Button(id=-1,
-				     label=self.PList["X028"][1],
-				     name='buttonClear',
-				     parent=self,
-				     pos=wx.Point(488, 568),
-				     size=wx.Size(192, 32),
-				     style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonClear, self.buttonClear)
+        self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
+        self.buttonOK.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        self.buttonOK.SetDefault()
 
+
+    def __do_layout(self):
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_10 = wx.BoxSizer(wx.VERTICAL)
+        sizer_13 = wx.StaticBoxSizer(self.sizer_13_staticbox, wx.VERTICAL)
+        grid_sizer_5 = wx.FlexGridSizer(5, 2, 3, 3)
+        sizer_12 = wx.StaticBoxSizer(self.sizer_12_staticbox, wx.VERTICAL)
+        grid_sizer_4 = wx.FlexGridSizer(3, 2, 3, 3)
+        sizer_11 = wx.StaticBoxSizer(self.sizer_11_staticbox, wx.VERTICAL)
+        grid_sizer_3 = wx.FlexGridSizer(4, 2, 3, 3)
+        sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_6 = wx.BoxSizer(wx.VERTICAL)
+        sizer_8 = wx.StaticBoxSizer(self.sizer_8_staticbox, wx.VERTICAL)
+        grid_sizer_2 = wx.FlexGridSizer(4, 2, 3, 3)
+        sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
+        grid_sizer_1 = wx.FlexGridSizer(10, 2, 3, 3)
+        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
+        sizer_5.Add(self.listBoxProcesses, 1, wx.EXPAND, 0)
+        sizer_5.Add(self.buttonAddProcess, 0, wx.ALIGN_RIGHT, 0)
+        sizer_5.Add(self.buttonDeleteProcess, 0, wx.ALIGN_RIGHT, 0)
+        sizer_4.Add(sizer_5, 1, wx.EXPAND, 0)
+
+        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_VERTICAL
+        flagText = wx.ALIGN_CENTER_VERTICAL
+
+        grid_sizer_1.Add(self.st1, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc1, 0, flagText, 2)
+        grid_sizer_1.Add(self.st2, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc2, 0, flagText, 2)
+        grid_sizer_1.Add(self.st3, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.choiceOfDBUnitOperation, 0, flagText, 2)
+        grid_sizer_1.Add(self.st4, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.choiceOfPMDBFluid, 0, flagText, 2)
+        grid_sizer_1.Add(self.st5, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc5, 0, flagText, 2)
+        grid_sizer_1.Add(self.st6, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc6, 0, flagText, 2)
+        grid_sizer_1.Add(self.st7, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc7, 0, flagText, 2)
+        grid_sizer_1.Add(self.st8, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc8, 0, flagText, 2)
+        grid_sizer_1.Add(self.st9, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc9, 0, flagText, 2)
+        grid_sizer_1.Add(self.st10, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc10, 0, flagText, 2)
+
+        sizer_7.Add(grid_sizer_1, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_6.Add(sizer_7, 2, wx.EXPAND, 0)
+
+        grid_sizer_2.Add(self.st11, 0, flagLabel, 0)
+        grid_sizer_2.Add(self.tc11, 0, flagText, 0)
+        grid_sizer_2.Add(self.st12, 0, flagLabel, 0)
+        grid_sizer_2.Add(self.tc12, 0, flagText, 0)
+        grid_sizer_2.Add(self.st13, 0, flagLabel, 0)
+        grid_sizer_2.Add(self.tc13, 0, flagText, 0)
+        grid_sizer_2.Add(self.st14, 0, flagLabel, 0)
+        grid_sizer_2.Add(self.tc14, 0, flagText, 0)
+
+        sizer_8.Add(grid_sizer_2, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_6.Add(sizer_8, 1, wx.EXPAND, 0)
+        sizer_4.Add(sizer_6, 2, wx.EXPAND, 0)
+        self.page0.SetSizer(sizer_4)
+        
+        grid_sizer_3.Add(self.st15, 0, flagLabel, 0)
+        grid_sizer_3.Add(self.tc15, 0, flagText, 0)
+        grid_sizer_3.Add(self.st16, 0, flagLabel, 0)
+        grid_sizer_3.Add(self.tc16, 0, flagText, 0)
+        grid_sizer_3.Add(self.st17, 0, flagLabel, 0)
+        grid_sizer_3.Add(self.tc17, 0, flagText, 0)
+        grid_sizer_3.Add(self.st18, 0, flagLabel, 0)
+        grid_sizer_3.Add(self.tc18, 0, flagText, 0)
+
+        sizer_11.Add(grid_sizer_3, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_10.Add(sizer_11, 1, wx.EXPAND, 0)
+        
+        grid_sizer_4.Add(self.st19, 0, flagLabel, 0)
+        grid_sizer_4.Add(self.tc19, 0, flagText, 0)
+        grid_sizer_4.Add(self.st20, 0, flagLabel, 0)
+        grid_sizer_4.Add(self.tc20, 0, flagText, 0)
+        grid_sizer_4.Add(self.st21, 0, flagLabel, 0)
+        grid_sizer_4.Add(self.tc21, 0, flagText, 0)
+
+        sizer_12.Add(grid_sizer_4, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_10.Add(sizer_12, 1, wx.EXPAND, 0)
+        
+        grid_sizer_5.Add(self.st22, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.choiceOfSMDBFluid, 0, flagText, 0)
+        grid_sizer_5.Add(self.st23, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc23, 0, flagText, 0)
+        grid_sizer_5.Add(self.st24, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc24, 0, flagText, 0)
+        grid_sizer_5.Add(self.st25, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc25, 0, flagText, 0)
+        grid_sizer_5.Add(self.st26, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc26, 0, flagText, 0)
+
+        sizer_13.Add(grid_sizer_5, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
+        self.page1.SetSizer(sizer_10)
+        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))
+        self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
+        sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizer_3.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
+        sizer_3.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
+        sizer_2.Add(sizer_3, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+        self.SetSizer(sizer_1)
+        self.Layout()
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -547,6 +379,60 @@ class PanelQ3(wx.Panel):
 
 
     def OnButtonAddProcess(self, event):
+        self.clear()
+
+    def OnButtonDeleteProcess(self, event):
+        Status.prj.deleteProcess(self.selectedProcessID)
+        self.clear()
+        self.fillPage()
+
+    def OnListBoxProcessesClick(self, event):
+        self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
+        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        q = processes.Process[self.selectedProcessName][0]
+        self.selectedProcessID = q.QProcessData_ID
+
+        self.tc1.SetValue(str(q.Process))
+        self.tc2.SetValue(str(q.ProcType))
+        self.tc5.SetValue(str(q.PT))
+        self.tc6.SetValue(str(q.PTInFlow))
+        self.tc7.SetValue(str(q.PTStartUp))
+        self.tc8.SetValue(str(q.VInFlowDay))
+        self.tc9.SetValue(str(q.VolProcMed))
+        self.tc10.SetValue(str(q.UAProc))
+        self.tc11.SetValue(str(q.HPerDayProc))
+        self.tc12.SetValue(str(q.NBatch))
+        self.tc13.SetValue(str(q.HBatch))
+        self.tc14.SetValue(str(q.NDaysProc))		
+        self.tc15.SetValue(str(q.PTOutFlow))
+        self.tc16.SetValue(str(q.PTFinal))
+        self.tc17.SetValue(str(q.VOutFlow))
+        self.tc18.SetValue(str(q.HeatRecOK))
+        self.tc19.SetValue(str(q.HeatRecExist))
+        self.tc20.SetValue(str(q.SourceWasteHeat))	
+        self.tc21.SetValue(str(q.PTInFlowRec))
+        self.tc23.SetValue(str(q.PipeDuctProc))
+        self.tc24.SetValue(str(q.TSupply))
+        self.tc25.SetValue(str(q.SupplyMedFlow))
+        self.tc26.SetValue(str(q.UPHtotQ))
+        if q.DBUnitOperation_id is not None:
+            self.choiceOfDBUnitOperation.SetSelection(\
+		self.choiceOfDBUnitOperation.FindString(\
+		    str(Status.DB.dbunitoperation.DBUnitOperation_ID[q.DBUnitOperation_id][0].UnitOperation)))
+        if q.ProcMedDBFluid_id is not None:
+            self.choiceOfPMDBFluid.SetSelection(\
+		self.choiceOfPMDBFluid.FindString(\
+		    str(Status.DB.dbfluid.DBFluid_ID[q.ProcMedDBFluid_id][0].FluidName)))
+        if q.SupplyMedDBFluid_id is not None:
+            self.choiceOfSMDBFluid.SetSelection(\
+		self.choiceOfSMDBFluid.FindString(\
+		    str(Status.DB.dbfluid.DBFluid_ID[q.SupplyMedDBFluid_id][0].FluidName)))
+
+    def OnButtonCancel(self, event):
+        self.clear()
+        self.fillPage
+
+    def OnButtonOK(self, event):
         if Status.PId == 0:
 	    return
 
@@ -656,59 +542,8 @@ class PanelQ3(wx.Panel):
 	    self.fillPage()
                           
 	else:
-	    self.showError("Process have to be an uniqe value!")
+	    self.main.showError("Process have to be an uniqe value!")
 
-
-
-    def OnButtonDeleteProcess(self, event):
-        Status.prj.deleteProcess(self.selectedProcessID)
-        self.clear()
-        self.fillPage()
-
-    def OnListBoxProcessesClick(self, event):
-        self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
-        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
-        q = processes.Process[self.selectedProcessName][0]
-        self.selectedProcessID = q.QProcessData_ID
-
-        self.tc1.SetValue(str(q.Process))
-        self.tc2.SetValue(str(q.ProcType))
-        self.tc5.SetValue(str(q.PT))
-        self.tc6.SetValue(str(q.PTInFlow))
-        self.tc7.SetValue(str(q.PTStartUp))
-        self.tc8.SetValue(str(q.VInFlowDay))
-        self.tc9.SetValue(str(q.VolProcMed))
-        self.tc10.SetValue(str(q.UAProc))
-        self.tc11.SetValue(str(q.HPerDayProc))
-        self.tc12.SetValue(str(q.NBatch))
-        self.tc13.SetValue(str(q.HBatch))
-        self.tc14.SetValue(str(q.NDaysProc))		
-        self.tc15.SetValue(str(q.PTOutFlow))
-        self.tc16.SetValue(str(q.PTFinal))
-        self.tc17.SetValue(str(q.VOutFlow))
-        self.tc18.SetValue(str(q.HeatRecOK))
-        self.tc19.SetValue(str(q.HeatRecExist))
-        self.tc20.SetValue(str(q.SourceWasteHeat))	
-        self.tc21.SetValue(str(q.PTInFlowRec))
-        self.tc23.SetValue(str(q.PipeDuctProc))
-        self.tc24.SetValue(str(q.TSupply))
-        self.tc25.SetValue(str(q.SupplyMedFlow))
-        self.tc26.SetValue(str(q.UPHtotQ))
-        if q.DBUnitOperation_id is not None:
-            self.choiceOfDBUnitOperation.SetSelection(\
-		self.choiceOfDBUnitOperation.FindString(\
-		    str(Status.DB.dbunitoperation.DBUnitOperation_ID[q.DBUnitOperation_id][0].UnitOperation)))
-        if q.ProcMedDBFluid_id is not None:
-            self.choiceOfPMDBFluid.SetSelection(\
-		self.choiceOfPMDBFluid.FindString(\
-		    str(Status.DB.dbfluid.DBFluid_ID[q.ProcMedDBFluid_id][0].FluidName)))
-        if q.SupplyMedDBFluid_id is not None:
-            self.choiceOfSMDBFluid.SetSelection(\
-		self.choiceOfSMDBFluid.FindString(\
-		    str(Status.DB.dbfluid.DBFluid_ID[q.SupplyMedDBFluid_id][0].FluidName)))
-
-    def OnButtonClear(self, event):
-        self.clear()
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -743,16 +578,6 @@ class PanelQ3(wx.Panel):
             for n in processes:
                 self.listBoxProcesses.Append (str(n.Process))
 
-    def showError(self, message):
-        dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
-    def showInfo(self, message):
-        dlg = wx.MessageDialog(None, message, 'Info', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
     def check(self, value):
         if value <> "" and value <> "None":
             return value
@@ -783,6 +608,9 @@ class PanelQ3(wx.Panel):
         self.tc24.SetValue('')
         self.tc25.SetValue('')
         self.tc26.SetValue('')
+        setChoice(self.choiceOfDBUnitOperation,None)
+        setChoice(self.choiceOfPMDBFluid,None)
+        setChoice(self.choiceOfSMDBFluid,None)
         
 
 

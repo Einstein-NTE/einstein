@@ -991,6 +991,41 @@ class Project(object):
         return WHEEList
 
 #------------------------------------------------------------------------------
+    def deleteEquipment(self,eqID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given equipment
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QGenerationHC_ID = '%s'"\
+                    %(Status.PId,Status.ANo,eqID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qgenerationhc,sqlQuery)
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
+
+        for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
+            equipes[i].EqNo = i+1
+            pass
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
+        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
+
+        for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
+            equipes[i].CascadeIndex = i+1
+            pass
+        
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
+        cgeneraldata[0].NEquipe = len(equipes)
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
     def getEqList(self,key):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers

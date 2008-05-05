@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.78
+#   Version No.: 0.85
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -42,6 +42,7 @@
 #                       Hans Schweiger                      29/04/2008
 #                       Tom Sobota                          29/04/2008
 #                       Tom Sobota                          01/05/2008
+#                       Hans Schweiger                      05/05/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -96,7 +97,7 @@
 #        1/05/2008  TS: Images are taken from folder 'img'
 #                       Report pages are simplified to 1
 #                       panel for report generation built
-#
+#       05/05/2008  Call to fillchoiceOfEquipment in PanelQ5 eliminated
 #
 #   
 #------------------------------------------------------------------------------     
@@ -639,7 +640,7 @@ class EinsteinFrame(wx.Frame):
             self.Page5.Show()
             self.logMessage(PList["0102"][1])
             self.Page5.clear()
-            self.Page5.fillchoiceOfEquipment()
+#            self.Page5.fillchoiceOfEquipment()
             self.Page5.fillPage()
 
         #Page6 (Heat Recovery Missing)

@@ -1,3 +1,4 @@
+# *-* coding: iso-8859-15 *-*
 #==============================================================================
 #
 #	E I N S T E I N
@@ -11,13 +12,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger 02/05/2008
+#                           Hans Schweiger  02/05/2008
+#                           Tom Sobota      02/05/2008
+#                           Hans Schweiger  05/05/2008
 #
 #       Changes to previous version:
-#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
+#       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
+#                   TS  Changes in layout
+#       05/05/08:   HS  Event handlers changed; resize of grid so that it fits
+#                       into the window
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -28,7 +34,6 @@
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
-
 import wx
 import wx.grid
 import pSQL
@@ -42,7 +47,8 @@ class PanelQ2(wx.Panel):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
-
+        self.__do_layout()
+        
     def _init_ctrls(self, parent):
 
 #------------------------------------------------------------------------------
@@ -50,93 +56,54 @@ class PanelQ2(wx.Panel):
 #------------------------------------------------------------------------------
 
         wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+                             pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+        
+        self.notebook = wx.Notebook(self, -1, style=0)
 
+        self.page0 = wx.Panel(self.notebook)
+        self.page1 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))
+        self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
+        self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Fuels list"))
+        self.sizer_3_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        #self.tc1 = wx.TextCtrl(id=-1, name='tc1', parent=self.,
-        #      pos=wx.Point(248, 64), size=wx.Size(200, 21), style=0, value='')
-
-        self.st1 = wx.StaticText(id=-1, label=self.PList["0401"][1], name='st1', parent=self, pos=wx.Point(248, 48), style=0)
-        self.choiceOfDBFuelType = wx.Choice(choices=[],
-              id=-1, name='choiceOfDBFuelType', parent=self, pos=wx.Point(248, 64),
-              size=wx.Size(200, 21), style=0)
-
-        self.st2 = wx.StaticText(id=-1, label=self.PList["0402"][1], name='st2', parent=self, pos=wx.Point(248, 88), style=0)
-
-        self.tc2 = wx.TextCtrl(id=-1, name='tc2', parent=self,
-              pos=wx.Point(248, 104), size=wx.Size(200, 21), style=0, value='')
-
-        self.st3 = wx.StaticText(id=-1, label=self.PList["0403"][2], name='st3', parent=self, pos=wx.Point(248, 128), style=0)
-
-        self.tc3 = wx.TextCtrl(id=-1, name='tc3', parent=self,
-              pos=wx.Point(248, 144), size=wx.Size(200, 21), style=0, value='')
-
-        self.st4 = wx.StaticText(id=-1, label=self.PList["0404"][2], name='st4', parent=self, pos=wx.Point(472, 48), style=0)
-
-        self.tc4 = wx.TextCtrl(id=-1, name='tc4', parent=self,
-              pos=wx.Point(472, 64), size=wx.Size(200, 21), style=0, value='')
-
-        self.st5 = wx.StaticText(id=-1, label=self.PList["0405"][1] + " " + self.PList["0405"][2], name='st5', parent=self, pos=wx.Point(472, 88), style=0)
-
-        self.tc5 = wx.TextCtrl(id=-1, name='tc5', parent=self,
-              pos=wx.Point(472, 104), size=wx.Size(200, 21), style=0, value='')
-
-        self.st6 = wx.StaticText(id=-1, label=self.PList["0406"][1] + " " + self.PList["0406"][2], name='st6', parent=self, pos=wx.Point(472, 128), style=0)
-
-        self.tc6 = wx.TextCtrl(id=-1, name='tc6', parent=self,
-              pos=wx.Point(472, 144), size=wx.Size(200, 21), style=0, value='')
-
-        self.stInfo1 = wx.StaticText(id=-1, label=self.PList["X029"][1], name='stInfo1', parent=self, pos=wx.Point(32, 24), style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.fuelListBox = wx.ListBox(choices=[], id=-1, name='fuelListBox',
-              parent=self, pos=wx.Point(32, 64), size=wx.Size(160, 112),
-              style=0)
+        self.fuelListBox = wx.ListBox(self.page0, -1, style=wx.LC_LIST|wx.SUNKEN_BORDER)
         self.Bind(wx.EVT_LISTBOX, self.OnFuelListBoxClick, self.fuelListBox)
 
-        self.stInfo2 = wx.StaticText(id=-1, label=self.PList["X030"][1], name='stInfo2', parent=self, pos=wx.Point(32, 48), style=0)
-        self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.buttonAddFuel = wx.Button(id=-1, label=self.PList["X031"][1],
-              name='buttonAddFuel', parent=self, pos=wx.Point(592,
-              176), size=wx.Size(192, 32), style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddFuel, self.buttonAddFuel)
-
-
-        self.buttonRemoveFuelFromList = wx.Button(id=-1,
-              label=self.PList["X032"][1], name='buttonRemoveFuelFromList',
-              parent=self, pos=wx.Point(88, 184), size=wx.Size(192, 32),
-              style=0)
+        self.buttonRemoveFuelFromList = wx.Button(self.page0, -1, _("Remove from list"))
+        self.buttonRemoveFuelFromList.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonRemoveFuelFromList, self.buttonRemoveFuelFromList)
 
-        #self.scrolledWindow = wx.ScrolledWindow(id=-1,
-        #      name='scrolledWindow', parent=self, pos=wx.Point(0,
-        #      268), size=wx.Size(790, 260), style=wx.HSCROLL)
-        #self.scrolledWindow.SetScrollbars(1,1, 950,240)
+        self.buttonAddFuel = wx.Button(self.page0, -1, _("Add fuel"))
+        self.buttonAddFuel.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddFuel, self.buttonAddFuel)
 
-        self.buttonStore = wx.Button(id=-1, label=self.PList["X019"][1],
-              name='buttonStore', parent=self, pos=wx.Point(600,
-              520), size=wx.Size(192, 32), style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonStore, self.buttonStore)
+        self.st1 = wx.StaticText(self.page0, -1, _("Fuels used"))
+        self.choiceOfDBFuelType = wx.Choice(self.page0,-1,choices=[])
+        self.st2 = wx.StaticText(self.page0, -1, _("Unit"))
+        self.tc2 = wx.TextCtrl(self.page0, -1, "")
+        self.st3 = wx.StaticText(self.page0, -1, _("Units/year"))
+        self.tc3 = wx.TextCtrl(self.page0, -1, "")
+        self.st4 = wx.StaticText(self.page0, -1, _("MWh / year (LCV)"))
+        self.tc4 = wx.TextCtrl(self.page0, -1, "")
+        self.st5 = wx.StaticText(self.page0, -1, _("Fuel price €/kWh LCV"))
+        self.tc5 = wx.TextCtrl(self.page0, -1, "")
+        self.st6 = wx.StaticText(self.page0, -1, _("Annual energy cost €/year"))
+        self.tc6 = wx.TextCtrl(self.page0, -1, "")
 
+        self.dummy1 = wx.StaticText(self.page0, -1, "")
+        self.dummy2 = wx.StaticText(self.page0, -1, "")
 
-        self.stInfo3 = wx.StaticText(id=-1, label=self.PList["X033"][1], name='stInfo3', parent=self, pos=wx.Point(32, 240), style=0)
-        self.stInfo3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, _("Cancel"))
+        self.buttonCancel.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.buttonClear = wx.Button(id=-1, label=self.PList["X028"][1],
-              name='buttonClear', parent=self, pos=wx.Point(248,
-              176), size=wx.Size(192, 32), style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonClear, self.buttonClear)
-
-
+        self.buttonOK = wx.Button(self,wx.ID_OK, 'OK')
+        self.buttonOK.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
         ###-- grid setup
-        self.grid = wx.grid.Grid(id=-1,
-				 name='grid',
-				 parent=self,
-				 pos=wx.Point(0, 268),
-				 size=wx.Size(800, 240),
-				 style=0)
+        self.grid = wx.grid.Grid(self.page1, -1, size=(1,1))
         
         self.grid.EnableGridLines(True)
         self.grid.CreateGrid(9, 6)
@@ -144,7 +111,7 @@ class PanelQ2(wx.Panel):
         self.grid.SetDefaultColSize(100, resizeExistingCols=False)
         self.grid.SetDefaultRowSize(23, resizeExistingRows=False)
 
-        self.grid.SetRowLabelSize(200)
+        self.grid.SetRowLabelSize(180)
         
         
         attr = wx.grid.GridCellAttr()
@@ -166,8 +133,6 @@ class PanelQ2(wx.Panel):
         self.grid.SetAttr(6, 0, attr2)
         self.grid.SetAttr(6, 3, attr2)
 
-        
-
         attr3 = wx.grid.GridCellAttr()
         attr3.SetBackgroundColour("light gray")
         attr3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -181,24 +146,22 @@ class PanelQ2(wx.Panel):
 
         self.grid.SetAttr(1, 4, attr4)
         
-        
-        
-        self.grid.SetColLabelValue(0,self.PList["X043"][1])
-        self.grid.SetColLabelValue(1,self.PList["X044"][1])
-        self.grid.SetColLabelValue(2,self.PList["X045"][1])
-        self.grid.SetColLabelValue(3,self.PList["X046"][1])
-        self.grid.SetColLabelValue(4,self.PList["X047"][1])
-        self.grid.SetColLabelValue(5,self.PList["X048"][1])
+        self.grid.SetColLabelValue(0,_('Peak'))
+        self.grid.SetColLabelValue(1,_('Standard'))
+        self.grid.SetColLabelValue(2,_('Valley'))
+        self.grid.SetColLabelValue(3,_('TOTAL'))
+        self.grid.SetColLabelValue(4,_('Self-generation'))
+        self.grid.SetColLabelValue(5,_('Sales to grid'))
 
-        self.grid.SetRowLabelValue(0,self.PList["X034"][1])
-        self.grid.SetRowLabelValue(1,self.PList["X035"][1])
-        self.grid.SetRowLabelValue(2,self.PList["X036"][1])
-        self.grid.SetRowLabelValue(3,self.PList["X037"][1])
-        self.grid.SetRowLabelValue(4,self.PList["X038"][1])
-        self.grid.SetRowLabelValue(5,self.PList["X039"][1])
-        self.grid.SetRowLabelValue(6,self.PList["X040"][1])
-        self.grid.SetRowLabelValue(7,self.PList["X041"][1])
-        self.grid.SetRowLabelValue(8,self.PList["X042"][1])
+        self.grid.SetRowLabelValue(0,_('Annual consumption MWh/year'))
+        self.grid.SetRowLabelValue(1,_('Contracted power kW'))
+        self.grid.SetRowLabelValue(2,_('Tariff type'))
+        self.grid.SetRowLabelValue(3,_('Tariff on installed power EUR/kW month'))
+        self.grid.SetRowLabelValue(4,_('Tariff on consumption EUR/kWh'))
+        self.grid.SetRowLabelValue(5,_('Annual electricity cost EUR/MWh'))
+        self.grid.SetRowLabelValue(6,_('Electric consumption -'))
+        self.grid.SetRowLabelValue(7,_('according type of use'))
+        self.grid.SetRowLabelValue(8,_('Annual consumption MWh/year'))
 
         self.grid.SetRowLabelAlignment(wx.LEFT, wx.BOTTOM)
 
@@ -209,14 +172,14 @@ class PanelQ2(wx.Panel):
 
 
 
-        self.grid.SetCellValue(6, 0, self.PList["X049"][1])
-        self.grid.SetCellValue(6, 3, self.PList["X050"][1])
-        self.grid.SetCellValue(7, 0, self.PList["X051"][1])
-        self.grid.SetCellValue(7, 1, self.PList["X052"][1])
-        self.grid.SetCellValue(7, 2, self.PList["X053"][1])
-        self.grid.SetCellValue(7, 3, self.PList["X054"][1])
-        self.grid.SetCellValue(7, 4, self.PList["X055"][1])
-        self.grid.SetCellValue(7, 5, self.PList["X056"][1])
+        self.grid.SetCellValue(6, 0, _('Electricity for thermal uses'))
+        self.grid.SetCellValue(6, 3, _('Electricity for non-thermal uses'))
+        self.grid.SetCellValue(7, 0, _('Refrigeration'))
+        self.grid.SetCellValue(7, 1, _('Air Conditioning'))
+        self.grid.SetCellValue(7, 2, _('Other uses'))
+        self.grid.SetCellValue(7, 3, _('Motor and machines'))
+        self.grid.SetCellValue(7, 4, _('Electro-chemics'))
+        self.grid.SetCellValue(7, 5, _('Lighting'))
 
         self.grid.SetReadOnly(6, 0, isReadOnly=True)
         self.grid.SetReadOnly(6, 3, isReadOnly=True)
@@ -235,15 +198,73 @@ class PanelQ2(wx.Panel):
         ###-- end of grid setup
 
 
+    def __do_layout(self):
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizerPage1 = wx.BoxSizer(wx.VERTICAL)
+        sizerPage0 = wx.BoxSizer(wx.HORIZONTAL)
+        grid_sizer_1 = wx.FlexGridSizer(7, 2, 5, 2)
+        sizer_3 = wx.StaticBoxSizer(self.sizer_3_staticbox, wx.VERTICAL)
+        sizer_3.Add(self.fuelListBox, 1, wx.EXPAND, 0)
+        sizer_3.Add(self.buttonRemoveFuelFromList, 0, wx.ALIGN_RIGHT, 0)
+        sizer_3.Add(self.buttonAddFuel, 0, wx.ALIGN_RIGHT, 2)
+        sizerPage0.Add(sizer_3, 1, wx.EXPAND, 0)
+        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
+
+        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
+        flagText = wx.ALIGN_CENTER_VERTICAL
+
+        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.choiceOfDBFuelType, 0, 0, 0)
+        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
+        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
+        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
+        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
+        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
+        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
+
+        sizerPage0.Add(grid_sizer_1, 2, wx.LEFT|wx.RIGHT|wx.EXPAND, 20)
+        self.page0.SetSizer(sizerPage0)
+        sizerPage1.Add(self.grid, 1, wx.EXPAND, 0)
+        self.page1.SetSizer(sizerPage1)
+
+        sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
+        sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
+
+        sizer_1.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizer_1.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        self.SetSizer(sizer_1)
+        self.Layout()
+
 #------------------------------------------------------------------------------
 #--- UI actions
 #------------------------------------------------------------------------------		
 
     def OnButtonAddFuel(self, event):
+        self.clearFuelData()
+        self.fillPage()
+
+    def OnButtonRemoveFuelFromList(self, event):
+        Status.prj.deleteFuel(self.selectedFuelID)
+        self.clear()
+        self.fillPage()
+        event.Skip()
+
+
+    def OnButtonOK(self, event):
+        if self.notebook.GetSelection()==0:
+            self.storeFuelData()
+        else:
+            self.storeElectricityData()
+
+    def storeFuelData(self):
         fuelName = str(self.choiceOfDBFuelType.GetStringSelection())
         fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if Status.PId <> 0 and fuelName <> 'None':
-            dbfid = Status.DB.dbfuel.FuelName[fuelName][0].DBFuel_ID
+            
             if len(fuels.DBFuel_id[dbfid]) == 0:
                 newID = Status.prj.addFuelDummy()
                 tmp = {
@@ -261,8 +282,7 @@ class PanelQ2(wx.Panel):
                 
                 self.fillFuelList()
 
-
-            elif len(fuels.DBFuel_id[dbfid]) == 1:
+            elif len(Status.DB.qfuel.Questionnaire_id[Status.PId].DBFuel_id[Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID]) == 1:
                 tmp = {
                     "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
@@ -278,19 +298,11 @@ class PanelQ2(wx.Panel):
                 self.fillFuelList()
                           
             else:
-                self.showError("FuelName have to be an uniqe value!")
+                self.main.showError("Fuel name has to be a unique value!")
 
-
-    def OnButtonRemoveFuelFromList(self, event):
-        print "PanelQ2 (remove fuel): removing fuel no ",self.selectedFuelID
-        Status.prj.deleteFuel(self.selectedFuelID)
-        self.clear()
-        self.fillPage()
-
-
-    def OnButtonStore(self, event):
+    def storeElectricityData(self):
         if Status.PId <> 0:
-            if len(Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
+            if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 0:
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
@@ -335,8 +347,8 @@ class PanelQ2(wx.Panel):
                 Status.DB.qelectricity.insert(tmp)
                 Status.SQL.commit()                      
 
-            elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
-                q = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+            elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 1:
+                q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
                 tmp = {                    
                     "PowerContrTot":self.check(self.grid.GetCellValue(1, 3)),
                     "PowerContrStd":self.check(self.grid.GetCellValue(1, 1)),
@@ -380,19 +392,26 @@ class PanelQ2(wx.Panel):
 
                 
     def OnFuelListBoxClick(self, event):
-        self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
-        self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
-        q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
-        self.tc2.SetValue(str(q.FuelUnit))
-        self.tc3.SetValue(str(q.MFuelYear))
-        self.tc4.SetValue(str(q.FuelOwn))
-        self.tc5.SetValue(str(q.FuelTariff))
-        self.tc6.SetValue(str(q.FuelCostYear))
-        self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))
+        try:
+            self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
+            self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
+            q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
+            self.tc2.SetValue(str(q.FuelUnit))
+            self.tc3.SetValue(str(q.MFuelYear))
+            self.tc4.SetValue(str(q.FuelOwn))
+            self.tc5.SetValue(str(q.FuelTariff))
+            self.tc6.SetValue(str(q.FuelCostYear))
+            self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))
+        except IndexError:
+            # no data available
+            self.clear()
         event.Skip()
 
-    def OnButtonClear(self, event):
-        self.clear()
+    def OnButtonCancel(self, event):
+        if self.notebook.GetSelection()==0:
+            self.clearFuelData()
+        else:
+            self.clear()
         event.Skip()
 
 
@@ -415,7 +434,7 @@ class PanelQ2(wx.Panel):
 	if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) <= 0:
 	    return
 
-	q = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+	q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
 	self.grid.SetCellValue(1, 3, str(q.PowerContrTot))
 	self.grid.SetCellValue(1, 1, str(q.PowerContrStd))
 	self.grid.SetCellValue(1, 0, str(q.PowerContrPeak))
@@ -466,28 +485,21 @@ class PanelQ2(wx.Panel):
                     fuelName = "unknown fuel"
                 self.fuelListBox.Append(fuelName)
 
-    def showError(self, message):
-        dlg = wx.MessageDialog(None, message, 'Error', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
-    def showInfo(self, message):
-        dlg = wx.MessageDialog(None, message, 'Info', wx.OK)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-
     def check(self, value):
         if value <> "" and value <> "None":
             return value
         else:
             return 'NULL'
 
-    def clear(self):
+    def clearFuelData(self):
         self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
+
+    def clear(self):
+        self.clearFuelData()
         self.grid.SetCellValue(1, 3, '')
         self.grid.SetCellValue(1, 1, '')
         self.grid.SetCellValue(1, 0, '')

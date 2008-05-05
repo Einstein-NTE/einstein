@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 #==============================================================================
 #
 #	E I N S T E I N
@@ -11,13 +12,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.05
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger 02/05/2008
+#                           Hans Schweiger  02/05/2008
+#                           Tom Sobota      03/05/2008
+#                           Hans Schweiger  05/05/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
+#       03/05/2008      Changed display format
+#       05/05/2008:     Event handlers changed
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -30,9 +35,44 @@
 #==============================================================================
 
 import wx
+from wx.lib.stattext import *
 import pSQL
 import HelperClass
 from status import Status
+
+
+# constants
+LABELWIDTH=180
+TEXTENTRYWIDTH=280
+
+
+class Label(wx.lib.stattext.GenStaticText):
+    # auxiliary class for labels (static text)
+    # will show a short descriptive string and
+    # generate a longer tooltip.
+    # the tooltip is also associated to the text control
+    #
+    w0 = None
+    w1 = None
+    def __init__(self,parent,txtctrl,text,tip,width0=None,width1=None):
+        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
+                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
+        self.SetLabel(text)
+        self.SetToolTip(wx.ToolTip(tip))
+        txtctrl.SetToolTip(wx.ToolTip(tip))
+        h = self.GetMinHeight()
+        if width0 is None:
+            if Label.w0 is not None:
+                self.SetMinSize((Label.w0, h))
+        else:
+            Label.w0 = width0
+            self.SetMinSize((Label.w0, h))
+        if width1 is None:
+            if Label.w1 is not None:
+                txtctrl.SetMinSize((Label.w1, h))
+        else:
+            txtctrl.SetMinSize((width1, h))
+            Label.w1 = width1
 
 
 class PanelQ5(wx.Panel):
@@ -41,390 +81,218 @@ class PanelQ5(wx.Panel):
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+        self.__do_layout()
 
-        self.pipeID = None
-
+        
     def _init_ctrls(self, parent):
 
 #------------------------------------------------------------------------------
 #--- UI setup
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
 
-        wx.Panel.__init__(self,
-			  id=-1,
-			  name='PanelQ5',
-			  parent=parent,
-			  pos=wx.Point(0, 0),
-			  size=wx.Size(800, 600),
-			  style=0)
+        wx.Panel.__init__(self, id=-1, name='PanelQ5', parent=parent,
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
 
-        self.listBoxDistributionList = wx.ListBox(choices=[],
-						       id=-1,
-						       name='listBoxDistributionList',
-						       parent=self,
-						       pos=wx.Point(24, 40),
-						       size=wx.Size(200, 216),
-						       style=0)
+        self.notebook = wx.Notebook(self, -1, style=0)
+        self.page0 = wx.Panel(self.notebook) # left panel
+        self.page1 = wx.Panel(self.notebook) # right panel
+
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Distribution list"))
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Distribution of heat/cold"))
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_13_staticbox = wx.StaticBox(self.page1, -1, "Storage")
+        self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        # left panel
+        
+        self.listBoxDistributionList = wx.ListBox(self.page0,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxDistributionListListboxClick, self.listBoxDistributionList)
 
 
-        self.stInfo1 = wx.StaticText(id=-1,
-					  label=self.PList["X063"][1],
-					  name='stInfo1',
-					  parent=self,
-					  pos=wx.Point(24, 24),
-					  style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc1 = wx.TextCtrl(self.page0,-1,'')
+        self.st1 = Label(self.page0,self.tc1,_("Branch"),
+                         _("Name of the branch / distribution system"),
+                         LABELWIDTH, TEXTENTRYWIDTH)
 
-        self.stInfo2 = wx.StaticText(id=-1,
-					  label=self.PList["0600"][1],
-					  name='stInfo2',
-					  parent=self,
-					  pos=wx.Point(272, 24),
-					  style=0)
-        self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.choiceOfSource = wx.Choice(self.page0,-1,choices=[])
+        self.st2 = Label(self.page0,self.choiceOfSource,_("Heat comes from?"),
+                         _("Heat or cold supply comes from equipment(s) no.:"))
 
-        self.stInfo3 = wx.StaticText(id=-1,
-					  label=self.PList["0615"][1],
-					  name='stInfo3',
-					  parent=self,
-					  pos=wx.Point(512, 224),
-					  style=0)
-        self.stInfo3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+	self.tc3 = wx.TextCtrl(self.page0,-1,'')
+        self.st3 = Label(self.page0,self.tc3,_("Distribution medium"),
+                         _("Heat or cold distribution medium"))
+
+        self.tc4 = wx.TextCtrl(self.page0,-1,'')
+        self.st4 = Label(self.page0,self.tc4,_("Nominal production"),
+                         _("Nominal production or circulation rate(specify units) (mü/hkg/h)"))
+
+        self.tc5 = wx.TextCtrl(self.page0,-1,'')
+        self.st5 = Label(self.page0,self.tc5,_("Outlet temperature"),
+                         _("Outlet temperature (to distribution) (ºC)"))
+
+        self.tc6 = wx.TextCtrl(self.page0,-1,'')
+        self.st6 = Label(self.page0,self.tc6,_("Return temperature"),
+                         _("Return temperature (from distribution) (ºC)"))
+
+        self.tc7 = wx.TextCtrl(self.page0,-1,'')
+        self.st7 = Label(self.page0,self.tc7,_("% of recirculation"),
+                         _("Percentage of recirculation (%)"))
+
+        self.tc8 = wx.TextCtrl(self.page0,-1,'')
+        self.st8 = Label(self.page0,self.tc8,_("Feed-up"),
+                         _("Feed-up in open circuit (ºC)"))
+
+        self.tc9 = wx.TextCtrl(self.page0,-1,'')
+        self.st9 = Label(self.page0,self.tc9,_("Pressure"),
+                         _("Pressure (bar)"))
+
+        self.tc10 = wx.TextCtrl(self.page0,-1,'')
+        self.st10 = Label(self.page0,self.tc10,_("% condensate recovery"),
+                          _("Percentage of condensate recovery (steam boilers only) (%)"))
+
+        self.tc11 = wx.TextCtrl(self.page0,-1,'')
+        self.st11 = Label(self.page0,self.tc11,_("Total length of piping"),
+                          _("Total length of distribution piping or ducts (one way) (m)"))
+
+        self.tc12 = wx.TextCtrl(self.page0,-1,'')
+        self.st12 = Label(self.page0,self.tc12,_("Total coef.heat losses"),
+                          _("Total coefficient of heat losses for piping or ducts (kW/K)"))
+
+        self.tc13 = wx.TextCtrl(self.page0,-1,'')
+        self.st13 = Label(self.page0,self.tc13,_("Mean pipe diameter"),
+                          _("Mean pipe diameter (mm)"))
+
+        self.tc14 = wx.TextCtrl(self.page0,-1,'')
+        self.st14 = Label(self.page0,self.tc14,_("Insulation thickness"),
+                          _("Insulation thickness (mm)"))
+
+        # right panel
+
+        self.tc15 = wx.TextCtrl(self.page1,-1,'')
+        self.st15 = Label(self.page1,self.tc15,_("Nº of storage units"),
+                          _("Number of heat or cold storage units"))
+
+        self.tc16 = wx.TextCtrl(self.page1,-1,'')
+        self.st16 = Label(self.page1,self.tc16,_("Storage volume"),
+                          _("Total volume of the storage (mü)"))
+
+        self.tc17 = wx.TextCtrl(self.page1,-1,'')
+        self.st17 = Label(self.page1,self.tc17,_("Type of storage"),
+                          _("Type of storage / storage medium"))
+
+        self.tc18 = wx.TextCtrl(self.page1,-1,'')
+        self.st18 = Label(self.page1,self.tc18,_("Max pressure"),
+                          _("Maximum pressure (bar)"))
+
+        self.tc19 = wx.TextCtrl(self.page1,-1,'')
+        self.st19 = Label(self.page1,self.tc19,_("Max temperature"),
+                          _("Maximum temperature of the storage (ºC)"))
 
 
-        self.buttonClear = wx.Button(id=-1,
-					  label=self.PList["X028"][1],
-					  name='buttonClear',
-					  parent=self,
-					  pos=wx.Point(272, 464),
-					  size=wx.Size(192, 32),
-					  style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonClear, self.buttonClear)
 
-        self.buttonDeleteDistribution = wx.Button(id=-1,
-						       label=self.PList["X064"][1],
-						       name='buttonDeleteDistribution',
-						       parent=self,
-						       pos=wx.Point(136, 264),
-						       size=wx.Size(192, 32),
-						       style=0)
+        self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
+        self.buttonOK.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
+        self.buttonCancel.SetMinSize((125, 32))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+
+        self.buttonDeleteDistribution = wx.Button(self.page0,-1,_("Delete distribution"))
+        self.buttonDeleteDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteDistribution, self.buttonDeleteDistribution)
 
-        self.buttonAddDistribution = wx.Button(id=-1,
-						    label=self.PList["X065"][1],
-						    name='buttonAddDistribution',
-						    parent=self,
-						    pos=wx.Point(584, 464),
-						    size=wx.Size(192, 32),
-						    style=0)
+        self.buttonAddDistribution = wx.Button(self.page0, -1, _("Add distribution"))
+        self.buttonAddDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddDistribution, self.buttonAddDistribution)
 
-	
-        self.st1 = wx.StaticText(id=-1,
-				      label=self.PList["0601"][1] + ' ' + self.PList["0601"][2],
-				      name='st1',
-				      parent=self,
-				      pos=wx.Point(272, 48),
-				      style=0)        
-
-        self.tc1 = wx.TextCtrl(id=-1,
-				    name='tc1',
-				    parent=self,
-				    pos=wx.Point(272, 64),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')        
-
-	
-        self.st2 = wx.StaticText(id=-1,
-				      label=self.PList["0602"][1] + ' ' + self.PList["0602"][2],
-				      name='st2',
-				      parent=self,
-				      pos=wx.Point(272, 88),
-				      style=0)
-
-        #self.tc2 = wx.TextCtrl(id=-1, name='tc2',
-        #      parent=self, pos=wx.Point(272, 104), size=wx.Size(200, 21),
-        #      style=0, value='')
-        self.choiceOfEquipment = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfEquipment',
-						parent=self,
-						pos=wx.Point(272, 104),
-						size=wx.Size(200, 21),
-						style=0)
-
-        self.st3 = wx.StaticText(id=-1,
-				      label=self.PList["0603"][1] + ' ' + self.PList["0603"][2],
-				      name='st3',
-				      parent=self,
-				      pos=wx.Point(272, 128),
-				      style=0)
-
-	self.tc3 = wx.TextCtrl(id=-1,
-				    name='tc3',
-				    parent=self,
-				    pos=wx.Point(272, 144),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
 
 
-        self.st4 = wx.StaticText(id=-1,
-				      label=self.PList["0604"][1] + ' ' + self.PList["0604"][2],
-				      name='st4',
-				      parent=self,
-				      pos=wx.Point(272, 168),
-				      style=0)
+    def __do_layout(self):
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_10 = wx.BoxSizer(wx.VERTICAL)
+        sizer_13 = wx.StaticBoxSizer(self.sizer_13_staticbox, wx.VERTICAL)
+        grid_sizer_5 = wx.FlexGridSizer(5, 2, 3, 3)
+        sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_6 = wx.BoxSizer(wx.VERTICAL)
+        sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
+        grid_sizer_1 = wx.FlexGridSizer(10, 2, 3, 3)# r,c,seph,sepv
+        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
 
-        self.tc4 = wx.TextCtrl(id=-1,
-				    name='tc4',
-				    parent=self,
-				    pos=wx.Point(272, 184),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
+        # panel 0, left part, distribution list
+        sizer_5.Add(self.listBoxDistributionList, 1, wx.EXPAND, 0)
+        sizer_5.Add(self.buttonAddDistribution, 0, wx.ALIGN_RIGHT, 0)
+        sizer_5.Add(self.buttonDeleteDistribution, 0, wx.ALIGN_RIGHT, 0)
+        sizer_4.Add(sizer_5, 1, wx.EXPAND, 0)
 
+        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_VERTICAL
+        flagText = wx.ALIGN_CENTER_VERTICAL
 
-        self.st5 = wx.StaticText(id=-1,
-				      label=self.PList["0605"][1] + ' ' + self.PList["0605"][2],
-				      name='st5',
-				      parent=self,
-				      pos=wx.Point(272, 208),
-				      style=0)
+        # panel 0, right part, distribution
+        grid_sizer_1.Add(self.st1, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc1, 0, flagText, 2)
+        grid_sizer_1.Add(self.st2, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.choiceOfSource, 0, flagText, 2)
+        grid_sizer_1.Add(self.st3, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc3, 0, flagText, 2)
+        grid_sizer_1.Add(self.st4, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc4, 0, flagText, 2)
+        grid_sizer_1.Add(self.st5, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc5, 0, flagText, 2)
+        grid_sizer_1.Add(self.st6, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc6, 0, flagText, 2)
+        grid_sizer_1.Add(self.st7, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc7, 0, flagText, 2)
+        grid_sizer_1.Add(self.st8, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc8, 0, flagText, 2)
+        grid_sizer_1.Add(self.st9, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc9, 0, flagText, 2)
+        grid_sizer_1.Add(self.st10, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc10, 0, flagText, 2)
+        grid_sizer_1.Add(self.st11, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc11, 0, flagText, 2)
+        grid_sizer_1.Add(self.st12, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc12, 0, flagText, 2)
+        grid_sizer_1.Add(self.st13, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc13, 0, flagText, 2)
+        grid_sizer_1.Add(self.st14, 0, flagLabel, 2)
+        grid_sizer_1.Add(self.tc14, 0, flagText, 2)
 
-        self.tc5 = wx.TextCtrl(id=-1,
-				    name='tc5',
-				    parent=self,
-				    pos=wx.Point(272, 224),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-        
+        sizer_7.Add(grid_sizer_1, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_6.Add(sizer_7, 3, wx.EXPAND, 0)#
 
-        self.st6 = wx.StaticText(id=-1,
-				      label=self.PList["0606"][1] + ' ' + self.PList["0606"][2],
-				      name='st6',
-				      parent=self,
-				      pos=wx.Point(272, 248),
-				      style=0)
+        sizer_4.Add(sizer_6, 2, wx.EXPAND, 0)
+        self.page0.SetSizer(sizer_4)
 
-        self.tc6 = wx.TextCtrl(id=-1,
-				    name='tc6',
-				    parent=self,
-				    pos=wx.Point(272, 264),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-        
+        #panel 1, storage
+        grid_sizer_5.Add(self.st15, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc15, 0, flagText, 0)
+        grid_sizer_5.Add(self.st16, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc16, 0, flagText, 0)
+        grid_sizer_5.Add(self.st17, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc17, 0, flagText, 0)
+        grid_sizer_5.Add(self.st18, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc18, 0, flagText, 0)
+        grid_sizer_5.Add(self.st19, 0, flagLabel, 0)
+        grid_sizer_5.Add(self.tc19, 0, flagText, 0)
 
-        self.st7 = wx.StaticText(id=-1,
-				      label=self.PList["0607"][1] + ' ' + self.PList["0607"][2],
-				      name='st7',
-				      parent=self,
-				      pos=wx.Point(272, 288),
-				      style=0)
-
-        self.tc7 = wx.TextCtrl(id=-1,
-				    name='tc7',
-				    parent=self,
-				    pos=wx.Point(272, 304),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-
-
-        self.st8 = wx.StaticText(id=-1,
-				      label=self.PList["0608"][1] + ' ' + self.PList["0608"][2],
-				      name='st8',
-				      parent=self,
-				      pos=wx.Point(272, 328),
-				      style=0)
-
-        self.tc8 = wx.TextCtrl(id=-1,
-				    name='tc8',
-				    parent=self,
-				    pos=wx.Point(272, 344),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-
-
-        self.st9 = wx.StaticText(id=-1,
-				      label=self.PList["0609"][1] + ' ' + self.PList["0609"][2],
-				      name='st9',
-				      parent=self,
-				      pos=wx.Point(272, 368),
-				      style=0)
-
-        self.tc9 = wx.TextCtrl(id=-1,
-				    name='tc9',
-				    parent=self,
-				    pos=wx.Point(272, 384),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-
-
-        self.st10 = wx.StaticText(id=-1,
-				       label=self.PList["0610"][1] + ' ' + self.PList["0610"][2],
-				       name='st10',
-				       parent=self,
-				       pos=wx.Point(272, 408),
-				       style=0)
-
-        self.tc10 = wx.TextCtrl(id=-1,
-				     name='tc10',
-				     parent=self,
-				     pos=wx.Point(272, 424),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st11 = wx.StaticText(id=-1,
-				       label=self.PList["0611"][1] + ' ' + self.PList["0611"][2],
-				       name='st11',
-				       parent=self,
-				       pos=wx.Point(512, 48),
-				       style=0)
-
-        self.tc11 = wx.TextCtrl(id=-1,
-				     name='tc11',
-				     parent=self,
-				     pos=wx.Point(512, 64),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')        
-
-
-        self.st12 = wx.StaticText(id=-1,
-				       label=self.PList["0612"][1] + ' ' + self.PList["0612"][2],
-				       name='st12',
-				       parent=self,
-				       pos=wx.Point(512, 88),
-				       style=0)
-        
-        self.tc12 = wx.TextCtrl(id=-1,
-				     name='tc12',
-				     parent=self,
-				     pos=wx.Point(512, 104),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st13 = wx.StaticText(id=-1,
-				       label=self.PList["0613"][1] + ' ' + self.PList["0613"][2],
-				       name='st13',
-				       parent=self,
-				       pos=wx.Point(512, 128),
-				       style=0)
-
-        self.tc13 = wx.TextCtrl(id=-1,
-				     name='tc13',
-				     parent=self,
-				     pos=wx.Point(512, 144),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-        
-        self.st14 = wx.StaticText(id=-1,
-				       label=self.PList["0614"][1] + ' ' + self.PList["0614"][2],
-				       name='st14',
-				       parent=self,
-				       pos=wx.Point(512, 168),
-				       style=0)
-
-        self.tc14 = wx.TextCtrl(id=-1,
-				     name='tc14',
-				     parent=self,
-				     pos=wx.Point(512, 184),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st15 = wx.StaticText(id=-1,
-				       label=self.PList["0616"][1] + ' ' + self.PList["0616"][2],
-				       name='st15',
-				       parent=self,
-				       pos=wx.Point(512, 248),
-				       style=0)
-
-        self.tc15 = wx.TextCtrl(id=-1,
-				     name='tc15',
-				     parent=self,
-				     pos=wx.Point(512, 264),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st16 = wx.StaticText(id=-1,
-				       label=self.PList["0617"][1] + ' ' + self.PList["0617"][2],
-				       name='st16',
-				       parent=self,
-				       pos=wx.Point(512, 288),
-				       style=0)
-
-        self.tc16 = wx.TextCtrl(id=-1,
-				     name='tc16',
-				     parent=self,
-				     pos=wx.Point(512, 304),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st17 = wx.StaticText(id=-1,
-				       label=self.PList["0618"][1] + ' ' + self.PList["0618"][2],
-				       name='st17',
-				       parent=self,
-				       pos=wx.Point(512, 328),
-				       style=0)
-
-        self.tc17 = wx.TextCtrl(id=-1,
-				     name='tc17',
-				     parent=self,
-				     pos=wx.Point(512, 344),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st18 = wx.StaticText(id=-1,
-				       label=self.PList["0619"][1] + ' ' + self.PList["0619"][2],
-				       name='st18',
-				       parent=self,
-				       pos=wx.Point(512, 368),
-				       style=0)
-	
-        self.tc18 = wx.TextCtrl(id=-1,
-				     name='tc18',
-				     parent=self,
-				     pos=wx.Point(512, 384),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')        
-	
-	
-        self.st19 = wx.StaticText(id=-1,
-				       label=self.PList["0620"][1] + ' ' + self.PList["0620"][2],
-				       name='st19',
-				       parent=self,
-				       pos=wx.Point(512, 408),
-				       style=0)
-        
-        self.tc19 = wx.TextCtrl(id=-1,
-				     name='tc19',
-				     parent=self,
-				     pos=wx.Point(512, 424),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        sizer_13.Add(grid_sizer_5, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
+        self.page1.SetSizer(sizer_10)
+        self.notebook.AddPage(self.page0, _('Distribution'))
+        self.notebook.AddPage(self.page1, _('Storage'))
+        sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
+        sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
+        sizer_2.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+        self.SetSizer(sizer_1)
+        self.Layout()
 
 
 #------------------------------------------------------------------------------
@@ -441,12 +309,7 @@ class PanelQ5(wx.Panel):
         self.pipeID = p.QDistributionHC_ID
         
         self.tc1.SetValue(str(p.Pipeduct))
-        #self.tc2.SetValue(str(p.HeatFromQGenerationHC_id))
-        if len(Status.DB.qgenerationhc.QGenerationHC_ID[p.HeatFromQGenerationHC_id]) <> 0:
-            self.choiceOfEquipment.SetSelection(\
-		self.choiceOfEquipment.FindString(\
-		    str(Status.DB.qgenerationhc.QGenerationHC_ID[p.HeatFromQGenerationHC_id][0].Equipment)))
-            
+        #self.tc2.SetValue(str(p.HeatFromQGenerationHC_id))   
         self.tc3.SetValue(str(p.HeatDistMedium))
         self.tc4.SetValue(str(p.DistribCircFlow))
         self.tc5.SetValue(str(p.ToutDistrib))
@@ -464,37 +327,21 @@ class PanelQ5(wx.Panel):
         self.tc17.SetValue(str(p.TypeStorage))
         self.tc18.SetValue(str(p.PmaxStorage))
         self.tc19.SetValue(str(p.TmaxStorage))
-        #event.Skip()
 
-    def OnButtonClear(self, event):
-        self.clear()
-        #event.Skip()
-
-    def OnButtonDeleteDistribution(self, event):
-        Status.prj.deletePipe(self.pipeID)
-        self.clear()
-        self.fillPage()
-        event.Skip()
-
-    def OnButtonAddDistribution(self, event):
+    def OnButtonOK(self, event):
         if Status.PId == 0:
 	    return
 
         pipeName = self.check(self.tc1.GetValue())
         pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+
 	if pipeName <> 'NULL' and len(pipes) == 0:
 
             newID = Status.prj.addPipeDummy()
             
-            eqTable = Status.DB.qgenerationhc.Equipment[str(self.choiceOfEquipment.GetStringSelection())].\
-                      Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
-            if len(eqTable) >0: qgid = eqTable[0].QGenerationHC_ID
-            else: qgid = None
-        
 	    tmp = {
 		"Questionnaire_id":Status.PId,
 		"Pipeduct":self.check(self.tc1.GetValue()),
-		"HeatFromQGenerationHC_id":qgid,
 		"HeatDistMedium":self.check(self.tc3.GetValue()), 
 		"DistribCircFlow":self.check(self.tc4.GetValue()), 
 		"ToutDistrib":self.check(self.tc5.GetValue()), 
@@ -511,8 +358,7 @@ class PanelQ5(wx.Panel):
 		"VtotStorage":self.check(self.tc16.GetValue()), 
 		"TypeStorage":self.check(self.tc17.GetValue()), 
 		"PmaxStorage":self.check(self.tc18.GetValue()), 
-		"TmaxStorage":self.check(self.tc19.GetValue()),
-		"IsAlternative":0
+		"TmaxStorage":self.check(self.tc19.GetValue())
 		}
 
             q = Status.DB.qdistributionhc.QDistributionHC_ID[newID][0]
@@ -522,16 +368,8 @@ class PanelQ5(wx.Panel):
 
 	elif pipeName <> 'NULL' and len(pipes) == 1:
 
-            eqTable = Status.DB.qgenerationhc.Equipment[\
-		str(self.choiceOfEquipment.GetStringSelection())].\
-		Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
-
-            if len(eqTable) >0: qgid = eqTable[0].QGenerationHC_ID                       
-            else: qgid = None
-        
 	    tmp = {
 		"Pipeduct":self.check(self.tc1.GetValue()),
-		"HeatFromQGenerationHC_id":qgid,
 		"HeatDistMedium":self.check(self.tc3.GetValue()), 
 		"DistribCircFlow":self.check(self.tc4.GetValue()), 
 		"ToutDistrib":self.check(self.tc5.GetValue()), 
@@ -548,8 +386,7 @@ class PanelQ5(wx.Panel):
 		"VtotStorage":self.check(self.tc16.GetValue()), 
 		"TypeStorage":self.check(self.tc17.GetValue()), 
 		"PmaxStorage":self.check(self.tc18.GetValue()), 
-		"TmaxStorage":self.check(self.tc19.GetValue()),
-		"IsAlternative":0
+		"TmaxStorage":self.check(self.tc19.GetValue())
 		}
 	    
 	    q = pipes[0]
@@ -560,20 +397,22 @@ class PanelQ5(wx.Panel):
 	else:
 	    self.showError("Pipeduct have to be an uniqe value!")
 
+    def OnButtonCancel(self, event):
+        self.clear()
+        event.Skip()
+
+    def OnButtonDeleteDistribution(self, event):
+        Status.prj.deletePipe(self.pipeID)
+        self.clear()
+        self.fillPage()
+        event.Skip()
+
+    def OnButtonAddDistribution(self, event):
+        self.clear()
+        
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------		
-
-    def fillchoiceOfEquipment(self):
-        self.choiceOfEquipment.Clear()
-        self.choiceOfEquipment.Append("None")
-        if Status.PId <> 0:
-            equipments = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
-            if len(equipments) <> 0:
-                for equipe in equipments:
-                    self.choiceOfEquipment.Append(equipe.Equipment)
-        self.choiceOfEquipment.SetSelection(0)
-
 
     def fillPage(self):
         self.listBoxDistributionList.Clear()

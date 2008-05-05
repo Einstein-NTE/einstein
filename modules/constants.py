@@ -63,6 +63,8 @@ EQUIPECLASSES = ["HP","BB"]
 HPTYPES = ["compression",
            "thermal"]
 
+HXTYPES = ["plate HX (liquid-liquid)","plate HX (air-air)","shell&tube HX (liquid-liquid)","finned tubes (liquid-air)"]
+
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries
 #==============================================================================
