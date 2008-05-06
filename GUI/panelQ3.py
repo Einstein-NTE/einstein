@@ -35,7 +35,6 @@
 #==============================================================================
 import wx
 import pSQL
-import HelperClass
 from status import Status
 from GUITools import *
 
@@ -77,11 +76,8 @@ class Label(wx.lib.stattext.GenStaticText):
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
-        paramlist = HelperClass.ParameterDataHelper()
-        self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
-
 
     def _init_ctrls(self, parent):
 
@@ -91,6 +87,7 @@ class PanelQ3(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ3', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.Hide()
         self.notebook = wx.Notebook(self, -1, style=0)
 
         self.page0 = wx.Panel(self.notebook)

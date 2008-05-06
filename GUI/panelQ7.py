@@ -1,596 +1,430 @@
+# -*- coding: iso-8859-15 -*-
+#==============================================================================
+#
+#	E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#	PanelQ7: Renewable energies
+#
+#==============================================================================
+#
+#	Version No.: 0.03
+#	Created by: 	    Heiko Henning February2008
+#       Revised by:         Tom Sobota      06/05/2008
+#
+#       Changes to previous version:
+#       06/05/2008      Changed display logic
+#
+#------------------------------------------------------------------------------
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	http://www.energyxperts.net/
+#
+#	This program is free software: you can redistribute it or modify it under
+#	the terms of the GNU general public license as published by the Free
+#	Software Foundation (www.gnu.org).
+#
+#==============================================================================
 import wx
 import pSQL
-import HelperClass
 from status import Status
+
+# constants
+LABELWIDTH=200
+TEXTENTRYWIDTH=160
+
+
+class Label(wx.lib.stattext.GenStaticText):
+    # auxiliary class for labels (static text)
+    # will show a short descriptive string and
+    # generate a longer tooltip.
+    # the tooltip is also associated to the text control
+    # 'txtlist' can be a scalar (just one control) or a list
+    # of controls. 'tiplist' is expected to be the same type
+    # and length as 'txtlist'
+    w0 = None
+    w1 = None
+    def __init__(self,parent,txtlist,text,tiplist,width0=None,width1=None,style=0):
+        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
+                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
+        self.SetLabel(text)
+        # sets sizes
+        h = self.GetMinHeight()
+        if width0 is None:
+            if Label.w0 is not None:
+                self.SetMinSize((Label.w0, h))
+        else:
+            Label.w0 = width0
+            self.SetMinSize((Label.w0, h))
+        if width1 is None:
+            if Label.w1 is not None:
+                if 'list' in str(type(txtlist)):
+                    # list of controls
+                    for tc  in txtlist:
+                        tc.SetMinSize((Label.w1, h))
+                else:
+                    # just one control
+                    txtlist.SetMinSize((Label.w1, h))
+        else:
+            Label.w1 = width1
+            for tc  in txtlist:
+                tc.SetMinSize((width1, h))
+        # sets tooltips
+        self.SetToolTipString(text)
+        if 'list' in str(type(txtlist)):
+            for i in range(len(txtlist)):
+                if len(tiplist[i].strip()) > 0:
+                    txtlist[i].SetToolTipString(tiplist[i])
+        else:
+            if len(tiplist.strip()) > 0:
+                txtlist.SetToolTipString(tiplist)
+
+
 
 
 class PanelQ7(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
-        paramlist = HelperClass.ParameterDataHelper()
-        self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
+        self.__do_layout()
 
     def _init_ctrls(self, parent):
 
 #------------------------------------------------------------------------------
 #--- UI setup
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
 
         wx.Panel.__init__(self, id=-1, name='PanelQ7', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.Hide()
 
 
-        self.buttonStoreData = wx.Button(id=-1,
-					 label=self.PList["X019"][1],
-					 name='buttonStoreData',
-					 parent=self,
-					 pos=wx.Point(640, 472),
-					 size=wx.Size(192, 32),
-					 style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonStoreData, self.buttonStoreData)
+        self.buttonOK = wx.Button(self,wx.ID_OK,"OK")
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,"Cancel")
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+
+
+        # page 0
+        self.notebook = wx.Notebook(self, -1, style=0)
+        self.page2 = wx.Panel(self.notebook, -1)
+        self.page1 = wx.Panel(self.notebook, -1)
+        self.page0 = wx.Panel(self.notebook, -1)
+
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, "Main motivation for renewable energy use")
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.sizer_7_staticbox = wx.StaticBox(self.page1, -1, "Solar thermal energy")
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.sizer_8_staticbox = wx.StaticBox(self.page2, -1, "Biomass")
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.sizer_10_staticbox = wx.StaticBox(self.page2, -1, "Availability of biomass from the processes")
+        self.sizer_10_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.sizer_11_staticbox = wx.StaticBox(self.page2, -1, "Availability of biomass from the region")
+        self.sizer_11_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.checkBox1 = wx.CheckBox(self.page0, -1, "Are you interested in the use of renewable energy?")
+        self.checkBox2 = wx.CheckBox(self.page0, -1, "Possibility of saving fuel cost")
+        self.checkBox3 = wx.CheckBox(self.page0, -1, "Contribution to a more ecologic supply")
+        self.checkBox4 = wx.CheckBox(self.page0, -1,
+                                     "Using solar energy helps for a better marketing of your products")
+
+        self.checkBox5 = wx.CheckBox(self.page0, -1, "Other")
+        self.tc1 = wx.TextCtrl(self.page0, -1,"Please explain here additional motives",
+                               style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE)
+        self.tc1.SetMinSize((650, 60))
+        self.tc1.SetMaxSize((650, 60))
+
+
+        # page 1
+        self.labelRoof = wx.StaticText(self.page1, -1, "Roof")
+        self.labelRoof.SetFont(wx.Font(10, wx.DEFAULT, wx.ITALIC, wx.BOLD, 0, ""))
+        self.labelGround = wx.StaticText(self.page1, -1, "Ground")
+        self.labelGround.SetFont(wx.Font(10, wx.DEFAULT, wx.ITALIC, wx.BOLD, 0, ""))
         
+        self.tc6_1 = wx.TextCtrl(self.page1,-1,'')
+        self.tc6_2 = wx.TextCtrl(self.page1,-1,'')
+        self.st6 = Label(self.page1,[self.tc6_1,self.tc6_2],_("Available area"),
+                         [_("Available area roof (m²)"),
+                          _("Available area ground (m²)")])
 
-        self.stInfo1 = wx.StaticText(id=-1,
-				     label=self.PList["0901"][1],
-				     name='stInfo1',
-				     parent=self,
-				     pos=wx.Point(16, 24),
-				     style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc7_1 = wx.TextCtrl(self.page1,-1,'')
+        self.tc7_2 = wx.TextCtrl(self.page1,-1,'')
+        self.st7 = Label(self.page1,[self.tc7_1,self.tc7_2],_("Inclination of the area"),
+				 [_("Positioning of the roof area (inclination in degrees)"),
+				 _("Positioning of the ground area (inclination in degrees)")])
+                                  
 
-        self.stInfo2 = wx.StaticText(id=-1,
-				     label=self.PList["X066"][1],
-				     name='stInfo2',
-				     parent=self,
-				     pos=wx.Point(16, 128),
-				     style=0)
-        self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc8_1 = wx.TextCtrl(self.page1,-1,'')
+        self.tc8_2 = wx.TextCtrl(self.page1,-1,'')
+        self.st8 = Label(self.page1,[self.tc8_1,self.tc8_2],_("Orientation of the area"),
+				 [_("positioning of the roof area (orientation to the south)"),
+                                  _("positioning of the ground area (orientation to the south)")])
 
-        self.stInfo3 = wx.StaticText(id=-1,
-				     label=self.PList["X067"][1],
-				     name='stInfo3',
-				     parent=self,
-				     pos=wx.Point(72, 152),
-				     style=0)
-        self.stInfo3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc9_1 = wx.TextCtrl(self.page1,-1,'')
+        self.tc9_2 = wx.TextCtrl(self.page1,-1,'')
+        self.st9 = Label(self.page1,[self.tc9_1,self.tc9_2],_("Shading problems?"),
+                         [_("Shading problems on roof?"),
+                         _("Shading problems on ground?")])
 
-        self.stInfo4 = wx.StaticText(id=-1,
-				     label=self.PList["X068"][1],
-				     name='stInfo4',
-				     parent=self,
-				     pos=wx.Point(192, 152),
-				     style=0)
-        self.stInfo4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc10_1 = wx.TextCtrl(self.page1,-1,'')
+        self.tc10_2 = wx.TextCtrl(self.page1,-1,'')
+        self.st10 = Label(self.page1,[self.tc10_1,self.tc10_2],_("Distance to process"),
+				  [_("Distance to the technical room or process roof (m)"),
+				  _("Distance to the technical room or process ground (m)")])
 
-        self.stInfo5 = wx.StaticText(id=-1,
-				     label=self.PList["X069"][1],
-				     name='stInfo5',
-				     parent=self,
-				     pos=wx.Point(360, 128),
-				     style=0)
-        self.stInfo5.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc11 = wx.TextCtrl(self.page1,-1,'')
+        self.st11 = Label(self.page1,self.tc11,_("Type of roof"), _("Type of roof"))
 
-        self.stInfo6 = wx.StaticText(id=-1,
-				     label=self.PList["X070"][1],
-				     name='stInfo6',
-				     parent=self,
-				     pos=wx.Point(360, 152),
-				     size=wx.Size(128, 26),
-				     style=0)
-        self.stInfo6.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc12 = wx.TextCtrl(self.page1,-1,'')
+        self.st12 = Label(self.page1,self.tc12,_("Static load capacity"),
+				  _("Static load capacity of the roof(s) (kg/mü)"))
 
-        self.stInfo7 = wx.StaticText(id=-1,
-				     label=self.PList["X071"][1],
-				     name='stInfo7',
-				     parent=self,
-				     pos=wx.Point(576, 152),
-				     size=wx.Size(128, 26),
-				     style=0)
-        self.stInfo7.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.Choice1 = wx.Choice(self.page1, -1, choices=["No", "Yes"])
+        self.st13 = Label(self.page1,self.Choice1,_("Scheme of building?"),
+                          _("Enclosing of drawing or scheme of building? (yes/no)"))
 
 
-        self.st1 = wx.StaticText(id=-1,
-				 label=self.PList["X072"][1],
-				 name='st1',
-				 parent=self,
-				 pos=wx.Point(24, 48),
-				 style=0)        
+        # page 2
 
-        self.checkBox1 = wx.CheckBox(id=-1,
-				     label='',
-				     name='checkBox1',
-				     parent=self,
-				     pos=wx.Point(24, 64),
-				     size=wx.Size(24, 16),
-				     style=0)
-        self.checkBox1.SetValue(False)
-        self.checkBox1.SetAutoLayout(True)
+        self.tc14 = wx.TextCtrl(self.page2,-1,'')
+        self.st14 = Label(self.page2,self.tc14,_("Type of biomass"),
+                          _("Type of biomass available from processes"))
+
+        self.tc15_1 = wx.TextCtrl(self.page2,-1,'')
+        self.tc15_2 = wx.TextCtrl(self.page2,-1,'')
+        self.st15 = Label(self.page2,[self.tc15_1,self.tc15_2],_("Period of year"),
+                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
+                           _("Start of period of year the biomass is available (dd/mm-dd/mm)")])
+
+        self.tc16 = wx.TextCtrl(self.page2,-1,'')
+        self.st16 = Label(self.page2,self.tc16,_("Duration of production"),
+                          _("Number of days biomass is produced (days)"))
+
+        self.tc17 = wx.TextCtrl(self.page2,-1,'')
+        self.st17 = Label(self.page2,self.tc17,_("Daily quantity"),
+                          _("Daily quantity of biomass (t/day)"))
+
+        self.tc18 = wx.TextCtrl(self.page2,-1,'')
+        self.st18 = Label(self.page2,self.tc18,_("Space availability"),
+                          _("Space availability to stock biomass (m3)"))
+
+        self.tc19 = wx.TextCtrl(self.page2,-1,'')
+        self.st19 = Label(self.page2,self.tc19,_("LCV biomass"),
+                          _("LCV biomass (kWh/kg)"))
+
+        self.tc20 = wx.TextCtrl(self.page2,-1,'')
+        self.st20 = Label(self.page2,self.tc20,_("Humidity"),
+                          _("Humidity (%)"))
+
+
+
+        self.tc21 = wx.TextCtrl(self.page2,-1,'')
+        self.st21 = Label(self.page2,self.tc21,_("Type of biomass"),
+                          _("Type of biomass available from the region"))
+
+        self.tc22 = wx.TextCtrl(self.page2,-1,'')
+        self.st22 = Label(self.page2,self.tc22,_("Unit price"),
+                          _("Unit price of biomass (¤/t)"))
+
+        self.tc23_1 = wx.TextCtrl(self.page2,-1,'')
+        self.tc23_2 = wx.TextCtrl(self.page2,-1,'')
+        self.st23 = Label(self.page2,[self.tc23_1,self.tc23_2],_("Period of availability"),
+                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
+                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
+
+        self.tc24 = wx.TextCtrl(self.page2,-1,'')
+        self.st24 = Label(self.page2,self.tc24,_("Duration of biomass prod."),
+                          _("Number of days the biomass is produced (days)"))
+
+        self.dummy1 = wx.StaticText(self.page1, -1, "")
+        self.dummy2 = wx.StaticText(self.page1, -1, "")
+        self.dummy3 = wx.StaticText(self.page1, -1, "")
+        self.dummy4 = wx.StaticText(self.page1, -1, "")
+
+    def __do_layout(self):
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_3 = wx.BoxSizer(wx.VERTICAL)
+        sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_8 = wx.StaticBoxSizer(self.sizer_8_staticbox, wx.VERTICAL)
+        sizer_9 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_11 = wx.StaticBoxSizer(self.sizer_11_staticbox, wx.VERTICAL)
+        grid_sizer_3 = wx.FlexGridSizer(4, 2, 2, 3)
+        sizer_13 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_10 = wx.StaticBoxSizer(self.sizer_10_staticbox, wx.VERTICAL)
+        grid_sizer_2 = wx.FlexGridSizer(7, 2, 2, 2)
+        sizer_12 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
+        grid_sizer_1 = wx.FlexGridSizer(8, 3, 2, 2)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
+        sizer_6 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_5.Add(self.checkBox1, 0, wx.ALL, 10)
+        sizer_5.Add(self.checkBox2, 0, wx.ALL, 10)
+        sizer_5.Add(self.checkBox3, 0, wx.ALL, 10)
+        sizer_5.Add(self.checkBox4, 0, wx.ALL, 10)
+        sizer_6.Add(self.checkBox5, 0, wx.ALL, 10)
+        #sizer_6.Add(self.tc1, 0, wx.ALL|wx.EXPAND, 4)
+        sizer_6.Add(self.tc1, 0, wx.ALL, 4)
+        sizer_5.Add(sizer_6, 1, wx.EXPAND, 0)
+        sizer_2.Add(sizer_5, 1, wx.ALL|wx.EXPAND, 2)
+        self.page0.SetSizer(sizer_2)
+        grid_sizer_1.Add(self.dummy1, 0, 0, 0)
+        grid_sizer_1.Add(self.labelRoof, 0, 0, 0)
+        grid_sizer_1.Add(self.labelGround, 0, 0, 0)
+
+        grid_sizer_1.Add(self.st6, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc6_1, 0, 0, 0)
+        grid_sizer_1.Add(self.tc6_2, 0, 0, 0)
+
+        grid_sizer_1.Add(self.st7, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc7_1, 0, 0, 0)
+        grid_sizer_1.Add(self.tc7_2, 0, 0, 0)
+
+        grid_sizer_1.Add(self.st8, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc8_1, 0, 0, 0)
+        grid_sizer_1.Add(self.tc8_2, 0, 0, 0)
         
-
-        self.st2 = wx.StaticText(id=-1,
-				 label=self.PList["X073"][1],
-				 name='st2',
-				 parent=self,
-				 pos=wx.Point(24, 80),
-				 style=0)
-
-        self.checkBox2 = wx.CheckBox(id=-1,
-				     label='',
-				     name='checkBox2',
-				     parent=self,
-				     pos=wx.Point(24, 96),
-				     size=wx.Size(24, 16),
-				     style=0)
-        self.checkBox2.SetValue(False)
-        self.checkBox2.SetAutoLayout(True)
+        grid_sizer_1.Add(self.st9, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc9_1, 0, 0, 0)
+        grid_sizer_1.Add(self.tc9_2, 0, 0, 0)
         
-
-        self.st3 = wx.StaticText(id=-1,
-				 label=self.PList["X074"][1],
-				 name='st3',
-				 parent=self,
-				 pos=wx.Point(290, 48),
-				 style=0)
-
-        self.checkBox3 = wx.CheckBox(id=-1,
-				     label='',
-				     name='checkBox3',
-				     parent=self,
-				     pos=wx.Point(290, 64),
-				     size=wx.Size(24, 16),
-				     style=0)
-        self.checkBox3.SetValue(False)
-        self.checkBox3.SetAutoLayout(True)
-
-
-        self.st4 = wx.StaticText(id=-1,
-				 label=self.PList["X075"][1],
-				 name='st4',
-				 parent=self,
-				 pos=wx.Point(290, 80),
-				 style=0)
-	
-        self.checkBox4 = wx.CheckBox(id=-1,
-				     label='',
-				     name='checkBox4',
-				     parent=self,
-				     pos=wx.Point(290, 96),
-				     size=wx.Size(24, 16),
-				     style=0)
-        self.checkBox4.SetValue(False)
-        self.checkBox4.SetAutoLayout(True)
-
+        grid_sizer_1.Add(self.st10, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc10_1, 0, 0, 0)
+        grid_sizer_1.Add(self.tc10_2, 0, 0, 0)
         
-        self.st5 = wx.StaticText(id=-1,
-				 label=self.PList["X076"][1],
-				 name='st5',
-				 parent=self,
-				 pos=wx.Point(608, 48),
-				 style=0)
-
-        self.tc1 = wx.TextCtrl(id=-1,
-			       name='tc1',
-			       parent=self,
-			       pos=wx.Point(608, 64),
-			       size=wx.Size(168, 48),
-			       style=wx.TE_MULTILINE,
-			       value='')
-
-
-        self.st6 = wx.StaticText(id=-1,
-				 label=self.PList["X077"][1] + " " + self.PList["X077"][2],
-				 name='st6',
-				 parent=self,
-				 pos=wx.Point(16, 168),
-				 style=0)
-
-        self.st7 = wx.StaticText(id=-1,
-				 label=self.PList["X078"][1] + " " + self.PList["X078"][2],
-				 name='st7',
-				 parent=self,
-				 pos=wx.Point(16, 208),
-				 style=0)
-
-        self.st8 = wx.StaticText(id=-1,
-				 label=self.PList["X079"][1] + " " + self.PList["X079"][2],
-				 name='st8',
-				 parent=self,
-				 pos=wx.Point(16, 248),
-				 style=0)
-
-        self.st9 = wx.StaticText(id=-1,
-				 label=self.PList["X080"][1] + " " + self.PList["X080"][2],
-				 name='st9',
-				 parent=self,
-				 pos=wx.Point(16, 288),
-				 style=0)
-
-        self.st10 = wx.StaticText(id=-1,
-				  label=self.PList["X081"][1] + " " + self.PList["X081"][2],
-				  name='st10',
-				  parent=self,
-				  pos=wx.Point(16, 328),
-				  style=0)
-
-        self.st11 = wx.StaticText(id=-1,
-				  label=self.PList["0914"][1] + " " + self.PList["0914"][2],
-				  name='st11',
-				  parent=self,
-				  pos=wx.Point(16, 368),
-				  style=0)
-
-        self.st12 = wx.StaticText(id=-1,
-				  label=self.PList["0915"][1] + " " + self.PList["0915"][2],
-				  name='st12',
-				  parent=self,
-				  pos=wx.Point(16, 408),
-				  style=0)
-
-
-        self.st13 = wx.StaticText(id=-1,
-				  label=self.PList["0916"][1] + " " + self.PList["0916"][2],
-				  name='st13',
-				  parent=self,
-				  pos=wx.Point(16, 456),
-				  style=0)
-
-        self.checkBox5 = wx.CheckBox(id=-1,
-				     label='',
-				     name='checkBox5',
-				     parent=self,
-				     pos=wx.Point(16, 472),
-				     size=wx.Size(16, 13),
-				     style=0)
-        self.checkBox5.SetValue(False)
-
+        grid_sizer_1.Add(self.st11, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc11, 0, 0, 0)
+        grid_sizer_1.Add(self.dummy2, 0, 0, 0)
         
-        self.st14 = wx.StaticText(id=-1,
-				  label=self.PList["0921"][1] + " " + self.PList["0921"][2],
-				  name='st14',
-				  parent=self,
-				  pos=wx.Point(360, 192),
-				  style=0)
-
-        self.st15 = wx.StaticText(id=-1,
-				  label=self.PList["X082"][1] + " " + self.PList["X082"][2],
-				  name='st15',
-				  parent=self,
-				  pos=wx.Point(360, 232),
-				  style=0)
-
-        self.st16 = wx.StaticText(id=-1,
-				  label=self.PList["0924"][1] + " " + self.PList["0924"][2],
-				  name='st16',
-				  parent=self,
-				  pos=wx.Point(360, 272),
-				  style=0)
-
-        self.st17 = wx.StaticText(id=-1,
-				  label=self.PList["0925"][1] + " " + self.PList["0925"][2],
-				  name='st17',
-				  parent=self,
-				  pos=wx.Point(360, 312),
-				  style=0)
-
-        self.st18 = wx.StaticText(id=-1,
-				  label=self.PList["0926"][1] + " " + self.PList["0926"][2],
-				  name='st18',
-				  parent=self,
-				  pos=wx.Point(360, 352),
-				  style=0)
-
-        self.st19 = wx.StaticText(id=-1,
-				  label=self.PList["0927"][1] + " " + self.PList["0927"][2],
-				  name='st19',
-				  parent=self,
-				  pos=wx.Point(360, 392),
-				  style=0)
-
-        self.st20 = wx.StaticText(id=-1,
-				  label=self.PList["0928"][1] + " " + self.PList["0928"][2],
-				  name='st20',
-				  parent=self,
-				  pos=wx.Point(360, 432),
-				  style=0)
-
-        self.st21 = wx.StaticText(id=-1,
-				  label=self.PList["0929"][1] + " " + self.PList["0929"][2],
-				  name='st21',
-				  parent=self,
-				  pos=wx.Point(576, 192),
-				  style=0)
-
-        self.st22 = wx.StaticText(id=-1,
-				  label=self.PList["0930"][1] + " " + self.PList["0930"][2],
-				  name='st22',
-				  parent=self,
-				  pos=wx.Point(576, 232),
-				  style=0)
+        grid_sizer_1.Add(self.st12, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_1.Add(self.tc12, 0, 0, 0)
+        grid_sizer_1.Add(self.dummy3, 0, 0, 0)
         
-        self.st23 = wx.StaticText(id=-1,
-				  label=self.PList["X083"][1] + " " + self.PList["X083"][2],
-				  name='st23',
-				  parent=self,
-				  pos=wx.Point(576, 272),
-				  style=0)
-
-        self.st24 = wx.StaticText(id=-1,
-				  label=self.PList["0933"][1] + " " + self.PList["0933"][2],
-				  name='st24',
-				  parent=self,
-				  pos=wx.Point(576, 312),
-				  style=0)
-
-
-        self.tc6_1 = wx.TextCtrl(id=-1,
-				 name='tc6_1',
-				 parent=self,
-				 pos=wx.Point(16, 184),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
-
-        self.tc6_2 = wx.TextCtrl(id=-1,
-				 name='tc6_2',
-				 parent=self,
-				 pos=wx.Point(152, 184),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
-
-        self.tc7_1 = wx.TextCtrl(id=-1,
-				 name='tc7_1',
-				 parent=self,
-				 pos=wx.Point(16, 224),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
+        grid_sizer_1.Add(self.st13, 0, 0, 0)
+        grid_sizer_1.Add(self.Choice1, 0, 0, 0)
+        grid_sizer_1.Add(self.dummy4, 0, 0, 0)
         
-        self.tc7_2 = wx.TextCtrl(id=-1,
-				 name='tc7_2',
-				 parent=self,
-				 pos=wx.Point(152, 224),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
+        sizer_7.Add(grid_sizer_1, 1, wx.ALL|wx.EXPAND, 20)
+        self.page1.SetSizer(sizer_7)
+        
+        grid_sizer_2.Add(self.st14, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc14, 0, 0, 0)
 
-        self.tc8_1 = wx.TextCtrl(id=-1,
-				 name='tc8_1',
-				 parent=self,
-				 pos=wx.Point(16, 264),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
+        grid_sizer_2.Add(self.st15, 0, wx.ALIGN_RIGHT, 0)
+        sizer_12.Add(self.tc15_1, 0, 0, 0)
+        sizer_12.Add(self.tc15_2, 0, wx.LEFT, 2)
+        grid_sizer_2.Add(sizer_12, 1, wx.EXPAND, 1)
 
-        self.tc8_2 = wx.TextCtrl(id=-1,
-				 name='tc8_2',
-				 parent=self,
-				 pos=wx.Point(152, 264),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
+        grid_sizer_2.Add(self.st16, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc16, 0, 0, 0)
+        
+        grid_sizer_2.Add(self.st17, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc17, 0, 0, 0)
+        
+        grid_sizer_2.Add(self.st18, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc18, 0, 0, 0)
+        
+        grid_sizer_2.Add(self.st19, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc19, 0, 0, 0)
+        
+        grid_sizer_2.Add(self.st20, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_2.Add(self.tc20, 0, 0, 0)
+        sizer_10.Add(grid_sizer_2, 1, wx.ALL|wx.EXPAND, 20)
+        sizer_9.Add(sizer_10, 1, wx.EXPAND, 0)
 
-        self.tc9_1 = wx.TextCtrl(id=-1,
-				 name='tc9_1',
-				 parent=self,
-				 pos=wx.Point(16, 304),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
-
-        self.tc9_2 = wx.TextCtrl(id=-1,
-				 name='tc9_2',
-				 parent=self,
-				 pos=wx.Point(152, 304),
-				 size=wx.Size(128, 21),
-				 style=0,
-				 value='')
-
-        self.tc10_1 = wx.TextCtrl(id=-1,
-				  name='tc10_1',
-				  parent=self,
-				  pos=wx.Point(16, 344),
-				  size=wx.Size(128, 21),
-				  style=0,
-				  value='')
-
-        self.tc10_2 = wx.TextCtrl(id=-1,
-				  name='tc10_2',
-				  parent=self,
-				  pos=wx.Point(152, 344),
-				  size=wx.Size(128, 21),
-				  style=0,
-				  value='')
-	
-        self.tc11 = wx.TextCtrl(id=-1,
-				name='tc11',
-				parent=self,
-				pos=wx.Point(16,384),
-				size=wx.Size(128, 21),
-				style=0,
-				value='')
-
-        self.tc12 = wx.TextCtrl(id=-1,
-				name='tc12',
-				parent=self,
-				pos=wx.Point(16, 424),
-				size=wx.Size(128, 21),
-				style=0,
-				value='')
+        grid_sizer_3.Add(self.st21, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_3.Add(self.tc21, 0, 0, 0)
+        
+        grid_sizer_3.Add(self.st22, 0, wx.ALIGN_RIGHT, 0)
+        grid_sizer_3.Add(self.tc22, 0, 0, 0)
+        
+        grid_sizer_3.Add(self.st23, 0, wx.ALIGN_RIGHT, 0)
+        sizer_13.Add(self.tc23_1, 0, 0, 0)
+        sizer_13.Add(self.tc23_2, 0, wx.LEFT, 2)
+        grid_sizer_3.Add(sizer_13, 1, wx.EXPAND, 0)
+        
+        grid_sizer_3.Add(self.st24, 0, 0, 0)
+        grid_sizer_3.Add(self.tc24, 0, 0, 0)
+        
+        sizer_11.Add(grid_sizer_3, 1, wx.ALL|wx.EXPAND, 20)
+        sizer_9.Add(sizer_11, 1, wx.EXPAND, 0)
+        sizer_8.Add(sizer_9, 1, wx.EXPAND, 0)
+        self.page2.SetSizer(sizer_8)
+        self.notebook.AddPage(self.page0, "Main motivation")
+        self.notebook.AddPage(self.page1, "Solar thermal energy")
+        self.notebook.AddPage(self.page2, "Biomass")
+        sizer_3.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizer_4.Add(self.buttonOK, 0, wx.ALL|wx.ALIGN_RIGHT, 2)
+        sizer_4.Add(self.buttonCancel, 0, wx.ALL|wx.ALIGN_RIGHT, 2)
+        sizer_3.Add(sizer_4, 0, wx.ALIGN_RIGHT, 0)
+        #self.panel_1.SetSizer(sizer_3)
+        #sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
+        #sizer_1.Add(self, 1, wx.EXPAND, 0)
+        #self.SetSizer(sizer_1)
+        self.SetSizer(sizer_3)
+        self.Layout()
 
 
-        self.tc14 = wx.TextCtrl(id=-1,
-				name='tc14',
-				
-				parent=self,
-				pos=wx.Point(360, 208),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc15_1 = wx.TextCtrl(id=-1,
-				  name='tc15_1',
-				  parent=self,
-				  pos=wx.Point(360, 248),
-				  size=wx.Size(72, 21),
-				  style=0,
-				  value='')
-
-        self.tc15_2 = wx.TextCtrl(id=-1,
-				  name='tc15_2',
-				  parent=self,
-				  pos=wx.Point(438, 248),
-				  size=wx.Size(72, 21),
-				  style=0,
-				  value='')
-
-
-        self.tc16 = wx.TextCtrl(id=-1,
-				name='tc16',
-				parent=self,
-				pos=wx.Point(360, 288),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc17 = wx.TextCtrl(id=-1,
-				name='tc17',
-				parent=self,
-				pos=wx.Point(360, 328),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc18 = wx.TextCtrl(id=-1,
-				name='tc18',
-				parent=self,
-				pos=wx.Point(360, 368),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc19 = wx.TextCtrl(id=-1,
-				name='tc19',
-				parent=self,
-				pos=wx.Point(360, 408),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc20 = wx.TextCtrl(id=-1,
-				name='tc20',
-				parent=self,
-				pos=wx.Point(360, 448),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc21 = wx.TextCtrl(id=-1,
-				name='tc21',
-				parent=self,
-				pos=wx.Point(576, 208),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc22 = wx.TextCtrl(id=-1,
-				name='tc22',
-				parent=self,
-				pos=wx.Point(576, 248),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
-
-
-        self.tc23_1 = wx.TextCtrl(id=-1,
-				  name='tc23_1',
-				  parent=self,
-				  pos=wx.Point(576, 288),
-				  size=wx.Size(72, 21),
-				  style=0,
-				  value='')
-
-        self.tc23_2 = wx.TextCtrl(id=-1,
-				  name='tc23_2',
-				  parent=self,
-				  pos=wx.Point(656, 288),
-				  size=wx.Size(72, 21),
-				  style=0,
-				  value='')
-
-
-        self.tc24 = wx.TextCtrl(id=-1,
-				name='tc24',
-				parent=self,
-				pos=wx.Point(576, 328),
-				size=wx.Size(150, 21),
-				style=0,
-				value='')
 
 
 #------------------------------------------------------------------------------
 #--- UI actions
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
 
-    def OnButtonStoreData(self, event):
-        
-        if Status.PId == 0:
-	    return
+    def OnButtonCancel(self, event):
+        event.Skip()
 
+    def OnButtonOK(self, event):
+        if Status.PId != 0:
+            tmp = {
+                "SurfAreaRoof":self.check(self.tc6_1.GetValue()),
+                "SurfAreaGround":self.check(self.tc6_2.GetValue()),
+                "InclinationRoof":self.check(self.tc7_1.GetValue()),
+                "InclinationGround":self.check(self.tc7_2.GetValue()),
+                "OrientationRoof":self.check(self.tc8_1.GetValue()),
+                "OrientationGround":self.check(self.tc8_2.GetValue()),
+                "ShadingRoof":self.check(self.tc9_1.GetValue()),
+                "ShadingGround":self.check(self.tc9_2.GetValue()),
+                "DistanceToRoof":self.check(self.tc10_1.GetValue()),
+                "DistanceToGround":self.check(self.tc10_2.GetValue()),
+                "RoofType":self.check(self.tc11.GetValue()),
+                "RoofStaticLoadCap":self.check(self.tc12.GetValue()),
+                "BiomassFromProc":self.check(self.tc14.GetValue()),
+                "PeriodBiomassProcStart":self.check(self.tc15_1.GetValue()),
+                "PeriodBiomassProcStop":self.check(self.tc15_2.GetValue()),
+                "NDaysBiomassProc":self.check(self.tc16.GetValue()),
+                "QBiomassProcDay":self.check(self.tc17.GetValue()),
+                "SpaceBiomassProc":self.check(self.tc18.GetValue()),
+                "LCVBiomassProc":self.check(self.tc19.GetValue()),
+                "HumidBiomassProc":self.check(self.tc20.GetValue()),
+                "BiomassFromRegion":self.check(self.tc21.GetValue()),
+                "PriceBiomassRegion":self.check(self.tc22.GetValue()),
+                "PeriodBiomassRegionStart":self.check(self.tc23_1.GetValue()),
+                "PeriodBiomassRegionStop":self.check(self.tc23_2.GetValue()),
+                "NDaysBiomassRegion":self.check(self.tc24.GetValue())
+                }
 
-	tmp = {
-	    "SurfAreaRoof":self.check(self.tc6_1.GetValue()), 
-	    "SurfAreaGround":self.check(self.tc6_2.GetValue()), 	
-	    "InclinationRoof":self.check(self.tc7_1.GetValue()), 
-	    "InclinationGround":self.check(self.tc7_2.GetValue()), 
-	    "OrientationRoof":self.check(self.tc8_1.GetValue()), 
-	    "OrientationGround":self.check(self.tc8_2.GetValue()), 
-	    "ShadingRoof":self.check(self.tc9_1.GetValue()), 
-	    "ShadingGround":self.check(self.tc9_2.GetValue()), 
-	    "DistanceToRoof":self.check(self.tc10_1.GetValue()), 
-	    "DistanceToGround":self.check(self.tc10_2.GetValue()), 
-	    "RoofType":self.check(self.tc11.GetValue()), 
-	    "RoofStaticLoadCap":self.check(self.tc12.GetValue()),	
-	    "BiomassFromProc":self.check(self.tc14.GetValue()), 
-	    "PeriodBiomassProcStart":self.check(self.tc15_1.GetValue()), 
-	    "PeriodBiomassProcStop":self.check(self.tc15_2.GetValue()), 
-	    "NDaysBiomassProc":self.check(self.tc16.GetValue()), 
-	    "QBiomassProcDay":self.check(self.tc17.GetValue()), 
-	    "SpaceBiomassProc":self.check(self.tc18.GetValue()), 
-	    "LCVBiomassProc":self.check(self.tc19.GetValue()), 
-	    "HumidBiomassProc":self.check(self.tc20.GetValue()), 	
-	    "BiomassFromRegion":self.check(self.tc21.GetValue()), 
-	    "PriceBiomassRegion":self.check(self.tc22.GetValue()), 
-	    "PeriodBiomassRegionStart":self.check(self.tc23_1.GetValue()), 
-	    "PeriodBiomassRegionStop":self.check(self.tc23_2.GetValue()), 
-	    "NDaysBiomassRegion":self.check(self.tc24.GetValue())
-	    }                
+            if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
+                # register does not exist, so store also id
+                tmp["Questionnaire_id"] = Status.PId
 
-	if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
-	    # register does not exist, so store also id
-	    tmp["Questionnaire_id"] = Status.PId
-           
-	    Status.DB.qrenewables.insert(tmp)
-	    Status.SQL.commit()
-       
-	else:
-	    # register does exist              
-	    q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
-	    q.update(tmp)
-	    Status.SQL.commit()
-                          
+                Status.DB.qrenewables.insert(tmp)
+                Status.SQL.commit()
+
+            else:
+                # register does exist
+                q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
+                q.update(tmp)
+                Status.SQL.commit()
+        event.Skip()
+
 
 #------------------------------------------------------------------------------
 #--- Public methods
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
 
 
     def clear(self):
@@ -599,31 +433,32 @@ class PanelQ7(wx.Panel):
         self.checkBox3.SetValue(False)
         self.checkBox4.SetValue(False)
         self.checkBox5.SetValue(False)
-        self.tc6_1.SetValue('')
-        self.tc6_2.SetValue('')
-        self.tc7_1.SetValue('')
-        self.tc7_2.SetValue('')
-        self.tc8_1.SetValue('')
-        self.tc8_2.SetValue('')
-        self.tc9_1.SetValue('')
-        self.tc9_2.SetValue('')
-        self.tc10_1.SetValue('')
-        self.tc10_2.SetValue('')
-        self.tc11.SetValue('')
-        self.tc12.SetValue('')
-        self.tc14.SetValue('')
-        self.tc15_1.SetValue('')
-        self.tc15_2.SetValue('')
-        self.tc16.SetValue('')
-        self.tc17.SetValue('')
-        self.tc18.SetValue('')
-        self.tc19.SetValue('')
-        self.tc20.SetValue('')
-        self.tc21.SetValue('')
-        self.tc22.SetValue('')
-        self.tc23_1.SetValue('')
-        self.tc23_2.SetValue('')
-        self.tc24.SetValue('')
+        self.Choice1.GetCurrentSelection()
+        self.tc6_1.Clear()
+        self.tc6_2.Clear()
+        self.tc7_1.Clear()
+        self.tc7_2.Clear()
+        self.tc8_1.Clear()
+        self.tc8_2.Clear()
+        self.tc9_1.Clear()
+        self.tc9_2.Clear()
+        self.tc10_1.Clear()
+        self.tc10_2.Clear()
+        self.tc11.Clear()
+        self.tc12.Clear()
+        self.tc14.Clear()
+        self.tc15_1.Clear()
+        self.tc15_2.Clear()
+        self.tc16.Clear()
+        self.tc17.Clear()
+        self.tc18.Clear()
+        self.tc19.Clear()
+        self.tc20.Clear()
+        self.tc21.Clear()
+        self.tc22.Clear()
+        self.tc23_1.Clear()
+        self.tc23_2.Clear()
+        self.tc24.Clear()
 
 
 
@@ -642,7 +477,7 @@ class PanelQ7(wx.Panel):
 		self.checkBox5.SetValue(False)
 	    else:
 		self.checkBox5.SetValue(bool(p.EnclBuildGroundSketch))
-                
+
 	    self.tc6_1.SetValue(str(p.SurfAreaRoof))
 	    self.tc6_2.SetValue(str(p.SurfAreaGround))
 	    self.tc7_1.SetValue(str(p.InclinationRoof))
@@ -654,7 +489,7 @@ class PanelQ7(wx.Panel):
 	    self.tc10_1.SetValue(str(p.DistanceToRoof))
 	    self.tc10_2.SetValue(str(p.DistanceToGround))
 	    self.tc11.SetValue(str(p.RoofType))
-	    self.tc12.SetValue(str(p.RoofStaticLoadCap))                
+	    self.tc12.SetValue(str(p.RoofStaticLoadCap))
 	    self.tc14.SetValue(str(p.BiomassFromProc))
 	    self.tc15_1.SetValue(str(p.PeriodBiomassProcStart))
 	    self.tc15_2.SetValue(str(p.PeriodBiomassProcStop))
@@ -667,6 +502,6 @@ class PanelQ7(wx.Panel):
 	    self.tc22.SetValue(str(p.PriceBiomassRegion))
 	    self.tc23_1.SetValue(str(p.PeriodBiomassRegionStart))
 	    self.tc23_2.SetValue(str(p.PeriodBiomassRegionStop))
-	    self.tc24.SetValue(str(p.NDaysBiomassRegion))                
+	    self.tc24.SetValue(str(p.NDaysBiomassRegion))
 
 

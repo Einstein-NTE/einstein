@@ -109,6 +109,7 @@ class PanelQ4(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ4', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580))
+        self.Hide()
 
         # fillers for the gridsizer
         self.dummy1 = wx.StaticText(self,-1,'')

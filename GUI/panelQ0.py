@@ -55,6 +55,7 @@ class PanelQ0(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ0', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+        self.Hide()
 
         self.stInfo1 = wx.StaticText(id=-1,
 				     label='Project list',

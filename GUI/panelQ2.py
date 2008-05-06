@@ -57,6 +57,7 @@ class PanelQ2(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
                              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+        self.Hide()
         
         self.notebook = wx.Notebook(self, -1, style=0)
 

@@ -12,17 +12,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.03
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger 02/05/2008
 #                           Tom Sobota      05/05/2008
-#                           Hans Schweiger
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
 #       05/05/2008      Changed display logic
-#                   HS  Adapted event handlers
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -120,6 +118,7 @@ class PanelQ8(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ8', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.Hide()
 
         self.sizer_4_staticbox = wx.StaticBox(self, -1, _("Building list"))
         self.sizer_4_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
@@ -294,6 +293,19 @@ class PanelQ8(wx.Panel):
         #event.Skip()
 
     def OnButtonOK(self, event):
+        event.Skip()
+
+    def OnButtonCancel(self, event):
+        self.clear()
+        event.Skip()
+
+    def OnButtonDeleteBuilding(self, event):
+        Status.prj.deleteBuilding(self.buildingID)
+        self.clear()
+        self.fillPage()
+        event.Skip()
+
+    def OnButtonAddBuilding(self, event):
         if Status.PId <> 0:
 
             buildingName = self.check(self.tc1.GetValue())
@@ -357,21 +369,6 @@ class PanelQ8(wx.Panel):
 
             else:
                 self.showError("BuildingName have to be an uniqe value!")
-        event.Skip()
-
-    def OnButtonCancel(self, event):
-        self.clear()
-        event.Skip()
-
-    def OnButtonDeleteBuilding(self, event):
-        Status.prj.deleteBuilding(self.buildingID)
-        self.clear()
-        self.fillPage()
-        event.Skip()
-
-    def OnButtonAddBuilding(self, event):
-        self.clear()
-        event.Skip()
 
 
 #------------------------------------------------------------------------------
