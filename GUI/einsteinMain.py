@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.85
+#   Version No.: 0.86
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -43,6 +43,7 @@
 #                       Tom Sobota                          29/04/2008
 #                       Tom Sobota                          01/05/2008
 #                       Hans Schweiger                      05/05/2008
+#                       Hans Schweiger                      07/05/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -98,7 +99,7 @@
 #                       Report pages are simplified to 1
 #                       panel for report generation built
 #       05/05/2008  Call to fillchoiceOfEquipment in PanelQ5 eliminated
-#
+#       07/05/2008  Just change in nomenclature tree items qEA,qEM,qEH
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -702,53 +703,53 @@ class EinsteinFrame(wx.Frame):
             #self.hidePages()
             #self.pageStatistics.Show()
             pass
-        #qStatisticYPage1 'Primary energy - Yearly'
+        #qEA1 'Primary energy - Yearly'
         elif select == PList["X137"][1]:
             self.hidePages()
             self.panelEA1 = PanelEA1(parent=self.leftpanel2)
             self.panelEA1.display()
 
-        #qStatisticYPage2 'Final energy by fuels - Yearly'
+        #qEA2 'Final energy by fuels - Yearly'
         elif select == PList["X138"][1]:
             self.hidePages()
             self.panelEA2 = PanelEA2(parent=self.leftpanel2)
             self.panelEA2.display()
-        #qStatisticYPage3 'Final energy by equipment - Yearly'
+        #qEA3 'Final energy by equipment - Yearly'
         elif select == PList["X139"][1]:
             self.hidePages()
             self.panelEA3 = PanelEA3(parent=self.leftpanel2)
             self.panelEA3.display()
-        #qStatisticYPage4 'Process heat - Yearly'
+        #qEA4 'Process heat - Yearly'
         elif select == PList["X140"][1]:
             self.hidePages()
             self.panelEA4 = PanelEA4(parent=self.leftpanel2)
             self.panelEA4.display()
-        #qStatisticYPage5 'Energy intensity - Yearly'
+        #qEA5 'Energy intensity - Yearly'
         elif select == PList["X141"][1]:
             self.hidePages()
             self.panelEA5 = PanelEA5(parent=self.leftpanel2)
             self.panelEA5.display()
-        #qStatisticYPage6 'Production of CO2 - Yearly'
+        #qEA6 'Production of CO2 - Yearly'
         elif select == PList["X142"][1]:
             self.hidePages()
             self.panelEA6 = PanelEA6(parent=self.leftpanel2)
             self.panelEA6.display()
-        #qStatisticMPage1 'Energy performance - Monthly'
+        #qEM1 'Energy performance - Monthly'
         elif select == 'Monthly demand':
             self.hidePages()
             self.panelEM1 = PanelEM1(parent=self.leftpanel2)
             self.panelEM1.display()
-        #qStatisticMPage2 'Heat supply - Monthly'
+        #qEM2 'Heat supply - Monthly'
         elif select == 'Monthly supply':
             self.hidePages()
             self.panelEM2 = PanelEM2(parent=self.leftpanel2)
             self.panelEM2.display()
-        #qStatisticHPage1 'Energy performance - Hourly'
+        #qEH1 'Energy performance - Hourly'
         elif select == 'Hourly demand':
             self.hidePages()
             #self.panelEH1 = PanelEH1(parent=self.leftpanel2)
             #self.panelEH1.Show()
-        #qStatisticHPage2 'Heat supply - Hourly'
+        #qEH2 'Heat supply - Hourly'
         elif select == 'Hourly supply':
             self.hidePages()
             #self.panelEH2 = PanelEH2(parent=self.leftpanel2)
@@ -1114,22 +1115,22 @@ class EinsteinFrame(wx.Frame):
         # statistics subtree
         #
         self.qStatistics = self.tree.AppendItem (self.qRoot, PList["X136"][1])
-        self.qStatisticsAnnual = self.tree.AppendItem (self.qStatistics, 'Annual data')
-        self.qStatisticsMonthly = self.tree.AppendItem (self.qStatistics, 'Monthly data')
-        self.qStatisticsHourly = self.tree.AppendItem (self.qStatistics, 'Hourly performance\ndata')
+        self.qEA = self.tree.AppendItem (self.qStatistics, 'Annual data')
+        self.qEM = self.tree.AppendItem (self.qStatistics, 'Monthly data')
+        self.qEH = self.tree.AppendItem (self.qStatistics, 'Hourly performance\ndata')
         # annual statistics subtree
-        self.qStatisticYPage1 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X137"][1])
-        self.qStatisticYPage2 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X138"][1])
-        self.qStatisticYPage3 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X139"][1])
-        self.qStatisticYPage4 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X140"][1])
-        self.qStatisticYPage5 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X141"][1])
-        self.qStatisticYPage6 = self.tree.AppendItem (self.qStatisticsAnnual, PList["X142"][1])
+        self.qEA1 = self.tree.AppendItem (self.qEA, PList["X137"][1])
+        self.qEA2 = self.tree.AppendItem (self.qEA, PList["X138"][1])
+        self.qEA3 = self.tree.AppendItem (self.qEA, PList["X139"][1])
+        self.qEA4 = self.tree.AppendItem (self.qEA, PList["X140"][1])
+        self.qEA5 = self.tree.AppendItem (self.qEA, PList["X141"][1])
+        self.qEA6 = self.tree.AppendItem (self.qEA, PList["X142"][1])
         # monthly statistics subtree
-        self.qStatisticMPage1 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly demand')
-        self.qStatisticMPage2 = self.tree.AppendItem (self.qStatisticsMonthly, 'Monthly supply')
+        self.qEM1 = self.tree.AppendItem (self.qEM, 'Monthly demand')
+        self.qEM2 = self.tree.AppendItem (self.qEM, 'Monthly supply')
         # hourly statistics subtree
-        self.qStatisticHPage1 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly demand')
-        self.qStatisticHPage2 = self.tree.AppendItem (self.qStatisticsHourly, 'Hourly supply')
+        self.qEH1 = self.tree.AppendItem (self.qEH, 'Hourly demand')
+        self.qEH2 = self.tree.AppendItem (self.qEH, 'Hourly supply')
 
         
         self.qBenchmarkCheck = self.tree.AppendItem (self.qRoot, PList["X143"][1])
