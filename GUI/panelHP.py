@@ -68,14 +68,11 @@
 
 import wx
 import wx.grid
-#from einstein.modules.heatPump.moduleHP import *
 from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
-from einstein.GUI.panelQ4 import PanelQ4
 from einstein.GUI.dialogOK import *
 
 from einstein.modules.interfaces import *
-from einstein.modules.modules import *
 from einstein.modules.constants import *
 from numpy import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
@@ -148,21 +145,12 @@ class PanelHP(wx.Panel):
 
     def __init__(self, parent, main, id, pos, size, style, name, sql, db):
 
-        print "PanelHP (__init__)"
         self.prnt = parent
-        self.main = main
-        
-        self.sql = sql
-        self.db = db
-
-#        self.info = Interfaces.GData["HP Info"]
-#        self.config = Interfaces.GData["HP Config"]
-        
+        self.main = main       
         self._init_ctrls(parent)
 
 	self.keys = ['HP Table']
         self.mod = Status.mod.moduleHP
-#        print "PanelHP (__init__): mod created",self.mod
 
 #   graphic: Cumulative heat demand by hours
         labels_column = 0
@@ -231,7 +219,6 @@ class PanelHP(wx.Panel):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHP, name='PanelHP', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
-#        self.SetClientSize(wx.Size(792, 618))
 
 #------------------------------------------------------------------------------		
 #       Displays of status
@@ -590,14 +577,10 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #       edits the selected equipment
 #------------------------------------------------------------------------------		
-        print "Grid - left button Dclick: here I should call the Q4H"
         rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
         EqId = self.mod.getEqId(rowNo)
-        print "now editing equipment in row %s with id = "%rowNo,EqId
-#        self.Hide()
 	dialog = ManualAddDialog(self, EqId)
 
-#Tom: here should be a link between the outcome of the dialog and what continues
         if (dialog.ShowModal() ==wx.ID_OK):
             print "PanelHP (OnGridLeftDclick) - OK"
 #            ret = self.mod.calculateCascade()

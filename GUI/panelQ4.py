@@ -12,13 +12,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.06
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger  13/04/2008
 #                           Stoyan Danov    25/04/2008
 #                           Hans Schweiger  25/04/2008
 #                           Tom Sobota      04/05/2008
 #                           Hans Schweiger  05/05/2008
+#                           Hans Schweiger  06/05/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -26,6 +27,7 @@
 #                   HS  Alternative proposal no. introduced ...
 #       04/05/2008      Changed display logic
 #       05/05/2008  HS  Event handlers changed.
+#       06/05/2008  HS  Security feature for non-defined fuel-id's
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -91,8 +93,11 @@ class PanelQ4(wx.Panel):
 
         print 'panelQ4 (__init__): eqId =', eqId, 'Status.PId =', Status.PId, 'Status.ANo =', Status.ANo
         if eqId is not None:
+            print "panelQ4: equipe is not None"
             equipe = Status.DB.qgenerationhc.QGenerationHC_ID[eqId][0]
+            print "panelQ4: displaying equipe"
             self.display(equipe)
+            print "panelQ4: has displayed equipe"
 
         try:
             for key in prefill:
@@ -285,32 +290,6 @@ class PanelQ4(wx.Panel):
         self.display(equipe)
         event.Skip()
 
-#HS2004-04-13 function display added
-
-    def display(self,q):
-        self.tc1.SetValue(str(q.Equipment))
-        self.tc2.SetValue(str(q.Manufact))
-        self.tc3.SetValue(str(q.YearManufact))
-        self.tc4.SetValue(str(q.Model))
-        self.tc5.SetValue(str(q.EquipType))
-        self.tc6.SetValue(str(q.NumEquipUnits))
-        self.tc9.SetValue(str(q.HCGPnom))
-        self.tc10.SetValue(str(q.FuelConsum))
-        self.tc11.SetValue(str(q.UnitsFuelConsum))
-        self.tc12.SetValue(str(q.ElectriConsum))
-        self.tc13.SetValue(str(q.HCGTEfficiency))
-        self.tc14.SetValue(str(q.HCGEEfficiency))
-        self.tc15.SetValue(str(q.ElectriProduction))
-        self.tc16.SetValue(str(q.TExhaustGas))
-        self.tc17.SetValue(str(q.PartLoad))
-        self.tc18.SetValue(str(q.HPerDayEq))
-        self.tc19.SetValue(str(q.NDaysEq))
-        self.tc20.SetValue(str(q.PipeDuctEquip))
-        self.tc8.SetValue(str(q.CoolTowerType))
-        if q.DBFuel_id <> None:
-            self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(\
-		    str(Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id][0].FuelName)))
-
     def OnButtonDeleteEquipment(self, event):
         Status.prj.deleteEquipment(self.equipeID)
         self.clear()
@@ -326,6 +305,7 @@ class PanelQ4(wx.Panel):
 
     def OnButtonCancel(self, event):
         self.clear()
+        event.Skip()
 
     def OnButtonOK(self, event):
         if Status.PId <> 0:
@@ -336,10 +316,10 @@ class PanelQ4(wx.Panel):
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
 		    Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
 
-                if len(Status.DB.dbfuel.FuelName[\
-		    str(self.choiceOfDBFuel.GetStringSelection())])>0:
-                    dbfid = Status.DB.dbfuel.FuelName[\
-                        str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID
+                fuelName = str(self.choiceOfDBFuel.GetStringSelection())
+                fuels = Status.DB.dbfuel.FuelName[fuelName]
+                if len(fuels)>0:
+                    dbfid = fuels[0].DBFuel_ID
                 else:
                     dbfid = None
 
@@ -380,10 +360,10 @@ class PanelQ4(wx.Panel):
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
 		    Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
 
-                if len(Status.DB.dbfuel.FuelName[\
-		    str(self.choiceOfDBFuel.GetStringSelection())])>0:
-                    dbfid = Status.DB.dbfuel.FuelName[\
-                        str(self.choiceOfDBFuel.GetStringSelection())][0].DBFuel_ID
+                fuelName = str(self.choiceOfDBFuel.GetStringSelection())
+                fuels = Status.DB.dbfuel.FuelName[fuelName]
+                if len(fuels)>0:
+                    dbfid = fuels[0].DBFuel_ID
                 else:
                     dbfid = None
 
@@ -423,6 +403,7 @@ class PanelQ4(wx.Panel):
             print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
             self.parent.equipeType = self.check(self.tc5.GetValue())
 
+            event.Skip()
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -451,8 +432,10 @@ class PanelQ4(wx.Panel):
         self.tc20.SetValue(str(q.PipeDuctEquip))
         self.tc8.SetValue(str(q.CoolTowerType))
         if q.DBFuel_id <> None:
-            self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(\
-		    str(Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id][0].FuelName)))
+            fuels = Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id]
+            if len(fuels)>0:
+                self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(fuels[0].FuelName))
+        self.Show()
 
     def clear(self):
         self.tc1.SetValue('')

@@ -20,11 +20,14 @@
 #   Last revised by:    Stoyan Danov    29/04/2008
 #                       Stoyan Danov    30/04/2008
 #                       Stoyan Danov    05/05/2008
+#                       Hans Schweiger  06/05/2008
 #
 #       Changes to previous version:
 #   29/04/2008 SD: added: cascadeMoveUp, cascadeMoveDown, cascadeMoveToTop, ...
 #   30/04/2008 SD: reference to cgenerationhc commented -> line 60
 #   05/05/2008 SD: move query PId,ANo from __init__ to initPanel
+#   06/05/2008 HS: self.NEquipe substituted by Status.int.NEquipe
+#                   the latter one is updated in the moves, adds, etc.
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -66,7 +69,7 @@ class ModuleHC(object):
         self.sql = Status.SQL
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
         self.NEquipe = len(self.equipments)
 
         Status.int.getEquipmentCascade()
@@ -111,6 +114,10 @@ class ModuleHC(object):
 #        moves equipment up in the cascade sequence
 #------------------------------------------------------------------------------
 
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
+
         idx = 0
         for i in range(self.NEquipe):
             if self.equipments[i]['CascadeIndex'] == actualCascadeIndex:
@@ -145,6 +152,10 @@ class ModuleHC(object):
 #------------------------------------------------------------------------------
 #        moves equipment down in the cascade sequence
 #------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
 
         idx = 0
         for i in range(self.NEquipe):
@@ -189,7 +200,7 @@ class ModuleHC(object):
 #   moves equipment to bottom in cascade sequence
 #------------------------------------------------------------------------------
 
-        for i in range(actualCascadeIndex,self.NEquipe):
+        for i in range(actualCascadeIndex,Status.int.NEquipe):
             newIndex = self.cascadeMoveDown(i)
 
         return newIndex
@@ -200,7 +211,7 @@ class ModuleHC(object):
 #   moves equipment to a userdefined finalIndex position in cascade sequence
 #------------------------------------------------------------------------------
 
-        if (finalIndex > actualIndex and finalIndex <= self.NEquipe):
+        if (finalIndex > actualIndex and finalIndex <= Status.int.NEquipe):
             for i in range (actualIndex,finalIndex):
                 newIndex = self.cascadeMoveDown(i)
 

@@ -50,8 +50,8 @@ INTERACTIONLEVELS = ['interactive','semi-automatic','automatic']
 
 EQUIPETYPESDICT = [{"Type":"compression heat pump", "Class":"HP",   "SubClass":"compression"},
                    {"Type":"thermal heat pump",  "Class":"HP",   "SubClass":"thermal"},
-                   {"Type":"steam boiler",          "Class":"BB",   "SubClass":"steam"},
-                   {"Type":"condensing boiler",     "Class":"BB",   "SubClass":"condensing"}]
+                   {"Type":"steam boiler",          "Class":"BB",   "SubClass":"steam boiler"},
+                   {"Type":"condensing boiler",     "Class":"BB",   "SubClass":"condensing boiler"}]
 
 EQUIPETYPES = ["compression heat pump",
               "thermal heat pump"
@@ -59,6 +59,9 @@ EQUIPETYPES = ["compression heat pump",
               "condensing boiler"]
 
 EQUIPECLASSES = ["HP","BB"]
+
+BBTYPES = ["condensing",
+           "steam"]
 
 HPTYPES = ["compression",
            "thermal"]
