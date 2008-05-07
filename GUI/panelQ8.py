@@ -32,74 +32,13 @@
 #
 #==============================================================================
 import wx
-from wx.lib.stattext import *
 import pSQL
 from status import Status
+from displayClasses import *
 
 # constants
 LABELWIDTH=200
 TEXTENTRYWIDTH=160
-
-
-class Label2(wx.lib.stattext.GenStaticText):
-    # same as Label but there are two or more associated text controls
-    # to the label
-    w0 = None
-    w1 = None
-    def __init__(self,parent,txtlist,text,tiplist,width0=None,width1=None):
-        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
-                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-        print repr(text)
-        self.SetLabel(text)
-        h = self.GetMinHeight()
-        if width0 is None:
-            if Label.w0 is not None:
-                self.SetMinSize((Label.w0, h))
-        else:
-            Label.w0 = width0
-            self.SetMinSize((Label.w0, h))
-        if width1 is None:
-            if Label.w1 is not None:
-                for tc  in txtlist:
-                    tc.SetMinSize((Label.w1, h))
-        else:
-            Label.w1 = width1
-            for tc  in txtlist:
-                tc.SetMinSize((width1, h))
-
-        self.SetToolTipString(text)
-        for i in range(len(txtlist)):
-            txtlist[i].SetToolTipString(tiplist[i])
-
-class Label(wx.lib.stattext.GenStaticText):
-    # auxiliary class for labels (static text)
-    # will show a short descriptive string and
-    # generate a longer tooltip.
-    # the tooltip is also associated to the text control
-    #
-    w0 = None
-    w1 = None
-    def __init__(self,parent,txtctrl,text,tip,width0=None,width1=None):
-        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
-                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-        self.SetLabel(text)
-        h = self.GetMinHeight()
-        if width0 is None:
-            if Label.w0 is not None:
-                self.SetMinSize((Label.w0, h))
-        else:
-            Label.w0 = width0
-            self.SetMinSize((Label.w0, h))
-        if width1 is None:
-            if Label.w1 is not None:
-                txtctrl.SetMinSize((Label.w1, h))
-        else:
-            txtctrl.SetMinSize((width1, h))
-            Label.w1 = width1
-
-        self.SetToolTipString(tip)
-        self.SetHelpText(u'esto es un help')
-        txtctrl.SetToolTipString(tip)
 
 
 class PanelQ8(wx.Panel):
@@ -176,22 +115,23 @@ class PanelQ8(wx.Panel):
 
         self.tc12_1 = wx.TextCtrl(self,-1,'')
         self.tc12_2 = wx.TextCtrl(self,-1,'')
-        self.st12 = Label2(self, [self.tc12_1,self.tc12_2], _("Holidays period"),
+        self.st12 = Label(self, [self.tc12_1,self.tc12_2], _("Holidays period"),
                            [_("Holidays period (from)"),_("Holidays period (to)")])
 
         self.tc13_1 = wx.TextCtrl(self,-1,'')
         self.tc13_2 = wx.TextCtrl(self,-1,'')
-        self.st13 = Label2(self,[self.tc13_1,self.tc13_2],_("Heating period"),
+        self.st13 = Label(self,[self.tc13_1,self.tc13_2],_("Heating period"),
                           [_("Heating period (from)"), _("Heating period (to)")])
 
         self.tc14_1 = wx.TextCtrl(self,-1,'')
         self.tc14_2 = wx.TextCtrl(self,-1,'')
-        self.st14 = Label2(self,[self.tc14_1,self.tc14_2],_("Air cond. period"),
+        self.st14 = Label(self,[self.tc14_1,self.tc14_2],_("Air cond. period"),
                           [_("Air conditioning period (from)"), _("Air conditioning period (to)")])
 
 
         self.buttonOK = wx.Button(self,wx.ID_OK, label=_("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        self.buttonOK.SetDefault()
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label=_("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)

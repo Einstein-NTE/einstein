@@ -12,14 +12,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.08
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger  13/04/2008
 #                           Stoyan Danov    25/04/2008
 #                           Hans Schweiger  25/04/2008
 #                           Tom Sobota      04/05/2008
 #                           Hans Schweiger  05/05/2008
-#                           Hans Schweiger  06/05/2008
+#                           Tom Sobota      07/05/2008
+#                           Hans Schweiger  07/05/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -27,7 +28,8 @@
 #                   HS  Alternative proposal no. introduced ...
 #       04/05/2008      Changed display logic
 #       05/05/2008  HS  Event handlers changed.
-#       06/05/2008  HS  Security feature for non-defined fuel-id's
+#       07/05/2008  HS  Some security features added (Nones, ...)
+#                       Function "display" was duplicated. one deleted
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -39,45 +41,13 @@
 #
 #==============================================================================
 import wx
-from wx.lib.stattext import *
-import pSQL
-import HelperClass
 from status import Status
+from displayClasses import *
+from GUITools import *  #HS2008-05-07 added
 
 # constants
 LABELWIDTH=150
 TEXTENTRYWIDTH=160
-
-
-class Label(wx.lib.stattext.GenStaticText):
-    # auxiliary class for labels (static text)
-    # will show a short descriptive string and
-    # generate a longer tooltip.
-    # the tooltip is also associated to the text control
-    #
-    w0 = None
-    w1 = None
-    def __init__(self,parent,txtctrl,text,tip,width0=None,width1=None):
-        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
-                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-        self.SetLabel(text)
-        h = self.GetMinHeight()
-        if width0 is None:
-            if Label.w0 is not None:
-                self.SetMinSize((Label.w0, h))
-        else:
-            Label.w0 = width0
-            self.SetMinSize((Label.w0, h))
-        if width1 is None:
-            if Label.w1 is not None:
-                txtctrl.SetMinSize((Label.w1, h))
-        else:
-            txtctrl.SetMinSize((width1, h))
-            Label.w1 = width1
-
-        self.SetToolTipString(tip)
-        self.SetHelpText(u'esto es un help')
-        txtctrl.SetToolTipString(tip)
 
 
 class PanelQ4(wx.Panel):
@@ -85,19 +55,14 @@ class PanelQ4(wx.Panel):
         print "PanelQ4 (__init__)"
 	self.parent = parent
 	self.main = main
-        paramlist = HelperClass.ParameterDataHelper()
-        self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
         self.equipeID = eqId
 
         print 'panelQ4 (__init__): eqId =', eqId, 'Status.PId =', Status.PId, 'Status.ANo =', Status.ANo
         if eqId is not None:
-            print "panelQ4: equipe is not None"
             equipe = Status.DB.qgenerationhc.QGenerationHC_ID[eqId][0]
-            print "panelQ4: displaying equipe"
             self.display(equipe)
-            print "panelQ4: has displayed equipe"
 
         try:
             for key in prefill:
@@ -201,14 +166,16 @@ class PanelQ4(wx.Panel):
         self.Bind(wx.EVT_BUTTON,self.OnButtonAddEquipment, self.buttonAddEquipment)
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label='Cancel')
-        self.buttonCancel.SetMinSize((125, 32))
-        self.buttonCancel.SetMaxSize((125, 32))
+        #self.buttonCancel.SetMinSize((125, 32))
+        #self.buttonCancel.SetMaxSize((125, 32))
         self.Bind(wx.EVT_BUTTON,self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK, label='OK')
-        self.buttonOK.SetMinSize((125, 32))
-        self.buttonOK.SetMaxSize((125, 32))
+        #self.buttonOK.SetMinSize((125, 32))
+        #self.buttonOK.SetMaxSize((125, 32))
         self.Bind(wx.EVT_BUTTON,self.OnButtonOK, self.buttonOK)
+        self.buttonOK.SetDefault()
+
 
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -305,17 +272,17 @@ class PanelQ4(wx.Panel):
 
     def OnButtonCancel(self, event):
         self.clear()
-        event.Skip()
 
     def OnButtonOK(self, event):
         if Status.PId <> 0:
 #..............................................................................
 # 1. equipment with this name not yet existing
 
-            if self.check(self.tc1.GetValue()) <> 'NULL' and \
+            if check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
 		    Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
 
+#HS2008-05-07: block changed for adding security
                 fuelName = str(self.choiceOfDBFuel.GetStringSelection())
                 fuels = Status.DB.dbfuel.FuelName[fuelName]
                 if len(fuels)>0:
@@ -326,27 +293,26 @@ class PanelQ4(wx.Panel):
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
-                    "Equipment":self.check(self.tc1.GetValue()),
-                    "Manufact":self.check(self.tc2.GetValue()),
-                    "YearManufact":self.check(self.tc3.GetValue()),
-                    "Model":self.check(self.tc4.GetValue()),
-                    "EquipType":self.check(self.tc5.GetValue()),
-                    "NumEquipUnits":self.check(self.tc6.GetValue()),
+                    "Equipment":check(self.tc1.GetValue()),
+                    "Manufact":check(self.tc2.GetValue()),
+                    "YearManufact":check(self.tc3.GetValue()),
+                    "Model":check(self.tc4.GetValue()),
+                    "EquipType":check(self.tc5.GetValue()),
+                    "NumEquipUnits":check(self.tc6.GetValue()),
                     "DBFuel_id":dbfid,
-                    "HCGPnom":self.check(self.tc9.GetValue()),
-                    "FuelConsum":self.check(self.tc10.GetValue()),
-                    "UnitsFuelConsum":self.check(self.tc11.GetValue()),
-                    "ElectriConsum":self.check(self.tc12.GetValue()),
-                    "HCGTEfficiency":self.check(self.tc13.GetValue()),
-                    "HCGEEfficiency":self.check(self.tc14.GetValue()),
-                    "ElectriProduction":self.check(self.tc15.GetValue()),
-                    "TExhaustGas":self.check(self.tc16.GetValue()),
-                    "PartLoad":self.check(self.tc17.GetValue()),
-                    "HPerDayEq":self.check(self.tc18.GetValue()),
-                    "NDaysEq":self.check(self.tc19.GetValue()),
-                    "PipeDuctEquip":self.check(self.tc20.GetValue()),
-                    "CoolTowerType":self.check(self.tc8.GetValue())
-#                    "IsAlternative":0
+                    "HCGPnom":check(self.tc9.GetValue()),
+                    "FuelConsum":check(self.tc10.GetValue()),
+                    "UnitsFuelConsum":check(self.tc11.GetValue()),
+                    "ElectriConsum":check(self.tc12.GetValue()),
+                    "HCGTEfficiency":check(self.tc13.GetValue()),
+                    "HCGEEfficiency":check(self.tc14.GetValue()),
+                    "ElectriProduction":check(self.tc15.GetValue()),
+                    "TExhaustGas":check(self.tc16.GetValue()),
+                    "PartLoad":check(self.tc17.GetValue()),
+                    "HPerDayEq":check(self.tc18.GetValue()),
+                    "NDaysEq":check(self.tc19.GetValue()),
+                    "PipeDuctEquip":check(self.tc20.GetValue()),
+                    "CoolTowerType":check(self.tc8.GetValue())
                     }
 
                 Status.DB.qgenerationhc.insert(tmp)
@@ -356,10 +322,11 @@ class PanelQ4(wx.Panel):
 #..............................................................................
 # 2. overwrite data of existing equipment
 
-            elif self.check(self.tc1.GetValue()) <> 'NULL' and \
+            elif check(self.tc1.GetValue()) <> 'NULL' and \
 		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
 		    Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
 
+#HS2008-05-07: block changed for adding security
                 fuelName = str(self.choiceOfDBFuel.GetStringSelection())
                 fuels = Status.DB.dbfuel.FuelName[fuelName]
                 if len(fuels)>0:
@@ -368,26 +335,26 @@ class PanelQ4(wx.Panel):
                     dbfid = None
 
                 tmp = {
-                    "Equipment":self.check(self.tc1.GetValue()),
-                    "Manufact":self.check(self.tc2.GetValue()),
-                    "YearManufact":self.check(self.tc3.GetValue()),
-                    "Model":self.check(self.tc4.GetValue()),
-                    "EquipType":self.check(self.tc5.GetValue()),
-                    "NumEquipUnits":self.check(self.tc6.GetValue()),
+                    "Equipment":check(self.tc1.GetValue()),
+                    "Manufact":check(self.tc2.GetValue()),
+                    "YearManufact":check(self.tc3.GetValue()),
+                    "Model":check(self.tc4.GetValue()),
+                    "EquipType":check(self.tc5.GetValue()),
+                    "NumEquipUnits":check(self.tc6.GetValue()),
                     "DBFuel_id":dbfid,
-                    "HCGPnom":self.check(self.tc9.GetValue()),
-                    "FuelConsum":self.check(self.tc10.GetValue()),
-                    "UnitsFuelConsum":self.check(self.tc11.GetValue()),
-                    "ElectriConsum":self.check(self.tc12.GetValue()),
-                    "HCGTEfficiency":self.check(self.tc13.GetValue()),
-                    "HCGEEfficiency":self.check(self.tc14.GetValue()),
-                    "ElectriProduction":self.check(self.tc15.GetValue()),
-                    "TExhaustGas":self.check(self.tc16.GetValue()),
-                    "PartLoad":self.check(self.tc17.GetValue()),
-                    "HPerDayEq":self.check(self.tc18.GetValue()),
-                    "NDaysEq":self.check(self.tc19.GetValue()),
-                    "PipeDuctEquip":self.check(self.tc20.GetValue()),
-                    "CoolTowerType":self.check(self.tc8.GetValue())
+                    "HCGPnom":check(self.tc9.GetValue()),
+                    "FuelConsum":check(self.tc10.GetValue()),
+                    "UnitsFuelConsum":check(self.tc11.GetValue()),
+                    "ElectriConsum":check(self.tc12.GetValue()),
+                    "HCGTEfficiency":check(self.tc13.GetValue()),
+                    "HCGEEfficiency":check(self.tc14.GetValue()),
+                    "ElectriProduction":check(self.tc15.GetValue()),
+                    "TExhaustGas":check(self.tc16.GetValue()),
+                    "PartLoad":check(self.tc17.GetValue()),
+                    "HPerDayEq":check(self.tc18.GetValue()),
+                    "NDaysEq":check(self.tc19.GetValue()),
+                    "PipeDuctEquip":check(self.tc20.GetValue()),
+                    "CoolTowerType":check(self.tc8.GetValue())
 #                    "IsAlternative":0
                     }
 
@@ -401,9 +368,11 @@ class PanelQ4(wx.Panel):
                 self.main.showError("Equipment has to be an unique value!")
 
             print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
-            self.parent.equipeType = self.check(self.tc5.GetValue())
+            self.parent.equipeType = check(self.tc5.GetValue())
 
+#HS2008-05-07: event.Skip() added. needed for leaving the dialog
             event.Skip()
+
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -431,6 +400,7 @@ class PanelQ4(wx.Panel):
         self.tc19.SetValue(str(q.NDaysEq))
         self.tc20.SetValue(str(q.PipeDuctEquip))
         self.tc8.SetValue(str(q.CoolTowerType))
+#HS2008-05-07:
         if q.DBFuel_id <> None:
             fuels = Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id]
             if len(fuels)>0:
@@ -444,8 +414,8 @@ class PanelQ4(wx.Panel):
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
-        self.tc8.SetValue('')
 
+        self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
         self.tc11.SetValue('')
@@ -478,12 +448,7 @@ class PanelQ4(wx.Panel):
 	if Status.PId != 0:
 	    self.fillEquipmentList()
 
-    def check(self, value):
-        if value <> "" and value <> "None":
-            return value
-        else:
-            return 'NULL'
-
+#HS2008-05-07: function "check" eliminated. use common function from GUITools
 
 if __name__ == '__main__':
     import pSQL

@@ -31,58 +31,7 @@
 import wx
 import pSQL
 from status import Status
-
-# constants
-LABELWIDTH=200
-TEXTENTRYWIDTH=160
-
-
-class Label(wx.lib.stattext.GenStaticText):
-    # auxiliary class for labels (static text)
-    # will show a short descriptive string and
-    # generate a longer tooltip.
-    # the tooltip is also associated to the text control
-    # 'txtlist' can be a scalar (just one control) or a list
-    # of controls. 'tiplist' is expected to be the same type
-    # and length as 'txtlist'
-    w0 = None
-    w1 = None
-    def __init__(self,parent,txtlist,text,tiplist,width0=None,width1=None,style=0):
-        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
-                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-        self.SetLabel(text)
-        # sets sizes
-        h = self.GetMinHeight()
-        if width0 is None:
-            if Label.w0 is not None:
-                self.SetMinSize((Label.w0, h))
-        else:
-            Label.w0 = width0
-            self.SetMinSize((Label.w0, h))
-        if width1 is None:
-            if Label.w1 is not None:
-                if 'list' in str(type(txtlist)):
-                    # list of controls
-                    for tc  in txtlist:
-                        tc.SetMinSize((Label.w1, h))
-                else:
-                    # just one control
-                    txtlist.SetMinSize((Label.w1, h))
-        else:
-            Label.w1 = width1
-            for tc  in txtlist:
-                tc.SetMinSize((width1, h))
-        # sets tooltips
-        self.SetToolTipString(text)
-        if 'list' in str(type(txtlist)):
-            for i in range(len(txtlist)):
-                if len(tiplist[i].strip()) > 0:
-                    txtlist[i].SetToolTipString(tiplist[i])
-        else:
-            if len(tiplist.strip()) > 0:
-                txtlist.SetToolTipString(tiplist)
-
-
+from displayClasses import *
 
 
 class PanelQ7(wx.Panel):
@@ -104,6 +53,8 @@ class PanelQ7(wx.Panel):
 
         self.buttonOK = wx.Button(self,wx.ID_OK,"OK")
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        self.buttonOK.SetDefault()
+
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,"Cancel")
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
@@ -147,8 +98,9 @@ class PanelQ7(wx.Panel):
         self.tc6_1 = wx.TextCtrl(self.page1,-1,'')
         self.tc6_2 = wx.TextCtrl(self.page1,-1,'')
         self.st6 = Label(self.page1,[self.tc6_1,self.tc6_2],_("Available area"),
-                         [_("Available area roof (m²)"),
-                          _("Available area ground (m²)")])
+                         [_("Available area roof (m2)"),
+                          _("Available area ground (m2)")],
+                         200,160)
 
         self.tc7_1 = wx.TextCtrl(self.page1,-1,'')
         self.tc7_2 = wx.TextCtrl(self.page1,-1,'')
@@ -191,13 +143,13 @@ class PanelQ7(wx.Panel):
 
         self.tc14 = wx.TextCtrl(self.page2,-1,'')
         self.st14 = Label(self.page2,self.tc14,_("Type of biomass"),
-                          _("Type of biomass available from processes"))
+                          _("Type of biomass available from processes"),180,70)
 
         self.tc15_1 = wx.TextCtrl(self.page2,-1,'')
         self.tc15_2 = wx.TextCtrl(self.page2,-1,'')
         self.st15 = Label(self.page2,[self.tc15_1,self.tc15_2],_("Period of year"),
                           [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
-                           _("Start of period of year the biomass is available (dd/mm-dd/mm)")])
+                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
 
         self.tc16 = wx.TextCtrl(self.page2,-1,'')
         self.st16 = Label(self.page2,self.tc16,_("Duration of production"),
@@ -227,7 +179,7 @@ class PanelQ7(wx.Panel):
 
         self.tc22 = wx.TextCtrl(self.page2,-1,'')
         self.st22 = Label(self.page2,self.tc22,_("Unit price"),
-                          _("Unit price of biomass (¤/t)"))
+                          _("Unit price of biomass (EUR/t)"))
 
         self.tc23_1 = wx.TextCtrl(self.page2,-1,'')
         self.tc23_2 = wx.TextCtrl(self.page2,-1,'')
@@ -245,7 +197,6 @@ class PanelQ7(wx.Panel):
         self.dummy4 = wx.StaticText(self.page1, -1, "")
 
     def __do_layout(self):
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_3 = wx.BoxSizer(wx.VERTICAL)
         sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_8 = wx.StaticBoxSizer(self.sizer_8_staticbox, wx.VERTICAL)
@@ -266,7 +217,6 @@ class PanelQ7(wx.Panel):
         sizer_5.Add(self.checkBox3, 0, wx.ALL, 10)
         sizer_5.Add(self.checkBox4, 0, wx.ALL, 10)
         sizer_6.Add(self.checkBox5, 0, wx.ALL, 10)
-        #sizer_6.Add(self.tc1, 0, wx.ALL|wx.EXPAND, 4)
         sizer_6.Add(self.tc1, 0, wx.ALL, 4)
         sizer_5.Add(sizer_6, 1, wx.EXPAND, 0)
         sizer_2.Add(sizer_5, 1, wx.ALL|wx.EXPAND, 2)
@@ -357,13 +307,9 @@ class PanelQ7(wx.Panel):
         self.notebook.AddPage(self.page1, "Solar thermal energy")
         self.notebook.AddPage(self.page2, "Biomass")
         sizer_3.Add(self.notebook, 1, wx.EXPAND, 0)
-        sizer_4.Add(self.buttonOK, 0, wx.ALL|wx.ALIGN_RIGHT, 2)
         sizer_4.Add(self.buttonCancel, 0, wx.ALL|wx.ALIGN_RIGHT, 2)
+        sizer_4.Add(self.buttonOK, 0, wx.ALL|wx.ALIGN_RIGHT, 2)
         sizer_3.Add(sizer_4, 0, wx.ALIGN_RIGHT, 0)
-        #self.panel_1.SetSizer(sizer_3)
-        #sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
-        #sizer_1.Add(self, 1, wx.EXPAND, 0)
-        #self.SetSizer(sizer_1)
         self.SetSizer(sizer_3)
         self.Layout()
 

@@ -37,42 +37,12 @@ import wx
 import pSQL
 from status import Status
 from GUITools import *
-
-
+from displayClasses import *
 
 # constants
 LABELWIDTH=180
 TEXTENTRYWIDTH=280
     
-class Label(wx.lib.stattext.GenStaticText):
-    # auxiliary class for labels (static text)
-    # will show a short descriptive string and
-    # generate a longer tooltip.
-    # the tooltip is also associated to the text control
-    #
-    w0 = None
-    w1 = None
-    def __init__(self,parent,txtctrl,text,tip,width0=None,width1=None):
-        wx.lib.stattext.GenStaticText.__init__(self,ID=-1,parent=parent,label='',
-                                              style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-        self.SetLabel(text)
-        self.SetToolTip(wx.ToolTip(tip))
-        txtctrl.SetToolTip(wx.ToolTip(tip))
-        h = self.GetMinHeight()
-        if width0 is None:
-            if Label.w0 is not None:
-                self.SetMinSize((Label.w0, h))
-        else:
-            Label.w0 = width0
-            self.SetMinSize((Label.w0, h))
-        if width1 is None:
-            if Label.w1 is not None:
-                txtctrl.SetMinSize((Label.w1, h))
-        else:
-            txtctrl.SetMinSize((width1, h))
-            Label.w1 = width1
-    
-
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -251,11 +221,11 @@ class PanelQ3(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProcess, self.buttonDeleteProcess)
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
-        self.buttonCancel.SetMinSize((125, 32))
+        #self.buttonCancel.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
-        self.buttonOK.SetMinSize((125, 32))
+        #self.buttonOK.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 

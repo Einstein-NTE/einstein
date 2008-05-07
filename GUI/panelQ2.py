@@ -57,7 +57,6 @@ class PanelQ2(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
                              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
-        self.Hide()
         
         self.notebook = wx.Notebook(self, -1, style=0)
 
@@ -87,20 +86,19 @@ class PanelQ2(wx.Panel):
         self.tc3 = wx.TextCtrl(self.page0, -1, "")
         self.st4 = wx.StaticText(self.page0, -1, _("MWh / year (LCV)"))
         self.tc4 = wx.TextCtrl(self.page0, -1, "")
-        self.st5 = wx.StaticText(self.page0, -1, _("Fuel price €/kWh LCV"))
+        self.st5 = wx.StaticText(self.page0, -1, _("Fuel price EUR/kWh LCV"))
         self.tc5 = wx.TextCtrl(self.page0, -1, "")
-        self.st6 = wx.StaticText(self.page0, -1, _("Annual energy cost €/year"))
+        self.st6 = wx.StaticText(self.page0, -1, _("Annual energy cost EUR/year"))
         self.tc6 = wx.TextCtrl(self.page0, -1, "")
 
         self.dummy1 = wx.StaticText(self.page0, -1, "")
         self.dummy2 = wx.StaticText(self.page0, -1, "")
 
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, _("Cancel"))
-        self.buttonCancel.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK, 'OK')
-        self.buttonOK.SetMinSize((125, 32))
+        self.buttonOK.SetDefault()
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
         ###-- grid setup

@@ -35,17 +35,14 @@
 
 import wx
 import pSQL
-import HelperClass
 from status import Status
-from einstein.modules.constants import HXTYPES
+#from einstein.modules.constants import HXTYPES
 from GUITools import *
 
 
 class PanelQ6(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
-        paramlist = HelperClass.ParameterDataHelper()
-        self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
 
@@ -94,6 +91,7 @@ class PanelQ6(wx.Panel):
 
         self.buttonOK = wx.Button(self,wx.ID_OK,"OK")
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        self.buttonOK.SetDefault()
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,"Cancel")
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)

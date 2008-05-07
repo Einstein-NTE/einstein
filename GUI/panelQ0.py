@@ -16,6 +16,7 @@
 #       Revised by:         Hans Schweiger 12/04/2008
 #                           Hans Schweiger 17/04/2008
 #                           Tom Sobota 21/04/2008
+#                           Tom Sobota 6/05/2008
 #
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
@@ -24,7 +25,7 @@
 #       18/04/08: HS    Update of panelInfo included
 #       21/04/08  TS    Separated NewProject from the button, so it can be called also from main.
 #                       set 1st item from listbox as selected initially
-#
+#       06/05/08  TS    Put a Hide at the gui setup start, to avoid visual "effects"
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -56,7 +57,7 @@ class PanelQ0(wx.Panel):
         wx.Panel.__init__(self, id=-1, name='PanelQ0', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.Hide()
-
+        
         self.stInfo1 = wx.StaticText(id=-1,
 				     label='Project list',
 				     name='stInfo1',
