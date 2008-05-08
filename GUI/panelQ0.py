@@ -165,8 +165,12 @@ class PanelQ0(wx.Panel):
 #------------------------------------------------------------------------------		
         projectName = self.listBoxProjects.GetStringSelection()
         Status.prj.setActiveProject(-1,name=projectName)
-        self.main.tree.SelectItem(self.main.qPage1, select=True)
+        #TS2008/05/17 two following lines interchanged
+        #(after SelectItem is executed,this panel gets destroyed,
+        # so the next line would bomb because self doesn't exist any more)
         self.main.panelinfo.update()
+        self.main.showMainMenuAlternatives()
+        self.main.tree.SelectItem(self.main.qPage1, select=True)
 
 #------------------------------------------------------------------------------		
 

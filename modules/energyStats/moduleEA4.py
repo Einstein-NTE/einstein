@@ -10,12 +10,13 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
-#	Created by: 	    Tom Sobota	21/03/2008
-#       Revised by:         Tom Sobota  29/03/2008
-#       Last revised by:    Stoyan Danov 07/04/2008
-#       Revised by:         Stoyan Danov     11/04/2008
-#       Revised by:         Stoyan Danov     02/05/2008
+#	Version No.: 0.06
+#	Created by: 	    Tom Sobota	    21/03/2008
+#       Revised by:         Tom Sobota      29/03/2008
+#                           Stoyan Danov    07/04/2008
+#                           Stoyan Danov    11/04/2008
+#                           Stoyan Danov    02/05/2008
+#                           Hans Schweiger  08/05/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
@@ -23,6 +24,7 @@
 #       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
 #                       Return to original state later!
 #       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int,None resistance,avoid ZeroDivision
+#       08/05/2008: HS  Generation of GDATA table PROCESS for report
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -80,14 +82,15 @@ class ModuleEA4(object):
         PId = Status.PId
         ANo = Status.ANo
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
-        self.qprocessdata = Status.DB.qprocessdata.sql_select(sqlQuery)
+        self.qprocessdata = Status.prj.getProcesses()   #sqlqueries centralised in project-functions
+        processes = self.qprocessdata
 
         Process = []
         PT = []
         TSupply = []
         UPHk = 0.0
         UPH = []
+        
         TotalUPH = 0.0
         for row in self.qprocessdata:
             Process.append(row.Process)
@@ -125,10 +128,10 @@ class ModuleEA4(object):
 
 
 #................................................................
-        #
-        # upper grid: UPH by process
-        #
+# here data are prepared for the GUI and the report
+        
 
+# upper grid: UPH by process
         TableColumnList1 = [Process, UPH, UPHPercentage]
 
         matrix1 = transpose(TableColumnList1)
@@ -137,10 +140,8 @@ class ModuleEA4(object):
 
         Status.int.setGraphicsData(self.keys[0], data1)
 
-        #
-        # lower grid: Process heat by temperature
-        #
-
+# lower grid: Process heat by temperature
+        
         Process.pop() #delete 'Total' and TotalUPH
         UPH.pop()
 
@@ -151,6 +152,21 @@ class ModuleEA4(object):
         data2 = array(matrix2)
 
         Status.int.setGraphicsData(self.keys[1], data2)
+
+# report field PROCESS: process info
+
+        tableReport = []
+        for process in processes:
+            k = process.ProcNo - 1
+            if k < 3:   #present master limited to 3 processes !!! XXXXXXX TO BE CHANGED XXXXX
+                tableReport.append([process.Process,"",
+                                    "here should be the process description text","","","","","","",
+#                                    process.Description,"","","","","","",
+                                    process.UPH,"",
+                                    UPHPercentage[k],"",
+                                    "",process.PT])
+
+        Status.int.setGraphicsData("PROCESSES", array(tableReport))
 
         return "ok"
 

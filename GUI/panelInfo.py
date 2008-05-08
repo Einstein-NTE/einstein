@@ -46,12 +46,6 @@ class PanelInfo(wx.StatusBar):
 
         self.update()
 
-    def update(self):
-        print "PanelInfo (update) running"
-        self.t0.SetValue(Status.ActiveProjectName)
-        self.t1.SetValue(Status.ActiveAlternativeName)
-        self.choiceAssistant.SetSelection(ASSISTANTLIST.index(Status.UserInteractionLevel))
-       
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -68,17 +62,31 @@ class PanelInfo(wx.StatusBar):
 
     def OnChoiceAssistant(self, event):
 	i = self.choiceAssistant.GetCurrentSelection()
-	self.main.logWarning('Design assistant changed to '+repr(ASSISTANTLIST[i]))
-        print "PanelInfo: setting UserInteractionLevel"
-	Status.prj.setUserInteractionLevel(ASSISTANTLIST[i])
-        event.Skip()
+	self.main.logWarning('Design assistant changed to '+repr(ASSISTANTLIST[i]))	
+        Status.prj.setUserInteractionLevel(ASSISTANTLIST[i])
+        self.main.changeAssistantMainMenu(i)
+        if event is not None:
+            event.Skip()
 
     def OnSize(self, event):
 	self._szpos(0,self.t0,60)
 	self._szpos(1,self.t1,80)
 	self._szpos(2,self.choiceAssistant,140)
-	#print 'SIZE 0 x=%s y=%s w=%s' % (r.x,r.y,r.width)
 
+#------------------------------------------------------------------------------
+# public methods
+#------------------------------------------------------------------------------
+    def update(self):
+        print "PanelInfo (update) running"
+        self.t0.SetValue(Status.ActiveProjectName)
+        self.t1.SetValue(Status.ActiveAlternativeName)
+        self.choiceAssistant.SetSelection(ASSISTANTLIST.index(Status.UserInteractionLevel))
+       
+    def changeAssistant(self,level):
+        self.choiceAssistant.SetSelection(level)
+        self.OnChoiceAssistant(None)
+
+        
 if __name__ == '__main__':
 
     app = wx.PySimpleApp()

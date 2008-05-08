@@ -1,4 +1,4 @@
-#Boa:Frame:DBEditFrame
+# -*- coding: iso-8859-15 -*-
 #==============================================================================
 #
 #	E I N S T E I N
@@ -20,10 +20,12 @@
 #	Created by: 	    Heiko Henning	February 2008
 #	Last revised by:    Hans Schweiger      13/04/2008
 #                           Tom Sobota          21/04/2008
+#                           Tom Sobota          07/05/2008
 #
 #       Changes in last update:
 #       13/04/08:       preselection added as input
 #       21/04/08: TS    Intercepted error when non existing table
+#       07/05/08: TS    Changed layout, added Delete row, Add row buttons
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,12 +40,9 @@ import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
 
-def create(parent):
-    return DBEditFrame(parent)
-
-[wxID_DBEDITFRAME, wxID_DBEDITFRAMEBUTTON1, wxID_DBEDITFRAMEBUTTON2, 
- wxID_DBEDITFRAMEGRID1, 
-] = [wx.NewId() for _init_ctrls in range(4)]
+#debug
+#def _(str):
+#    return str
 
 #
 # constants
@@ -57,45 +56,55 @@ GRID_BACKGROUND_COLOR_EDITABLE = '#FFFFC0' # idem
 class DBEditFrame(wx.Dialog):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
-        wx.Dialog.__init__(self, id=wxID_DBEDITFRAME, name=u'DBEditFrame',
+        wx.Dialog.__init__(self, id=-1, name=u'DBEditFrame',
               parent=prnt, pos=wx.Point(354, 332), size=wx.Size(800, 400),
               style=wx.DEFAULT_FRAME_STYLE, title=self.title)
         self.SetClientSize(wx.Size(800, 400))
 
-        self.grid1 = wx.grid.Grid(id=wxID_DBEDITFRAMEGRID1, name='grid1',
-              parent=self, pos=wx.Point(8, 32), size=wx.Size(632, 352),
-              style=wx.WANTS_CHARS | wx.VSCROLL | wx.HSCROLL)
+        self.grid1 = wx.grid.Grid(self,-1, name='grid1',
+                                  style=wx.WANTS_CHARS | wx.VSCROLL | wx.HSCROLL)
         self.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN, self.OnGridEdit, self.grid1)
         self.Bind(wx.grid.EVT_GRID_CELL_CHANGE, self.OnGridEditStore, self.grid1)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid1)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellLeftDClick, self.grid1)
 
-        self.button1 = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
-              name='button1', parent=self, pos=wx.Point(656, 352),
-              size=wx.Size(128, 32), style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.button1)
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,'Cancel')
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.button2 = wx.Button(id=wx.ID_OK, label=u'OK', name='button2',
-              parent=self, pos=wx.Point(656, 312), size=wx.Size(128, 32),
-              style=0)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.button2)
+        self.buttonOK = wx.Button(self,wx.ID_OK,'OK')
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+
+        if self.can_edit:
+            # add and delete row buttons are shown only if
+            # editing is allowed
+            self.buttonAddRow = wx.Button(self, -1, _("Add row"))
+            self.Bind(wx.EVT_BUTTON, self.OnButtonAddRow, self.buttonAddRow)
+            self.buttonDeleteRow = wx.Button(self, -1, _("Delete row"))
+            self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteRow, self.buttonDeleteRow)
+
+        self.lblTableName = wx.StaticText(self, -1, "")
 
     def __init__(self, parent, title, tablename, col_returned, can_edit, preselection = None):
 	self.title = title
 	self.tablename = tablename
 	self.can_edit = can_edit
 	self.col_returned = col_returned
-        self._init_ctrls(parent)
         self.preselection = preselection
+        self._init_ctrls(parent)
+        self.__do_layout()
+
 
         #self.maxrow = 25
         self.rowcount = 0
 	self.theId = -1
+        self.col0 = None
         self.grid1.EnableEditing(can_edit)
 	if can_edit:
 	    self.backcolor = GRID_BACKGROUND_COLOR_EDITABLE
+            self.lblTableName.SetLabel(" Editing table "+tablename)
 	else:
 	    self.backcolor = GRID_BACKGROUND_COLOR_NOEDITABLE
+            self.lblTableName.SetLabel(" Viewing table "+tablename)
 
         self.lastEditRow = 0
         self.lastEditCol = 0
@@ -103,6 +112,25 @@ class DBEditFrame(wx.Dialog):
         if self.initDatabase():
             self.SetupGrid()
             self.displayData()
+
+    def __do_layout(self):
+        # begin wxGlade: MyDialog.__do_layout
+        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_3 = wx.BoxSizer(wx.VERTICAL)
+        sizer_3.Add(self.grid1, 1, wx.EXPAND, 0)
+        sizer_3.Add(self.lblTableName, 0, wx.TOP|wx.EXPAND, 2)
+        sizer_1.Add(sizer_3, 1, wx.EXPAND, 0)
+
+        if self.can_edit:
+            sizer_2.Add(self.buttonAddRow, 0, 0, 0)
+            sizer_2.Add(self.buttonDeleteRow, 0, 0, 0)
+            
+        sizer_2.Add(self.buttonCancel, 0, 0, 0)
+        sizer_2.Add(self.buttonOK, 0, 0, 0)
+        sizer_1.Add(sizer_2, 0, wx.ALIGN_BOTTOM, 0)
+        self.SetSizer(sizer_1)
+        self.Layout()
 
 #HS2008-04-13: possibility of preselection-list added in DB Editor.
     def initDatabase(self):
@@ -153,16 +181,12 @@ class DBEditFrame(wx.Dialog):
         attr.SetBackgroundColour(self.backcolor)
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        #startrow = pagenr * self.maxrow - self.maxrow # if paginated
         startrow = 0
         if self.grid1.GetNumberRows() > 0:
             self.grid1.DeleteRows(pos=0,numRows=self.grid1.GetNumberRows())
         rownr = startrow + 1
         r = 0
         c = 0
-        #for row in self.table.sql_select("%s > 0 ORDER BY %s LIMIT %s,%s" % (self.table.keys()[0],
-        #                                                                     self.table.keys()[0],
-        #                                                                     startrow, self.maxrow)):
 
         for row in self.table.sql_select("%s > 0 ORDER BY %s" % (self.table.keys()[0],
 								 self.table.keys()[0])):
@@ -197,21 +221,17 @@ class DBEditFrame(wx.Dialog):
 
     def OnGridCellLeftClick(self, event):
 	try:
-	    self.theId = int(self.grid1.GetCellValue(event.GetRow(), self.col_returned))
+	    i = self.grid1.GetCellValue(event.GetRow(), self.col_returned)
+	    self.theId = int(i)
 	except:
-	    print 'DBEditFrame. Returned cell is empty or not integer'
+	    print 'DBEditFrame. Returned cell is empty or not integer:'+repr(i)
 	    self.theId = -1
+        self.col0 = self.grid1.GetCellValue(event.GetRow(), 0)
 
         event.Skip()
 
 
     def OnGridCellLeftDClick(self, event):
-	try:
-	    self.theId = int(self.grid1.GetCellValue(event.GetRow(), self.col_returned))
-	except:
-	    print 'DBEditFrame. Returned cell is empty or not integer'
-	    self.theId = -1
-
 	# accept editions and close this dialog
 	if self.can_edit:
 	    Status.DB.sql_query('commit')
@@ -221,9 +241,55 @@ class DBEditFrame(wx.Dialog):
     def OnButtonCancel(self,event):
 	if self.can_edit:
 	    Status.DB.sql_query('rollback')
+	self.EndModal(wx.ID_CANCEL)
         event.Skip()
 
     def OnButtonOK(self,event):
 	if self.can_edit:
 	    Status.DB.sql_query('commit')
+	self.EndModal(wx.ID_OK)
+        event.Skip()
+
+    def OnButtonAddRow(self,event):
+        tmp={}
+        for col in self.table.keys():
+            # create empty row
+            ty = col.find('_id')
+            if ty >= 0:
+                tmp[col] = 0 
+            else:
+                tmp[col] = 'NULL' 
+                
+        self.table.insert(tmp)    
+        self.displayData()
+        event.Skip()
+
+    def OnButtonDeleteRow(self,event):
+        if self.col0 is None:
+            dlg = wx.MessageDialog(None,'A row must be selected!\n'\
+                                   'Please click on any data cell\n'\
+                                   'to select a row',
+                                   'Warning', wx.OK | wx.ICON_EXCLAMATION)
+            ret = dlg.ShowModal()
+            dlg.Destroy()
+        else:
+            field = self.table.columns()[0]
+            dlg = wx.MessageDialog(None, 'Delete row with %s=%s?' % (field,self.col0),
+                                   'Confirm delete', wx.YES_NO | wx.ICON_QUESTION)
+            ret = dlg.ShowModal()
+            dlg.Destroy()
+            if ret == wx.ID_NO:
+                return
+            try:
+                dummy = int(self.col0)
+                rows = self.table.select({field:self.col0})
+                if len(rows) == 1:
+                    row = rows[0]
+                    row.delete()
+                    self.displayData()
+            except:
+                dlg = wx.MessageDialog(None,'Cannot delete row with %s=%s' % (field,self.col0),
+                                       'Warning', wx.OK | wx.ICON_EXCLAMATION)
+                ret = dlg.ShowModal()
+                dlg.Destroy()
         event.Skip()

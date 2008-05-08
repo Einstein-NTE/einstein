@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.86
+#   Version No.: 0.87
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -44,6 +44,7 @@
 #                       Tom Sobota                          01/05/2008
 #                       Hans Schweiger                      05/05/2008
 #                       Hans Schweiger                      07/05/2008
+#                       Tom Sobota                          07/05/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -100,6 +101,7 @@
 #                       panel for report generation built
 #       05/05/2008  Call to fillchoiceOfEquipment in PanelQ5 eliminated
 #       07/05/2008  Just change in nomenclature tree items qEA,qEM,qEH
+#       07/05/2008  TS fixed Interaction level, alternative.
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -128,6 +130,7 @@ import HelperClass
 
 from einstein.modules.interfaces import Interfaces
 from einstein.modules.modules import Modules
+from einstein.modules.constants import *
 
 #--- popup frames
 from status import Status #processing status of the tool
@@ -290,6 +293,7 @@ class EinsteinFrame(wx.Frame):
 
         #----- add menu
         self.CreateMenu()
+        self.changeAssistantMainMenu(ASSISTANTLIST.index(Status.UserInteractionLevel))
         
         #----- create tree control and close branches that conditionally cannot be yet activated
         self.CreateTree()
@@ -472,9 +476,10 @@ class EinsteinFrame(wx.Frame):
 
 #TS20080421 Dynamic alternatives menu
     def OnMenuPresentState(self, event):
-        i = event.GetId()- self.iid[0]
-        apNo = self.altList[i][0]
-        print 'SELECTED I='+str(i)+' APNO='+repr(apNo)+' DESCR='+self.altList[i][1]
+        i = event.GetId()- self.rangeId[0]
+        al = Status.prj.getAlternativeList()
+        apNo = al[i][0]
+        print 'OnMenuPresentState',i,apNo
         Status.prj.setActiveAlternative(apNo)
         self.panelinfo.update()
 
@@ -514,10 +519,13 @@ class EinsteinFrame(wx.Frame):
 # Scroll-up menu "USER SELECT LEVEL 1 - 3"
 
     def OnMenuUserSelectLevel1(self, event):
+        self.panelinfo.changeAssistant(0)
         Status.prj.setUserInteractionLevel(1)
     def OnMenuUserSelectLevel2(self, event):
+        self.panelinfo.changeAssistant(1)
         Status.prj.setUserInteractionLevel(2)
     def OnMenuUserSelectLevel3(self, event):
+        self.panelinfo.changeAssistant(2)
         Status.prj.setUserInteractionLevel(3)
 
 #..............................................................................     
@@ -1007,7 +1015,6 @@ class EinsteinFrame(wx.Frame):
         self.menuBar = wx.MenuBar()
         
         self.menuFile = wx.Menu()
-        self.menuView = wx.Menu()
         self.menuDatabase = wx.Menu()
         self.menuSettings = wx.Menu()        
         self.menuHelp = wx.Menu()
@@ -1034,16 +1041,6 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, PList["X107"][1])
 
-        self.altList = Status.prj.getAlternativeList()
-        id0 = wx.NewId()
-        id1 = id0
-        for al in self.altList:
-            #self.PresentState = self.menuView.AppendRadioItem(id1, al[1])
-            self.menuView.AppendRadioItem(id1, al[1])
-            id1 = wx.NewId()
-            
-        self.iid = (id0,id1-1)
-
         self.EditDBCHP = self.subnenuEquipments.Append(-1, PList["X111"][1])
         self.EditDBHeatPump = self.subnenuEquipments.Append(-1, PList["X112"][1])
         self.EditDBChiller = self.subnenuEquipments.Append(-1, PList["X117"][1])
@@ -1060,9 +1057,16 @@ class EinsteinFrame(wx.Frame):
         self.EditDBNaceCode = self.submenuClassification.Append(-1, PList["X109"][1])
         self.EditDBUnitOperation = self.submenuClassification.Append(-1, PList["X110"][1])       
 
-        self.UserSelectLevel1 = self.submenuUserLevel.AppendRadioItem(-1, PList["X120"][1])
-        self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(-1, PList["X121"][1])
-        self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(-1, PList["X122"][1])
+        self.interactionLevelList=[]
+        i = wx.NewId()
+        self.interactionLevelList.append(i)
+        self.UserSelectLevel1 = self.submenuUserLevel.AppendRadioItem(i, INTERACTIONLEVELS[0])
+        i = wx.NewId()
+        self.interactionLevelList.append(i)
+        self.UserSelectLevel2 = self.submenuUserLevel.AppendRadioItem(i, INTERACTIONLEVELS[1])
+        i = wx.NewId()
+        self.interactionLevelList.append(i)
+        self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(i, INTERACTIONLEVELS[2])
         self.UserLevel = self.menuSettings.AppendMenu(-1, PList["X123"][1], self.submenuUserLevel)
         self.Preferences = self.menuSettings.Append(-1, PList["X119"][1])#preferences
         self.Classification = self.menuSettings.AppendMenu(-1, PList["X123a"][1], self.submenuClassification)
@@ -1076,13 +1080,49 @@ class EinsteinFrame(wx.Frame):
         self.HelpAbout = self.menuHelp.Append(-1, PList["X127"][1])
 
         self.menuBar.Append(self.menuFile, PList["X128"][1])
-        self.menuBar.Append(self.menuView, "View")
+        self.showMainMenuAlternatives()
+        
         self.menuBar.Append(self.menuDatabase, "Database")
         self.menuBar.Append(self.menuSettings, PList["X130"][1])
         self.menuBar.Append(self.menuHelp, PList["X132"][1])
         
         self.SetMenuBar(self.menuBar)
         self.menuBar.Check(i,True)
+
+    def showMainMenuAlternatives(self):
+        checkedId = None
+        self.menuView = wx.Menu()
+        id0 = wx.NewId()
+        id1 = id0
+        for al in Status.prj.getAlternativeList():
+            #print 'altlist (%s) "%s"  id= %s' % (al[0],al[1],id1)
+            self.menuView.AppendRadioItem(id1, al[1])
+            # save the active option id for checking later
+            if al[1] == Status.ActiveAlternativeName:
+                checkedId = id1
+            id1 = wx.NewId()
+            
+        self.rangeId = (id0,id1-1)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnMenuPresentState, id=self.rangeId[0], id2=self.rangeId[1])
+        pos = self.menuBar.FindMenu('View')
+        if pos < 0:
+            # the first time just append
+            self.menuBar.Append(self.menuView, "View")
+        else:
+            # first delete existing
+            self.menuBar.Remove(pos)
+            # then insert new
+            self.menuBar.Insert(1,self.menuView, "View")
+
+        if checkedId is not None:
+            self.menuBar.Check(checkedId,True)
+
+    def changeAssistantMainMenu(self,level):
+        try:
+            id = self.interactionLevelList[level]
+            self.menuBar.Check(id,True)
+        except AttributeError,e:
+            pass
 
     def Cond(self,test,errtext):
         d = []
@@ -1239,8 +1279,6 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
 
-        self.Bind(wx.EVT_MENU_RANGE, self.OnMenuPresentState, id=self.iid[0], id2=self.iid[1])
-
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
@@ -1293,23 +1331,18 @@ class EinsteinApp(wx.App):
     #TS20080421 Some testing code that will magically disappear later
     #
     def OnExit(self):
-        print "OnExit"
         sys.stdout.flush();
     
     def OnQueryEndSession(self):
-        print "OnQueryEndSession"
         sys.stdout.flush();
         
     def _onQueryEndSession(self,event):
-        print "_onQueryEndSession"
         sys.stdout.flush();
                 
     def _onEndSession(self,event):
-        print "_onEndSession"
         sys.stdout.flush();
 
     def _onFrameClose(self, event):
-        print ("_onFrameClose");
         sys.stdout.flush();
         self.frame.Destroy();
         wx.Exit()
