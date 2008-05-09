@@ -189,11 +189,22 @@ def firstHigher(val, ASClist):
     for i in range(len(ASClist)):
         if val <= ASClist[i]:
             return i
-        else:
-            continue
     
     print 'In auxiliary.py - firstHigher() not found: error!'
     return 0
+
+
+#-----------------------------------------------------------------------------
+def findFirstGE(val, ASClist):
+#-----------------------------------------------------------------------------
+#   identical to firstHigher, but returns len(ASClist) if val > max(ASClist)
+#-----------------------------------------------------------------------------
+
+    for i in range(len(ASClist)):
+        if val <= ASClist[i]:
+            return i
+    
+    return len(ASClist)
 
 
 #------------------------------------------------------------------------------		
@@ -221,6 +232,19 @@ def frange(start, end, inc=None):
     return L
 
 #------------------------------------------------------------------------------		
+def checkLimits(x,xmin,xmax,default=None):   
+#------------------------------------------------------------------------------
+#   Checks if a value is within limits
+#   If no value is given, the default value is assigned
+#------------------------------------------------------------------------------		
+
+    if x is None:
+        return default
+    xl = min(x,xmax)
+    xl = max(xl,xmin)
+    return xl
+
+#------------------------------------------------------------------------------		
 def noneFilter(datalist,substitute=" "):   
 #------------------------------------------------------------------------------
 #   A range function with float arguments
@@ -230,6 +254,25 @@ def noneFilter(datalist,substitute=" "):
         if datalist[i] is None:
             datalist[i] = substitute
     return datalist
+
+#------------------------------------------------------------------------------		
+def cutInterval(x, x0, x1):
+#------------------------------------------------------------------------------		
+#   returns the fraction of the interval [x0,x1] or [x1,x0] that is below x
+#------------------------------------------------------------------------------		
+
+    if x0 is None or x1 is None:
+        return 0
+
+    xl = min(x0,x1)
+    xh = max(x0,x1)
+    
+    if x <= xl:
+        return 0.0
+    elif x <= xh and xh > xl:
+        return (x - xl)/(xh-xl)
+    else:
+        return 1.0
 
 #==============================================================================
 

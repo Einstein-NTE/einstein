@@ -43,6 +43,8 @@
 from einstein.GUI.status import Status
 from messageLogger import *
 from constants import *
+from schedules import Schedules
+from processes import Processes
 
 #------------------------------------------------------------------------------		
 def copySQLRows(table,query,keyID,keyPar,valPar):
@@ -128,6 +130,12 @@ class Project(object):
 # get last tool settings from table STOOLS (last project opened, etc.)
 
         self.getLastToolSettings()
+
+#..............................................................................
+# create instance of Schedules and Processes
+
+        Status.schedules = Schedules()
+        Status.processes = Processes()
 
 #..............................................................................
 # set active project to the last one opened
@@ -347,6 +355,25 @@ class Project(object):
             projectList.append(n.Name)
         return projectList
 
+#------------------------------------------------------------------------------
+    def getProjectData(self):
+#------------------------------------------------------------------------------
+#   returns the data in tables questionnaire and cgenerationhc
+#   for given ANo and PId
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
+        projects = Status.DB.questionnaire.sql_select(sqlQuery)
+        if len(projects)>0: self.projectData = projects[0]
+        else: self.projectData = None
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        generaldatasets = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        if len(generaldatasets) > 0:self.generalData = generaldatasets[0]
+        else: self.generalData = None
+        
+        return (self.projectData,self.generalData)
+
 
 #------------------------------------------------------------------------------
     def getProjectID(self,name):
@@ -426,6 +453,9 @@ class Project(object):
                            "ActiveAlternative":0,
                            "WriteProtected":0,
                            "StatusQ":EINSTEIN_NOTOK,
+                           "StatusCC":EINSTEIN_NOTOK,
+                           "StatusCA":EINSTEIN_NOTOK,
+                           "StatusR":EINSTEIN_NOTOK,
                            "LanguageReport":Status.LanguageTool,
                            "UnitsReport":Status.UnitsTool}
             sprojects.insert(newSProject)
@@ -589,6 +619,20 @@ class Project(object):
             print "Project (setUserInteractionLevel): ",level
         else:
             print "Project (setUserInteractionLevel): ERROR in level ",level
+
+#------------------------------------------------------------------------------
+    def setStatus(self,key,value=1):
+#------------------------------------------------------------------------------
+#   sets a status flag
+#------------------------------------------------------------------------------
+        if key=="Q":
+            Status.StatusQ = value
+        elif key=="CC":
+            Stauts.StatusCC = value
+        elif key=="CS":
+            Stauts.StatusCS = value
+        else:
+            print "Project (setStatus): status key %s unknown"%key
 
 #------------------------------------------------------------------------------
     def deleteProduct(self,productName):
@@ -1054,6 +1098,17 @@ class Project(object):
             processList.append(process[key])
 
         return processList
+
+#------------------------------------------------------------------------------
+    def getProcesses(self):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
+        self.processes = Status.DB.qprocessdata.sql_select(sqlQuery)
+        
+        return self.processes
 
 #------------------------------------------------------------------------------
     def getPipeList(self,key):

@@ -289,12 +289,20 @@ class PanelCC(wx.Panel):
 #   Generate new alterantive proposal
 #------------------------------------------------------------------------------		
 
-        nc = self.mod.basicCheck(matrixCheck=False)
+        nc = self.mod.basicCheck(matrixCheck=True)
         self.display()
 
         if nc > 0:
             self.pu1 = conflictFrame(self)
             self.pu1.Show()
+        else:
+            nc =  self.mod.basicCheck(matrixCheck=True)
+            self.display
+
+            if nc > 0:
+                self.pu1 = conflictFrame(self)
+                self.pu1.Show()
+
         
 #------------------------------------------------------------------------------		
     def OnEstimateDataButton(self, event):
@@ -355,26 +363,16 @@ class PanelCC(wx.Panel):
 #==============================================================================
 #   EVENT HANDLERS BUTTONS TO DESIGN ASSISTANTS
 #==============================================================================
-    def OnDesignPAButton(self, event):
-        event.Skip()
-
-    def OnDesignHXButton(self, event):
-        event.Skip()
-
-    def OnDesignHCButton(self, event):
-        self.Hide()
-        self.main.tree.SelectItem(self.main.qHC, select=True)
-
-    def OnDesignPOButton(self, event):
-        event.Skip()
 
 #------------------------------------------------------------------------------		
 #   <<< OK Cancel >>>
 #------------------------------------------------------------------------------		
     def OnButtonpanelOkButton(self, event):
         self.Hide()
-        self.main.tree.SelectItem(self.main.qHC, select=True)
-        print "Button exitModuleOK: now I should go back to HC"
+        ###AQUI FALTA CONFIRMACION DATOS Y PASAR DE ANO -1 a ANO 0
+        Status.schedules.create()
+        Status.processes.createAggregateDemand()
+        self.main.tree.SelectItem(self.main.qEM1, select=True)
 
     def OnButtonpanelCancelButton(self, event):
         #warning: do you want to leave w/o saving ???
@@ -386,7 +384,7 @@ class PanelCC(wx.Panel):
 
     def OnButtonpanelFwdButton(self, event):
         self.Hide()
-        self.main.tree.SelectItem(self.main.qHC, select=True)
+        self.main.tree.SelectItem(self.main.qEM1, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
     def OnCbSetAccuracyCombobox(self, event):
