@@ -56,6 +56,7 @@ def copySQLRows(table,query,keyID,keyPar,valPar):
     newID = None
         
     for row in rows:
+
 #..............................................................................
 # translates the pSQL - object into a dictionary
 
@@ -88,7 +89,6 @@ def copySQLRows(table,query,keyID,keyPar,valPar):
 # now inserts the new row into the SQL Table
 
         newID = table.insert(mydict)
-        print "copySQL rows. newID = ",newID
 
     return newID
 #------------------------------------------------------------------------------		
@@ -98,9 +98,19 @@ def deleteSQLRows(table,query):
 #------------------------------------------------------------------------------		
     rows = table.sql_select(query)
 
-    for row in rows:
-        print "deleting: ",row
-        row.delete()
+#HS2008-05-10: there were strange problems with this
+#   deleting several rows, one remained without deleting ...
+#   maybe a commit() is required after every delete ? -> requires some testing
+#    for row in rows:
+#        print "deleting: ",row
+#        row.delete()
+# Alternative solution that works:
+    n = len(rows)
+    for i in range(n):
+        rows[0].delete()
+        Status.SQL.commit()
+        rows = table.sql_select(query)
+           
 
 #------------------------------------------------------------------------------		
 def shiftANoInSQLRows(table,query, shift):
@@ -112,7 +122,6 @@ def shiftANoInSQLRows(table,query, shift):
     for row in rows:
         newval = row.AlternativeProposalNo + shift
         row.AlternativeProposalNo = newval
-        print "newval assigned",newval,row.AlternativeProposalNo
                 
 #==============================================================================
 #       PROJECT CLASS
@@ -141,6 +150,7 @@ class Project(object):
 # set active project to the last one opened
 
         self.setActiveProject(Status.PId)
+        self.getStatus()
 
 #------------------------------------------------------------------------------		
         
@@ -154,6 +164,8 @@ class Project(object):
 #   creates a new alternative copying all entries for the original ANo
 #------------------------------------------------------------------------------
 
+        if Status.PId < 0: return
+        
         DB = Status.DB
 
         Status.NoOfAlternatives += 1
@@ -163,20 +175,6 @@ class Project(object):
         sproject.NoOfAlternatives = Status.NoOfAlternatives
 
         print "Project (createNewAlternative) - project %s, copying from"%Status.PId,originalANo,ANo
-
-#..............................................................................
-# create a copy of present state ...
-
-        if (originalANo == 0):
-
-#XXX init project information with defaults where necessary
-#            initAlternative()
-             pass
-            
-#..............................................................................
-# ... create a new alternative copying from an existing one
-        else:
-            pass
 
 #..............................................................................
 # copying Q- and corresponding C-Tables
@@ -220,7 +218,8 @@ class Project(object):
 #   deletes all entries for the original ANo
 #------------------------------------------------------------------------------
 
-        if ANo > Status.NoOfAlternatives or ANo <= 0:
+        if ANo > Status.NoOfAlternatives or ANo == -1 or (ANo == 0 and Status.StatusCC > 0):
+            
             print"Project (deleteAlternative) - project %s, cannot delete alternative "%Status.PId,ANo
             return -1
         
@@ -324,8 +323,8 @@ class Project(object):
                 Status.SQL.commit()
                 Status.ANo = n
                 Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
-                print "Project (setActiveAlternative): set alternative to",n
-
+                self.getStatus()
+                
             except:
                 print "Project (setActiveAlternative): error trying to set alternative to ",n
                 pass
@@ -333,12 +332,22 @@ class Project(object):
             print "Project (setActiveAlternative): alternative number out of range"
             
 #------------------------------------------------------------------------------
-    def initAlternative(copyFrom = None):
+    def copyQuestionnaire(self):
 #------------------------------------------------------------------------------
-        # copy all demand parameters describing the industry (processes)
-        # set status variables for the given alternative
-        # ...
-        pass
+#   Creates a 1:1 copy from alternative -1 to alternative 0
+#------------------------------------------------------------------------------
+
+#first remove everything with ANo > -1
+
+        n = Status.NoOfAlternatives
+        for ANo in range(n,-1,-1):
+            self.deleteAlternative(ANo)
+        self.createNewAlternative(-1,"Present State (checked)",\
+                                "complete data set for present state after cross-checking and data estimation")
+        self.setActiveAlternative(-1)
+        self.setStatus("Q")
+        self.setStatus("CC",0)
+
 #------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
@@ -439,8 +448,12 @@ class Project(object):
         questionnaires = Status.DB.questionnaire
         sprojects = Status.DB.sproject
         salternatives = Status.DB.salternatives
+        cgeneraldata = Status.DB.cgeneraldata
+        qelectricity = Status.DB.qelectricity
         
         if (originalPId <= 0) and (originalName is None):
+
+            newProject = True
 #..............................................................................
 # start a new project from scratch (creates basic project tables)
 
@@ -449,8 +462,8 @@ class Project(object):
             print "new project inserted: ",newID
 
             newSProject = {"ProjectID":newID,
-                           "NoOfAlternatives":0,
-                           "ActiveAlternative":0,
+                           "NoOfAlternatives":-1,
+                           "ActiveAlternative":-1,
                            "WriteProtected":0,
                            "StatusQ":EINSTEIN_NOTOK,
                            "StatusCC":EINSTEIN_NOTOK,
@@ -466,13 +479,26 @@ class Project(object):
                               "Description":"original data as submitted by industry"}
             salternatives.insert(newAlternative)
             
-            newAlternative = {"ProjectID":newID,
-                              "AlternativeProposalNo":0,
-                              "ShortName":"present state (checked)",
-                              "Description":"present state after consistency checking"}
-            salternatives.insert(newAlternative)
-            
-        else:  
+            newGeneralData = {"Questionnaire_id":newID,
+                              "AlternativeProposalNo":-1,
+                              "Nfuels":0,
+                              "NEquipe":0,
+                              "NPipeDuct":0,
+                              "NThProc":0,
+                              "NProducts":0,
+                              "NHX":0,
+                              "NWHEE":0}
+            cgeneraldata.insert(newGeneralData)
+
+            newElectricity = {"Questionnaire_id":newID,
+                              "AlternativeProposalNo":-1}
+            qelectricity.insert(newGeneralData)
+
+            Status.NoOfAlternatives = -1
+                        
+        else:
+
+            newProject = False
 
             if originalName is not None:    #if a name is given, overwrite ID
                 originalPId = self.getProjectID(originalName)
@@ -508,11 +534,11 @@ class Project(object):
             copySQLRows(DB.qelectricity,sqlQueryQ,"QElectricity_ID","Questionnaire_id",newID)
             copySQLRows(DB.qfuel,sqlQueryQ,"QFuel_ID","Questionnaire_id",newID)
             copySQLRows(DB.qgenerationhc,sqlQueryQ,"QGenerationHC_ID","Questionnaire_id",newID)
-            copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","ProjectID",newID)
             copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","Questionnaire_id",newID)
             copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","Questionnaire_id",newID)
             copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","Questionnaire_id",newID)
-            copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","ProjectID",newID)
             copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","Questionnaire_id",newID)
 
 #..............................................................................
@@ -532,6 +558,8 @@ class Project(object):
         print "setting new project as active project"
 
         self.setActiveProject(newID)
+
+        if newProject == True: self.setStatus("Q",0)
 
         print "finished my work - uff"
         
@@ -625,14 +653,40 @@ class Project(object):
 #------------------------------------------------------------------------------
 #   sets a status flag
 #------------------------------------------------------------------------------
+
+        sqlQuery = "ProjectID = '%s'"%(Status.PId)
+        sprojects = Status.DB.sproject.sql_select(sqlQuery)
+
         if key=="Q":
             Status.StatusQ = value
+            if len(sprojects) > 0: sprojects[0].StatusQ = value
         elif key=="CC":
-            Stauts.StatusCC = value
+            Status.StatusCC = value
+            if len(sprojects) > 0: sprojects[0].StatusCC = value
         elif key=="CS":
-            Stauts.StatusCS = value
+            Status.StatusCS = value
+#XXXXXXXX here name confusion between CA and CS -> to be unified to CS once SQL is changed !!!
+            if len(sprojects) > 0: sprojects[0].StatusCA = value
         else:
             print "Project (setStatus): status key %s unknown"%key
+
+#------------------------------------------------------------------------------
+    def getStatus(self):
+#------------------------------------------------------------------------------
+#   sets a status flag
+#------------------------------------------------------------------------------
+
+        sqlQuery = "ProjectID = '%s'"%(Status.PId)
+        sprojects = Status.DB.sproject.sql_select(sqlQuery)
+        if len(sprojects) > 0:
+            sproject = sprojects[0]
+            if sproject.StatusQ is not None: Status.StatusQ = sproject.StatusQ
+            else: sproject.StatusQ = EINSTEIN_NOTOK
+
+            if sproject.StatusCC is not None: Status.StatusCC = sproject.StatusCC
+            else: sproject.StatusCC = EINSTEIN_NOTOK
+        else:
+            print "Project (getStatus): ERROR - could not find sproject table"
 
 #------------------------------------------------------------------------------
     def deleteProduct(self,productName):
@@ -650,6 +704,36 @@ class Project(object):
                     %(Status.PId,Status.ANo,productName)
 
         deleteSQLRows(DB.qproduct,sqlQueryQ)
+
+#------------------------------------------------------------------------------
+    def addEquipmentDummy(self):
+#------------------------------------------------------------------------------
+#   enters a dummy of a new equiment
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        NEquipe = len(equipments)
+        tmp = {
+            "Questionnaire_id":Status.PId,
+            "AlternativeProposalNo":Status.ANo,
+            "EqNo": NEquipe+1,
+            "CascadeIndex": NEquipe+1
+            }          
+        newID = Status.DB.qgenerationhc.insert(tmp)
+        newEquipe = Status.DB.qgenerationhc.QGenerationHC_ID[newID][0]
+
+        NEquipe += 1
+
+        generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        generaldata[0].NEquipe = NEquipe
+
+        Status.SQL.commit()
+
+        return newEquipe
 
 #------------------------------------------------------------------------------
     def addFuelDummy(self):

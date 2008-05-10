@@ -21,6 +21,7 @@
 #                           Hans Schweiger  05/05/2008
 #                           Tom Sobota      07/05/2008
 #                           Hans Schweiger  07/05/2008
+#                           Hans Schweiger  10/05/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -30,6 +31,7 @@
 #       05/05/2008  HS  Event handlers changed.
 #       07/05/2008  HS  Some security features added (Nones, ...)
 #                       Function "display" was duplicated. one deleted
+#       10/05/2008  HS  AddEquipmentDummy added
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -274,104 +276,57 @@ class PanelQ4(wx.Panel):
         self.clear()
 
     def OnButtonOK(self, event):
-        if Status.PId <> 0:
-#..............................................................................
-# 1. equipment with this name not yet existing
+        equipeName = check(self.tc1.GetValue())
+        equipments = Status.DB.qgenerationhc.Equipment[equipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
-            if check(self.tc1.GetValue()) <> 'NULL' and \
-		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    Status.PId].AlternativeProposalNo[Status.ANo]) == 0:
+	if equipeName <> 'NULL' and len(equipments) == 0:
+            equipe = Status.prj.addEquipmentDummy()
+        elif equipeName <> 'NULL' and len(equipments) == 1:
+            equipe = equipments[0]
+        else:
+	    print "Equipment name has to be a uniqe value!"
+	    return
 
-#HS2008-05-07: block changed for adding security
-                fuelName = str(self.choiceOfDBFuel.GetStringSelection())
-                fuels = Status.DB.dbfuel.FuelName[fuelName]
-                if len(fuels)>0:
-                    dbfid = fuels[0].DBFuel_ID
-                else:
-                    dbfid = None
+        fuelName = str(self.choiceOfDBFuel.GetStringSelection())
+        fuels = Status.DB.dbfuel.FuelName[fuelName]
+        if len(fuels)>0:
+            dbfid = fuels[0].DBFuel_ID
+        else:
+            dbfid = None
+            print "PANELQ4: warning - fuel not found in DB"
 
-                tmp = {
-                    "Questionnaire_id":Status.PId,
-                    "AlternativeProposalNo":Status.ANo,
-                    "Equipment":check(self.tc1.GetValue()),
-                    "Manufact":check(self.tc2.GetValue()),
-                    "YearManufact":check(self.tc3.GetValue()),
-                    "Model":check(self.tc4.GetValue()),
-                    "EquipType":check(self.tc5.GetValue()),
-                    "NumEquipUnits":check(self.tc6.GetValue()),
-                    "DBFuel_id":dbfid,
-                    "HCGPnom":check(self.tc9.GetValue()),
-                    "FuelConsum":check(self.tc10.GetValue()),
-                    "UnitsFuelConsum":check(self.tc11.GetValue()),
-                    "ElectriConsum":check(self.tc12.GetValue()),
-                    "HCGTEfficiency":check(self.tc13.GetValue()),
-                    "HCGEEfficiency":check(self.tc14.GetValue()),
-                    "ElectriProduction":check(self.tc15.GetValue()),
-                    "TExhaustGas":check(self.tc16.GetValue()),
-                    "PartLoad":check(self.tc17.GetValue()),
-                    "HPerDayEq":check(self.tc18.GetValue()),
-                    "NDaysEq":check(self.tc19.GetValue()),
-                    "PipeDuctEquip":check(self.tc20.GetValue()),
-                    "CoolTowerType":check(self.tc8.GetValue())
-                    }
+        tmp = {
+            "Equipment":check(self.tc1.GetValue()),
+            "Manufact":check(self.tc2.GetValue()),
+            "YearManufact":check(self.tc3.GetValue()),
+            "Model":check(self.tc4.GetValue()),
+            "EquipType":check(self.tc5.GetValue()),
+            "NumEquipUnits":check(self.tc6.GetValue()),
+            "DBFuel_id":dbfid,
+            "HCGPnom":check(self.tc9.GetValue()),
+            "FuelConsum":check(self.tc10.GetValue()),
+            "UnitsFuelConsum":check(self.tc11.GetValue()),
+            "ElectriConsum":check(self.tc12.GetValue()),
+            "HCGTEfficiency":check(self.tc13.GetValue()),
+            "HCGEEfficiency":check(self.tc14.GetValue()),
+            "ElectriProduction":check(self.tc15.GetValue()),
+            "TExhaustGas":check(self.tc16.GetValue()),
+            "PartLoad":check(self.tc17.GetValue()),
+            "HPerDayEq":check(self.tc18.GetValue()),
+            "NDaysEq":check(self.tc19.GetValue()),
+            "PipeDuctEquip":check(self.tc20.GetValue()),
+            "CoolTowerType":check(self.tc8.GetValue())
+            }
 
-                Status.DB.qgenerationhc.insert(tmp)
-                Status.SQL.commit()
-                self.fillEquipmentList()
+        equipe.update(tmp)
+        Status.SQL.commit()
+        self.fillEquipmentList()
 
-#..............................................................................
-# 2. overwrite data of existing equipment
-
-            elif check(self.tc1.GetValue()) <> 'NULL' and \
-		    len(Status.DB.qgenerationhc.Equipment[self.tc1.GetValue()].Questionnaire_id[\
-		    Status.PId].AlternativeProposalNo[Status.ANo]) == 1:
-
-#HS2008-05-07: block changed for adding security
-                fuelName = str(self.choiceOfDBFuel.GetStringSelection())
-                fuels = Status.DB.dbfuel.FuelName[fuelName]
-                if len(fuels)>0:
-                    dbfid = fuels[0].DBFuel_ID
-                else:
-                    dbfid = None
-
-                tmp = {
-                    "Equipment":check(self.tc1.GetValue()),
-                    "Manufact":check(self.tc2.GetValue()),
-                    "YearManufact":check(self.tc3.GetValue()),
-                    "Model":check(self.tc4.GetValue()),
-                    "EquipType":check(self.tc5.GetValue()),
-                    "NumEquipUnits":check(self.tc6.GetValue()),
-                    "DBFuel_id":dbfid,
-                    "HCGPnom":check(self.tc9.GetValue()),
-                    "FuelConsum":check(self.tc10.GetValue()),
-                    "UnitsFuelConsum":check(self.tc11.GetValue()),
-                    "ElectriConsum":check(self.tc12.GetValue()),
-                    "HCGTEfficiency":check(self.tc13.GetValue()),
-                    "HCGEEfficiency":check(self.tc14.GetValue()),
-                    "ElectriProduction":check(self.tc15.GetValue()),
-                    "TExhaustGas":check(self.tc16.GetValue()),
-                    "PartLoad":check(self.tc17.GetValue()),
-                    "HPerDayEq":check(self.tc18.GetValue()),
-                    "NDaysEq":check(self.tc19.GetValue()),
-                    "PipeDuctEquip":check(self.tc20.GetValue()),
-                    "CoolTowerType":check(self.tc8.GetValue())
-#                    "IsAlternative":0
-                    }
-
-                q = Status.DB.qgenerationhc.Equipment[\
-		    self.tc1.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
-                q.update(tmp)
-                Status.SQL.commit()
-                self.fillEquipmentList()
-
-            else:
-                self.main.showError("Equipment has to be an unique value!")
-
-            print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
-            self.parent.equipeType = check(self.tc5.GetValue())
+        print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
+        self.parent.equipeType = check(self.tc5.GetValue())
 
 #HS2008-05-07: event.Skip() added. needed for leaving the dialog
-            event.Skip()
+        event.Skip()
 
 
 #------------------------------------------------------------------------------

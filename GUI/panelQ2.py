@@ -12,18 +12,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.06
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
 #                           Tom Sobota      02/05/2008
 #                           Hans Schweiger  05/05/2008
+#                           Hans Schweiger  10/05/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
 #                   TS  Changes in layout
 #       05/05/08:   HS  Event handlers changed; resize of grid so that it fits
 #                       into the window
+#       10/05/08:   HS  FuelOwn substituted by FECFuel
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,7 +50,7 @@ class PanelQ2(wx.Panel):
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
-        
+       
     def _init_ctrls(self, parent):
 
 #------------------------------------------------------------------------------
@@ -261,16 +263,21 @@ class PanelQ2(wx.Panel):
 
     def storeFuelData(self):
         fuelName = str(self.choiceOfDBFuelType.GetStringSelection())
-        fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        dbfuels = Status.DB.dbfuel.FuelName[fuelName]
+        if len(dbfuels) > 0:
+            dbfid = dbfuels[0].DBFuel_ID
+        else:
+            dbfid = -1
+        fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[dbfid]
+        
         if Status.PId <> 0 and fuelName <> 'None':
-            
-            if len(fuels.DBFuel_id[dbfid]) == 0:
+            if len(fuels) == 0:
                 newID = Status.prj.addFuelDummy()
                 tmp = {
                     "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
-                    "FuelOwn":self.check(self.tc4.GetValue()),
+                    "FECFuel":self.check(self.tc4.GetValue()),
                     "FuelTariff":self.check(self.tc5.GetValue()),
                     "FuelCostYear":self.check(self.tc6.GetValue())
                     }
@@ -281,12 +288,12 @@ class PanelQ2(wx.Panel):
                 
                 self.fillFuelList()
 
-            elif len(Status.DB.qfuel.Questionnaire_id[Status.PId].DBFuel_id[Status.DB.dbfuel.FuelName[str(self.choiceOfDBFuelType.GetStringSelection())][0].DBFuel_ID]) == 1:
+            elif len(fuels) == 1:
                 tmp = {
                     "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
-                    "FuelOwn":self.check(self.tc4.GetValue()),
+                    "FECFuel":self.check(self.tc4.GetValue()),
                     "FuelTariff":self.check(self.tc5.GetValue()),
                     "FuelCostYear":self.check(self.tc6.GetValue())
                     }
@@ -394,10 +401,11 @@ class PanelQ2(wx.Panel):
         try:
             self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
             self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
+            print "PanelQ2: fuel selection -> ",self.selectedFuelName,self.selectedFuelID
             q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
             self.tc2.SetValue(str(q.FuelUnit))
             self.tc3.SetValue(str(q.MFuelYear))
-            self.tc4.SetValue(str(q.FuelOwn))
+            self.tc4.SetValue(str(q.FECFuel))
             self.tc5.SetValue(str(q.FuelTariff))
             self.tc6.SetValue(str(q.FuelCostYear))
             self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))
@@ -430,49 +438,50 @@ class PanelQ2(wx.Panel):
 	if Status.PId == 0:
 	    return
 
-	if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) <= 0:
-	    return
+	if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) > 0:
+	    
+            q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
+            self.grid.SetCellValue(1, 3, str(q.PowerContrTot))
+            self.grid.SetCellValue(1, 1, str(q.PowerContrStd))
+            self.grid.SetCellValue(1, 0, str(q.PowerContrPeak))
+            self.grid.SetCellValue(1, 2, str(q.PowerContrVall))
+            self.grid.SetCellValue(0, 3, str(q.ElectricityTotYear))
+            self.grid.SetCellValue(0, 0, str(q.ElectricityPeakYear))
+            self.grid.SetCellValue(0, 1, str(q.ElectricityStandYear))
+            self.grid.SetCellValue(0, 2, str(q.ElectricityValleyYear))
+            self.grid.SetCellValue(0, 4, str(q.ElGenera))
+            self.grid.SetCellValue(0, 5, str(q.ElSales))
+            self.grid.SetCellValue(8, 0, str(q.ElectricityRef))
+            self.grid.SetCellValue(8, 1, str(q.ElectricityAC))
+            self.grid.SetCellValue(8, 2, str(q.ElectricityThOther))
+            self.grid.SetCellValue(8, 3, str(q.ElectricityMotors))
+            self.grid.SetCellValue(8, 4, str(q.ElectricityChem))
+            self.grid.SetCellValue(8, 5, str(q.ElectricityLight))
+            self.grid.SetCellValue(2, 3, str(q.ElTariffClassTot))
+            self.grid.SetCellValue(2, 1, str(q.ElTariffClassStd))
+            self.grid.SetCellValue(2, 0, str(q.ElTariffClassPeak))
+            self.grid.SetCellValue(2, 2, str(q.ElTariffClassTotVall))
+            self.grid.SetCellValue(2, 5, str(q.ElTariffClassCHP))
+            self.grid.SetCellValue(3, 3, str(q.ElTariffPowTot))
+            self.grid.SetCellValue(3, 1, str(q.ElTariffPowStd))
+            self.grid.SetCellValue(3, 0, str(q.ElTariffPowPeak))
+            self.grid.SetCellValue(3, 2, str(q.ElTariffPowVall))
+            self.grid.SetCellValue(3, 5, str(q.ElTariffPowCHP))
+            self.grid.SetCellValue(4, 3, str(q.ElTariffCTot))
+            self.grid.SetCellValue(4, 1, str(q.ElTariffCStd))
+            self.grid.SetCellValue(4, 0, str(q.ElTariffCPeak))
+            self.grid.SetCellValue(4, 2, str(q.ElTariffCVall))
+            self.grid.SetCellValue(4, 5, str(q.ETariffCHP))
+            self.grid.SetCellValue(5, 3, str(q.ElCostYearTot))
+            self.grid.SetCellValue(5, 1, str(q.ElCostYearStd))
+            self.grid.SetCellValue(5, 0, str(q.ElCostYearPeak))
+            self.grid.SetCellValue(5, 2, str(q.ElCostYearVall))
+            self.grid.SetCellValue(5, 5, str(q.ElSalesYearCHP))
 
-	q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
-	self.grid.SetCellValue(1, 3, str(q.PowerContrTot))
-	self.grid.SetCellValue(1, 1, str(q.PowerContrStd))
-	self.grid.SetCellValue(1, 0, str(q.PowerContrPeak))
-	self.grid.SetCellValue(1, 2, str(q.PowerContrVall))
-	self.grid.SetCellValue(0, 3, str(q.ElectricityTotYear))
-	self.grid.SetCellValue(0, 0, str(q.ElectricityPeakYear))
-	self.grid.SetCellValue(0, 1, str(q.ElectricityStandYear))
-	self.grid.SetCellValue(0, 2, str(q.ElectricityValleyYear))
-	self.grid.SetCellValue(0, 4, str(q.ElGenera))
-	self.grid.SetCellValue(0, 5, str(q.ElSales))
-	self.grid.SetCellValue(8, 0, str(q.ElectricityRef))
-	self.grid.SetCellValue(8, 1, str(q.ElectricityAC))
-	self.grid.SetCellValue(8, 2, str(q.ElectricityThOther))
-	self.grid.SetCellValue(8, 3, str(q.ElectricityMotors))
-	self.grid.SetCellValue(8, 4, str(q.ElectricityChem))
-	self.grid.SetCellValue(8, 5, str(q.ElectricityLight))
-	self.grid.SetCellValue(2, 3, str(q.ElTariffClassTot))
-	self.grid.SetCellValue(2, 1, str(q.ElTariffClassStd))
-	self.grid.SetCellValue(2, 0, str(q.ElTariffClassPeak))
-	self.grid.SetCellValue(2, 2, str(q.ElTariffClassTotVall))
-	self.grid.SetCellValue(2, 5, str(q.ElTariffClassCHP))
-	self.grid.SetCellValue(3, 3, str(q.ElTariffPowTot))
-	self.grid.SetCellValue(3, 1, str(q.ElTariffPowStd))
-	self.grid.SetCellValue(3, 0, str(q.ElTariffPowPeak))
-	self.grid.SetCellValue(3, 2, str(q.ElTariffPowVall))
-	self.grid.SetCellValue(3, 5, str(q.ElTariffPowCHP))
-	self.grid.SetCellValue(4, 3, str(q.ElTariffCTot))
-	self.grid.SetCellValue(4, 1, str(q.ElTariffCStd))
-	self.grid.SetCellValue(4, 0, str(q.ElTariffCPeak))
-	self.grid.SetCellValue(4, 2, str(q.ElTariffCVall))
-	self.grid.SetCellValue(4, 5, str(q.ETariffCHP))
-	self.grid.SetCellValue(5, 3, str(q.ElCostYearTot))
-	self.grid.SetCellValue(5, 1, str(q.ElCostYearStd))
-	self.grid.SetCellValue(5, 0, str(q.ElCostYearPeak))
-	self.grid.SetCellValue(5, 2, str(q.ElCostYearVall))
-	self.grid.SetCellValue(5, 5, str(q.ElSalesYearCHP))
 	self.fillFuelList()
 
     def fillFuelList(self):
+        print "PanelQ2: Trying to fill fuel list"
         self.fuelListBox.Clear()
         fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(fuels) > 0:

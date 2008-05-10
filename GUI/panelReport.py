@@ -82,8 +82,6 @@ PREFIX      ='KEY_'
 NEWREPORT   = 'report.ods'
 TMPFILE     = "./workfile"
 CONTENTFILE = 'content.xml'
-P_RANGE     = re.compile('.*?\'(.+?)\'.*?\$([A-Z]+)\$(\d+).*?\$([A-Z]+)\$(\d+)')
-P_CELL      = re.compile('.*?\'(.+?)\'.*?\$([A-Z]+)\$(\d+)')
 
 wxID_BTNSELECTREPORT = wx.NewId()
 
@@ -193,6 +191,35 @@ class PanelReport(wx.Panel):
     def getDOM(self):
         return self.document
     
+    def getNameComponents(self, expr):
+        result = []
+        e1 = expr.replace('.','')
+        e2 = e1.replace(':','')
+        e3 = e2.replace("'",'')
+        e4 = e3.replace('&apos;','')
+        comp = e4.split('$')
+        for c in comp:
+            s = c.strip()
+            if s:
+                result.append(s)
+
+        if len(result) == 5:
+            # range of cells
+            return ((result[0],
+                    [int(COLUMNS.find(result[1].upper())) + 1,
+                     int(result[2]),
+                     int(COLUMNS.find(result[3].upper())) + 1,
+                     int(result[4])]))
+        if len(result) == 3:
+            # one single cell
+            return ((result[0],
+                    [int(COLUMNS.find(result[1].upper())) + 1,
+                     int(result[2])]))
+        else:
+            # not recognized
+            print 'panelReport (getNameComponents): name format not recognized->'+repr(expr)
+            return None
+
     def createNamesTable(self):
         self.names = {}
         self.sheetnames = {}
@@ -204,98 +231,112 @@ class PanelReport(wx.Panel):
                 continue
             name = name[len(PREFIX):]
             range = namelement.getAttribute('table:cell-range-address')
-            m = P_RANGE.match(range)
-            if m:
-                # datum is a range
-                colFrom = int(COLUMNS.find(m.group(2).strip().upper())) + 1
-                rowFrom = int(m.group(3))
-                colTo = int(COLUMNS.find(m.group(4).strip().upper())) + 1
-                rowTo = int(m.group(5))
-                sheetname = m.group(1)
-                itemlist = [rowFrom, colFrom, rowTo, colTo]
-            else:
-                m = P_CELL.match(range)
-                if m:
-                    # datum is a single cell
-                    col = int(COLUMNS.find(m.group(2).strip().upper())) + 1
-                    row = int(m.group(3))
-                    sheetname = m.group(1)
-                    itemlist = [row, col]
-
-            if m:
+            m = self.getNameComponents(range)
+            if m is not None:
+                (sheetname,itemlist) = m
                 self.names[name] = [sheetname,itemlist]
                 sheetlist = []
                 if self.sheetnames.has_key(sheetname):
                     sheetlist = self.sheetnames[sheetname]
                 sheetlist.append([name,itemlist])
                 self.sheetnames[sheetname] = sheetlist
-
+        #for s in self.names.keys():
+        #    print 'self.names. key',s,'value',self.names[s]
+        #for s in self.sheetnames.keys():
+        #    print 'self.sheetnames. key',s,'value',self.sheetnames[s]
 
     def replaceData(self):
         #
-        # Parse the document and modify table cells
+        # Scan the sheet names list and change values on each
+        # sheet on the list
         #
-        worksheets = self.document.getElementsByTagName("table:table")
-        for sheet in worksheets:
-            sheetname =  sheet.getAttribute('table:name')
-            if not self.sheetnames.has_key(sheetname):
-                continue
-            print 'Updating worksheet ' + repr(sheetname)
-            nrow=0
-            #rowElements = self.document.getElementsByTagName("table:table-row")
-            rowElements = sheet.getElementsByTagName("table:table-row")
-            for row in rowElements:
-                nrow += 1
-                things =  self._processRowFindName(sheetname,nrow, row)
-                if things is not None:
-                    # a name referring to this row has been found
-                    (ncol, data, thelist) = things
-                    (datarows,datacols) = data.shape
-                    for c in range(datacols):
-                        for r in range(datarows):
-                            self._findOneCell(sheet,nrow+r,ncol+c,data[r,c])
-
+        for sheetname in self.sheetnames.keys():
+            #
+            # get the list of names,changes for this sheet
+            # each element of the list has the structure:
+            # [name,[col,row]] for cells
+            # [name,[left_col, upper_row,  right_col,lower_row]] for ranges
+            #
+            changeslist = self.sheetnames[sheetname]
+            for cl in changeslist:
+                thename = cl[0]
+                if not Interfaces.GData.has_key(thename):
+                    continue
+                # found a name on this sheet
+                data = Interfaces.GData[thename]
+                thelist = cl[1]
+                ncol = thelist[0]
+                nrow = thelist[1]
+                #print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
+                #      (sheetname,thename,nrow,ncol)
+                (datarows,datacols) = data.shape
+                #print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
+                for c in range(datacols):
+                    for r in range(datarows):
+                        #print 'Call _findOneCell with data="%s" for row %s col %s' %\
+                        #    (data[r,c],nrow+r,ncol+c)
+                        self._findOneCell(sheetname,nrow+r,ncol+c,data[r,c])
 
 #
 # private instance methods
 #
 
-    def _findOneCell(self,sheet,nrowfound,ncolfound,newval):
-        nrow=0
-        rowElements = sheet.getElementsByTagName("table:table-row")
-        for row in rowElements:
-            nrow += 1
-            if nrow != nrowfound:
-                continue
+    def _findOneCell(self,sheetname,nrowfound,ncolfound,newval):
+        # traverse the DOM looking for one element, identified by:
+        # the name of the sheet, the row and the column
+        # When found, call _changeOneCell to modify the element
+        #
+        worksheets = self.document.getElementsByTagName("table:table")
+        for sheet in worksheets:
+            thissheet =  sheet.getAttribute('table:name')
+            if sheetname == thissheet:
+                nrow=0
+                rowElements = sheet.getElementsByTagName("table:table-row")
+                for row in rowElements:
+                    nrow += 1
+                    if nrow != nrowfound:
+                        continue
 
-            ncol = 1
-            for element in row.childNodes:
-                if element.nodeName == 'table:covered-table-cell':
-                    pass # looks like this doesn't count
-                elif element.nodeName == 'table:table-cell':
-                    if ncol == ncolfound:
-                        # found the place!
-                        # replace and exit
-                        self._changeOneCell(element,newval)
-                        return
-                    n = element.getAttribute('table:number-columns-repeated')
-                    if n:
-                        # if repeated, add the value
-                        ncol += int(n)
-                    else:
-                        # if not, add 1
-                        ncol += 1
+                    ncol = 1
+                    for element in row.childNodes:
+                        if element.nodeName == 'table:covered-table-cell':
+                            pass # looks like this doesn't count
+                        elif element.nodeName == 'table:table-cell':
+                            if ncol == ncolfound:
+                                # found the place!
+                                # replace and exit
+                                #print 'Call _changeOneCell with element=%s newval %s' %\
+                                #      (element.nodeName,newval)
+                                self._changeOneCell(element,newval)
+                                return
+                            n = element.getAttribute('table:number-columns-repeated')
+                            if n:
+                                # if repeated, add the value
+                                ncol += int(n)
+                            else:
+                                # if not, add 1
+                                ncol += 1
 
-
+        print 'panelReport (_findOneCell) warning: Element at sheet %s, row %s col %s not found' %\
+              (sheetname,nrowfound,ncolfound)
 
     def _changeOneCell(self,element,newval):
-        # now let's do the change
-        if not newval:
-            return
+        if newval is None:
+            newval = ''
+        elif not newval:
+            newval = ''
+
+        # ok we have some value
         try:
-            newval=newval.strip()
             dummy = float(newval)
+            aNumber = True
+        except ValueError:
+            aNumber = False
+
+        newval = str(newval)
+        if aNumber:
             element.setAttribute('office:value',newval)
+            ##print "Do: element.setAttribute('office:value',%s)" % (newval,)
             element.setAttribute('office:value-type','float')
             # there probably is a text node also with the value
             # it is deleted here and OO will recreate it.
@@ -306,60 +347,26 @@ class PanelReport(wx.Panel):
                     (child.nodeType == child.TEXT_NODE):
                     element.removeChild(child)
                 child = next
-            element.normalize()
-            return
-        except ValueError:
-            pass
-        # the value is a text element
-        child = element.firstChild
-        while child is not None:
-            next = child.nextSibling
-            if child.nodeType == child.ELEMENT_NODE:
-                child.firstChild.data = newval
-                return
-            child = next
-        # if comes here, there was not a previous text node.
-        # create a text child for the data
-        dataelement = self.document.createElement('text:p')
-        # now the text with the value
-        text = self.document.createTextNode(newval)
-        dataelement.appendChild(text)
-        element.appendChild(dataelement)
+        else:
+            # the value is a text element
+            child = element.firstChild
+            while child is not None:
+                next = child.nextSibling
+                if child.nodeType == child.ELEMENT_NODE:
+                    child.firstChild.data = newval
+                    ##print 'Do: child.firstChild.data = %s' % (newval,)
+                    return
+                child = next
+            # if comes here, there was not a previous text node.
+            # create a text child for the data
+            dataelement = self.document.createElement('text:p')
+            # now the text with the value
+            text = self.document.createTextNode(newval)
+            ##print 'Do: text = self.document.createTextNode(%s)' % (newval,)
+            dataelement.appendChild(text)
+            element.appendChild(dataelement)
+            
         element.normalize()
 
-
-
-    def _processRowFindName(self,sheetname,nrow,row):
-        ncol = 0
-        for element in row.childNodes:
-            if element.nodeName == 'table:covered-table-cell':
-                pass # looks like this doesn't count
-            elif element.nodeName == 'table:table-cell':
-                n = element.getAttribute('table:number-columns-repeated')
-                if n:
-                    # if repeated, add the value
-                    ncol += int(n)
-                else:
-                    # if not, add 1
-                    ncol += 1
-
-                #
-                # get the list of names,changes for this worksheet
-                # each element of the list has the structure:
-                # [name,[r,c]] for cells
-                # [name,[upper_row, left_col, lower_row, right_col]] for ranges
-                #
-                changeslist = self.sheetnames[sheetname]
-                for cl in changeslist:
-                    thename = cl[0]
-                    thelist = cl[1]
-                    if int(thelist[0]) == nrow and int(thelist[1]) == ncol:
-                        if not Interfaces.GData.has_key(thename):
-                            continue
-                        data = Interfaces.GData[thename]
-                        return (ncol, data, thelist)
-
-        # no data for this row
-        return None
 
 

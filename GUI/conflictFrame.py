@@ -80,13 +80,13 @@ class conflictFrame(wx.Dialog):
               id=wxID_CONFLICTFRAMEGRID)
 
         self.button1 = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
-              name='button1', parent=self, pos=wx.Point(808, 584),
+              name='button1', parent=self, pos=wx.Point(772, 610),
               size=wx.Size(128, 32), style=0)
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, id=wx.ID_CANCEL)
 
         self.button2 = wx.Button(id=wx.ID_OK, label=u'OK', name='button2',
-              parent=self, pos=wx.Point(664, 584), size=wx.Size(128, 32),
+              parent=self, pos=wx.Point(632, 610), size=wx.Size(128, 32),
               style=0)
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, id=wx.ID_OK)

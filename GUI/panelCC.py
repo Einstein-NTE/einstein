@@ -67,7 +67,7 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-MAXCOLS = 5
+COLNO = 5
 
 class PanelCC(wx.Panel):
 
@@ -78,9 +78,7 @@ class PanelCC(wx.Panel):
 	self.main = main
 
         self.mod = Status.mod.moduleCC
-
-        self.shortName = "new alternative"
-        self.description = "describe shortly the main differential features of the new alternative"
+        self.checkOK = False
 
         self.ANo = Status.ANo
         labels_column = 1
@@ -100,7 +98,7 @@ class PanelCC(wx.Panel):
         key = keys[0]
 
 
-        self.grid.CreateGrid(MAXROWS, MAXCOLS)
+        self.grid.CreateGrid(MAXROWS, COLNO)
 
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
@@ -123,7 +121,7 @@ class PanelCC(wx.Panel):
         #
         for r in range(MAXROWS):
             self.grid.SetRowAttr(r, attr)
-            for c in range(MAXCOLS):
+            for c in range(COLNO):
                 if c == labels_column:
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -231,7 +229,7 @@ class PanelCC(wx.Panel):
               label='---', name='stStatistics3Val', parent=self,
               pos=wx.Point(176, 488), size=wx.Size(12, 13), style=0)
 
-        self.cbSetAccuracy = wx.ComboBox(choices=["quick and dirty", "final"],
+        self.cbSetAccuracy = wx.ComboBox(choices=["quick & dirty","standard","detailed"],
               id=wxID_PANELCCCBSETACCURACY, name='cbSetAccuracy', parent=self,
               pos=wx.Point(616, 8), size=wx.Size(162, 21), style=0,
               value='"quick and dirty"')
@@ -252,28 +250,32 @@ class PanelCC(wx.Panel):
 #..............................................................................
 # update of alternatives table
 
+        rows = 0
         try:
             data = Interfaces.GData[self.keys[0]]
             print "data = ",data
             (rows,cols) = data.shape
             print rows,cols
             for r in range(rows):
-                for c in range(cols):
+                for c in range(COLNO):
                     self.grid.SetCellValue(r, c, data[r][c])
+        except:
+            pass
 
-    #XXX Here better would be updating the grid and showing less rows ... ????
-            for r in range(rows,MAXROWS):
-                for c in range(cols):
+        for r in range(rows,MAXROWS):
+                for c in range(COLNO):
                     self.grid.SetCellValue(r, c, "")
 
+        try:
             info = Interfaces.GData[self.keys[1]]
 
             self.stStatistics1Val.SetLabel(str(info[0]))
             self.stStatistics3Val.SetLabel(str(info[2]))
-            
+
+            self.cbSetAccuracy.SetSelection(int(info[3]-1))     
         except:
             pass
-
+        
         self.Show()
         self.main.panelinfo.update()
        
@@ -289,56 +291,43 @@ class PanelCC(wx.Panel):
 #   Generate new alterantive proposal
 #------------------------------------------------------------------------------		
 
-        nc = self.mod.basicCheck(matrixCheck=True)
-        self.display()
+        popup =  DialogOK(self,"confirm basic check",\
+                          "DEMO VERSION. Check works only for 1 fuel+elect., 2 equipes and 3 processes !!!"+\
+                          "\nTake care: running the check will invalidate existing alternative proposals"+\
+                          "\nDo You want to continue ?")
+        if popup.ShowModal() == wx.ID_OK:
 
-        if nc > 0:
-            self.pu1 = conflictFrame(self)
-            self.pu1.Show()
-        else:
-            nc =  self.mod.basicCheck(matrixCheck=True)
-            self.display
+            Status.prj.copyQuestionnaire()
+
+            nc = self.mod.basicCheck(matrixCheck=True)
+            self.display()
 
             if nc > 0:
-                self.pu1 = conflictFrame(self)
-                self.pu1.Show()
-
+                self.checkOK = False
+                self.cf = conflictFrame(self)
+                self.cf.Show()
+            else:
+                self.checkOK = True
+            
+        event.Skip()
         
 #------------------------------------------------------------------------------		
     def OnEstimateDataButton(self, event):
 #------------------------------------------------------------------------------		
 #   Generate new porposal copying from existing alternative
 #------------------------------------------------------------------------------		
-        self.shortName = self.grid.GetCellValue(self.selectedRow,1)+"(mod.)"
-        self.description = self.grid.GetCellValue(self.selectedRow,2)+"(modified alternative based on "+self.grid.GetCellValue(self.selectedRow,1)+")"
-
-        pu1 =  DialogA(self)
-        if pu1.ShowModal() == wx.ID_OK:
-            print "PanelCC - OK",self.shortName,self.description
-            print "PanelCC (BasicCheck-Button): calling function createNewAlternative"
-
-            self.display()
-
-        elif pu1.ShowModal() == wx.ID_Cancel:
-            print "PanelCC - Cancel"
-        else:
-            print "PanelCC - ???"
-
+        popup =  DialogOK(self,"confirm data estimation","DATA ESTIMATE NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY")
+        if popup.ShowModal() == wx.ID_OK:
+            pass
 #------------------------------------------------------------------------------		
     def OnCheckListButton(self, event):
 #------------------------------------------------------------------------------		
 #   Delete alternative proposal
 #------------------------------------------------------------------------------		
 
-        pu2 =  DialogOK(self,"delete alternative","do you really want to delete this alternative ?")
+        pu2 =  DialogOK(self,"confirm check list","CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY")
         if pu2.ShowModal() == wx.ID_OK:
-            if self.ANo > 0:
-                self.display()
-            elif self.ANo in [-1,0]:
-                print "PanelCC (DeleteButton): cannot delete alternative ",self.ANo
-            else:
-                print "PanelCC (DeleteButton): erroneous alternative number ",self.ANo
-
+            pass
 #------------------------------------------------------------------------------		
     def OnGridPanelGridCellLeftClick(self, event):
 #------------------------------------------------------------------------------		
@@ -346,7 +335,6 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
 	self.selectedRow = event.GetRow()
 
-        print "PanelCC - updating panelinfo"
         self.main.panelinfo.update()
 
         event.Skip()
@@ -360,19 +348,36 @@ class PanelCC(wx.Panel):
     def OnGridPanelGridCellRightClick(self, event):
         event.Skip()        
 
-#==============================================================================
-#   EVENT HANDLERS BUTTONS TO DESIGN ASSISTANTS
-#==============================================================================
+#------------------------------------------------------------------------------		
+    def OnCbSetAccuracyCombobox(self, event):
+#------------------------------------------------------------------------------		
+
+        accuracy = self.cbSetAccuracy.GetSelection()
+        self.mod.setPriorityLevel(accuracy+1)
+        self.display()
+        event.Skip()
+
 
 #------------------------------------------------------------------------------		
 #   <<< OK Cancel >>>
 #------------------------------------------------------------------------------		
     def OnButtonpanelOkButton(self, event):
-        self.Hide()
-        ###AQUI FALTA CONFIRMACION DATOS Y PASAR DE ANO -1 a ANO 0
-        Status.schedules.create()
-        Status.processes.createAggregateDemand()
-        self.main.tree.SelectItem(self.main.qEM1, select=True)
+
+        if self.checkOK == True:
+            popup =  DialogOK(self,"accept data",\
+                              "you have to confirm that data are correct, before continuing")
+            if popup.ShowModal() == wx.ID_OK:
+                Status.prj.setActiveAlternative(0)
+                Status.prj.setStatus("CC")
+                self.Hide()
+                self.main.tree.SelectItem(self.main.qEA4, select=True)
+        else:
+            popup =  DialogOK(self,"revise data",\
+                              "you first have to eliminate unconsistencies in the data set")
+
+#        Status.schedules.create()
+#        Status.processes.createAggregateDemand()
+
 
     def OnButtonpanelCancelButton(self, event):
         #warning: do you want to leave w/o saving ???
@@ -387,7 +392,5 @@ class PanelCC(wx.Panel):
         self.main.tree.SelectItem(self.main.qEM1, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
-    def OnCbSetAccuracyCombobox(self, event):
-        event.Skip()
 
 

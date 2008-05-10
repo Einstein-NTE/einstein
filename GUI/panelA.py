@@ -269,7 +269,10 @@ class PanelA(wx.Panel):
         print rows,cols
         for r in range(rows):
             for c in range(cols):
-                self.grid.SetCellValue(r, c, data[r][c])
+                try:
+                    self.grid.SetCellValue(r, c, data[r][c])
+                except:
+                    pass
 
 #XXX Here better would be updating the grid and showing less rows ... ????
         for r in range(rows,MAXROWS):

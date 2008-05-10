@@ -159,12 +159,22 @@ class ModuleEA4(object):
         for process in processes:
             k = process.ProcNo - 1
             if k < 3:   #present master limited to 3 processes !!! XXXXXXX TO BE CHANGED XXXXX
-                tableReport.append([process.Process,"",
-                                    "here should be the process description text","","","","","","",
+#                tableReport.append([process.Process,"",
+#                                    "here should be the process description text","","","","","","",
 #                                    process.Description,"","","","","","",
-                                    process.UPH,"",
-                                    UPHPercentage[k],"",
-                                    "",process.PT])
+#                                    process.UPH,"",
+#                                    UPHPercentage[k],"",
+#                                    "",process.PT])
+
+                tableReport.append([process.Process,                              # col C.
+                                    "",                                           # col D is empty
+                                    "here should be the process description text",# cols E-K are merged,
+                                                                                  # so they count as
+                                                                                  # a single cell
+                                    process.UPH,                                  # cols L-M are merged
+                                    UPHPercentage[k],                             # cols N-O are merged
+                                    process.PT,                                   # col P
+                                   ""])                                           # col Q is empty
 
         Status.int.setGraphicsData("PROCESSES", array(tableReport))
 
