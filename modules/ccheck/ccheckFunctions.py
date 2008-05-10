@@ -28,6 +28,8 @@
 #                           Hans Schweiger      23/04/2008
 #                           Hans Schweiger      24/04/2008
 #                           Hans Schweiger      25/04/2008
+#                           Claudia Vannoni     02/05/2008
+#                           Hans Schweiger      07/05/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -43,6 +45,9 @@
 #       23/04/08 HS method setValue added in CCPar
 #       24/04/08 HS added method "screen" in CCPar
 #       25/04/08 HS tracking of conflicts in ccheck-functions 
+#       02/05/08 CV calcH,adjustH provisional: TO BE IMPROVED
+#       07/05/08 HS entry for process/equipe/pipe no added in conflict list
+#                   adjustProd/ProdC -> changed
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -56,22 +61,25 @@
 
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
-DEFAULT_SQERR = 1.e-4 # default value for sqerr assigned to questionnaire values
+DEFAULT_SQERR = 1.e-10 # default value for sqerr assigned to questionnaire values
 NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
-MAX_SQERR = 1       # critical square error for screening
+MAX_SQERR = 0.25     # critical square error for screening
 
 CONFIDENCE = 2      #maximum relation between statistical square error and abs.min/max
+CHECKMODE = "MEAN"  #MEAN or BEST. MEAN recommened as BEST doesn't give consistent results
 
-DEBUG = "OFF" #Set to:
+DEBUG = "BASIC" #Set to:
                 #"ALL": highest level,
                 #"CALC": only debug in CALC Functions
                 #"ADJUST": only debug in ADJUST Functions
+                #"MAIN": plots the show-alls in each block
                 #"BASIC": basic debugging (not yet implemented)
                 #"OFF" or any other value ...: doesn't print anything
 
 TEST = False
 TESTCASE = 3
-                
+
+from einstein.modules.constants import *                
 from math import *
 
 #------------------------------------------------------------------------------
@@ -81,23 +89,60 @@ class CCPar():
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def __init__(self,s):
+    def __init__(self,s,parType=None,priority=3):
 #------------------------------------------------------------------------------
         self.name = s
+        self.priority = priority
         self.val = None
         self.sqerr = INFINITE
         self.sqdev = INFINITE
 
         self.valMin = 0         #default: non-negative values !!!!
-        self.valMax = INFINITE
+
+        if parType=="T" or parType=="DT":
+            self.valMax = MAXTEMP
+        elif parType =="X":
+            self.valMax = 1.0
+        else:
+            self.valMax = INFINITE
 
         self.track = [self.name]
+
+#------------------------------------------------------------------------------
+    def calcDev(self):
+#------------------------------------------------------------------------------
+#   calculates sqDev from sqErr and value
+#------------------------------------------------------------------------------
+        if self.val > NUMERIC_ERR:
+            self.sqdev = self.sqerr*pow(self.val,2.)
+        elif self.sqerr ==0:
+            self.sqdev = 0
+        else:
+            try:
+                self.sqdev = (self.valMax - self.valMin,0)^2
+            except:
+                self.sqdev = INFINITE
+        return self.sqdev
+
+#------------------------------------------------------------------------------
+    def calcErr(self):
+#------------------------------------------------------------------------------
+#   calculates sqErr from sqDev and value
+#------------------------------------------------------------------------------
+        if self.val > NUMERIC_ERR:
+            self.sqerr = self.sqdev/pow(self.val,2.)
+        elif self.sqdev == 0:
+            self.sqerr = 0
+        else:
+            self.sqerr = INFINITE
+        return self.sqerr
 
 #------------------------------------------------------------------------------
     def update(self,new):
 #------------------------------------------------------------------------------
         self.val = new.val
         self.sqerr = new.sqerr
+        self.sqdev = new.sqdev
         self.valMin = new.valMin
         self.valMax = new.valMax
 
@@ -172,16 +217,6 @@ class CCPar():
                 self.valMax = max(self.valMin,self.valMax) #new max can not be lower than min
 
 #.............................................................................
-# consider that the error can not be larger than [maxVal - minVal]
-
-                try:    #helps to avoid crash for very large errors
-                    self.sqerr = min(self.sqerr,pow((self.valMax-self.valMin)/self.val,2))
-                except:
-                    pass
-
-                self.sqerr = min(self.sqerr,INFINITE)
-
-#.............................................................................
 # special case: exact zero
 
             elif self.val==0 and self.sqerr==0:
@@ -194,6 +229,19 @@ class CCPar():
             self.val = min(self.val,self.valMax)
             self.val = max(self.val,self.valMin)
 
+
+#.............................................................................
+# consider that the error can not be larger than [maxVal - minVal]
+
+            if self.val > 0:
+                
+                try:    #helps to avoid crash for very large errors
+                    self.sqerr = min(self.sqerr,pow((self.valMax-self.valMin)/self.val,2))
+                except:
+                    pass
+
+                self.sqerr = min(self.sqerr,INFINITE)
+
 #.............................................................................
 # check for all values larger than 0 !!!
 # if constrain in between min/max works, and min> 0, the following should be unnecessary
@@ -205,11 +253,15 @@ class CCPar():
                 self.show()
                 print "======================================================"
                 print "======================================================"
+
+        elif self.valMax < 1.e-10*INFINITE:
+            self.val = 0.5 * (self.valMin+self.valMax)
+            self.sqdev = pow((self.valMax-self.valMin),2)
                 
 #------------------------------------------------------------------------------
     def show(self):
 #------------------------------------------------------------------------------
-        print "%s = "%self.name,self.val,"(sqerr: %s)"%self.sqerr,"[%s"%self.valMin,",%s"%self.valMax,"]",self.track
+        print "%s = "%self.name,self.val,"(sqerr: %s)"%self.sqerr,"[%s"%self.valMin,",%s"%self.valMax,"]"
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -220,10 +272,10 @@ class CCPar():
         CCScreen.nScreened += 1
         
         if (self.val == None):
-            CCScreen.screenList.append([self.name,self.val,"-"])
+            CCScreen.screenList.append([self.name,"---","---",screen.dataGroup,self.priority])
         elif (self.sqerr > MAX_SQERR):
             err = pow(self.sqerr,0.5)*100
-            CCScreen.screenList.append([self.name,self.val, str(err)+"%"])
+            CCScreen.screenList.append([self.name,'%9.2f'%self.val,'+/-%5.2f'%err,screen.dataGroup,self.priority])
 
         if DEBUG in ["ALL","BASIC"]:
             print "CCPar (screen): screening parameter"
@@ -269,6 +321,9 @@ class CCScreen():
     def __init__(self):
         self.reset()
 
+    def setDataGroup(self,name,no):
+        self.dataGroup = str(no)
+
     def reset(self):
         CCScreen.screenList = []
         CCScreen.nScreened = 0
@@ -297,6 +352,9 @@ class CCConflict():
         CCConflict.nConflictChecked = 0
         CCConflict.nConflicts = 0
 
+    def setDataGroup(self,name,no):
+        self.dataGroup = name + "["+str(no)+"]"
+
     def show(self):
         print "CCConflict: %s parameters screened for possible conflicts"%len(CCConflict.conflictList)
         for i in range(len(CCConflict.conflictList)):
@@ -307,7 +365,7 @@ class CCConflict():
         y1err = pow(y1.sqerr,0.5)
         y2err = pow(y2.sqerr,0.5)
         
-        row = [dif,maxDif,y1.name,y1.track,y1.val,y1err,y2.name,y2.track,y2.val,y2err]
+        row = [dif,maxDif,y1.name,y1.track,y1.val,y1err,y2.name,y2.track,y2.val,y2err,self.dataGroup]
         CCConflict.conflictList.append(row)
         CCConflict.nConflicts += 1
 
@@ -388,6 +446,13 @@ def calcK(yname,a,x1):
         y.track = []
         y.track.extend(x1.track)
         y.cleanUp()
+
+    if DEBUG in ["ALL","CALC"]:
+        print "CalcK(%s*x1)_______________________"%a
+        x1.show()
+        print "a*x1 = "
+        y.show()
+        print "___________________________________________________"
 
     return y
 
@@ -683,6 +748,40 @@ def calcFlow(Qdotname,cp,m,T1,T0,DT,DT1):
     return Qdot
 
 #------------------------------------------------------------------------------
+def calcH(yname,a,x1,x2):
+#------------------------------------------------------------------------------
+#   Default function for calculating the entalpy h
+#------------------------------------------------------------------------------
+    y = CCPar(yname)
+
+    if (x1.val ==None):
+        y.val = None
+        y.sqerr = INFINITE
+    else:
+        y.val = a * x1.val
+        y.sqerr = x1.sqerr
+
+    y.valMin = a*x1.valMin
+    y.valMax = min(INFINITE,a*x1.valMax)
+    y.constrain()
+
+    if y.val is not None:
+        y.track = []
+        y.track.extend(x1.track)
+        y.cleanUp()
+
+    if DEBUG in ["ALL","CALC"]:
+        print "CalcH(x1,x2)____________________________________"
+        x1.show()
+        x2.show()
+        print "h(%s,x1,x2) = "%a
+        y.show()
+        print "___________________________________________________"
+
+    return y
+
+
+#------------------------------------------------------------------------------
 def adjustcalcK(y,a,x1):
 #------------------------------------------------------------------------------
 #   Default function for calculating and adjusting the product between a value and a constant
@@ -717,33 +816,41 @@ def adjustProd(y,x1,x2):
         x1.show()
         x2.show()
 
-    if not (y.val == None):
-        if not (x1.val == None) and ((x1.sqerr < x2.sqerr) or (x2.val == None)):
+    if (y.val is not None):
+        if (x1.val is not None) and ((x1.sqerr < x2.sqerr) or (x2.val is None)):
             if (x1.val ==0):
                 if y.val > 0:
                     x2.val = INFINITE
                     x2.sqerr = INFINITE
             else:
                 x2.val = y.val / x1.val
-                x2.sqerr = min(y.sqerr + x1.sqerr,x2.sqerr)
-        elif not (x2.val == None):
+                x2.sqerr = y.sqerr + x1.sqerr
+                x2.calcDev()
+#                x2.sqerr = min(y.sqerr + x1.sqerr,x2.sqerr)
+        elif (x2.val is not None):
             if (x2.val ==0):
                 if y.val > 0:
                     x1.val = INFINITE
                     x1.sqerr = INFINITE
             else:
                 x1.val = y.val / x2.val
-                x1.sqerr = min(y.sqerr + x2.sqerr,x1.sqerr)
+#HS2008-05-07 minimum eliminated. gave problems                x1.sqerr = min(y.sqerr + x2.sqerr,x1.sqerr)
+                x1.sqerr = y.sqerr + x2.sqerr
+                x1.calcDev()
 
     if (x2.valMax > 0):
-        x1.valMin = min(y.valMin/x2.valMax,INFINITE)
+        newMin = min(y.valMin/x2.valMax,INFINITE)
     elif (y.valMin > 0):
-        x1.valMin = INFINITE
+        newMin = INFINITE
+    else:
+        newMin = x1.valMin
 
     if (x2.valMin > 0):
-        x1.valMax = min(y.valMax/x2.valMin,INFINITE)
+        newMax = min(y.valMax/x2.valMin,INFINITE)
     elif (y.valMax > 0):
-        x1.valMax = INFINITE
+        newMax = INFINITE
+    else:
+        newMax = x1.valMax
 
     if (x1.valMax > 0):
         x2.valMin = min(y.valMin/x1.valMax,INFINITE)
@@ -754,6 +861,9 @@ def adjustProd(y,x1,x2):
         x2.valMax = min(y.valMax/x1.valMin,INFINITE)
     elif (y.valMax > 0):
         x2.valMax = INFINITE
+
+    x1.valMin = newMin
+    x1.valMax = newMax
 
     x1.constrain()
     x2.constrain()
@@ -862,14 +972,18 @@ def adjustProdS(y,x1,x2):
 # adjustment of minimum and maximum values (XXX Take care: only valid for non-negative data)
                       
     if (x2.valMax > 0):
-        x1.valMin = min(y.valMin/x2.valMax,INFINITE)
+        newMin = min(y.valMin/x2.valMax,INFINITE)
     elif (y.valMin > 0):
-        x1.valMin = INFINITE
+        newMin = INFINITE
+    else:
+        newMin = x1.valMin
 
     if (x2.valMin > 0):
-        x1.valMax = min(y.valMax/x2.valMin,INFINITE)
+        newMax = min(y.valMax/x2.valMin,INFINITE)
     elif (y.valMax > 0):
-        x1.valMax = INFINITE
+        newMax = INFINITE
+    else:
+        newMax = x2.valMin
 
     if (x1.valMax > 0):
         x2.valMin = min(y.valMin/x1.valMax,INFINITE)
@@ -880,6 +994,9 @@ def adjustProdS(y,x1,x2):
         x2.valMax = min(y.valMax/x1.valMin,INFINITE)
     elif (y.valMax > 0):
         x2.valMax = INFINITE
+
+    x1.valMin = newMin
+    x1.valMax = newMax
 
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustProdS before constraint......................"
@@ -947,14 +1064,18 @@ def adjustProdC(y,a,x1,x2):
                 x1.sqerr = y.sqerr + x2.sqerr
 
     if (a*x2.valMax > 0):
-        x1.valMin = min(y.valMin/(a*x2.valMax),INFINITE)
+        newMin = min(y.valMin/(a*x2.valMax),INFINITE)
     elif (y.valMin > 0):
-        x1.valMin = INFINITE
+        newMin = INFINITE
+    else:
+        newMin = x1.valMin
 
     if (a*x2.valMin > 0):
-        x1.valMax = min(y.valMax/(a*x2.valMin),INFINITE)
+        newMax = min(y.valMax/(a*x2.valMin),INFINITE)
     elif (y.valMax > 0):
-        x1.valMax = INFINITE
+        newMax = INFINITE
+    else:
+        newMax = x1.valMax
 
     if (a*x1.valMax > 0):
         x2.valMin = min(y.valMin/(a*x1.valMax),INFINITE)
@@ -965,6 +1086,9 @@ def adjustProdC(y,a,x1,x2):
         x2.valMax = min(y.valMax/(a*x1.valMin),INFINITE)
     elif (y.valMax > 0):
         x2.valMax = INFINITE
+
+    x1.valMin = newMin
+    x1.valMax = newMax
 
     x1.constrain()
     x2.constrain()
@@ -1034,12 +1158,15 @@ def adjustSum(y,x1,x2):
                 x1.sqerr = x1.sqdev/pow(x1.val,2)
             else:
                 x1.sqerr = INFINITE
-
-    x1.valMin = max(y.valMin-x2.valMax,0)
-    x1.valMax = max(y.valMax-x2.valMin,0)
+    
+    newMin = max(y.valMin-x2.valMax,0)
+    newMax = max(y.valMax-x2.valMin,0)
 
     x2.valMin = max(y.valMin-x1.valMax,0)
     x2.valMax = max(y.valMax-x1.valMin,0)
+
+    x1.valMin = newMin
+    x1.valMax = newMax
 
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustSum before constraints",x1.name,x2.name
@@ -1161,6 +1288,9 @@ def adjRowSum(name,y,row,m):
     SumMax=0.0
     SumErr=0.0
     SumSqDev=0.0
+
+    y.calcDev()
+    
     for i in range(m):
         if row[i].val is None:
             nNones += 1
@@ -1169,7 +1299,7 @@ def adjRowSum(name,y,row,m):
             SumMin += row[i].valMin
             SumMax += row[i].valMax
             SumErr += row[i].sqerr
-            SumSqDev += row[i].sqerr*pow(row[i].val,2)
+            SumSqDev += row[i].calcDev()
             
     sMin = max(y.valMin - SumMax,0) #positive values considered
     sMax = max(y.valMax - SumMin,0)
@@ -1187,26 +1317,27 @@ def adjRowSum(name,y,row,m):
         for i in range(m):
             row[i].val = 0
             row[i].sqerr = 0
+            row[i].sqdev = 0
 
         diff = abs(Sum - y.val)
 
     elif (nNones > 0):
 
+        newSqDev = y.sqdev + pow(sMax,2)
         if (y.val is not None):
             sEst = float (y.val - Sum)/nNones
             if DEBUG in ["ALL","ADJUST"]:
                 print "adjustRowSum: (nNones=%s) sEst = "%nNones,sEst
                 
             if (sEst > 0):
-                newSqerr = (y.sqerr*pow(y.val,2)+pow(sMax,2))/pow(sEst,2)
+                newSqerr = newSqDev/pow(sEst,2)
             else:
                 sEst = 0.0
                 newSqerr = INFINITE
         else:
             sEst = None
             newSqerr = INFINITE
-
-        
+       
         for i in range(m):
             if row[i].val is None:
 
@@ -1221,44 +1352,41 @@ def adjRowSum(name,y,row,m):
                 else:
                     row[i].valMin=max(row[i].valMin,sMin)
 
-                row[i].sqerr = min(newSqerr,row[i].sqerr)
+                row[i].sqdev = newSqDev
+                row[i].calcErr()
                         
         diff = nNones
 
     else:
+        
         for i in range(m):
             if SumErr <> 0:
-                newval = row[i].val + ((row[i].sqerr/SumErr)*(y.val-Sum))
-                newval = max(newval,row[i].valMin)
-                newval = min(newval,row[i].valMax)
                 
-                if DEBUG in ["ALL","ADJUST"]:
-                    print "In adjRowSum newval = ",newval," substitutes "
-                    row[i].show()  
-
                 newValMin = max(y.valMin - SumMax + row[i].valMax,row[i].valMin)
                 newValMax = min(y.valMax - SumMin + row[i].valMin,row[i].valMax)
 
-                maxSqDev = SumSqDev - row[i].sqerr*pow(row[i].val,2) + y.sqerr*pow(y.val,2)
+                if y.val is not None:
+                    maxSqDev = SumSqDev - row[i].calcDev() + y.sqdev
 
-                row[i].val = newval
+                    newval = row[i].val + ((row[i].sqdev/SumSqDev)*(y.val-Sum))
+                    newval = max(newval,row[i].valMin)
+                    newval = min(newval,row[i].valMax)
+                    if DEBUG in ["ALL","ADJUST"]:
+                        print "In adjRowSum newval = ",newval," substitutes "
+                        row[i].show()  
 
-                if (newval == 0):
-                    maxSqerr = INFINITE
-                else:
-                    maxSqerr1 = pow((newValMax - newValMin)/newval,2)
-                    maxSqerr2 = maxSqDev/pow(newval,2)
-                    maxSqerr = min(maxSqerr1,maxSqerr2)
+                    row[i].val = newval
+
+                    if DEBUG in ["ALL","ADJUST"]:
+                        print "... to new value:"
+                        row[i].show()  
+
+                    row[i].sqdev = min(row[i].sqdev,maxSqDev)
+                    row[i].calcErr()
 
 
                 row[i].valMax = newValMax
                 row[i].valMin = newValMin
-
-                row[i].sqerr = min(row[i].sqerr,maxSqerr)
-
-                if DEBUG in ["ALL","ADJUST"]:
-                    print "... to new value:"
-                    row[i].show()  
 
             elif not isequal(Sum,y.val):
 
@@ -1271,9 +1399,12 @@ def adjRowSum(name,y,row,m):
                     row[i].show()  
                 print "====================================================="
                                 
-        diff = abs(Sum - y.val)
+        if y.val is not None:
+            diff = abs(Sum - y.val)
+        else:
+            diff = 1.0
 
-    for i in range(m):
+    for i in range(m):        
         row[i].constrain()
 
     if y.val is not None:
@@ -1315,43 +1446,37 @@ def adjustDiff(y,x1,x2):
                     # in this case holds x1 = x2                    
         ccheck1(x1,x2)
 
-    if not (y.val == None):
+    if y.val is not None:
 
-        y.sqdev = y.sqerr*pow(y.val,2)
+        y.calcDev()
 
         if iszero(y):   #special case SUM = 0
                     # in this case holds x1 = x2                    
             ccheck1(x1,x2)
 
-        elif not (x1.val==None) and ((x1.sqdev < x2.sqdev) or x2.val ==None):
+        elif (x1.val is not None) and ((x1.sqdev < x2.sqdev) or x2.val ==None):
           
-            x1.sqdev = x1.sqerr*pow(x1.val,2)
-        
             x2.val = x1.val - y.val
-            x2.sqdev = y.sqdev + x1.sqdev
-            if (x2.val == 0):
-                x2.sqerr = INFINITE
-            else:
-                x2.sqerr = x2.sqdev/pow(x2.val,2)
-        elif not (x2.val == None):
+            x2.sqdev = y.sqdev + x1.calcDev()
+            x2.calcErr()
+                
+        elif x2.val is not None:
             
-            x2.sqdev = x2.sqerr*pow(x2.val,2)
-
             x1.val = y.val + x2.val
-            x1.sqdev = y.sqdev + x2.sqdev
-            if (x1.val ==0):
-                x1.sqerr = INFINITE
-            else:
-                x1.sqerr = x1.sqdev/pow(x1.val,2)              
+            x1.sqdev = y.sqdev + x2.calcDev()
+            x1.calcErr()
 
-        x1.valMin = min(y.valMin+x2.valMin,INFINITE)
-        x1.valMax = min(y.valMax+x2.valMax,INFINITE)
+    newMin = min(y.valMin+x2.valMin,INFINITE)
+    newMax = min(y.valMax+x2.valMax,INFINITE)
 
-        x2.valMin = max(x1.valMin-y.valMax,0)
-        x2.valMax = max(x1.valMax-y.valMin,0)
+    x2.valMin = max(x1.valMin-y.valMax,0)
+    x2.valMax = max(x1.valMax-y.valMin,0)
 
-        x1.constrain()
-        x2.constrain()
+    x1.valMin = newMin
+    x1.valMax = newMax
+
+    x1.constrain()
+    x2.constrain()
 
     if y.val is not None:
         newtrackx1 = []
@@ -1407,6 +1532,45 @@ def adjustFlow(Qdot,cp,m,T1,T0,DT,DT1):
         DT1.show()
         print "___________________________________________________"
 
+
+#------------------------------------------------------------------------------
+def adjustH(y,a,x1,x2):
+#------------------------------------------------------------------------------
+#   Default function for adjusting the entalpy h
+#------------------------------------------------------------------------------
+
+    if DEBUG in ["ALL","ADJUST"]:
+        print "___________________________________________________"
+        print "adjustProd starting",x1.name,x2.name
+        y.show()
+        print "a= ",a
+        x1.show()
+        x2.show()
+
+    if not (y.val == None):
+        
+        x1.val = y.val /a
+        x1.sqerr = y.sqerr
+
+    x1.valMin = min(y.valMin/a,INFINITE)
+    x1.valMax = min(y.valMax/a,INFINITE)
+
+    x1.constrain()
+
+    if y.val is not None:
+        x1.track = []
+        x1.track.extend(y.track)
+
+        x1.cleanUp()
+
+    if DEBUG in ["ALL","ADJUST"]:
+        print "adjustH________________________________________"
+        y.show()
+        x1.show()
+        x2.show()
+        print "___________________________________________________"
+
+
 #------------------------------------------------------------------------------
 def ccheck1(y0,y1):
 #------------------------------------------------------------------------------
@@ -1414,27 +1578,49 @@ def ccheck1(y0,y1):
 #   calculated input.
 #------------------------------------------------------------------------------
 
+    if DEBUG in ["ALL","CHECK"]:
+        print "CCheck1_(before...)________________________________"
+        y0.show()
+        y1.show()
+        print "___________________________________________________"
+
     y = CCPar("CCheck1")
     
     if (y0.val == None and y1.val == None): #Case 1: Nothing to do
         y.update(y0)
+        y.valMin = max(y0.valMin,y1.valMin)
+        y.valMax = min(y0.valMax,y1.valMax)
         
     elif y1.val == None: #Case 2: Pnom1 = ok, Pnom2 = None
         y.update(y0)
+        y.valMin = max(y0.valMin,y1.valMin)
+        y.valMax = min(y0.valMax,y1.valMax)
                 
     elif y0.val == None: #case 3: Pnom1 = None, Pnom2 = ok
         y.update(y1)
+        y.valMin = max(y0.valMin,y1.valMin)
+        y.valMax = min(y0.valMax,y1.valMax)
                
     else: #case 4 Pnom1 = ok, Pnom2 = ok
-        y = meanValueOf(y0,y1)
+        if CHECKMODE == "BEST":
+            y = bestOf(y0,y1)
+        else:
+            y = meanValueOf(y0,y1)
                      
 #..............................................................................
 # Updating values
-
+   
     y.constrain()
     
     y0.update(y)
     y1.update(y)
+
+    if DEBUG in ["ALL","CHECK"]:
+        print "CCheck1_(... and after adjustment)_________________"
+        y0.show()
+        y1.show()
+        print "___________________________________________________"
+
 
 #------------------------------------------------------------------------------
 def ccheck2(y0,y1,y2):
@@ -1466,11 +1652,15 @@ def ccheck2(y0,y1,y2):
 #                ccheckMsg.append("Case 1: all parameters are unknown. Calculation not possible")
                 y.val = None
                 y.sqerr = INFINITE
+                y.valMin = max(y0.valMin,y1.valMin,y2.valMin)
+                y.valMax = min(y0.valMax,y1.valMax,y2.valMax)
 
             else:               
 #..............................................................................
 #Case 2: USH3 known, USH1 unknown,USH2 unknown,
                 y.update(y0)
+                y.valMin = max(y0.valMin,y1.valMin,y2.valMin)
+                y.valMax = min(y0.valMax,y1.valMax,y2.valMax)
 #                print "Case 2: USH3 known. USH1 and USH2 adjusted"
              
         else:
@@ -1479,6 +1669,8 @@ def ccheck2(y0,y1,y2):
 #Case 3: USH3 unknown, USH1 unknown,USH2 known
 
                 y.update(y2)
+                y.valMin = max(y0.valMin,y1.valMin,y2.valMin)
+                y.valMax = min(y0.valMax,y1.valMax,y2.valMax)
 #                print "Case 3: USH2 known. USH1 and USH3 adjusted"
                 
             else:
@@ -1491,7 +1683,12 @@ def ccheck2(y0,y1,y2):
 #                    print "Case4: USH1 unknown. USH2 and USH3 redundant and not consistent"
                     pass
 
-                y = meanValueOf(y0,y2)
+                if CHECKMODE == "BEST":
+                    y = bestOf(y0,y2)
+                else:
+                    y = meanValueOf(y0,y2)
+                y.valMin = max(y.valMin,y1.valMin)
+                y.valMax = min(y.valMax,y1.valMax)
                     
     else:
         if y2.val == None:
@@ -1499,6 +1696,8 @@ def ccheck2(y0,y1,y2):
 #..............................................................................
 #Case 5: USH3 unknown, USH1 known,USH2 unknown,
                 y.update(y1)
+                y.valMin = max(y0.valMin,y1.valMin,y2.valMin)
+                y.valMax = min(y0.valMax,y1.valMax,y2.valMax)
 #                print "Case 5: USH1 known. USH2 and USH3 adjusted"
                 
             else:
@@ -1511,7 +1710,12 @@ def ccheck2(y0,y1,y2):
 #                    print "Case6: USH2 unknown. USH1 and USH3 redundant and not consistent"
                     pass
 
-                y = meanValueOf(y0,y1)
+                if CHECKMODE == "BEST":
+                    y = bestOf(y0,y1)
+                else:
+                    y = meanValueOf(y0,y1)
+                y.valMin = max(y.valMin,y2.valMin)
+                y.valMax = min(y.valMax,y2.valMax)
                     
         else:
             if y0.val == None:
@@ -1523,14 +1727,22 @@ def ccheck2(y0,y1,y2):
 #                else:
 #                    print "Case7: USH3 unknown. USH2 and USH1 redundant and not consistent"
 
-                y = meanValueOf(y1,y2)
+                if CHECKMODE == "BEST":
+                    y = bestOf(y1,y2)
+                else:
+                    y = meanValueOf(y1,y2)
+                y.valMin = max(y.valMin,y0.valMin)
+                y.valMax = min(y.valMax,y0.valMax)
                                         
             else:
     
 #..............................................................................
 # Case 8:USH3 known, USH1 known,USH2 known,
 
-                    y = meanValueOf3(y0,y1,y2)
+                    if CHECKMODE == "BEST":
+                        y = bestOf3(y0,y1,y2)
+                    else:
+                        y = meanValueOf3(y0,y1,y2)
                                                                             
 #..............................................................................
 # Updating values
@@ -1566,7 +1778,10 @@ def ccheck3(y0,y1,y2,y3):
     row[2] = y2
     row[3] = y3
                 
-    y = meanOfRow(row,4)
+    if CHECKMODE == "BEST":
+        y = bestOfRow(row,4)
+    else:
+        y = meanOfRow(row,4)
 
     y0.update(y)
     y1.update(y)
@@ -1651,11 +1866,14 @@ def bestOf(y1,y2):
             best = y1
     else:
             best = y2
+    
 
     best.valMin = max(y1.valMin,y2.valMin)
     best.valMax = min(y1.valMax,y2.valMax)
 
     best.constrain()
+
+    checkIfConflict(y1,y2)
     
     return best   
 
@@ -1674,6 +1892,22 @@ def bestOf3(y1,y2,y3):
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
+def bestOfRow(row,m):
+#------------------------------------------------------------------------------
+#   Selects the best of three values (the one with lowest errors)
+#   Does not carry out None-check !!!!
+#------------------------------------------------------------------------------
+
+    best = CCPar("bestOfRow")
+    best.val = INFINITE
+    for i in range(m):
+        if row[i].val is not None:
+            best = bestOf(best,row[i])
+    
+    return best   
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 def meanValueOf(y1,y2):
 #------------------------------------------------------------------------------
 #   Selects the best of three values (the one with lowest errors)
@@ -1683,20 +1917,21 @@ def meanValueOf(y1,y2):
     mean = CCPar("meanValueOf")
     mean.track = trackBestOf(y1,y2)
 
-    if DEBUG=="ALL":
-        print "meanValueOf", y1.val, y1.sqerr, y2.val, y2.sqerr
-        print "meanValueOf", y1.valMin, y1.valMax, y2.valMin, y2.valMax
-
-    sumSqErr = pow(y1.sqerr,2) + pow(y2.sqerr,2)
+#    sumSqErr = pow(y1.sqerr,2) + pow(y2.sqerr,2)
+    sumSqDev = y1.calcDev() + y2.calcDev()
     
-    if sumSqErr > 0:
-        mean.val = (pow(y1.sqerr,2)*y2.val + pow(y2.sqerr,2)*y1.val)/sumSqErr
+#    if sumSqErr > 0:
+#        mean.val = (pow(y1.sqerr,2)*y2.val + pow(y2.sqerr,2)*y1.val)/sumSqErr
 
+    if sumSqDev > 0:
+        mean.val = (y1.sqdev*y2.val + y2.sqdev*y1.val)/sumSqDev
+        
     else:
         mean.val=0.5*(y1.val+y2.val)
 
+    
     dif=abs(y1.val-y2.val)
-    maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
+    maxDif = pow(sumSqDev,0.5)*CONFIDENCE
     
     if dif > maxDif + NUMERIC_ERR:
         print "======================================================"
@@ -1706,13 +1941,15 @@ def meanValueOf(y1,y2):
         y2.show()
         print "======================================================"
 
-            
-    mean.sqerr = min(y1.sqerr,y2.sqerr)
+
+    mean.sqdev = min(y1.sqdev,y2.sqdev)
+    
     mean.valMin = max(y1.valMin,y2.valMin)
     mean.valMax = min(y1.valMax,y2.valMax)
-    
-    mean.constrain()
+    mean.calcErr()
 
+    mean.constrain()
+    
     checkIfConflict(y1,y2)
     
     return mean   
@@ -1728,45 +1965,57 @@ def meanValueOf3(y1,y2,y3):
     mean = CCPar("meanValueOf3")
     mean.track = trackBestOf3(y1,y2,y3)
 
-    if DEBUG=="ALL":
-        print "meanValueOf", y1.val, y1.sqerr, y2.val, y2.sqerr, y3.val, y3.sqerr
-
-    if (y1.sqerr == 0):
+    sumSqDev = y1.calcDev() + y2.calcDev() + y3.calcDev()
+    
+    if (y1.sqdev == 0):
         mean = y1
-        if (y2.sqerr == 0) and not isequal(y1.val,y2.val) and DEBUG=="ALL":
-            print "======================================================"
-            print "WARNING !!!! "
-            print "CCheckFunctions (meanValueOf3): contradiction found",y1.name,y1.val,y2.name,y2.val
-            y1.show()
-            y2.show()
-            print "======================================================"
-        if (y3.sqerr == 0) and not isequal(y1.val,y3.val) and DEBUG=="ALL":
-            print "======================================================"
-            print "WARNING !!!! "
-            print "CCheckFunctions (meanValueOf3): contradiction found",y1.name,y1.val,y3.name,y3.val
-            y1.show()
-            y2.show()
-            print "======================================================"
-    elif (y2.sqerr ==0 and y1.sqerr <> 0):
+        if (y2.sqdev == 0) and not isequal(y1.val,y2.val):
+            mean = meanValueOf(mean,y1)
+
+            if DEBUG=="ALL":
+                print "======================================================"
+                print "WARNING !!!! "
+                print "CCheckFunctions (meanValueOf3): contradiction found",y1.name,y1.val,y2.name,y2.val
+                y1.show()
+                y2.show()
+                print "======================================================"
+
+        if (y3.sqdev == 0) and not isequal(y1.val,y3.val):
+            mean = meanValueOf(mean,y3)
+
+            if DEBUG=="ALL":
+                print "======================================================"
+                print "WARNING !!!! "
+                print "CCheckFunctions (meanValueOf3): contradiction found",y1.name,y1.val,y3.name,y3.val
+                y1.show()
+                y2.show()
+                print "======================================================"
+
+    elif (y2.sqdev ==0 and y1.sqdev <> 0):
         mean = y2
-        if (y3.sqerr == 0) and not isequal(y2.val,y3.val) and DEBUG=="ALL":
-            print "======================================================"
-            print "WARNING !!!! "
-            print "CCheckFunctions (meanValueOf3): contradiction found",y2.name,y2.val,y3.name,y3.val
-            y1.show()
-            y2.show()
-            print "======================================================"
-    elif (y3.sqerr == 0 and y2.sqerr <> 0 and y1.sqerr <> 0):
+        if (y3.sqerr == 0) and not isequal(y2.val,y3.val):
+            mean = meanValueOf(mean,y3)
+
+            if DEBUG=="ALL":           
+                print "======================================================"
+                print "WARNING !!!! "
+                print "CCheckFunctions (meanValueOf3): contradiction found",y2.name,y2.val,y3.name,y3.val
+                y1.show()
+                y2.show()
+                print "======================================================"
+
+    elif (y3.sqdev == 0 and y2.sqdev <> 0 and y1.sqdev <> 0):
         mean = y3
     else:
-        p1 = 1/pow(y1.sqerr,2)
-        p2 = 1/pow(y2.sqerr,2)
-        p3 = 1/pow(y3.sqerr,2)
+        p1 = 1/y1.sqdev
+        p2 = 1/y2.sqdev
+        p3 = 1/y3.sqdev
         mean.val = (y1.val*p1 + y2.val*p2 + y3.val*p3)/(p1+p2+p3)
 
-    mean.sqerr = min(y1.sqerr,y2.sqerr,y3.sqerr)
+    mean.sqdev = min(y1.sqdev,y2.sqdev,y3.sqdev)
     mean.valMin = max(y1.valMin,y2.valMin,y3.valMin)
     mean.valMax = min(y1.valMax,y2.valMax,y3.valMax)
+    mean.calcErr()
             
     mean.constrain()
 
@@ -1798,19 +2047,22 @@ def meanOfRow(row,m):
 
     for i in range(m):
         if not (row[i].val == None):
-            if row[i].sqerr == 0:
+            if row[i].calcDev() == 0:
                 weight = INFINITE
             else:
-                weight = 1./row[i].sqerr
+                weight = 1./row[i].sqdev
+                
             sumWeight += weight
             sumVal += row[i].val*weight
-            
-            mean.valMin = max(mean.valMin,row[i].valMin)
-            mean.valMax = min(mean.valMax,row[i].valMax)
-            mean.sqerr = min(mean.sqerr,row[i].sqerr)
 
+        mean.sqdev = min(mean.sqdev,row[i].sqdev)
+
+        mean.valMin = max(mean.valMin,row[i].valMin)
+        mean.valMax = min(mean.valMax,row[i].valMax)
+    
     if sumWeight > 0:
         mean.val = sumVal/sumWeight
+        mean.calcErr()
 
     mean.constrain()
 

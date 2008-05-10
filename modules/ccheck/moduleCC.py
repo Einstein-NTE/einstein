@@ -15,11 +15,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by:         Claudia Vannoni     20/04/2008
+#                           Claudia Vannoni     2/05/2008
 #
 #       Changes to previous version:
-#	
+#	v0.02 CV Add CCPipe, Add Matrix and links between matrix
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -44,6 +45,8 @@ from checkProc import *
 from checkEq import *
 from checkFETfuel import *
 from checkFETel import *
+from checkPipe import *
+from checkTotals import *
 
 class ModuleCC(object):
     
@@ -66,6 +69,11 @@ class ModuleCC(object):
         
         self.ccProc = []
         self.NProc = 0
+
+        self.ccPipe = []
+        self.NPipeDuct = 0
+
+        self.screen_priority = 2
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -86,21 +94,37 @@ class ModuleCC(object):
 #..............................................................................
 # export screening data
 
+        format_percentage = '%3.2f'
+
+        print "ModuleCC (updatePanel): screening with priority ",self.screen_priority        
         CCList = []
+        nMissingVarsOfPriority=0
         for entry in CCScreen.screenList:
-            row = [entry[0],
-                   "here should be the description",
-                   entry[1],
-                   entry[2],
-                   "revise questionnaire"]
-            CCList.append(noneFilter(row))
+            if entry[4] <= self.screen_priority:
+
+                if entry[4] == 1:
+                    action = "Calculations w/o this are nonsense !!!"
+                elif entry[4] == 2:
+                    action = "Value required for detail analysis !!!"
+                else:
+                    action = "not strictly necessary"
+                row = [entry[0]+"["+entry[3]+"]",
+                       "here should be the description",
+                       entry[1],
+                       entry[2]+"%",
+                       action]
+                CCList.append(noneFilter(row))
+                nMissingVarsOfPriority+=1
+
+        if nMissingVarsOfPriority==0:
+            CCList.append(["","","","",""])
             
         data = array(CCList)
         Status.int.setGraphicsData(self.keys[0], data)  #sends the data to the GUI
 
         nMissingVars = len(CCScreen.screenList)
         nScreenedVars = CCScreen.nScreened
-        CCList = [nScreenedVars,"---",nMissingVars]
+        CCList = [nScreenedVars,"---",nMissingVarsOfPriority,self.screen_priority]
 
         Status.int.setGraphicsData(self.keys[1], CCList)  #sends the data to the GUI
 
@@ -123,22 +147,22 @@ class ModuleCC(object):
             if pair not in conflictPairs:
                 conflictPairs.append(pair)
 
-                row0 = [str(entry[2])+"/"+str(entry[6]),"",""]
+                row0 = [str(entry[2])+"<>"+str(entry[6]),entry[10],""]
 
                 origin1 = ""
                 for parname in entry[3]:
                     origin1 = origin1 + str(parname) + "; "
 
-                row1 = [str(entry[4]),
-                        "+/- "+str(entry[5])+"%",
+                row1 = ["%10.4f"%entry[4],
+                        "+/- "+"%5.3f"%entry[5]+"%",
                         origin1]
 
                 origin2 = ""
                 for parname in entry[7]:
                     origin2 = origin2 + str(parname) + "; "
 
-                row2 = [str(entry[8]),
-                        "+/- "+str(entry[9])+"%",
+                row2 = ["%10.4f"%entry[8],
+                        "+/- "+"%5.3f"%entry[9]+"%",
                         origin2]
                        
                 conflictReport.append(noneFilter(row0))
@@ -150,22 +174,35 @@ class ModuleCC(object):
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
+    def setPriorityLevel(self,level):
+#------------------------------------------------------------------------------
+#   is called at entering the CC panel
+#------------------------------------------------------------------------------
+        print "ModuleCC: setting priority level to ",level
+        self.screen_priority = level
+        self.updatePanel()
+    
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def getQuestionnaireData(self):
 #------------------------------------------------------------------------------
 #   function that gets the data from the questionnaire
 #------------------------------------------------------------------------------
 
-#   should define the same data set as getTestData, but taking the values from
-#   the questionnaire.
+#..............................................................................
+# creates an empty space for the different check-blocks
 
-        pass
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-    def getTestData(self):
-#------------------------------------------------------------------------------
-#   function that substitutes getQuestionnaireData for testing purposes
-#   independent of SQL
-#------------------------------------------------------------------------------
+        self.ccFET = []
+        self.NFET = 0
+        
+        self.ccEq = []
+        self.NEquipe = 0
+        
+        self.ccProc = []
+        self.NProc = 0
+
+        self.ccPipe = []
+        self.NPipeDuct = 0 
 
 #..............................................................................
 # import data on fuel and electricity consumption (FET)
@@ -194,11 +231,25 @@ class ModuleCC(object):
 
         self.NThProc = 3
         NK = self.NThProc
-        self.UPHProck = CCRow("UPHk",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+        self.UPHProck = CCRow("UPHProck",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
         self.QHXk = CCRow("QHXk",NK)     #creates the space for intermediate storge towards matrix
 
         for k in range(NK):
             self.ccProc.append(CheckProc(k))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
+
+#..............................................................................
+# import data on existing pipeducts
+
+        self.NPipeDuct = 3
+        NM = self.NPipeDuct
+        self.UPHProcm = CCRow("UPHProcm",NM)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+        self.QHXPipe = CCRow("QHXPipe",NM)          #creates the space for intermediate storge towards matrix
+        self.USHm = CCRow("USHm",NM) 
+
+        for m in range(NM):
+            self.ccPipe.append(CheckPipe(m))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
 
 #..............................................................................
 # import data on link of fuels and equipment
@@ -213,18 +264,42 @@ class ModuleCC(object):
         self.FETMatrix = CheckMatrix("FET Matrix",self.FETi,self.FETj,FETLink)
 
 #..............................................................................
-# import data on link of equipment and processes
+# import data on link of equipment and pipes
 
-        UPHLink = arange(NJ*NK).reshape(NK,NJ)  # reshape(rows,cols)
+        USHLink = arange(NJ*NM).reshape(NM,NJ)  # reshape(rows,cols)
+
+        USHLink[0][0] = 1
+        USHLink[1][0] = 0
+        USHLink[2][0] = 0
+        USHLink[0][1] = 1
+        USHLink[1][1] = 1
+        USHLink[2][1] = 1
+
+        self.USHMatrix = CheckMatrix("USH Matrix",self.USHj,self.USHm,USHLink)   
+
+
+#..............................................................................
+# import data on link of  pipes and processes
+
+        UPHLink = arange(NM*NK).reshape(NK,NM)  # reshape(rows,cols)
 
         UPHLink[0][0] = 1
         UPHLink[1][0] = 0
         UPHLink[2][0] = 0
-        UPHLink[0][1] = 1
+        UPHLink[0][1] = 0
         UPHLink[1][1] = 1
-        UPHLink[2][1] = 1
+        UPHLink[2][1] = 0
+        UPHLink[0][2] = 0
+        UPHLink[1][2] = 0
+        UPHLink[2][2] = 1
 
-        self.UPHMatrix = CheckMatrix("UPH Matrix",self.USHj,self.UPHProck,UPHLink)   
+        self.UPHMatrix = CheckMatrix("UPH Matrix",self.UPHProcm,self.UPHProck,UPHLink) 
+
+#..............................................................................
+# import data on existing totals
+
+        self.UPHk = CCRow("UPHk",NK) 
+        self.totals = CheckTotals("Totals",self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
 
 
 #------------------------------------------------------------------------------
@@ -243,8 +318,14 @@ class ModuleCC(object):
             print "ModuleCC: getting Test data"
             print "===================================================="
         
-        self.getTestData()
+        self.getQuestionnaireData()
+
+#..............................................................................
+# reset the counters of conflicts before starting
+
+        conflict.reset()
         
+#..............................................................................
         if DEBUG in ["ALL","BASIC"]:
             print "===================================================="
             print "ModuleCC: starting cycle"
@@ -267,12 +348,16 @@ class ModuleCC(object):
             NI = self.NFET
             
             print "checking electricity consumption"
+            conflict.setDataGroup("Electricity","-")
+            
             self.ccFET[0].check()
             self.FETi[0].update(self.ccFET[0].FETel)
 
             for i in range(1,NI):       #then check all the Nfuels = NI-1 fuels
 
                 print "checking fuel no. %s"%i
+                conflict.setDataGroup("Fuel",i)
+
                 self.ccFET[i].check()
                 self.FETi[i].update(self.ccFET[i].FETFuel)
             
@@ -288,24 +373,50 @@ class ModuleCC(object):
 
             for j in range(NJ):
                 print "checking equipment no. %s"%j
+                conflict.setDataGroup("Equipment",j+1)
+
                 self.ccEq[j].check()               # ejecuta la función check para equipo j
 
                 self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
-        
-#..............................................................................
-# check of pipes and ducts
-#       self.NPipeDuct = 2
-#        for m in range(self.NPipeDuct):
-#            print "checking pipe/duct no. %s"%m
-#            self.ccPipeDuct.append(CheckProc(k))  # añade un objeto checkProc con todas las variables necesarias a la listac
-#            self.ccPipeDuct[m].check()             # ejecuta la función check para proceso k
 
+#..............................................................................
+# check of pipes
+
+            if DEBUG in ["ALL","BASIC"]:
+                print "===================================================="
+                print "ModuleCC: checking Pipes (Pipe)"
+                print "===================================================="
+
+            NM = self.NPipeDuct
+
+            for m in range(NM):
+
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+#   PIPE CHECK TEMPORARILY DEACTIVATED FOR DEMO
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                
+                if VERSION=="M2_DEMO":
+                    ccheck1(self.USHm[m],self.UPHProcm[m]) #just set 0 losses, UPH=USH
+                    print "M2_DEMO SHORT CUT===================="
+                    self.USHm[m].show()
+                    self.UPHProcm[m].show()
+                    
+                else:
+                    conflict.setDataGroup("Pipe/Duct",m+1)
+
+                    print "checking pipe no. %s"%m
+                    self.ccPipe[m].check()               # ejecuta la función check para pipe m
+
+
+                    self.USHm[m].update(self.ccPipe[m].USHm)      #obtain results 
+                    self.UPHProcm[m].update(self.ccPipe[m].UPHProcm)
+        
 
 #..............................................................................
 # check of thermal processes
 
-            if DEBUG in ["ALL","BASIC"]:
+            if DEBUG in ["ALL","MAIN","BASIC"]:
                 print "===================================================="
                 print "ModuleCC: checking processes (UPH)"
                 print "===================================================="
@@ -314,9 +425,29 @@ class ModuleCC(object):
 
             for k in range(self.NThProc):
                 print "checking process no. %s"%k
+                conflict.setDataGroup("Process",k+1)
+
                 self.ccProc[k].check()             # ejecuta la función check para proceso k
 
                 self.UPHProck[k].update(self.ccProc[k].UPHProc)      #obtain results 
+                self.UPHk[k].update(self.ccProc[k].UPH)      #obtain results 
+
+#..............................................................................
+# check of totals
+
+            if DEBUG in ["ALL","MAIN","BASIC"]:
+                print "===================================================="
+                print "ModuleCC: checking Totals"
+                print "===================================================="
+
+            conflict.setDataGroup("Total",0)
+
+            self.totals.check()             # ejecuta la función check para proceso k
+
+#..............................................................................
+# Before going to matrix check, assure that there are no data conflicts
+
+            if conflict.nConflicts > 0: break
 
 #..............................................................................
 # Step 2: now check the link of all the blocks via the matrix checking function
@@ -324,6 +455,13 @@ class ModuleCC(object):
             if matrixCheck == True:
 #..............................................................................
 # link of fuels and equipment
+
+                if DEBUG in ["ALL","MAIN","BASIC"]:
+                    print "===================================================="
+                    print "ModuleCC: checking FET matrix"
+                    print "===================================================="
+
+                conflict.setDataGroup("FET matrix","-")
 
                 self.FETMatrix.check()
 
@@ -334,32 +472,100 @@ class ModuleCC(object):
                 for j in range(NJ):
                     self.ccEq[j].FETj.update(self.FETj[j])
 
+#..............................................................................
+# If any matrix conflict appears, break immediately.
+
+                if conflict.nConflicts > 0: break
         
 #..............................................................................
-# link of equipment and processes
+# link of equipment and pipes
 
-                self.UPHMatrix.check()
+                if DEBUG in ["ALL","MAIN","BASIC"]:
+                    print "===================================================="
+                    print "ModuleCC: checking USH matrix"
+                    print "===================================================="
+
+                conflict.setDataGroup("USH matrix","-")
+
+                self.USHMatrix.check()
 
                 for j in range(NJ):
                     self.ccEq[j].USHj.update(self.USHj[j])
 
+                for m in range(1,NM):
+                    self.ccPipe[m].USHm.update(self.USHm[m])
+
+#..............................................................................
+# If any matrix conflict appears, break immediately.
+
+                if conflict.nConflicts > 0: break
+        
+#..............................................................................
+# link of pipes and processes
+
+                if DEBUG in ["ALL","MAIN","BASIC"]:
+                    print "===================================================="
+                    print "ModuleCC: checking UPH matrix"
+                    print "===================================================="
+
+                conflict.setDataGroup("UPH matrix","-")
+
+                self.UPHMatrix.check()
+
+                for m in range(NM):
+                    self.ccPipe[m].UPHProcm.update(self.UPHProcm[m])
+
                 for k in range(1,NK):
                     self.ccProc[k].UPHProc.update(self.UPHProck[k])
 
+#..............................................................................
+# If any matrix conflict appears, break immediately.
+
+                if conflict.nConflicts > 0: break
+        
 #..............................................................................
 # At the end of the checking, screen the modules
 
         screen.reset()
 
         for i in range(0,NI):       #then check all the Nfuels = NI-1 fuels
+            screen.setDataGroup("Fuel",i)
             self.ccFET[i].screen()
-        for j in range(0,NJ):       #then check all the Nfuels = NI-1 fuels
+        for j in range(0,NJ):       
+            screen.setDataGroup("Eq.",j+1)
             self.ccEq[j].screen()
-        for k in range(0,NK):       #then check all the Nfuels = NI-1 fuels
+        for k in range(0,NK):       
+            screen.setDataGroup("Proc.",k+1)
             self.ccProc[k].screen()
+
+        if VERSION != "M2_DEMO":
+            for m in range(0,NM):      
+                screen.setDataGroup("Pipe",m+1)
+                self.ccPipe[m].screen()
+
+        screen.setDataGroup("Totals",0)
+        self.totals.screen()
             
-        screen.show()
-        conflict.show()
+        if DEBUG in ["ALL","MAIN","BASIC"]:
+            screen.show()
+            conflict.show()
+
+#..............................................................................
+# And finally export all the data
+
+        for i in range(0,NI):       #then check all the Nfuels = NI-1 fuels
+            self.ccFET[i].exportData()
+        for j in range(0,NJ):       
+            self.ccEq[j].exportData()
+        for k in range(0,NK):       
+            screen.setDataGroup("Proc.",k+1)
+            self.ccProc[k].exportData()
+
+        if VERSION != "M2_DEMO":
+            for m in range(0,NM):      
+                screen.setDataGroup("Pipe",m+1)
+                self.ccPipe[m].exportData()
+        self.totals.exportData()
 
         return conflict.nConflicts
 

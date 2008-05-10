@@ -56,9 +56,11 @@ class CheckFETfuel():
 
     def __init__(self,i):     #function that is called at the beginning when object is created
 
+        print "CheckFETfuel: __INIT__ running"
+
 # assign a variable to all intermediate/calculated values needed
 
-        self.FETFuel = CCPar("FETFuel")
+        self.FETFuel = CCPar("FETFuel",priority=2)
         self.FETFuel1 = CCPar("FETFuel1") 
         self.FECFuel1 = CCPar("FECFuel1") 
         
@@ -76,6 +78,8 @@ class CheckFETfuel():
 #   i = 1 ... NFuels: number of fuel
 #------------------------------------------------------------------------------
 
+        self.FuelNo = i
+        print "CheckFETfuel: importing data"
         ANo = -1
         
 #..............................................................................
@@ -109,7 +113,7 @@ class CheckFETfuel():
             pass
 
 #------------------------------------------------------------------------------
-    def exportData(self,i):  
+    def exportData(self):  
 #------------------------------------------------------------------------------
 #   stores corrected data in SQL (under AlternativeProposalNo = 0)
 #------------------------------------------------------------------------------
@@ -118,8 +122,9 @@ class CheckFETfuel():
         
 #..............................................................................
 # writing data into table " qfuel"
-        try:
-            qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[i+1]
+#        try:
+        if ANo == 0:
+            qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[self.FuelNo]
             if len(qfuelTable) > 0:
                 print "exporting data to qfuel"
                 qfuel = qfuelTable[0]
@@ -132,7 +137,7 @@ class CheckFETfuel():
                 
                 Status.SQL.commit()
                 
-        except:
+#        except:
             print "CheckFETfuel (exportData): error writing data to qfuel"
             pass
                               
@@ -204,6 +209,10 @@ class CheckFETfuel():
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
 
+        print "CheckFETfuel: starting check with"
+        self.FECFuel.show()
+        self.MFuelYear.show()
+        
         if DEBUG in ["ALL"]:
             print "-------------------------------------------------"
             print " FETfuel checking"

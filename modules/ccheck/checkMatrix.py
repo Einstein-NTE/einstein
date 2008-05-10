@@ -233,8 +233,17 @@ class CheckMatrix():
                 MColTotals[n][m].update(self.colTotals[m])
                 MRowTotals[n][m].update(self.rowTotals[n])
 
-                adjustProdS(MRow,self.FRow[n][m],MRowTotals[n][m])
-                adjustProdS(MCol,self.FCol[n][m],MColTotals[n][m])
+#                adjustProdS(MRow,self.FRow[n][m],MRowTotals[n][m])
+#                adjustProdS(MCol,self.FCol[n][m],MColTotals[n][m])
+
+                FRow = self.FRow[n][m]
+                FCol = self.FCol[n][m]
+                
+                adjustProd(MRow,FRow,MRowTotals[n][m])
+                adjustProd(MCol,FCol,MColTotals[n][m])
+
+                ccheck1(FRow,self.FRow[n][m])
+                ccheck1(FCol,self.FCol[n][m])
 
 # get mean values of MRowTotals
 
@@ -260,7 +269,10 @@ class CheckMatrix():
         improvement = INFINITE
         improvementCtr = 0
 
-        if DEBUG in ["ALL","BASIC"]:
+        if DEBUG in ["ALL","MAIN","BASIC"]:
+            print "======================================================"
+            print " starting values of matrix M"
+            print "======================================================"
             self.printM()
 
         for i in range(NMAXITERATIONS):
@@ -321,7 +333,7 @@ class CheckMatrix():
 
             improvement -= diff
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 print "======================================================"
                 print "CheckMatrix (check): diff[%s] = "%i,diff
                 print "======================================================"
@@ -336,7 +348,7 @@ class CheckMatrix():
             if improvementCtr == 10:
                 break
 
-        if DEBUG in ["ALL","BASIC"]:
+        if DEBUG in ["ALL","MAIN","BASIC"]:
             print "======================================================"
             print "CheckMatrix concluded ================================"
             print "======================================================"

@@ -66,19 +66,19 @@ class CheckFETel():
         self.FEOel = CCPar("FEOel")
         self.FETel1 = CCPar("FETel1")
         self.FETel2 = CCPar("FETel2")
-        self.FETel = CCPar("FETel")
+        self.FETel = CCPar("FETel",priority=2)
         
         if TEST==True:
             self.importTestData()
         else:
-            self.importData()
+            self.importData(0)
 
-        if DEBUG:
+        if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllFETel()
 
 
 #------------------------------------------------------------------------------
-    def importData(self):  
+    def importData(self,i):  
 #------------------------------------------------------------------------------
 #   imports data from SQL tables (from AlternativeProposalNo = -1)
 #------------------------------------------------------------------------------
@@ -148,7 +148,8 @@ class CheckFETel():
         
 #..............................................................................
 # writing data to table "cgeneraldata"
-        try:
+#        try:
+        if ANo == 0:
             cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
             if len(cgeneraldataTable) > 0:
                 print "exporting data to cgeneraldata"
@@ -156,15 +157,14 @@ class CheckFETel():
 
                 cgeneraldata.ElectricityGen = self.ElectricityGen.val
                 cgeneraldata.ElectricitySales = self.ElectricitySales.val
-                cgeneraldata.ElectricityNet = self.ElectricityNet.val
+#                cgeneraldata.ElectricityNet = self.ElectricityNet.val
                 cgeneraldata.FECel = self.FECel.val
                 cgeneraldata.FEOel = self.FEOel.val
                 cgeneraldata.FETel = self.FETel.val
-                
 
                 Status.SQL.commit()
                 
-        except:
+#        except:
             print "CheckFETel (exportData): error writing data to cgeneraldata"
             pass
 
@@ -336,13 +336,14 @@ class CheckFETel():
 #------------------------------------------------------------------------------
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
-        if DEBUG in ["ALL"]:
+        if DEBUG in ["ALL","MAIN","BASIC"]:
             print "-------------------------------------------------"
-            print " Process checking"
+            print " Checking FETel"
             print "-------------------------------------------------"
+
         for n in range(3):
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"
                 print "Ciclo %s"%n
                 print "-------------------------------------------------"
@@ -409,7 +410,7 @@ class CheckFETel():
 # End of the cycle. Last print in DEBUG mode
 
 
-        if DEBUG in ["ALL","BASIC"]:
+        if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllFETel()
 
 #==============================================================================

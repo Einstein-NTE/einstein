@@ -67,7 +67,7 @@ class CheckEq():
         self.USHBoiler1 = CCPar("USHBoiler1")
         self.USHBoiler2 = CCPar("USHBoiler2")
         self.USHBoiler = CCPar("USHBoiler")
-        self.USHj = CCPar("USH")
+        self.USHj = CCPar("USH",priority=2)
         self.USHj1 = CCPar("USH1")
         self.HCGTEfficiency1 = CCPar("HCGTEfficiency1")
         self.FETj1 = CCPar("FETj1") 
@@ -87,27 +87,32 @@ class CheckEq():
 #   imports data from SQL tables (from AlternativeProposalNo = -1)
 #------------------------------------------------------------------------------
 
+        self.EqNo = j+1
         ANo = -1
         
 #..............................................................................
 # assign empty CCPar to all questionnaire parameters
 
-        self.FuelLCV = 50       #IMPORT this parameter from the fuelDB
+        self.FuelLCV = 10       #IMPORT this parameter from the fuelDB
 
-        self.HCGPnom = CCPar("HCGPnom")
+        self.HCGPnom = CCPar("HCGPnom",priority=2)
         self.FuelConsum = CCPar("FuelConsum")
         self.NDaysEq = CCPar("NDaysEq")
         self.HPerDayEq = CCPar("HPerDayEq")
         self.PartLoad = CCPar("PartLoad")
         self.HCGTEfficiency = CCPar("HCGTEfficiency")
 
-        self.FETj = CCPar("FETj")   # from the FET matrix
+        self.FETj = CCPar("FETj",priority=2)   # from the FET matrix
         self.QHXEq = CCPar("QHXEq") #from the heat recovery matrix
 
 #..............................................................................
 # reading data from table "qprocessdata"
-        try:
-            qgenerationhcTable = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].EqNo[j+1]
+#        try:
+        if ANo == -1:       
+            qgenerationhcTable = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].EqNo[self.EqNo]
+
+            print "CheckEq: importing data"
+            print qgenerationhcTable[0]
             
             if len(qgenerationhcTable) > 0:
                 qgenerationhc = qgenerationhcTable[0]
@@ -122,12 +127,12 @@ class CheckEq():
                 
                 self.QHXEq.setValue(0)          #from the heat recovery matrix
 
-        except:
+#        except:
             print "CheckEq(importData): error reading data from qgenerationhc"
             pass
 
 #------------------------------------------------------------------------------
-    def exportData(self,j):  
+    def exportData(self):  
 #------------------------------------------------------------------------------
 #   stores corrected data in SQL (under AlternativeProposalNo = 0)
 #------------------------------------------------------------------------------
@@ -136,8 +141,9 @@ class CheckEq():
         
 #..............................................................................
 # writing data into table "qgenerationhc"
-        try:
-            qgenerationhcTable = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].EqNo[j+1]
+#        try:
+        if ANo == 0:
+            qgenerationhcTable = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].EqNo[self.EqNo]
             if len(qgenerationhcTable) > 0:
                 print "importing data into qgenerationhc"
                 qgenerationhc = qgenerationhcTable[0]
@@ -158,7 +164,7 @@ class CheckEq():
 
                 Status.SQL.commit()
                 
-        except:
+#        except:
             print "CheckEq (exportData): error writing data to qgenerationhc"
             pass
 

@@ -18,13 +18,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.07
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni      7/04/2008
 #                           Claudia Vannoni      16/04/2008
 #                           Hans Schweiger      19/04/2008
 #                           Claudia Vannoni      25/04/2008
 #                           Claudia Vannoni      27/04/2008
+#              v0.07        Hans Schweiger      07/05/2008
 #                    
 #
 #       Changes in last update: 
@@ -33,6 +34,10 @@
 #       19/04/2008: HS  PT1,2,3 and PTInFlow1 added as tmp-variables
 #       v005: import from SQL, PT, ccheck of USHProc1
 #       v0.06: small changes in labels,added the connection to the DB.
+#       v0.07: importData - import of UPH instead of UPHProc
+#               PTOutFlow1, VOutFlow and VOutFLow1 added
+#               VInFlowDay3 eliminated
+#
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -75,18 +80,19 @@ class CheckProc():
         self.PT3 = CCPar("PT3") 
         self.PTInFlow1 = CCPar("PTInFlow1")
         self.PTInFlowRec1 = CCPar("PTInFlowRec1")
+        self.PTOutFlow1 = CCPar("PTInFlow1")
         self.HperYearProc1 = CCPar("HperYearProc1")
-        self.HperYearProc = CCPar("HperYearProc")
+        self.HperYearProc = CCPar("HperYearProc",priority=2)
         self.DTLoss1=CCPar("DTLoss1")
         self.DTLoss=CCPar("DTLoss")
         self.VInFlowDay1 = CCPar("VInFlowDay1") 
-        self.VInFlowDay2 = CCPar("VInFlowDay1") 
-        self.VInFlowDay3 = CCPar("VInFlowDay1")
+        self.VInFlowDay2 = CCPar("VInFlowDay2") 
+        self.VOutFlow1 = CCPar("VOutFlow1")
         self.QLoss = CCPar("QLoss")
         self.QLoss1 = CCPar("QLoss1")
         self.QOpProc1 = CCPar("QOpProc1")
         self.UPHm1 = CCPar("UPHm1")
-        self.UPHm = CCPar("UPHm")
+        self.UPHm = CCPar("UPHm",priority=2)
         self.DTUPHcGross1 = CCPar("DTUPHcGross1")
         self.DTUPHcGross = CCPar("DTUPHcGross")
         self.UPHcdotGross1 = CCPar("UPHcdotGross1")#For convention UPH and UPHc are net!
@@ -105,7 +111,7 @@ class CheckProc():
         self.UPHcdot2 = CCPar("UPHcdot2")
         self.UPHcdot = CCPar("UPHcdot")
         self.UPHc1 = CCPar("UPHc1")
-        self.UPHc = CCPar("UPHc")
+        self.UPHc = CCPar("UPHc",priority=2)
         self.DTUPHs1 = CCPar("DTUPHs1")
         self.DTUPHs = CCPar("DTUPHs")
         self.UPHsdot1 = CCPar("UPHsdot1")
@@ -114,7 +120,7 @@ class CheckProc():
         self.UPHs = CCPar("UPHs")
         self.UPH1 = CCPar("UPH1")
         self.UPH2 = CCPar("UPH2")
-        self.UPH = CCPar("UPH")
+        self.UPH = CCPar("UPH",priority=2)
         self.UPHProc1 = CCPar("UPHProc1")
         self.QHXProc1 = CCPar("QHXProc1")
         self.UAProc = CCPar("UAProc")
@@ -136,22 +142,23 @@ class CheckProc():
 #   imports data from SQL tables (from AlternativeProposalNo = -1)
 #------------------------------------------------------------------------------
 
+        self.ProcNo = k+1
         ANo = -1
         
 #..............................................................................
 # assign empty CCPar to all questionnaire parameters
 
         self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-        self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+        self.FluidDensity = 1030 # Kg/m3 # IMPORT Constant from the FluidDB
 
         self.PTInFlow = CCPar("PTInFlow")
-        self.PT = CCPar("PT")
+        self.PT = CCPar("PT",priority=2)
         self.PTOutFlow = CCPar("PTOutFlow")# assumed to be Tpor
         self.PTOutFlowRec = CCPar("PTOutFlowRec") # It is not defined in the questionnaire. it has to be estimated
         self.PTInFlowRec = CCPar("PTInFlowRec")
         self.PTStartUp = CCPar("PTStartUp")
         self.VInFlowDay = CCPar("VInFlowDay ")
-        self.VolProcMed = CCPar("VolProcMed")
+        self.VOutFlow = CCPar("VOutFlow")
         self.VolProcMed = CCPar("VolProcMed")
         self.NDaysProc = CCPar("NDaysProc")
         self.HPerDayProc = CCPar("HPerDay")
@@ -166,7 +173,7 @@ class CheckProc():
 #..............................................................................
 # reading data from table "qprocessdata"
         try:
-            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[k+1]
+            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[self.ProcNo]
             
             if len(qprocessdataTable) > 0:
                 qprocessdata = qprocessdataTable[0]
@@ -179,13 +186,14 @@ class CheckProc():
                 self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
                 self.PTStartUp.setValue(qprocessdata.PTStartUp)
                 self.VInFlowDay.setValue(qprocessdata.VInFlowDay) 
+                self.VOutFlow.setValue(qprocessdata.VOutFlow) 
                 self.VolProcMed.setValue(qprocessdata.VolProcMed) 
                 self.NDaysProc.setValue(qprocessdata.NDaysProc)
                 self.HPerDayProc.setValue(qprocessdata.HPerDayProc) 
                 self.NBatch.setValue(qprocessdata.NBatch) 
                 self.TEnvProc.setValue(qprocessdata.TEnvProc)
                 self.QOpProc.setValue(qprocessdata.QOpProc) 
-                self.UPHProc.setValue(qprocessdata.UPHProc) 
+                self.UPH.setValue(qprocessdata.UPH) 
 
                 self.QHXProc.setValue(0.0)  
                
@@ -194,7 +202,7 @@ class CheckProc():
             pass
 
 #------------------------------------------------------------------------------
-    def exportData(self,k):  
+    def exportData(self):  
 #------------------------------------------------------------------------------
 #   stores corrected data in SQL (under AlternativeProposalNo = 0)
 #------------------------------------------------------------------------------
@@ -203,8 +211,9 @@ class CheckProc():
         
 #..............................................................................
 # writing data into table " qprocessdata"
-        try:
-            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[k+1]
+#        try:
+        if ANo == 0:
+            qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[self.ProcNo]
             if len(qprocessdataTable) > 0:
                 print "exporting data to qprocessdata"
                 qprocessdata = qprocessdataTable[0]
@@ -224,11 +233,11 @@ class CheckProc():
                 qprocessdata.TEnvProc = self.TEnvProc.val
                 qprocessdata.QOpProc = self.QOpProc.val
                 qprocessdata.UPHProc = self.UPHProc.val
-                qprocessdata.HperYearProc = self.HperYearProc.val
+#                qprocessdata.HperYearProc = self.HperYearProc.val
                 qprocessdata.UAProc = self.UAProc.val
                 qprocessdata.QEvapProc = self.QEvapProc.val
                 qprocessdata.UPHcGross = self.UPHcGross.val
-                qprocessdata.QHXProcint = self.QHXProcInt.val
+                qprocessdata.QHXProcInt = self.QHXProcInt.val
                 qprocessdata.UPHm = self.UPHm.val
                 qprocessdata.UPHs = self.UPHs.val
                 qprocessdata.UPHc = self.UPHc.val
@@ -241,7 +250,7 @@ class CheckProc():
 
                 Status.SQL.commit()
                 
-        except:
+#        except:
             print "CheckProc (exportData): error writing data to qprocessdata"
             pass
 
@@ -581,7 +590,8 @@ class CheckProc():
         self.VInFlowDay.show()
         self.VInFlowDay1.show()
         self.VInFlowDay2.show()
-        self.VInFlowDay3.show()
+        self.VOutFlow.show()
+        self.VOutFlow1.show()
         self.PTInFlow.show()
         self.PTInFlow1.show()
         self.PT.show()
@@ -661,14 +671,14 @@ class CheckProc():
 
         for n in range(5):
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"
                 print "Ciclo %s"%n
                 print "-------------------------------------------------"
         
 # Step 1: Call all calculation routines in a given sequence
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"
                 print "Step 1: calculating from left to right (CALC)"
                 print "-------------------------------------------------"
@@ -680,10 +690,10 @@ class CheckProc():
             self.QOpProc1 = calcSum("QOpProc1",self.QLoss,self.QEvapProc)
             self.UPHm1 = calcProd("UPHm1",self.QOpProc,self.HPerDayProc)
             self.UPHcdotGross1 = calcFlow("UPHcdotGross1",self.FluidCp,self.VInFlowDay,self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)
-            self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidCp,self.VInFlowDay1,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
+            self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidCp,self.VOutFlow,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
             self.QHXdotProcInt2 = calcFlow("QHXdotProcInt2",self.FluidCp,self.VInFlowDay2,self.PTInFlowRec,self.PTInFlow1,self.DTQHX,self.DTQHX2)
             self.UPHcdot1 = calcDiff("UPHcdot1",self.UPHcdotGross,self.QHXdotProcInt)
-            self.UPHcdot2 = calcFlow("UPHcdot2",self.FluidCp,self.VInFlowDay3,self.PT2,self.PTInFlowRec1,self.DTUPHcNet,self.DTUPHcNet1)
+            self.UPHcdot2 = calcFlow("UPHcdot2",self.FluidCp,self.VInFlowDay1,self.PT2,self.PTInFlowRec1,self.DTUPHcNet,self.DTUPHcNet1)
             self.UPHc1 = calcProd("UPHc1",self.UPHcdot,self.NDaysProc)
             self.UPHsdot1 = calcFlow("UPHsdot1",(self.FluidCp*self.FluidDensity),self.VolProcMed,self.PT3,self.PTStartUp,self.DTUPHs,self.DTUPHs1)
             self.NBatchPerYear1 =calcProd("NbatchPeryear1",self.NDaysProc,self.NBatch)
@@ -692,7 +702,7 @@ class CheckProc():
             self.UPH2 = calcSum("UPH2",self.UPHProc,self.QHXProc)
 
           
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
 
 # Step 2: Cross check the variables
@@ -704,7 +714,9 @@ class CheckProc():
             ccheck3(self.PT,self.PT1,self.PT2,self.PT3)
             ccheck1(self.PTInFlow,self.PTInFlow1)
             ccheck1(self.PTInFlowRec,self.PTInFlowRec1)
-            ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
+            ccheck2(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2)
+            ccheck1(self.VOutFlow,self.VOutFlow1)
+            ccheck1(self.PTOutFlow,self.PTOutFlow1)
             
             ccheck1(self.HperYearProc,self.HperYearProc1)
             ccheck1(self.DTLoss,self.DTLoss1)
@@ -721,9 +733,10 @@ class CheckProc():
             ccheck1(self.UPHProc,self.UPHProc1)
             ccheck1(self.QHXProc,self.QHXProc1)
             ccheck2(self.UPH,self.UPH1,self.UPH2)
+            ccheck1(self.PTOutFlow,self.PTOutFlow1)
             
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
 
 # Step 3: Adjust the variables (inverse of calculation routines)
@@ -737,10 +750,10 @@ class CheckProc():
             adjustProd(self.NBatchPerYear1,self.NDaysProc,self.NBatch)
             adjustFlow(self.UPHsdot1,(self.FluidCp*self.FluidDensity),self.VolProcMed,self.PT3,self.PTStartUp,self.DTUPHs,self.DTUPHs1)
             adjustProd(self.UPHc1,self.UPHcdot,self.NDaysProc)
-            adjustFlow(self.UPHcdot2,self.FluidCp,self.VInFlowDay3,self.PT2,self.PTInFlowRec,self.DTUPHcNet,self.DTUPHcNet1)
+            adjustFlow(self.UPHcdot2,self.FluidCp,self.VInFlowDay1,self.PT2,self.PTInFlowRec,self.DTUPHcNet,self.DTUPHcNet1)
             adjustDiff(self.UPHcdot1,self.UPHcdotGross,self.QHXdotProcInt)
             adjustFlow(self.QHXdotProcInt2,self.FluidCp,self.VInFlowDay2,self.PTInFlowRec,self.PTInFlow1,self.DTQHX,self.DTQHX2)
-            adjustFlow(self.QHXdotProcInt1,self.FluidCp,self.VInFlowDay1,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
+            adjustFlow(self.QHXdotProcInt1,self.FluidCp,self.VOutFlow,self.PTOutFlowRec,self.PTOutFlow,self.DTQHX,self.DTQHX1)
             adjustFlow(self.UPHcdotGross1,self.FluidCp,self.VInFlowDay,self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)
             adjustProd(self.UPHm1,self.QOpProc,self.HPerDayProc)
             adjustSum(self.QOpProc1,self.QLoss,self.QEvapProc)
@@ -748,7 +761,7 @@ class CheckProc():
             adjustDiff(self.DTLoss1,self.PT,self.TEnvProc)
             adjustProd(self.HperYearProc1,self.NDaysProc,self.HPerDayProc)
             
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
            
 # Step 4: Second cross check of the variables
@@ -760,7 +773,9 @@ class CheckProc():
             ccheck3(self.PT,self.PT1,self.PT2,self.PT3)  
             ccheck1(self.PTInFlow,self.PTInFlow1)
             ccheck1(self.PTInFlowRec,self.PTInFlowRec1)
-            ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
+            ccheck2(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2)
+            ccheck1(self.VOutFlow,self.VOutFlow1)
+            ccheck1(self.PTOutFlow,self.PTOutFlow1)
             
             ccheck1(self.HperYearProc,self.HperYearProc1)
             ccheck1(self.DTLoss,self.DTLoss1)
@@ -776,10 +791,9 @@ class CheckProc():
             ccheck1(self.UPHs,self.UPHs1)
             ccheck1(self.UPHProc,self.UPHProc1)
             ccheck1(self.QHXProc,self.QHXProc1)
-            ccheck2(self.UPH,self.UPH1,self.UPH2)
-            
+            ccheck2(self.UPH,self.UPH1,self.UPH2)            
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
 
 # Arrived at the end
