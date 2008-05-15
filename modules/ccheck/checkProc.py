@@ -149,7 +149,7 @@ class CheckProc():
 # assign empty CCPar to all questionnaire parameters
 
         self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-        self.FluidDensity = 1030 # Kg/m3 # IMPORT Constant from the FluidDB
+        self.FluidDensity = 1000 # Kg/m3 # IMPORT Constant from the FluidDB
 
         self.PTInFlow = CCPar("PTInFlow")
         self.PT = CCPar("PT",priority=2)

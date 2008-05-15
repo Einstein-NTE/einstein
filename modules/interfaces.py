@@ -27,6 +27,7 @@
 #                           Stoyan Danov        24/04/2008
 #                           Stoyan Danov        30/04/2008
 #                           Hans Schweiger      05/05/2008
+#                           Hans Schweiger      14/05/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -41,6 +42,7 @@
 #       24/04/2008 getEquipmentCascade: add filling EquipTableDataList-changed
 #       30/04/2008 eliminate references to C tables, function affected: getEquipmentCascade
 #       05/05/2008  autocorrection of equipment cascade introduced
+#       14/05/2008  auxiliary function "print cascade" added for testing purposes
 #
 #	
 #------------------------------------------------------------------------------		
@@ -113,7 +115,7 @@ class Interfaces(object):
         self.T = []
         for iT in range(Status.NT+1):
             self.T.append(iT*Status.TemperatureInterval)
-        self.T.append(999)
+        self.T.append(999.0)
         
         self.setDefaultDemand()
         
@@ -161,34 +163,36 @@ class Interfaces(object):
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
-            self.NEquipe = NEquipe
-            
-            Interfaces.QD_Tt_mod = []      
-            Interfaces.QD_T_mod = []
-            Interfaces.QA_Tt_mod = []       
-            Interfaces.QA_T_mod = []
+        self.NEquipe = NEquipe
+        
+        Interfaces.QD_Tt_mod = []      
+        Interfaces.QD_T_mod = []
+        Interfaces.QA_Tt_mod = []       
+        Interfaces.QA_T_mod = []
 
-            Interfaces.USHj_Tt = []
-            Interfaces.USHj_T = []
-            Interfaces.QHXj_Tt = []
-            Interfaces.QHXj_T = []
+        Interfaces.USHj_Tt = []
+        Interfaces.USHj_T = []
+        Interfaces.QHXj_Tt = []
+        Interfaces.QHXj_T = []
 
+        Interfaces.QD_Tt_mod.append(self.QD_Tt)       
+        Interfaces.QD_T_mod.append(self.QD_T)
+        Interfaces.QA_Tt_mod.append(self.QA_Tt)      
+        Interfaces.QA_T_mod.append(self.QA_T)
+
+        for j in range(NEquipe):
             Interfaces.QD_Tt_mod.append(self.QD_Tt)       
             Interfaces.QD_T_mod.append(self.QD_T)
             Interfaces.QA_Tt_mod.append(self.QA_Tt)      
             Interfaces.QA_T_mod.append(self.QA_T)
 
-            for j in range(NEquipe):
-                Interfaces.QD_Tt_mod.append(self.QD_Tt)       
-                Interfaces.QD_T_mod.append(self.QD_T)
-                Interfaces.QA_Tt_mod.append(self.QA_Tt)      
-                Interfaces.QA_T_mod.append(self.QA_T)
+            Interfaces.USHj_Tt.append(self.createQ_Tt)
+            Interfaces.USHj_T.append(self.createQ_T)
+            Interfaces.QHXj_Tt.append(self.createQ_Tt)
+            Interfaces.QHXj_T.append(self.createQ_T)
 
-                Interfaces.USHj_Tt.append(self.createQ_Tt)
-                Interfaces.USHj_T.append(self.createQ_T)
-                Interfaces.QHXj_Tt.append(self.createQ_Tt)
-                Interfaces.QHXj_T.append(self.createQ_T)
-                
+        self.printCascade()
+                        
 #------------------------------------------------------------------------------		
     def addCascadeArrays(self):
 #------------------------------------------------------------------------------		
@@ -223,6 +227,24 @@ class Interfaces(object):
 
 
         
+#------------------------------------------------------------------------------		
+    def printCascade(self,):
+#------------------------------------------------------------------------------		
+
+        NT = Status.NT
+        print "Heat Demand"
+        print "CascadeIndex - QD_total - QD_Tt(first day)"
+        for i in range(self.NEquipe+1):
+            print i,\
+            "%10.4f"%Interfaces.QD_T_mod[i][NT+1],\
+            Interfaces.QD_Tt_mod[i][NT+1][0:23]
+        print "Heat Availability"
+        print "CascadeIndex - QA_total - QA_Tt(first day)"
+        for i in range(self.NEquipe+1):
+            print i,\
+            "%10.4f"%Interfaces.QA_T_mod[i][NT+1],\
+            Interfaces.QA_Tt_mod[i][NT+1][0:23]
+        
 #------------------------------------------------------------------------------
     def getEquipmentCascade(self):
 #------------------------------------------------------------------------------
@@ -251,9 +273,6 @@ class Interfaces(object):
             self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
                                             self.equipments[j].EquipType, self.equipments[j].HPerYearEq, self.equipments[j].YearManufact]) #SD change 30/04.2008
                                                 
-        
-        
-
 
 #------------------------------------------------------------------------------		
     def setGraphicsData(self,key, data):
