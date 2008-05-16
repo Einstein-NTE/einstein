@@ -625,7 +625,7 @@ class PanelHP(wx.Panel):
     def OnChoiceConfig2Choice(self, event):
         self.config[1] = TYPELIST[self.choiceConfig2.GetSelection()]
         print "new config[%s] value: "%1,self.config[1]
-        Interfaces.GData["HP Config"] = self.config
+        Interfaces.GData["HP Config"] = self.config[1]
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig3TextEnter(self, event):

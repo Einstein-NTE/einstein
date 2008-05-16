@@ -61,16 +61,18 @@ from einstein.modules.constants import *
 [wxID_PANELBB, wxID_PANELBBBBCALCULATE, wxID_PANELBBBUTTONPAGEBBADD, 
  wxID_PANELBBBUTTONPAGEBBBACK, wxID_PANELBBBUTTONPAGEBBCANCEL, 
  wxID_PANELBBBUTTONPAGEBBFWD, wxID_PANELBBBUTTONPAGEBBOK, 
- wxID_PANELBBCB1PAGEBB, wxID_PANELBBCHOICEPAGEBB, wxID_PANELBBGRID, 
- wxID_PANELFIG, wxID_PANELBBSTCONFIG8, wxID_PANELBBST11PAGEBB, 
- wxID_PANELBBST12PAGEBB, wxID_PANELBBST1PAGEBB, wxID_PANELBBST2PAGEBB, 
- wxID_PANELBBST3PAGEBB, wxID_PANELBBST4PAGEBB, wxID_PANELBBSTCONFIG3, 
- wxID_PANELBBSTCONFIG4, wxID_PANELBBSTCONFIG5, wxID_PANELBBSTCONFIG6, 
- wxID_PANELBBSTCONFIG7, wxID_PANELBBSTATICTEXT1, wxID_PANELBBTCCONFIG3, 
- wxID_PANELBBTCCONFIG4, wxID_PANELBBTCCONFIG5, wxID_PANELBBTCCONFIG6, 
- wxID_PANELBBTCCONFIG7, wxID_PANELBBTC6PAGEBB, wxID_PANELBBTC7PAGEBB, 
-] = [wx.NewId() for _init_ctrls in range(31)]
-#
+ wxID_PANELBBCBCONFIG1, wxID_PANELBBCBCONFIG3, wxID_PANELBBCHOICECONFIG4, 
+ wxID_PANELBBGRID, wxID_PANELBBPANELFIG, wxID_PANELBBST12PAGEBB, 
+ wxID_PANELBBST1PAGEBB, wxID_PANELBBST2PAGEBB, wxID_PANELBBST3PAGEBB, 
+ wxID_PANELBBST4PAGEBB, wxID_PANELBBSTATICTEXT1, wxID_PANELBBSTINFO2_T3, 
+ wxID_PANELBBSTCONFIG3, wxID_PANELBBSTCONFIG4, wxID_PANELBBSTCONFIG5, 
+ wxID_PANELBBSTCONFIG6, wxID_PANELBBSTCONFIG7, wxID_PANELBBSTINFO1, 
+ wxID_PANELBBSTINFO1VALUE, wxID_PANELBBSTINFO2, wxID_PANELBBSTINFO2_P1, 
+ wxID_PANELBBSTINFO2_P2, wxID_PANELBBSTINFO2_P3, wxID_PANELBBSTINFO2_T1, 
+ wxID_PANELBBSTINFO2_T2, wxID_PANELBBSTINFO2A, wxID_PANELBBTCCONFIG2, 
+ wxID_PANELBBTCCONFIG5, wxID_PANELBBTCCONFIG6, wxID_PANELBBTCCONFIG7, 
+] = [wx.NewId() for _init_ctrls in range(37)]
+
 # constants
 #
 GRID_LETTER_SIZE = 8 #points
@@ -93,17 +95,17 @@ def drawFigure(self):
         self.subplot = self.figure.add_subplot(1,1,1)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][1],
-                      'go-', label='QD', linewidth=2)
+                      'go-', label='QD [80ºC]', linewidth=2)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][2],
-                      'rs',  label='QA')
+                      'rs',  label='QD [120ºC]')
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][3],
-                      'go-', label='QD_mod', linewidth=2)
+                      'go-', label='QD [250ºC]', linewidth=2)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][4],
-                      'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 3e+7])
+                      'rs',  label='USH (boiler)')
+#    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
 
@@ -184,28 +186,18 @@ class PanelBB(wx.Panel):
         wx.Panel.__init__(self, id=wxID_PANELBB, name='PanelBB', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
-#------------------------------------------------------------------------------		
-#       Displays of status
-#------------------------------------------------------------------------------		
-
-#..............................................................................
-# Figure to be plotted
-
         self.staticText1 = wx.StaticText(id=wxID_PANELBBSTATICTEXT1,
-              label=u'Heat demand and availability with and without BB',
-              name='staticText1', parent=self, pos=wx.Point(424, 32),
-              size=wx.Size(352, 17), style=0)
+              label='Cumulative heat demand to be covered by boilers',
+              name='staticText1', parent=self, pos=wx.Point(448, 32),
+              size=wx.Size(239, 13), style=0)
 
-        self.panelFig = wx.Panel(id=wxID_PANELFIG, name='panelFig', parent=self,
+        self.panelFig = wx.Panel(id=wxID_PANELBBPANELFIG, name='panelFig', parent=self,
               pos=wx.Point(450, 66), size=wx.Size(316, 220),
               style=wx.TAB_TRAVERSAL)
 
-#..............................................................................
-# Grid for display of existing boilers and burners
-
-        self.grid = wx.grid.Grid(id=wxID_PANELBBGRID,
-              name='gridpageBB', parent=self, pos=wx.Point(40, 48),
-              size=wx.Size(376, 168), style=0)
+        self.grid = wx.grid.Grid(id=wxID_PANELBBGRID, name='gridpageBB',
+              parent=self, pos=wx.Point(40, 48), size=wx.Size(376, 168),
+              style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPageBBGridCellLeftDclick, id=wxID_PANELBBGRID)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
@@ -214,17 +206,13 @@ class PanelBB(wx.Panel):
         self.st1pageBB = wx.StaticText(id=-1,
               label='Existing Boilers and burners in the HC system',
               name='st1pageBB', parent=self, pos=wx.Point(40, 32), style=0)
-#------------------------------------------------------------------------------		
-#       Action buttons and text entry
-#------------------------------------------------------------------------------		
 
-# Button "run design assistant"
         self.BBCalculate = wx.Button(id=wxID_PANELBBBBCALCULATE,
               label='run design assistant', name='BB_Calculate', parent=self,
               pos=wx.Point(232, 224), size=wx.Size(184, 24), style=0)
         self.BBCalculate.Bind(wx.EVT_BUTTON, self.OnBBCalculateButton,
               id=wxID_PANELBBBBCALCULATE)
-# Button "add BB"
+
         self.buttonpageBBAdd = wx.Button(id=wxID_PANELBBBUTTONPAGEBBADD,
               label='add boiler / burner', name='buttonpageBBAdd', parent=self,
               pos=wx.Point(32, 224), size=wx.Size(184, 24), style=0)
@@ -234,11 +222,11 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #       Configuration design assistant
 #------------------------------------------------------------------------------		
-
         self.st2pageBB = wx.StaticText(id=-1, label='Design assistant options:',
               name='st2pageBB', parent=self, pos=wx.Point(40, 272), style=0)
         self.st2pageBB.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
+
 
 #..............................................................................
 # 1. Maintain existing equipment ?
@@ -246,80 +234,80 @@ class PanelBB(wx.Panel):
         self.st3pageBB = wx.StaticText(id=-1,
               label='Maintain existing equipment ?', name='st3pageBB',
               parent=self, pos=wx.Point(40, 304), style=0)
-
-        self.cb1pageBB = wx.CheckBox(id=wxID_PANELBBCB1PAGEBB, label='',
-              name='cb1pageBB', parent=self, pos=wx.Point(288, 308),
-              size=wx.Size(24, 13), style=0)
-
-        self.cb1pageBB.Bind(wx.EVT_CHECKBOX, self.OnCb1pageBBCheckbox,
-              id=wxID_PANELBBCB1PAGEBB)
+        self.cbConfig1 = wx.CheckBox(id=wxID_PANELBBCBCONFIG1, label='',
+              name='cbConfig1', parent=self, pos=wx.Point(288, 304),
+              size=wx.Size(16, 16), style=0)
+        self.cbConfig1.Bind(wx.EVT_CHECKBOX, self.OnCbConfig1Checkbox,
+              id=wxID_PANELBBCBCONFIG1)
 
 #..............................................................................
-# 2. BB type 
-        self.st4pageBB = wx.StaticText(id=-1, label='Type of boiler/burner',
+# 2. Safety factor
+
+        self.st4pageBB = wx.StaticText(id=-1, label='Safety factor [%]',
               name='st4pageBB', parent=self, pos=wx.Point(40, 344), style=0)
 
-        self.choicepageBB = wx.Choice(choices=["steam boiler",
-              "hot water (condensing)", "hot water (standard)"],
-              id=wxID_PANELBBCHOICEPAGEBB, name='choicepageBB', parent=self,
-              pos=wx.Point(288, 336), size=wx.Size(130, 21), style=0)
-        self.choicepageBB.Bind(wx.EVT_CHOICE, self.OnChoicepageBBChoice,
-              id=wxID_PANELBBCHOICEPAGEBB)
+        self.tcConfig2 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG2, name='tcConfig2',
+              parent=self, pos=wx.Point(288, 336), size=wx.Size(128, 24),
+              style=0, value='')
+        self.tcConfig2.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig2TextEnter,
+              id=wxID_PANELBBTCCONFIG2)
+
 
 #..............................................................................
-# 3. Minimum operating hours
-        self.stConfig3 = wx.StaticText(id=-1,
-              label='Minimum desired annual operation hours, h',
+# 3. Redundancy necessary ?
+
+        self.stConfig3 = wx.StaticText(id=-1, label='Is redundancy necessary ?',
               name='stConfig3', parent=self, pos=wx.Point(40, 384), style=0)
 
-        self.tcConfig3 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG3, name='tcConfig3',
-              parent=self, pos=wx.Point(288, 376), size=wx.Size(128, 21),
-              style=0, value='')
-        self.tcConfig3.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig3TextEnter,
-              id=wxID_PANELBBTCCONFIG3)
+        self.cbConfig3 = wx.CheckBox(id=wxID_PANELBBCBCONFIG3, label='',
+              name='cbConfig3', parent=self, pos=wx.Point(288, 388),
+              size=wx.Size(24, 13), style=0)
+        self.cbConfig3.Bind(wx.EVT_CHECKBOX, self.OnCbConfig3Checkbox,
+              id=wxID_PANELBBCBCONFIG3)
+
 
 #..............................................................................
-# 4. Temperature lift
-        self.stConfig4 = wx.StaticText(id=-1,
-              label='Maximum desired temperature lift, \xbaC', name='stConfig4',
-              parent=self, pos=wx.Point(40, 424), style=0)
+# 4. choose fuel
 
-        self.tcConfig4 = wx.TextCtrl(id=-1, name='tcConfig4', parent=self,
-              pos=wx.Point(288, 416), size=wx.Size(128, 21), style=0, value='')
-        self.tcConfig4.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig4TextEnter,
-              id=wxID_PANELBBTCCONFIG4)
+        self.stConfig4 = wx.StaticText(id=-1, label='Fuel Type',
+              name='stConfig4', parent=self, pos=wx.Point(40, 424), style=0)
+        self.choiceConfig4 = wx.Choice(choices=["Natural Gas",
+              "Biomass", "Fuel oil"],
+              id=wxID_PANELBBCHOICECONFIG4, name='choiceConfig4', parent=self,
+              pos=wx.Point(288, 416), size=wx.Size(128, 21), style=0)
+        self.choiceConfig4.Bind(wx.EVT_CHOICE, self.OnChoiceConfig4Choice,
+              id=wxID_PANELBBCHOICECONFIG4)
 
 #..............................................................................
-# 5. condensing temperature
+# 5. minimum operation hours
+
         self.stConfig5 = wx.StaticText(id=-1,
-              label='Maximum desired condensing temperature, \xbaC',
+              label='Minimum operating hours (baseload boiler)',
               name='stConfig5', parent=self, pos=wx.Point(40, 464), style=0)
 
         self.tcConfig5 = wx.TextCtrl(id=-1, name='tcConfig5', parent=self,
-              pos=wx.Point(288, 456), size=wx.Size(128, 21), style=0, value='')
+              pos=wx.Point(288, 456), size=wx.Size(128, 24), style=0, value='')
         self.tcConfig5.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig5TextEnter,
               id=wxID_PANELBBTCCONFIG5)
 
 #..............................................................................
-# 6. evaporating temperature
-        self.stConfig6 = wx.StaticText(id=-1,
-              label='Minimum desired evaporating temperature, \xbaC',
+# 5. minimum boiler power
+
+        self.stConfig6 = wx.StaticText(id=-1, label='Minimum boiler power [kW]',
               name='stConfig6', parent=self, pos=wx.Point(40, 504), style=0)
 
         self.tcConfig6 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG6, name='tcConfig6',
-              parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 21),
+              parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 24),
               style=0, value='')
         self.tcConfig6.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig6TextEnter,
               id=wxID_PANELBBTCCONFIG6)
 
 #..............................................................................
-# 7. condensing temperature: inlet temp.
-        self.stConfig7 = wx.StaticText(id=-1, label='Only for absorption type:',
-              name='stConfig7', parent=self, pos=wx.Point(40, 536), style=0)
+# 5. minimum efficiency
 
-        self.stConfig8 = wx.StaticText(id=-1,
-              label='Inlet temperature of heating fluid in generator, \xbaC',
-              name='stConfig8', parent=self, pos=wx.Point(40, 552), style=0)
+        self.stConfig7 = wx.StaticText(id=-1,
+              label='Minimum effiency allowed [%]', name='stConfig7',
+              parent=self, pos=wx.Point(40, 544), style=0)
 
         self.tcConfig7 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG7, name='tcConfig7',
               parent=self, pos=wx.Point(288, 544), size=wx.Size(128, 21),
@@ -328,38 +316,59 @@ class PanelBB(wx.Panel):
               id=wxID_PANELBBTCCONFIG7)
 
 #------------------------------------------------------------------------------		
-#       Display field at the right
+#       Display INFO field at the right
 #------------------------------------------------------------------------------		
 
-        self.st11pageBB = wx.StaticText(id=-1, label='Pinch temperature \xb0C',
-              name='st11pageBB', parent=self, pos=wx.Point(440, 424), style=0)
+        self.stInfo1 = wx.StaticText(id=wxID_PANELBBSTINFO1,
+              label='Safety factor [%]', name='stInfo1', parent=self,
+              pos=wx.Point(440, 352), style=0)
+        self.stInfo1Value = wx.StaticText(id=wxID_PANELBBSTINFO1VALUE,
+              label='10', name='stInfo1Value', parent=self, pos=wx.Point(544,
+              352), style=0)
 
-        self.tc6pageBB = wx.TextCtrl(id=-1, name='tc6pageBB', parent=self,
-              pos=wx.Point(640, 416), size=wx.Size(128, 21), style=0,
-              value='??')
+        self.stInfo2 = wx.StaticText(id=wxID_PANELBBSTINFO2,
+              label='Residual power to be supplied:', name='stInfo2',
+              parent=self, pos=wx.Point(440, 392), style=0)
 
-        self.tc7pageBB = wx.TextCtrl(id=-1, name='tc7pageBB', parent=self,
-              pos=wx.Point(640, 456), size=wx.Size(128, 21), style=0,
-              value='??')
+        self.stInfo2a = wx.StaticText(id=wxID_PANELBBSTINFO2A,
+              label='Temperature [\xbaC]', name='stInfo3', parent=self,
+              pos=wx.Point(504, 416), style=0)
+        self.stInfo2b = wx.StaticText(id=-1, label='Peak demand [kW]',
+              name='stInfo2b', parent=self, pos=wx.Point(616, 416), style=0)
 
-        self.st12pageBB = wx.StaticText(id=-1, label='Temperature gap \xb0K',
-              name='st12pageBB', parent=self, pos=wx.Point(440, 464), style=0)
+        self.stInfo2_T1 = wx.StaticText(id=wxID_PANELBBSTINFO2_T1, label='80',
+              name='stInfo2_T1', parent=self, pos=wx.Point(504, 440), style=0)
+
+        self.stInfo2_T2 = wx.StaticText(id=wxID_PANELBBSTINFO2_T2, label='120',
+              name='stInfo2_T2', parent=self, pos=wx.Point(504, 464), style=0)
+
+        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label='400',
+              name='staticText3', parent=self, pos=wx.Point(504, 488), style=0)
+
+        self.stInfo2_P1 = wx.StaticText(id=wxID_PANELBBSTINFO2_P1, label='1100',
+              name='stInfo2_P1', parent=self, pos=wx.Point(616, 440), style=0)
+
+        self.stInfo2_P2 = wx.StaticText(id=wxID_PANELBBSTINFO2_P2, label='1380',
+              name='stInfo2_P2', parent=self, pos=wx.Point(616, 464), style=0)
+
+        self.stInfo2_P3 = wx.StaticText(id=wxID_PANELBBSTINFO2_P3, label='4270',
+              name='stInfo2_P3', parent=self, pos=wx.Point(616, 488), style=0)
+
 #------------------------------------------------------------------------------		
 #       Default action buttons: FWD / BACK / OK / Cancel
-#------------------------------------------------------------------------------		
 
-        self.buttonpageBBOk = wx.Button(id=wx.ID_OK,
-              label='OK', name='buttonpageBBOk', parent=self, pos=wx.Point(528,
-              544), size=wx.Size(75, 23), style=0)
+#------------------------------------------------------------------------------		
+        self.buttonpageBBOk = wx.Button(id=wx.ID_OK, label='OK',
+              name='buttonpageBBOk', parent=self, pos=wx.Point(528, 544),
+              size=wx.Size(75, 23), style=0)
         self.buttonpageBBOk.Bind(wx.EVT_BUTTON, self.OnButtonpageBBOkButton,
               id=wx.ID_OK)
 
-        self.buttonpageBBCancel = wx.Button(id=wx.ID_CANCEL,
-              label='Cancel', name='buttonpageBBCancel', parent=self,
-              pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
+        self.buttonpageBBCancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+              name='buttonpageBBCancel', parent=self, pos=wx.Point(616, 544),
+              size=wx.Size(75, 23), style=0)
         self.buttonpageBBCancel.Bind(wx.EVT_BUTTON,
-              self.OnButtonpageBBCancelButton,
-              id=wx.ID_CANCEL)
+              self.OnButtonpageBBCancelButton, id=wx.ID_CANCEL)
 
         self.buttonpageBBFwd = wx.Button(id=wxID_PANELBBBUTTONPAGEBBFWD,
               label='>>>', name='buttonpageBBFwd', parent=self,
@@ -372,6 +381,8 @@ class PanelBB(wx.Panel):
               pos=wx.Point(440, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageBBBack.Bind(wx.EVT_BUTTON, self.OnButtonpageBBBackButton,
               id=wxID_PANELBBBUTTONPAGEBBBACK)
+
+#------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
     def display(self):
@@ -403,14 +414,17 @@ class PanelBB(wx.Panel):
 # update of design assistant parameters
 
         self.config = Interfaces.GData["BB Config"]
-#        self.cbConfig1.SetValue(self.config[0])
-#        try:        #try-except necessary if there comes a string that is not in list.
-#            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
-#        except:
-#            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
-#            pass
-        self.tcConfig3.SetValue(str(self.config[2]))
-        self.tcConfig4.SetValue(str(self.config[3]))
+        self.cbConfig1.SetValue(self.config[0])
+        self.tcConfig2.SetValue(str(self.config[1]))
+
+        self.cbConfig3.SetValue(self.config[2])
+        try:        #try-except necessary if there comes a string that is not in list.
+            self.choiceConfig4.SetSelection(0)
+#            self.choiceConfig4.SetSelection(TYPELIST.index(self.config[1]))
+        except:
+            print "PanelBB (display): was asked to display an erroneous heat pump type",self.config[1]
+            pass
+
         self.tcConfig5.SetValue(str(self.config[4]))
         self.tcConfig6.SetValue(str(self.config[5]))
         self.tcConfig7.SetValue(str(self.config[6]))
@@ -418,10 +432,12 @@ class PanelBB(wx.Panel):
 #..............................................................................
 # update of info-values
 
-#        self.info = Interfaces.GData["HP Info"]
+        self.info = Interfaces.GData["BB Info"]
         
-#        self.tcInfo1.SetValue(str(self.info[0]))
-#        self.tcInfo2.SetValue(str(self.info[1]))
+        self.stInfo1Value.SetLabel(str(self.info[0]))
+        self.stInfo2_P1.SetLabel(str(self.info[1]))
+        self.stInfo2_P2.SetLabel(str(self.info[2]))
+        self.stInfo2_P3.SetLabel(str(self.info[3]))
 
         self.panelFig.draw()
         self.Show()
@@ -535,41 +551,45 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #   Event handlers: parameter change in design assistant
 #------------------------------------------------------------------------------		
-    def OnCb1pageBBCheckbox(self, event):
-        self.modBB.storeModulePars()
+    def OnCbConfig1Checkbox(self, event):
+        self.config[0] = self.cbConfig1.GetValue()
+        Interfaces.GData["BB Config"] = self.config
+        self.mod.setUserDefinedPars()
 
-    def OnChoicepageBBChoice(self, event):
-        self.modBB.storeModulePars()
-
-    def OnTcConfig3TextEnter(self, event):
+    def OnTcConfig2TextEnter(self, event):
         print "new config[%s] value: "%2,self.config[2]
-        self.config[2] = self.tcConfig3.GetValue()
+        self.config[1] = self.tcConfig2.GetValue()
         Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParamHP()
+        self.mod.setUserDefinedPars()
 
-    def OnTcConfig4TextEnter(self, event):
-        self.config[3] = self.tcConfig4.GetValue()
-        print "new config[%s] value: "%3,self.config[3]
-        Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParamHP()
+    def OnCbConfig3Checkbox(self, event):
+        self.config[2] = self.cbConfig3.GetValue()
+        Interfaces.GData["BB Config"] = self.config
+        self.mod.setUserDefinedPars()
+
+    def OnChoiceConfig4Choice(self, event):
+        self.config[3] = FUELLIST[self.choiceConfig4.GetSelection()]
+        print "new config[%s] value: "%1,self.config[1]
+        Interfaces.GData["HP Config"] = self.config[3]
+        self.mod.setUserDefinedPars()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
         print "new config[%s] value: "%4,self.config[4]
         Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParamHP()
+        self.mod.setUserDefinedParas()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
         print "new config[%s] value: "%5,self.config[5]
         Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParamHP()
+        self.mod.setUserDefinedPars()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
         print "new config[%s] value: "%6,self.config[6]
         Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParamHP()
+        self.mod.setUserDefinedPars()
 
 
 #==============================================================================
