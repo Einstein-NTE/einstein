@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
+#	Version No.: 0.12
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Revised by:         Hans Schweiger      13/03/2008
 #	                    Tom Sobota          17/03/2008
@@ -28,6 +28,7 @@
 #                           Stoyan Danov        30/04/2008
 #                           Hans Schweiger      05/05/2008
 #                           Hans Schweiger      14/05/2008
+#                           Stoyan Danov        15/05/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -43,6 +44,8 @@
 #       30/04/2008 eliminate references to C tables, function affected: getEquipmentCascade
 #       05/05/2008  autocorrection of equipment cascade introduced
 #       14/05/2008  auxiliary function "print cascade" added for testing purposes
+#       15/05/2008 initCascadeArrays: parenthesis added in call calculateQ_Tt()...
+#                   functions added: printCascade_mod, printUSH
 #
 #	
 #------------------------------------------------------------------------------		
@@ -186,10 +189,10 @@ class Interfaces(object):
             Interfaces.QA_Tt_mod.append(self.QA_Tt)      
             Interfaces.QA_T_mod.append(self.QA_T)
 
-            Interfaces.USHj_Tt.append(self.createQ_Tt)
-            Interfaces.USHj_T.append(self.createQ_T)
-            Interfaces.QHXj_Tt.append(self.createQ_Tt)
-            Interfaces.QHXj_T.append(self.createQ_T)
+            Interfaces.USHj_Tt.append(self.createQ_Tt())
+            Interfaces.USHj_T.append(self.createQ_T())
+            Interfaces.QHXj_Tt.append(self.createQ_Tt())
+            Interfaces.QHXj_T.append(self.createQ_T())
 
         self.printCascade()
                         
@@ -202,10 +205,10 @@ class Interfaces(object):
         Interfaces.QA_Tt_mod.append(self.QA_Tt)      
         Interfaces.QA_T_mod.append(self.QA_T)
 
-        Interfaces.USHj_Tt.append(self.createQ_Tt)
-        Interfaces.USHj_T.append(self.createQ_T)
-        Interfaces.QHXj_Tt.append(self.createQ_Tt)
-        Interfaces.QHXj_T.append(self.createQ_T)
+        Interfaces.USHj_Tt.append(self.createQ_Tt())
+        Interfaces.USHj_T.append(self.createQ_T())
+        Interfaces.QHXj_Tt.append(self.createQ_Tt())
+        Interfaces.QHXj_T.append(self.createQ_T())
 
         self.NEquipe += 1
 
@@ -243,8 +246,43 @@ class Interfaces(object):
         for i in range(self.NEquipe+1):
             print i,\
             "%10.4f"%Interfaces.QA_T_mod[i][NT+1],\
-            Interfaces.QA_Tt_mod[i][NT+1][0:23]
+            Interfaces.QA_Tt_mod[i][0][0:23]
         
+#------------------------------------------------------------------------------		
+    def printUSH(self):
+#------------------------------------------------------------------------------		
+
+        NT = Status.NT
+        print "USH"
+        print "CascadeIndex - USHj_total - USHj_Tt(first day)"
+        for i in range(self.NEquipe+1):
+            print i,\
+            "%10.4f"%Interfaces.USHj_T[i][NT],\
+            Interfaces.USHj_Tt[i][NT][0:23]
+        
+#------------------------------------------------------------------------------		
+    def printCascade_mod(self,cascade):
+#------------------------------------------------------------------------------		
+
+        NT = Status.NT
+        print "Heat Demand"
+        print "CascadeIndex - QD_total - QD_Tt(first day)"
+        for i in range(self.NEquipe+1):
+            if i == cascade:
+                print i,\
+                "%10.4f"%Interfaces.QD_T_mod[i][NT+1],\
+                Interfaces.QD_Tt_mod[i][NT+1][0:23]
+            else:
+                pass
+        print "Heat Availability"
+        print "CascadeIndex - QA_total - QA_Tt(first day)"
+        for i in range(self.NEquipe+1):
+            if i == cascade:
+                print i,\
+                "%10.4f"%Interfaces.QA_T_mod[i][0],\
+                Interfaces.QA_Tt_mod[i][0][0:23]
+            else:
+                pass
 #------------------------------------------------------------------------------
     def getEquipmentCascade(self):
 #------------------------------------------------------------------------------
@@ -292,9 +330,10 @@ class Interfaces(object):
         Nt = Status.Nt
 
         hourlyProfile = [0,0,0,0,0,0,0,1,5,2,3.3,10,4,9,2,8,7,1,0,0,0,0,0,0] 
+        Tpinch = 40.0
         for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
-            fscaleD = max(iT-NT/2,0)*1e+5
-            fscaleA = max(NT/2-iT,0)*1e+5
+            fscaleD = max(self.T[iT]-Tpinch,0)*1e+2
+            fscaleA = max(Tpinch-self.T[iT],0)*1e+2
 
             load = []
             waste = []

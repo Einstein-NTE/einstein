@@ -133,7 +133,7 @@ def drawFigure(self):
     self.subplot.plot(Interfaces.GData['HP Plot'][0],
                       Interfaces.GData['HP Plot'][4],
                       'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 3e+7])
+    self.subplot.axis([0, 100, 0, 5e+6])
     self.subplot.legend()
 
 
