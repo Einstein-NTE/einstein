@@ -674,7 +674,7 @@ class PanelQ1(wx.Panel):
     def OnButtonOK(self, event):
         if Status.PId <> 0 and self.notebook.GetSelection()<2:
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
-               Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
+                Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
                 tmp = {
                     "Name":self.check(self.tc1.GetValue()),
                     "City":self.check(self.tc2.GetValue()),
@@ -707,6 +707,8 @@ class PanelQ1(wx.Panel):
                 q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
                 Status.SQL.commit()
+
+                Status.prj.setStatus("Q")
                           
             else:
                 self.main.showError(_("Name has to be an unique value!"))

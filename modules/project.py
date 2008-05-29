@@ -492,7 +492,7 @@ class Project(object):
 
             newElectricity = {"Questionnaire_id":newID,
                               "AlternativeProposalNo":-1}
-            qelectricity.insert(newGeneralData)
+            qelectricity.insert(newElectricity)
 
             Status.NoOfAlternatives = -1
                         
@@ -670,6 +670,161 @@ class Project(object):
         else:
             print "Project (setStatus): status key %s unknown"%key
 
+        self.setTreePermissions()
+
+#------------------------------------------------------------------------------
+    def setTreePermissions(self):
+#------------------------------------------------------------------------------
+#   sets the tree permissions ...
+#------------------------------------------------------------------------------
+
+        tmp = {}
+        allow = (True,0,"")
+        
+        tmp.update({_("Edit Industry Data"):allow})   #access to this window is always allowed
+
+#..............................................................................
+# StatusPId: actions allowed once an industry is selected
+
+        if (Status.PId > 0):
+            if (Status.ANo <= 0 and Status.StatusCC > 0):
+                permit = (False,0,_("Data have already been confirmed as consisten. First unblock before modifying"))
+            else:
+                permit = allow           
+        else:
+            permit = (False,0,_("Cannot access this function. First open or define a new project"))
+
+        tmp.update({_("General data"):permit})
+        
+#..............................................................................
+# StatusQ: actions allowed once general data of the industry have been set and
+#   and confirmed
+
+# 1. manipulation of questionnaire
+
+        if (Status.StatusQ > 0):
+            if (Status.ANo <= 0 and Status.StatusCC > 0):
+                permit = (False,0,_("Data have already been confirmed as consisten. First unblock before modifying"))
+            else:
+                permit = allow           
+        else:
+            permit = (False,0,_("Cannot access this function. First open or define a new project and enter general data"))
+
+        tmp.update({_("Energy consumption"):permit})
+        tmp.update({_("Processes data"):permit})
+        tmp.update({_("Generation of heat and cold"):permit})
+        tmp.update({_("Distribution of heat and cold"):permit})
+        tmp.update({_("Heat recovery"):permit})
+        tmp.update({_("Renewable energies"):permit})
+        tmp.update({_("Buildings"):permit})
+        tmp.update({_("Economic parameters"):permit})
+
+# 2. access to consistency check window
+
+        if (Status.StatusQ > 0):
+            permit = allow
+        else:
+            permit = (False,0,_("Cannot access this function. First open or define a new project"))
+
+        tmp.update({_("Consistency Check"):permit})
+        tmp.update({_("Basic check"):permit})
+        tmp.update({_("Estimate missing data"):permit})
+        tmp.update({_("Check list for visit"):permit})
+
+#..............................................................................
+# StatusCC: actions allowed once consistency check is concluded
+
+        if (Status.StatusCC > 0):
+            if Status.ANo > -1:
+                permit = allow
+            else:
+                permit = (False,0,_("Cannot display statistics for raw data. change view to checked version"))
+        else:
+            permit = (False,0,_("Cannot access this function. First check the data for consistency"))
+                                      
+        tmp.update({_("Energy statistics"):permit})
+        tmp.update({_("Annual data"):permit})
+        tmp.update({_("Monthly data"):permit})
+        tmp.update({_("Hourly performance\ndata"):permit})
+                
+        tmp.update({_("Primary energy"):permit})
+        tmp.update({_("Final energy by fuels"):permit})
+        tmp.update({_("Final energy by equipment"):permit})
+        tmp.update({_("Process heat"):permit})
+        tmp.update({_("Energy intensity"):permit})
+        tmp.update({_("Production of CO2"):permit})
+
+        tmp.update({_("Monthly demand"):permit})
+        tmp.update({_("Monthly supply"):permit})
+                   
+        tmp.update({_("Hourly demand"):permit})
+        tmp.update({_("Hourly supply"):permit})
+
+
+        tmp.update({_("Benchmark check"):permit})
+        tmp.update({_("Select appropriate benchmarks"):permit})
+        tmp.update({_("Global energy intensity"):permit})
+        tmp.update({_("SEC by product"):permit})
+        tmp.update({_("product name"):permit})
+        tmp.update({_("SEC by process"):permit})
+        tmp.update({_("process name"):permit})
+
+        tmp.update({_("Alternative proposals"):permit})
+
+#..............................................................................
+# ActiveAlternative: actions allowed only for ANo > 0
+
+        if (Status.ANo > 0):
+            permit = allow
+        else:
+            permit = (False,0,_("Cannot access this function for the present state of the industry.\nFirst define a new alternative !"))
+                          
+        tmp.update({_("Design"):permit})
+
+        tmp.update({_("Process optimisation"):permit})
+        tmp.update({_("Process optimisation interface 1"):permit})
+        tmp.update({_("Process optimisation interface 2"):permit})
+
+        tmp.update({_("Pinch analysis"):permit})
+        tmp.update({_("Pinch interface 1"):permit})
+        tmp.update({_("Pinch interface 2"):permit})
+               
+        tmp.update({_("HX network"):permit})
+        tmp.update({_("H&C Supply"):permit})
+        tmp.update({_("H&C Storage"):permit})
+        tmp.update({_("CHP"):permit})
+        tmp.update({_("Solar Thermal"):permit})
+        tmp.update({_("Heat Pumps"):permit})
+        tmp.update({_("Biomass"):permit})
+        tmp.update({_("Chillers"):permit})
+        tmp.update({_("Boilers & burners"):permit})
+
+        tmp.update({_("H&C Distribution"):permit})
+
+        tmp.update({_("Energy performance"):permit})
+        tmp.update({_("Economic analysis"):permit})
+        tmp.update({_("Economics 1"):permit})
+        tmp.update({_("Economics 2"):permit})
+
+#..............................................................................
+# StatusCC: actions allowed once consistency check is concluded
+
+        if (Status.StatusCC > 0):
+            permit = allow
+        else:
+            permit = (False,0,_("Cannot access this function. First check the data for consistency"))
+            
+        tmp.update({_("Comparative analysis"):permit})
+        tmp.update({_("nanu"):(False,0,"no se")})
+        tmp.update({_("Comparative study - Detail Info 1"):permit})
+        tmp.update({_("Comparative study - Detail Info 2"):permit})
+        tmp.update({_("Comparative study - Detail Info 3"):permit})
+
+        tmp.update({_("Report"):permit})
+        tmp.update({_("Report generation"):permit})
+
+        Status.main.treePermissions = tmp
+        
 #------------------------------------------------------------------------------
     def getStatus(self):
 #------------------------------------------------------------------------------
@@ -687,6 +842,8 @@ class Project(object):
             else: sproject.StatusCC = EINSTEIN_NOTOK
         else:
             print "Project (getStatus): ERROR - could not find sproject table"
+
+        self.setTreePermissions()
 
 #------------------------------------------------------------------------------
     def deleteProduct(self,productName):
