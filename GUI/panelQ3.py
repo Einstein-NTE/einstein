@@ -12,17 +12,22 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.06
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
 #                           Tom Sobota      04/05/2008
 #                           Hans Schweiger  05/05/2008
+#                           Hans Schweiger  07/05/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
 #       04/05/2008      Changed display format etc.
 #       05/05/2008: HS  Event handlers changed
+#       07/05/2008: HS  Safety features added against corrupt strings or Nones
+#                       in checkboxes and fluid selectors
+#                       UPHtotQ substituted by UPH
+#                       UAProc substitutde by QOpProc
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -122,15 +127,15 @@ class PanelQ3(wx.Panel):
 
         self.tc8 = wx.TextCtrl(self.page0,-1,'')
         self.st8 = Label(self.page0,self.tc8,_("Daily inflow"),
-                                 _("Daily inflow of process medium (mü)"))
+                                 _("Daily inflow of process medium (m3)"))
 
         self.tc9 = wx.TextCtrl(self.page0,-1,'')
         self.st9 = Label(self.page0,self.tc9,_("Volume process medium"),
-                                 _("Volume of the process medium within the equipment or storage (mü)"))
+                                 _("Volume of the process medium within the equipment or storage (m3)"))
 
         self.tc10 = wx.TextCtrl(self.page0,-1,'')
-        self.st10 = Label(self.page0,self.tc10,_("Heat loss"),
-                                  _("Thermal heat loss coefficient of the process (kW/K)"))
+        self.st10 = Label(self.page0,self.tc10,_("Power requirement"),
+                                  _("Power requirement of the process in operation (kW)"))
 
         #
         # schedule
@@ -366,7 +371,7 @@ class PanelQ3(wx.Panel):
         self.tc7.SetValue(str(q.PTStartUp))
         self.tc8.SetValue(str(q.VInFlowDay))
         self.tc9.SetValue(str(q.VolProcMed))
-        self.tc10.SetValue(str(q.UAProc))
+        self.tc10.SetValue(str(q.QOpProc))
         self.tc11.SetValue(str(q.HPerDayProc))
         self.tc12.SetValue(str(q.NBatch))
         self.tc13.SetValue(str(q.HBatch))
@@ -374,27 +379,31 @@ class PanelQ3(wx.Panel):
         self.tc15.SetValue(str(q.PTOutFlow))
         self.tc16.SetValue(str(q.PTFinal))
         self.tc17.SetValue(str(q.VOutFlow))
-        #self.tc18.SetValue(str(q.HeatRecOK))
-        self.choiceHeatRecovered.SetSelection(q.HeatRecOK)
-        self.choiceExistsHeat.SetSelection(q.HeatRecExist)
+        setChoice(self.choiceHeatRecovered,q.HeatRecOK)
+        setChoice(self.choiceExistsHeat,q.HeatRecExist)
         self.tc20.SetValue(str(q.SourceWasteHeat))	
         self.tc21.SetValue(str(q.PTInFlowRec))
         self.tc23.SetValue(str(q.PipeDuctProc))
         self.tc24.SetValue(str(q.TSupply))
         self.tc25.SetValue(str(q.SupplyMedFlow))
-        self.tc26.SetValue(str(q.UPHtotQ))
+        self.tc26.SetValue(str(q.UPH))
         if q.DBUnitOperation_id is not None:
-            self.choiceOfDBUnitOperation.SetSelection(\
-		self.choiceOfDBUnitOperation.FindString(\
-		    str(Status.DB.dbunitoperation.DBUnitOperation_ID[q.DBUnitOperation_id][0].UnitOperation)))
+            dbunitoperation = Status.DB.dbunitoperation.DBUnitOperation_ID[q.DBUnitOperation_id]
+            if len(dbunitoperation)>0:
+                unitOp = str(dbunitoperation[0].UnitOperation)
+                setChoice(self.choiceOfDBUnitOperation,unitOp)
+                
         if q.ProcMedDBFluid_id is not None:
-            self.choiceOfPMDBFluid.SetSelection(\
-		self.choiceOfPMDBFluid.FindString(\
-		    str(Status.DB.dbfluid.DBFluid_ID[q.ProcMedDBFluid_id][0].FluidName)))
+            dbfluids = Status.DB.dbfluid.DBFluid_ID[q.ProcMedDBFluid_id]
+            if len(dbfluids)>0:
+                fluidName = str(dbfluids[0].FluidName)
+                setChoice(self.choiceOfPMDBFluid,fluidName)
+                
         if q.SupplyMedDBFluid_id is not None:
-            self.choiceOfSMDBFluid.SetSelection(\
-		self.choiceOfSMDBFluid.FindString(\
-		    str(Status.DB.dbfluid.DBFluid_ID[q.SupplyMedDBFluid_id][0].FluidName)))
+            dbfluids = Status.DB.dbfluid.DBFluid_ID[q.SupplyMedDBFluid_id]
+            if len(dbfluids)>0:
+                fluidName = str(dbfluids[0].FluidName)
+                setChoice(self.choiceOfSMDBFluid,fluidName)
 
     def OnButtonCancel(self, event):
         self.clear()
@@ -442,7 +451,7 @@ class PanelQ3(wx.Panel):
 		"PTStartUp":self.check(self.tc7.GetValue()), 
 		"VInFlowDay":self.check(self.tc8.GetValue()), 
 		"VolProcMed":self.check(self.tc9.GetValue()), 
-		"UAProc":self.check(self.tc10.GetValue()), 
+		"QOpProc":self.check(self.tc10.GetValue()), 
 		"HPerDayProc":self.check(self.tc11.GetValue()), 
 		"NBatch":self.check(self.tc12.GetValue()), 
 		"HBatch":self.check(self.tc13.GetValue()), 
@@ -458,7 +467,7 @@ class PanelQ3(wx.Panel):
 		"PipeDuctProc":self.check(self.tc23.GetValue()), 
 		"TSupply":self.check(self.tc24.GetValue()), 
 		"SupplyMedFlow":self.check(self.tc25.GetValue()), 
-		"UPHtotQ":self.check(self.tc26.GetValue()) 
+		"UPH":self.check(self.tc26.GetValue()) 
 		}
 
             q = Status.DB.qprocessdata.QProcessData_ID[newID][0]
@@ -469,12 +478,25 @@ class PanelQ3(wx.Panel):
 
 	elif processName <> 'NULL' and \
 		len(processes.Process[processName]) == 1:
-	    dbuid = Status.DB.dbunitoperation.UnitOperation[\
-		str(self.choiceOfDBUnitOperation.GetStringSelection())][0].DBUnitOperation_ID
-	    dbpmfid = Status.DB.dbfluid.FluidName[\
-		str(self.choiceOfPMDBFluid.GetStringSelection())][0].DBFluid_ID
-	    dbsmfid = Status.DB.dbfluid.FluidName[\
-		str(self.choiceOfSMDBFluid.GetStringSelection())][0].DBFluid_ID                       
+
+            selectedUnitOps = Status.DB.dbunitoperation.UnitOperation[\
+		str(self.choiceOfDBUnitOperation.GetStringSelection())]
+            if len(selectedUnitOps) > 0:
+                dbuid = selectedUnitOps[0].DBUnitOperation_ID
+            else: dbuid = None
+            
+            selectedFluids = Status.DB.dbfluid.FluidName[\
+		str(self.choiceOfPMDBFluid.GetStringSelection())]
+            if len(selectedFluids) > 0:
+                dbpmfid = Status.DB.dbfluid.FluidName[\
+                    str(self.choiceOfPMDBFluid.GetStringSelection())][0].DBFluid_ID
+            else: dbpmfid = None
+            
+            selectedFluids = Status.DB.dbfluid.FluidName[\
+		str(self.choiceOfSMDBFluid.GetStringSelection())]
+            if len(selectedFluids) > 0:
+                dbsmfid = selectedFluids[0].DBFluid_ID                       
+            else: dbsmfid = None
         
 	    tmp = {
 		"Process":self.check(self.tc1.GetValue()),
@@ -486,7 +508,7 @@ class PanelQ3(wx.Panel):
 		"PTStartUp":self.check(self.tc7.GetValue()), 
 		"VInFlowDay":self.check(self.tc8.GetValue()), 
 		"VolProcMed":self.check(self.tc9.GetValue()), 
-		"UAProc":self.check(self.tc10.GetValue()), 
+		"QOpProc":self.check(self.tc10.GetValue()), 
 		"HPerDayProc":self.check(self.tc11.GetValue()), 
 		"NBatch":self.check(self.tc12.GetValue()), 
 		"HBatch":self.check(self.tc13.GetValue()), 
@@ -502,7 +524,7 @@ class PanelQ3(wx.Panel):
 		"PipeDuctProc":self.check(self.tc23.GetValue()), 
 		"TSupply":self.check(self.tc24.GetValue()), 
 		"SupplyMedFlow":self.check(self.tc25.GetValue()), 
-		"UPHtotQ":self.check(self.tc26.GetValue()) 
+		"UPH":self.check(self.tc26.GetValue()) 
 		}
 	    q = Status.DB.qprocessdata.Process[processName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
 	    q.update(tmp)               
