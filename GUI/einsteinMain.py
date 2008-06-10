@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.89
+#   Version No.: 0.90
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -48,6 +48,7 @@
 #                       Tom Sobota                          10/05/2008
 #                       Tom Sobota                          15/05/2008
 #                       Tom Sobota                          17/05/2008
+#                       Hans Schweiger                      10/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -110,6 +111,7 @@
 #       17/05/2008  TS some general refactoring, plus the beginning of work for import/export
 #                   of xml files.
 #       28/05/2008  HS assignment of tree-permissions
+#       10/06/2008  HS panelHR included
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -134,8 +136,13 @@ import pSQL, MySQLdb
 # fix pythonpath for this run
 # before loading Einstein modules
 sys.path.append(os.path.abspath('../..'))
-import HelperClass
+#TS20080505 install a default language, so the importing of 'constants'
+#           will recognize the gettext alias _(...)
+gettext.install("einstein", "locale", unicode=False)
+language = gettext.translation("einstein", "locale", languages=['%s' % ('en',)], fallback=True)
+language.install()
 
+import HelperClass
 from einstein.modules.interfaces import Interfaces
 from einstein.modules.modules import Modules
 from einstein.modules.constants import *
@@ -151,6 +158,7 @@ import PreferencesFrame
 #--- Module Panels
 from panelCC import *
 from panelA import *
+from panelHR import *
 from panelHC import *
 from panelHP import *
 from panelBB import *
@@ -870,6 +878,13 @@ class EinsteinFrame(wx.Frame):
                                            style=wx.TAB_TRAVERSAL)
             self.panelEnergy.display()
 
+        #panelHR
+        elif select == _("HX network"):
+            self.hidePages()
+            self.panelHR = PanelHR(id=-1, name='panelHR', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelHR.display()
+
         #panelHC
         elif select == "H&C Supply":
             self.hidePages()
@@ -1019,9 +1034,9 @@ class EinsteinFrame(wx.Frame):
         try:self.panelBM3.Destroy()
         except:pass
 
-        #self.pageHeatRecoveryTargets.Hide()
-
         try:self.panelA.Destroy()
+        except:pass
+        try:self.panelHR.Destroy()
         except:pass
         try:self.panelHC.Destroy()
         except:pass

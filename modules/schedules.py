@@ -51,10 +51,11 @@ class Schedule():
 
     def __init__(self):     #by default assigns a constant profile throughout the year
         self.daily = [[(0.0,24.0)]]
-        self.weekly = [(0.0,168.0)]
+        self.weekly = [(0.0,120.0)]
         self.monthly = [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
         self.holidays = []
-        self.NDays = 365
+        self.NHolidays = 1
+        self.NDays = 260
         self.HPerDay = 24.      #operating period for the present schedule
         self.NBatch = 1
         self.HBatch = 24.
@@ -68,11 +69,13 @@ class Schedule():
         if ScheduleType in DEFAULTSCHEDULES: self.ScheduleType = ScheduleType
         else: ScheduleType = DEFAULTSCHEDULES[0]
         
-        self.NDays = checkLimits(NDays,0,365,default=260)
+        self.NDays = int(checkLimits(NDays,0,365,default=260))
         self.HPerDay = checkLimits(HPerDay,0.0,Status.HPerDayInd,default=Status.HPerDayInd)
-        self.NBatch = checkLimits(NBatch,1,100,default=1)
+        self.NBatch = int(checkLimits(NBatch,1,100,default=1))
         self.HBatch = checkLimits(HBatch,0,HPerDay,default=(self.HPerDay/self.NBatch))
         self.HPerYear = self.NDays*self.HPerDay
+
+        self.setDefault(ScheduleType)
         
 #------------------------------------------------------------------------------		
     def f(self,time):
@@ -167,7 +170,7 @@ class Schedule():
 # Batch process
 
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
-                TPeriod = self.HPerDayInd / self.NBatch
+                TPeriod = Status.HPerDayInd / self.NBatch
             else:
                 print "Schedule (setDefault): ERROR in schedule parameters"
 
@@ -190,12 +193,12 @@ class Schedule():
             else:
                 print "Schedule (setDefault): ERROR in schedule parameters"
 
-            tStartDay = 12.0 - 0.5 * self.HPerDayInd
+            tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
             self.daily = [[]]
             for i in range(self.NBatch):
                 start = tStartDay + TPeriod*i
-                stop = start + DEFAULTCHARGETIME*self.HBAtch
+                stop = start + DEFAULTCHARGETIME*self.HBatch
                 self.daily[0].append((start,stop))
 
             self.HPerDay = self.NBatch*self.HBatch*DEFAULTCHARGETIME
@@ -214,7 +217,7 @@ class Schedule():
             self.daily = [[]]
             for i in range(self.NBatch):
                 start = (tStartDay + TPeriod*i + self.HBatch)%DAY
-                stop = (start + DEFAULTCHARGETIME*self.HBAtch)%DAY
+                stop = (start + DEFAULTCHARGETIME*self.HBatch)%DAY
 
 #### take care: the %DAY controls to avoid that processes discharge AFTER 24:00 h of a day
 #### this works well only for 7 days operation without holidays
@@ -224,6 +227,28 @@ class Schedule():
                 self.daily[0].append((start,stop))
 
             self.HPerDay = self.NBatch*self.HBatch*DEFAULTCHARGETIME
+
+#..............................................................................		
+# Now extend daily to weekly profile
+
+        self.NDaysPerWeek = (self.NDays - self.NHolidays - 1.0)/52.0
+
+        self.weekly = []
+        for i in range(7):
+            tmax = self.NDaysPerWeek * 24.0
+            
+            for dayinterval in self.daily[0]:
+                (start,stop) = dayinterval
+                start += 24.0*i
+                stop += 24.0*i
+                if start < tmax:
+                    stop = min(stop,tmax)
+                    self.weekly.append((start,stop))
+                else:
+                    break
+
+        print ("weekly profile created")
+        print self.weekly
         
 #------------------------------------------------------------------------------		
 class Schedules(object):
@@ -244,6 +269,9 @@ class Schedules(object):
         Status.HPerDayInd = projectData.HPerDayInd
 
         self.calculateProcessSchedules()
+        self.calculateEquipmentSchedules()
+        self.calculateWHEESchedules()
+
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -252,6 +280,8 @@ class Schedules(object):
 #   calulates the Schedules of the processes
 #------------------------------------------------------------------------------		
 
+        print ("Schedules (calcProcS): running")
+        
         processes = Status.prj.getProcesses()
 
         self.procOpSchedules = []
@@ -260,6 +290,8 @@ class Schedules(object):
         self.procOutFlowSchedules = []
         
         for process in processes:
+
+            print ("Schedules (calcProcS): process no. %s: ")%process.ProcNo,process.Process
 
 #..............................................................................
 # check if data are correct
@@ -325,16 +357,13 @@ class Schedules(object):
             if process.ProcType == "continuous":
                 scheduleType = "continuous"
             else:
-                scheduleType = "batchDisharge"
+                scheduleType = "batchDischarge"
             newSchedule.setPars(scheduleType,
                                    process.NDaysProc,
                                    process.HPerDayProc,
                                    process.NBatch,
                                    process.HBatch)
             self.procOutFlowSchedules.append(newSchedule)
-            
-
-        
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -343,21 +372,15 @@ class Schedules(object):
 #   calulates the Schedules of the processes
 #------------------------------------------------------------------------------		
 
+        print ("Schedules (calcEquipeSchedules): running")
+        
         equipments = Status.prj.getEquipments()
 
         self.equipmentSchedules = []
         
         for equipe in equipments:
 
-#..............................................................................
-# check if data are correct
-
-            if process.ProcType == "continuous":
-                if process.NBatch != 1 or process.HBatch != process.HPerDayProc:
-                    print "Schedules (calculate): error in process schedule"
-                    process.HBatch = process.HPerDayProc
-                    process.NBatch = 1
-                    Status.SQL.commit()
+            print ("Schedules (calcEquipeSchedules): eq. no. %s: ")%equipe.EqNo,equipe.Equipment
 
 #..............................................................................
 # schedule for equipment operation
@@ -368,8 +391,36 @@ class Schedules(object):
                                 equipe.NDaysEq,
                                 equipe.HPerDayEq,
                                 1,
-                                equipe.HPerDayEq, 
-                                self.HPerDayInd)
+                                equipe.HPerDayEq)
+            self.equipmentSchedules.append(newSchedule)
+            
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+    def calculateWHEESchedules(self):
+#------------------------------------------------------------------------------		
+#   calulates the Schedules of the electrical equipment w. waste heat
+#------------------------------------------------------------------------------		
+
+        print ("Schedules (calcWHEESchedules): running")
+        
+        whees = Status.prj.getWHEEs()
+
+        self.WHEESchedules = []
+        
+        for whee in whees:
+
+            print ("Schedules (calcEquipeSchedules): eq. no. %s: ")%whee.WHEENo,whee.WHEEName
+
+#..............................................................................
+# schedule for equipment operation
+                    
+            newSchedule = Schedule()
+
+            newSchedule.setPars("continuous",
+                                whee.NDaysWHEE,
+                                whee.HPerDayWHEE,
+                                whee.NBatchWHEE,
+                                whee.HBatchWHEE)
             self.equipmentSchedules.append(newSchedule)
             
 #------------------------------------------------------------------------------		

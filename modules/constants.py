@@ -18,8 +18,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	    22/03/2008
+#
+#       Last modified by:   Stoyan Danov            04/06/2008
+#                           Hans Schweiger          10/06/2008
+#
+#       Changes to previous version:
+#       04/06/2008  SD: traduceable lists creation
+#       10/06/2008  HS: function findKey added
 #
 #
 #------------------------------------------------------------------------------		
@@ -31,6 +38,8 @@
 #	Software Foundation (www.gnu.org).
 #
 #============================================================================== 
+def _(text):
+    return text
 
 #------------------------------------------------------------------------------		
 VERSION = "M2_DEMO"
@@ -53,67 +62,173 @@ INTERACTIONLEVELS = ['interactive','semi-automatic','automatic']
 #------------------------------------------------------------------------------		
 #default entries for parameters
 
-EQUIPETYPESDICT = [{"Type":"compression heat pump", "Class":"HP",   "SubClass":"compression"},
-                   {"Type":"thermal heat pump",  "Class":"HP",   "SubClass":"thermal"},
-                   {"Type":"steam boiler",          "Class":"BB",   "SubClass":"steam boiler"},
-                   {"Type":"condensing boiler",     "Class":"BB",   "SubClass":"condensing boiler"}]
+EQUIPTYPE = ["compression heat pump",
+             "thermal heat pump",
+             "steam boiler",
+             "condensing boiler",
+             "burner (direct heating)",
+             "burner (indirect heating)",
+             "compression chiller",
+             "thermal chiller",
+             "solar thermal (single-glazed selective)",
+             "solar thermal (double-glazed selective)",
+             "solar thermal (vacuum pump)",
+             "CHP engine",
+             "CHP steam turbine",
+             "CHP gas turbine",
+             "CHP fuel cell"]
 
-EQUIPETYPES = ["compression heat pump",
-              "thermal heat pump"
-              "steam boiler",
-              "condensing boiler"]
+PROCESSTYPE = ["condensing",
+               "steam",
+               "direct heating",
+               "indirect heating",
+               "compression",
+               "thermal",
+               "single-glazed selective",
+               "double-glazed selective",
+               "vacuum tube",
+               "steam turbine",
+               "gas turbine",
+               "engine",
+               "fuel cell",
+               "plate HX (liquid-liquid)",
+               "plate HX (air-air)",
+               "shell&tube HX (liquid-liquid)",
+               "finned tubes (liquid-air)"]
 
-EQUIPECLASSES = ["HP","BB"]
+BBTYPES = [PROCESSTYPE[0], PROCESSTYPE[1]]
+HPTYPES = [PROCESSTYPE[4], PROCESSTYPE[5]]
+HXTYPES = [PROCESSTYPE[13], PROCESSTYPE[14], PROCESSTYPE[15], PROCESSTYPE[16]]
 
-BBTYPES = ["condensing",
-           "steam"]
+EQUIPMENT = {"HP":                 # equipment class
+             [(EQUIPTYPE[0],       # type of equipment, untranslated
+               _(EQUIPTYPE[0]),    # type of equipment, translated
+               PROCESSTYPE[4],     # type of process, untranslated
+               _(PROCESSTYPE[4])), # type of process, translated
 
-HPTYPES = ["compression",
-           "thermal"]
+              (EQUIPTYPE[1],_(EQUIPTYPE[1]),PROCESSTYPE[5],_(PROCESSTYPE[5]))],
 
-HXTYPES = ["plate HX (liquid-liquid)","plate HX (air-air)","shell&tube HX (liquid-liquid)","finned tubes (liquid-air)"]
+             "BB": [(EQUIPTYPE[2],_(EQUIPTYPE[2]),PROCESSTYPE[1],_(PROCESSTYPE[1])),
+                    (EQUIPTYPE[3],_(EQUIPTYPE[3]),PROCESSTYPE[0],_(PROCESSTYPE[0])),
+                    (EQUIPTYPE[4],_(EQUIPTYPE[4]),PROCESSTYPE[2],_(PROCESSTYPE[2])),
+                    (EQUIPTYPE[5],_(EQUIPTYPE[5]),PROCESSTYPE[3],_(PROCESSTYPE[3]))],
+
+             "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),PROCESSTYPE[4],_(PROCESSTYPE[4])),
+                    (EQUIPTYPE[7],_(EQUIPTYPE[7]),PROCESSTYPE[5],_(PROCESSTYPE[5]))],
+
+             "ST": [(EQUIPTYPE[8],_(EQUIPTYPE[8]),PROCESSTYPE[6],_(PROCESSTYPE[6])),
+                    (EQUIPTYPE[9],_(EQUIPTYPE[9]),PROCESSTYPE[7],_(PROCESSTYPE[7])),
+                    (EQUIPTYPE[10],_(EQUIPTYPE[10]),PROCESSTYPE[8],_(PROCESSTYPE[8]))],
+
+             "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),PROCESSTYPE[11],_(PROCESSTYPE[11])),
+                    (EQUIPTYPE[12],_(EQUIPTYPE[12]),PROCESSTYPE[9],_(PROCESSTYPE[9])),
+                    (EQUIPTYPE[13],_(EQUIPTYPE[13]),PROCESSTYPE[10],_(PROCESSTYPE[10])),
+                    (EQUIPTYPE[14],_(EQUIPTYPE[14]),PROCESSTYPE[12],_(PROCESSTYPE[12]))]
+             }
+
+
+#....................................................................
+
+PROCTYPES = ["continuous",
+             "batch"]
+#translatable dictionary
+TRANSPROCTYPES = {"Continuous":_("continuous"),
+                  "Batch":_("batch")}
+
+YESNO = ["yes","no"]
+#translatable dictionary
+TRANSYESNO = {"Yes":_("yes"),"No":_("no")}
+
+STORAGETYPES = ["sensible",
+                "latent"]
+#translatable dictionary
+TRANSSTORAGETYPES = {"Sensible":_("sensible"),
+                     "Latent":_("latent")}
+
+WHEEEQTYPES = ["electric motor",
+               "compressor","other"]
+#translatable dictionary
+TRANSWHEEEQTYPES = {"ElectricMotor":_("electric motor"),
+                    "Compressor":_("compressor"),
+                    "Other":_("other")}
+
+WHEEWASTEHEATTYPES = ["cooling water",
+                      "intercooler",
+                      "cooling air"]
+#translatable dictionary
+WHEEWASTEHEATTYPES = {"CoolingWater":_("cooling water"),
+                      "Intercooler":_("intercooler"),
+                      "CoolingAir":_("cooling air")}
+
 
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries
 #==============================================================================
 #------------------------------------------------------------------------------
-def getEquipmentClass(equipeType):
+def getEquipmentItem(item,equipeType):
 #------------------------------------------------------------------------------
 #       returns the class of the equipment as a function of the equipment type
 #------------------------------------------------------------------------------
 
-    for eq in EQUIPETYPESDICT:
-        if eq["Type"] == equipeType:
-            return eq["Class"]
-    return "class undefined (equipeType = %s)"%equipeType
-            
+    for cls in EQUIPMENT.keys():
+        theList = EQUIPMENT[cls]
+        for elem in theList:
+            if elem[item] == equipeType:
+                return (cls,elem[1],elem[2],elem[3])
+
+    return "cannot find element %s)" % equipeType
+
+
+def getEquipmentClassUntrans(equipeType):
 #------------------------------------------------------------------------------
+#       returns the class of the untranslated equipment as a function of the equipment type
 #------------------------------------------------------------------------------
-def getEquipmentSubClass(equipeType):
+    return getEquipmentItem(0,equipeType)[0]
+
+def getEquipmentClassTrans(equipeType):
 #------------------------------------------------------------------------------
-#       returns the class of the equipment as a function of the equipment type
+#       returns the class of the translated equipment as a function of the equipment type
+#------------------------------------------------------------------------------
+    return getEquipmentItem(1,equipeType)[0]
 #------------------------------------------------------------------------------
 
-    for eq in EQUIPETYPESDICT:
-        if eq["Type"] == equipeType:
-            return eq["SubClass"]
-    return "subClass undefined (equipeType = %s)"%equipeType
+
+#------------------------------------------------------------------------------
+def getEquipmentSubClassUntrans(equipeType):
+#------------------------------------------------------------------------------
+#       returns the untranslated subclass of the untranslated equipment as a function of the equipment type
+#------------------------------------------------------------------------------
+    return getEquipmentItem(0,equipeType)[2]
 
 #------------------------------------------------------------------------------
 def getEquipmentType(equipeClass,equipeSubClass):
 #------------------------------------------------------------------------------
+#       returns the type of the equipment as a function of the untranslated equipment class and subclass
+#------------------------------------------------------------------------------
+    theList = EQUIPMENT[equipeClass]
+    for eq in theList:
+        if eq[2] == equipeSubClass:
+            return eq[0]
+
+    return "type undefined (equipeSubClass = %s)"%equipeSubClass
+#------------------------------------------------------------------------------
+def findKey(dictionary,value):
+#------------------------------------------------------------------------------
 #       returns the class of the equipment as a function of the equipment type
 #------------------------------------------------------------------------------
 
-    print "getEquipmentType: starting"
-    print "getEquipmentType: ",equipeClass,equipeSubClass
-    for eq in EQUIPETYPESDICT:
-        if eq["Class"] == equipeClass and eq["SubClass"]==equipeSubClass:
-            print "getEquipmentType: selected type = ",eq["Type"]
-            return eq["Type"]
-    return "type undefined (equipeSubClass = %s)"%equipeSubClass
+    for key in dictionary.keys():
+        if dictionary[key] == value:
+            return key
+
+    return None
             
 #------------------------------------------------------------------------------
             
 
 
+if __name__ == '__main__':
+
+    print 'Class   = '+getEquipmentClassUntrans("steam boiler")
+    print 'SubClass= '+getEquipmentSubClassUntrans("steam boiler")
+    print 'Type    = '+getEquipmentType("BB","direct heating")

@@ -16,12 +16,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	03/04/2008
 #	Revised by:         Hans Schweiger      08/04/2008
+#                           Hans Schweiger      10/06/2008
 #
 #       Changes in last update:
 #       08/04/08    Benchmark module included
+#       10/06/08    HR module added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -37,6 +39,7 @@ from einstein.modules.ccheck.moduleCC import ModuleCC
 from einstein.modules.moduleBM import ModuleBM
 from einstein.modules.moduleA import ModuleA
 from einstein.modules.energy.moduleEnergy import ModuleEnergy
+from einstein.modules.moduleHR import ModuleHR
 from einstein.modules.moduleHC import ModuleHC
 from einstein.modules.heatPump.moduleHP import ModuleHP
 from einstein.modules.boiler.moduleBB import ModuleBB
@@ -58,6 +61,9 @@ class Modules(object):
         keys = ['ENERGY'] 
         self.moduleEnergy = ModuleEnergy(keys)
 
+        keys = ['HR Table'] 
+        self.moduleHR = ModuleHR(keys)
+        
         keys = ['HC Table'] 
         self.moduleHC = ModuleHC(keys)
         
