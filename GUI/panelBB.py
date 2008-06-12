@@ -102,9 +102,9 @@ def drawFigure(self):
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][3],
                       'go-', label='QD [250ºC]', linewidth=2)
-    self.subplot.plot(Interfaces.GData['BB Plot'][0],
-                      Interfaces.GData['BB Plot'][4],
-                      'rs',  label='USH (boiler)')
+#    self.subplot.plot(Interfaces.GData['BB Plot'][0],
+#                      Interfaces.GData['BB Plot'][4],
+#                      'rs',  label='USH (boiler)')
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
@@ -249,7 +249,7 @@ class PanelBB(wx.Panel):
         self.tcConfig2 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG2, name='tcConfig2',
               parent=self, pos=wx.Point(288, 336), size=wx.Size(128, 24),
               style=0, value='')
-        self.tcConfig2.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig2TextEnter,
+        self.tcConfig2.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig2TextEnter,
               id=wxID_PANELBBTCCONFIG2)
 
 
@@ -287,7 +287,7 @@ class PanelBB(wx.Panel):
 
         self.tcConfig5 = wx.TextCtrl(id=-1, name='tcConfig5', parent=self,
               pos=wx.Point(288, 456), size=wx.Size(128, 24), style=0, value='')
-        self.tcConfig5.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig5TextEnter,
+        self.tcConfig5.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig5TextEnter,
               id=wxID_PANELBBTCCONFIG5)
 
 #..............................................................................
@@ -299,7 +299,7 @@ class PanelBB(wx.Panel):
         self.tcConfig6 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG6, name='tcConfig6',
               parent=self, pos=wx.Point(288, 496), size=wx.Size(128, 24),
               style=0, value='')
-        self.tcConfig6.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig6TextEnter,
+        self.tcConfig6.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig6TextEnter,
               id=wxID_PANELBBTCCONFIG6)
 
 #..............................................................................
@@ -312,7 +312,7 @@ class PanelBB(wx.Panel):
         self.tcConfig7 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG7, name='tcConfig7',
               parent=self, pos=wx.Point(288, 544), size=wx.Size(128, 21),
               style=0, value='')
-        self.tcConfig7.Bind(wx.EVT_TEXT_ENTER, self.OnTcConfig7TextEnter,
+        self.tcConfig7.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig7TextEnter,
               id=wxID_PANELBBTCCONFIG7)
 
 #------------------------------------------------------------------------------		
@@ -454,36 +454,8 @@ class PanelBB(wx.Panel):
 # Step 1 design assistant: gets a preselected list of possible heat pumps
 
         print "PanelBB (run design assistant): calling function DA"
-        (mode,BBList) = self.mod.designAssistant()
+        self.mod.designAssistant()
         
-#..............................................................................
-# In interactive mode open DB Edidor Heat pump and select manually
-
-        if (mode == "MANUAL"):
-            self.dbe = DBEditFrame(self,
-                            'Select boiler or burner from preselected list', # title for the dialogs
-			    'dbboiler',              # database table
-			    0,                         # column to be returned
-			    False,
-                            preselection = BBList)      # database table can be edited in DBEditFrame?
-            if self.dbe.ShowModal() == wx.ID_OK:
-                BBId = self.dbe.theId
-            else:
-                BBId = -1
-                print "PanelBB: no BB selected after DA1 -> check whether this works"
-
-        elif (mode == "AUTOMATIC"):
-            BBId = BBList[0]    #in automatic mode just take first in the list
-
-        elif (mode == "CANCEL"):
-            BBId = -1 #make designAssistant2 to understand that
-        else:
-            print "PanelBB (DesignAssistant-Button): erroneous panel mode: ",mode
-
-#..............................................................................
-# Step 2 design assistant: add selected equipment to the list and update display
-        
-        self.mod.designAssistant2(HPId)
         self.display()
 
 #------------------------------------------------------------------------------		
@@ -553,41 +525,43 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
+        print "PanelBB: new config[%s] value: "%0,self.config[0]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig2TextEnter(self, event):
-        print "new config[%s] value: "%2,self.config[2]
         self.config[1] = self.tcConfig2.GetValue()
+        print "PanelBB: new config[%s] value: "%1,self.config[1]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnCbConfig3Checkbox(self, event):
         self.config[2] = self.cbConfig3.GetValue()
+        print "PanelBB: new config[%s] value: "%2,self.config[2]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnChoiceConfig4Choice(self, event):
         self.config[3] = FUELLIST[self.choiceConfig4.GetSelection()]
-        print "new config[%s] value: "%1,self.config[1]
+        print "PanelBB: new config[%s] value: "%3,self.config[3]
         Interfaces.GData["HP Config"] = self.config[3]
         self.mod.setUserDefinedPars()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
-        print "new config[%s] value: "%4,self.config[4]
+        print "PanelBB: new config[%s] value: "%4,self.config[4]
         Interfaces.GData["HP Config"] = self.config
-        self.mod.setUserDefinedParas()
+        self.mod.setUserDefinedPars()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
-        print "new config[%s] value: "%5,self.config[5]
+        print "PanelBB: new config[%s] value: "%5,self.config[5]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
-        print "new config[%s] value: "%6,self.config[6]
+        print "PanelBB: new config[%s] value: "%6,self.config[6]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 

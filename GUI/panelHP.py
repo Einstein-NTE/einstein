@@ -35,6 +35,7 @@
 #                           Hans Schweiger          25/04/2008
 #                           Hans Schweiger          29/04/2008
 #                           Stoyan Danov            30/04/2008
+#                           Stoyan Danov            22/05/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -55,6 +56,7 @@
 #       25/04/08:   Some clean-up in adding HP manually
 #       29/04/08:   call to method "draw" for panelHPFig added
 #       30/04/08:   in OnButtonpageHPAddButton: delete equipeC in assignment of addEquipmentDummy
+#       22/05/08:   in drawFigure: Interfaces -> Status.int
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -68,11 +70,14 @@
 
 import wx
 import wx.grid
+#from einstein.modules.heatPump.moduleHP import *
 from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
+from einstein.GUI.panelQ4 import PanelQ4
 from einstein.GUI.dialogOK import *
 
 from einstein.modules.interfaces import *
+from einstein.modules.modules import *
 from einstein.modules.constants import *
 from numpy import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
@@ -121,19 +126,19 @@ def drawFigure(self):
 #------------------------------------------------------------------------------		
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.plot(Interfaces.GData['HP Plot'][0],
-                      Interfaces.GData['HP Plot'][1],
+    self.subplot.plot(Status.int.GData['HP Plot'][0],
+                      Status.int.GData['HP Plot'][1],
                       'go-', label='QD', linewidth=2)
-    self.subplot.plot(Interfaces.GData['HP Plot'][0],
-                      Interfaces.GData['HP Plot'][2],
+    self.subplot.plot(Status.int.GData['HP Plot'][0],
+                      Status.int.GData['HP Plot'][2],
                       'rs',  label='QA')
-    self.subplot.plot(Interfaces.GData['HP Plot'][0],
-                      Interfaces.GData['HP Plot'][3],
+    self.subplot.plot(Status.int.GData['HP Plot'][0],
+                      Status.int.GData['HP Plot'][3],
                       'go-', label='QD_mod', linewidth=2)
-    self.subplot.plot(Interfaces.GData['HP Plot'][0],
-                      Interfaces.GData['HP Plot'][4],
+    self.subplot.plot(Status.int.GData['HP Plot'][0],
+                      Status.int.GData['HP Plot'][4],
                       'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 5e+6])
+    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
 
@@ -145,12 +150,21 @@ class PanelHP(wx.Panel):
 
     def __init__(self, parent, main, id, pos, size, style, name, sql, db):
 
+        print "PanelHP (__init__)"
         self.prnt = parent
-        self.main = main       
+        self.main = main
+        
+        self.sql = sql
+        self.db = db
+
+#        self.info = Status.int.GData["HP Info"]
+#        self.config = Status.int.GData["HP Config"]
+        
         self._init_ctrls(parent)
 
 	self.keys = ['HP Table']
         self.mod = Status.mod.moduleHP
+#        print "PanelHP (__init__): mod created",self.mod
 
 #   graphic: Cumulative heat demand by hours
         labels_column = 0
@@ -182,7 +196,7 @@ class PanelHP(wx.Panel):
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         key = self.keys[0]
-#        data = Interfaces.GData[key]
+#        data = Status.int.GData[key]
 #        print "data = ",data
         (rows,cols) = (MAXROWS,TABLECOLS)
 #        self.gridPageHP.CreateGrid(max(rows,20), cols)
@@ -219,6 +233,7 @@ class PanelHP(wx.Panel):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHP, name='PanelHP', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+#        self.SetClientSize(wx.Size(792, 618))
 
 #------------------------------------------------------------------------------		
 #       Displays of status
@@ -457,7 +472,7 @@ class PanelHP(wx.Panel):
 # update of equipment table
 
         try:
-            data = Interfaces.GData[self.keys[0]]
+            data = Status.int.GData[self.keys[0]]
             (rows,cols) = data.shape
         except:
             rows = 0
@@ -475,7 +490,7 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # update of design assistant parameters
 
-        self.config = Interfaces.GData["HP Config"]
+        self.config = Status.int.GData["HP Config"]
         self.cbConfig1.SetValue(self.config[0])
         try:        #try-except necessary if there comes a string that is not in list.
             self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
@@ -491,7 +506,7 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # update of info-values
 
-        self.info = Interfaces.GData["HP Info"]
+        self.info = Status.int.GData["HP Info"]
         
         self.tcInfo1.SetValue(str(self.info[0]))
         self.tcInfo2.SetValue(str(self.info[1]))
@@ -550,26 +565,42 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
-        try:                #creates space for new equipment in Q/C
-	    self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
+##        try:                #creates space for new equipment in Q/C
+##	    self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
+##
+##            pu1 =  AddEquipment(self,                      # pointer to this panel
+##                                self.mod,                # pointer to the associated module
+##                                'Add Heat Pump equipment', # title for the dialogs
+##                                'dbheatpump',              # database table
+##                                0,                         # column to be returned
+##                                False)                     # database table can be edited in DBEditFrame?
+##
+##            if pu1.ShowModal() == wx.ID_OK:
+##                print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
+##            else:
+##                self.mod.deleteEquipment(None)
+##
+##            self.display()
+##	except:
+##            print "PanelHP (HPAddButton): could not create equipment dummy"
+##	    pass
 
-            pu1 =  AddEquipment(self,                      # pointer to this panel
-                                self.mod,                # pointer to the associated module
-                                'Add Heat Pump equipment', # title for the dialogs
-                                'dbheatpump',              # database table
-                                0,                         # column to be returned
-                                False)                     # database table can be edited in DBEditFrame?
+                #creates space for new equipment in Q/C
+	self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
 
-            if pu1.ShowModal() == wx.ID_OK:
-                print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
-            else:
-                self.mod.deleteEquipment(None)
+        pu1 =  AddEquipment(self,                      # pointer to this panel
+                            self.mod,                # pointer to the associated module
+                            'Add Heat Pump equipment', # title for the dialogs
+                            'dbheatpump',              # database table
+                            0,                         # column to be returned
+                            False)                     # database table can be edited in DBEditFrame?
 
-            self.display()
-	except:
-            print "PanelHP (HPAddButton): could not create equipment dummy"
-	    pass
+        if pu1.ShowModal() == wx.ID_OK:
+            print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
+        else:
+            self.mod.deleteEquipment(None)
 
+        self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -577,10 +608,14 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #       edits the selected equipment
 #------------------------------------------------------------------------------		
+        print "Grid - left button Dclick: here I should call the Q4H"
         rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
         EqId = self.mod.getEqId(rowNo)
+        print "now editing equipment in row %s with id = "%rowNo,EqId
+#        self.Hide()
 	dialog = ManualAddDialog(self, EqId)
 
+#Tom: here should be a link between the outcome of the dialog and what continues
         if (dialog.ShowModal() ==wx.ID_OK):
             print "PanelHP (OnGridLeftDclick) - OK"
 #            ret = self.mod.calculateCascade()
@@ -619,43 +654,43 @@ class PanelHP(wx.Panel):
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
         print "new config[%s] value: "%0,self.config[0]
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnChoiceConfig2Choice(self, event):
         self.config[1] = TYPELIST[self.choiceConfig2.GetSelection()]
         print "new config[%s] value: "%1,self.config[1]
-        Interfaces.GData["HP Config"] = self.config[1]
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig3TextEnter(self, event):
         print "new config[%s] value: "%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig4TextEnter(self, event):
         self.config[3] = self.tcConfig4.GetValue()
         print "new config[%s] value: "%3,self.config[3]
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
         print "new config[%s] value: "%4,self.config[4]
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
         print "new config[%s] value: "%5,self.config[5]
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
         print "new config[%s] value: "%6,self.config[6]
-        Interfaces.GData["HP Config"] = self.config
+        Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
 #------------------------------------------------------------------------------		

@@ -179,7 +179,7 @@ def getEquipmentItem(item,equipeType):
     return "cannot find element %s)" % equipeType
 
 
-def getEquipmentClassUntrans(equipeType):
+def getEquipmentClass(equipeType):
 #------------------------------------------------------------------------------
 #       returns the class of the untranslated equipment as a function of the equipment type
 #------------------------------------------------------------------------------

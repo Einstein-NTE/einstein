@@ -22,6 +22,7 @@
 #                       Hans Schweiger      18/04/2008
 #                       Hans Schweiger      23/04/2008
 #                       Hans Schweiger      10/06/2008
+#                       Stoyan Danov      11/06/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -31,6 +32,7 @@
 #       02/05/08: HS    deleteProduct, deleteFuel, deleteProcess
 #                       and addFuel/ProcessDummy added
 #       10/06/08: HS    getFluidDict added
+#       11/06/08: SD    getFuelDict added
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1268,24 +1270,14 @@ class Project(object):
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        whees = self.getWHEEs()
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
+        whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
         
         WHEEList = []
         for whee in whees:
             WHEEList.append(whee[key])
 
         return WHEEList
-
-#------------------------------------------------------------------------------
-    def getWHEEs(self):
-#------------------------------------------------------------------------------
-#   returns the table of existing WHEEs
-#------------------------------------------------------------------------------
-
-        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
-        self.whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
-        
-        return self.whees
 
 #------------------------------------------------------------------------------
     def deleteEquipment(self,eqID):
@@ -1336,17 +1328,6 @@ class Project(object):
             eqList.append(eq[key])
 
         return eqList
-
-#------------------------------------------------------------------------------
-    def getEquipments(self):
-#------------------------------------------------------------------------------
-#   returns the table of existing equipments
-#------------------------------------------------------------------------------
-
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
-        
-        return self.equipments
 
 #------------------------------------------------------------------------------
     def getProcessList(self,key):
@@ -1406,6 +1387,25 @@ class Project(object):
             fluidDict.update({fluidID:fluidName})
 
         return fluidDict
+
+#------------------------------------------------------------------------------
+    def getFuelDict(self):
+#------------------------------------------------------------------------------
+#   returns a list of fuels in DB
+#------------------------------------------------------------------------------
+
+        sqlQuery = "% ORDER BY FuelName ASC"
+#        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
+        fuels = Status.DB.dbfuel.FuelName["%"]       
+        print "getFuelDict: fuel data base ->", fuels
+        fuelDict = {}
+        for fuel in fuels:
+            print "getFuelDict: ", fuel
+            fuelName = fuel["FuelName"]
+            fuelID = fuel["DBFuel_ID"]
+            fuelDict.update({fuelID:fuelName})
+
+        return fuelDict
 
 #==============================================================================
 

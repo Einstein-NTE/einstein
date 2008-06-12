@@ -29,6 +29,7 @@
 #                           Hans Schweiger      05/05/2008
 #                           Hans Schweiger      14/05/2008
 #                           Stoyan Danov        15/05/2008
+#                           Stoyan Danov        27/05/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -46,6 +47,8 @@
 #       14/05/2008  auxiliary function "print cascade" added for testing purposes
 #       15/05/2008 initCascadeArrays: parenthesis added in call calculateQ_Tt()...
 #                   functions added: printCascade_mod, printUSH
+#       27/05/2008  printCascade: change Interfaces.QA_Tt_mod[i][NT+1][0:23] to Interfaces.QA_Tt_mod[i][0][0:23]
+#                   initCascadeArrays: assignment of QD/QA_Tt_mod to avoid copy of the address
 #
 #	
 #------------------------------------------------------------------------------		
@@ -167,7 +170,7 @@ class Interfaces(object):
 # assigning total heat demand and availability to the first row in cascade
 
         self.NEquipe = NEquipe
-        
+            
         Interfaces.QD_Tt_mod = []      
         Interfaces.QD_T_mod = []
         Interfaces.QA_Tt_mod = []       
@@ -178,24 +181,31 @@ class Interfaces(object):
         Interfaces.QHXj_Tt = []
         Interfaces.QHXj_T = []
 
-        Interfaces.QD_Tt_mod.append(self.QD_Tt)       
-        Interfaces.QD_T_mod.append(self.QD_T)
-        Interfaces.QA_Tt_mod.append(self.QA_Tt)      
-        Interfaces.QA_T_mod.append(self.QA_T)
+        Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
+        Interfaces.QD_T_mod.append(self.createQ_T())
+        Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
+        Interfaces.QA_T_mod.append(self.createQ_T())
+
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt+1):
+                Interfaces.QD_Tt_mod[0][iT][it] = self.QD_Tt[iT][it]
+                Interfaces.QA_Tt_mod[0][iT][it] = self.QA_Tt[iT][it]
+            Interfaces.QD_T_mod[0][iT] = self.QD_T[iT]
+            Interfaces.QA_T_mod[0][iT] = self.QA_T[iT]
 
         for j in range(NEquipe):
-            Interfaces.QD_Tt_mod.append(self.QD_Tt)       
-            Interfaces.QD_T_mod.append(self.QD_T)
-            Interfaces.QA_Tt_mod.append(self.QA_Tt)      
-            Interfaces.QA_T_mod.append(self.QA_T)
+            Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
+            Interfaces.QD_T_mod.append(self.createQ_T())
+            Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
+            Interfaces.QA_T_mod.append(self.createQ_T())
 
             Interfaces.USHj_Tt.append(self.createQ_Tt())
             Interfaces.USHj_T.append(self.createQ_T())
             Interfaces.QHXj_Tt.append(self.createQ_Tt())
             Interfaces.QHXj_T.append(self.createQ_T())
 
-        self.printCascade()
-                        
+#        self.printCascade_mod()
+
 #------------------------------------------------------------------------------		
     def addCascadeArrays(self):
 #------------------------------------------------------------------------------		
@@ -245,7 +255,7 @@ class Interfaces(object):
         print "CascadeIndex - QA_total - QA_Tt(first day)"
         for i in range(self.NEquipe+1):
             print i,\
-            "%10.4f"%Interfaces.QA_T_mod[i][NT+1],\
+            "%10.4f"%Interfaces.QA_T_mod[i][0],\
             Interfaces.QA_Tt_mod[i][0][0:23]
         
 #------------------------------------------------------------------------------		

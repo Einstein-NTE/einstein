@@ -26,6 +26,7 @@
 #                           Hans Schweiger      13/04/2008
 #                           Hans Schweiger      18/04/2008
 #                           Stoyan Danov        14/05/2008
+#                           Enrico Facci        11/06/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -37,6 +38,8 @@
 #       13/04/2008 CascadeIndex corrected: now from 1 to N
 #       18/04/2008 Reference to Status.int
 #       14/05/2008 runSimulation reperence to C tables eliminated
+#       11/06/2008 modified runSimulation (getEquipmentClass, activated
+#                  calculateEnergyFlows for boilers
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,6 +55,7 @@ from sys import *
 from math import *
 from numpy import *
 
+from einstein.modules.constants import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
@@ -148,7 +152,7 @@ class ModuleEnergy(object):
         return "ok"
 
 #------------------------------------------------------------------------------
-    def calculateEnergyFlows(self,equipe,equipeC,cascadeIndex):
+    def calculateEnergyFlows(self,equipe,cascadeIndex):
 #------------------------------------------------------------------------------
 #   dummy function for calculation of energy flows in any equipment
 #------------------------------------------------------------------------------
@@ -248,32 +252,7 @@ class ModuleEnergy(object):
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
-            Interfaces.QD_Tt_mod = []      
-            Interfaces.QD_T_mod = []
-            Interfaces.QA_Tt_mod = []       
-            Interfaces.QA_T_mod = []
-
-            Interfaces.USHj_Tt = []
-            Interfaces.USHj_T = []
-            Interfaces.QHXj_Tt = []
-            Interfaces.QHXj_T = []
-
-            Interfaces.QD_Tt_mod.append(Status.int.QD_Tt)       
-            Interfaces.QD_T_mod.append(Status.int.QD_T)
-            Interfaces.QA_Tt_mod.append(Status.int.QA_Tt)      
-            Interfaces.QA_T_mod.append(Status.int.QA_T)
-
-            for j in range(self.NEquipe):
-                Interfaces.QD_Tt_mod.append(Status.int.createQ_Tt())      
-                Interfaces.QD_T_mod.append(Status.int.createQ_T())
-                Interfaces.QA_Tt_mod.append(Status.int.createQ_Tt())    
-                Interfaces.QA_T_mod.append(Status.int.createQ_T())
-
-                Interfaces.USHj_Tt.append(Status.int.createQ_Tt())
-                Interfaces.USHj_T.append(Status.int.createQ_T())
-                Interfaces.QHXj_Tt.append(Status.int.createQ_Tt())
-                Interfaces.QHXj_T.append(Status.int.createQ_T())
-                                       
+            Status.int.initCascadeArrays(self.NEquipe)
 
 #..............................................................................
 # now calculate the cascade
@@ -284,19 +263,29 @@ class ModuleEnergy(object):
 
                 equipe = self.equipments.QGenerationHC_ID[equipeID][0]
 #                equipeC = self.equipmentsC.QGenerationHC_ID[equipeID][0]
-                print "ModuleEnergy (runSimulation) [%s]: "%cascadeIndex,equipe.EquipType
-  
-                if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL" or equipe.EquipType == "compression heat pump":
+                print "ModuleEnergy (runSimulation) [%s] equipeType = : "%cascadeIndex,equipe.EquipType
+                
+                equipeClass = getEquipmentClass(equipe.EquipType)
+                print "ModuleEnergy (runSimulation): equipe type/class = ",equipe.EquipType,equipeClass
+                
+#                if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL" or equipe.EquipType == "compression heat pump":
+                if equipeClass == "HP":
                     print "======================================"
                     print "heat pump"
                     print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
                     Status.mod.moduleHP.calculateEnergyFlows(equipe,cascadeIndex)
                     print "end heat pump"
                     print "======================================"
-                elif equipe.EquipType == "Boiler":
+                elif equipeClass == "BB":
                     print "boiler"
+                    print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
+                    Status.mod.moduleBB.calculateEnergyFlows(equipe,cascadeIndex)
+                    print "boiler"
+                    print "end boiler"
+                    print "======================================"
                 else:
                     print "equipment type not yet forseen in system simulation module"
+                    print "running calculateEnergyFlows-dummy"
                     self.calculateEnergyFlows(equipe,cascadeIndex)
 
                 print "ModuleEnergy (runSimulation): end simulation"
@@ -304,7 +293,7 @@ class ModuleEnergy(object):
               
 #..............................................................................
         except Exception, runSimulation: #in case of an error
-            print 'run Simulation', runSimulation
+            print 'run Simulation exception', runSimulation
             return runSimulation
 
 #..............................................................................

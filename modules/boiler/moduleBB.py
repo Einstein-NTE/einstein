@@ -30,6 +30,8 @@
 #                           Enrico Facci        07/05/2008
 #                           Enrico Facci        13/05/2008
 #                           Hans Schweiger      15/04/2008
+#                           Enrico Facci        26/05/2008
+#                           Enrico Facci        06/06/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -64,7 +66,8 @@
 #                   (by the way eliminated some old comments that are no longer useful)
 #                   => changes in updatePanel
 #                   => "userDefinedPars"-Functions copied from HP (not working yet)
-#                   
+#       26/05/2008 some changes in functions sortBoiler, designAssistant, redundancy                   
+#       06/06/2008 implemented function updatePannel. Some small changes in designAsssistant
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -79,7 +82,7 @@
 from sys import *
 from math import *
 from numpy import *
-
+import copy
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
@@ -112,7 +115,9 @@ class ModuleBB(object):
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        Status.int.initCascadeArrays(self.NEquipe)        
+        Status.int.initCascadeArrays(self.NEquipe)
+        Status.mod.moduleEnergy.runSimulation()
+        Status.int.printCascade()
         self.updatePanel()
     
 #------------------------------------------------------------------------------
@@ -134,11 +139,89 @@ class ModuleBB(object):
         data = array(matrix)
 
         Status.int.setGraphicsData('BB Table',data)
+#............................................................................................
+# 2. Preparing data
+        self.findmaxTemp(Status.int.QD_T)
+        print "maximum temperature",self.maxTemp
+        PowerSum80=0
+        PowerSum140=0
+        PowerSumTmax=0
+        if self.maxTemp>80:
+            if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
+                for i in BBList:
+                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>80 and \
+                                                        self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=140:
+                        PowerSum140 +=i["equipePnom"]
+                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>140:
+                        PowerSumTmax += i["equipePnom"]
+            else :
+                for i in BBList:
+                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>80:
+                        PowerSumTmax += i["equipePnom"]
+            print "starting block for calculation of PowerSum80"
+            for i in BBList:
+                print "i = ",i
+                print "TExhaustGas = ",self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]
+                if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=80:
+                    PowerSum80 += i["equipePnom"]
+                    print "PowerSum80",PowerSum80
+        else:
+            for i in BBList:
+               PowerSumTmax += i["equipePnom"] 
 
+        if len(BBList)==0:
+            index=len(self.equipments)-1
+        else:
+            index = self.equipments.QGenerationHC_ID[BBList[0]["equipeID"]][0]["CascadeIndex"]
+        print "length of QD_Tt_mod is", len(Status.int.QD_Tt_mod)
+        print "the element we are looking at is", index
+        QD80C=Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval)]
+        QD80C.sort(reverse=True)
+        print "QD80C: ",QD80C
+        print "the maximum power required at 80°C is",QD80C[0]
+        if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
+            QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
+            QD140C.sort(reverse=True)
+            print "QD140C: ",QD140C
+        else:
+            QD140C=[]
+            for i in range(len(QD80C)):
+                QD140C.append(0)
+        QDmaxTemp=Status.int.QD_Tt_mod[index-1][int(self.maxTemp/Status.TemperatureInterval)]
+        QDmaxTemp.sort(reverse=True)
+        print "QDmaxTemp: ",QDmaxTemp
+        print "the maximum power required at maxTemp is",QDmaxTemp[0]                
 #............................................................................................
 # 2. XY Plot
-
-        try:
+        TimeIntervals=[]
+        for it in range(Status.Nt+1):
+            TimeIntervals.append(1.0*(it+1))
+#        print "TimeInterval len is", len(TimeIntervals)
+#        print "demand len is", len(QD80C)
+        if self.maxTemp>160:
+            try:
+                Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+                                                            QD80C,
+                                                            QD140C,
+                                                            QDmaxTemp])
+            except:
+                pass
+        else:
+            if self.maxTemp>80:
+                try:
+                    Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+                                                                QD80C,
+                                                                QD140C,
+                                                                QDmaxTemp])
+                except:
+                    pass
+            else:
+                try:
+                    Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+                                                                QD80C])
+                except:
+                    pass
+#        try:
 
 #####ENRICO, you should substitute this by the graphics you want to show
 #            Status.int.setGraphicsData('BB Plot',[Status.int.T,
@@ -172,39 +255,39 @@ class ModuleBB(object):
 #                                                      Supply2,
 #                                                      Supply3])
 
-            pass
+#            pass
         
-        except:
-            pass
-
+#        except:
+#            pass
+#............................................................................................
 #this is just a test. you should substitute the 2nd - nth "TimeIntervals" by the right list
 # i put it here out of the try-except, in order to SEE the error messages, if they occur
 # afterwards should be returned to WITHIN the try-except.
-
-        TimeIntervals = []
-        CHD_80 = []
-        NT80 = int(ceil(80/Status.TemperatureInterval))
-        for it in range(Status.Nt):
-            TimeIntervals.append(1.0*(it+1))
-            CHD_80.append(Status.int.QD_Tt_mod[self.cascadeIndex][NT80][it]/Status.TimeStep)
-                          
-        CHD_80.sort()
-        CHD_80.reverse()
+#............................................................................................
+#        TimeIntervals = []
+#        CHD_80 = []
+#        NT80 = int(ceil(80/Status.TemperatureInterval))
+#        for it in range(Status.Nt):
+#            TimeIntervals.append(1.0*(it+1))
+#            CHD_80.append(Status.int.QD_Tt_mod[self.cascadeIndex][NT80][it]/Status.TimeStep)
+#                          
+#        CHD_80.sort()
+#        CHD_80.reverse()
             
-        Status.int.setGraphicsData('BB Plot',[TimeIntervals,
-                                            CHD_80,
-                                            TimeIntervals,
-                                            TimeIntervals,
-                                            TimeIntervals])
+#        Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+#                                            CHD_80,
+#                                            TimeIntervals,
+#                                            TimeIntervals,
+#                                            TimeIntervals])
 
-
+#............................................................................................
 #............................................................................................
 # 3. Configuration design assistant
 
 ###HS2008-05-16: these are the values for the design assistant
 # (Config field). Should later on be taken from U-table in SQL
 
-        config = [False,10,True,"Natural Gas",2000,500,0.85]
+        config = self.getUserDefinedPars()
         Status.int.setGraphicsData('BB Config',config)
 
     
@@ -215,9 +298,17 @@ class ModuleBB(object):
 # (Info field)
         info = []
         info.append(10)  #first value to be displayed
-        info.append(999.99)  #power for T-level
-        info.append(1999.99)  #power for T-level
-        info.append(9999.99)  #power for T-level
+        info.append(max(0,(QD80C[0]-PowerSum80)))  #power for T-level
+        if self.maxTemp>160:
+            info.append(max(0,(QD140C[0]-QD80C[0]-PowerSum140)))  #power for T-level
+            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSummaxTemp)))  #power for T-level
+        else:
+            info.append(0)
+            if self.maxTemp>80:
+                info.append(max(0,(QDmaxTemp[0]-QD80C[0]-PowerSumTmax)))  #power for T-level
+            else:
+                info.append(0)
+
 
         Status.int.setGraphicsData('BB Info',info)
 
@@ -231,70 +322,52 @@ class ModuleBB(object):
 #   gets the user defined data from UHeatPump and stores it to interfaces to be shown in HP panel
 #------------------------------------------------------------------------------
 
-        uHProws = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
-        if len(uHProws) == 0:
-            print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
+        if len(urows) == 0:
+            print 'getUserDefinedParamBB: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
             print 'Error: confusion in PId and ANo'
             maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, 'not available',0.0,0.0,0.0,0.0,0.0])            
+            config = [False,10,True,"Natural Gas",100,500,85]            
 
         else:
-            uHP = uHProws[0]
-            #returns to the GUI the default user-defined data to be shown in HP panel
-            maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
-                                                     uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
+            u = urows[0]
+            config = [u.BBMaintain,
+                      u.BBSafety,
+                      u.BBRedundancy,
+                      u.BBFuelType,
+                      u.BBHOp,
+                      u.BBPmin,
+                      u.BBEff]
+            print "ModuleBB (getUserDefinedPars): config = ",config
+        return config
 
 #------------------------------------------------------------------------------
     def setUserDefinedPars(self):
 #------------------------------------------------------------------------------
 
-        UDList = Status.int.GData['HP Config']
+        config = Status.int.GData['BB Config']
 
-        uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
+        urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
         
-        if len(uhp)==0:
-            print "ModuleHP(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
+        if len(urows)==0:
+            print "ModuleBB(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
-            uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
+            urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
             
-        row = uhp[0]
+        u = urows[0]
 
 #        row.MaintainExisting = UDList[0] # to add in UHeatPump
-        row.UHPType = UDList[1]
-        row.UHPMinHop = UDList[2]
-        row.UHPDTMax = UDList[3]
-        row.UHPmaxT = UDList[4]
-        row.UHPminT = UDList[5]
-        row.UHPTgenIn = UDList[6]
+        u.BBMaintain = config[0]
+        u.BBSafety = config[1]
+        u.BBRedundancy = config[2]
+        u.BBFuelType = config[3]
+        u.BBHOp = config[4]
+        u.BBPmin = config[5]
+        u.BBEff = config[6]
 
         Status.SQL.commit()
-
-#------------------------------------------------------------------------------
-    def initUserDefinedPars(self):
-#------------------------------------------------------------------------------
-#   gets the default user defined data for HP from PSetUpData table. Stores them in UHeatPump.
-#   to be executed only onece when new alternative is created
-#------------------------------------------------------------------------------
-        default = Status.DB.psetupdata.PSetUpData_ID[Status.SetUpId][0]
-        uheatpump = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
-
-        uheatpump.UHPType = default.UHPType
-        uheatpump.UHPMinHop = default.UHPMinHop
-        uheatpump.UHPDTMax = default.UHPDTMax
-        uheatpump.UHPmaxT = default.UHPmaxT
-        uheatpump.UHPminT = default.UHPminT
-        uheatpump.UHPTgenIn = default.UHPTgenIn
-
-        self.sql.commit()
-        
-##XXX idea aparte:
-##en vez de duplicar todas las columnas de la tabla en UHeatPump en PSetUp, no sería mejor crear una convención tipo
-##PId = -1 en la tabla UHeatPump mismo = espacio reservado para los default values ????
-### La definicion de la sql ahora no permute entrar PId negativo, SD, 28/03/2008, se tiene que cambiar
-
 
 #------------------------------------------------------------------------------
     def screenEquipments(self):
@@ -340,21 +413,23 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def deleteEquipment(self,rowNo):
+    def deleteEquipment(self,rowNo,automatic=False):
 #------------------------------------------------------------------------------
         """
         deletes the selected boiler in the current alternative
         """
 #------------------------------------------------------------------------------
 
-
-        if rowNo == None:   #indicates to delete last added equipment dummy
-            BBid = self.dummyEqId
+        if automatic == False:
+            if rowNo == None:   #indicates to delete last added equipment dummy
+                BBid = self.dummyEqId
+            else:
+            #--> delete BB from the equipment list under current alternative #from C&QGenerationHC under ANo
+                BBid = self.getEqId(rowNo)
+                print "Module BB (delete): id to be deleted = ",BBid
         else:
-        #--> delete BB from the equipment list under current alternative #from C&QGenerationHC under ANo
-            BBid = self.getEqId(rowNo)
-            print "Module BB (delete): id to be deleted = ",BBid
-
+            BBid= rowNo
+            print "Module BB (delete automaticly): id to be deleted = ",BBid
         
         eq = self.equipments.QGenerationHC_ID[BBid][0] #select the corresponding rows to HPid in both tables
 ###HS: CGENERATIONHC ELIMINATED.        eqC = self.equipmentsC.QGenerationHC_id[BBid][0]
@@ -479,7 +554,8 @@ class ModuleBB(object):
         if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         Status.SQL.commit()
-        print "demand before the add"
+        print "cascade index is:",
+        print "demand before the add",self.cascadeIndex-1
         print Status.int.QD_Tt_mod[self.cascadeIndex-1][8]
         self.calculateEnergyFlows(equipe,self.cascadeIndex)
         print "demand after the add"
@@ -504,7 +580,7 @@ class ModuleBB(object):
 #   calculates the energy flows in the equipment identified by "cascadeIndex"
 #------------------------------------------------------------------------------
 
-        print "ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
+        print "ModuleBB (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
 #..............................................................................
 # get equipment data from equipment list in SQL
 
@@ -527,8 +603,8 @@ class ModuleBB(object):
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = Status.int.QD_Tt_mod[cascadeIndex]
-        QA_Tt = Status.int.QA_Tt_mod[cascadeIndex]
+        QD_Tt = copy.deepcopy(Status.int.QD_Tt_mod[cascadeIndex-1])
+        QA_Tt = copy.deepcopy(Status.int.QA_Tt_mod[cascadeIndex-1])
         
         USHj_Tt = Status.int.createQ_Tt()
         USHj_T = Status.int.createQ_T()
@@ -567,30 +643,22 @@ class ModuleBB(object):
 
         print "ModuleBB (calculateEnergyFlows): now storing final results"
         a=[]
-        Interfaces.QD_Tt_mod.append(a)  #####I'm not sure!!
-        Interfaces.QD_T_mod.append (a)   #####I'm not sure!!
-        Interfaces.QA_Tt_mod.append (a)   #####I'm not sure!!
-        Interfaces.QA_T_mod.append (a)   #####I'm not sure!!
        
 # remaining heat demand and availability for next equipment in cascade
-        Interfaces.QD_Tt_mod[cascadeIndex+1] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex+1] = Status.int.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex+1] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex+1] = Status.int.calcQ_T(QA_Tt)
+        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Interfaces.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
+        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Interfaces.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment
-        Interfaces.USHj_Tt.append(a)  #####I'm not sure!!
-        Interfaces.USHj_T.append(a)  #####I'm not sure!!
 
-        Interfaces.USHj_Tt[cascadeIndex] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex] = Status.int.calcQ_T(USHj_Tt)
+        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Interfaces.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
 
 # waste heat absorbed by present equipment
-        Interfaces.QHXj_Tt.append(a)  #####I'm not sure!!
-        Interfaces.QHXj_T.append(a)  #####I'm not sure!!
 
-        Interfaces.QHXj_Tt[cascadeIndex] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex] = Status.int.calcQ_T(QHXj_Tt)
+        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
 #        equipeC.USHj = USHj
 #        equipeC.QHXj = QHXj    #XXX to be defined in data base
@@ -683,7 +751,7 @@ class ModuleBB(object):
 
         for i in range(len(boilerList)):
             for j in range(i,len(boilerList)):
-                if boilerList[i]["temperature"] <= 80 :
+                if boilerList[i]["temperature"] <= 80 and boilerList[j]["temperature"]>80:
                     bi = boilerList[i]
                     bj = boilerList[j]
                     boilerList[i] = bj
@@ -693,7 +761,7 @@ class ModuleBB(object):
 
         for i in range(len(boilerList)):
             for j in range(i,len(boilerList)):
-                if 90 < boilerList[i]["temperature"] <= 140 :
+                if 80 < boilerList[i]["temperature"] <= 140 and (boilerList[j]["temperature"]<=80 or boilerList[j]["temperature"]>140):
                     bi = boilerList[i]
                     bj = boilerList[j]
                     boilerList[i] = bj
@@ -703,7 +771,7 @@ class ModuleBB(object):
 
         for i in range(len(boilerList)):
             for j in range(i,len(boilerList)):
-                if  boilerList[i]["temperature"] > 140 :
+                if  boilerList[i]["temperature"] > 140 and  boilerList[j]["temperature"]<=140:
                     bi = boilerList[i]
                     bj = boilerList[j]
                     boilerList[i] = bj
@@ -734,9 +802,12 @@ class ModuleBB(object):
             if  boilerList[i]["temperature"] > 140 :
                 b+=1
 
-        self.firstBB = len(Status.int.cascade)-len(boilerList)+1
-        self.firstBB140 = len(Status.int.cascade)-a +1
-        self.firstBBmaxTemp = len(Status.int.cascade)-b+1
+        self.firstBB = len(Status.int.cascade)-len(boilerList)
+        self.firstBB140 = len(Status.int.cascade)-a
+        if self.maxTemp >140:
+            self.firstBBmaxTemp = len(Status.int.cascade)-b
+        else:
+            self.firstBBmaxTemp =len(Status.int.cascade)-a
         lastBB = len(Status.int.cascade)-1
             
 #OR JUST CORRECTING YOUR CODE (don't understand it so I can't say if it should work or not ...):
@@ -790,15 +861,22 @@ class ModuleBB(object):
     
     
 #------------------------------------------------------------------------------
-    def automDeleteBoiler (self,minEfficencyAccepted=0.80):  #0.80 is a default value for minimum of efficiency
+    def automDeleteBoiler (self,minEfficencyAccepted=80):  #0.80 is a default value for minimum of efficiency
 #------------------------------------------------------------------------------
 # delete unefficient boiler
 #------------------------------------------------------------------------------
+        print"entered 'automDeleteBoiler' function" 
         self.screenEquipments()
+        automatic=True
         for i in range (len (self.BBList)):
-            if self.equipments[i].QGenerationHC_ID < minEfficencyAccepted:
+            print "controlling equipe", self.BBList[i]['equipeID']
+            eff= self.equipments.QGenerationHC_ID[self.BBList[i]['equipeID']][0]['HCGTEfficiency']
+            print "efficiency of the boiler number '%s'is:'%s'"%(i,eff)
+            print "min efficiency accepted:",minEfficencyAccepted
+            if eff < minEfficencyAccepted:
 #                 add the fuel criterion: if not biomass,biofuels?,gas methane ->delete ???
-                self.deleteEquipment(self.equipments[i].QGenerationHC_ID)# The row number should be passed. is this right? 
+                print "Module BB (): id to be deleted = ",self.BBList[i]['equipeID']
+                self.deleteEquipment(self.BBList[i]['equipeID'],automatic)# The row number should be passed. is this right? 
                 
                 
 
@@ -843,29 +921,36 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 #       when redundancy is required provides suitable boilers.
 #       N.B. the possibility of retriveing deleted boilers is not implemented yet.
+#       N.B. The possibility that a boiler with nominal power > than biggerBB is in the list has to be considered.
 #------------------------------------------------------------------------------      
-
+        print "dimensioning reduntant boilers"
         self.maxPow80=0
         self.maxPow140=0
         self.maxPowTmax=0
         for k in range(len(Status.int.cascade)):
-            if getEquipmentClass(Status.int.cascade.equipeType) == "BB":
-                if self.equipments[Status.int.cascade[k].equipeID].Temp <=90 and \
-                   Status.int.cascade[k].Pnom > self.maxPow80:
-                    self.maxPow80 =Status.int.cascade[k].Pnom
-                elif 90< self.equipments[Status.int.cascade[k].equipeID].Temp <= 150 and \
-                     Status.int.cascade[k].Pnom > self.maxPow140:
-                    self.maxPow140 =Status.int.cascade[k].Pnom
-                elif Status.int.cascade[k].Pnom > self.maxPowTmax:
-                    self.maxPowTmax =Status.int.cascade[k].Pnom
+            if getEquipmentClass(Status.int.cascade[k]["equipeType"]) == "BB":
+#                print "the equipment ID is:",Status.int.cascade[k]["equipeID"]
+#                print "the corresponding temp. is:",self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas']
+                if self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas'] <=90 and \
+                   Status.int.cascade[k]["equipePnom"] > self.maxPow80:     # TExhaustGas to be sostituted with tthe operating temperature
+                    self.maxPow80 =Status.int.cascade[k]["equipePnom"]
+                elif 90< self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas'] <= 150 and \
+                     Status.int.cascade[k]["equipePnom"] > self.maxPow140:
+                    self.maxPow140 =Status.int.cascade[k]["equipePnom"]
+                elif Status.int.cascade[k]["equipePnom"] > self.maxPowTmax:
+                    self.maxPowTmax =Status.int.cascade[k]["equipePnom"]
         if self.maxPow80>0:
-            self.selectBB(self.maxPow80)
-            self.setEquipmentFromDB(equipe,equipeC,modelID)
-        if self.maxPow140>0:
-            self.selectBB(self.maxPow140)
-            self.setEquipmentFromDB(equipe,equipeC,modelID)
-        self.selectBB(self.maxPowTmax)
-        self.setEquipmentFromDB(equipe,equipeC,modelID)
+            modelID =self.selectBB(self.maxPow80,80)
+            equipe = self.addEquipmentDummy()
+            self.setEquipmentFromDB(equipe,modelID)
+        if self.maxPow140>0 and self.maxTemp>140:
+            modelID =self.selectBB(self.maxPow140,140)
+            equipe = self.addEquipmentDummy()
+            self.setEquipmentFromDB(equipe,modelID)
+        modelID =self.selectBB(self.maxPowTmax,self.maxTemp)
+        equipe = self.addEquipmentDummy()
+        self.setEquipmentFromDB(equipe,modelID)
+        
 
 
 #------------------------------------------------------------------------------
@@ -890,7 +975,7 @@ class ModuleBB(object):
 #  we could give the possibility to choose the boiler to the user (in the interactive mode) in a 'selected' list. In this version we take the first  
 #  element of the list
 #------------------------------------------------------------------------------
-
+        print "entered selectBB module"
         sqlQuery="BoilerTemp >= '%s'AND BBPnom >= '%s' ORDER BY BBPnom ASC" %(Top,Pow)       
         selected = Status.DB.dbboiler.sql_select(sqlQuery)
         for i in range(len(selected)):
@@ -906,7 +991,7 @@ class ModuleBB(object):
         print "selectBB: the requested power is:", Pow 
         print "selectBB: the selected boiler ID is:", modelID
 #        print "selectBB: the list of boiler is:"
-        print selected
+#        print selected
         return modelID
         
 
@@ -920,8 +1005,11 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
         added=0
         if Status.int.QD_T_mod[self.firstBB][int(80/Status.TemperatureInterval)] >= 0.1*Status.int.QD_T_mod[self.firstBB][int(self.maxTemp/Status.TemperatureInterval)]: #we design boiler at this temperature level only if the demand is bigger than the 10% of the total demand
+            print "point AA reached"
             if self.QDh80[0]*self.securityMargin >= self.minPow:
+                print "point AB reached"
                 if self.QDh80[0]*self.securityMargin>=2*self.minPow:
+                    print "point AC reached"
                     if self.QDh80[0]*self.securityMargin < self.QDh80[self.minOpTime]*1.3 \
                        or (self.QDh80[0]*self.securityMargin - self.QDh80[self.minOpTime]) < self.minPow:
                         print "point A reached"
@@ -976,7 +1064,7 @@ class ModuleBB(object):
                     print "point H reached"
                     self.selectBB(self.QDh80[0]*self.securityMargin,80)
                     equipe = self.addEquipmentDummy()
-                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                    self.setEquipmentFromDB(equipe,self.modelID)   #assign model from DB to current equipment in equipment list
 
         print "point i reached"
         self.sortBoiler()                
@@ -990,67 +1078,129 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 # design a boiler sistem at 140°C
 #------------------------------------------------------------------------------
-
-        if Status.int.QD_T_mod[self.firstBB140][int(140/Status.TemperatureInterval)] >= Status.int.QD_T_mod[self.firstBB][int(maxTemp/Status.TemperatureInterval)]:
+        added=0
+        if Status.int.QD_T_mod[self.firstBB140][int(140/Status.TemperatureInterval)] >= 0.1*Status.int.QD_T_mod[self.firstBB][int(self.maxTemp/Status.TemperatureInterval)]:
+            print"point A1 reached"
             if self.QDh140[0]*self.securityMargin >= self.minPow:
+                print "point A2 reached"
                 if self.QDh140[0]*self.securityMargin>=2*self.minPow:
-                    if self.QDh140[0]*self.securityMargin < self.QDh140[self.minOpTime]*1.2 or \
+                    print "point A3 reached"
+                    if self.QDh140[0]*self.securityMargin < self.QDh140[self.minOpTime]*1.3 or \
                     self.QDh140[0]*self.securityMargin -self.QDh140[self.minOpTime]<self.minPow:
+                        print "point A4 reached"
                     
 #HS TAKE CARE !!!! methods of the same class have to be called with the "self." before
 #                   has probably to be corrected throughout the code ... !!!!
 #                        selectBB((QDh_descending[0]*securityMargin)) # ,...)  #select the right bb from the database.
-                        self.self.selectBB((self.QDh140[0]*self.securityMargin)) # ,...)  #select the right bb from the database.
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        modelID=self.selectBB((self.QDh140[0]*self.securityMargin),140) # ,...)  #select the right bb from the database.
+                        equipe = self.addEquipmentDummy()
+                        self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
                     else:
 #HS: elif requires a condition !!!                    elif:
-                        self.selectBB(self.QDh140[self.minOpTime])    #  select the base load boiler from DB
-                        self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-
-                        
-                        if self.QDh140[0]*self.securityMargin - equipeC['HCGPnom']>= 2*self.minPow:
-                            self.selectBB((self.QDh140[0]*self.securityMargin - equipeC['HCGPnom'])/2)
-#twice the same ?? for being sure, if the first time fails ???                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                        if self.QDh140[self.minOpTime]>self.bigger140:
+                            for i in range (int(self.QDh140[self.minOpTime]/self.bigger140)):
+                                print "point B1 reached"
+                                modelID =self.selectBB(self.bigger140,140)
+                                equipe = self.addEquipmentDummy()
+                                self.setEquipmentFromDB(equipe,modelID)
+                            added += int(self.QDh140[self.minOpTime]/self.bigger140)*self.bigger140
                         else:
-#HS: elif requires a condition !!!                        elif:
-                            self.selectBB(self.QDh140[0]*self.securityMargin - equipeC['HCGPnom'])
-                            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                else:
-#HS: elif requires a condition !!!                elif:
-                    self.selectBB(self.QDh140[0]*self.securityMargin)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                            print "point C1 reached"
+                            modelID =self.selectBB(self.QDh140[self.minOpTime],140)  #  select the base load boiler from DB
+                            equipe = self.addEquipmentDummy()
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                            added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom
+                        print "power of the last bb group added"
+                        print added
+                      
+                        if self.QDh140[0]*self.securityMargin - added>= 2*self.minPow:
+                            if self.QDh80[0]*self.securityMargin - added >= self.bigger80:
+                                for i in range (int((self.QDh140[0]*self.securityMargin - added)/self.bigger140)):
+                                    print "point D1 reached"
+                                    modelID =self.selectBB(self.bigger140,140)
+                                    equipe = self.addEquipmentDummy()
+                                    self.setEquipmentFromDB(equipe,modelID)
+                                print "point E1 reached"
+                                added += int((self.QDh140[0]*self.securityMargin - added)/self.bigger140)*self.bigger140
+                                modelID =self.selectBB((self.QDh140[0]*self.securityMargin - added),140)
+                                equipe = self.addEquipmentDummy()
+                                self.setEquipmentFromDB(equipe,modelID)
+                            else:
+                                print "point F1 reached"
+                                modelID=self.selectBB(((self.QDh140[0]*self.securityMargin - added)/2),140)  #sempre aggiungere anche il criterio di efficienza
+                                equipe = self.addEquipmentDummy()
+                                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                                self.setEquipmentFromDB(equipe,modelID)
+                            
+                        else:
+                            print "point G1 reached"
+                            self.selectBB((self.QDh140[0]*self.securityMargin - added),140)
+                            equipe = self.addEquipmentDummy()
+                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
+                else:
+                    print "point H1 reached"
+                    self.selectBB(self.QDh140[0]*self.securityMargin,140)
+                    equipe = self.addEquipmentDummy()
+                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+
+        print "point i1 reached"
         self.sortBoiler()
 #------------------------------------------------------------------------------
     def designBBmaxTemp(self): #HS .........,maxTemp...):
 #------------------------------------------------------------------------------
 # design a boiler sistem at the maximum temperature of the heat demand
 #------------------------------------------------------------------------------
-
+        added=0
         if self.QDhmaxTemp[0]*self.securityMargin>=2*self.minPow:
-            if self.QDhmaxTemp[0]*self.securityMargin < self.QDhmaxTemp[self.minOpTime]*1.2:
-                self.selectBB((self.QDhmaxTemp[0]*self.securityMargin)) #HS....,...)  #select the right bb from the database.
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+            if self.QDhmaxTemp[0]*self.securityMargin < self.QDhmaxTemp[self.minOpTime]*1.3 \
+               or (self.QDhmaxTemp[0]*self.securityMargin - self.QDhmaxTemp[self.minOpTime]) < self.minPow:
+                modelID = self.selectBB((self.QDhmaxTemp[0]*self.securityMargin),self.maxTemp) #HS....,...)  #select the right bb from the database.
+                equipe = self.addEquipmentDummy()
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
             else:
-
-                self.selectBB(self.QDhmaxTemp[self.minOpTime])    #  select the base load boiler from DB
-                self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-
-                if self.QDhmaxTemp[0]*self.securityMargin - equipeC['HCGPnom']>= 2*self.minPow:
-                    self.selectBB((self.QDhmaxTemp[0]*self.securityMargin - equipeC['HCGPnom'])/2)
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
-
+                if self.QDhmaxTemp[self.minOpTime]>self.biggermaxTemp:
+                    for i in range (int(self.QDhmaxTemp[self.minOpTime]/self.biggermaxTemp)):
+                        modelID =self.selectmaxTemp(self.biggermaxTemp,self.maxTemp)
+                        equipe = self.addEquipmentDummy()
+                        self.setEquipmentFromDB(equipe,modelID)
+                    added += int(self.QDhmaxTemp[self.minOpTime]/self.biggermaxTemp)*self.biggermaxTemp
                 else:
-                    self.selectBB(self.QDhmaxTemp[0]*self.securityMargin - equipeC['HCGPnom'])
-                    self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+                    modelID =self.selectBB(self.QDhmaxTemp[self.minOpTime],self.maxTemp)
+                    equipe = self.addEquipmentDummy()
+                    self.setEquipmentFromDB(equipe,modelID)
+                    added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom
+
+
+                if self.QDhmaxTemp[0]*self.securityMargin - added >= 2*self.minPow:
+                    if self.QDhmaxTemp[0]*self.securityMargin - added >= self.biggermaxTemp:
+                        for i in range (int((self.QDhmaxTemp[0]*self.securityMargin - added)/self.biggermaxTemp)):
+                            modelID =self.selectBB(self.biggermaxTemp,self.maxTemp)
+                            equipe = self.addEquipmentDummy()
+                            self.setEquipmentFromDB(equipe,modelID)
+                        added += int((self.QDhmaxTemp[0]*self.securityMargin - added)/self.biggermaxTemp)*self.biggermaxTemp
+                        modelID =self.selectBB((self.QDhmaxTemp[0]*self.securityMargin - added),self.maxTemp)
+                        equipe = self.addEquipmentDummy()
+                        self.setEquipmentFromDB(equipe,modelID)
+                    else:
+                        modelID=self.selectBB(((self.QDhmaxTemp[0]*self.securityMargin - added)/2),maxTemp)
+                        equipe = self.addEquipmentDummy()
+                        self.setEquipmentFromDB(equipe,modelID)
+                        equipe = self.addEquipmentDummy()
+                        self.setEquipmentFromDB(equipe,modelID)
+
+                   
+                else:
+                    modelID=self.selectBB((self.QDhmaxTemp[0]*self.securityMargin - added),self.maxTemp)
+                    equipe = self.addEquipmentDummy()
+                    self.setEquipmentFromDB(equipe,modelID)
 
         else:
-            self.selectBB(self.QDhmaxTemp[0]*self.securityMargin)
-            self.setEquipmentFromDB(equipe,equipeC,modelID)   #assign model from DB to current equipment in equipment list
+            modelID=self.selectBB(self.QDhmaxTemp[0]*self.securityMargin,self.maxTemp)
+            equipe = self.addEquipmentDummy()
+            self.setEquipmentFromDB(equipe,modelID)
 
 
         self.sortBoiler()
@@ -1060,7 +1210,16 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
+        DATable = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        if len(DATable) > 0:
+            DA = DATable[0]
+        else:
+            print "ModuleBB (design assistant): WARNING - no DA configuration parameters available"
+            return
 
+        if DA.BBRedundancy == True:
+            pass
+        
 #            if (MaintainExistingEquipment == False):
 #                deleteAllBoilers()
         self.securityMargin=1.2      #  N.B. securityMargin should be choosen by the user!!! At the moment is setted to 1.2############
@@ -1085,12 +1244,13 @@ class ModuleBB(object):
 #        print zz
         print "the first boiler in cascade is"
         print self.firstBB
-        print Status.int.QD_Tt_mod [0][8]        
+#        print Status.int.QD_Tt_mod [0][8]        
 #        print Status.int.QD_Tt_mod [0][zz]
         yy= maxInList(Status.int.QD_Tt_mod [self.firstBB][zz])
         print "print the maximum pawer of the demand at 80°C"
         print yy
-        b= max(((yy * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 80°C
+        b=max((yy  - exBP),0)
+        b1= max(((yy * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 80°C
         c=[]
         for it in range (Status.Nt):
             c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB][zz][it]))
@@ -1102,40 +1262,44 @@ class ModuleBB(object):
         print self.QDh80
         print "lenght of the demand array (QDh80)"
         print len(self.QDh80)
-        self.designBB80()
+        if self.QDh80[0]>0:
+            self.designBB80()
         print" reached point L"
 #        for k in range (self.firstBB , self.firstBB140):
 #            equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]   #self.equipments.QGenerationHC_ID[{"CascadeIndex"}][0]
 #            self.calculateEnergyFlows(equipe,k)
 
             
-        
+        if self.maxTemp>160:   # N.B. The difference between temperature levels is now setted in 20°C but in the future could be a parameter.      
                         
-        exBP=0       #   power of the boiler in the cascade operating at 140°C
-        for row in Status.int.cascade:
-            equipTry= Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0]
-            if getEquipmentClass(row["equipeType"]) == "BB" and 90 <= equipTry["TExhaustGas"]<=140:
-                exBP += row['equipePnom']
+            exBP=0       #   power of the boiler in the cascade operating at 140°C
+            for row in Status.int.cascade:
+                equipTry= Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0]
+                if getEquipmentClass(row["equipeType"]) == "BB" and 90 <= equipTry["TExhaustGas"]<=140:
+                    exBP += row['equipePnom']
 
-        zz=int(140/Status.TemperatureInterval)
-        yy= maxInList(Status.int.QD_Tt_mod [self.firstBB140][zz])
-        b= max(((yy * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 140°C
-        c=[]
-        for it in range (Status.Nt):
-            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB140][zz][it]))
+            zz=int(140/Status.TemperatureInterval)
+            yy= maxInList(Status.int.QD_Tt_mod [self.firstBB140][zz])
+            b=max((yy  - exBP),0) #   minimum power of the new boilers at 140°C
+            c=[]
+            for it in range (Status.Nt):
+                c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB140][zz][it]))
 
-        self.QDh140=c  # demand to be supplied by new boilers at 140°C
-#        print "The total demand at 80°C is:", Status.int.QD_Tt_mod[self.firstBB][8]
-#        print "The total demand at 140°C is:", Status.int.QD_Tt_mod[self.firstBB][14]
-#        print "Print the residual demand at 140°C" 
-        print self.QDh140
+            self.QDh140=c  # demand to be supplied by new boilers at 140°C
+#            print "The total demand at 80°C is:", Status.int.QD_Tt_mod[self.firstBB][8]
+#            print "The total demand at 140°C is:", Status.int.QD_Tt_mod[self.firstBB][14]
+            print " the residual demand at 140°C" 
+            print self.QDh140
+            self.QDh140.sort(reverse=True)
 
-        self.QDh140.sort(reverse=True)
-#        self.sortDemand(140)               
-        self.designBB140()
+            print "The lenght of the demand (temperature levels)is", len (Status.int.QD_T_mod[self.firstBB140])
+            print "the maxTemp is", self.maxTemp
+            if self.QDh140[0]>0:
+                self.designBB140()
         
-        for k in range (self.firstBB140 , self.firstBBmaxTemp):
-            self.calculateEnergyFlows(equipe,k)
+#            for k in range (self.firstBB140 , self.firstBBmaxTemp):
+#                equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]   #self.equipments.QGenerationHC_ID[{"CascadeIndex"}][0]
+#                self.calculateEnergyFlows(equipe,k)
 
 
         exBP=0       #   power of the boiler in the cascade operating at maxTemp
@@ -1145,26 +1309,37 @@ class ModuleBB(object):
             if getEquipmentClass(row["equipeType"]) == "BB":
                 exBP += row['equipePnom']
 
-        cI= len(Status.int.QD_Tt_mod)+1     
-        b= (max (Status.int.QD_Tt_mod[self.firstBBmaxTemp][maxTemp/Status.TemperatureInterval]) * self.securityMargin) - exBP #   minimum power of the new boilers at maxTemp°C
+        cI= len(Status.int.QD_Tt_mod)+1
+        zz=int(self.maxTemp/Status.TemperatureInterval)
+        print "The maximum temperature is:", self.maxTemp
+        print "the annual energy at 3 temperature level 'around' the max temp is:", Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)-1],\
+        Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)]#,Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)+1]
+        print "the cascade index of the first boiler at max temp is:",self.firstBBmaxTemp
+        yy= maxInList(Status.int.QD_Tt_mod [self.firstBBmaxTemp][zz])
+        b=max((yy  - exBP),0) #   minimum power of the new boilers at maxTemp°C
         c=[]
         for it in range (Status.Nt):
-            c[it]= min (b, Status.int.QD_Tt[self.firstBBmaxTemp][maxTemp/Status.TemperatureInterval][it])
+            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBBmaxTemp][zz][it]))
 
         self.QDhmaxTemp=c  # demand to be supplied by new boilers at maxTemp°C
 
         self.QDhmaxTemp.sort(reverse=True)
-#        self.sortDemand(maxTemp)               
-        self.designBBmaxTemp()
+        print "the demand at max temp. is:", self.QDhmaxTemp
+        if self.QDhmaxTemp[0]>0:
+            self.designBBmaxTemp()
 
-        for k in range (self.firstBBmaxTemp , self.lastBB+1):
-            self.calculateEnergyFlows(equipe,k)
+#        for k in range (self.firstBBmaxTemp , self.lastBB+1):
+#            equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]
+#            self.calculateEnergyFlows(equipe,k)
 
-
+        print "set of boiler designed"
+        off= False
+        print "can we accept to stop the production?",off
         if off== False:
             self.redundancy()
-            
-
+        
+        self.updatePanel()    
+        print "ModuleBB (design assistant) reached the end"
 
 #..............................................................................                       
 
