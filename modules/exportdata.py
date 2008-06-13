@@ -53,16 +53,18 @@ class ExportDataXML(object):
 
         self.cursor = conn.cursor(MySQLdb.cursors.DictCursor)
         self.fd = open(outfile, 'w')
-        self.fd.write('<?xml version="1.0" encoding="utf-8"?>\n')
+        self.fd.write('<?xml version="1.0" encoding="utf-8"?>\n' +
+                      '<InputXMLDataController xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n')
 
         if pid is not None and ano is not None:
             criterium = "WHERE Questionnaire_id=%s AND AlternativeProposalNo=%s" % (pid,ano)
-            self.dumpTable('qgenerationhc', criterium)
-            self.dumpTable('qprocessdata', criterium)
+            self.dumpTable('qgenerationhc', criterium, 'ORDER BY EqNo')
+            self.dumpTable('qprocessdata', criterium, 'ORDER BY ProcNo')
+            self.dumpTable('qdistributionhc', criterium,'ORDER BY PipeDuctNo')
 
             criterium = "WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (pid,ano)
-            self.dumpTable('qheatexchanger', criterium)
-            self.dumpTable('qwasteheatelequip', criterium)
+            self.dumpTable('qheatexchanger', criterium,'ORDER BY HXNo')
+            self.dumpTable('qwasteheatelequip', criterium,'ORDER BY WHEENo')
 
         if len(fuels)>0:
             criterium = "WHERE DBFuel_ID IN %s" % (str(fuels),)
@@ -76,10 +78,12 @@ class ExportDataXML(object):
             print 'FLUIDS='+criterium
             self.dumpTable('dbfluid', criterium)
             
+        self.fd.write('</InputXMLDataController>\n')
         self.fd.close()
         conn.close()
 
-    def dumpTable(self, table, criterium):
+
+    def dumpTable(self, table, criterium, order=None):
         fieldtypes = {}
         self.cursor.execute("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS " \
                         "WHERE table_name = '%s' AND table_schema = 'einstein'" % (table,))
@@ -91,24 +95,25 @@ class ExportDataXML(object):
             fieldtypes[fname] = ftype
     
         sql = "SELECT * FROM %s" % (table,)
+
         if criterium:
             sql += (' ' + criterium)
+        if order:
+            sql += (' ' + order)
         self.cursor.execute(sql)
         result_set = self.cursor.fetchall()
         nrows = self.cursor.rowcount
         if nrows <= 0:
             self.fd.write('<!-- table %s has no values -->\n' % (table,))
         else:
-            self.fd.write('<table name="%s" rows="%s">\n' % (table,nrows))
-            i = 0
+            self.fd.write('<ListOf%s>\n' % (table,))
             for row in result_set:
-                self.fd.write('<row i="%s" fields="%s">\n' % (i,nfields))
-                i += 1
+                self.fd.write('<InputXML%s>\n' % (table,))
                 for key in row.keys():
                     value = row[key]
-                    if value is None:
-                        value = ''
-                    s = '<field name="%s" type="%s" value="%s" />\n' % (key, fieldtypes[key],value)
-                    self.fd.write(s)
-                self.fd.write('</row>\n')
-            self.fd.write('</table><!-- end of %s -->\n' % (table,))
+                    if value is not None:
+                        s = '<%s>%s</%s>\n' % (key,value,key)
+                        self.fd.write(s)
+                self.fd.write('</InputXML%s>\n' % (table,))
+            self.fd.write('</ListOf%s>\n' % (table,))
+

@@ -33,6 +33,8 @@
 #                       and addFuel/ProcessDummy added
 #       10/06/08: HS    getFluidDict added
 #       11/06/08: SD    getFuelDict added
+#       13/06/08: HS    several functions getXY + getXYList for subsystems
+#                       creation of new entry in uheatpump added in createNewProject
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -497,6 +499,10 @@ class Project(object):
             newElectricity = {"Questionnaire_id":newID,
                               "AlternativeProposalNo":-1}
             qelectricity.insert(newElectricity)
+
+            newUHeatPump =  {"Questionnaire_id":newID,
+                              "AlternativeProposalNo":-1}
+            uheatpump.insert(newUHeatPump)
 
             Status.NoOfAlternatives = -1
                         
@@ -1191,13 +1197,23 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getHXList(self,key):
+    def getHXes(self):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
         sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY HXNo ASC"%(Status.PId,Status.ANo)
         hxes = Status.DB.qheatexchanger.sql_select(sqlQuery)
+        
+        return hxes
+
+#------------------------------------------------------------------------------
+    def getHXList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        hxes = self.getHXes()
         
         HXList = []
         for hx in hxes:
@@ -1265,13 +1281,23 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getWHEEList(self,key):
+    def getWHEEs(self):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
         sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
         whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
+        
+        return whees
+
+#------------------------------------------------------------------------------
+    def getWHEEList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        whees = self.getWHEEs()
         
         WHEEList = []
         for whee in whees:
@@ -1315,13 +1341,48 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getEqList(self,key):
+    def getFuels(self):
 #------------------------------------------------------------------------------
-#   returns a list of existing heat exchangers
+#   returns a table of existing equipment
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        fuels = Status.DB.qfuel.sql_select(sqlQuery)
+        
+        return fuels
+
+#------------------------------------------------------------------------------
+    def getFuelList(self,key):
+#------------------------------------------------------------------------------
+#   returns a table of existing equipment
+#------------------------------------------------------------------------------
+
+        fuels = self.getFuels()
+        
+        fuelList = []
+        for fuel in fuels:
+            fuelList.append(fuel[key])
+
+        return fuelList
+
+#------------------------------------------------------------------------------
+    def getEquipments(self):
+#------------------------------------------------------------------------------
+#   returns a table of existing equipment
 #------------------------------------------------------------------------------
 
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        eqs = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        
+        return equipments
+
+#------------------------------------------------------------------------------
+    def getEquipmentList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing equipment
+#------------------------------------------------------------------------------
+
+        eqs = self.getEquipments()
         
         eqList = []
         for eq in eqs:
@@ -1329,20 +1390,9 @@ class Project(object):
 
         return eqList
 
-#------------------------------------------------------------------------------
-    def getProcessList(self,key):
-#------------------------------------------------------------------------------
-#   returns a list of existing heat exchangers
-#------------------------------------------------------------------------------
-
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
-        processes = Status.DB.qprocessdata.sql_select(sqlQuery)
-        
-        processList = []
-        for process in processes:
-            processList.append(process[key])
-
-        return processList
+#getEqList maintained for backward compatibility. can be eliminated once being sure that not used any more.
+    def getEqList(self,key):
+        return self.getEquipmentList(key)
 
 #------------------------------------------------------------------------------
     def getProcesses(self):
@@ -1356,7 +1406,21 @@ class Project(object):
         return self.processes
 
 #------------------------------------------------------------------------------
-    def getPipeList(self,key):
+    def getProcessList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        processes = self.getProcesses()
+        
+        processList = []
+        for process in processes:
+            processList.append(process[key])
+
+        return processList
+
+#------------------------------------------------------------------------------
+    def getPipes(self):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
@@ -1364,11 +1428,21 @@ class Project(object):
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
         pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
         
+        return pipes
+#------------------------------------------------------------------------------
+    def getPipeList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        pipes = self.getPipes()
+        
         pipeList = []
         for pipe in pipes:
             pipeList.append(pipe[key])
 
         return pipeList
+    
 #------------------------------------------------------------------------------
     def getFluidDict(self):
 #------------------------------------------------------------------------------
@@ -1406,6 +1480,26 @@ class Project(object):
             fuelDict.update({fuelID:fuelName})
 
         return fuelDict
+
+#------------------------------------------------------------------------------
+    def getUnitOpDict(self):
+#------------------------------------------------------------------------------
+#   returns a list of unit operations in DB
+#------------------------------------------------------------------------------
+
+        sqlQuery = "% ORDER BY UnitOperation ASC"
+#        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
+        unitOperations = Status.DB.dbunitoperation.UnitOperation["%"]       
+        print "getUnitOpDict: dbunitoperation data base ->", unitOperations
+        unitOpDict = {}
+        for unitOperation in unitOperations:
+            print "getUnitOpDict: ", unitOperation
+            unitOperationName = unitOperation["UnitOperation"]
+            unitOperationID = unitOperation["DBUnitOperation_ID"]
+            unitOpDict.update({unitOperationID:unitOperationName})
+
+        return unitOpDict
+
 
 #==============================================================================
 

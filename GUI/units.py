@@ -18,12 +18,15 @@
 #       Revised by:         Stoyan Danov    10/06/2008
 #                           Stoyan Danov    11/06/2008
 #                           Hans Schweiger  11/06/2008
+#                           Stoyan Danov    12/06/2008
 #
 #       Changes to previous version:
 #       SD: 10/06/2008: added FUELPRICELCV, PRICE
 #       SD: 11/06/2008: mergeDict() added
 #       HS: 11/06/2008: corrections of bugs: MJ/GJ, comma by dot, ...
 #                       new structure of dictionaries
+#       SD: 12/06/2008: completing the new structure: MASSFLOW,PRESSURE,SPECIFICENTHALPY,
+#                       VOLUMEFLOW,TIME,
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -35,155 +38,226 @@
 #
 #==============================================================================
 
+CURRENCY = 'EUR'
+
 UNITS = {
 # conversion to internal unit: [ºC]
     'TEMPERATURE' : {
-        'ºC':(1.0,0.0),
-        'ºF':(5.0/9,-32.0*5/9),
-        'K':(1.0,-273.15)
-        }
+        'ºC':   (1.0,   0.0),
+        'ºF':   (5.0/9, -32.0*5/9),
+        'K':    (1.0,   -273.15)
+        },
 
 # conversion to internal unit: [K]
     'TEMPERATUREDIFF' : {
-        'K': (1.0,0.0),
-        'ºF':(5.0/9,0.0),
-        }
+        'K':    (1.0,   0.0),
+        'ºF':   (5.0/9, 0.0),
+        },
+
+# conversion to internal unit: [h]
+    'TIME' : {
+        'h' : (1.0,0.0),
+        'min' : (1.0/60,0.0),
+        's' : (1.0/3600,0.0)
+        },
 
 # conversion to internal unit: [m]
     'LENGTH' : {
-        'm' : (1.0,0.0),
-        'km' : (1000.0,0.0),
-        'mm' : (1.0e-3,0.0),
-        'yards': (0.9144,0.0),
-        'ft'   : (0,3048,0.0),
-        'in'   : (0.0254,0.0)
-        }
+        'm' :       (1.0,       0.0),
+        'km' :      (1000.0,    0.0),
+        'mm' :      (1.0e-3,    0.0),
+        'yards':    (0.9144,    0.0),
+        'ft'   :    (0,3048,    0.0),
+        'in'   :    (0.0254,    0.0)
+        },
     
+
+#### to be continued ...
+
+# conversion to internal unit: [bar]
+    'PRESSURE' : {
+        'bar' : (1.0,0.0),
+        'atm' : (1.01325,0.0),
+        'mm Hg' : (0.001333224,0.0),
+        'Pa' : (1.0e-5,0.0),
+        'kPa' : (1.0e-2,0.0),
+        'MPa' : (10.0,0.0)
+        },
+    
+# conversion to internal unit: [m3]
+    'VOLUME': {
+        'm3' : (1.0,0.0),
+        'l' : (1.0e-3,0.0),
+        'ft3' : (0.028317,0.0),
+        'U.S. gal' : (0.003785,0.0),
+        'Brit. gal' : (0.004546,0.0),
+        'barrel (U.S. pet.)' : (0.15898,0.0)
+        },
+
+# conversion to internal unit: [m3/h]
+    'VOLUMEFLOW' : {
+        'm3/h' : (1.0,0.0),
+        'm3/s' : (3600.0,0.0)
+        },
+
+# conversion to internal unit: [kg]
+    'MASS': {
+        'kg' : (1.0,0.0),
+        'lb' : (0.45359,0.0),
+        't' : (1000.0,0.0)
+        },
+
+# conversion to internal unit: [kg/h]
+    'MASSFLOW': {
+        'kg/h' : (1.0,0.0),
+        'kg/s' : (3600.0,0.0),
+        'lb/h' : (0.45359,0.0),
+        'lb/s' : (1632.924,0.0)
+        },
+
+# conversion to internal unit: [kWh]
+    'ENERGY': {
+        'kWh' : (1.0,0.0),
+        'kJ': (1.0/3600,0.0),
+        'MJ': (1.0/3.6,0.0),
+        'GJ': (1.0e6/3600,0.0),
+        'kcal': (1.163/1000,0.0),
+        'btu': (0.0002930711,0.0)
+        },
+
+# conversion to internal unit: [kW]
+    'POWER' : {
+        'kW' : (1.0,0.0),
+        'MW' : (1.0e3,0.0),
+        'GW' : (1.0e6,0.0),
+        'W' : (1.0e-3,0.0),
+        'kcal/h' : (1.163e-3,0.0),
+        'btu/h' : (0.0002930711,0.0)
+        },
+
+# conversion to internal unit: [kWh/kg]
+    'SPECIFICENTHALPY' : {
+        'kWh/kg' : (1.0,0.0),
+        'kJ/kg' : (3600.0e-1,0.0),
+        'kcal/kg' : (1.163e-3,0.0),
+        'btu/lb' : (0.0002930711/0.45359,0.0)
+        },
+
+# conversion to internal unit: [kWh/kgK]
+    'SPECIFICHEAT' : {
+        'kWh/kgK' : (1.0,0.0),
+        'kJ/kgK' : (3600.0e-1,0.0),
+        'kcal/kgK' : (1.163e-3,0.0),
+        'btu/lbºF' : (((0.0002930711*9)/(0.45359*5)),0.0)
+        },
+
+# conversion to internal unit: [kW/K]
+    'HEATTRANSFERCOEF' : {
+        'kW/K' : (1.0,0.0),
+        'W/K' : (1.0e-3,0.0),
+        'btu/hºF' : ((0.0002930711*9)/5,0.0)
+        },
+
+# conversion to internal unit: [¤/kWh]
+    'ENERGYTARIFF': {
+        '%s/kWh'%CURRENCY : (1.0,0.0),
+        '%s/kJ'%CURRENCY: (3600.0,0),
+        '%s/MJ'%CURRENCY: (3.6,0.0),
+        '%s/GJ'%CURRENCY: (3.6e-3,0.0),
+        '%s/btu'%CURRENCY: (1.0/0.0002930711,0.0)
+        },
+
+# conversion to internal unit: [¤]
+    'PRICE': {
+        '%s'%CURRENCY : (1.0,0.0),
+        'k%s'%CURRENCY: (1000.0,0.0),
+        'M%s'%CURRENCY: (1.e+6,0.0),
+        }
     }
 
 
-#### to be continued ...
+
+UNITSYSTEM = {
+    'SI' :      {
+                'TEMPERATURE':'ºC',
+                'TEMPERATUREDIFF':'K',
+                'TIME':'s',
+                'LENGTH': 'm',
+                'PRESSURE':'bar',
+                'VOLUME':'m3',
+                'VOLUMEFLOW':'m3/s',
+                'MASS':'kg',
+                'MASSFLOW':'kg/s',
+                'ENERGY':'kJ',
+                'POWER':'kW',
+                'SPECIFICENTHALPY':'kJ/kg',
+                'SPECIFICHEAT':'kJ/kgK',
+                'HEATTRANSFERCOEF':'kW/K',
+                'ENERGYTARIFF':'%s/kJ'%CURRENCY,
+                'PRICE':'%s'%CURRENCY
+                },
     
-###all converted to [bar]
-##PRESSURE = {'bar' : 'v',
-##            'atm' : 'v*1.01325',
-##            'mm Hg' : 'v*0.001333224',
-##            'kPa' : 'v/100',
-##            'MPa' : 'v*10'}
-##
-###all converted to [m3]
-##VOLUME = {'m3' : 'v',
-##          'l' : 'v/1000',
-##          'ft3' : 'v*0.028317',
-##          'U.S. gal' : 'v*0.003785',
-##          'Brit. gal' : 'v*0.004546',
-##          'barrel (U.S. pet.)' : 'v*0.15898'}
-##
-###all converted to [kg]
-##MASS = {'kg' : 'v',
-##        'lb' : 'v*0.45359',
-##        'ton' : 'v*1000'}
-##
-##
-###all converted to [kg/h]
-##MASSFLOW = {'kg/h' : 'v',
-##            'kg/s': 'v*3600',
-##            'lb/h'  : 'v*0.45359'}
-##
-###all converted to [kWh]
-##ENERGY = {'kWh' : 'v',
-##          'kJ': 'v/3600',
-##          'MJ': 'v*1e3/3600',
-##          'GJ': 'v*1e6/3600',
-##          'kcal': 'v*1.163/1000',
-##          'btu': 'v*0.0002930711'}
-##
-###all converted to [kW]
-##POWER = {'kW' : 'v',
-##         'kcal/h': 'v*1.163/1000',
-##         'btu/h': 'v*0.0002930711'}
-##
-###all converted to [kWh/kg]
-##ENTHALPY = {'kWh/kg' : 'v',
-##            'kJ/kg': 'v/3600',
-##            'kcal/kg': 'v*1.163/1000'}
-##
-###all converted to [kWh/kgK]
-##SPECIFICHEAT = {'kWh/kgK' : 'v',
-##                'kJ/kgK': 'v/3600',
-##                'kcal/kgK': 'v*1.163/1000'}
-##
-###all converted to [kW/K]
-##HEATTRANSFERCOEF = {'kW/K' : 'v',
-##                    'W/K': 'v/1000'}
+    'SI-kWh' :  {
+                'TEMPERATURE':'ºC',
+                'TEMPERATUREDIFF':'K',
+                'TIME':'h',
+                'LENGTH': 'm',
+                'PRESSURE':'bar',
+                'VOLUME':'m3',
+                'VOLUMEFLOW':'m3/h',
+                'MASS':'kg',
+                'MASSFLOW':'kg/h',
+                'ENERGY':'kWh',
+                'POWER':'kW',
+                'SPECIFICENTHALPY':'kWh/kg',
+                'SPECIFICHEAT':'kWh/kgK',
+                'HEATTRANSFERCOEF':'kW/K',
+                'ENERGYTARIFF':'%s/kWh'%CURRENCY,
+                'PRICE':'%s'%CURRENCY
+                },
 
-
-UNITSYSTEM = {'SI' : {'TEMPERATURE':'ºC',
-                 'TEMPERATUREDIFF':'K',
-                 'LENGTH': 'm',
-                 'PRESSURE':'bar',
-                 'VOLUME':'m3',
-                 'MASS':'kg',
-                 'MASSFLOW':'kg/s',
-                 'ENERGY':'kJ',
-                 'POWER':'kW'},
-                 'SPECIFICENTHALPY':'kWh/kg',
-                 'SPECIFICHEAT':'kWh/kgK',
-                 'HEATTRANSFERCOEF':'kW/K',
-                 'FUELPRICELCV':'¤/kJ (LCV)',
-                 'PRICE':'¤'},
-         'SI-kWh' : {'TEMPERATURE':'ºC',
-                 'TEMPERATUREDIFF':'K',
-                 'LENGTH': 'm',
-                 'PRESSURE':'bar',
-                 'VOLUME':'m3',
-                 'MASS':'kg',
-                 'MASSFLOW':'kg/h',
-                 'ENERGY':'kWh',
-                 'POWER':'kW'},
-                 'SPECIFICENTHALPY':'kWh/kg',
-                 'SPECIFICHEAT':'kWh/kgK',
-                 'HEATTRANSFERCOEF':'kW/K',
-                 'FUELPRICELCV':'¤/kWh (LCV)',
-                 'PRICE':'¤'},
-          'BTU' :{'TEMPERATURE':'ºF',
-                 'TEMPERATUREDIFF':'ºF',
-                 'LENGTH': 'ft',
-                 'PRESSURE':'lbs/ft2',
-                 'VOLUME':'US gal',
-                 'MASS':'lb',
-                 'MASSFLOW':'lb/h',
-                 'ENERGY':'btu',
-                 'POWER': 'btu/h',
-                 'SPECIFICENTHALPY':'btu/lb???',
-                 'SPECIFICHEAT':'btu/lbºF???',
-                 'HEATTRANSFERCOEF':'btu/hºF'},
-                 'FUELPRICELCV':'US-$/btu (LCV)',
-                 'PRICE':'US-$'}
-         }
+    'BTU' :     {
+                'TEMPERATURE':'ºF',
+                'TEMPERATUREDIFF':'ºF',
+                'TIME':'h',
+                'LENGTH': 'ft',
+                'PRESSURE':'lb/ft2',
+                'VOLUME':'US gal',
+                'VOLUMEFLOW':'US gal/h',
+                'MASS':'lb',
+                'MASSFLOW':'lb/h',
+                'ENERGY':'btu',
+                'POWER':'btu/h',
+                'SPECIFICENTHALPY':'btu/lb',
+                'SPECIFICHEAT':'btu/lbºF',
+                'HEATTRANSFERCOEF':'btu/hºF',
+                'ENERGYTARIFF':'%s/btu'%CURRENCY,
+                'PRICE':'%s'%CURRENCY
+                }
+}
 
 #==================================================================================
 #   Conversion functions
 #==================================================================================
 #------------------------------------------------------------------------------
-def value(displayValue,unit,unitType):
+def internalValue(displayValue,unit,unitType):
 #------------------------------------------------------------------------------
 #   calculates the internal value from the value entered on GUI
 #------------------------------------------------------------------------------
     (a,b) = UNITS[unitType][unit]
     
-    value = a*value + b
-    return value
+    internalValue = a*displayValue + b
+    return internalValue
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-def displayValue(value,unit,unitType):
+def displayValue(internalValue,unit,unitType):
 #------------------------------------------------------------------------------
 #   calculates the value to be displayed from the internally stored value
 #------------------------------------------------------------------------------
     (a,b) = UNITS[unitType][unit]
     
-    displayValue = (value - b)/a
+    displayValue = (internalValue - b)/a
     return displayValue
     
 #------------------------------------------------------------------------------

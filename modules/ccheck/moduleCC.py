@@ -15,12 +15,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by:         Claudia Vannoni     20/04/2008
-#                           Claudia Vannoni     2/05/2008
+#                           Claudia Vannoni     02/05/2008
+#                           Hans Schweiger      13/06/2008
 #
 #       Changes to previous version:
 #	v0.02 CV Add CCPipe, Add Matrix and links between matrix
+#       13/06/2008 HS   Connections between sub-systems imported from SQL
+#                       Very basic version of CheckHX added. Not yet coupled
+#                       to the rest.
+#
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -41,12 +46,15 @@ from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
 from checkMatrix import *
+from checkCon import *
 from checkProc import *
 from checkEq import *
 from checkFETfuel import *
 from checkFETel import *
 from checkPipe import *
+from checkHX import *
 from checkTotals import *
+from connect import *
 
 class ModuleCC(object):
     
@@ -72,6 +80,9 @@ class ModuleCC(object):
 
         self.ccPipe = []
         self.NPipeDuct = 0
+
+        self.ccHX = []
+        self.NHx = 0
 
         self.screen_priority = 2
         
@@ -193,113 +204,220 @@ class ModuleCC(object):
 # creates an empty space for the different check-blocks
 
         self.ccFET = []
-        self.NFET = 0
         
         self.ccEq = []
-        self.NEquipe = 0
         
         self.ccProc = []
-        self.NProc = 0
 
         self.ccPipe = []
-        self.NPipeDuct = 0 
+
+        self.ccHX = []
+
+        if Status.UserInteractionLevel == "automatic":
+            #predefined testCase. to be eliminated once the general case works well
+
+            print "ModuleCC (getQuestionnaireData): running in fix test-case-mode"
 
 #..............................................................................
 # import data on fuel and electricity consumption (FET)
 
-        self.NFET = 2
-        NI = self.NFET
-        self.FETi = CCRow("FETi",NI)
+            self.NFET = 2
+            NI = self.NFET
+            self.FETi = CCRow("FETi",NI)
 
-        self.ccFET.append(CheckFETel())     
-        for i in range(1,NI):      
-            self.ccFET.append(CheckFETfuel(i))
+            self.ccFET.append(CheckFETel())     
+            for i in range(1,NI):      
+                self.ccFET.append(CheckFETfuel(i))
 
 #..............................................................................
 # import data on existing equipment 
 
-        self.NEquipe = 2
-        NJ = self.NEquipe
-        self.USHj = CCRow("USHj",NJ)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
-        self.FETj = CCRow("FETj",NJ)     #creates the space for intermediate storge towards matrix
+            self.NEquipe = 2
+            NJ = self.NEquipe
+            self.USHj = CCRow("USHj",NJ)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.FETj = CCRow("FETj",NJ)     #creates the space for intermediate storge towards matrix
 
-        for j in range(NJ):
-            self.ccEq.append(CheckEq(j))     # añade un objeto checkEq con todas las variables necesarias a la lista
+            for j in range(NJ):
+                self.ccEq.append(CheckEq(j))     # añade un objeto checkEq con todas las variables necesarias a la lista
 
 #..............................................................................
 # import data on existing processes
 
-        self.NThProc = 3
-        NK = self.NThProc
-        self.UPHProck = CCRow("UPHProck",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
-        self.QHXk = CCRow("QHXk",NK)     #creates the space for intermediate storge towards matrix
+            self.NThProc = 3
+            NK = self.NThProc
+            self.UPHProck = CCRow("UPHProck",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.QHXk = CCRow("QHXk",NK)     #creates the space for intermediate storge towards matrix
 
-        for k in range(NK):
-            self.ccProc.append(CheckProc(k))  # añade un objeto checkProc con todas las variables necesarias a la listac
+            for k in range(NK):
+                self.ccProc.append(CheckProc(k))  # añade un objeto checkProc con todas las variables necesarias a la listac
 
 
 #..............................................................................
 # import data on existing pipeducts
 
-        self.NPipeDuct = 3
-        NM = self.NPipeDuct
-        self.UPHProcm = CCRow("UPHProcm",NM)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
-        self.QHXPipe = CCRow("QHXPipe",NM)          #creates the space for intermediate storge towards matrix
-        self.USHm = CCRow("USHm",NM) 
+            self.NPipeDuct = 3
+            NM = self.NPipeDuct
+            self.UPHProcm = CCRow("UPHProcm",NM)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.QHXPipe = CCRow("QHXPipe",NM)          #creates the space for intermediate storge towards matrix
+            self.USHm = CCRow("USHm",NM) 
 
-        for m in range(NM):
-            self.ccPipe.append(CheckPipe(m))  # añade un objeto checkProc con todas las variables necesarias a la listac
-
+            for m in range(NM):
+                self.ccPipe.append(CheckPipe(m))  # añade un objeto checkProc con todas las variables necesarias a la listac
 
 #..............................................................................
 # import data on link of fuels and equipment
 
-        FETLink = arange(NI*NJ).reshape(NJ,NI)  # reshape(rows,cols)
-        
-        FETLink[0][0] = 0
-        FETLink[1][0] = 0
-        FETLink[0][1] = 1
-        FETLink[1][1] = 1
+            FETLink = arange(NI*NJ).reshape(NJ,NI)  # reshape(rows,cols)
+            
+            FETLink[0][0] = 0
+            FETLink[1][0] = 0
+            FETLink[0][1] = 1
+            FETLink[1][1] = 1
 
-        self.FETMatrix = CheckMatrix("FET Matrix",self.FETi,self.FETj,FETLink)
+            self.FETMatrix = CheckMatrix("FET Matrix",self.FETi,self.FETj,FETLink)
 
 #..............................................................................
 # import data on link of equipment and pipes
 
-        USHLink = arange(NJ*NM).reshape(NM,NJ)  # reshape(rows,cols)
+            USHLink = arange(NJ*NM).reshape(NM,NJ)  # reshape(rows,cols)
 
-        USHLink[0][0] = 1
-        USHLink[1][0] = 0
-        USHLink[2][0] = 0
-        USHLink[0][1] = 1
-        USHLink[1][1] = 1
-        USHLink[2][1] = 1
+            USHLink[0][0] = 1
+            USHLink[1][0] = 0
+            USHLink[2][0] = 0
+            USHLink[0][1] = 1
+            USHLink[1][1] = 1
+            USHLink[2][1] = 1
 
-        self.USHMatrix = CheckMatrix("USH Matrix",self.USHj,self.USHm,USHLink)   
+            self.USHMatrix = CheckMatrix("USH Matrix",self.USHj,self.USHm,USHLink)   
 
 
 #..............................................................................
 # import data on link of  pipes and processes
 
-        UPHLink = arange(NM*NK).reshape(NK,NM)  # reshape(rows,cols)
+            UPHLink = arange(NM*NK).reshape(NK,NM)  # reshape(rows,cols)
 
-        UPHLink[0][0] = 1
-        UPHLink[1][0] = 0
-        UPHLink[2][0] = 0
-        UPHLink[0][1] = 0
-        UPHLink[1][1] = 1
-        UPHLink[2][1] = 0
-        UPHLink[0][2] = 0
-        UPHLink[1][2] = 0
-        UPHLink[2][2] = 1
+            UPHLink[0][0] = 1
+            UPHLink[1][0] = 0
+            UPHLink[2][0] = 0
+            UPHLink[0][1] = 0
+            UPHLink[1][1] = 1
+            UPHLink[2][1] = 0
+            UPHLink[0][2] = 0
+            UPHLink[1][2] = 0
+            UPHLink[2][2] = 1
 
-        self.UPHMatrix = CheckMatrix("UPH Matrix",self.UPHProcm,self.UPHProck,UPHLink) 
+            self.UPHMatrix = CheckMatrix("UPH Matrix",self.UPHProcm,self.UPHProck,UPHLink) 
 
 #..............................................................................
 # import data on existing totals
 
-        self.UPHk = CCRow("UPHk",NK) 
-        self.totals = CheckTotals("Totals",self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
+            self.UPHk = CCRow("UPHk",NK) 
+            self.totals = CheckTotals("Totals",self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
+
+        else:
+            # general case: uses the information from the SQL
+            # eliminate "else" and raise one level once this is the only option
+
+            print "ModuleCC (getQuestionnaireData): running in new general mode (import connections from SQL)"
+
+#..............................................................................
+# import data on link of fuels and equipment
+
+            getConnections()
+
+#..............................................................................
+# import data on fuel and electricity consumption (FET)
+
+            self.NFET = Status.NFET
+            NI = self.NFET
+            self.FETi = CCRow("FETi",NI)
+
+            self.ccFET.append(CheckFETel())     
+            for i in range(1,NI):      
+                self.ccFET.append(CheckFETfuel(i))
+
+#..............................................................................
+# import data on existing equipment 
+
+            self.NEquipe = Status.NEquipe
+            NJ = self.NEquipe
+            self.USHj = CCRow("USHj",NJ)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.FETj = CCRow("FETj",NJ)     #creates the space for intermediate storge towards matrix
+            self.QHXEq = CCRow("QHXEq",NJ)      # incoming waste heat from heat recovery
+            self.QWHEq = CCRow("QWHEq",NJ)    # outgoing waste heat to be recovered
+
+            for j in range(NJ):
+                self.ccEq.append(CheckEq(j))     # añade un objeto checkEq con todas las variables necesarias a la lista
+
+#..............................................................................
+# import data on existing processes
+
+            self.NThProc = Status.NThProc
+            NK = self.NThProc
+            self.UPHProck = CCRow("UPHProck",NK)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.QHXk = CCRow("QHXk",NK)        #CHECK!!!!!!!!!!!!!!: Probably to be eliminated -> substitute by QHX or QWH
+            self.QHXProc = CCRow("QHXProc",NK)      # incoming waste heat from heat recovery
+            self.QWHProc = CCRow("QWHProc",NK)    # outgoing waste heat to be recovered
+
+            for k in range(NK):
+                self.ccProc.append(CheckProc(k))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
+
+#..............................................................................
+# import data on existing pipeducts
+
+            self.NPipeDuct = Status.NPipeDuct
+            NM = self.NPipeDuct
+            self.UPHProcm = CCRow("UPHProcm",NM)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
+            self.USHm = CCRow("USHm",NM) 
+            self.QHXPipe = CCRow("QHXPipe",NM)        # incoming waste heat from heat recovery
+            self.QWHPipe = CCRow("QWHPipe",NM)        # outgoing waste heat to be recovered
+
+            for m in range(NM):
+                self.ccPipe.append(CheckPipe(m))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
+#..............................................................................
+# import data on existing heat exchangers
+
+            self.NHX = Status.NHX
+            NH = self.NHX
+            self.QWH = CCRow("QWH",NH)     
+            self.QHX = CCRow("QHX",NH)          
+
+            for h in range(NH):
+                self.ccHX.append(CheckHX(h))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
+#..............................................................................
+# import data on link of fuels and equipment
+
+            self.FETMatrix = CheckMatrix("FET Matrix",self.FETi,self.FETj,Status.FETLink)
+
+#..............................................................................
+# import data on link of equipment and pipes
+
+            self.USHMatrix = CheckMatrix("USH Matrix",self.USHj,self.USHm,Status.USHLink)   
+
+#..............................................................................
+# import data on link of  pipes and processes
+
+            self.UPHMatrix = CheckMatrix("UPH Matrix",self.UPHProcm,self.UPHProck,Status.UPHLink) 
+
+#..............................................................................
+# import data on link of heat exchangers inlet / outlet with equipments, pipes and processes
+
+            self.QWHEqCon = CheckCon("QWHEq Con",self.QWH,self.QWHEq,Status.QWHEqLink)
+            self.QWHPipeCon = CheckCon("QWHPipe Con",self.QWH,self.QWHPipe,Status.QWHPipeLink)
+            self.QWHProcCon = CheckCon("QWHProc Con",self.QWH,self.QWHProc,Status.QWHProcLink)
+
+            self.QHXEqCon = CheckCon("QWHEq Con",self.QHX,self.QHXEq,Status.QHXEqLink)
+            self.QHXPipeCon = CheckCon("QWHPipe Con",self.QHX,self.QHXPipe,Status.QHXPipeLink)
+            self.QHXProcCon = CheckCon("QWHProc Con",self.QHX,self.QHXProc,Status.QHXProcLink)
+
+#..............................................................................
+# import data on existing totals
+
+            self.UPHk = CCRow("UPHk",NK) 
+            self.totals = CheckTotals("Totals",self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
 
 
 #------------------------------------------------------------------------------
@@ -379,6 +497,9 @@ class ModuleCC(object):
 
                 self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
+# here data should be passed to the correspoinding inputs in CheckEq
+#               self.QHXEq[j].update(self.ccEq[j].QHXEq)
+#               self.QWHEq[j].update(self.ccEq[j].QWHEq)
 
 #..............................................................................
 # check of pipes
@@ -411,7 +532,9 @@ class ModuleCC(object):
 
                     self.USHm[m].update(self.ccPipe[m].USHm)      #obtain results 
                     self.UPHProcm[m].update(self.ccPipe[m].UPHProcm)
-        
+# here data should be passed to the correspoinding inputs in CheckPipe
+#                   self.QHXPipe[m].update(self.ccPipe[m].QHXPipe)
+#                   self.QWHPipe[m].update(self.ccPipe[m].QWHPipe)
 
 #..............................................................................
 # check of thermal processes
@@ -431,6 +554,29 @@ class ModuleCC(object):
 
                 self.UPHProck[k].update(self.ccProc[k].UPHProc)      #obtain results 
                 self.UPHk[k].update(self.ccProc[k].UPH)      #obtain results 
+
+# here data should be passed to the correspoinding inputs in CheckProc
+#               self.QHXProc[k].update(self.ccProc[k].QHXProc)
+#               self.QWHProc[k].update(self.ccProc[k].QWHProc)
+
+#..............................................................................
+# check of heat exchangers
+
+            if DEBUG in ["ALL","MAIN","BASIC"]:
+                print "===================================================="
+                print "ModuleCC: checking heat exchangers (QHX)"
+                print "===================================================="
+
+            NH = self.NHX
+
+            for h in range(self.NHX):
+                print "checking process no. %s"%h
+                conflict.setDataGroup("HX",h+1)
+
+                self.ccHX[h].check()             # ejecuta la función check para proceso k
+
+                self.QHX[h].update(self.ccHX[h].QHX)      #obtain results 
+                self.QWH[h].update(self.ccHX[h].QHX)      #obtain results 
 
 #..............................................................................
 # check of totals
@@ -492,7 +638,7 @@ class ModuleCC(object):
                 for j in range(NJ):
                     self.ccEq[j].USHj.update(self.USHj[j])
 
-                for m in range(1,NM):
+                for m in range(NM):
                     self.ccPipe[m].USHm.update(self.USHm[m])
 
 #..............................................................................
@@ -515,8 +661,61 @@ class ModuleCC(object):
                 for m in range(NM):
                     self.ccPipe[m].UPHProcm.update(self.UPHProcm[m])
 
-                for k in range(1,NK):
+                for k in range(NK):
                     self.ccProc[k].UPHProc.update(self.UPHProck[k])
+
+#..............................................................................
+# If any matrix conflict appears, break immediately.
+
+                if conflict.nConflicts > 0: break
+        
+#..............................................................................
+# link of heat exchanger with the rest
+
+                if DEBUG in ["ALL","MAIN","BASIC"]:
+                    print "===================================================="
+                    print "ModuleCC: checking Heat exchanger connections"
+                    print "===================================================="
+
+                conflict.setDataGroup("QHWEq Con","-")
+                self.QWHEqCon.check()
+
+                conflict.setDataGroup("QHWPipe Con","-")
+                self.QWHPipeCon.check()
+
+                conflict.setDataGroup("QHWProc Con","-")
+                self.QWHProcCon.check()
+
+                conflict.setDataGroup("QHXEq Con","-")
+                self.QHXEqCon.check()
+
+                conflict.setDataGroup("QHXPipe Con","-")
+                self.QHXPipeCon.check()
+
+                conflict.setDataGroup("QHXProc Con","-")
+                self.QHXProcCon.check()
+
+                for j in range(NJ):
+                    pass
+# here data should be passed to the correspoinding inputs in CheckEq
+#                    self.ccEq[j].QHXEq.update(self.QHXEq[j])
+#                    self.ccEq[j].QWHEq.update(self.QWHEq[j])
+
+                for m in range(NM):
+                    pass
+# here data should be passed to the correspoinding inputs in CheckPipe
+#                    self.ccPipe[m].QHXPipe.update(self.QHXPipe[m])
+#                    self.ccPipe[m].QWHPipe.update(self.QWHPipe[m])
+
+                for k in range(NK):
+                    pass
+# here data should be passed to the correspoinding inputs in CheckEq
+#                    self.ccProc[k].QHXProc.update(self.QHXProc[k])
+#                    self.ccProc[k].QWHProc.update(self.QWHProc[k])
+
+                for h in range(1,NH):
+                    self.ccHX[h].QWH.update(self.QWH[h])
+                    self.ccHX[h].QHX.update(self.QHX[h])
 
 #..............................................................................
 # If any matrix conflict appears, break immediately.
@@ -528,21 +727,25 @@ class ModuleCC(object):
 
         screen.reset()
 
-        for i in range(0,NI):       #then check all the Nfuels = NI-1 fuels
+        for i in range(NI):       #then check all the Nfuels = NI-1 fuels
             screen.setDataGroup("Fuel",i)
             self.ccFET[i].screen()
-        for j in range(0,NJ):       
+        for j in range(NJ):       
             screen.setDataGroup("Eq.",j+1)
             self.ccEq[j].screen()
-        for k in range(0,NK):       
+        for k in range(NK):       
             screen.setDataGroup("Proc.",k+1)
             self.ccProc[k].screen()
 
         if VERSION != "M2_DEMO":
-            for m in range(0,NM):      
+            for m in range(NM):      
                 screen.setDataGroup("Pipe",m+1)
                 self.ccPipe[m].screen()
 
+        for h in range(NH):       
+            screen.setDataGroup("HX",h+1)
+            self.ccHX[h].screen()
+        
         screen.setDataGroup("Totals",0)
         self.totals.screen()
             
@@ -553,18 +756,20 @@ class ModuleCC(object):
 #..............................................................................
 # And finally export all the data
 
-        for i in range(0,NI):       #then check all the Nfuels = NI-1 fuels
+        for i in range(NI):       #then check all the Nfuels = NI-1 fuels
             self.ccFET[i].exportData()
-        for j in range(0,NJ):       
+        for j in range(NJ):       
             self.ccEq[j].exportData()
-        for k in range(0,NK):       
-            screen.setDataGroup("Proc.",k+1)
+        for k in range(NK):       
             self.ccProc[k].exportData()
 
         if VERSION != "M2_DEMO":
             for m in range(0,NM):      
-                screen.setDataGroup("Pipe",m+1)
                 self.ccPipe[m].exportData()
+
+        for h in range(NH):       
+            self.ccHX[h].exportData()
+
         self.totals.exportData()
 
         return conflict.nConflicts
