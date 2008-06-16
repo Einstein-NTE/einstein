@@ -12,12 +12,13 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota 06/06/2008
 #
 #       Changes to previous version:
 #       TS20080530          Added several classes for data display and edition
 #       06/06/2008: TS      Some changes for Stoyan's panel changes
+#       14/06/2008: TS      Added multiple choices,
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -256,6 +257,34 @@ class Generics(object):
         #font.SetDefaultEncoding(en)
         other.SetFont(font)
 
+    def getChoiceValues(self, other, multiple, text):
+        if multiple:
+            # multiple values can be selected
+            if text:
+                # return the text of the selections
+                # first get the indices
+                ituple = other.GetSelections()
+                slist = []
+                # then look for the text of each index
+                for i in ituple:
+                    slist.append(other.GetString(i))
+                return tuple(slist)
+                    
+            else:
+                # we return a tuple with the indices of the selections
+                return other.GetSelections()
+        else:
+            # single values can be selected
+            if text:
+                # return a tuple with the texts of the selections
+                return other.GetStringSelection()
+            else:
+                # we return the index of the (single) selection
+                return other.GetCurrentSelection()
+
+
+
+        
 class MskFC(wx.lib.masked.numctrl.NumCtrl):
     def __init__(self, prnt,
                  id=-1,
@@ -437,8 +466,8 @@ class FloatEntry(wx.Panel):
         except:
             self.entry.SetValue(0.0)
 
-    def getUnit(self):
-        return self.units.GetCurrentSelection()
+    def GetUnit(self,text=False):
+        return self.g.getChoiceValues(self.units, False, text)
 
     def setUnit(self,n):
         # n is the 0-based index to the contents
@@ -509,8 +538,8 @@ class IntEntry(wx.Panel):
         except:
             self.entry.SetValue(0)
 
-    def getUnit(self):
-        return self.units.GetCurrentSelection()
+    def GetUnit(self,text=False):
+        return self.g.getChoiceValues(self.units, False, text)
 
     def setUnit(self,n):
         self.units.SetSelection(n)
@@ -654,6 +683,7 @@ class DateEntry(wx.Panel):
 
 class ChoiceEntry(wx.Panel):
     def __init__(self, parent=None,
+                 multiple=False,  # admits choosing multiple elements?
                  values=[],       # initial values list
                  wLabel=None,     # width of the label
                  wData=None,      # width of the data entry
@@ -664,6 +694,7 @@ class ChoiceEntry(wx.Panel):
                  font=None):      # full wx.Font specification
 
         self.hasunits = False
+        self.multiple = multiple
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
 
@@ -678,9 +709,15 @@ class ChoiceEntry(wx.Panel):
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
             self.g.setFont(self.label,size=fontsize,font=font)
 
-        # create a choice control
-        self.entry = wx.Choice(self, -1, pos=(lblSize[0]+1,0),
-                                 choices=values, size=datSize)
+        if multiple:
+            # if multiple choice, create a listbox
+            self.entry = wx.ListBox(self, -1, pos=(lblSize[0]+1,0),
+                                    choices=values, size=datSize,
+                                    style=wx.LB_MULTIPLE|wx.LB_ALWAYS_SB)
+        else:
+            #create a choice control
+            self.entry = wx.Choice(self, -1, pos=(lblSize[0]+1,0),
+                                   choices=values, size=datSize)
         backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
         self.entry.SetBackgroundColour(backgroundcolour)
         self.g.setFont(self.entry,size=fontsize,font=font)
@@ -693,8 +730,8 @@ class ChoiceEntry(wx.Panel):
         # this method is just for compatibility
         pass
 
-    def GetValue(self):
-        return self.entry.GetCurrentSelection()
+    def GetValue(self,text=False):
+        return self.g.getChoiceValues(self.entry, self.multiple, text)
 
     def SetValue(self, thing=0):
         # this method has triple functionality:
@@ -794,4 +831,36 @@ class Label(wx.lib.stattext.GenStaticText):
             if len(tiplist.strip()) > 0:
                 self.SetToolTipString(tiplist)
                 txtlist.SetToolTipString(tiplist)
+
+
+
+if __name__ == '__main__':
+    global ce
+    def OnButtonOK(event):
+        global ce
+        print repr(ce.GetValue(text=True))
+
+    app = wx.PySimpleApp()
+    frame = wx.Frame(parent=None, id=-1, size=wx.Size(500, 80), title="Einstein - displayClasses test")
+
+    ce = ChoiceEntry(parent=frame,
+                     multiple=False,
+                     values=['one','two','three'],
+                     wLabel=200,
+                     wData=200,
+                     label='This is the label',
+                     tip='This is a tip')
+
+    buttonOK = wx.Button(frame,wx.ID_OK, 'OK')
+    frame.Bind(wx.EVT_BUTTON, OnButtonOK, buttonOK)
+
+    sizer_1 = wx.BoxSizer(wx.VERTICAL)
+    sizer_1.Add(ce, 1, wx.ALL|wx.EXPAND, 5)
+    sizer_1.Add(buttonOK, 0, 0, 1)
+    frame.SetSizer(sizer_1)
+    frame.Layout()
+
+    frame.Show(True)
+    app.MainLoop()
+
 
