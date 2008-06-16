@@ -78,6 +78,24 @@ EQUIPTYPE = ["compression heat pump",
              "CHP gas turbine",
              "CHP fuel cell"]
 
+#translatable dictionary
+TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
+             "thermal heat pump":_("thermal heat pump"),
+             "steam boiler":_("steam boiler"),
+             "condensing boiler":_("condensing boiler"),
+             "burner (direct heating)":_("burner (direct heating)"),
+             "burner (indirect heating)":_("burner (indirect heating)"),
+             "compression chiller":_("compression chiller"),
+             "thermal chiller":_("thermal chiller"),
+             "solar thermal (single-glazed selective)":_("solar thermal (single-glazed selective)"),
+             "solar thermal (double-glazed selective)":_("solar thermal (double-glazed selective)"),
+             "solar thermal (vacuum pump)":_("solar thermal (vacuum pump)"),
+             "CHP engine":_("CHP engine"),
+             "CHP steam turbine":_("CHP steam turbine"),
+             "CHP gas turbine":_("CHP gas turbine"),
+             "CHP fuel cell":_("CHP fuel cell")}
+
+
 PROCESSTYPE = ["condensing",
                "steam",
                "direct heating",
@@ -160,6 +178,17 @@ WHEEWASTEHEATTYPES = {"CoolingWater":_("cooling water"),
                       "Intercooler":_("intercooler"),
                       "CoolingAir":_("cooling air")}
 
+AMBIENTSOURCE = ["ambient air",
+               "ground heat exchanger"]
+#translatable dictionary
+TRANSAMBIENTSOURCE = {"ambient air":_("ambient air"),
+                    "ground heat exchanger":_("ground heat exchanger")}
+
+AMBIENTSINK = ["cooling tower",
+               "ground heat exchanger"]
+#translatable dictionary
+TRANSAMBIENTSINK = {"cooling tower":_("cooling tower"),
+                    "ground heat exchanger":_("ground heat exchanger")}
 
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries

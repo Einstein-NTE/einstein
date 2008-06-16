@@ -977,6 +977,7 @@ class Project(object):
             "ProcNo": NThProc+1
             }          
         newID = Status.DB.qprocessdata.insert(tmp)
+        newProcess = Status.DB.qprocessdata.QProcessData_ID[newID][0]
 
         NThProc += 1
 
@@ -985,7 +986,7 @@ class Project(object):
 
         Status.SQL.commit()
 
-        return newID
+        return newProcess
 
 #------------------------------------------------------------------------------
     def deleteProcess(self,processID):
@@ -1073,6 +1074,45 @@ class Project(object):
 
         Status.SQL.commit()
 
+#------------------------------------------------------------------------------
+    def getPipes(self):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
+        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
+        
+        return pipes
+#------------------------------------------------------------------------------
+    def getPipeList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        pipes = self.getPipes()
+        
+        pipeList = []
+        for pipe in pipes:
+            pipeList.append(pipe[key])
+
+        return pipeList
+    
+#------------------------------------------------------------------------------
+    def getPipeDict(self):
+#------------------------------------------------------------------------------
+#   returns a list of fuels in DB
+#------------------------------------------------------------------------------
+
+        pipes = self.getPipes()     
+        pipeDict = {}
+        for pipe in pipes:
+            pipeName = pipes["Pipeduct"]
+            pipeID = pipes["QDistributionHC_ID"]
+            pipeDict.update({pipeID:pipeName})
+
+        return pipeDict
+
 #==============================================================================
 #------------------------------------------------------------------------------
     def addBuildingDummy(self):
@@ -1156,7 +1196,7 @@ class Project(object):
             "HXNo": NHX+1
             }          
         newID = Status.DB.qheatexchanger.insert(tmp)
-        newhx = Status.DB.qheatexchanger.QHeatExchanger_ID[newID]
+        newhx = Status.DB.qheatexchanger.QHeatExchanger_ID[newID][0]
 
         NHX += 1
 
@@ -1240,7 +1280,7 @@ class Project(object):
             "WHEENo": NWHEE+1
             }          
         newID = Status.DB.qwasteheatelequip.insert(tmp)
-        newwhee = Status.DB.qwasteheatelequip.QWasteHeatElEquip_ID[newID]
+        newwhee = Status.DB.qwasteheatelequip.QWasteHeatElEquip_ID[newID][0]
 
         NWHEE += 1
 
@@ -1419,30 +1459,6 @@ class Project(object):
 
         return processList
 
-#------------------------------------------------------------------------------
-    def getPipes(self):
-#------------------------------------------------------------------------------
-#   returns a list of existing heat exchangers
-#------------------------------------------------------------------------------
-
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
-        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
-        
-        return pipes
-#------------------------------------------------------------------------------
-    def getPipeList(self,key):
-#------------------------------------------------------------------------------
-#   returns a list of existing heat exchangers
-#------------------------------------------------------------------------------
-
-        pipes = self.getPipes()
-        
-        pipeList = []
-        for pipe in pipes:
-            pipeList.append(pipe[key])
-
-        return pipeList
-    
 #------------------------------------------------------------------------------
     def getFluidDict(self):
 #------------------------------------------------------------------------------
