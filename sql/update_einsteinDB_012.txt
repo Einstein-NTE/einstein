@@ -1,0 +1,95 @@
+--update einstein database: add periods various start/stop (date), change of some parameters type, 16/06/2008, SD
+USE einstein;
+
+--add three periods NoProdStart/Stop (questionnaire table)
+ALTER TABLE questionnaire CHANGE COLUMN NoProdStart NoProdStart_1 DATE COMMENT 'date entry';
+ALTER TABLE questionnaire ADD COLUMN NoProdStart_2 DATE COMMENT 'date entry' AFTER NoProdStart_1;
+ALTER TABLE questionnaire ADD COLUMN NoProdStart_3 DATE COMMENT 'date entry' AFTER NoProdStart_2;
+
+ALTER TABLE questionnaire CHANGE COLUMN NoProdStop NoProdStop_1 DATE COMMENT 'date entry';
+ALTER TABLE questionnaire ADD COLUMN NoProdStop_2 DATE COMMENT 'date entry' AFTER NoProdStop_1;
+ALTER TABLE questionnaire ADD COLUMN NoProdStop_3 DATE COMMENT 'date entry' AFTER NoProdStop_2;
+
+
+-- ===========================================================================================
+
+--change type (qrenewables table) 
+ALTER TABLE qrenewables MODIFY COLUMN PeriodBiomassProcStart DATE COMMENT 'date entry';
+ALTER TABLE qrenewables MODIFY COLUMN PeriodBiomassProcStop DATE COMMENT 'date entry';
+
+--change type (qrenewables table) EnclBuildGroundSketch from TINYINT to VARCHAR(45)
+ALTER TABLE qrenewables MODIFY COLUMN EnclBuildGroundSketch VARCHAR(45) COMMENT 'from predefined list yes/no';
+
+
+-- ===========================================================================================
+
+--add three periods (qbuildings table), change to DATE
+ALTER TABLE qbuildings CHANGE COLUMN BuildHolidaysPeriodStart BuildHolidaysPeriodStart_1 DATE COMMENT 'date entry';
+ALTER TABLE qbuildings ADD COLUMN BuildHolidaysPeriodStart_2 DATE COMMENT 'date entry' AFTER BuildHolidaysPeriodStart_1;
+ALTER TABLE qbuildings ADD COLUMN BuildHolidaysPeriodStart_3 DATE COMMENT 'date entry' AFTER BuildHolidaysPeriodStart_2;
+
+ALTER TABLE qbuildings CHANGE COLUMN BuildHolidaysPeriodStop BuildHolidaysPeriodStop_1 DATE COMMENT 'date entry';
+ALTER TABLE qbuildings ADD COLUMN BuildHolidaysPeriodStop_2 DATE COMMENT 'date entry' AFTER BuildHolidaysPeriodStop_1;
+ALTER TABLE qbuildings ADD COLUMN BuildHolidaysPeriodStop_3 DATE COMMENT 'date entry' AFTER BuildHolidaysPeriodStop_2;
+
+
+--change type (qbuildings)
+
+ALTER TABLE qbuildings MODIFY COLUMN BuildHeatingPeriodStart DATE COMMENT 'date entry';
+ALTER TABLE qbuildings MODIFY COLUMN BuildHeatingPeriodStop DATE COMMENT 'date entry';
+
+--
+ALTER TABLE qbuildings MODIFY COLUMN BuildAirCondPeriodStart DATE COMMENT 'date entry';
+ALTER TABLE qbuildings MODIFY COLUMN BuildAirCondPeriodStop DATE COMMENT 'date entry';
+
+
+--change type (qbuildings table) EnclBuildDraw from TINYINT to VARCHAR(45)
+ALTER TABLE qbuildings MODIFY COLUMN EnclBuildDraw VARCHAR(45) COMMENT 'from predefined list yes/no';
+
+
+-- ==========================================================================================
+
+
+--change type (qgenerationhc) from DOUBLE to VARCHAR(45)
+ALTER TABLE qgenerationhc MODIFY COLUMN Refrigerant INTEGER COMMENT 'Refrigerant ID from DB';
+ALTER TABLE qgenerationhc ADD COLUMN THeatSourceLT DOUBLE COMMENT 'temperature of low temperature heat source' AFTER HeatSourceLT;
+
+
+-- ==========================================================================================
+
+
+--change type (qprocessdata) from DOUBLE to VARCHAR(45)
+ALTER TABLE qprocessdata MODIFY COLUMN ProcMedOut INTEGER COMMENT 'Fluid ID from DB';
+
+
+--change type (qprocessdata) from TINYINT to VARCHAR(45)
+ALTER TABLE qprocessdata MODIFY COLUMN HeatRecOK VARCHAR(4) COMMENT 'from predefined list yes/no';
+ALTER TABLE qprocessdata MODIFY COLUMN HeatRecExist VARCHAR(4) COMMENT 'from predefined list yes/no';
+
+-- ===========================================================================================
+
+-- add new columns (dbnacecode) ProductCode and ProductDescription
+ALTER TABLE dbnacecode ADD COLUMN ProductCode VARCHAR(45) COMMENT 'Product code' AFTER ProductName;
+ALTER TABLE dbnacecode ADD COLUMN ProductDescription VARCHAR(200) COMMENT 'Product description' AFTER ProductCode;
+
+-- ===========================================================================================
+
+-- add new column (qdistributionhc)
+ALTER TABLE qdistributionhc ADD COLUMN VUnitStorage DOUBLE COMMENT 'Volume of a single storage unit' AFTER NumStorageUnits;
+
+
+--
+-- New Table ListProductCode
+--
+
+DROP TABLE IF EXISTS lproductcode;
+CREATE TABLE lproductcode (
+  LProductCode_ID INTEGER unsigned NOT NULL auto_increment,
+  ProductCode VARCHAR(45) COMMENT 'Product code',
+  ProductDescription VARCHAR(200) COMMENT 'Product description',
+  PRIMARY KEY  (LProductCode_ID)
+) TYPE=MyISAM;
+
+
+
+

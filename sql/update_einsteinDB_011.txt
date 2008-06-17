@@ -1,0 +1,11 @@
+--update einstein database: add BB parameters to UHEATPUMP
+USE einstein;
+
+ALTER TABLE uheatpump ADD COLUMN BBEff DOUBLE COMMENT 'minimum boiler efficiency' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBPmin DOUBLE COMMENT 'minimum boiler power' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBHOp DOUBLE COMMENT 'minimum hours of operation' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBFuelType VARCHAR(45) COMMENT 'fuel type' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBRedundancy TINYINT UNSIGNED COMMENT 'is redundancy required' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBSafety DOUBLE COMMENT 'safety factor' AFTER UHPminT;
+ALTER TABLE uheatpump ADD COLUMN BBMaintain TINYINT UNSIGNED COMMENT 'maintain existing equipment' AFTER UHPminT;
+
