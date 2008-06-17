@@ -7,22 +7,27 @@
 #
 #------------------------------------------------------------------------------
 #
-#	INDUSTRY
+#	PROJECT
 #			
 #------------------------------------------------------------------------------
 #			
 #	Definition of objects defining and handling a project (industry)
+#       - projects (create, delete, ...)
+#       - alternatives (create, delete, ...)
+#       - access to SQL data tables (fuels, equipments, pipes, processes, ...)
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.10
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
 #                       Hans Schweiger      18/04/2008
 #                       Hans Schweiger      23/04/2008
 #                       Hans Schweiger      10/06/2008
-#                       Stoyan Danov      11/06/2008
+#                       Stoyan Danov        11/06/2008
+#                       Hans Schweiger      13/06/2008
+#                       Stoyan Danov        16/06/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -35,6 +40,7 @@
 #       11/06/08: SD    getFuelDict added
 #       13/06/08: HS    several functions getXY + getXYList for subsystems
 #                       creation of new entry in uheatpump added in createNewProject
+#       16/06/08: SD    addPipeDummy changed: now returning table, not ID
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1025,9 +1031,7 @@ class Project(object):
 #..............................................................................
 # deleting Q- and corresponding C-Tables
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-
-        pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
+        pipes = self.getPipes()
         NPipes = len(pipes)
         tmp = {
             "Questionnaire_id":Status.PId,
@@ -1035,6 +1039,7 @@ class Project(object):
             "PipeDuctNo": NPipes+1
             }          
         newID = Status.DB.qdistributionhc.insert(tmp)
+        newPipe = Status.DB.qdistributionhc.QDistributionHC_ID[newID][0]
 
         NPipes += 1
 
@@ -1043,7 +1048,7 @@ class Project(object):
 
         Status.SQL.commit()
 
-        return newID
+        return newPipe
 
 #------------------------------------------------------------------------------
     def deletePipe(self,pipeID):

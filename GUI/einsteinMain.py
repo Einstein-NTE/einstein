@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.90
+#   Version No.: 0.92
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -49,6 +49,8 @@
 #                       Tom Sobota                          15/05/2008
 #                       Tom Sobota                          17/05/2008
 #                       Hans Schweiger                      10/06/2008
+#                       Hans Schweiger                      12/06/2008
+#                       Stoyan Danov                        16/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -112,6 +114,8 @@
 #                   of xml files.
 #       28/05/2008  HS assignment of tree-permissions
 #       10/06/2008  HS panelHR included
+#       12/06/2008  HS function display in PanelQ3 and PanelQ4 called
+#       16/06/2008  SD function display in PanelQ5
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -658,30 +662,19 @@ class EinsteinFrame(wx.Frame):
         elif select == _("Processes data"): #Processes data
             self.hidePages()
             self.Page3 = PanelQ3(self.leftpanel2, self)
-            self.Page3.fillChoiceOfDBUnitOperation()
-            self.Page3.fillChoiceOfPMDBFluid()
-            self.Page3.fillChoiceOfSMDBFluid()
-            self.Page3.clear()
-            self.Page3.fillPage()
-            self.Page3.Show()
+            self.Page3.display()
 
         #Page4
         elif select == _("Generation of heat and cold"): #Generation of heat and cold
             self.hidePages()
             #HS2008-04-13 None as argument added.
             self.Page4 = PanelQ4(self.leftpanel2, self, None)
-            self.Page4.clear()
-            self.Page4.fillChoiceOfDBFuel()
-            self.Page4.fillPage()
-            self.Page4.Show()
+            self.Page4.display()
         #Page5
         elif select == _("Distribution of heat and cold"): #Distribution of heat and cold
             self.hidePages()
             self.Page5 = PanelQ5(self.leftpanel2, self)
-            self.Page5.clear()
-#            self.Page5.fillchoiceOfEquipment()
-            self.Page5.fillPage()
-            self.Page5.Show()
+            self.Page5.display()
 
         #Page6 (Heat Recovery Missing)
         elif select == _("Heat recovery"): #Heat recovery

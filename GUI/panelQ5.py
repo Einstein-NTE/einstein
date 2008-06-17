@@ -12,17 +12,28 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.07
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
 #                           Tom Sobota      03/05/2008
 #                           Hans Schweiger  05/05/2008
+#                           Tom Sobota      30/05/2008
+#                           Stoyan Danov    10/06/2008
+#                           Stoyan Danov    16/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
 #       03/05/2008      Changed display format
 #       05/05/2008:     Event handlers changed
+#       30/05/2008      Adapted to new display and data entry classes
+#       10/06/2008      Text changes
+#       16/06/2008      SD: OnListBoxDistributionListListboxClick - rearrange,
+#                       ->changed to -> fluidName = fluidDict[int(p.HeatDistMedium)] because of key error,
+#                       but problem to delete branch if Medium ==NULL !!! to arrange
+#                           OnButtonOK, display() added, unitdict, digits values,
+#                           changed IntEntry->FloatEntry tc7,tc10,tc13,tc14
+#                           in OnButtonOK: -> VUnitStorage in turn of VtotStorage 
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -37,12 +48,17 @@
 import wx
 import pSQL
 from status import Status
+from GUITools import *
 from displayClasses import *
+from units import *
 
 
-# constants
-LABELWIDTH=180
-TEXTENTRYWIDTH=280
+# constants that control the default field sizes
+
+HEIGHT         =  27
+LABELWIDTH     = 180
+DATAENTRYWIDTH = 100
+UNITSWIDTH     =  90
 
 
 class PanelQ5(wx.Panel):
@@ -80,85 +96,138 @@ class PanelQ5(wx.Panel):
         self.listBoxDistributionList = wx.ListBox(self.page0,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxDistributionListListboxClick, self.listBoxDistributionList)
 
+        #
+        # set default field sizes and font properties.
+        # Each data entry class has 4 configurable parameters for field size:
+        # 1. The height. This is the same for all the widgets that make the class
+        # 2. The width of the label
+        # 3. The width of the entry widget
+        # 4. The width of the unit chooser.
+        # and 7 parameters for font:
+        # 1. fSize font size
+        # 2. fFamily font family
+        # 3. fStyle font style
+        # 4. fWeight font weight
+        # 5. fUnderline underlined or not
+        # 6. fFacename font face
+        # 7. fEncoding font encoding
+        # All these parameters have reasonable defaults.
+        #
+        f = FieldSizes(wHeight=HEIGHT,wLabel=LABELWIDTH,wData=DATAENTRYWIDTH,wUnits=UNITSWIDTH,fSize=9)
 
-        self.tc1 = wx.TextCtrl(self.page0,-1,'')
-        self.st1 = Label(self.page0,self.tc1,_("Branch"),
-                         _("Name of the branch / distribution system"),
-                         LABELWIDTH, TEXTENTRYWIDTH)
+        self.tc1 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Name of the branch / distribution system"),
+                             tip=_("Give some brief name or number of the distribution tube consistent with the hydraulic scheme"))
+        
+       
+        self.tc3 = ChoiceEntry(self.page0,
+                               values=[],
+                               label=_("Heat or cold distribution medium"),
+                               tip=_("e.g air for drying process, vapour, hot water, refrigerant,..."))
 
-        self.choiceOfSource = wx.Choice(self.page0,-1,choices=[])
-        self.st2 = Label(self.page0,self.choiceOfSource,_("Heat comes from?"),
-                         _("Heat or cold supply comes from equipment(s) no.:"))
+        self.tc4 = FloatEntry(self.page0,
+                              ipart=6,                       # max n. of characters left of decimal point
+                              decimals=2,                    # max n. of characters right of decimal point
+                              minval=0.,                     # min value accepted
+                              maxval=999999.,                # max value accepted
+                              value=0.,                      # initial value
+                              unitdict=mergeDict(UNITS['VOLUMEFLOW'],UNITS['MASSFLOW']),            # values for the units chooser
+                              #label=_("Nominal production"), # label
+                              label=_("Nominal production or circulation rate (specify units)"),
+                              tip=_(" "),
+                              fontsize=6)
 
-	self.tc3 = wx.TextCtrl(self.page0,-1,'')
-        self.st3 = Label(self.page0,self.tc3,_("Distribution medium"),
-                         _("Heat or cold distribution medium"))
+        self.tc5 = FloatEntry(self.page0,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict=UNITS['TEMPERATURE'],
+                              label=_("Outlet temperature (to distribution)"),
+                              tip=_("Temperature of supply medium from equipment"))
 
-        self.tc4 = wx.TextCtrl(self.page0,-1,'')
-        self.st4 = Label(self.page0,self.tc4,_("Nominal production"),
-                         _("Nominal production or circulation rate(specify units) (mü/hkg/h)"))
+        self.tc6 = FloatEntry(self.page0,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict=UNITS['TEMPERATURE'],
+                              label=_("Return temperature"),
+                              tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vepour system)"))
 
-        self.tc5 = wx.TextCtrl(self.page0,-1,'')
-        self.st5 = Label(self.page0,self.tc5,_("Outlet temperature"),
-                         _("Outlet temperature (to distribution) (ºC)"))
+        self.tc7 = FloatEntry(self.page0,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict={},
+                              label=_("Percentage of recirculation"),
+                              tip=_("Specify the percentage of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
 
-        self.tc6 = wx.TextCtrl(self.page0,-1,'')
-        self.st6 = Label(self.page0,self.tc6,_("Return temperature"),
-                         _("Return temperature (from distribution) (ºC)"))
 
-        self.tc7 = wx.TextCtrl(self.page0,-1,'')
-        self.st7 = Label(self.page0,self.tc7,_("% of recirculation"),
-                         _("Percentage of recirculation (%)"))
+        self.tc8 = FloatEntry(self.page0,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict=UNITS['TEMPERATURE'],
+                              label=_("Temperature of feed-up in open circuit"),
+                              tip=_("Temperature of medium of distribution of heat/cold entering in open circuit (e.g. temperature of water entering from network...)"))
 
-        self.tc8 = wx.TextCtrl(self.page0,-1,'')
-        self.st8 = Label(self.page0,self.tc8,_("Feed-up"),
-                         _("Feed-up in open circuit (ºC)"))
+        self.tc9 = FloatEntry(self.page0,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['PRESSURE'],
+                              label=_("Pressure of heat or cold distribution medium"),
+                              tip=_("Working pressure for the heat/cold supply medium"))
 
-        self.tc9 = wx.TextCtrl(self.page0,-1,'')
-        self.st9 = Label(self.page0,self.tc9,_("Pressure"),
-                         _("Pressure (bar)"))
+        self.tc10 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict={},
+                              label=_("Percentage of condensate recovery (steam boilers only)"),
+                              tip=_("Percentage of condensate returned to boiler"))
 
-        self.tc10 = wx.TextCtrl(self.page0,-1,'')
-        self.st10 = Label(self.page0,self.tc10,_("% condensate recovery"),
-                          _("Percentage of condensate recovery (steam boilers only) (%)"))
+        self.tc11 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['LENGTH'],
+                              label=_("Total length of distribution piping or ducts (one way)"),
+                              tip=_("Only distance one way"))
 
-        self.tc11 = wx.TextCtrl(self.page0,-1,'')
-        self.st11 = Label(self.page0,self.tc11,_("Total length of piping"),
-                          _("Total length of distribution piping or ducts (one way) (m)"))
+        self.tc12 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['HEATTRANSFERCOEF'],
+                              label=_("Total coefficient of heat losses for piping or ducts"),
+                              tip=_("For the whole duct: go and return"))
 
-        self.tc12 = wx.TextCtrl(self.page0,-1,'')
-        self.st12 = Label(self.page0,self.tc12,_("Total coef.heat losses"),
-                          _("Total coefficient of heat losses for piping or ducts (kW/K)"))
+        self.tc13 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['LENGTH'],
+                              label=_("Mean pipe diameter"),
+                              tip=_(" "))
 
-        self.tc13 = wx.TextCtrl(self.page0,-1,'')
-        self.st13 = Label(self.page0,self.tc13,_("Mean pipe diameter"),
-                          _("Mean pipe diameter (mm)"))
-
-        self.tc14 = wx.TextCtrl(self.page0,-1,'')
-        self.st14 = Label(self.page0,self.tc14,_("Insulation thickness"),
-                          _("Insulation thickness (mm)"))
+        self.tc14 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['LENGTH'],
+                              label=_("Insulation thickness"),
+                              tip=_(" "))
 
         # right panel
 
-        self.tc15 = wx.TextCtrl(self.page1,-1,'')
-        self.st15 = Label(self.page1,self.tc15,_("Nº of storage units"),
-                          _("Number of heat or cold storage units"))
+        self.tc15 = IntEntry(self.page1,
+                             minval=0, maxval=100, value=0,
+                             label=_("Number of storage units"),
+                             tip=_("Specify the number of storage units of the same type"),
+                             hasunits=False)
 
-        self.tc16 = wx.TextCtrl(self.page1,-1,'')
-        self.st16 = Label(self.page1,self.tc16,_("Storage volume"),
-                          _("Total volume of the storage (mü)"))
+        self.tc16 = FloatEntry(self.page1,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict=UNITS['VOLUME'],
+                              label=_("Volume of one storage unit"),
+                              tip=_("Volume of the storage medium of a single single storage unit"))
 
-        self.tc17 = wx.TextCtrl(self.page1,-1,'')
-        self.st17 = Label(self.page1,self.tc17,_("Type of storage"),
-                          _("Type of storage / storage medium"))
+        self.tc17 = ChoiceEntry(self.page1,
+                               values=TRANSSTORAGETYPES.values(),
+                               label=_("Type of heat storage"),
+                               tip=_("Select from predefined list"))
 
-        self.tc18 = wx.TextCtrl(self.page1,-1,'')
-        self.st18 = Label(self.page1,self.tc18,_("Max pressure"),
-                          _("Maximum pressure (bar)"))
+        self.tc18 = FloatEntry(self.page1,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict=UNITS['PRESSURE'],
+                              label=_("Pressure of heat storage medium"),
+                              tip=_("Pressure of the process medium entering the storage unit if different from storage medium"))
 
-        self.tc19 = wx.TextCtrl(self.page1,-1,'')
-        self.st19 = Label(self.page1,self.tc19,_("Max temperature"),
-                          _("Maximum temperature of the storage (ºC)"))
+        self.tc19 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=UNITS['TEMPERATURE'],
+                              label=_("Maximum temperature of the storage"),
+                              tip=_("The maximum temperature to which storage unit can be operated"))
 
 
 
@@ -187,11 +256,13 @@ class PanelQ5(wx.Panel):
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
         sizer_10 = wx.BoxSizer(wx.VERTICAL)
         sizer_13 = wx.StaticBoxSizer(self.sizer_13_staticbox, wx.VERTICAL)
-        grid_sizer_5 = wx.FlexGridSizer(5, 2, 3, 3)
+        #grid_sizer_5 = wx.FlexGridSizer(5, 2, 3, 3)
+        sizer_15 = wx.BoxSizer(wx.VERTICAL)
         sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_6 = wx.BoxSizer(wx.VERTICAL)
         sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
-        grid_sizer_1 = wx.FlexGridSizer(10, 2, 3, 3)# r,c,seph,sepv
+        #grid_sizer_1 = wx.FlexGridSizer(10, 2, 3, 3)# r,c,seph,sepv
+        sizer_11 = wx.BoxSizer(wx.VERTICAL)
         sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
 
         # panel 0, left part, distribution list
@@ -204,54 +275,35 @@ class PanelQ5(wx.Panel):
         flagText = wx.ALIGN_CENTER_VERTICAL
 
         # panel 0, right part, distribution
-        grid_sizer_1.Add(self.st1, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc1, 0, flagText, 2)
-        grid_sizer_1.Add(self.st2, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.choiceOfSource, 0, flagText, 2)
-        grid_sizer_1.Add(self.st3, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 2)
-        grid_sizer_1.Add(self.st4, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 2)
-        grid_sizer_1.Add(self.st5, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 2)
-        grid_sizer_1.Add(self.st6, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 2)
-        grid_sizer_1.Add(self.st7, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc7, 0, flagText, 2)
-        grid_sizer_1.Add(self.st8, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc8, 0, flagText, 2)
-        grid_sizer_1.Add(self.st9, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc9, 0, flagText, 2)
-        grid_sizer_1.Add(self.st10, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc10, 0, flagText, 2)
-        grid_sizer_1.Add(self.st11, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc11, 0, flagText, 2)
-        grid_sizer_1.Add(self.st12, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc12, 0, flagText, 2)
-        grid_sizer_1.Add(self.st13, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc13, 0, flagText, 2)
-        grid_sizer_1.Add(self.st14, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc14, 0, flagText, 2)
+        sizer_11.Add(self.tc1, 0, flagText, 2)
+#        sizer_11.Add(self.tc2, 0, flagText, 2)
+        sizer_11.Add(self.tc3, 0, flagText, 2)
+        sizer_11.Add(self.tc4, 0, flagText, 2)
+        sizer_11.Add(self.tc5, 0, flagText, 2)
+        sizer_11.Add(self.tc6, 0, flagText, 2)
+        sizer_11.Add(self.tc7, 0, flagText, 2)
+        sizer_11.Add(self.tc8, 0, flagText, 2)
+        sizer_11.Add(self.tc9, 0, flagText, 2)
+        sizer_11.Add(self.tc10, 0, flagText, 2)
+        sizer_11.Add(self.tc11, 0, flagText, 2)
+        sizer_11.Add(self.tc12, 0, flagText, 2)
+        sizer_11.Add(self.tc13, 0, flagText, 2)
+        sizer_11.Add(self.tc14, 0, flagText, 2)
 
-        sizer_7.Add(grid_sizer_1, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_7.Add(sizer_11, 1, wx.LEFT|wx.EXPAND, 40)
         sizer_6.Add(sizer_7, 3, wx.EXPAND, 0)#
 
         sizer_4.Add(sizer_6, 2, wx.EXPAND, 0)
         self.page0.SetSizer(sizer_4)
 
         #panel 1, storage
-        grid_sizer_5.Add(self.st15, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc15, 0, flagText, 0)
-        grid_sizer_5.Add(self.st16, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc16, 0, flagText, 0)
-        grid_sizer_5.Add(self.st17, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc17, 0, flagText, 0)
-        grid_sizer_5.Add(self.st18, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc18, 0, flagText, 0)
-        grid_sizer_5.Add(self.st19, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc19, 0, flagText, 0)
+        sizer_15.Add(self.tc15, 0, flagText, 0)
+        sizer_15.Add(self.tc16, 0, flagText, 0)
+        sizer_15.Add(self.tc17, 0, flagText, 0)
+        sizer_15.Add(self.tc18, 0, flagText, 0)
+        sizer_15.Add(self.tc19, 0, flagText, 0)
 
-        sizer_13.Add(grid_sizer_5, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_13.Add(sizer_15, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
         self.page1.SetSizer(sizer_10)
         self.notebook.AddPage(self.page0, _('Distribution'))
@@ -279,8 +331,14 @@ class PanelQ5(wx.Panel):
         self.pipeID = p.QDistributionHC_ID
         
         self.tc1.SetValue(str(p.Pipeduct))
-        #self.tc2.SetValue(str(p.HeatFromQGenerationHC_id))   
-        self.tc3.SetValue(str(p.HeatDistMedium))
+#        self.tc2.SetValue(str(p.HeatFromQGenerationHC_id)) #SD: parameter excluded)  
+
+        fluidDict = Status.prj.getFluidDict()        
+        if p.HeatDistMedium is not None:
+            #fluidName = fluidDict[p.HeatDistMedium]#SD
+            fluidName = fluidDict[int(p.HeatDistMedium)] #SD key must be immutable type, changed to -> int       
+            self.tc3.SetValue(fluidName)  
+
         self.tc4.SetValue(str(p.DistribCircFlow))
         self.tc5.SetValue(str(p.ToutDistrib))
         self.tc6.SetValue(str(p.TreturnDistrib))
@@ -293,26 +351,37 @@ class PanelQ5(wx.Panel):
         self.tc13.SetValue(str(p.DDistPipe))
         self.tc14.SetValue(str(p.DeltaDistPipe))		
         self.tc15.SetValue(str(p.NumStorageUnits)) 
-        self.tc16.SetValue(str(p.VtotStorage))
-        self.tc17.SetValue(str(p.TypeStorage))
+        self.tc16.SetValue(str(p.VUnitStorage))
+        if p.TypeStorage in TRANSSTORAGETYPES: self.tc17.SetValue(TRANSSTORAGETYPES[str(p.TypeStorage)])#SD
         self.tc18.SetValue(str(p.PmaxStorage))
         self.tc19.SetValue(str(p.TmaxStorage))
 
+
     def OnButtonOK(self, event):
+        #TS20080530 tc2 getvalue is missing.
         if Status.PId == 0:
 	    return
-
         pipeName = self.check(self.tc1.GetValue())
         pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
-	if pipeName <> 'NULL' and len(pipes) == 0:
+	if pipeName != 'NULL' and len(pipes) == 0:
+            pipe = Status.prj.addPipeDummy()     
 
-            newID = Status.prj.addPipeDummy()
-            
-	    tmp = {
+        elif pipeName != 'NULL' and len(pipes) == 1:
+            pipe = pipes[0]
+        else:
+	    print "PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"
+	    return
+
+	print 'PanelQ5 (ButtonOK): pipe =', pipe
+	print 'PanelQ5 (ButtonOK): pipes =', pipes
+
+	fluidDict = Status.prj.getFluidDict()#SD
+
+	tmp = {
 		"Questionnaire_id":Status.PId,
 		"Pipeduct":self.check(self.tc1.GetValue()),
-		"HeatDistMedium":self.check(self.tc3.GetValue()), 
+		"HeatDistMedium":check(findKey(fluidDict,self.tc3.entry.GetStringSelection())), #SD               
 		"DistribCircFlow":self.check(self.tc4.GetValue()), 
 		"ToutDistrib":self.check(self.tc5.GetValue()), 
 		"TreturnDistrib":self.check(self.tc6.GetValue()), 
@@ -325,47 +394,15 @@ class PanelQ5(wx.Panel):
 		"DDistPipe":self.check(self.tc13.GetValue()), 
 		"DeltaDistPipe":self.check(self.tc14.GetValue()), 		
 		"NumStorageUnits":self.check(self.tc15.GetValue()),  
-		"VtotStorage":self.check(self.tc16.GetValue()), 
-		"TypeStorage":self.check(self.tc17.GetValue()), 
+		"VUnitStorage":self.check(self.tc16.GetValue()),
+                "TypeStorage":check(findKey(TRANSSTORAGETYPES,self.tc17.entry.GetStringSelection())),#SD
 		"PmaxStorage":self.check(self.tc18.GetValue()), 
 		"TmaxStorage":self.check(self.tc19.GetValue())
-		}
-
-            q = Status.DB.qdistributionhc.QDistributionHC_ID[newID][0]
-	    q.update(tmp)               
-	    Status.SQL.commit()
-	    self.fillPage()
-
-	elif pipeName <> 'NULL' and len(pipes) == 1:
-
-	    tmp = {
-		"Pipeduct":self.check(self.tc1.GetValue()),
-		"HeatDistMedium":self.check(self.tc3.GetValue()), 
-		"DistribCircFlow":self.check(self.tc4.GetValue()), 
-		"ToutDistrib":self.check(self.tc5.GetValue()), 
-		"TreturnDistrib":self.check(self.tc6.GetValue()), 
-		"PercentRecirc":self.check(self.tc7.GetValue()), 
-		"Tfeedup":self.check(self.tc8.GetValue()), 
-		"PressDistMedium":self.check(self.tc9.GetValue()), 
-		"PercentCondRecovery":self.check(self.tc10.GetValue()), 
-		"TotLengthDistPipe":self.check(self.tc11.GetValue()), 
-		"UDistPipe":self.check(self.tc12.GetValue()), 
-		"DDistPipe":self.check(self.tc13.GetValue()), 
-		"DeltaDistPipe":self.check(self.tc14.GetValue()), 		
-		"NumStorageUnits":self.check(self.tc15.GetValue()),  
-		"VtotStorage":self.check(self.tc16.GetValue()), 
-		"TypeStorage":self.check(self.tc17.GetValue()), 
-		"PmaxStorage":self.check(self.tc18.GetValue()), 
-		"TmaxStorage":self.check(self.tc19.GetValue())
-		}
-	    
-	    q = pipes[0]
-	    q.update(tmp)               
-	    Status.SQL.commit()
-	    self.fillPage()
+	}
+	pipe.update(tmp)               
+	Status.SQL.commit()
+	self.fillPage()
                           
-	else:
-	    self.showError("Pipeduct have to be an uniqe value!")
 
     def OnButtonCancel(self, event):
         self.clear()
@@ -384,6 +421,23 @@ class PanelQ5(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------		
 
+#SD2008-6-16
+    def display(self):
+        self.fillChoiceOfHDMedium()
+        self.clear()
+        self.fillPage()
+        self.Show()
+
+
+    def fillChoiceOfHDMedium(self):
+        fluidDict = Status.prj.getFluidDict()
+        fluidNames = fluidDict.values()
+        self.tc3.entry.Clear()
+        for name in fluidNames:
+            self.tc3.entry.Append(name)
+    
+##
+
     def fillPage(self):
         self.listBoxDistributionList.Clear()
         pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
@@ -400,7 +454,7 @@ class PanelQ5(wx.Panel):
 
     def clear(self):
         self.tc1.SetValue('')
-        #self.tc2.SetValue('')
+#        self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
