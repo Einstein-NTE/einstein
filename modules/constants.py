@@ -116,7 +116,16 @@ PROCESSTYPE = ["condensing",
 
 BBTYPES = [PROCESSTYPE[0], PROCESSTYPE[1]]
 HPTYPES = [PROCESSTYPE[4], PROCESSTYPE[5]]
-HXTYPES = [PROCESSTYPE[13], PROCESSTYPE[14], PROCESSTYPE[15], PROCESSTYPE[16]]
+HXTYPES = [ "plate HX (liquid-liquid)",
+            "plate HX (air-air)",
+            "shell&tube HX (liquid-liquid)",
+            "finned tubes (liquid-air)"]
+TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
+                "plate HX (air-air)":           _("plate HX (air-air)"),
+                "shell&tube HX (liquid-liquid)":_("shell&tube HX (liquid-liquid)"),
+                "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
+                }
+
 
 EQUIPMENT = {"HP":                 # equipment class
              [(EQUIPTYPE[0],       # type of equipment, untranslated
@@ -174,7 +183,7 @@ WHEEWASTEHEATTYPES = ["cooling water",
                       "intercooler",
                       "cooling air"]
 #translatable dictionary
-WHEEWASTEHEATTYPES = {"CoolingWater":_("cooling water"),
+TRANSWHEEWASTEHEATTYPES = {"CoolingWater":_("cooling water"),
                       "Intercooler":_("intercooler"),
                       "CoolingAir":_("cooling air")}
 

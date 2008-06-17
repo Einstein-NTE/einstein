@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.11
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -27,6 +27,7 @@
 #                           Stoyan Danov    12/06/2008
 #                           Stoyan Danov    13/06/2008
 #                           Hans Schweiger  14/06/2008
+#                           Hans Schweiger  17/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -45,6 +46,7 @@
 #       12/06/2008: SD  unitdict to new units.py, add fillChoice to display()
 #       13/06/2008: SD  OnButtonOK changes
 #       14/06/2008: HS  Clean-up
+#       17/06/2008: HS  adaptation to new display_classes
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -153,21 +155,21 @@ e.g. air for drying, lye or water for washing, etc..."))
 
         self.tc5 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Typical (final) temperature of the  process medium during operation"),
                               tip=_("Give the temperature of the process medium and not that of the heat supplying medium."))
 
 
         self.tc6 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Inlet temperature of the process medium (before heat recovery)"),
                               tip=_("Inlet temperature of the process medium before heat recovery"))
 
 
         self.tc7 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Start-up temperature of process medium (after breaks)"),
                               tip=_("Temperature of the process equipment before heating up \
 when process start-up begins"))
@@ -176,7 +178,7 @@ when process start-up begins"))
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=mergeDict(UNITS['MASS'],UNITS['VOLUME']),
+                              unitdict='MASS',
                               label=_("Daily inflow of process medium"),
                               tip=_("Continuous process: Fluid flow rate times hours of circulation. \
 Batch process with fluid renewal: volume times No. of lots."))
@@ -184,14 +186,14 @@ Batch process with fluid renewal: volume times No. of lots."))
 
         self.tc9 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['VOLUME'],
+                              unitdict='VOLUME',
                               label=_("Volume of the process medium within the equipment or storage"),
                               tip=_("e.g. volume of liquid in a bottle for cleaning"))
 
 
         self.tc10 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['POWER'],
+                              unitdict='POWER',
                               label=_("Power requirement of the process in operation"),
                               tip=_("Power requierment during operation at steady state \
 (thermal losses, evapoartion, endogenous chemical recations; without heating of circulating fluid)"))
@@ -201,39 +203,28 @@ Batch process with fluid renewal: volume times No. of lots."))
         #
         # schedule
         #
-##        self.tc11 = wx.TextCtrl(self.page0,-1,'')
-##        self.st11 = Label(self.page0,self.tc11,_("Hours per day"),
-##				  _("Hours of process operation per day (hrs/day)"))
         self.tc11 = FloatEntry(self.page0,
-                              ipart=2, decimals=1, minval=0., maxval=24., value=0., 
-                              unitdict={},
+                              ipart=2, decimals=1, minval=0., maxval=24., value=0.,
+                              unitdict = 'TIME',
                               label=_("Hours of process operation per day"),
                               tip=_("For batch processes: specify the total duration of process, \
 e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
-##        self.tc12 = wx.TextCtrl(self.page0,-1,'')
-##        self.st12 = Label(self.page0,self.tc12,_("Number of batches"),
-##				  _("Number of batches per day"))
         self.tc12 = FloatEntry(self.page0,
                               ipart=2, decimals=1, minval=0., maxval=99., value=0.,
-                              unitdict={},
                               label=_("Number of batches per day"),
                               tip=_("For batch processes: specify the total duration of process, \
 e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
-##        self.tc13 = wx.TextCtrl(self.page0,-1,'')
-##        self.st13 = Label(self.page0,self.tc13,_("Duration of 1 batch"),
-##                                  _("Duration of 1 batch (h)"))
         self.tc13 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TIME'],
+                              unitdict='TIME',
                               label=_("Duration of 1 batch"),
                               tip=_("For batch processes: specify the total duration of process, \
 e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
         self.tc14 = FloatEntry(self.page0,
                               ipart=3, decimals=1, minval=0., maxval=365., value=0.,
-                              unitdict={},
                               label=_("Days of process operation per year"),
                               tip=_("For batch processes: specify the total duration of process, \
 e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
@@ -253,28 +244,28 @@ e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
                                tip=_("Specify media of waste heat flows (up to 3)")) 
         self.tc15 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Temperature of outgoing (waste) heat flows"),
                               tip=_("Temperature of the outgoing waste heat flow \
 (e.g. water or hot humid air at the outlet of a drying process)"))
 
         self.tc15_2 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['SPECIFICENTHALPY'],
+                              unitdict='SPECIFICENTHALPY',
                               label=_("Specific enthalpy of outgoing (waste) heat flows"),
                               tip=_("Enthalpy of the outgoing waste heat flow \
 (e.g. water or hot humid air at the outlet of a drying process)"))
 
         self.tc16 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Final  temperature of outgoing (waste) heat flows"),
                               tip=_("Minimum temperature to which the waste heat flow can be cooled. \
 If there is no limit specify 0"))
 
         self.tc17 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=mergeDict(UNITS['MASS'],UNITS['VOLUME']),
+                              unitdict='MASS',
                               label=_("Daily outflow of process medium"),
                               tip=_("Can be different from the incoming flow if e.g. there is evaporation \
 or some chemical reaction."))
@@ -295,14 +286,13 @@ the heat exchanger,..."))
 
         self.tc20 = ChoiceEntry(self.page1,
                                 values=TRANSYESNO.values(),
-##                               values=['list of processes...','one source'],
                                label=_("Source of waste heat"),
                                tip=_("Specify the heat source (e.g. heat lossed from process X, \
 flue gases from  boiler Y, etc)"))
 
         self.tc21 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Inlet temperature of the process medium  (after heat recovery)"),
                               tip=_("Inlet temperature (towards the system) of the process medium after the \
 heat recovery"))
@@ -318,26 +308,26 @@ heat recovery"))
 
 
         self.tc23 = ChoiceEntry(self.page1,
-                             values = ["pipe1","pipe2"],
+                             values = [],
                              label=_("Heat or cold supply to the process from distribution line / branch No."),
                              tip=_("Specify the distribution(supply) line of heat/cold feeding the process, \
 using the nomenclature of the hydraulic scheme"))
 
         self.tc24 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
                               tip=_("Temperature of the supplying medium at heat exchangers inlet"))
 
         self.tc25 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value = 0.,
-                              unitdict=mergeDict(UNITS['MASSFLOW'],UNITS['VOLUMEFLOW']),
+                              unitdict='MASSFLOW',
                               label=_("Flow rate of the heat supply medium (close to process)"),
                               tip=_("Mass flow of the heat/cold supplyind medium"))
 
         self.tc26 = FloatEntry(self.page1,
                               ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
-                              unitdict=UNITS['ENERGY'],
+                              unitdict='ENERGY',
                               label=_("Annual consumption of UPH"),
                               tip=_("Only for the process"))
 

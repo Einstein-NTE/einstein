@@ -21,6 +21,7 @@
 #                           Tom Sobota      30/05/2008
 #                           Stoyan Danov    10/06/2008
 #                           Stoyan Danov    16/06/2008
+#                           Stoyan Danov    17/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
@@ -33,7 +34,8 @@
 #                       but problem to delete branch if Medium ==NULL !!! to arrange
 #                           OnButtonOK, display() added, unitdict, digits values,
 #                           changed IntEntry->FloatEntry tc7,tc10,tc13,tc14
-#                           in OnButtonOK: -> VUnitStorage in turn of VtotStorage 
+#                           in OnButtonOK: -> VUnitStorage in turn of VtotStorage
+#       17/06/2008      SD: unitdict, staticboxes
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -88,6 +90,15 @@ class PanelQ5(wx.Panel):
         self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Distribution of heat/cold"))
         self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("General data"))
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_9_staticbox = wx.StaticBox(self.page0, -1, _("Temperatures and pressures"))
+        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_10_staticbox = wx.StaticBox(self.page0, -1, _("Piping specifications"))
+        self.sizer_10_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
         self.sizer_13_staticbox = wx.StaticBox(self.page1, -1, "Storage")
         self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
@@ -115,6 +126,9 @@ class PanelQ5(wx.Panel):
         #
         f = FieldSizes(wHeight=HEIGHT,wLabel=LABELWIDTH,wData=DATAENTRYWIDTH,wUnits=UNITSWIDTH,fSize=9)
 
+
+#In StaticBox "Distribution of heat/cold"
+#In StaticBox "General data" within "Distribution of heat/cold"    
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Name of the branch / distribution system"),
                              tip=_("Give some brief name or number of the distribution tube consistent with the hydraulic scheme"))
@@ -131,70 +145,67 @@ class PanelQ5(wx.Panel):
                               minval=0.,                     # min value accepted
                               maxval=999999.,                # max value accepted
                               value=0.,                      # initial value
-                              unitdict=mergeDict(UNITS['VOLUMEFLOW'],UNITS['MASSFLOW']),            # values for the units chooser
+                              unitdict='MASSORVOLUMEFLOW',            # values for the units chooser
                               #label=_("Nominal production"), # label
                               label=_("Nominal production or circulation rate (specify units)"),
                               tip=_(" "),
                               fontsize=6)
 
+#In StaticBox "Temperatures and pressures" within "Distribution of heat/cold" 
         self.tc5 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Outlet temperature (to distribution)"),
                               tip=_("Temperature of supply medium from equipment"))
 
         self.tc6 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Return temperature"),
                               tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vepour system)"))
 
         self.tc7 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict={},
+                              unitdict=None,
                               label=_("Percentage of recirculation"),
                               tip=_("Specify the percentage of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
 
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Temperature of feed-up in open circuit"),
                               tip=_("Temperature of medium of distribution of heat/cold entering in open circuit (e.g. temperature of water entering from network...)"))
 
         self.tc9 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['PRESSURE'],
+                              unitdict='PRESSURE',
                               label=_("Pressure of heat or cold distribution medium"),
                               tip=_("Working pressure for the heat/cold supply medium"))
 
-        self.tc10 = FloatEntry(self.page0,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
-                              unitdict={},
-                              label=_("Percentage of condensate recovery (steam boilers only)"),
-                              tip=_("Percentage of condensate returned to boiler"))
 
+#In StaticBox "Piping specifications" within "Distribution of heat/cold" 
         self.tc11 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['LENGTH'],
+                              unitdict='LENGTH',
                               label=_("Total length of distribution piping or ducts (one way)"),
                               tip=_("Only distance one way"))
 
         self.tc12 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['HEATTRANSFERCOEF'],
+                              unitdict='HEATTRANSFERCOEF',
                               label=_("Total coefficient of heat losses for piping or ducts"),
                               tip=_("For the whole duct: go and return"))
 
         self.tc13 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['LENGTH'],
+                              unitdict='LENGTH',
                               label=_("Mean pipe diameter"),
                               tip=_(" "))
 
         self.tc14 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['LENGTH'],
+                              unitdict='LENGTH',
                               label=_("Insulation thickness"),
                               tip=_(" "))
 
@@ -203,12 +214,11 @@ class PanelQ5(wx.Panel):
         self.tc15 = IntEntry(self.page1,
                              minval=0, maxval=100, value=0,
                              label=_("Number of storage units"),
-                             tip=_("Specify the number of storage units of the same type"),
-                             hasunits=False)
+                             tip=_("Specify the number of storage units of the same type"))
 
         self.tc16 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict=UNITS['VOLUME'],
+                              unitdict='VOLUME',
                               label=_("Volume of one storage unit"),
                               tip=_("Volume of the storage medium of a single single storage unit"))
 
@@ -219,13 +229,13 @@ class PanelQ5(wx.Panel):
 
         self.tc18 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict=UNITS['PRESSURE'],
+                              unitdict='PRESSURE',
                               label=_("Pressure of heat storage medium"),
                               tip=_("Pressure of the process medium entering the storage unit if different from storage medium"))
 
         self.tc19 = FloatEntry(self.page1,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
-                              unitdict=UNITS['TEMPERATURE'],
+                              unitdict='TEMPERATURE',
                               label=_("Maximum temperature of the storage"),
                               tip=_("The maximum temperature to which storage unit can be operated"))
 
@@ -284,7 +294,7 @@ class PanelQ5(wx.Panel):
         sizer_11.Add(self.tc7, 0, flagText, 2)
         sizer_11.Add(self.tc8, 0, flagText, 2)
         sizer_11.Add(self.tc9, 0, flagText, 2)
-        sizer_11.Add(self.tc10, 0, flagText, 2)
+##        sizer_11.Add(self.tc10, 0, flagText, 2)
         sizer_11.Add(self.tc11, 0, flagText, 2)
         sizer_11.Add(self.tc12, 0, flagText, 2)
         sizer_11.Add(self.tc13, 0, flagText, 2)
@@ -345,7 +355,7 @@ class PanelQ5(wx.Panel):
         self.tc7.SetValue(str(p.PercentRecirc))
         self.tc8.SetValue(str(p.Tfeedup))
         self.tc9.SetValue(str(p.PressDistMedium))
-        self.tc10.SetValue(str(p.PercentCondRecovery))
+##        self.tc10.SetValue(str(p.PercentCondRecovery))
         self.tc11.SetValue(str(p.TotLengthDistPipe))
         self.tc12.SetValue(str(p.UDistPipe))
         self.tc13.SetValue(str(p.DDistPipe))
@@ -388,7 +398,7 @@ class PanelQ5(wx.Panel):
 		"PercentRecirc":self.check(self.tc7.GetValue()), 
 		"Tfeedup":self.check(self.tc8.GetValue()), 
 		"PressDistMedium":self.check(self.tc9.GetValue()), 
-		"PercentCondRecovery":self.check(self.tc10.GetValue()), 
+##		"PercentCondRecovery":self.check(self.tc10.GetValue()), 
 		"TotLengthDistPipe":self.check(self.tc11.GetValue()), 
 		"UDistPipe":self.check(self.tc12.GetValue()), 
 		"DDistPipe":self.check(self.tc13.GetValue()), 
@@ -462,7 +472,7 @@ class PanelQ5(wx.Panel):
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
-        self.tc10.SetValue('')
+##        self.tc10.SetValue('')
         self.tc11.SetValue('')
         self.tc12.SetValue('')
         self.tc13.SetValue('')

@@ -115,6 +115,29 @@ UNITS = {
         'lb/s' : (1632.924,0.0)
         },
 
+# conversion to internal unit: [kg or m3]
+    'MASSORVOLUME': {
+        'kg' : (1.0,0.0),
+        'lb' : (0.45359,0.0),
+        't' : (1000.0,0.0),
+        'm3' : (1.0,0.0),
+        'l' : (1.0e-3,0.0),
+        'ft3' : (0.028317,0.0),
+        'U.S. gal' : (0.003785,0.0),
+        'Brit. gal' : (0.004546,0.0),
+        'barrel (U.S. pet.)' : (0.15898,0.0)
+        },
+
+# conversion to internal unit: [kg/h]
+    'MASSORVOLUMEFLOW': {
+        'kg/h' : (1.0,0.0),
+        'kg/s' : (3600.0,0.0),
+        'lb/h' : (0.45359,0.0),
+        'lb/s' : (1632.924,0.0),
+        'm3/h' : (1.0,0.0),
+        'm3/s' : (3600.0,0.0)
+        },
+
 # conversion to internal unit: [kWh]
     'ENERGY': {
         'kWh' : (1.0,0.0),
@@ -188,6 +211,8 @@ UNITSYSTEM = {
                 'VOLUMEFLOW':'m3/s',
                 'MASS':'kg',
                 'MASSFLOW':'kg/s',
+                'MASSORVOLUME':'kg',
+                'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'kJ',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kJ/kg',
@@ -207,6 +232,8 @@ UNITSYSTEM = {
                 'VOLUMEFLOW':'m3/h',
                 'MASS':'kg',
                 'MASSFLOW':'kg/h',
+                'MASSORVOLUME':'kg',
+                'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'kWh',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kWh/kg',
@@ -226,6 +253,8 @@ UNITSYSTEM = {
                 'VOLUMEFLOW':'US gal/h',
                 'MASS':'lb',
                 'MASSFLOW':'lb/h',
+                'MASSORVOLUME':'kg',
+                'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'btu',
                 'POWER':'btu/h',
                 'SPECIFICENTHALPY':'btu/lb',

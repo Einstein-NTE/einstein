@@ -12,10 +12,11 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger
 #       Modified by
 #                           Tom Sobota 04/05/2008
+#                           Stoyan Danov June 2008 ???
 #
 #       Changes to previous versions:
 #       03/05/08:   Change of button functions -> new version
@@ -36,8 +37,16 @@
 import wx
 import pSQL
 from status import Status
+from displayClasses import *
 #from einstein.modules.constants import HXTYPES
 from GUITools import *
+
+# constants that control the default field sizes
+
+HEIGHT         =  27
+LABELWIDTH     = 180
+DATAENTRYWIDTH = 100
+UNITSWIDTH     =  90
 
 
 class PanelQ6(wx.Panel):
@@ -57,8 +66,11 @@ class PanelQ6(wx.Panel):
 #--- UI setup
 #------------------------------------------------------------------------------		
 
+##        wx.Panel.__init__(self, id=-1, name='PanelQ6', parent=parent,
+##              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+##        self.Hide()
         wx.Panel.__init__(self, id=-1, name='PanelQ6', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
 
         self.notebook = wx.Notebook(self, -1, style=0)
@@ -69,9 +81,29 @@ class PanelQ6(wx.Panel):
         self.notebook.AddPage(self.page0, _('Heat recovery from thermal equipment'))
         self.notebook.AddPage(self.page1, _('Heat recovery from electrical equipment'))
 
+        self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Heat exchangers list"))
+        self.sizer_3_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Heat exchanger data"))
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Heat source / sink"))
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("Electrical equipment list"))
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_9_staticbox = wx.StaticBox(self.page0, -1, _("Equipment data"))
+        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_10_staticbox = wx.StaticBox(self.page0, -1, _("Schedule"))
+        self.sizer_10_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+      
+
 #..............................................................................
 # layout page 0
 
+#Substitute with static box: List of heat exchangers
         self.stInfo1 = wx.StaticText(id=-1,
 					  label="list of heat exchangers",
 					  name='stInfo1',
@@ -79,6 +111,8 @@ class PanelQ6(wx.Panel):
 					  pos=wx.Point(24, 24),
 					  style=0)
         self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+
         self.listBoxHX = wx.ListBox(choices=[],
 						       id=-1,
 						       name='listBoxHXList',
@@ -114,226 +148,101 @@ class PanelQ6(wx.Panel):
 						    style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonHXAdd, self.buttonHXAdd)
 
-	
+
+#Substitute with static box: Heat exchanger data	
         self.stInfo2 = wx.StaticText(id=-1,
-					  label="heat exchanger data",
+					  label=_("heat exchanger data"),
 					  name='stInfo2',
 					  parent=self.page0,
 					  pos=wx.Point(272, 24),
 					  style=0)
         self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.st1 = wx.StaticText(id=-1,
-				      label="short name of heat exchanger",
-				      name='st1',
-				      parent=self.page0,
-				      pos=wx.Point(272, 48),
-				      style=0)        
+        self.tc1 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Short name of heat exchanger"),
+                             tip=_("Give a short name of the equipment"))
 
-        self.tc1 = wx.TextCtrl(id=-1,
-				    name='tc1',
-				    parent=self.page0,
-				    pos=wx.Point(272, 64),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')        
+        self.tc2 = ChoiceEntry(self.page0,
+                               values=[],
+                               label=_("Heat exchanger type"),
+                               tip=_("Specify the type of heat exchanger, e.g. shell-and-tube, plate, fin-and-tube, ..."))
 
-	
-        self.st2 = wx.StaticText(id=-1,
-				      label="heat exchanger type",
-				      name='st2',
-				      parent=self.page0,
-				      pos=wx.Point(272, 88),
-				      style=0)
-
-        self.choiceOfHXType = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfHXType',
-						parent=self.page0,
-						pos=wx.Point(272, 104),
-						size=wx.Size(200, 21),
-						style=0)
-
-        self.st3 = wx.StaticText(id=-1,
-				      label="heat transfer rate [kW]",
-				      name='st3',
-				      parent=self.page0,
-				      pos=wx.Point(272, 128),
-				      style=0)
-
-	self.tc3 = wx.TextCtrl(id=-1,
-				    name='tc3',
-				    parent=self.page0,
-				    pos=wx.Point(272, 144),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-
-
-        self.st4 = wx.StaticText(id=-1,
-				      label="log.mean temp.diff (LMTD) [K]",
-				      name='st4',
-				      parent=self.page0,
-				      pos=wx.Point(272, 168),
-				      style=0)
-
-        self.tc4 = wx.TextCtrl(id=-1,
-				    name='tc4',
-				    parent=self.page0,
-				    pos=wx.Point(272, 184),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
-
-
-        self.st5 = wx.StaticText(id=-1,
-				      label="total heat tranferred [MWh/year]",
-				      name='st5',
-				      parent=self.page0,
-				      pos=wx.Point(272, 208),
-				      style=0)
-
-        self.tc5 = wx.TextCtrl(id=-1,
-				    name='tc5',
-				    parent=self.page0,
-				    pos=wx.Point(272, 224),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
         
+        self.tc3 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='POWER',
+                              label=_("Heat transfer rate"),
+                              tip=_("Heat transfer rate for the specific working conditions"))
 
-        self.st6 = wx.StaticText(id=-1,
-				      label="heat source",
-				      name='st6',
-				      parent=self.page0,
-				      pos=wx.Point(272, 268),
-				      style=0)
-        self.st6.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc4 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Log. Mean Temperature Diff. (LMTD)"),
+                              tip=_("Between the fluids in the heat exchanger"))
 
-        self.choiceOfHXSource = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfHXSource',
-						parent=self.page0,
-						pos=wx.Point(272, 284),
-						size=wx.Size(200, 21),
-						style=0)
-        
+        self.tc5 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='ENERGY',
+                              label=_("Total heat transfered"),
+                              tip=_("Total heat transferred per year"))
 
-        self.st7 = wx.StaticText(id=-1,
-				      label="inlet temperature (source) [ºC]",
-				      name='st7',
-				      parent=self.page0,
-				      pos=wx.Point(272, 308),
-				      style=0)
+#In staticbox Heat source / sink
+#on the left
+        self.tc6 = ChoiceEntry(self.page0,
+                               values=[],
+                               label=_("Heat source (process [+outflow no.], equipment, ...)"),
+                               tip=_("Indicate: Process, Equipment, Distribution line, Compressor, Electric motor, together with its number"))
 
-        self.tc7 = wx.TextCtrl(id=-1,
-				    name='tc7',
-				    parent=self.page0,
-				    pos=wx.Point(272, 324),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
+        self.tc7 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Inlet temperature (source)"),
+                              tip=_("Inlet temperature of the hot fluid"))
 
+        self.tc8 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='SPECIFICENTHALPY',
+                              label=_("Inlet specific enthalpy (source)"),
+                              tip=_("Inlet enthalpy of the hot fluid"))
 
-        self.st8 = wx.StaticText(id=-1,
-				      label="inlet enthalpy (source) [kJ/kgK]",
-				      name='st8',
-				      parent=self.page0,
-				      pos=wx.Point(272, 348),
-				      style=0)
+        self.tc9 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Outlet temperature (source)"),
+                              tip=_("Outlet temperature of hot fluid"))
 
-        self.tc8 = wx.TextCtrl(id=-1,
-				    name='tc8',
-				    parent=self.page0,
-				    pos=wx.Point(272, 364),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
+        self.tc10 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='SPECIFICENTHALPY',
+                              label=_("Outlet specific enthalpy (source)"),
+                              tip=_("Outlet enthalpy of the hot fluid"))
 
-
-        self.st9 = wx.StaticText(id=-1,
-				      label="outlet temperature (source) [ºC]",
-				      name='st9',
-				      parent=self.page0,
-				      pos=wx.Point(272, 388),
-				      style=0)
-
-        self.tc9 = wx.TextCtrl(id=-1,
-				    name='tc9',
-				    parent=self.page0,
-				    pos=wx.Point(272, 404),
-				    size=wx.Size(200, 21),
-				    style=0,
-				    value='')
+#on the right
+        self.tc11 = ChoiceEntry(self.page0,
+                               values=[],
+                               label=_("Heat sink (process, pipe/duct)"),
+                               tip=_("Indicate: Process or Distribution line and number. If heat exchange is via storage, it should be defined in the distribution line"))
 
 
-        self.st10 = wx.StaticText(id=-1,
-				       label="outlet enthalpy (source) [kJ/kgK]",
-				       name='st10',
-				       parent=self.page0,
-				       pos=wx.Point(272, 428),
-				       style=0)
+        self.tc12 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Inlet temperature (sink)"),
+                              tip=_("Inlet temperature of the cold fluid"))
 
-        self.tc10 = wx.TextCtrl(id=-1,
-				     name='tc10',
-				     parent=self.page0,
-				     pos=wx.Point(272, 444),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc13 = FloatEntry(self.page0,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Outlet temperature (sink)"),
+                              tip=_("Inlet enthalpy of the cold fluid"))
 
 
-        self.st11 = wx.StaticText(id=-1,
-				       label="heat sink",
-				       name='st11',
-				       parent=self.page0,
-				       pos=wx.Point(512, 268),
-				       style=0)
-        self.st11.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
-        self.choiceOfHXSink = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfHXSink',
-						parent=self.page0,
-						pos=wx.Point(512, 284),
-						size=wx.Size(200, 21),
-						style=0)
-
-        self.st12 = wx.StaticText(id=-1,
-				       label="inlet temperature (sink) [ºC]",
-				       name='st12',
-				       parent=self.page0,
-				       pos=wx.Point(512, 308),
-				       style=0)
-        
-        self.tc12 = wx.TextCtrl(id=-1,
-				     name='tc12',
-				     parent=self.page0,
-				     pos=wx.Point(512, 324),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st13 = wx.StaticText(id=-1,
-				       label="outlet temperature (sink) [ºC]",
-				       name='st13',
-				       parent=self.page0,
-				       pos=wx.Point(512, 388),
-				       style=0)
-
-        self.tc13 = wx.TextCtrl(id=-1,
-				     name='tc13',
-				     parent=self.page0,
-				     pos=wx.Point(512, 404),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
 
         
 #..............................................................................
 # layout page 1
 
+#Substitute with static box: List of electrical equipment
         self.stInfo101 = wx.StaticText(id=-1,
 					  label="list of electrical equipment",
 					  name='stInfo101',
@@ -369,7 +278,7 @@ class PanelQ6(wx.Panel):
 						    style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonWHEEAdd, self.buttonWHEEAdd)
 
-	
+#Substitute with static box: Equipment data	
         self.stInfo102 = wx.StaticText(id=-1,
 					  label="equipment data",
 					  name='stInfo102',
@@ -378,6 +287,7 @@ class PanelQ6(wx.Panel):
 					  style=0)
         self.stInfo102.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+#Substitute with static box: Schedule
         self.stInfo103 = wx.StaticText(id=-1,
 					  label="operation schedule",
 					  name='stInfo103',
@@ -386,191 +296,75 @@ class PanelQ6(wx.Panel):
 					  style=0)
         self.stInfo103.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+#In static box: Equipment data
 
-        self.st101 = wx.StaticText(id=-1,
-				       label="short name of electrical equipment",
-				       name='st101',
-				       parent=self.page1,
-				       pos=wx.Point(272, 48),
-				       style=0)
+        self.tc101 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Short name of electrical equipment"),
+                             tip=_("Give a short name of the equipment"))
 
-        self.tc101 = wx.TextCtrl(id=-1,
-				     name='tc101',
-				     parent=self.page1,
-				     pos=wx.Point(272, 64),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc102 = ChoiceEntry(self.page1,
+                               values=[],
+                               label=_("Equipment type"),
+                               tip=_("specify type of equipment, e.g. compressor, electric motor,..."))
 
-
-        self.st102 = wx.StaticText(id=-1,
-				       label="equipment type",
-				       name='st102',
-				       parent=self.page1,
-				       pos=wx.Point(272, 88),
-				       style=0)
-
-        self.choiceOfWHEEEqType = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfWHEEEqType',
-						parent=self.page1,
-						pos=wx.Point(272, 104),
-						size=wx.Size(200, 21),
-						style=0)
-
-
-        self.st103 = wx.StaticText(id=-1,
-				       label="waste heat type",
-				       name='st103',
-				       parent=self.page1,
-				       pos=wx.Point(272, 128),
-				       style=0)
-
-        self.choiceOfWHEEWasteHeatType = wx.Choice(choices=[],
-						id=-1,
-						name='choiceOfWHEEWasteHEatType',
-						parent=self.page1,
-						pos=wx.Point(272, 144),
-						size=wx.Size(200, 21),
-						style=0)
-
-
-        self.st104 = wx.StaticText(id=-1,
-				       label="available waste heat [kW]",
-				       name='st104',
-				       parent=self.page1,
-				       pos=wx.Point(272, 168),
-				       style=0)
-
-        self.tc104 = wx.TextCtrl(id=-1,
-				     name='tc104',
-				     parent=self.page1,
-				     pos=wx.Point(272, 184),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-
-
-        self.st105 = wx.StaticText(id=-1,
-				       label="heat carrier medium",
-				       name='st105',
-				       parent=self.page1,
-				       pos=wx.Point(272, 208),
-				       style=0)
-	
-        self.tc105 = wx.TextCtrl(id=-1,
-				     name='tc105',
-				     parent=self.page1,
-				     pos=wx.Point(272, 224),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')        
-	
-	
-        self.st106 = wx.StaticText(id=-1,
-				       label="mass flow rate [kg/h]",
-				       name='st106',
-				       parent=self.page1,
-				       pos=wx.Point(272, 248),
-				       style=0)
+        self.tc103 = ChoiceEntry(self.page1,
+                               values=[],
+                               label=_("Waste heat type"),
+                               tip=_("Specify type of waste heat (e.g. Recooling of compressed air, cooling water of motor/compressor, ...)"))
         
-        self.tc106 = wx.TextCtrl(id=-1,
-				     name='tc106',
-				     parent=self.page1,
-				     pos=wx.Point(272, 264),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc104 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='POWER',
+                              label=_("Available waste heat"),
+                              tip=_("Estimated quantity"))
 
-        self.st107 = wx.StaticText(id=-1,
-				       label="waste heat temperature (outlet) [ºC]",
-				       name='st107',
-				       parent=self.page1,
-				       pos=wx.Point(272, 288),
-				       style=0)
-        
-        self.tc107 = wx.TextCtrl(id=-1,
-				     name='tc107',
-				     parent=self.page1,
-				     pos=wx.Point(272, 304),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-        self.st108 = wx.StaticText(id=-1,
-				       label="present use of waste heat ?",
-				       name='st108',
-				       parent=self.page1,
-				       pos=wx.Point(272, 328),
-				       style=0)
-        
-        self.tc108 = wx.TextCtrl(id=-1,
-				     name='tc108',
-				     parent=self.page1,
-				     pos=wx.Point(272, 344),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
-        
-        self.st110 = wx.StaticText(id=-1,
-				       label="daily hours of operation [h]",
-				       name='st110',
-				       parent=self.page1,
-				       pos=wx.Point(512, 48),
-				       style=0)
-        
-        self.tc110 = wx.TextCtrl(id=-1,
-				     name='tc110',
-				     parent=self.page1,
-				     pos=wx.Point(512, 64),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc105 = ChoiceEntry(self.page1,
+                               values=[],
+                               label=_("Medium"),
+                               tip=_("Waste heat carrying medium (fluid)"))
+
+        self.tc106 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='MASSORVOLUMEFLOW',
+                              label=_("Flow rate"),
+                              tip=_("Specify the flow rate of the waste heat carrying medium"))
+
+        self.tc107 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Waste heat temperature"),
+                              tip=_("Specify the temperature of the waste heat medium at the outlet"))
 
 
-        self.st111 = wx.StaticText(id=-1,
-				       label="batches per day",
-				       name='st111',
-				       parent=self.page1,
-				       pos=wx.Point(512, 88),
-				       style=0)
-        
-        self.tc111 = wx.TextCtrl(id=-1,
-				     name='tc111',
-				     parent=self.page1,
-				     pos=wx.Point(512, 104),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc108 = ChoiceEntry(self.page1,
+                               values=TRANSYESNO.values(),
+                               label=_("Present use of waste heat"),
+                               tip=_("If yes, specify distribution pipe / duct or heat exchanger where waste heat is used at present"))
 
-        self.st112 = wx.StaticText(id=-1,
-				       label="duration of one bacth [min.]",
-				       name='st112',
-				       parent=self.page1,
-				       pos=wx.Point(512, 128),
-				       style=0)
-        
-        self.tc112 = wx.TextCtrl(id=-1,
-				     name='tc112',
-				     parent=self.page1,
-				     pos=wx.Point(512, 144),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+#In static box Schedule
 
-        self.st113 = wx.StaticText(id=-1,
-				       label="days of operation per year",
-				       name='st113',
-				       parent=self.page1,
-				       pos=wx.Point(512, 168),
-				       style=0)
-        
-        self.tc113 = wx.TextCtrl(id=-1,
-				     name='tc113',
-				     parent=self.page1,
-				     pos=wx.Point(512, 184),
-				     size=wx.Size(200, 21),
-				     style=0,
-				     value='')
+        self.tc110 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TIME',
+                              label=_("Hours of  operation per day"),
+                              tip=_(""))
+
+        self.tc111 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              label=_("Number of batches per day"),
+                              tip=_(""))
+
+        self.tc112 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TIME',
+                              label=_("Duration of 1 batch"),
+                              tip=_(""))
+
+        self.tc113 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              label=_("Days of operation per year"),
+                              tip=_(""))
+
 
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -608,6 +402,8 @@ class PanelQ6(wx.Panel):
         self.HXName = str(self.listBoxHX.GetStringSelection())
         self.HXNo = self.HXList.index(self.HXName)+1
 
+        self.fillPage()
+
         hxes = Status.DB.qheatexchanger.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].HXName[self.HXName]
 
         if len(hxes) <>0:
@@ -615,16 +411,16 @@ class PanelQ6(wx.Panel):
             self.HXID = q.QHeatExchanger_ID
             
             self.tc1.SetValue(str(q.HXName))
-            setChoice(self.choiceOfHXType,q.HXType)          
+            if str(q.HXType) in TRANSHXTYPES.values(): self.tc2.SetValue(str(q.HXType))          
             self.tc3.SetValue(str(q.QdotHX))
             self.tc4.SetValue(str(q.HXLMTD))
             self.tc5.SetValue(str(q.QHX))
-            setChoice(self.choiceOfHXSource,q.HXSource)          
+            if str(q.HXSource) in self.sourceList: self.tc6.SetValue(str(q.HXSource))          
             self.tc7.SetValue(str(q.HXTSourceInlet))
             self.tc8.SetValue(str(q.HXhSourceInlet))
             self.tc9.SetValue(str(q.HXTSourceOutlet))
             self.tc10.SetValue(str(q.HXhSourceOutlet))
-            setChoice(self.choiceOfHXSink,q.HXSink)          
+            if str(q.HXSink) in self.sinkList: self.tc11.SetValue(str(q.HXSink))          
             self.tc12.SetValue(str(q.HXTSinkInlet))
             self.tc13.SetValue(str(q.HXTSinkOutlet))
 
@@ -652,16 +448,16 @@ class PanelQ6(wx.Panel):
                         
         tmp = {
             "HXName":check(self.tc1.GetValue()),
-            "HXType":check(str(self.choiceOfHXType.GetStringSelection())),
+            "HXType":check(self.tc2.GetValue(text=True)),
             "QdotHX":check(self.tc3.GetValue()), 
             "HXLMTD":check(self.tc4.GetValue()), 
             "QHX":check(self.tc5.GetValue()), 
-            "HXSource":check(str(self.choiceOfHXSource.GetStringSelection())), 
+            "HXSource":check(self.tc6.GetValue(text=True)), 
             "HXTSourceInlet":check(self.tc7.GetValue()), 
             "HXhSourceInlet":check(self.tc8.GetValue()), 
             "HXTSourceOutlet":check(self.tc9.GetValue()), 
             "HXhSourceOutlet":check(self.tc10.GetValue()), 
-            "HXSink":check(str(self.choiceOfHXSink.GetStringSelection())), 
+            "HXSink":check(self.tc11.GetValue(text=True)), 
             "HXTSinkInlet":check(self.tc12.GetValue()), 
             "HXTSinkOutlet":check(self.tc13.GetValue()), 
             }
@@ -669,6 +465,7 @@ class PanelQ6(wx.Panel):
         hx.update(tmp)
         
         Status.SQL.commit()
+        self.fillPage()
 
                           
 #------------------------------------------------------------------------------
@@ -687,8 +484,8 @@ class PanelQ6(wx.Panel):
             self.WHEEID = q.QWasteHeatElEquip_ID
         
             self.tc101.SetValue(str(q.WHEEName))
-            setChoice(self.choiceOfWHEEEqType,q.WHEEEqType)          
-            setChoice(self.choiceOfWHEEWasteHeatType,q.WHEEWasteHeatType)          
+            if str(q.WHEEEqType) in TRANSWHEEEQTYPES.values(): self.tc102.SetValue(str(q.WHEEEqType))          
+            if str(q.WHEEWasteHeatType) in TRANSWHEEWASTEHEATTYPES.values(): self.tc103.SetValue(str(q.WHEEWasteHeatType))          
             self.tc104.SetValue(str(q.QWHEE))
             self.tc105.SetValue(str(q.WHEEMedium))
             self.tc106.SetValue(str(q.WHEEFlow))
@@ -723,8 +520,8 @@ class PanelQ6(wx.Panel):
                         
         tmp = {
             "WHEEName":check(self.tc101.GetValue()),
-            "WHEEEqType":check(str(self.choiceOfWHEEEqType.GetStringSelection())),
-            "WHEEWasteHeatType":check(str(self.choiceOfWHEEWasteHeatType.GetStringSelection())),
+            "WHEEEqType":check(self.tc102.GetValue(text=True)),
+            "WHEEWasteHeatType":check(self.tc103.GetValue(text=True)),
             "QWHEE":check(self.tc104.GetValue()), 
             "WHEEMedium":check(self.tc105.GetValue()), 
             "WHEEFlow":check(self.tc106.GetValue()), 
@@ -739,6 +536,7 @@ class PanelQ6(wx.Panel):
         whee.update(tmp)
         
         Status.SQL.commit()
+        self.fillPage()
 
 #------------------------------------------------------------------------------
     def fillPage(self):
@@ -758,22 +556,28 @@ class PanelQ6(wx.Panel):
             self.listBoxWHEE.Append(str(whee))
 
         try:
-            fillChoice(self.choiceOfHXType,HXTYPES)
+            fillChoice(self.tc2.entry,TRANSHXTYPES)
         except:
             pass
-        sourceList = Status.prj.getEqList("Equipment")
-        sourceList.extend(Status.prj.getPipeList("Pipeduct"))
-        sourceList.extend(Status.prj.getProcessList("Process"))
+        self.sourceList = Status.prj.getEqList("Equipment")
+        self.sourceList.extend(Status.prj.getPipeList("Pipeduct"))
+        self.sourceList.extend(Status.prj.getProcessList("Process"))
+        self.sourceList.extend(Status.prj.getWHEEList("WHEEName"))
         
-        fillChoice(self.choiceOfHXSource,sourceList)
+        fillChoice(self.tc6.entry,self.sourceList)
 
-        sinkList = Status.prj.getEqList("Equipment")
-        sinkList.extend(Status.prj.getPipeList("Pipeduct"))
-        sinkList.extend(Status.prj.getProcessList("Process"))
+        self.sinkList = Status.prj.getEqList("Equipment")
+        self.sinkList.extend(Status.prj.getPipeList("Pipeduct"))
+        self.sinkList.extend(Status.prj.getProcessList("Process"))
         
-        fillChoice(self.choiceOfHXSink,sinkList)
+        fillChoice(self.tc11.entry,self.sinkList)
         
 #------------------------------------------------------------------------------
+
+    def display(self):
+        self.clear()
+        self.fillPage()
+        self.Show()
 
     def clear(self):
         self.clearHX()
@@ -781,26 +585,23 @@ class PanelQ6(wx.Panel):
 
     def clearHX(self):
         self.tc1.SetValue('')
-
-        setChoice(self.choiceOfHXType,None)
-        
+        self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
-
+        self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
-
+        self.tc11.SetValue('')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
 
     def clearWHEE(self):
         self.tc101.SetValue('')
-        setChoice(self.choiceOfWHEEEqType,None)
-        setChoice(self.choiceOfWHEEWasteHeatType,None)
-
+        self.tc102.SetValue('')
+        self.tc103.SetValue('')
         self.tc104.SetValue('')
         self.tc105.SetValue('')
         self.tc106.SetValue('')

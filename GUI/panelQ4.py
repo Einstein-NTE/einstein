@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
+#	Version No.: 0.10
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger  13/04/2008
 #                           Stoyan Danov    25/04/2008
@@ -22,6 +22,9 @@
 #                           Tom Sobota      07/05/2008
 #                           Hans Schweiger  07/05/2008
 #                           Hans Schweiger  10/05/2008
+#                           Stoyan Danov    06/06/2008
+#                           Hans Schweiger  16/06/2008
+#                           Stoyan Danov    17/06/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -32,6 +35,9 @@
 #       07/05/2008  HS  Some security features added (Nones, ...)
 #                       Function "display" was duplicated. one deleted
 #       10/05/2008  HS  AddEquipmentDummy added
+#       06/06/2008  SD  label/tooltip, new displayClasses
+#       16/06/2008: HS  clean-up and adapt SQL-I/O to new label names/numbers
+#       17/06/2008: SD  order the parameters as in paper Q4H, unitdict, OnButtonOK
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -43,14 +49,22 @@
 #
 #==============================================================================
 import wx
+import pSQL
 from status import Status
 from displayClasses import *
 from GUITools import *  #HS2008-05-07 added
+from units import *
 
-# constants
-LABELWIDTH=150
+### constants
+##LABELWIDTH=150
 TEXTENTRYWIDTH=160
 
+# constants that control the default field sizes
+
+HEIGHT         =  27
+LABELWIDTH     = 180
+DATAENTRYWIDTH = 100
+UNITSWIDTH     =  90
 
 class PanelQ4(wx.Panel):
     def __init__(self, parent, main, eqId,prefill=None):
@@ -91,75 +105,179 @@ class PanelQ4(wx.Panel):
         self.sizer_4_staticbox = wx.StaticBox(self, -1, _("Equipment list"))
         self.sizer_4_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
         self.sizer_5_staticbox = wx.StaticBox(self, -1,
-                                              _("Description of equipment for heat and cold generation"))
+                                              _("Descriptive data"))
         self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-        
+
+        self.sizer_7_staticbox = wx.StaticBox(self, -1, _("Thechnical data"))
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_8_staticbox = wx.StaticBox(self, -1, _("Schedule"))
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_9_staticbox = wx.StaticBox(self, -1, _("Heat source / sink"))
+        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
         self.listBoxEquipment = wx.ListBox(self,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentClick, self.listBoxEquipment)
 
         # izquierda
-        self.tc1 = wx.TextCtrl(self,-1,'')
-        self.st1 = Label(self,self.tc1,_("Name"),_("Short name of equipment"),LABELWIDTH, TEXTENTRYWIDTH)
+#In Descriptive data
+        
+        self.tc1 = TextEntry(self,maxchars=255,value='',
+                             label=_("Short name of equipment"),
+                             tip=_("Give some brief name of the equipments to identify them in the reports"))
+        
+        self.tc2 = TextEntry(self,maxchars=255,value='',
+                             label=_("Manufacturer"),
+                             tip=_("Attach the technical data if available"))
+        
+        self.tc3 = IntEntry(self,
+                            minval=2000, maxval=2050, value=0,
+                            label=_("Year of  manufacturing or/and installation?"),
+                            tip=_("Year of manufacturing or installation"),
+                            hasunits=False)
+
+        self.tc4 = TextEntry(self,maxchars=255,value='',
+                             label=_("Model"),
+                             tip=_("Model according manufacturer nomenclature"))
+
+        self.tc5 = ChoiceEntry(self,
+                               values=TRANSEQUIPTYPE.values(),
+                               label=_("Type of equipment"),
+                               tip=_("e.g. boiler / burner / chiller / compressor / CHP motor"))
+
+        self.tc6 = IntEntry(self,
+                            minval=0, maxval=100, value=0,
+                            label=_("Number of units of the same type"),
+                            tip=_("Specify how many units of this type exist"),
+                            hasunits=False)
+#In Technical data
+
+        self.tc7 = FloatEntry(self,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict='POWER',
+                              label=_("Nominal power (heat or cold, output)"),
+                              tip=_("Power at manufacturer nominal conditions"))
+
+        self.tc8 = ChoiceEntry(self,
+                               values=[],
+                               label=_("Fuel type"),
+                               tip=_("Select fuel type from predefined list"))
+
+        self.tc9 = FloatEntry(self,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict='MASSORVOLUME',
+                              label=_("Fuel consumption (nominal)"),
+                              tip=_("Specify the units below"))
+
+        self.tc12 = FloatEntry(self,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict='POWER',
+                              label=_("Electrical power input"),
+                              tip=_("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
+
+        self.tc13 = FloatEntry(self,
+                              ipart=1, decimals=3, minval=0., maxval=1., value=0.,
+                              label=_("Mean overall thermal conversion efficiency"),
+                              tip=_("Specify the efficiency of boiler or EER(COP) for cold generation"))
+
+        self.tc17 = FloatEntry(self,
+                              ipart=1, decimals=3, minval=0., maxval=1., value=0.,
+                              label=_("Mean utilisation factor (full capacity = 100%)"),
+                              tip=_("Specify the mean supplied power of the boiler/cooler/etc. with respect to its nominal power"))
 
 
-        self.tc2 = wx.TextCtrl(self,-1,'')
-        self.st2 = Label(self,self.tc2,_("Manufacturer"),_("Who made this equipment"))
+        self.tc16 = FloatEntry(self,
+                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Temperature of exhaust gas at standard operation conditions (boilers only)"),
+                              tip=_("Only for boilers and CHP"))
 
-        self.tc3 = wx.TextCtrl(self,-1,'')
-        self.st3 = Label(self,self.tc3,_("Year"),_("Year of manufacturing or/and installation"))
+        self.tc16_2 = FloatEntry(self,
+                              ipart=2, decimals=2, minval=0., maxval=99.99, value=0.,
+                              label=_("Excess air ratio (boilers only)"),
+                              tip=_("Only for boilers and CHP"))
 
-        self.tc4 = wx.TextCtrl(self,-1,'')
-        self.st4 = Label(self,self.tc4,_("Model"),_("Model of the equipment"))
+        self.tc15 = FloatEntry(self,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict='POWER',
+                              label=_("Electricity production (CHP only)"),
+                              tip=_("Only for CHP"))
 
-        self.tc5 = wx.TextCtrl(self,-1,'')
-        self.st5 = Label(self,self.tc5,_("Type"),_("Type of equipment"))
-
-        self.tc6 = wx.TextCtrl(self,-1,'')
-        self.st6 = Label(self,self.tc6,_("Nº units"),_("Number of units of the same type"))
-
-        self.choiceOfDBFuel = wx.Choice(self,-1,choices=[])
-        self.st7 = Label(self,self.choiceOfDBFuel,_("Fuel type"),_("Fuel type"))
-
-        self.tc8 = wx.TextCtrl(self,-1,'')
-        self.st8 = Label(self,self.tc8,_("Cooling tower"),_("Only for cooling: Type of cooling tower: dry/wet ?"))
-
-        self.tc9 = wx.TextCtrl(self,-1,'')
-        self.st9 = Label(self,self.tc9,_("Nominal power"),_("Nominal Power (heat or cold,output) (kW)"))
-
-        self.tc10 = wx.TextCtrl(self,-1,'')
-        self.st10 = Label(self,self.tc10,_("Fuel consumption"),_("Fuel consumption (nominal)"))
+        self.tc14 = FloatEntry(self,
+                              ipart=1, decimals=3, minval=0., maxval=1., value=0.,
+                              label=_("Electrical conversion efficiency (CHP only)"),
+                              tip=_("Only for CHP"))
+#next from Q4C
+        self.tc102 = ChoiceEntry(self,
+                               values=[],
+                               label=_("Refrigerant (HP or Chiller only)"),
+                               tip=_("Refrigerant or working fluid (HP or Chiller only)"))
 
         # derecha
-        self.tc11 = wx.TextCtrl(self,-1,'')
-        self.st11 = Label(self,self.tc11,_("Units fuel"),_("Units (fuel consumption)"))
+#In Heat source / sink
+        self.tc20 = ChoiceEntry(self,
+                             values = [],
+                             multiple = True,
+                             label=_("Heat or cold supplyed to the distribution line / branch (piping or duct) no."),
+                             tip=_("Specify the tube for supply to the equipment, using the nomenclature of the block ''distribution system''"))
+        #
+        self.tc30 = ChoiceEntry(self,
+                               values=[],
+                               label=_("Low temperature heat source"),
+                               tip=_("If waste heat is used, indicate the process or equipment from which waste heat originates"))
 
-        self.tc12 = wx.TextCtrl(self,-1,'')
-        self.st12 = Label(self,self.tc12,_("Elect. consumption"),_("Electricity consumption (kW)"))
 
-        self.tc13 = wx.TextCtrl(self,-1,'')
-        self.st13 = Label(self,self.tc13,_("Conversion efficiency"),_("Mean overall thermal conversion efficiency (%)"))
+        self.tc31 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Temperature of low temp. heat source"),
+                              tip=_("Temperature of the medium entering the evaporator"))
 
-        self.tc14 = wx.TextCtrl(self,-1,'')
-        self.st14 = Label(self,self.tc14,_("Elect. production"),_("CHP only: Electricity production (kW)"))
 
-        self.tc15 = wx.TextCtrl(self,-1,'')
-        self.st15 = Label(self,self.tc15,_("Conversion efficiency"),_("CHP only: Electrical conversion efficiency (%)"))
+        self.tc34 = FloatEntry(self,
+                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              unitdict='POWER',
+                              label=_("Thermal power input high temp. (thermal HP and chillers only)"),
+                              tip=_("Power applied to the generator of a thermal heat pump or chiller"))
 
-        self.tc16 = wx.TextCtrl(self,-1,'')
-        self.st16 = Label(self,self.tc16,_("Temperature Exhaust"),_("Temperature of exhaust gas at standard operation conditions"))
 
-        self.tc17 = wx.TextCtrl(self,-1,'')
-        self.st17 = Label(self,self.tc17,_("Utiliz. factor"),_("Mean utilisation factor (full capacity = 100%) (%)"))
+        self.tc33 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Driving temperature (thermal HP and chillers only)"),
+                              tip=_("Temperature of heat supply fluid entering the generator"))
 
-        self.tc18 = wx.TextCtrl(self,-1,'')
-        self.st18 = Label(self,self.tc18,_("Hours of operation"),_("Hours of operation per day (hrs/day)"))
 
-        self.tc19 = wx.TextCtrl(self,-1,'')
-        self.st19 = Label(self,self.tc19,_("Days of operation"),_("Days of operation per year (days/year)"))
+        self.tc32 = ChoiceEntry(self,
+                               values=[],
+                               label=_("High temperature heat source (thermal HP and chillers only)"),
+                               tip=_("Indicate if the circuit of the heat supply to generator is closed or opened (waste heat released to ambient)"))
 
-        self.tc20 = wx.TextCtrl(self,-1,'')
-        self.st20 = Label(self,self.tc20,_("Heat or cold supplied"),_("Heat or cold supplied to the distribution line / branch (piping or duct) no."))
+#next 2 from Q4C
+        self.tc35 = ChoiceEntry(self,
+                               values=[],
+                               label=_("Destination of waste heat (chillers only)"),
+                               tip=_("If applies, specify heat exchanger where waste heat is used"))
+
+        self.tc36 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='TEMPERATURE',
+                              label=_("Temperature of re-cooling (chillers only)"),
+                              tip=_("Outlet temperature of cooling water or hot air stream"))
+
+#In Schedule
+
+        self.tc18 = FloatEntry(self,
+                              ipart=2, decimals=1, minval=0., maxval=24., value=0.,
+                              label=_("Hours of operation per day"),
+                              tip=_("Specify representative mean values"))
+
+        self.tc19 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=365., value=0.,
+                              label=_("Days of operation per year"),
+                              tip=_("Specify representative mean values"))
+
 
         self.buttonDeleteEquipment = wx.Button(self,-1,label=_("Delete equipment"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
@@ -183,8 +301,7 @@ class PanelQ4(wx.Panel):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        #grid_sizer_1 = wx.FlexGridSizer(10, 4, 10, 10) #r,c,vsep,hsep
-        grid_sizer_1 = wx.FlexGridSizer(10, 4, 10, 2) #r,c,vsep,hsep
+        grid_sizer_1 = wx.FlexGridSizer(14, 2, 10, 10) #r,c,vsep,hsep
         sizer_4 = wx.StaticBoxSizer(self.sizer_4_staticbox, wx.VERTICAL)
         sizer_4.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
         sizer_4.Add(self.buttonDeleteEquipment, 0, wx.EXPAND, 0)
@@ -197,48 +314,35 @@ class PanelQ4(wx.Panel):
 
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
         flagText = wx.EXPAND|wx.ALIGN_CENTER_VERTICAL
-        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc1, 0, flagText, 0)
-        grid_sizer_1.Add(self.st11, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc11, 0, flagText, 0)
-        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-        grid_sizer_1.Add(self.st12, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc12, 0, flagText, 0)
-        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-        grid_sizer_1.Add(self.st13, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc13, 0, flagText, 0)
-        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-        grid_sizer_1.Add(self.st14, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc14, 0, flagText, 0)
-        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-        grid_sizer_1.Add(self.st15, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc15, 0, flagText, 0)
-        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
-        grid_sizer_1.Add(self.st16, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc16, 0, flagText, 0)
-        grid_sizer_1.Add(self.st7, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.choiceOfDBFuel, 0, flagText, 0)
-        grid_sizer_1.Add(self.st17, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc17, 0, flagText, 0)
-        grid_sizer_1.Add(self.st8, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc8, 0, flagText, 0)
-        grid_sizer_1.Add(self.st18, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc18, 0, flagText, 0)
-        grid_sizer_1.Add(self.st9, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc9, 0, flagText, 0)
-        grid_sizer_1.Add(self.st19, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc19, 0, flagText, 0)
-        grid_sizer_1.Add(self.st10, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc10, 0, flagText, 0)
-        grid_sizer_1.Add(self.st20, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc20, 0, flagText, 0)
         grid_sizer_1.Add(self.dummy1, 0, wx.EXPAND, 0)
+#        grid_sizer_1.Add(self.tc11, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc12, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc13, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc14, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc15, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc16, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc7, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc17, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc8, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc18, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc9, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc19, 0, flagText, 0)
+#        grid_sizer_1.Add(self.tc10, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc20, 0, flagText, 0)
         grid_sizer_1.Add(self.dummy2, 0, wx.EXPAND, 0)
+        grid_sizer_1.Add(self.tc30, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc31, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc32, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc33, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc34, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc35, 0, flagText, 0)
+        grid_sizer_1.Add(self.tc36, 0, flagText, 0)
             
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
@@ -275,47 +379,55 @@ class PanelQ4(wx.Panel):
     def OnButtonCancel(self, event):
         self.clear()
 
-    def OnButtonOK(self, event):
-        equipeName = check(self.tc1.GetValue())
-        equipments = Status.DB.qgenerationhc.Equipment[equipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
-	if equipeName <> 'NULL' and len(equipments) == 0:
+    def OnButtonOK(self, event):
+
+        if Status.PId == 0:
+	    return
+        equipeName = check(self.tc1.GetValue())
+        equipments = Status.DB.qgenerationhc.Equipment[equipeName].\
+                     Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+
+	if equipeName != 'NULL' and len(equipments) == 0:
             equipe = Status.prj.addEquipmentDummy()
-        elif equipeName <> 'NULL' and len(equipments) == 1:
+        elif equipeName != 'NULL' and len(equipments) == 1:
             equipe = equipments[0]
         else:
-	    print "Equipment name has to be a uniqe value!"
+	    print "PanelQ4 (ButtonOK) Equipment name has to be a unique value!"
 	    return
 
-        fuelName = str(self.choiceOfDBFuel.GetStringSelection())
-        fuels = Status.DB.dbfuel.FuelName[fuelName]
-        if len(fuels)>0:
-            dbfid = fuels[0].DBFuel_ID
-        else:
-            dbfid = None
-            print "PANELQ4: warning - fuel not found in DB"
+        fuelDict = Status.prj.getFuelDict()
+        fluidDict = Status.prj.getFluidDict()
+        pipeDict = Status.prj.getPipeDict()
 
         tmp = {
             "Equipment":check(self.tc1.GetValue()),
             "Manufact":check(self.tc2.GetValue()),
             "YearManufact":check(self.tc3.GetValue()),
             "Model":check(self.tc4.GetValue()),
-            "EquipType":check(self.tc5.GetValue()),
+            "EquipType":check(findKey(TRANSEQUIPTYPES,self.tc5.GetValue(text=True))), 
             "NumEquipUnits":check(self.tc6.GetValue()),
-            "DBFuel_id":dbfid,
-            "HCGPnom":check(self.tc9.GetValue()),
-            "FuelConsum":check(self.tc10.GetValue()),
-            "UnitsFuelConsum":check(self.tc11.GetValue()),
+            "HCGPnom":check(self.tc7.GetValue()),
+            "DBFuel_id":check(findKey(fuelDict,self.tc8.GetValue(text=True))),
+            "FuelConsum":check(self.tc9.GetValue()),
             "ElectriConsum":check(self.tc12.GetValue()),
             "HCGTEfficiency":check(self.tc13.GetValue()),
-            "HCGEEfficiency":check(self.tc14.GetValue()),
-            "ElectriProduction":check(self.tc15.GetValue()),
+            "PartLoad":check(self.tc17.GetValue()),            
             "TExhaustGas":check(self.tc16.GetValue()),
-            "PartLoad":check(self.tc17.GetValue()),
+            "ExcessAirRatio":check(self.tc16_2.GetValue()),
+            "ElectriProduction":check(self.tc15.GetValue()),
+            "HCGEEfficiency":check(self.tc14.GetValue()),
+            "PipeDuctEquip":self.getPipeIDString(self.tc20.GetValue()),
+            "HeatSourceLT":check(self.tc30.GetValue(text=True)),
+            "THeatSourceLT":check(self.tc31.GetValue()),
+            "ThermalConsum":check(self.tc34.GetValue()),
+            "THeatSourceHT":check(self.tc33.GetValue()),
+            "HeatSourceHT":check(findKey(pipeDict,self.tc32.GetValue(text=True))),
+            "Refrigerant":self.getPipeIDString(),
+            "DestinationWasteHeat":check(self.tc35.GetValue(text=True)),
+            "TemperatureReCooling":check(self.tc36.GetValue()),
             "HPerDayEq":check(self.tc18.GetValue()),
-            "NDaysEq":check(self.tc19.GetValue()),
-            "PipeDuctEquip":check(self.tc20.GetValue()),
-            "CoolTowerType":check(self.tc8.GetValue())
+            "NDaysEq":check(self.tc19.GetValue()),  
             }
 
         equipe.update(tmp)
@@ -329,37 +441,61 @@ class PanelQ4(wx.Panel):
         event.Skip()
 
 
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
 
 #HS2004-04-13 function display extracted from event handler
 
-    def display(self,q):
-        self.tc1.SetValue(str(q.Equipment))
-        self.tc2.SetValue(str(q.Manufact))
-        self.tc3.SetValue(str(q.YearManufact))
-        self.tc4.SetValue(str(q.Model))
-        self.tc5.SetValue(str(q.EquipType))
-        self.tc6.SetValue(str(q.NumEquipUnits))
-        self.tc9.SetValue(str(q.HCGPnom))
-        self.tc10.SetValue(str(q.FuelConsum))
-        self.tc11.SetValue(str(q.UnitsFuelConsum))
-        self.tc12.SetValue(str(q.ElectriConsum))
-        self.tc13.SetValue(str(q.HCGTEfficiency))
-        self.tc14.SetValue(str(q.HCGEEfficiency))
-        self.tc15.SetValue(str(q.ElectriProduction))
-        self.tc16.SetValue(str(q.TExhaustGas))
-        self.tc17.SetValue(str(q.PartLoad))
-        self.tc18.SetValue(str(q.HPerDayEq))
-        self.tc19.SetValue(str(q.NDaysEq))
-        self.tc20.SetValue(str(q.PipeDuctEquip))
-        self.tc8.SetValue(str(q.CoolTowerType))
-#HS2008-05-07:
-        if q.DBFuel_id <> None:
-            fuels = Status.DB.dbfuel.DBFuel_ID[q.DBFuel_id]
-            if len(fuels)>0:
-                self.choiceOfDBFuel.SetSelection(self.choiceOfDBFuel.FindString(fuels[0].FuelName))
+    def display(self,q=None):
+        self.fillChoiceOfDBFuel()
+        self.fillChoiceOfFluid()
+        self.fillChoiceOfPipe()
+        self.fillChoiceOfLTSource()
+        self.fillChoiceOfLTSink()
+        self.fillChoiceOfHTSource()
+        self.clear()
+        self.fillPage()
+
+        pipeDict = Status.prj.getPipeDict()
+        fuelDict = Status.prj.getFuelDict()
+        
+        if q is not None:
+            self.tc1.SetValue(str(q.Equipment))
+            self.tc2.SetValue(str(q.Manufact))
+            self.tc3.SetValue(str(q.YearManufact))
+            self.tc4.SetValue(str(q.Model))
+            self.tc5.SetValue(str(q.EquipType))
+            self.tc6.SetValue(str(q.NumEquipUnits))
+            self.tc7.SetValue(str(q.HCGPnom))
+
+            if q.DBFuel_id in fuelDict.keys():
+                self.tc8.SetValue(fuelDict[q.DBFuel_id])
+
+            self.tc9.SetValue(str(q.FuelConsum))
+
+            self.tc12.SetValue(str(q.ElectriConsum))
+            self.tc13.SetValue(str(q.HCGTEfficiency))
+            self.tc14.SetValue(str(q.HCGEEfficiency))
+            self.tc15.SetValue(str(q.ElectriProduction))
+            self.tc16.SetValue(str(q.TExhaustGas))
+            self.tc16_2.SetValue(str(q.ExcessAirRatio))
+            self.tc17.SetValue(str(q.PartLoad))
+            self.tc18.SetValue(str(q.HPerDayEq))
+            self.tc19.SetValue(str(q.NDaysEq))
+            self.tc20.SetValue(self.getPipeNames(q.PipeDuctEquip))
+            self.tc30.SetValue(str(q.HeatSourceLT))
+            self.tc31.SetValue(str(q.THeatSourceLT))
+            
+            if q.HeatSourceHT in pipeDict.keys():
+                self.tc32.SetValue(pipeDict[q.HeatSourceHT])
+                
+            self.tc33.SetValue(str(q.THeatSourceHT))
+            self.tc34.SetValue(str(q.ThermalConsum))
+    #        self.tc35.SetValue(str(q.))
+    #        self.tc36.SetValue(str(q.))
+
         self.Show()
 
     def clear(self):
@@ -369,11 +505,10 @@ class PanelQ4(wx.Panel):
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
-
+        self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
-        self.tc10.SetValue('')
-        self.tc11.SetValue('')
+
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
@@ -383,6 +518,14 @@ class PanelQ4(wx.Panel):
         self.tc18.SetValue('')
         self.tc19.SetValue('')
         self.tc20.SetValue('')
+        
+        self.tc30.SetValue('')
+        self.tc31.SetValue('')
+        self.tc32.SetValue('')
+        self.tc33.SetValue('')
+        self.tc34.SetValue('')
+        self.tc35.SetValue('')
+        self.tc36.SetValue('')
 
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()
@@ -390,20 +533,74 @@ class PanelQ4(wx.Panel):
             for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
                 self.listBoxEquipment.Append (str(n.Equipment))
 
-
     def fillChoiceOfDBFuel(self):
-        self.choiceOfDBFuel.Clear()
-        self.choiceOfDBFuel.Append ("None")
+        self.tc8.entry.Clear()
         for n in Status.DB.dbfuel.FuelName["%"]:
-            self.choiceOfDBFuel.Append (n.FuelName)
-        self.choiceOfDBFuel.SetSelection(0)
+            self.tc8.entry.Append (n.FuelName)
 
+    def fillChoiceOfFluid(self):
+        fluidDict = Status.prj.getFluidDict()
+        fluidNames = fluidDict.values()
+        self.tc102.entry.Clear()
+        for name in fluidNames:
+            self.tc102.entry.Append(name)
+
+    def fillChoiceOfPipe(self):
+        pipeList = Status.prj.getPipeList("Pipeduct")
+        self.tc20.entry.Clear()
+        for pipe in pipeList:
+            self.tc20.entry.Append(pipe)
+
+    def fillChoiceOfLTSource(self):
+        hxList = Status.prj.getHXList("HXName")
+        self.tc30.entry.Clear()
+        for src in TRANSAMBIENTSOURCE.values():
+            self.tc30.entry.Append(src)
+        for hx in hxList:
+            self.tc30.entry.Append(hx)
+
+    def fillChoiceOfHTSource(self):
+        pipeList = Status.prj.getPipeList("Pipeduct")
+        self.tc32.entry.Clear()
+        for pipe in pipeList:
+            self.tc32.entry.Append(pipe)
+
+    def fillChoiceOfLTSink(self):
+        hxList = Status.prj.getHXList("HXName")
+        self.tc35.entry.Clear()
+        for src in TRANSAMBIENTSINK.values():
+            self.tc35.entry.Append(src)
+        for hx in hxList:
+            self.tc35.entry.Append(hx)
 
     def fillPage(self):
 	if Status.PId != 0:
 	    self.fillEquipmentList()
 
-#HS2008-05-07: function "check" eliminated. use common function from GUITools
+    def getPipeNames(self,IDString):
+        print "PanelQ4 (getPipeNames): Getting pipenames from :",IDString
+        pipeDict = Status.prj.getPipeDict()
+        pipeIDsSQL = IDString.split(';')
+        pipes = []
+        for i in pipeIDsSQL:
+            pipeID = int(i)
+            if pipeID in pipeDict.keys():
+                pipes.append(pipeDict[pipeID])
+        print "PanelQ4: Names of pipes stored in SQL :",pipes
+        return pipes
+            
+    def getPipeIDString(self,nameList):
+        print "PanelQ4 (getPipeIDString): Getting pipeIDs from :",nameList
+        pipeDict = Status.prj.getPipeDict()
+        pipeIDs = []
+        for name in nameList:
+            pipeID = findKey(pipeDict,name)
+            pipeIDs.append("%10d"%pipeID)
+            
+        IDString = ";".join(pipeIDs)
+        print "PanelQ4: ID's of pipes stored in SQL :",IDString
+        return IDString
+            
 
 if __name__ == '__main__':
     import pSQL

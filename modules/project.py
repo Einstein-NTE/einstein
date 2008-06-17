@@ -1112,8 +1112,8 @@ class Project(object):
         pipes = self.getPipes()     
         pipeDict = {}
         for pipe in pipes:
-            pipeName = pipes["Pipeduct"]
-            pipeID = pipes["QDistributionHC_ID"]
+            pipeName = pipe["Pipeduct"]
+            pipeID = pipe["QDistributionHC_ID"]
             pipeDict.update({pipeID:pipeName})
 
         return pipeDict
@@ -1473,10 +1473,8 @@ class Project(object):
         sqlQuery = "% ORDER BY FluidName ASC"
 #        fluids = Status.DB.dbfluid.sql_select(sqlQuery)
         fluids = Status.DB.dbfluid.FluidName["%"]       
-        print "getFluiddict: fluid data base ->", fluids
         fluidDict = {}
         for fluid in fluids:
-            print "getFluiddict: ", fluid
             fluidName = fluid["FluidName"]
             fluidID = fluid["DBFluid_ID"]
             fluidDict.update({fluidID:fluidName})
@@ -1492,10 +1490,8 @@ class Project(object):
         sqlQuery = "% ORDER BY FuelName ASC"
 #        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
         fuels = Status.DB.dbfuel.FuelName["%"]       
-        print "getFuelDict: fuel data base ->", fuels
         fuelDict = {}
         for fuel in fuels:
-            print "getFuelDict: ", fuel
             fuelName = fuel["FuelName"]
             fuelID = fuel["DBFuel_ID"]
             fuelDict.update({fuelID:fuelName})
@@ -1511,10 +1507,8 @@ class Project(object):
         sqlQuery = "% ORDER BY UnitOperation ASC"
 #        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
         unitOperations = Status.DB.dbunitoperation.UnitOperation["%"]       
-        print "getUnitOpDict: dbunitoperation data base ->", unitOperations
         unitOpDict = {}
         for unitOperation in unitOperations:
-            print "getUnitOpDict: ", unitOperation
             unitOperationName = unitOperation["UnitOperation"]
             unitOperationID = unitOperation["DBUnitOperation_ID"]
             unitOpDict.update({unitOperationID:unitOperationName})
