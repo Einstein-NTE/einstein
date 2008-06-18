@@ -15,9 +15,11 @@
 #	Created by: 	    Tom Sobota	28/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #	
 #------------------------------------------------------------------------------		
@@ -66,8 +68,8 @@ class PanelEM2(wx.Panel):
         paramList={'labels'      : labels_column,                 # labels column
                    'data'        : 4,                             # data column for this graph
                    'key'         : keys[0],                       # key for Interface
-                   'title'       : 'Monthly process heat supply', # title of the graph
-                   'ylabel'      : 'UPH (MWh)',                   # y axis label
+                   'title'       : _('Monthly process heat supply'), # title of the graph
+                   'ylabel'      : _('UPH (MWh)'),                   # y axis label
                    'backcolor'   : GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                             # tick label fontsize
                    'ignoredrows' : [0,12]}                        # rows that should not be plotted
@@ -136,7 +138,7 @@ class PanelEM2(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=wxID_PANELEM2BTNBACK)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=u'OK', name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
               parent=self, pos=wx.Point(272, 520), size=wx.Size(104, 32),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

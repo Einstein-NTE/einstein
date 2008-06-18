@@ -16,10 +16,12 @@
 #	Created by: 	    Tom Sobota 21/03/2008
 #       Revised by:         Tom Sobota 29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -68,7 +70,7 @@ class PanelEA4(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : 'UPH by processes',      # title of the graph
+                   'title'       : _('UPH by process'),       # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -84,7 +86,7 @@ class PanelEA4(wx.Panel):
         paramList={'labels'      : labels_column,              # labels column
                    'data'        : 3,                          # data column for this graph
                    'key'         : keys[1],                    # key for Interface
-                   'title'       : 'HD by process temperature',# title of the graph
+                   'title'       : _('HD by process temperature'),# title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR}     # graph background color
 
         dummy = Mp.MatPanel(self.panelGraphHD,
@@ -113,9 +115,9 @@ class PanelEA4(wx.Panel):
         self.grid1.SetColSize(0,115)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, "Process")
-        self.grid1.SetColLabelValue(1, "MWh")
-        self.grid1.SetColLabelValue(2, "%")
+        self.grid1.SetColLabelValue(0, _("Process"))
+        self.grid1.SetColLabelValue(1, _("MWh"))
+        self.grid1.SetColLabelValue(2, _("%"))
         #
         # copy values from dictionary to grid
         #
@@ -146,10 +148,10 @@ class PanelEA4(wx.Panel):
         self.grid2.SetColSize(3,100)
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, "Process")
-        self.grid2.SetColLabelValue(1, "Process\ntemperature")
-        self.grid2.SetColLabelValue(2, "Distribution\ntemperature")
-        self.grid2.SetColLabelValue(3, "Heat\ndemand MWh")
+        self.grid2.SetColLabelValue(0, _("Process"))
+        self.grid2.SetColLabelValue(1, _("Process\ntemperature"))
+        self.grid2.SetColLabelValue(2, _("Distribution\ntemperature"))
+        self.grid2.SetColLabelValue(3, _("Heat\ndemand MWh"))
         #
         # copy values from dictionary to grid
         #
@@ -174,12 +176,12 @@ class PanelEA4(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA4STATICTEXT1,
-              label=u'Useful process heat (UPH) demand by process.',
+              label=_(u'Useful process heat (UPH) demand by process.'),
               name='staticText1', parent=self, pos=wx.Point(40, 8),
               size=wx.Size(580, 20), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA4STATICTEXT2,
-              label=u'UPH by process', name='staticText2',
+              label=_(u'UPH by process'), name='staticText2',
               parent=self, pos=wx.Point(220, 70), size=wx.Size(270, 17),
               style=0)
 
@@ -193,7 +195,7 @@ class PanelEA4(wx.Panel):
         self.panelGraphUPH.SetBackgroundColour(wx.Colour(127, 127, 127))
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA4STATICTEXT3,
-              label=u'Heat demand by process temperature.', name='staticText3',
+              label=_(u'Heat demand by process temperature.'), name='staticText3',
               parent=self, pos=wx.Point(40, 324), size=wx.Size(580, 20),
               style=0)
 

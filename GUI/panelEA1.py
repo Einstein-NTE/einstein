@@ -17,11 +17,13 @@
 #       Revised by:         Hans Schweiger 28/03/2008
 #                           Tom Sobota 29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       28/03/08:           included functions draw ... (before in module)
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          changed method display to display graphics the first time
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -105,7 +107,7 @@ class PanelEA1(wx.Panel):
         data_column = 2
 
         # title of the graph
-        title = 'FEC by fuel'
+        title = _('FEC by fuel')
 
         # background color of the graph
         backcolor = GRAPH_BACKGROUND_COLOR
@@ -143,7 +145,7 @@ class PanelEA1(wx.Panel):
         paramList={'labels'      : 0,                 # labels column
                    'data'        : 4,                 # data column for this graph
                    'key'         : self.keys[0],      # key for Interface
-                   'title'       : 'FET by fuel',     # title of the graph
+                   'title'       : _('FET by fuel'),     # title of the graph
                    'backcolor'   : backcolor,         # graph background color
                    'tickfontsize': ticklabelfontsize, # tick label fontsize
                    'ignoredrows' : ignoredrows}       # rows that should not be plotted
@@ -180,11 +182,11 @@ class PanelEA1(wx.Panel):
         self.grid.SetColSize(0,115)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(GRID_LABEL_SIZE, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Fuel type")
-        self.grid.SetColLabelValue(1, "MWh")
-        self.grid.SetColLabelValue(2, "%")
-        self.grid.SetColLabelValue(3, "MWh")
-        self.grid.SetColLabelValue(4, "%")
+        self.grid.SetColLabelValue(0, _("Fuel type"))
+        self.grid.SetColLabelValue(1, _("MWh"))
+        self.grid.SetColLabelValue(2, _("%"))
+        self.grid.SetColLabelValue(3, _("MWh"))
+        self.grid.SetColLabelValue(4, _("%"))
 
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
@@ -214,8 +216,8 @@ class PanelEA1(wx.Panel):
               size=wx.Size(800, 600), style=wx.DEFAULT_FRAME_STYLE)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA1STATICTEXT1,
-              label=u'Total final energy consumption (FEC) and\n' + \
-                                         u'final energy consumption for thermal use (FET)',
+              label=_(u'Total final energy consumption (FEC) and\n') + \
+                                         _(u'final energy consumption for thermal use (FET)'),
               name='staticText1', parent=self, pos=wx.Point(130, 8),
               size=wx.Size(500, 50), style=0)
         self.staticText1.Center(wx.HORIZONTAL)
@@ -235,14 +237,14 @@ class PanelEA1(wx.Panel):
         self.panelGraphFET.SetBackgroundColour(wx.Colour(127, 127, 127))
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA1STATICTEXT2,
-              label=u'Final energy\nconsumption (FEC)', name='staticText3',
+              label=_(u'Final energy\nconsumption (FEC)'), name='staticText3',
               parent=self, pos=wx.Point(300, 70), size=wx.Size(219, 30),
               style=0)
         self.staticText2.SetFont(wx.Font(9, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'Sans'))
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA1STATICTEXT3,
-              label=u'Final energy for\nthermal use', name='staticText4',
+              label=_(u'Final energy for\nthermal use'), name='staticText4',
               parent=self, pos=wx.Point(460, 70), size=wx.Size(191, 30),
               style=0)
         self.staticText3.SetFont(wx.Font(9, wx.SWISS, wx.NORMAL, wx.NORMAL,

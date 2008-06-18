@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
 #                           Hans Schweiger          03/04/2008
@@ -424,7 +424,7 @@ class PanelBB(wx.Panel):
             self.choiceConfig4.SetSelection(0)
 #            self.choiceConfig4.SetSelection(TYPELIST.index(self.config[1]))
         except:
-            print "PanelBB (display): was asked to display an erroneous heat pump type",self.config[1]
+            print _("PanelBB (display): was asked to display an erroneous heat pump type"),self.config[1]
             pass
 
         self.tcConfig5.SetValue(str(self.config[4]))
@@ -476,12 +476,12 @@ class PanelBB(wx.Panel):
                                 False)                     # database table can be edited in DBEditFrame?
 
             if pu1.ShowModal() == wx.ID_OK:
-                print 'PanelBB AddEquipment accepted. Id='+str(pu1.theId)
+                print _('PanelBB AddEquipment accepted. Id=')+str(pu1.theId)
             else:
                 self.mod.deleteEquipment(None)
             self.display()
         except:
-            print "PanelBB (HPAddButton): could not create equipment dummy"
+            print _("PanelBB (HPAddButton): could not create equipment dummy")
 	    pass
 
 #------------------------------------------------------------------------------		
@@ -517,7 +517,7 @@ class PanelBB(wx.Panel):
                 self.mod.deleteEquipment(rowNo)
                 self.display()
                 
-        elif (ret == "edit"):
+        elif (ret == _("edit")):
             OnGridPageBBGridCellLeftDclick(self,event)
         
 #------------------------------------------------------------------------------		
@@ -527,43 +527,43 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
-        print "PanelBB: new config[%s] value: "%0,self.config[0]
+        print _("PanelBB: new config[%s] value: ")%0,self.config[0]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig2TextEnter(self, event):
         self.config[1] = self.tcConfig2.GetValue()
-        print "PanelBB: new config[%s] value: "%1,self.config[1]
+        print _("PanelBB: new config[%s] value: ")%1,self.config[1]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnCbConfig3Checkbox(self, event):
         self.config[2] = self.cbConfig3.GetValue()
-        print "PanelBB: new config[%s] value: "%2,self.config[2]
+        print _("PanelBB: new config[%s] value: ")%2,self.config[2]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnChoiceConfig4Choice(self, event):
         self.config[3] = FUELLIST[self.choiceConfig4.GetSelection()]
-        print "PanelBB: new config[%s] value: "%3,self.config[3]
+        print _("PanelBB: new config[%s] value: ")%3,self.config[3]
         Interfaces.GData["HP Config"] = self.config[3]
         self.mod.setUserDefinedPars()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
-        print "PanelBB: new config[%s] value: "%4,self.config[4]
+        print _("PanelBB: new config[%s] value: ")%4,self.config[4]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
-        print "PanelBB: new config[%s] value: "%5,self.config[5]
+        print _("PanelBB: new config[%s] value: ")%5,self.config[5]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
-        print "PanelBB: new config[%s] value: "%6,self.config[6]
+        print _("PanelBB: new config[%s] value: ")%6,self.config[6]
         Interfaces.GData["HP Config"] = self.config
         self.mod.setUserDefinedPars()
 
@@ -577,7 +577,7 @@ class PanelBB(wx.Panel):
         self.Hide()
 
     def OnButtonpageBBCancelButton(self, event):
-        print "Button exitModuleCancel: CANCEL Option not yet foreseen"
+        print _("Button exitModuleCancel: CANCEL Option not yet foreseen")
 
     def OnButtonpageBBBackButton(self, event):
         self.main.tree.SelectItem(self.main.qHP, select=True)

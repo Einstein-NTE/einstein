@@ -15,10 +15,12 @@
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota 29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -66,7 +68,7 @@ class PanelEA2(wx.Panel):
         paramList={'labels'      : 0,                     # labels column
                    'data'        : 2,                     # data column for this graph
                    'key'         : keys[0],               # key for Interface
-                   'title'       :'PEC by fuel',          # title of the graph
+                   'title'       :_('PEC by fuel'),          # title of the graph
                    'backcolor'   :GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' :[2]}                    # rows that should not be plotted
 
@@ -82,7 +84,7 @@ class PanelEA2(wx.Panel):
         paramList={'labels'      : 0,                     # labels column
                    'data'        : 4,                     # data column for this graph
                    'key'         : keys[0],               # key for Interface
-                   'title'       :'PET by fuel',          # title of the graph
+                   'title'       :_('PET by fuel'),          # title of the graph
                    'backcolor'   :GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' :[2]}                    # rows that should not be plotted
 
@@ -104,14 +106,14 @@ class PanelEA2(wx.Panel):
         self.grid.SetColSize(0,160)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Fuel type")
-        self.grid.SetColLabelValue(1, "MWh")
-        self.grid.SetColLabelValue(2, "%")
-        self.grid.SetColLabelValue(3, "MWh")
-        self.grid.SetColLabelValue(4, "%")
-        self.grid.SetCellValue(0,0,"Total Fuels")
-        self.grid.SetCellValue(1,0,"Total Electricity")
-        self.grid.SetCellValue(2,0,"Total (Fuels+Electricity)")
+        self.grid.SetColLabelValue(0, _("Fuel type"))
+        self.grid.SetColLabelValue(1, _("MWh"))
+        self.grid.SetColLabelValue(2, _("%"))
+        self.grid.SetColLabelValue(3, _("MWh"))
+        self.grid.SetColLabelValue(4, _("%"))
+        self.grid.SetCellValue(0,0,_("Total Fuels"))
+        self.grid.SetCellValue(1,0,_("Total Electricity"))
+        self.grid.SetCellValue(2,0,_("Total (Fuels+Electricity)"))
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
@@ -141,7 +143,7 @@ class PanelEA2(wx.Panel):
               style=wx.DEFAULT_FRAME_STYLE)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA2STATICTEXT1,
-              label=u'Total primary energy consumption (PEC) and primary energy\nconsumption for thermal use (PET)',
+              label=_(u'Total primary energy consumption (PEC) and primary energy\nconsumption for thermal use (PET)'),
               name='staticText1', parent=self, pos=wx.Point(200, 8),
               size=wx.Size(580, 40), style=0)
         self.staticText1.Center(wx.HORIZONTAL)
@@ -161,11 +163,11 @@ class PanelEA2(wx.Panel):
         self.panelGraphPET.SetBackgroundColour(wx.Colour(127, 127, 127))
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA2STATICTEXT2,
-              label=u'PEC', name='staticText2', parent=self, pos=wx.Point(405,
+              label=_(u'PEC'), name='staticText2', parent=self, pos=wx.Point(405,
               82), size=wx.Size(56, 17), style=0)
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA2STATICTEXT3,
-              label=u'PET', name='staticText3', parent=self, pos=wx.Point(565,
+              label=_(u'PET'), name='staticText3', parent=self, pos=wx.Point(565,
               82), size=wx.Size(40, 17), style=0)
 
 

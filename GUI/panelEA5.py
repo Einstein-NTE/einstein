@@ -15,10 +15,12 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #	
 #------------------------------------------------------------------------------		
@@ -67,7 +69,7 @@ class PanelEA5(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : 'Energy intensity',     # title of the graph
+                   'title'       : _('Energy intensity'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : [2]}                    # rows that should not be plotted
 
@@ -83,9 +85,9 @@ class PanelEA5(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : keys[1],                # key for Interface
-                   'title'       : 'SEC by product',       # title of the graph
+                   'title'       : _('SEC by product'),       # title of the graph
                    'ylabel'      : 'Energy',
-                   'legend'      : ['Energy by fuels', 'Energy by electricity', 'Primary energy'], # legend
+                   'legend'      : [_('Energy by fuels'), _('Energy by electricity'), _('Primary energy')], # legend
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -114,8 +116,8 @@ class PanelEA5(wx.Panel):
         self.grid1.SetColSize(1,125)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, "Energy type")
-        self.grid1.SetColLabelValue(1, "Energy intensity\nkWh/euro")
+        self.grid1.SetColLabelValue(0, _("Energy type"))
+        self.grid1.SetColLabelValue(1, _("Energy intensity\nkWh/euro"))
         #
         # copy values from dictionary to grid
         #
@@ -146,10 +148,10 @@ class PanelEA5(wx.Panel):
         self.grid2.SetColSize(3,100)
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, "Product")
-        self.grid2.SetColLabelValue(1, "Energy by\nfuels\nkWh/pu")
-        self.grid2.SetColLabelValue(2, "Energy by\nelectricity\nkWh/pu")
-        self.grid2.SetColLabelValue(3, "Primary\nenergy\nkWh/pu")
+        self.grid2.SetColLabelValue(0, _("Product"))
+        self.grid2.SetColLabelValue(1, _("Energy by\nfuels\nkWh/pu"))
+        self.grid2.SetColLabelValue(2, _("Energy by\nelectricity\nkWh/pu"))
+        self.grid2.SetColLabelValue(3, _("Primary\nenergy\nkWh/pu"))
         #
         # copy values from dictionary to grid
         #
@@ -173,7 +175,7 @@ class PanelEA5(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA5STATICTEXT1,
-              label=u'Energy intensity by energy type (turnover)',
+              label=_(u'Energy intensity by energy type (turnover)'),
               name='staticText1', parent=self, pos=wx.Point(40, 8),
               size=wx.Size(580, 20), style=0)
 
@@ -188,7 +190,7 @@ class PanelEA5(wx.Panel):
 
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA5STATICTEXT2,
-              label=u'Specific energy consumption (SEC) by product.',
+              label=_(u'Specific energy consumption (SEC) by product.'),
               name='staticText2', parent=self, pos=wx.Point(40, 324),
               size=wx.Size(580, 20), style=0)
 

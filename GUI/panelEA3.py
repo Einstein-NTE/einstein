@@ -15,10 +15,12 @@
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #	
 #------------------------------------------------------------------------------		
@@ -76,7 +78,7 @@ class PanelEA3(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : 'FET by equipment',     # title of the graph
+                   'title'       : _('FET by equipment'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -100,7 +102,7 @@ class PanelEA3(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : keys[1],                # key for Interface
-                   'title'       : 'USH by equipment',     # title of the graph
+                   'title'       : _('USH by equipment'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -138,10 +140,10 @@ class PanelEA3(wx.Panel):
         self.grid1.SetColSize(1,115)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, "Equipment")
-        self.grid1.SetColLabelValue(1, "Fuel type")
-        self.grid1.SetColLabelValue(2, "MWh")
-        self.grid1.SetColLabelValue(3, "%")
+        self.grid1.SetColLabelValue(0, _("Equipment"))
+        self.grid1.SetColLabelValue(1, _("Fuel type"))
+        self.grid1.SetColLabelValue(2, _("MWh"))
+        self.grid1.SetColLabelValue(3, _("%"))
         #
         # copy values from dictionary to grid
         #
@@ -178,9 +180,9 @@ class PanelEA3(wx.Panel):
         self.grid2.SetColSize(0,120)
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, "Equipment")
-        self.grid2.SetColLabelValue(1, "MWh")
-        self.grid2.SetColLabelValue(2, "%")
+        self.grid2.SetColLabelValue(0, _("Equipment"))
+        self.grid2.SetColLabelValue(1, _("MWh"))
+        self.grid2.SetColLabelValue(2, _("%"))
         #
         # copy values from dictionary to grid
         #
@@ -209,12 +211,12 @@ class PanelEA3(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA3STATICTEXT1,
-              label=u'Final energy consumption for thermal use (FET) by equipment',
+              label=_(u'Final energy consumption for thermal use (FET) by equipment'),
               name='staticText1', parent=self, pos=wx.Point(40, 8),
               size=wx.Size(580, 20), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA3STATICTEXT2,
-              label=u'FET by equipment',
+              label=_(u'FET by equipment'),
               name='staticText2', parent=self, pos=wx.Point(320, 70),
               size=wx.Size(50, 17), style=0)
 
@@ -229,12 +231,12 @@ class PanelEA3(wx.Panel):
 
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA3STATICTEXT3,
-              label=u'Useful supply heat (USH) by equipment',
+              label=_(u'Useful supply heat (USH) by equipment'),
               name='staticText3', parent=self, pos=wx.Point(40, 324),
               size=wx.Size(580, 20), style=0)
 
         self.staticText4 = wx.StaticText(id=wxID_PANELEA3STATICTEXT4,
-              label=u'USH by equipment',
+              label=_(u'USH by equipment'),
               name='staticText4', parent=self, pos=wx.Point(200, 372),
               size=wx.Size(50, 17), style=0)
 

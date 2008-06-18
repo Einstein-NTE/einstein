@@ -19,12 +19,14 @@
 #                           Hans Schweiger  03/04/2008
 #                           Hans Schweiger  16/04/2008
 #                           Hans Schweiger  29/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
 #       03/04/08:           moduleEnergy passed from Interfaces
 #       16/04/08:   HS      main as argument in __init__
 #       29/04/08:   HS      method display added
+#       18/06/2008 SD: change to translatable text _(...)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -84,7 +86,7 @@ class PanelEnergy(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : 'Energy demand',        # title of the graph
+                   'title'       : _('Energy demand'),        # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -95,7 +97,7 @@ class PanelEnergy(wx.Panel):
         paramList={'labels'      : labels_column,            # labels column
                    'data'        : 2,                        # data column for this graph
                    'key'         : keys[0],                  # key for Interface
-                   'title'       : 'Comparative performance',# title of the graph
+                   'title'       : _('Comparative performance'),# title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR,   # graph background color
                    'ignoredrows' : ignoredrows}              # rows that should not be plotted
 
@@ -125,10 +127,10 @@ class PanelEnergy(wx.Panel):
         self.grid.SetDefaultColSize(115)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Equipment\ntype")
-        self.grid.SetColLabelValue(1, "Useful supply\nheat/cold")
-        self.grid.SetColLabelValue(2, "Primary energy\nconsumption")
-        self.grid.SetColLabelValue(3, "CO2 generation")
+        self.grid.SetColLabelValue(0, _("Equipment\ntype"))
+        self.grid.SetColLabelValue(1, _("Useful supply\nheat/cold"))
+        self.grid.SetColLabelValue(2, _("Primary energy\nconsumption"))
+        self.grid.SetColLabelValue(3, _("CO2 generation"))
         #
         # copy values from dictionary to grid
         #
@@ -151,7 +153,7 @@ class PanelEnergy(wx.Panel):
         self.SetClientSize(wx.Size(792, 566))
 
         self.monthly = wx.Button(id=wxID_PANELENERGYMONTHLY,
-              label='monthly data', name='monthly', parent=self,
+              label=_('monthly data'), name='monthly', parent=self,
               pos=wx.Point(592, 144), size=wx.Size(184, 23), style=0)
         self.monthly.Bind(wx.EVT_BUTTON, self.OnMonthlyButton,
               id=wxID_PANELENERGYMONTHLY)
@@ -161,13 +163,13 @@ class PanelEnergy(wx.Panel):
               style=0)
 
         self.st2 = wx.StaticText(id=wxID_PANELENERGYST2,
-              label='simulation results', name='st2', parent=self,
+              label=_('simulation results'), name='st2', parent=self,
               pos=wx.Point(632, 72), style=0)
         self.st2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
 
-        self.choiceSimulationTool = wx.Choice(choices=["einstein",
-              "transEnergy"], id=wxID_PANELENERGYCHOICESIMULATIONTOOL,
+        self.choiceSimulationTool = wx.Choice(choices=[_("einstein"),
+              _("transEnergy")], id=wxID_PANELENERGYCHOICESIMULATIONTOOL,
               name='choiceSimulationTool', parent=self, pos=wx.Point(392, 16),
               size=wx.Size(130, 21), style=0)
         self.choiceSimulationTool.Bind(wx.EVT_CHOICE,
@@ -175,26 +177,26 @@ class PanelEnergy(wx.Panel):
               id=wxID_PANELENERGYCHOICESIMULATIONTOOL)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELENERGYSTATICBOX1,
-              label='energy demand', name='staticBox1', parent=self,
+              label=_('energy demand'), name='staticBox1', parent=self,
               pos=wx.Point(16, 288), size=wx.Size(360, 224), style=0)
         self.panelEnergyDemand = wx.Panel(id=wxID_PANELENERGYPICTURE1, name='panelEnergyDemand', parent=self,
               pos=wx.Point(24, 312), size=wx.Size(344, 192),
               style=wx.TAB_TRAVERSAL)
 
-        self.buttonOK = wx.Button(id=wxID_PANELENERGYBUTTONOK, label='ok',
+        self.buttonOK = wx.Button(id=wxID_PANELENERGYBUTTONOK, label=_('ok'),
               name='buttonOK', parent=self, pos=wx.Point(528, 528),
               size=wx.Size(75, 23), style=0)
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton,
               id=wxID_PANELENERGYBUTTONOK)
 
         self.buttonCancel = wx.Button(id=wxID_PANELENERGYBUTTONCANCEL,
-              label='cancel', name='buttonCancel', parent=self,
+              label=_('cancel'), name='buttonCancel', parent=self,
               pos=wx.Point(616, 528), size=wx.Size(75, 23), style=0)
         self.buttonCancel.Bind(wx.EVT_BUTTON, self.OnButtonCancelButton,
               id=wxID_PANELENERGYBUTTONCANCEL)
 
         self.buttonRunSimulation = wx.Button(id=wxID_PANELENERGYBUTTONRUNSIMULATION,
-              label='run simulation', name='buttonRunSimulation', parent=self,
+              label=_('run simulation'), name='buttonRunSimulation', parent=self,
               pos=wx.Point(16, 16), size=wx.Size(184, 23), style=0)
         self.buttonRunSimulation.Bind(wx.EVT_BUTTON,
               self.OnButtonRunSimulationButton,
@@ -213,31 +215,31 @@ class PanelEnergy(wx.Panel):
               id=wxID_PANELENERGYBUTTONBACK)
 
         self.hourly = wx.Button(id=wxID_PANELENERGYHOURLY,
-              label='hourly performance', name='hourly', parent=self,
+              label=_('hourly performance'), name='hourly', parent=self,
               pos=wx.Point(592, 184), size=wx.Size(184, 23), style=0)
         self.hourly.Bind(wx.EVT_BUTTON, self.OnHourlyButton,
               id=wxID_PANELENERGYHOURLY)
 
-        self.annual = wx.Button(id=wxID_PANELENERGYANNUAL, label='annual data',
+        self.annual = wx.Button(id=wxID_PANELENERGYANNUAL, label=_('annual data'),
               name='annual', parent=self, pos=wx.Point(592, 104),
               size=wx.Size(184, 23), style=0)
         self.annual.Bind(wx.EVT_BUTTON, self.OnAnnualButton,
               id=wxID_PANELENERGYANNUAL)
 
         self.st3 = wx.StaticText(id=wxID_PANELENERGYST3,
-              label='simulation setup: ', name='st3', parent=self,
+              label=_('simulation setup: '), name='st3', parent=self,
               pos=wx.Point(280, 20), style=0)
         self.st3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
 
         self.st1 = wx.StaticText(id=wxID_PANELENERGYST1,
-              label='energetic performance', name='st1', parent=self,
+              label=_('energetic performance'), name='st1', parent=self,
               pos=wx.Point(16, 82), style=0)
         self.st1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELENERGYSTATICBOX2,
-              label='comparative performance', name='staticBox2', parent=self,
+              label=_('comparative performance'), name='staticBox2', parent=self,
               pos=wx.Point(416, 288), size=wx.Size(360, 224), style=0)
         
         self.panelComPerformance = wx.Panel(id=wxID_PANELENERGYPICTURE2,

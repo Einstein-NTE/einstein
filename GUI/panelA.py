@@ -167,7 +167,7 @@ class PanelA(wx.Panel):
               style=wx.TAB_TRAVERSAL)
 
         self.DesignPA = wx.Button(id=wxID_PANELADESIGNPA,
-              label='pinch analysis', name='DesignPA', parent=self,
+              label=_('pinch analysis'), name='DesignPA', parent=self,
               pos=wx.Point(592, 360), size=wx.Size(184, 24), style=0)
         self.DesignPA.Bind(wx.EVT_BUTTON, self.OnDesignPAButton,
               id=wxID_PANELADESIGNPA)
@@ -303,16 +303,16 @@ class PanelA(wx.Panel):
         
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print "PanelA - OK",self.shortName,self.description
+            print _("PanelA - OK"),self.shortName,self.description
             print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(0,self.shortName,self.description)
             self.display()
 
         elif pu1.ShowModal() == wx.ID_Cancel:
-            print "PanelA - Cancel"
+            print _("PanelA - Cancel")
         else:
-            print "PanelA ???"
+            print _("PanelA ???")
 
         self.display()
         
@@ -326,16 +326,16 @@ class PanelA(wx.Panel):
 
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print "PanelA - OK",self.shortName,self.description
+            print _("PanelA - OK"),self.shortName,self.description
             print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(self.ANo,self.shortName,self.description)
             self.display()
 
         elif pu1.ShowModal() == wx.ID_Cancel:
-            print "PanelA - Cancel"
+            print _("PanelA - Cancel")
         else:
-            print "PanelA - ???"
+            print _("PanelA - ???")
 
 #------------------------------------------------------------------------------		
     def OnDeleteProposalButton(self, event):
@@ -343,15 +343,15 @@ class PanelA(wx.Panel):
 #   Delete alternative proposal
 #------------------------------------------------------------------------------		
 
-        pu2 =  DialogOK(self,"delete alternative","do you really want to delete this alternative ?")
+        pu2 =  DialogOK(self,_("delete alternative"),_("do you really want to delete this alternative ?"))
         if pu2.ShowModal() == wx.ID_OK:
             if self.ANo > 0:
                 Status.prj.deleteAlternative(self.ANo)
                 self.display()
             elif self.ANo in [-1,0]:
-                print "PanelA (DeleteButton): cannot delete alternative ",self.ANo
+                print _("PanelA (DeleteButton): cannot delete alternative "),self.ANo
             else:
-                print "PanelA (DeleteButton): erroneous alternative number ",self.ANo
+                print _("PanelA (DeleteButton): erroneous alternative number "),self.ANo
 
 #------------------------------------------------------------------------------		
     def OnGridPageAGridCellLeftClick(self, event):

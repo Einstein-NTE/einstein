@@ -15,10 +15,12 @@
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -66,7 +68,7 @@ class PanelEA6(wx.Panel):
         paramList={'labels'      : labels_column,               # labels column
                    'data'        : 2,                           # data column for this graph
                    'key'         : keys[0],                     # key for Interface
-                   'title'       : 'Production of CO2 by fuel', # title of the graph
+                   'title'       : _('Production of CO2 by fuel'), # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR,      # graph background color
                    'ignoredrows' : ignoredrows}                 # rows that should not be plotted
 
@@ -94,9 +96,9 @@ class PanelEA6(wx.Panel):
         self.grid1.SetColSize(2,125)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, "Fuel type")
-        self.grid1.SetColLabelValue(1, "Production\nof CO2 t/a")
-        self.grid1.SetColLabelValue(2, "Production\nof CO2 %")
+        self.grid1.SetColLabelValue(0, _("Fuel type"))
+        self.grid1.SetColLabelValue(1, _("Production\nof CO2 t/a"))
+        self.grid1.SetColLabelValue(2, _("Production\nof CO2 %"))
         #
         # copy values from dictionary to grid
         #
@@ -119,7 +121,7 @@ class PanelEA6(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
         self.staticText1 = wx.StaticText(id=wxID_PANELEA6STATICTEXT1,
-              label=u'Production of CO2 by energy type', name='staticText1',
+              label=_(u'Production of CO2 by energy type'), name='staticText1',
               parent=self, pos=wx.Point(40, 8), size=wx.Size(580, 20),
               style=0)
 

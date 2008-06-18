@@ -36,6 +36,7 @@
 #                           Hans Schweiger          29/04/2008
 #                           Stoyan Danov            30/04/2008
 #                           Stoyan Danov            22/05/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -57,6 +58,7 @@
 #       29/04/08:   call to method "draw" for panelHPFig added
 #       30/04/08:   in OnButtonpageHPAddButton: delete equipeC in assignment of addEquipmentDummy
 #       22/05/08:   in drawFigure: Interfaces -> Status.int
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -172,7 +174,7 @@ class PanelHP(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : self.keys[0],                # key for Interface
-                   'title'       : 'Some title',           # title of the graph
+                   'title'       : _('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -209,12 +211,12 @@ class PanelHP(wx.Panel):
         self.grid.SetColSize(0,115)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Short name")
-        self.grid.SetColLabelValue(1, "Nom. power")
-        self.grid.SetColLabelValue(2, "COP")
-        self.grid.SetColLabelValue(3, "Type")
-        self.grid.SetColLabelValue(4, "Operating\nhours")
-        self.grid.SetColLabelValue(5, "Year manufact.")
+        self.grid.SetColLabelValue(0, _("Short name"))
+        self.grid.SetColLabelValue(1, _("Nom. power"))
+        self.grid.SetColLabelValue(2, _("COP"))
+        self.grid.SetColLabelValue(3, _("Type"))
+        self.grid.SetColLabelValue(4, _("Operating\nhours"))
+        self.grid.SetColLabelValue(5, _("Year manufact."))
         #
         # copy values from dictionary to grid
         #
@@ -243,7 +245,7 @@ class PanelHP(wx.Panel):
 # Figure to be plotted
 
         self.staticBox1 = wx.StaticBox(id=-1,
-              label='Heat demand and availability with and without HP',
+              label=_('Heat demand and availability with and without HP'),
               name='staticBox1', parent=self, pos=wx.Point(440, 40),
               size=wx.Size(336, 256), style=0)
 
@@ -264,7 +266,7 @@ class PanelHP(wx.Panel):
 
 
         self.st1pageHeatpump = wx.StaticText(id=-1,
-              label='Existing Heat pumps in the HC system',
+              label=_('Existing Heat pumps in the HC system'),
               name='st1pageHeatpump', parent=self, pos=wx.Point(40, 32),
               style=0)
 
@@ -274,7 +276,7 @@ class PanelHP(wx.Panel):
 
 # Button "run design assistant"
         self.hpCalculate = wx.Button(id=wxID_PANELHPHPCALCULATE,
-              label='Run design assistant', name='HP_Calculate', parent=self,
+              label=_('Run design assistant'), name='HP_Calculate', parent=self,
               pos=wx.Point(232, 224), size=wx.Size(184, 23), style=0)
 
         self.hpCalculate.Bind(wx.EVT_BUTTON, self.OnHpCalculateButton,
@@ -282,7 +284,7 @@ class PanelHP(wx.Panel):
 
 # Button "add heat pump"
         self.buttonpageHeatPumpAdd = wx.Button(id=-1,
-              label='add heat pump manually', name='buttonpageHeatPumpAdd',
+              label=_('add heat pump manually'), name='buttonpageHeatPumpAdd',
               parent=self, pos=wx.Point(40, 224), size=wx.Size(184, 23),
               style=0)
         self.buttonpageHeatPumpAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageHPAddButton,
@@ -293,7 +295,7 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.stConfig = wx.StaticText(id=-1,
-              label='Design assistant options:', name='stConfig',
+              label=_('Design assistant options:'), name='stConfig',
               parent=self, pos=wx.Point(40, 272), style=0)
         self.stConfig.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, 'Tahoma'))
@@ -302,7 +304,7 @@ class PanelHP(wx.Panel):
 # 1. Maintain existing equipment ?
 
         self.stConfig1 = wx.StaticText(id=-1,
-              label='Maintain existing equipment ?', name='stConfig1',
+              label=_('Maintain existing equipment ?'), name='stConfig1',
               parent=self, pos=wx.Point(40, 304), style=0)
 
         self.cbConfig1 = wx.CheckBox(id=-1, label='',
@@ -315,7 +317,7 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # 2. Heat pump type 
 
-        self.stConfig2 = wx.StaticText(id=-1, label='Type of heat pump',
+        self.stConfig2 = wx.StaticText(id=-1, label=_('Type of heat pump'),
               name='stConfig2', parent=self, pos=wx.Point(40, 344),
               style=0)
 
@@ -329,7 +331,7 @@ class PanelHP(wx.Panel):
 # 3. Minimum operating hours
 
         self.stConfig3 = wx.StaticText(id=-1,
-              label='Minimum desired annual operation hours, h',
+              label=_('Minimum desired annual operation hours, h'),
               name='stConfig3', parent=self, pos=wx.Point(40, 384),
               style=0)
 
@@ -345,7 +347,7 @@ class PanelHP(wx.Panel):
 # 4. Temperature lift
 
         self.stConfig4 = wx.StaticText(id=-1,
-              label='Maximum desired temperature lift, \xbaC',
+              label=_('Maximum desired temperature lift, \xbaC'),
               name='stConfig4', parent=self, pos=wx.Point(40, 424),
               style=0)
 
@@ -360,7 +362,7 @@ class PanelHP(wx.Panel):
 # 5. condensing temperature
 
         self.stConfig5 = wx.StaticText(id=-1,
-              label='Maximum desired condensing temperature, \xbaC',
+              label=_('Maximum desired condensing temperature, \xbaC'),
               name='stConfig5', parent=self, pos=wx.Point(40, 464),
               style=0)
 
@@ -375,7 +377,7 @@ class PanelHP(wx.Panel):
 # 6. evaporating temperature
 
         self.stConfig6 = wx.StaticText(id=-1,
-              label='Minimum desired evaporating temperature, \xbaC',
+              label=_('Minimum desired evaporating temperature, \xbaC'),
               name='stConfig6', parent=self, pos=wx.Point(40, 504),
               style=0)
 
@@ -390,11 +392,11 @@ class PanelHP(wx.Panel):
 # 7. condensing temperature: inlet temp.
 
         self.stConfig7a = wx.StaticText(id=-1,
-              label='Only for absorption type:', name='stConfig7a',
+              label=_('Only for absorption type:'), name='stConfig7a',
               parent=self, pos=wx.Point(40, 536), style=0)
 
         self.stConfig7b = wx.StaticText(id=-1,
-              label='Inlet temperature of heating fluid in generator, \xbaC',
+              label=_('Inlet temperature of heating fluid in generator, \xbaC'),
               name='stConfig7b', parent=self, pos=wx.Point(40, 552),
               style=0)
 
@@ -411,7 +413,7 @@ class PanelHP(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label='Pinch temperature \xb0C', name='stInfo1',
+              label=_('Pinch temperature \xb0C'), name='stInfo1',
               parent=self, pos=wx.Point(440, 424), style=0)
 
         self.tcInfo1 = wx.TextCtrl(id=-1, name='tcInfo1',
@@ -419,7 +421,7 @@ class PanelHP(wx.Panel):
               style=0, value="")
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label='Temperature gap \xb0K', name='stInfo2',
+              label=_('Temperature gap \xb0K'), name='stInfo2',
               parent=self, pos=wx.Point(440, 464), style=0)
 
         self.tcInfo2 = wx.TextCtrl(id=-1, name='tcInfo2',
@@ -437,11 +439,11 @@ class PanelHP(wx.Panel):
 #                  In this way, wxWidgets will show the right icons on the buttons
 #------------------------------------------------------------------------------		
 
-        self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label='OK',
+        self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonpageHeatPumpOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
 
-        self.buttonpageHeatPumpCancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+        self.buttonpageHeatPumpCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='buttonpageHeatPumpCancel', parent=self, pos=wx.Point(616,
               544), size=wx.Size(75, 23), style=0)
 
@@ -495,7 +497,7 @@ class PanelHP(wx.Panel):
         try:        #try-except necessary if there comes a string that is not in list.
             self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
         except:
-            print "PanelHP (display): was asked to display an erroneous heat pump type",self.config[1]
+            print _("PanelHP (display): was asked to display an erroneous heat pump type"),self.config[1]
             pass
         self.tcConfig3.SetValue(str(self.config[2]))
         self.tcConfig4.SetValue(str(self.config[3]))
@@ -534,8 +536,8 @@ class PanelHP(wx.Panel):
 
         if (mode == "MANUAL"):
             self.dbe = DBEditFrame(self,
-                            'Select heat pump from preselected list', # title for the dialogs
-			    'dbheatpump',              # database table
+                            _('Select heat pump from preselected list'), # title for the dialogs
+			    _('dbheatpump'),              # database table
 			    0,                         # column to be returned
 			    False,
                             preselection = HPList)      # database table can be edited in DBEditFrame?
@@ -551,7 +553,7 @@ class PanelHP(wx.Panel):
         elif (mode == "CANCEL"):
             HPId = -1 #make designAssistant2 to understand that
         else:
-            print "PanelHP (DesignAssistant-Button): erroneous panel mode: ",mode
+            print _("PanelHP (DesignAssistant-Button): erroneous panel mode: "),mode
 
 #..............................................................................
 # Step 2 design assistant: add selected equipment to the list and update display
@@ -590,13 +592,13 @@ class PanelHP(wx.Panel):
 
         pu1 =  AddEquipment(self,                      # pointer to this panel
                             self.mod,                # pointer to the associated module
-                            'Add Heat Pump equipment', # title for the dialogs
-                            'dbheatpump',              # database table
+                            _('Add Heat Pump equipment'), # title for the dialogs
+                            _('dbheatpump'),              # database table
                             0,                         # column to be returned
                             False)                     # database table can be edited in DBEditFrame?
 
         if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
+            print _('PanelHP AddEquipment accepted. Id=')+str(pu1.theId)
         else:
             self.mod.deleteEquipment(None)
 
@@ -611,13 +613,13 @@ class PanelHP(wx.Panel):
         print "Grid - left button Dclick: here I should call the Q4H"
         rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
         EqId = self.mod.getEqId(rowNo)
-        print "now editing equipment in row %s with id = "%rowNo,EqId
+        print _("now editing equipment in row %s with id = ")%rowNo,EqId
 #        self.Hide()
 	dialog = ManualAddDialog(self, EqId)
 
 #Tom: here should be a link between the outcome of the dialog and what continues
         if (dialog.ShowModal() ==wx.ID_OK):
-            print "PanelHP (OnGridLeftDclick) - OK"
+            print _("PanelHP (OnGridLeftDclick) - OK")
 #            ret = self.mod.calculateCascade()
 
         self.display()
@@ -639,7 +641,7 @@ class PanelHP(wx.Panel):
 # "delete" selected:
 
         if (ret=="delete"):
-            pu2 =  DialogOK(self,"delete equipment","do you really want to delete this equipment ?")
+            pu2 =  DialogOK(self,_("delete equipment"),_("do you really want to delete this equipment ?"))
             if pu2.ShowModal() == wx.ID_OK:
                 self.mod.deleteEquipment(rowNo)
                 self.display()
@@ -653,43 +655,43 @@ class PanelHP(wx.Panel):
 
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
-        print "new config[%s] value: "%0,self.config[0]
+        print _("new config[%s] value: ")%0,self.config[0]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnChoiceConfig2Choice(self, event):
         self.config[1] = TYPELIST[self.choiceConfig2.GetSelection()]
-        print "new config[%s] value: "%1,self.config[1]
+        print _("new config[%s] value: ")%1,self.config[1]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig3TextEnter(self, event):
-        print "new config[%s] value: "%2,self.config[2]
+        print _("new config[%s] value: ")%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig4TextEnter(self, event):
         self.config[3] = self.tcConfig4.GetValue()
-        print "new config[%s] value: "%3,self.config[3]
+        print _("new config[%s] value: ")%3,self.config[3]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
-        print "new config[%s] value: "%4,self.config[4]
+        print _("new config[%s] value: ")%4,self.config[4]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
-        print "new config[%s] value: "%5,self.config[5]
+        print _("new config[%s] value: ")%5,self.config[5]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
-        print "new config[%s] value: "%6,self.config[6]
+        print _("new config[%s] value: ")%6,self.config[6]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
@@ -713,7 +715,7 @@ class PanelHP(wx.Panel):
         event.Skip()
 
     def OnButtonpageBBCancelButton(self, event):
-        print "Button exitModuleCancel: CANCEL Option not yet foreseen"
+        print _("Button exitModuleCancel: CANCEL Option not yet foreseen")
 
 #============================================================================== 				
 

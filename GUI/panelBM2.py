@@ -21,10 +21,12 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	    08/04/2008
 #       Revised by:         Tom Sobota  28/04/2008
+#                           Stoyan Danov            18/06/2008
 #                           
 #
 #       Changes to previous version:
 #       28/04/2008          created method display
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -118,18 +120,18 @@ class PanelBM2(wx.Panel):
         self.gridPage.SetColSize(0,115)
         self.gridPage.EnableEditing(False)
         self.gridPage.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.gridPage.SetColLabelValue(0, "Source")
-        self.gridPage.SetColLabelValue(1, "Reference")
-        self.gridPage.SetColLabelValue(2, "Validity")
-        self.gridPage.SetColLabelValue(3, "Electricity (min)")
-        self.gridPage.SetColLabelValue(4, "Electricity (target)")
-        self.gridPage.SetColLabelValue(5, "Electricity (max)")
-        self.gridPage.SetColLabelValue(6, "Fuels (min)")
-        self.gridPage.SetColLabelValue(7, "Fuels (target)")
-        self.gridPage.SetColLabelValue(8, "Fuels (max)")
-        self.gridPage.SetColLabelValue(9, "Primary energy (min)")
-        self.gridPage.SetColLabelValue(10, "Primary energy (target)")
-        self.gridPage.SetColLabelValue(11, "Primary energy (max)")
+        self.gridPage.SetColLabelValue(0, _("Source"))
+        self.gridPage.SetColLabelValue(1, _("Reference"))
+        self.gridPage.SetColLabelValue(2, _("Validity"))
+        self.gridPage.SetColLabelValue(3, _("Electricity (min)"))
+        self.gridPage.SetColLabelValue(4, _("Electricity (target)"))
+        self.gridPage.SetColLabelValue(5, _("Electricity (max)"))
+        self.gridPage.SetColLabelValue(6, _("Fuels (min)"))
+        self.gridPage.SetColLabelValue(7, _("Fuels (target)"))
+        self.gridPage.SetColLabelValue(8, _("Fuels (max)"))
+        self.gridPage.SetColLabelValue(9, _("Primary energy (min)"))
+        self.gridPage.SetColLabelValue(10, _("Primary energy (target)"))
+        self.gridPage.SetColLabelValue(11, _("Primary energy (max)"))
      #
         # copy values from dictionary to grid
         #
@@ -164,22 +166,22 @@ class PanelBM2(wx.Panel):
         self.gridPage.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridPageGridCellRightClick, id=wxID_PANELBM2GRIDPAGE)
 
-        self.st1pageBM2 = wx.StaticText(id=-1, label='Search criteria',
+        self.st1pageBM2 = wx.StaticText(id=-1, label=_('Search criteria'),
               name='st1pageBM2', parent=self, pos=wx.Point(448, 312), style=0)
 
         self.stTitle = wx.StaticText(id=wxID_PANELBM2STTITLE,
-              label='Benchmarks 2: specific energy consumption by product',
+              label=_('Benchmarks 2: specific energy consumption by product'),
               name='stTitle', parent=self, pos=wx.Point(24, 16), style=0)
         self.stTitle.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
 
-        self.buttonpageBM2Ok = wx.Button(id=wx.ID_OK, label='OK',
+        self.buttonpageBM2Ok = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonpageBM2Ok', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBM2Ok.Bind(wx.EVT_BUTTON, self.OnButtonpageBM2OkButton,
               id=wx.ID_OK)
 
-        self.buttonpageBM2Cancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+        self.buttonpageBM2Cancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='buttonpageBM2Cancel', parent=self, pos=wx.Point(616, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBM2Cancel.Bind(wx.EVT_BUTTON,
@@ -199,30 +201,30 @@ class PanelBM2(wx.Panel):
               id=wxID_PANELBM2BUTTONPAGEBM2BACK)
 
         self.FindBenchmarks = wx.Button(id=wxID_PANELBM2FINDBENCHMARKS,
-              label='find benchmarks', name='FindBenchmarks', parent=self,
+              label=_('find benchmarks'), name='FindBenchmarks', parent=self,
               pos=wx.Point(592, 280), size=wx.Size(184, 24), style=0)
         self.FindBenchmarks.Bind(wx.EVT_BUTTON, self.OnGenerateNewButton,
               id=wxID_PANELBM2FINDBENCHMARKS)
 
         self.st3pageBM2 = wx.StaticText(id=wxID_PANELBM2ST3PAGEBM2,
-              label='Comparison benchmark data', name='st3pageBM2', parent=self,
+              label=_('Comparison benchmark data'), name='st3pageBM2', parent=self,
               pos=wx.Point(24, 320), size=wx.Size(137, 13), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELBM2STATICTEXT1,
-              label='Benchmarks found:', name='staticText1', parent=self,
+              label=_('Benchmarks found:'), name='staticText1', parent=self,
               pos=wx.Point(24, 40), style=0)
 
         self.stSearchCrit1 = wx.StaticText(id=wxID_PANELBM2STSEARCHCRIT1,
-              label='NACE Code range (digits)', name='stSearchCrit1',
+              label=_('NACE Code range (digits)'), name='stSearchCrit1',
               parent=self, pos=wx.Point(448, 352), size=wx.Size(123, 13),
               style=0)
 
         self.SearchCrit2 = wx.StaticText(id=wxID_PANELBM2SEARCHCRIT2,
-              label='Production volume', name='SearchCrit2', parent=self,
+              label=_('Production volume'), name='SearchCrit2', parent=self,
               pos=wx.Point(448, 416), size=wx.Size(89, 13), style=0)
 
         self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM2STSEARCHCRIT3,
-              label='Year of data', name='stSearchCrit3', parent=self,
+              label=_('Year of data'), name='stSearchCrit3', parent=self,
               pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
 
         self.comboSearchCrit1 = wx.ComboBox(choices=["15500", "1550 _",
@@ -239,11 +241,11 @@ class PanelBM2(wx.Panel):
               name='tcSearchCrit2a', parent=self, pos=wx.Point(640, 408),
               size=wx.Size(64, 24), style=0, value='0')
 
-        self.st1 = wx.StaticText(id=wxID_PANELBM2ST1, label='max.', name='st1',
+        self.st1 = wx.StaticText(id=wxID_PANELBM2ST1, label=_('max.'), name='st1',
               parent=self, pos=wx.Point(728, 384), size=wx.Size(25, 13),
               style=0)
 
-        self.st2 = wx.StaticText(id=wxID_PANELBM2ST2, label='min.', name='st2',
+        self.st2 = wx.StaticText(id=wxID_PANELBM2ST2, label=_('min.'), name='st2',
               parent=self, pos=wx.Point(664, 384), size=wx.Size(21, 13),
               style=0)
 
@@ -256,22 +258,22 @@ class PanelBM2(wx.Panel):
               size=wx.Size(64, 24), style=0, value='2008')
 
         self.stSearchCrit2Unit = wx.StaticText(id=wxID_PANELBM2STSEARCHCRIT2UNIT,
-              label='t/year', name='stSearchCrit2Unit', parent=self,
+              label=_('t/year'), name='stSearchCrit2Unit', parent=self,
               pos=wx.Point(592, 416), size=wx.Size(30, 13), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELBM2STATICTEXT2,
-              label='staticText2', name='staticText2', parent=self.panelFig,
+              label=_('staticText2'), name='staticText2', parent=self.panelFig,
               pos=wx.Point(400, -320), size=wx.Size(55, 13), style=0)
 
         self.stProduct = wx.StaticText(id=wxID_PANELBM2STPRODUCT,
-              label='Product:', name='stProduct', parent=self, pos=wx.Point(512,
+              label=_('Product:'), name='stProduct', parent=self, pos=wx.Point(512,
               16), size=wx.Size(42, 13), style=0)
 
-        self.comboProduct = wx.ComboBox(choices=["milk", "cheese", "yoghourt"],
+        self.comboProduct = wx.ComboBox(choices=[_("milk"), _("cheese"), _("yoghourt")],
               id=wxID_PANELBM2COMBOPRODUCT, name='comboProduct', parent=self,
               pos=wx.Point(568, 8), size=wx.Size(210, 21), style=0,
               value='milk')
-        self.comboProduct.SetLabel('milk')
+        self.comboProduct.SetLabel(_('milk'))
 
 
     def display(self):
@@ -294,11 +296,11 @@ class PanelBM2(wx.Panel):
 	#right table when it is created
         pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
         if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelBM2 AddEquipment accepted. Id='+str(pu1.theId)
+            print _('PanelBM2 AddEquipment accepted. Id=')+str(pu1.theId)
 #            ret = self.modA.add(AId)
             #update plots
         else:
-            print 'Cancelled'
+            print _('Cancelled')
 
     def OnGridPageGridCellLeftDclick(self, event):
         print "PanelBM2: Grid - left button Dclick"

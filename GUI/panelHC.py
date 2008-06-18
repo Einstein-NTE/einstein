@@ -22,10 +22,12 @@
 #	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	    03/04/2008
 #	Last revised by:    Hans Schweiger          16/04/2008
+#                           Stoyan Danov            18/06/2008
 #                           
 #
 #       Changes to previous version:
 #       16/04/2008  HS  main as argument in __init__
+#       18/06/2008 SD: change to translatable text _(...)
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -100,12 +102,12 @@ class PanelHC(wx.Panel):
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Cascade index")
-        self.grid.SetColLabelValue(1, "Equipment No.")
-        self.grid.SetColLabelValue(2, "Equipment")
-        self.grid.SetColLabelValue(3, "Type")
-        self.grid.SetColLabelValue(4, "Nominal power [kW]")
-        self.grid.SetColLabelValue(5, "Heat Supplied to pipe/duct no.")
+        self.grid.SetColLabelValue(0, _("Cascade index"))
+        self.grid.SetColLabelValue(1, _("Equipment No."))
+        self.grid.SetColLabelValue(2, _("Equipment"))
+        self.grid.SetColLabelValue(3, _("Type"))
+        self.grid.SetColLabelValue(4, _("Nominal power [kW]"))
+        self.grid.SetColLabelValue(5, _("Heat Supplied to pipe/duct no."))
         #
         # copy values from dictionary to grid
         #
@@ -137,17 +139,17 @@ class PanelHC(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridGridCellRightClick, id=wxID_PANELHCGRID)
 
-        self.st1pageHC = wx.StaticText(id=-1, label='Order equipment cascade',
+        self.st1pageHC = wx.StaticText(id=-1, label=_('Order equipment cascade'),
               name='st1pageHC', parent=self, pos=wx.Point(664, 128), style=0)
 
         self.buttonpageHCOk = wx.Button(id=wxID_PANELHCBUTTONPAGEHCOK,
-              label='ok', name='buttonpageHCOk', parent=self, pos=wx.Point(528,
+              label=_('ok'), name='buttonpageHCOk', parent=self, pos=wx.Point(528,
               544), size=wx.Size(75, 23), style=0)
         self.buttonpageHCOk.Bind(wx.EVT_BUTTON, self.OnButtonpageHCOkButton,
               id=wxID_PANELHCBUTTONPAGEHCOK)
 
         self.buttonpageHCCancel = wx.Button(id=wxID_PANELHCBUTTONPAGEHCCANCEL,
-              label='cancel', name='buttonpageHCCancel', parent=self,
+              label=_('cancel'), name='buttonpageHCCancel', parent=self,
               pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHCCancel.Bind(wx.EVT_BUTTON,
               self.OnButtonpageHCCancelButton,
@@ -172,32 +174,32 @@ class PanelHC(wx.Panel):
               id=wxID_PANELHCMOVETOBOTTOM)
 
         self.MoveDownwards = wx.Button(id=wxID_PANELHCMOVEDOWNWARDS,
-              label='down', name='MoveDownwards', parent=self, pos=wx.Point(680,
+              label=_('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
               304), size=wx.Size(96, 24), style=0)
         self.MoveDownwards.Bind(wx.EVT_BUTTON, self.OnMoveDownwardsButton,
               id=wxID_PANELHCMOVEDOWNWARDS)
 
-        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label='up',
+        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label=_('up'),
               name='MoveUpwards', parent=self, pos=wx.Point(680, 240),
               size=wx.Size(96, 24), style=0)
         self.MoveUpwards.Bind(wx.EVT_BUTTON, self.OnMoveUpwardsButton,
               id=wxID_PANELHCMOVEUPWARDS)
 
-        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label='to top',
+        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label=_('to top'),
               name='MoveToTop', parent=self, pos=wx.Point(680, 200),
               size=wx.Size(96, 24), style=0)
         self.MoveToTop.Bind(wx.EVT_BUTTON, self.OnMoveToTopButton,
               id=wxID_PANELHCMOVETOTOP)
 
         self.AutoDesign = wx.Button(id=wxID_PANELHCAUTODESIGN,
-              label='get recommendations and automatic pre-design',
+              label=_('get recommendations and automatic pre-design'),
               name='AutoDesign', parent=self, pos=wx.Point(40, 32),
               size=wx.Size(616, 24), style=0)
         self.AutoDesign.Bind(wx.EVT_BUTTON, self.OnAutoDesignButton,
               id=wxID_PANELHCAUTODESIGN)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELHCSTATICTEXT1,
-              label='Existing equipment in the system',
+              label=_('Existing equipment in the system'),
               name='staticText1', parent=self, pos=wx.Point(40, 72), style=0)
 
 #------------------------------------------------------------------------------		
@@ -234,19 +236,19 @@ class PanelHC(wx.Panel):
     def OnGridGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
         self.selectedRow = event.GetRow()
-        print "PanelHC (GridLeftDclick): selected row = ",self.selectedRow
+        print _("PanelHC (GridLeftDclick): selected row = "),self.selectedRow
         event.Skip()
 
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftClick(self, event):
 #------------------------------------------------------------------------------		
 	self.selectedRow = event.GetRow()
-        print "PanelHC (GridLeftClick): selected row = ",self.selectedRow
+        print _("PanelHC (GridLeftClick): selected row = "),self.selectedRow
         event.Skip()
 
     def OnGridGridCellRightClick(self, event):
 	self.selectedRow = event.GetRow()
-        print "PanelHC (GridRightClick): selected row = ",self.selectedRow
+        print _("PanelHC (GridRightClick): selected row = "),self.selectedRow
         event.Skip()
         
 #==============================================================================
@@ -277,25 +279,25 @@ class PanelHC(wx.Panel):
 #==============================================================================
     def OnMoveToBottomButton(self, event):
         ci = self.selectedRow + 1
-        print "PanelHC (move to bottom)",ci
+        print _("PanelHC (move to bottom)"),ci
         self.mod.cascadeMoveToBottom(ci)
         self.display()
 
     def OnMoveDownwardsButton(self, event):
         ci = self.selectedRow + 1
-        print "PanelHC (move down)",ci
+        print _("PanelHC (move down)"),ci
         self.mod.cascadeMoveDown(ci)
         self.display()
 
     def OnMoveUpwardsButton(self, event):
         ci = self.selectedRow + 1
-        print "PanelHC (move up)",ci
+        print _("PanelHC (move up)"),ci
         self.mod.cascadeMoveUp(ci)
         self.display()
 
     def OnMoveToTopButton(self, event):
         ci = self.selectedRow + 1
-        print "PanelHC (move to top)",ci
+        print _("PanelHC (move to top)"),ci
         self.mod.cascadeMoveToTop(ci)   
         self.display()
 #==============================================================================
