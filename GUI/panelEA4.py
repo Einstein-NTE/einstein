@@ -68,7 +68,7 @@ class PanelEA4(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : 'UPH by process',       # title of the graph
+                   'title'       : 'UPH by processes',      # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
