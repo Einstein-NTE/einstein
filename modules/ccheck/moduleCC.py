@@ -388,6 +388,16 @@ class ModuleCC(object):
                 self.ccHX.append(CheckHX(h))  # añade un objeto checkProc con todas las variables necesarias a la listac
 
 #..............................................................................
+# import data on existing WHEEs
+
+            self.NWHEE = Status.NWHEE
+            NN = self.NWHEE
+            self.QWHEE = CCRow("QWHEE",NN)     
+
+            for n in range(NN):
+                self.ccWHEE.append(CheckWHEE(n))  # añade un objeto checkProc con todas las variables necesarias a la listac
+
+#..............................................................................
 # import data on link of fuels and equipment
 
             self.FETMatrix = CheckMatrix("FET Matrix",self.FETi,self.FETj,Status.FETLink)
@@ -408,6 +418,7 @@ class ModuleCC(object):
             self.QWHEqCon = CheckCon("QWHEq Con",self.QWH,self.QWHEq,Status.QWHEqLink)
             self.QWHPipeCon = CheckCon("QWHPipe Con",self.QWH,self.QWHPipe,Status.QWHPipeLink)
             self.QWHProcCon = CheckCon("QWHProc Con",self.QWH,self.QWHProc,Status.QWHProcLink)
+            self.QWHEECon = CheckCon("QWHEE Con",self.QWH,self.QWHEE,Status.QWHEELink)
 
             self.QHXEqCon = CheckCon("QWHEq Con",self.QHX,self.QHXEq,Status.QHXEqLink)
             self.QHXPipeCon = CheckCon("QWHPipe Con",self.QHX,self.QHXPipe,Status.QHXPipeLink)
@@ -498,8 +509,8 @@ class ModuleCC(object):
                 self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
 # here data should be passed to the correspoinding inputs in CheckEq
-#               self.QHXEq[j].update(self.ccEq[j].QHXEq)
-#               self.QWHEq[j].update(self.ccEq[j].QWHEq)
+#               self.QHXEq[j].update(self.ccEq[j].QHXEqRec)
+#               self.QWHEq[j].update(self.ccEq[j].QWHEqRec)
 
 #..............................................................................
 # check of pipes
@@ -533,8 +544,8 @@ class ModuleCC(object):
                     self.USHm[m].update(self.ccPipe[m].USHm)      #obtain results 
                     self.UPHProcm[m].update(self.ccPipe[m].UPHProcm)
 # here data should be passed to the correspoinding inputs in CheckPipe
-#                   self.QHXPipe[m].update(self.ccPipe[m].QHXPipe)
-#                   self.QWHPipe[m].update(self.ccPipe[m].QWHPipe)
+#                   self.QHXPipe[m].update(self.ccPipe[m].QHXPipeRec)
+#                   self.QWHPipe[m].update(self.ccPipe[m].QWHPipeRec)
 
 #..............................................................................
 # check of thermal processes
@@ -556,8 +567,8 @@ class ModuleCC(object):
                 self.UPHk[k].update(self.ccProc[k].UPH)      #obtain results 
 
 # here data should be passed to the correspoinding inputs in CheckProc
-#               self.QHXProc[k].update(self.ccProc[k].QHXProc)
-#               self.QWHProc[k].update(self.ccProc[k].QWHProc)
+#               self.QHXProc[k].update(self.ccProc[k].QHXProcRec)
+#               self.QWHProc[k].update(self.ccProc[k].QWHProcRec)
 
 #..............................................................................
 # check of heat exchangers
@@ -570,13 +581,31 @@ class ModuleCC(object):
             NH = self.NHX
 
             for h in range(self.NHX):
-                print "checking process no. %s"%h
+                print "checking HX no. %s"%h
                 conflict.setDataGroup("HX",h+1)
 
                 self.ccHX[h].check()             # ejecuta la función check para proceso k
 
                 self.QHX[h].update(self.ccHX[h].QHX)      #obtain results 
-                self.QWH[h].update(self.ccHX[h].QHX)      #obtain results 
+                self.QWH[h].update(self.ccHX[h].QWH)      #obtain results 
+
+#..............................................................................
+# check of whees
+
+            if DEBUG in ["ALL","MAIN","BASIC"]:
+                print "===================================================="
+                print "ModuleCC: checking WHEEs (QWHEE)"
+                print "===================================================="
+
+            NN = self.NWHEE
+
+            for n in range(self.NWHEE):
+                print "checking WHEE no. %s"%n
+                conflict.setDataGroup("WHEE",n+1)
+
+                self.ccWHEE[n].check()             # ejecuta la función check para proceso k
+
+                self.QWHEE[n].update(self.ccWHEE[n].QWHEERec)      #obtain results 
 
 #..............................................................................
 # check of totals
@@ -686,6 +715,9 @@ class ModuleCC(object):
                 conflict.setDataGroup("QHWProc Con","-")
                 self.QWHProcCon.check()
 
+                conflict.setDataGroup("QWHEE Con","-")
+                self.QWHEECon.check()
+
                 conflict.setDataGroup("QHXEq Con","-")
                 self.QHXEqCon.check()
 
@@ -698,24 +730,32 @@ class ModuleCC(object):
                 for j in range(NJ):
                     pass
 # here data should be passed to the correspoinding inputs in CheckEq
-#                    self.ccEq[j].QHXEq.update(self.QHXEq[j])
-#                    self.ccEq[j].QWHEq.update(self.QWHEq[j])
+#                    self.ccEq[j].QHXEqRec.update(self.QHXEq[j])
+#                    self.ccEq[j].QWHEqRec.update(self.QWHEq[j])
 
                 for m in range(NM):
                     pass
 # here data should be passed to the correspoinding inputs in CheckPipe
-#                    self.ccPipe[m].QHXPipe.update(self.QHXPipe[m])
-#                    self.ccPipe[m].QWHPipe.update(self.QWHPipe[m])
+#                    self.ccPipe[m].QHXPipeRec.update(self.QHXPipe[m])
+#                    self.ccPipe[m].QWHPipeRec.update(self.QWHPipe[m])
 
                 for k in range(NK):
                     pass
 # here data should be passed to the correspoinding inputs in CheckEq
-#                    self.ccProc[k].QHXProc.update(self.QHXProc[k])
-#                    self.ccProc[k].QWHProc.update(self.QWHProc[k])
+#                    self.ccProc[k].QHXProcRec.update(self.QHXProc[k])
+#                    self.ccProc[k].QWHProcRec.update(self.QWHProc[k])
 
-                for h in range(1,NH):
+                for n in range(NN):
+                    self.ccWHEE[n].QHXWHEERec.update(self.QWHEE[n])
+
+                for h in range(NH):
                     self.ccHX[h].QWH.update(self.QWH[h])
                     self.ccHX[h].QHX.update(self.QHX[h])
+
+# here data should be passed to the correspoinding inputs in CheckEq
+#                    self.ccProc[k].QHXProcRec.update(self.QHXProc[k])
+#                    self.ccProc[k].QWHProcRec.update(self.QWHProc[k])
+
 
 #..............................................................................
 # If any matrix conflict appears, break immediately.

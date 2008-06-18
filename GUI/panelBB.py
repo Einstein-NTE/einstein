@@ -19,13 +19,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.07
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
 #                           Hans Schweiger          03/04/2008
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          16/04/2008
 #                           Hans Schweiger          29/04/2008
+#                           Stoyan Danov            18/06/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
@@ -34,6 +35,7 @@
 #                   slight change to OK and Cancel buttons, to show the right icons
 #       16/04/2008: HS  main as argument in __init__
 #       29/04/2008: HS  method draw for panelBBFig
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -159,12 +161,12 @@ class PanelBB(wx.Panel):
         self.grid.SetColSize(0,115)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Short name")
-        self.grid.SetColLabelValue(1, "Nom. power")
-        self.grid.SetColLabelValue(2, "COP")
-        self.grid.SetColLabelValue(3, "Type")
-        self.grid.SetColLabelValue(4, "Operating\nhours")
-        self.grid.SetColLabelValue(5, "Year manufact.")
+        self.grid.SetColLabelValue(0, _("Short name"))
+        self.grid.SetColLabelValue(1, _("Nom. power"))
+        self.grid.SetColLabelValue(2, _("COP"))
+        self.grid.SetColLabelValue(3, _("Type"))
+        self.grid.SetColLabelValue(4, _("Operating\nhours"))
+        self.grid.SetColLabelValue(5, _("Year manufact."))
         #
         # copy values from dictionary to grid
         #
@@ -187,7 +189,7 @@ class PanelBB(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELBBSTATICTEXT1,
-              label='Cumulative heat demand to be covered by boilers',
+              label=_('Cumulative heat demand to be covered by boilers'),
               name='staticText1', parent=self, pos=wx.Point(448, 32),
               size=wx.Size(239, 13), style=0)
 
@@ -204,17 +206,17 @@ class PanelBB(wx.Panel):
               self.OnGridPageBBGridCellRightClick, id=wxID_PANELBBGRID)
 
         self.st1pageBB = wx.StaticText(id=-1,
-              label='Existing Boilers and burners in the HC system',
+              label=_('Existing Boilers and burners in the HC system'),
               name='st1pageBB', parent=self, pos=wx.Point(40, 32), style=0)
 
         self.BBCalculate = wx.Button(id=wxID_PANELBBBBCALCULATE,
-              label='run design assistant', name='BB_Calculate', parent=self,
+              label=_('run design assistant'), name='BB_Calculate', parent=self,
               pos=wx.Point(232, 224), size=wx.Size(184, 24), style=0)
         self.BBCalculate.Bind(wx.EVT_BUTTON, self.OnBBCalculateButton,
               id=wxID_PANELBBBBCALCULATE)
 
         self.buttonpageBBAdd = wx.Button(id=wxID_PANELBBBUTTONPAGEBBADD,
-              label='add boiler / burner', name='buttonpageBBAdd', parent=self,
+              label=_('add boiler / burner'), name='buttonpageBBAdd', parent=self,
               pos=wx.Point(32, 224), size=wx.Size(184, 24), style=0)
         self.buttonpageBBAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageBBAddButton,
               id=wxID_PANELBBBUTTONPAGEBBADD)
@@ -222,7 +224,7 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #       Configuration design assistant
 #------------------------------------------------------------------------------		
-        self.st2pageBB = wx.StaticText(id=-1, label='Design assistant options:',
+        self.st2pageBB = wx.StaticText(id=-1, label=_('Design assistant options:'),
               name='st2pageBB', parent=self, pos=wx.Point(40, 272), style=0)
         self.st2pageBB.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
               'Tahoma'))
@@ -232,7 +234,7 @@ class PanelBB(wx.Panel):
 # 1. Maintain existing equipment ?
 
         self.st3pageBB = wx.StaticText(id=-1,
-              label='Maintain existing equipment ?', name='st3pageBB',
+              label=_('Maintain existing equipment ?'), name='st3pageBB',
               parent=self, pos=wx.Point(40, 304), style=0)
         self.cbConfig1 = wx.CheckBox(id=wxID_PANELBBCBCONFIG1, label='',
               name='cbConfig1', parent=self, pos=wx.Point(288, 304),
@@ -243,7 +245,7 @@ class PanelBB(wx.Panel):
 #..............................................................................
 # 2. Safety factor
 
-        self.st4pageBB = wx.StaticText(id=-1, label='Safety factor [%]',
+        self.st4pageBB = wx.StaticText(id=-1, label=_('Safety factor [%]'),
               name='st4pageBB', parent=self, pos=wx.Point(40, 344), style=0)
 
         self.tcConfig2 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG2, name='tcConfig2',
@@ -256,7 +258,7 @@ class PanelBB(wx.Panel):
 #..............................................................................
 # 3. Redundancy necessary ?
 
-        self.stConfig3 = wx.StaticText(id=-1, label='Is redundancy necessary ?',
+        self.stConfig3 = wx.StaticText(id=-1, label=_('Is redundancy necessary ?'),
               name='stConfig3', parent=self, pos=wx.Point(40, 384), style=0)
 
         self.cbConfig3 = wx.CheckBox(id=wxID_PANELBBCBCONFIG3, label='',
@@ -269,10 +271,10 @@ class PanelBB(wx.Panel):
 #..............................................................................
 # 4. choose fuel
 
-        self.stConfig4 = wx.StaticText(id=-1, label='Fuel Type',
+        self.stConfig4 = wx.StaticText(id=-1, label=_('Fuel Type'),
               name='stConfig4', parent=self, pos=wx.Point(40, 424), style=0)
-        self.choiceConfig4 = wx.Choice(choices=["Natural Gas",
-              "Biomass", "Fuel oil"],
+        self.choiceConfig4 = wx.Choice(choices=[_("Natural Gas"),
+              _("Biomass"), _("Fuel oil")],
               id=wxID_PANELBBCHOICECONFIG4, name='choiceConfig4', parent=self,
               pos=wx.Point(288, 416), size=wx.Size(128, 21), style=0)
         self.choiceConfig4.Bind(wx.EVT_CHOICE, self.OnChoiceConfig4Choice,
@@ -282,7 +284,7 @@ class PanelBB(wx.Panel):
 # 5. minimum operation hours
 
         self.stConfig5 = wx.StaticText(id=-1,
-              label='Minimum operating hours (baseload boiler)',
+              label=_('Minimum operating hours (baseload boiler)'),
               name='stConfig5', parent=self, pos=wx.Point(40, 464), style=0)
 
         self.tcConfig5 = wx.TextCtrl(id=-1, name='tcConfig5', parent=self,
@@ -293,7 +295,7 @@ class PanelBB(wx.Panel):
 #..............................................................................
 # 5. minimum boiler power
 
-        self.stConfig6 = wx.StaticText(id=-1, label='Minimum boiler power [kW]',
+        self.stConfig6 = wx.StaticText(id=-1, label=_('Minimum boiler power [kW]'),
               name='stConfig6', parent=self, pos=wx.Point(40, 504), style=0)
 
         self.tcConfig6 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG6, name='tcConfig6',
@@ -306,7 +308,7 @@ class PanelBB(wx.Panel):
 # 5. minimum efficiency
 
         self.stConfig7 = wx.StaticText(id=-1,
-              label='Minimum effiency allowed [%]', name='stConfig7',
+              label=_('Minimum effiency allowed [%]'), name='stConfig7',
               parent=self, pos=wx.Point(40, 544), style=0)
 
         self.tcConfig7 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG7, name='tcConfig7',
@@ -320,51 +322,51 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.stInfo1 = wx.StaticText(id=wxID_PANELBBSTINFO1,
-              label='Safety factor [%]', name='stInfo1', parent=self,
+              label=_('Safety factor [%]'), name='stInfo1', parent=self,
               pos=wx.Point(440, 352), style=0)
         self.stInfo1Value = wx.StaticText(id=wxID_PANELBBSTINFO1VALUE,
-              label='10', name='stInfo1Value', parent=self, pos=wx.Point(544,
+              label=_('10'), name='stInfo1Value', parent=self, pos=wx.Point(544,
               352), style=0)
 
         self.stInfo2 = wx.StaticText(id=wxID_PANELBBSTINFO2,
-              label='Residual power to be supplied:', name='stInfo2',
+              label=_('Residual power to be supplied:'), name='stInfo2',
               parent=self, pos=wx.Point(440, 392), style=0)
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELBBSTINFO2A,
-              label='Temperature [\xbaC]', name='stInfo3', parent=self,
+              label=_('Temperature [\xbaC]'), name='stInfo3', parent=self,
               pos=wx.Point(504, 416), style=0)
-        self.stInfo2b = wx.StaticText(id=-1, label='Peak demand [kW]',
+        self.stInfo2b = wx.StaticText(id=-1, label=_('Peak demand [kW]'),
               name='stInfo2b', parent=self, pos=wx.Point(616, 416), style=0)
 
-        self.stInfo2_T1 = wx.StaticText(id=wxID_PANELBBSTINFO2_T1, label='80',
+        self.stInfo2_T1 = wx.StaticText(id=wxID_PANELBBSTINFO2_T1, label=_('80'),
               name='stInfo2_T1', parent=self, pos=wx.Point(504, 440), style=0)
 
-        self.stInfo2_T2 = wx.StaticText(id=wxID_PANELBBSTINFO2_T2, label='120',
+        self.stInfo2_T2 = wx.StaticText(id=wxID_PANELBBSTINFO2_T2, label=_('120'),
               name='stInfo2_T2', parent=self, pos=wx.Point(504, 464), style=0)
 
-        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label='400',
+        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label=_('400'),
               name='staticText3', parent=self, pos=wx.Point(504, 488), style=0)
 
-        self.stInfo2_P1 = wx.StaticText(id=wxID_PANELBBSTINFO2_P1, label='1100',
+        self.stInfo2_P1 = wx.StaticText(id=wxID_PANELBBSTINFO2_P1, label=_('1100'),
               name='stInfo2_P1', parent=self, pos=wx.Point(616, 440), style=0)
 
-        self.stInfo2_P2 = wx.StaticText(id=wxID_PANELBBSTINFO2_P2, label='1380',
+        self.stInfo2_P2 = wx.StaticText(id=wxID_PANELBBSTINFO2_P2, label=_('1380'),
               name='stInfo2_P2', parent=self, pos=wx.Point(616, 464), style=0)
 
-        self.stInfo2_P3 = wx.StaticText(id=wxID_PANELBBSTINFO2_P3, label='4270',
+        self.stInfo2_P3 = wx.StaticText(id=wxID_PANELBBSTINFO2_P3, label=_('4270'),
               name='stInfo2_P3', parent=self, pos=wx.Point(616, 488), style=0)
 
 #------------------------------------------------------------------------------		
 #       Default action buttons: FWD / BACK / OK / Cancel
 
 #------------------------------------------------------------------------------		
-        self.buttonpageBBOk = wx.Button(id=wx.ID_OK, label='OK',
+        self.buttonpageBBOk = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonpageBBOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBBOk.Bind(wx.EVT_BUTTON, self.OnButtonpageBBOkButton,
               id=wx.ID_OK)
 
-        self.buttonpageBBCancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+        self.buttonpageBBCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='buttonpageBBCancel', parent=self, pos=wx.Point(616, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBBCancel.Bind(wx.EVT_BUTTON,
@@ -510,7 +512,7 @@ class PanelBB(wx.Panel):
 # "delete" selected:
 
         if (ret=="delete"):
-            pu2 =  DialogOK(self,"delete equipment","do you really want to delete this equipment ?")
+            pu2 =  DialogOK(self,_("delete equipment"),_("do you really want to delete this equipment ?"))
             if pu2.ShowModal() == wx.ID_OK:
                 self.mod.deleteEquipment(rowNo)
                 self.display()

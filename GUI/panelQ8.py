@@ -12,15 +12,23 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.07
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger 02/05/2008
 #                           Tom Sobota      05/05/2008
+#                           Stoyan Danov    06/06/2008
+#                           Stoyan Danov    17/06/2008
+#                           Stoyan Danov    18/06/2008
+#                           Hans Schweiger  18/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
 #       05/05/2008      Changed display logic
+#       06/06/2008      SD: new classes & texts, not functional still
+#       17/06/2008 SD   adapt to new unitdict, change tc numbers to old one + add new
+#       18/06/2008 SD   create display(), add imports
+#                   HS: bug corrections and clean-up
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -34,7 +42,9 @@
 import wx
 import pSQL
 from status import Status
+from GUITools import *
 from displayClasses import *
+from units import *
 
 # constants
 LABELWIDTH=200
@@ -61,8 +71,18 @@ class PanelQ8(wx.Panel):
 
         self.sizer_4_staticbox = wx.StaticBox(self, -1, _("Building list"))
         self.sizer_4_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
         self.sizer_5_staticbox = wx.StaticBox(self, -1, _("Building (or part of building)"))
         self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_6_staticbox = wx.StaticBox(self, -1, _("General data"))
+        self.sizer_6_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_7_staticbox = wx.StaticBox(self, -1, _("Energy demand"))
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_8_staticbox = wx.StaticBox(self, -1, _("Period of occupation"))
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
 
         # left side
@@ -76,58 +96,139 @@ class PanelQ8(wx.Panel):
         self.buttonAddBuilding = wx.Button(self,-1,_("Add building"))
 	self.Bind(wx.EVT_BUTTON, self.OnButtonAddBuilding, self.buttonAddBuilding)
 
+
         # right side
+
+#In staticbox: General data
+
+        self.tc1 = TextEntry(self,maxchars=255,value='',
+                             label=_("Building short name"),
+                             tip=_("Give some brief name of the buildings to identify them in the reports"))
+
+
+        self.tc2 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='AREA',
+                              label=_("Constructed surface"),
+                              tip=_("Surface limited by building's perimeter multiplied by number of floors"))
+
+        self.tc3 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='AREA',
+                              label=_("Useful surface"),
+                              tip=_("Total useful surface of building (excluding walls)"))
+
+        self.tc4 = TextEntry(self,maxchars=255,value='',
+                             label=_("Use of the building"),
+                             tip=_("Specify use, e.g. offices, production, storage,..."))
+
+
+#In staticbox: Energy demand
         
-        self.tc1 = wx.TextCtrl(self,-1,'')
-        self.st1 = Label(self, self.tc1, _("Building name"), _("Building short name"),
-                         LABELWIDTH, TEXTENTRYWIDTH)
+        self.tc5 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='POWER',
+                              label=_("Maximum heating power"),
+                              tip=_("Maximum heating power (without including the security coefficient of the equipment)"))
 
-        self.tc2 = wx.TextCtrl(self,-1,'')
-        self.st2 = Label(self, self.tc2, _("Constructed surface"), _("Constructed surface (m2)"))
+        self.tc6 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='POWER',
+                              label=_("Maximum cooling power"),
+                              tip=_(" "))
 
-        self.tc3 = wx.TextCtrl(self,-1,'')
-        self.st3 = Label(self, self.tc3, _("Useful surface"), _("Useful surface (m2)"))
+        self.tc7 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='ENERGY',
+                              label=_("Annual heating demand"),
+                              tip=_("Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate table (if available)"))
 
-        self.tc4 = wx.TextCtrl(self,-1,'')
-        self.st4 = Label(self, self.tc4, _("Use"), _("Use of the building"))
+        self.tc8 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='ENERGY',
+                              label=_("Annual demand of air conditioning"),
+                              tip=_(" "))
 
-        self.tc5 = wx.TextCtrl(self,-1,'')
-        self.st5 = Label(self, self.tc5, _("Max. heating power"), _("Maximum heating power (kW)"))
+        self.tc9 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='VOLUME',
+                              label=_("Daily consumption of  DHW"),
+                              tip=_("Only consumption of hot water that is not included yet in ''Processes''"))
 
-        self.tc6 = wx.TextCtrl(self,-1,'')
-        self.st6 = Label(self, self.tc6, _("Max. cooling power"), _("Maximum cooling power (kW)"))
 
-        self.tc7 = wx.TextCtrl(self,-1,'')
-        self.st7 = Label(self, self.tc7, _("Heating demand"), _("Annual heating demand (MWh / year)"))
+#In staticbox: Period of occupation
+        
+        self.tc10 = FloatEntry(self,#SD:change type of entry?? -> time start - time stop?? or change tip: hours of occupation per day??
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=None,
+                              label=_("Hours of occupation"),
+                              tip=_("Hours of occupation of the building, during which heating and air conditionning is active"))
 
-        self.tc8 = wx.TextCtrl(self,-1,'')
-        self.st8 = Label(self, self.tc8, _("Air conditioning demand"),
-                         _("Annual demand of air conditioning (MWh / year)"))
+        self.tc11 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=None,
+                              label=_("Days of use per year"),
+                              tip=_(" "))
 
-        self.tc9 = wx.TextCtrl(self,-1,'')
-        self.st9 = Label(self, self.tc9, _("Consumption of DHW"), _("Daily consumption of DHW (l/day)"))
+        self.tc12_10 = DateEntry(self,
+                              value='',
+                              label=_("Start period 1"),
+                              tip=_("Period of year that the building is not used"))
 
-        self.tc10 = wx.TextCtrl(self,-1,'')
-        self.st10 = Label(self, self.tc10, _("Hours of occupation"), _("Hours of occupation (h/day)"))
+        self.tc12_11 = DateEntry(self,
+                              value='',
+                              label=_("Stop period 1"),
+                              tip=_("Period of year that the building is not used"))
 
-        self.tc11 = wx.TextCtrl(self,-1,'')
-        self.st11 = Label(self, self.tc11, _("Days of use"), _("Days of use per year (days/year)"))
-
-        self.tc12_1 = wx.TextCtrl(self,-1,'')
-        self.tc12_2 = wx.TextCtrl(self,-1,'')
-        self.st12 = Label(self, [self.tc12_1,self.tc12_2], _("Holidays period"),
+#### CHECK CHECK CHECK Tom => please check the use of these labels ...
+        self.st12 = Label(self, [self.tc12_10,self.tc12_11], _("Holidays period"),
                            [_("Holidays period (from)"),_("Holidays period (to)")])
 
-        self.tc13_1 = wx.TextCtrl(self,-1,'')
-        self.tc13_2 = wx.TextCtrl(self,-1,'')
+        self.tc12_20 = DateEntry(self,
+                              value='',
+                              label=_("Start period 2"),
+                              tip=_("Period of year that the building is not used"))
+
+        self.tc12_21 = DateEntry(self,
+                              value='',
+                              label=_("Stop period 2"),
+                              tip=_("Period of year that the building is not used"))
+
+        self.tc12_30 = DateEntry(self,
+                              value='',
+                              label=_("Start period 3"),
+                              tip=_("Period of year that the building is not used"))
+
+        self.tc12_31 = DateEntry(self,
+                              value='',
+                              label=_("Stop period 3"),
+                              tip=_("Period of year that the building is not used"))
+
+
+        self.tc13_1 = DateEntry(self,
+                              value='',
+                              label=_("Start of heating period"),
+                              tip=_(" "))
+
+        self.tc13_2 = DateEntry(self,
+                              value='',
+                              label=_("Stop of heating period"),
+                              tip=_(" "))
         self.st13 = Label(self,[self.tc13_1,self.tc13_2],_("Heating period"),
                           [_("Heating period (from)"), _("Heating period (to)")])
 
-        self.tc14_1 = wx.TextCtrl(self,-1,'')
-        self.tc14_2 = wx.TextCtrl(self,-1,'')
+        self.tc14_1 = DateEntry(self,
+                              value='',
+                              label=_("Start of air conditioning period"),
+                              tip=_(" "))
+
+        self.tc14_2 = DateEntry(self,
+                              value='',
+                              label=_("Stop of air conditioning period"),
+                              tip=_(" "))
+
         self.st14 = Label(self,[self.tc14_1,self.tc14_2],_("Air cond. period"),
                           [_("Air conditioning period (from)"), _("Air conditioning period (to)")])
-
 
         self.buttonOK = wx.Button(self,wx.ID_OK, label=_("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
@@ -156,32 +257,34 @@ class PanelQ8(wx.Panel):
 
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
         flagText = wx.EXPAND|wx.ALIGN_CENTER_VERTICAL
-        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
+
+#HS: 2008-06-18: st's eliminated from grid sizer (except st12,13,14)
+#        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc1, 0, flagText, 0)
-        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc6, 0, flagText, 0)
-        grid_sizer_1.Add(self.st7, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st7, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc7, 0, flagText, 0)
-        grid_sizer_1.Add(self.st8, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st8, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc8, 0, flagText, 0)
-        grid_sizer_1.Add(self.st9, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st9, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc9, 0, flagText, 0)
-        grid_sizer_1.Add(self.st10, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st10, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc10, 0, flagText, 0)
-        grid_sizer_1.Add(self.st11, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st11, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc11, 0, flagText, 0)
 
         grid_sizer_1.Add(self.st12, 0, flagLabel, 0)
-        sizer_tc12.Add(self.tc12_1, 0, flagText, 0)
-        sizer_tc12.Add(self.tc12_2, 0, flagText, 0)
+        sizer_tc12.Add(self.tc12_10, 0, flagText, 0)
+        sizer_tc12.Add(self.tc12_11, 0, flagText, 0)
         grid_sizer_1.Add(sizer_tc12, 0, flagText, 0)
 
         grid_sizer_1.Add(self.st13, 0, flagLabel, 0)
@@ -224,8 +327,12 @@ class PanelQ8(wx.Panel):
         self.tc9.SetValue(str(q.BuildDailyDHW))
         self.tc10.SetValue(str(q.BuildHoursOccup))
         self.tc11.SetValue(str(q.BuildDaysInUse))
-        self.tc12_1.SetValue(str(q.BuildHolidaysPeriodStart))
-        self.tc12_2.SetValue(str(q.BuildHolidaysPeriodStop))
+        self.tc12_10.SetValue(str(q.BuildHolidaysPeriodStart1))
+        self.tc12_11.SetValue(str(q.BuildHolidaysPeriodStop1))
+        self.tc12_20.SetValue(str(q.BuildHolidaysPeriodStart2))
+        self.tc12_21.SetValue(str(q.BuildHolidaysPeriodStop2))
+        self.tc12_30.SetValue(str(q.BuildHolidaysPeriodStart3))
+        self.tc12_31.SetValue(str(q.BuildHolidaysPeriodStop3))
         self.tc13_1.SetValue(str(q.BuildHeatingPeriodStart))
         self.tc13_2.SetValue(str(q.BuildHeatingPeriodStop))
         self.tc14_1.SetValue(str(q.BuildAirCondPeriodStart))
@@ -268,8 +375,12 @@ class PanelQ8(wx.Panel):
                     "BuildDailyDHW":self.check(self.tc9.GetValue()),
                     "BuildHoursOccup":self.check(self.tc10.GetValue()),
                     "BuildDaysInUse":self.check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart":self.check(self.tc12_1.GetValue()),
-                    "BuildHolidaysPeriodStop":self.check(self.tc12_2.GetValue()),
+                    "BuildHolidaysPeriodStart1":self.check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop1":self.check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart2":self.check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop2":self.check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart3":self.check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop3":self.check(self.tc12_31.GetValue()),
                     "BuildHeatingPeriodStart":self.check(self.tc13_1.GetValue()),
                     "BuildHeatingPeriodStop":self.check(self.tc13_2.GetValue()),
                     "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()),
@@ -295,8 +406,12 @@ class PanelQ8(wx.Panel):
                     "BuildDailyDHW":self.check(self.tc9.GetValue()),
                     "BuildHoursOccup":self.check(self.tc10.GetValue()),
                     "BuildDaysInUse":self.check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart":self.check(self.tc12_1.GetValue()),
-                    "BuildHolidaysPeriodStop":self.check(self.tc12_2.GetValue()),
+                    "BuildHolidaysPeriodStart1":self.check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop1":self.check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart2":self.check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop2":self.check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart3":self.check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop3":self.check(self.tc12_31.GetValue()),
                     "BuildHeatingPeriodStart":self.check(self.tc13_1.GetValue()),
                     "BuildHeatingPeriodStop":self.check(self.tc13_2.GetValue()),
                     "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()),
@@ -314,6 +429,11 @@ class PanelQ8(wx.Panel):
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
+
+    def display(self):
+        self.clear()
+        self.fillPage()
+        self.Show()
 
     def fillBuildingList(self):
         self.listBoxBuildingList.Clear()
@@ -344,8 +464,12 @@ class PanelQ8(wx.Panel):
         self.tc9.SetValue('')
         self.tc10.SetValue('')
         self.tc11.SetValue('')
-        self.tc12_1.SetValue('')
-        self.tc12_2.SetValue('')
+        self.tc12_10.SetValue('')
+        self.tc12_11.SetValue('')
+        self.tc12_20.SetValue('')
+        self.tc12_21.SetValue('')
+        self.tc12_30.SetValue('')
+        self.tc12_31.SetValue('')
         self.tc13_1.SetValue('')
         self.tc13_2.SetValue('')
         self.tc14_1.SetValue('')

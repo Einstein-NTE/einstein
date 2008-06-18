@@ -24,6 +24,8 @@
 #	Revised by:    
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          15/04/2008
+#                           Stoyan Danov            18/06/2008
+#
 #       Revised by:         Tom Sobota  28/04/2008
 #
 #       Changes to previous version:
@@ -31,6 +33,7 @@
 #                   slight change to OK and Cancel buttons, to show the right icons
 #       15/04/08 HS copy and delete buttons added. event handler "Generate New" linked
 #       28/04/2008  added 'draw' to method display
+#       18/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -82,8 +85,8 @@ class PanelA(wx.Panel):
 	self.keys = keys
 	self.main = main
         self.mod = Status.mod.moduleA
-        self.shortName = "new alternative"
-        self.description = "describe shortly the main differential features of the new alternative"
+        self.shortName = _("new alternative")
+        self.description = _("describe shortly the main differential features of the new alternative")
         self.ANo = Status.ANo
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
@@ -131,12 +134,12 @@ class PanelA(wx.Panel):
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, "Alternative No")
-        self.grid.SetColLabelValue(1, "Name")
-        self.grid.SetColLabelValue(2, "Description")
-        self.grid.SetColLabelValue(3, "State of processing")
-        self.grid.SetColLabelValue(4, "Primary energy consumption\n[MWh/a]")
-        self.grid.SetColLabelValue(5, "Total annual energy cost\n[€/a]")
+        self.grid.SetColLabelValue(0, _("Alternative No"))
+        self.grid.SetColLabelValue(1, _("Name"))
+        self.grid.SetColLabelValue(2, _("Description"))
+        self.grid.SetColLabelValue(3, _("State of processing"))
+        self.grid.SetColLabelValue(4, _("Primary energy consumption\n[MWh/a]"))
+        self.grid.SetColLabelValue(5, _("Total annual energy cost\n[€/a]"))
         #
         # copy values from dictionary to grid
         #
@@ -179,22 +182,22 @@ class PanelA(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
               self.OnGridPageAGridCellLeftClick)
 
-        self.st1pageA = wx.StaticText(id=-1, label='Existing alternatives',
+        self.st1pageA = wx.StaticText(id=-1, label=_('Existing alternatives'),
               name='st1pageA', parent=self, pos=wx.Point(24, 40), style=0)
 
         self.stTitlePageA = wx.StaticText(id=wxID_PANELASTTITLEPAGEA,
-              label='Design of alternative proposals', name='stTitlePageA',
+              label=_('Design of alternative proposals'), name='stTitlePageA',
               parent=self, pos=wx.Point(24, 16), style=0)
         self.stTitlePageA.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, 'Tahoma'))
 
-        self.buttonpageAOk = wx.Button(id=wx.ID_OK, label='OK',
+        self.buttonpageAOk = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonpageAOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageAOk.Bind(wx.EVT_BUTTON, self.OnButtonpageAOkButton,
               id=wx.ID_OK)
 
-        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL, label='Cancel',
+        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='buttonpageACancel', parent=self, pos=wx.Point(616, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageACancel.Bind(wx.EVT_BUTTON,
@@ -213,42 +216,42 @@ class PanelA(wx.Panel):
               id=wxID_PANELABUTTONPAGEABACK)
 
         self.GenerateNew = wx.Button(id=wxID_PANELAGENERATENEW,
-              label='generate new proposal', name='GenerateNew', parent=self,
+              label=_('generate new proposal'), name='GenerateNew', parent=self,
               pos=wx.Point(24, 280), size=wx.Size(136, 24), style=0)
         self.GenerateNew.Bind(wx.EVT_BUTTON, self.OnGenerateNewButton,
               id=wxID_PANELAGENERATENEW)
 
         self.st3pageA = wx.StaticText(id=wxID_PANELAST3PAGEA,
-              label='Comparison of energy consumption', name='st3pageA',
+              label=_('Comparison of energy consumption'), name='st3pageA',
               parent=self, pos=wx.Point(24, 320), size=wx.Size(170, 13),
               style=0)
 
         self.DesignHX = wx.Button(id=wxID_PANELADESIGNHX,
-              label='HX network design', name='DesignHX', parent=self,
+              label=_('HX network design'), name='DesignHX', parent=self,
               pos=wx.Point(592, 400), size=wx.Size(184, 24), style=0)
         self.DesignHX.Bind(wx.EVT_BUTTON, self.OnDesignHXButton,
               id=wxID_PANELADESIGNHX)
 
         self.DesignHC = wx.Button(id=wxID_PANELADESIGNHC,
-              label='Heat and cold supply', name='DesignHC', parent=self,
+              label=_('Heat and cold supply'), name='DesignHC', parent=self,
               pos=wx.Point(592, 440), size=wx.Size(184, 24), style=0)
         self.DesignHC.Bind(wx.EVT_BUTTON, self.OnDesignHCButton,
               id=wxID_PANELADESIGNHC)
 
         self.DesignPO = wx.Button(id=wxID_PANELADESIGNPO,
-              label='process optimisation', name='DesignPO', parent=self,
+              label=_('process optimisation'), name='DesignPO', parent=self,
               pos=wx.Point(592, 320), size=wx.Size(184, 24), style=0)
         self.DesignPO.Bind(wx.EVT_BUTTON, self.OnDesignPOButton,
               id=wxID_PANELADESIGNPO)
 
         self.copyProposal = wx.Button(id=wxID_PANELACOPYPROPOSAL,
-              label='copy proposal', name='copyProposal', parent=self,
+              label=_('copy proposal'), name='copyProposal', parent=self,
               pos=wx.Point(176, 280), size=wx.Size(136, 24), style=0)
         self.copyProposal.Bind(wx.EVT_BUTTON, self.OnCopyProposalButton,
               id=wxID_PANELACOPYPROPOSAL)
 
         self.deleteProposal = wx.Button(id=wxID_PANELADELETEPROPOSAL,
-              label='delete proposal', name='deleteProposal', parent=self,
+              label=_('delete proposal'), name='deleteProposal', parent=self,
               pos=wx.Point(328, 280), size=wx.Size(136, 24), style=0)
         self.deleteProposal.Bind(wx.EVT_BUTTON, self.OnDeleteProposalButton,
               id=wxID_PANELADELETEPROPOSAL)

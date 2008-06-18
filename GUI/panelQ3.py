@@ -65,12 +65,14 @@ from displayClasses import *
 from units import *
 
 # constants that control the default field sizes
-
-HEIGHT          =  27
-LABELWIDTHLEFT  = 260
-LABELWIDTHRIGHT = 500
-DATAENTRYWIDTH  = 100
-UNITSWIDTH      =  90
+TYPE_SIZE_LEFT    =   9
+TYPE_SIZE_RIGHT   =   9
+HEIGHT_LEFT       =  29
+HEIGHT_RIGHT      =  26
+LABEL_WIDTH_LEFT  = 260
+LABEL_WIDTH_RIGHT = 550
+DATA_ENTRY_WIDTH  = 100
+UNITS_WIDTH       = 100
     
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
@@ -112,13 +114,21 @@ class PanelQ3(wx.Panel):
         self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
         #
-        # set default field sizes. Each data entry class has 4 configurable parameters:
+        # set field sizes for the left tab.
+        # Each data entry class has several configurable parameters:
         # 1. The height. This is the same for all the widgets that make the class
         # 2. The width of the label
         # 3. The width of the entry widget
         # 4. The width of the unit chooser.
+        # Parameters pertaining to the font
         #
-        f = FieldSizes(wHeight=HEIGHT,wLabel=LABELWIDTHLEFT,wData=DATAENTRYWIDTH,wUnits=UNITSWIDTH)
+        f = FieldSizes(wHeight=HEIGHT_LEFT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH,
+                       fFamily=wx.FONTFAMILY_SWISS,
+                       fStyle=wx.FONTSTYLE_NORMAL,
+                       fWeight=wx.FONTWEIGHT_NORMAL,
+                       fFacename='TAHOMA',
+                       fSize=TYPE_SIZE_LEFT)
 
         #
         # left panel controls
@@ -232,7 +242,8 @@ e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
         # Right panel controls
         # make width of labels larger for this panel
-        f = FieldSizes(wLabel=LABELWIDTHRIGHT)
+        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT,
+                       fSize=TYPE_SIZE_RIGHT)
 
         #
         # waste heat
@@ -314,22 +325,23 @@ heat recovery"))
 using the nomenclature of the hydraulic scheme"))
 
         self.tc24 = FloatEntry(self.page1,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
-                              unitdict='TEMPERATURE',
-                              label=_("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
-                              tip=_("Temperature of the supplying medium at heat exchangers inlet"))
+                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                               unitdict='TEMPERATURE',
+                               label=_("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
+                               tip=_("Temperature of the supplying medium at heat exchangers inlet"),
+                               fontsize=TYPE_SIZE_RIGHT-1)
 
         self.tc25 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value = 0.,
-                              unitdict='MASSFLOW',
-                              label=_("Flow rate of the heat supply medium (close to process)"),
-                              tip=_("Mass flow of the heat/cold supplyind medium"))
+                               ipart=6, decimals=1, minval=0., maxval=999999., value = 0.,
+                               unitdict='MASSFLOW',
+                               label=_("Flow rate of the heat supply medium (close to process)"),
+                               tip=_("Mass flow of the heat/cold supplyind medium"))
 
         self.tc26 = FloatEntry(self.page1,
-                              ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
-                              unitdict='ENERGY',
-                              label=_("Annual consumption of UPH"),
-                              tip=_("Only for the process"))
+                               ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
+                               unitdict='ENERGY',
+                               label=_("Annual consumption of UPH"),
+                               tip=_("Only for the process"))
 
         self.buttonAddProcess = wx.Button(self.page0,-1,_("Add process"))
         self.buttonAddProcess.SetMinSize((125, 32))
@@ -340,11 +352,9 @@ using the nomenclature of the hydraulic scheme"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProcess, self.buttonDeleteProcess)
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
-        #self.buttonCancel.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
-        #self.buttonOK.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 
@@ -352,119 +362,91 @@ using the nomenclature of the hydraulic scheme"))
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_11 = wx.StaticBoxSizer(self.sizer_11_staticbox, wx.VERTICAL)
+        sizer_12 = wx.StaticBoxSizer(self.sizer_12_staticbox, wx.VERTICAL)
+
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_3 = wx.BoxSizer(wx.VERTICAL)#SD before HORIZONTAL
         sizer_10 = wx.BoxSizer(wx.VERTICAL)
         sizer_13 = wx.StaticBoxSizer(self.sizer_13_staticbox, wx.VERTICAL)
-        grid_sizer_5 = wx.BoxSizer(wx.VERTICAL)
-        sizer_12 = wx.StaticBoxSizer(self.sizer_12_staticbox, wx.VERTICAL)
-        grid_sizer_4 = wx.BoxSizer(wx.VERTICAL)
-        sizer_11 = wx.StaticBoxSizer(self.sizer_11_staticbox, wx.VERTICAL)
-        grid_sizer_3 = wx.BoxSizer(wx.VERTICAL)
+        sizer_25 = wx.BoxSizer(wx.VERTICAL)
+        sizer_24 = wx.BoxSizer(wx.VERTICAL)
+
+        sizer_23 = wx.BoxSizer(wx.VERTICAL)
         sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_6 = wx.BoxSizer(wx.VERTICAL)
         sizer_8 = wx.StaticBoxSizer(self.sizer_8_staticbox, wx.VERTICAL)
-        grid_sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_22 = wx.BoxSizer(wx.VERTICAL)
         sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
-        grid_sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_21 = wx.BoxSizer(wx.VERTICAL)
         sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
         sizer_5.Add(self.listBoxProcesses, 1, wx.EXPAND, 0)
         sizer_5.Add(self.buttonAddProcess, 0, wx.ALIGN_RIGHT, 0)
         sizer_5.Add(self.buttonDeleteProcess, 0, wx.ALIGN_RIGHT, 0)
         sizer_4.Add(sizer_5, 1, wx.EXPAND, 0)
 
-        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_VERTICAL
-        flagText = wx.ALIGN_CENTER_VERTICAL
+        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM
+        flagText = wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM
+        # Left tab. Processes description
+        sizer_21.Add(self.tc1, 0, flagText, 2)
+        sizer_21.Add(self.tc2, 0, flagText, 2)
+        sizer_21.Add(self.tc3, 0, flagText, 2)
+        sizer_21.Add(self.tc4, 0, flagText, 2)
+        sizer_21.Add(self.tc5, 0, flagText, 2)
+        sizer_21.Add(self.tc6, 0, flagText, 2)
+        sizer_21.Add(self.tc7, 0, flagText, 2)
+        sizer_21.Add(self.tc8, 0, flagText, 2)
+        sizer_21.Add(self.tc9, 0, flagText, 2)
+        sizer_21.Add(self.tc10, 0, flagText, 2)
 
-        #grid_sizer_1.Add(self.st1, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc1, 0, flagText, 2) #SD before grid_sizer_1
-        #grid_sizer_1.Add(self.st2, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc2, 0, flagText, 2) #SD before grid_sizer_1
-        #grid_sizer_1.Add(self.st3, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 2) #SD before grid_sizer_1
-        #grid_sizer_1.Add(self.choiceOfDBUnitOperation, 0, flagText, 2)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st4, 0, flagLabel, 2)
-        #grid_sizer_1.Add(self.choiceOfPMDBFluid, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st5, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st6, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st7, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc7, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st8, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc8, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st9, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc9, 0, flagText, 2)
-        #grid_sizer_1.Add(self.st10, 0, flagLabel, 2)
-        grid_sizer_1.Add(self.tc10, 0, flagText, 2)
-
-        sizer_7.Add(grid_sizer_1, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_7.Add(sizer_21, 1, wx.LEFT|wx.EXPAND, 40)
         sizer_6.Add(sizer_7, 2, wx.EXPAND, 0)
 
-        #grid_sizer_2.Add(self.st11, 0, flagLabel, 0)
-        grid_sizer_2.Add(self.tc11, 0, flagText, 0)
-        #grid_sizer_2.Add(self.st12, 0, flagLabel, 0)
-        grid_sizer_2.Add(self.tc12, 0, flagText, 0)
-        #grid_sizer_2.Add(self.st13, 0, flagLabel, 0)
-        grid_sizer_2.Add(self.tc13, 0, flagText, 0)
-        #grid_sizer_2.Add(self.st14, 0, flagLabel, 0)
-        grid_sizer_2.Add(self.tc14, 0, flagText, 0)
+        # Left tab. Schedule
+        sizer_22.Add(self.tc11, 0, flagText, 1)
+        sizer_22.Add(self.tc12, 0, flagText, 1)
+        sizer_22.Add(self.tc13, 0, flagText, 1)
+        sizer_22.Add(self.tc14, 0, flagText, 1)
 
-        sizer_8.Add(grid_sizer_2, 1, wx.LEFT|wx.EXPAND, 40)
-        sizer_6.Add(sizer_8, 1, wx.EXPAND, 0)
+        sizer_8.Add(sizer_22, 1, wx.LEFT|wx.EXPAND, 40)
+        sizer_6.Add(sizer_8, 0, wx.EXPAND, 0)
         sizer_4.Add(sizer_6, 2, wx.EXPAND, 0)
         self.page0.SetSizer(sizer_4)
         
-        #grid_sizer_3.Add(self.st15, 0, flagLabel, 0)
-        grid_sizer_3.Add(self.tc15_1, 0, flagText, 0)#SD
-        #grid_sizer_3.Add(self.st16, 0, flagLabel, 0)
-        grid_sizer_3.Add(self.tc15, 0, flagText, 0)#SD
-        #grid_sizer_3.Add(self.st17, 0, flagLabel, 0)
-        grid_sizer_3.Add(self.tc15_2, 0, flagText, 0)#SD
-        #grid_sizer_3.Add(self.st18, 0, flagLabel, 0)
-        #grid_sizer_3.Add(self.choiceHeatRecovered, 0, flagText, 0)
-        grid_sizer_3.Add(self.tc16, 0, flagText, 0)#SD
-        grid_sizer_3.Add(self.tc17, 0, flagText, 0)#SD
-        grid_sizer_3.Add(self.tc18, 0, flagText, 0)#SD
+        # Right tab. Heat available for recovery
+        sizer_23.Add(self.tc15_1, 0, flagText, 1)
+        sizer_23.Add(self.tc15,   0, flagText, 1)
+        sizer_23.Add(self.tc15_2, 0, flagText, 1)
+        sizer_23.Add(self.tc16,   0, flagText, 1)
+        sizer_23.Add(self.tc17,   0, flagText, 1)
+        sizer_23.Add(self.tc18,   0, flagText, 1)
 
-        sizer_11.Add(grid_sizer_3, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_11.Add(sizer_23, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_11, 1, wx.EXPAND, 0)
         
-        #grid_sizer_4.Add(self.st19, 0, flagLabel, 0)
-        #grid_sizer_4.Add(self.choiceExistsHeat, 0, flagText, 0)
-        #grid_sizer_4.Add(self.st20, 0, flagLabel, 0)
-        #grid_sizer_4.Add(self.tc20, 0, flagText, 0)
-        #grid_sizer_4.Add(self.st21, 0, flagLabel, 0)
-        grid_sizer_4.Add(self.tc19, 0, flagText, 0)#SD
-        grid_sizer_4.Add(self.tc20, 0, flagText, 0)#SD
-        grid_sizer_4.Add(self.tc21, 0, flagText, 0)#SD
+        # Right tab. Recovery for this process
+        sizer_24.Add(self.tc19, 0, flagText, 1)
+        sizer_24.Add(self.tc20, 0, flagText, 1)
+        sizer_24.Add(self.tc21, 0, flagText, 1)
 
-        sizer_12.Add(grid_sizer_4, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
-        sizer_10.Add(sizer_12, 1, wx.EXPAND, 0)
+        sizer_12.Add(sizer_24, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_10.Add(sizer_12, 0, wx.EXPAND, 0)
         
-        #grid_sizer_5.Add(self.st22, 0, flagLabel, 0)
-        #grid_sizer_5.Add(self.choiceOfSMDBFluid, 0, flagText, 0)
-        #grid_sizer_5.Add(self.st23, 0, flagLabel, 0)
-        #grid_sizer_5.Add(self.tc23, 0, flagText, 0)
-        #grid_sizer_5.Add(self.st24, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc22, 0, flagText, 0)#SD
-        #grid_sizer_5.Add(self.st25, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc23, 0, flagText, 0)#SD
-        #grid_sizer_5.Add(self.st26, 0, flagLabel, 0)
-        grid_sizer_5.Add(self.tc24, 0, flagText, 0)#SD
-        grid_sizer_5.Add(self.tc25, 0, flagText, 0)#SD
-        grid_sizer_5.Add(self.tc26, 0, flagText, 0)#SD
+        # Right tab. Data of existing supply
+        sizer_25.Add(self.tc22, 0, flagText, 1)
+        sizer_25.Add(self.tc23, 0, flagText, 1)
+        sizer_25.Add(self.tc24, 0, flagText, 1)
+        sizer_25.Add(self.tc25, 0, flagText, 1)
+        sizer_25.Add(self.tc26, 0, flagText, 1)
 
-        sizer_13.Add(grid_sizer_5, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
+        sizer_13.Add(sizer_25, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
         self.page1.SetSizer(sizer_10)
         self.notebook.AddPage(self.page0, _('Process data'))
         self.notebook.AddPage(self.page1, _('Heat supply and waste heat'))
         sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
-        sizer_3.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
-        sizer_3.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
-        sizer_2.Add(sizer_3, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
+        sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
+        sizer_2.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
         self.Layout()
@@ -612,34 +594,21 @@ using the nomenclature of the hydraulic scheme"))
         self.Show()
 
 
-    def fillChoiceOfDBUnitOperation(self):
+    def fillChoiceOfDBUnitOperation(self): # tc3
         unitOpDict = Status.prj.getUnitOpDict()
-        unitOpNames = unitOpDict.values()
-        self.tc3.entry.Clear()
-        for name in unitOpNames:
-            self.tc3.entry.Append(name) 
-
+        self.tc3.SetValue(unitOpDict.values())
             
     def fillChoiceOfPMDBFluid(self):
         fluidDict = Status.prj.getFluidDict()
-        fluidNames = fluidDict.values()
-        self.tc4.entry.Clear()
-        for name in fluidNames:
-            self.tc4.entry.Append(name)
+        self.tc4.SetValue(fluidDict.values())
 
     def fillChoiceOfODBFluid(self):
         fluidDict = Status.prj.getFluidDict()
-        fluidNames = fluidDict.values()
-        self.tc15_1.entry.Clear()
-        for name in fluidNames:
-            self.tc15_1.entry.Append(name)
+        self.tc15_1.SetValue(fluidDict.values())
 
     def fillChoiceOfSMDBFluid(self):
         fluidDict = Status.prj.getFluidDict()
-        fluidNames = fluidDict.values()
-        self.tc22.entry.Clear()
-        for name in fluidNames:
-            self.tc22.entry.Append(name)
+        self.tc22.SetValue(fluidDict.values())
 
     def fillPage(self):
         self.listBoxProcesses.Clear()

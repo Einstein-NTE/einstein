@@ -12,12 +12,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.06
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota      06/05/2008
+#                           Stoyan Danov    09/06/2008
+#                           Stoyan Danov    17/06/2008
+#                           Stoyan Danov    18/06/2008
+#                           Hans Schweiger  18/06/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
+#       09/06/2008      Changed texts GUI
+#       17/06/2008 SD   adapt to new unitdict
+#       18/06/2008 SD   create display(), add imports
+#                   HS: bug corrections and clean-up
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -31,7 +39,9 @@
 import wx
 import pSQL
 from status import Status
+from GUITools import *
 from displayClasses import *
+from units import *
 
 # constants
 LABELWIDTH=120
@@ -74,31 +84,36 @@ class PanelQ9(wx.Panel):
         self.dummy2 = wx.StaticText(self, -1, "\n")
         self.dummy3 = wx.StaticText(self, -1, "\n")
 
-        self.tc1 = wx.TextCtrl(self,-1, '')
-        self.st1 = Label(self, self.tc1,_("Inflation rate"),
-                         _("General inflation rate (%)"),
-                         LABELWIDTH,
-                         TEXTENTRYWIDTH)
+        #SD added
+        self.tc1 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='GROWTHRATE',
+                              label=_("General inflation rate [%]"),
+                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
-        self.tc2 = wx.TextCtrl(self,-1, '')
-        self.st2 = Label(self,self.tc2,_("Increm. of energy prices"),
-                         _("Rate of increment of energy prices (%)"))
+        self.tc2 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='GROWTHRATE',
+                              label=_("Rate of increment of energy prices [%]"),
+                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
+        self.tc3 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='GROWTHRATE',
+                              label=_("Nominal rate of interest for external financing of installations [%]"),
+                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
-        self.tc3 = wx.TextCtrl(self,-1, '')
-        self.st3 = Label(self,self.tc3,_("Rate of interest"),
-                                 _("Nominal rate of interest for external financing of installations (%)"))
+        self.tc4 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='FRACTION',
+                              label=_("Percentage of external financing for installations"),
+                              tip=_("Percentage of the external financing for the inversions"))
 
-
-
-        self.tc4 = wx.TextCtrl(self,-1, '')
-        self.st4 = Label(self,self.tc4, _("% external financing"),
-                                 _("Percentage of external financing for installations (%)"))
-
-        self.tc5 = wx.TextCtrl(self,-1, '')
-        self.st5 = Label(self, self.tc5, _("Amortization time"),
-                                 _("Time for economic amortization of installations (years)"))
-
+        self.tc5 = FloatEntry(self,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='LONGTIME',
+                              label=_("Time for economic amortization of installations [years]"),
+                              tip=_("Amortization time"))
 
 
         self.label_1 = wx.StaticText(self, -1, _("Public funding for energy\nsaving measures"))
@@ -171,18 +186,19 @@ class PanelQ9(wx.Panel):
 
         labelFlags = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
 
+#HS2008-06-18: st's eliminated from grid sizer
         grid_sizer_2 = wx.FlexGridSizer(5, 2, 2, 0)
         grid_sizer_2.Add(self.dummy1, 0, 0, 0)
         grid_sizer_2.Add(self.dummy2, 0, 0, 0)
-        grid_sizer_2.Add(self.st1, 0, labelFlags, 0)
+#        grid_sizer_2.Add(self.st1, 0, labelFlags, 0)
         grid_sizer_2.Add(self.tc1, 0, 0, 0)
-        grid_sizer_2.Add(self.st2, 0, labelFlags, 0)
+#        grid_sizer_2.Add(self.st2, 0, labelFlags, 0)
         grid_sizer_2.Add(self.tc2, 0, 0, 0)
-        grid_sizer_2.Add(self.st3, 0, labelFlags, 0)
+#        grid_sizer_2.Add(self.st3, 0, labelFlags, 0)
         grid_sizer_2.Add(self.tc3, 0, 0, 0)
-        grid_sizer_2.Add(self.st4, 0, labelFlags, 0)
+#        grid_sizer_2.Add(self.st4, 0, labelFlags, 0)
         grid_sizer_2.Add(self.tc4, 0, 0, 0)
-        grid_sizer_2.Add(self.st5, 0, labelFlags, 0)
+#        grid_sizer_2.Add(self.st5, 0, labelFlags, 0)
         grid_sizer_2.Add(self.tc5, 0, 0, 0)
         sizer_8.Add(grid_sizer_2, 2, wx.TOP|wx.EXPAND, 6)
 
@@ -294,14 +310,19 @@ class PanelQ9(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------
 
+    def display(self):
+        self.clear()
+        self.fillPage()
+        self.Show()
+
     def clear(self):
         self.checkBox6.SetValue(False)
         self.checkBox7.SetValue(False)
-        self.tc1.Clear()
-        self.tc2.Clear()
-        self.tc3.Clear()
-        self.tc4.Clear()
-        self.tc5.Clear()
+        self.tc1.entry.Clear()
+        self.tc2.entry.Clear()
+        self.tc3.entry.Clear()
+        self.tc4.entry.Clear()
+        self.tc5.entry.Clear()
         self.tc10_1.Clear()
         self.tc10_2.Clear()
         self.tc10_3.Clear()

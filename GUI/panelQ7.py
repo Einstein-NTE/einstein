@@ -12,12 +12,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.06
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota      06/05/2008
+#                           Stoyan Danov    06/06/2008
+#                           Stoyan Danov    17/06/2008
+#                           Stoyan Danov    18/06/2008
+#                           Hans Schweiger  18/06/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
+#       06/06/2008      page0, page2: checkboxes changed to choices, not functional still, new classes & text
+#       17/06/2008 SD   page0, page2: adapt to new unitdict, change tc numbers to old ones, introduce DateEntry
+#       18/06/2008 SD   create display(), add imports
+#                   HS  bug corrections (reactivation of check-boxes)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -31,7 +39,9 @@
 import wx
 import pSQL
 from status import Status
+from GUITools import *
 from displayClasses import *
+from units import *
 
 
 class PanelQ7(wx.Panel):
@@ -76,12 +86,36 @@ class PanelQ7(wx.Panel):
         self.sizer_11_staticbox = wx.StaticBox(self.page2, -1, "Availability of biomass from the region")
         self.sizer_11_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
+#SD: substitute with choices
+#HS: reactivated check-boxes, otherwise panel didn't work -> REVISE whether check-box or choiceEntry
         self.checkBox1 = wx.CheckBox(self.page0, -1, "Are you interested in the use of renewable energy?")
         self.checkBox2 = wx.CheckBox(self.page0, -1, "Possibility of saving fuel cost")
         self.checkBox3 = wx.CheckBox(self.page0, -1, "Contribution to a more ecologic supply")
         self.checkBox4 = wx.CheckBox(self.page0, -1,
                                      "Using solar energy helps for a better marketing of your products")
 
+
+        self.tc1 = ChoiceEntry(self.page0,
+                               values=TRANSYESNO.values(),
+                               label=_("Are you interested in the use of renweable energy? (solar thermal/biomass)"),
+                               tip=_(" "))
+        
+        self.tc2 = ChoiceEntry(self.page0,
+                               values=TRANSYESNO.values(),
+                               label=_("Possibility of saving fuel cost"),
+                               tip=_(" "))
+
+        self.tc3 = ChoiceEntry(self.page0,
+                               values=TRANSYESNO.values(),
+                               label=_("Contribution to a more ecologic energy supply"),
+                               tip=_(" "))
+
+        self.tc4 = ChoiceEntry(self.page0,
+                               values=TRANSYESNO.values(),
+                               label=_("Using solar energy helps for a better marketing of your products"),
+                               tip=_(" "))
+
+        #think if we have to change this, SD to ????
         self.checkBox5 = wx.CheckBox(self.page0, -1, "Other")
         self.tc1 = wx.TextCtrl(self.page0, -1,"Please explain here additional motives",
                                style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE)
@@ -141,55 +175,136 @@ class PanelQ7(wx.Panel):
 
         # page 2
 
-        self.tc14 = wx.TextCtrl(self.page2,-1,'')
-        self.st14 = Label(self.page2,self.tc14,_("Type of biomass"),
-                          _("Type of biomass available from processes"),180,70)
+##        self.tc14 = wx.TextCtrl(self.page2,-1,'')
+##        self.st14 = Label(self.page2,self.tc14,_("Type of biomass"),
+##                          _("Type of biomass available from processes"),180,70)
+##
+        self.tc14 = TextEntry(self.page2,maxchars=255,value='',
+                             label=_("Type of biomass available from processes"),
+                             tip=_("Specify if the availability is continuous or during some specific season of the year"))
 
-        self.tc15_1 = wx.TextCtrl(self.page2,-1,'')
-        self.tc15_2 = wx.TextCtrl(self.page2,-1,'')
-        self.st15 = Label(self.page2,[self.tc15_1,self.tc15_2],_("Period of year"),
-                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
-                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
+##        self.tc15_1 = wx.TextCtrl(self.page2,-1,'')
+##        self.tc15_2 = wx.TextCtrl(self.page2,-1,'')
+##        self.st15 = Label(self.page2,[self.tc15_1,self.tc15_2],_("Period of year"),
+##                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
+##                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
+##
+        self.tc15_1 = DateEntry(self.page2,
+                              value='',
+                              label=_("Start of period of year the biomass is available"),
+                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
 
-        self.tc16 = wx.TextCtrl(self.page2,-1,'')
-        self.st16 = Label(self.page2,self.tc16,_("Duration of production"),
-                          _("Number of days biomass is produced (days)"))
-
-        self.tc17 = wx.TextCtrl(self.page2,-1,'')
-        self.st17 = Label(self.page2,self.tc17,_("Daily quantity"),
-                          _("Daily quantity of biomass (t/day)"))
-
-        self.tc18 = wx.TextCtrl(self.page2,-1,'')
-        self.st18 = Label(self.page2,self.tc18,_("Space availability"),
-                          _("Space availability to stock biomass (m3)"))
-
-        self.tc19 = wx.TextCtrl(self.page2,-1,'')
-        self.st19 = Label(self.page2,self.tc19,_("LCV biomass"),
-                          _("LCV biomass (kWh/kg)"))
-
-        self.tc20 = wx.TextCtrl(self.page2,-1,'')
-        self.st20 = Label(self.page2,self.tc20,_("Humidity"),
-                          _("Humidity (%)"))
+        self.tc15_2 = DateEntry(self.page2,
+                              value='',
+                              label=_("Stop of period of year the biomass is available"),
+                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
 
 
+##        self.tc16 = wx.TextCtrl(self.page2,-1,'')
+##        self.st16 = Label(self.page2,self.tc16,_("Duration of production"),
+##                          _("Number of days biomass is produced (days)"))
+##
 
-        self.tc21 = wx.TextCtrl(self.page2,-1,'')
-        self.st21 = Label(self.page2,self.tc21,_("Type of biomass"),
-                          _("Type of biomass available from the region"))
+        self.tc16 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=None,
+                              label=_("Number of days biomass is produced"),
+                              tip=_(" "))
 
-        self.tc22 = wx.TextCtrl(self.page2,-1,'')
-        self.st22 = Label(self.page2,self.tc22,_("Unit price"),
-                          _("Unit price of biomass (EUR/t)"))
+##        self.tc17 = wx.TextCtrl(self.page2,-1,'')
+##        self.st17 = Label(self.page2,self.tc17,_("Daily quantity"),
+##                          _("Daily quantity of biomass (t/day)"))
+##
+        self.tc17 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='MASS',
+                              label=_("Daily quantity of biomass"),
+                              tip=_(" "))
 
-        self.tc23_1 = wx.TextCtrl(self.page2,-1,'')
-        self.tc23_2 = wx.TextCtrl(self.page2,-1,'')
-        self.st23 = Label(self.page2,[self.tc23_1,self.tc23_2],_("Period of availability"),
-                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
-                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
 
-        self.tc24 = wx.TextCtrl(self.page2,-1,'')
-        self.st24 = Label(self.page2,self.tc24,_("Duration of biomass prod."),
-                          _("Number of days the biomass is produced (days)"))
+##        self.tc18 = wx.TextCtrl(self.page2,-1,'')
+##        self.st18 = Label(self.page2,self.tc18,_("Space availability"),
+##                          _("Space availability to stock biomass (m3)"))
+##
+        self.tc18 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='VOLUME',
+                              label=_("Space availability to stock biomass?"),
+                              tip=_("Specify the volume"))
+
+##        self.tc19 = wx.TextCtrl(self.page2,-1,'')
+##        self.st19 = Label(self.page2,self.tc19,_("LCV biomass"),
+##                          _("LCV biomass (kWh/kg)"))
+##
+        self.tc19 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='ENERGY',
+                              label=_("LCV biomass"),
+                              tip=_(" "))
+
+
+
+##        self.tc20 = wx.TextCtrl(self.page2,-1,'')
+##        self.st20 = Label(self.page2,self.tc20,_("Humidity"),
+##                          _("Humidity (%)"))
+##
+##
+        self.tc20 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=None,
+                              label=_("Humidity"),
+                              tip=_("Specify the percentage of humidity in biomass"))
+
+#In StaticBox: Availability of biomass from the region
+   
+##
+##        self.tc21 = wx.TextCtrl(self.page2,-1,'')
+##        self.st21 = Label(self.page2,self.tc21,_("Type of biomass"),
+##                          _("Type of biomass available from the region"))
+##
+        self.tc21 = TextEntry(self.page2,maxchars=255,value='',
+                             label=_("Type of biomass available"),
+                             tip=_(" "))
+
+
+
+##        self.tc22 = wx.TextCtrl(self.page2,-1,'')
+##        self.st22 = Label(self.page2,self.tc22,_("Unit price"),
+##                          _("Unit price of biomass (EUR/t)"))
+##
+
+        self.tc22 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='ENERGYTARIFF',
+                              label=_("Unit price of biomass"),
+                              tip=_(" "))
+
+##        self.tc23_1 = wx.TextCtrl(self.page2,-1,'')
+##        self.tc23_2 = wx.TextCtrl(self.page2,-1,'')
+##        self.st23 = Label(self.page2,[self.tc23_1,self.tc23_2],_("Period of availability"),
+##                          [_("Start of period of year the biomass is available (dd/mm-dd/mm)"),
+##                           _("End of period of year the biomass is available (dd/mm-dd/mm)")])
+##
+        self.tc23_1 = DateEntry(self.page2,
+                              value='',
+                              label=_("Start of period of year the biomass is available"),
+                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+
+        self.tc23_2 = DateEntry(self.page2,
+                              value='',
+                              label=_("Stop of period of year the biomass is available"),
+                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+
+
+##        self.tc24 = wx.TextCtrl(self.page2,-1,'')
+##        self.st24 = Label(self.page2,self.tc24,_("Duration of biomass prod."),
+##                          _("Number of days the biomass is produced (days)"))
+        self.tc24 = FloatEntry(self.page2,
+                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict=None,
+                              label=_("Number of days biomass is produced"),
+                              tip=_(" "))
+
 
         self.dummy1 = wx.StaticText(self.page1, -1, "")
         self.dummy2 = wx.StaticText(self.page1, -1, "")
@@ -225,6 +340,7 @@ class PanelQ7(wx.Panel):
         grid_sizer_1.Add(self.labelRoof, 0, 0, 0)
         grid_sizer_1.Add(self.labelGround, 0, 0, 0)
 
+#HS2008-06-18: st's in grid-sizer cancelled out from st14 on, in order to bring panel to run
         grid_sizer_1.Add(self.st6, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_1.Add(self.tc6_1, 0, 0, 0)
         grid_sizer_1.Add(self.tc6_2, 0, 0, 0)
@@ -260,43 +376,43 @@ class PanelQ7(wx.Panel):
         sizer_7.Add(grid_sizer_1, 1, wx.ALL|wx.EXPAND, 20)
         self.page1.SetSizer(sizer_7)
         
-        grid_sizer_2.Add(self.st14, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st14, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc14, 0, 0, 0)
 
-        grid_sizer_2.Add(self.st15, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st15, 0, wx.ALIGN_RIGHT, 0)
         sizer_12.Add(self.tc15_1, 0, 0, 0)
         sizer_12.Add(self.tc15_2, 0, wx.LEFT, 2)
         grid_sizer_2.Add(sizer_12, 1, wx.EXPAND, 1)
 
-        grid_sizer_2.Add(self.st16, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st16, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc16, 0, 0, 0)
         
-        grid_sizer_2.Add(self.st17, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st17, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc17, 0, 0, 0)
         
-        grid_sizer_2.Add(self.st18, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st18, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc18, 0, 0, 0)
         
-        grid_sizer_2.Add(self.st19, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st19, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc19, 0, 0, 0)
         
-        grid_sizer_2.Add(self.st20, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_2.Add(self.st20, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_2.Add(self.tc20, 0, 0, 0)
         sizer_10.Add(grid_sizer_2, 1, wx.ALL|wx.EXPAND, 20)
         sizer_9.Add(sizer_10, 1, wx.EXPAND, 0)
 
-        grid_sizer_3.Add(self.st21, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_3.Add(self.st21, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_3.Add(self.tc21, 0, 0, 0)
         
-        grid_sizer_3.Add(self.st22, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_3.Add(self.st22, 0, wx.ALIGN_RIGHT, 0)
         grid_sizer_3.Add(self.tc22, 0, 0, 0)
         
-        grid_sizer_3.Add(self.st23, 0, wx.ALIGN_RIGHT, 0)
+#        grid_sizer_3.Add(self.st23, 0, wx.ALIGN_RIGHT, 0)
         sizer_13.Add(self.tc23_1, 0, 0, 0)
         sizer_13.Add(self.tc23_2, 0, wx.LEFT, 2)
         grid_sizer_3.Add(sizer_13, 1, wx.EXPAND, 0)
         
-        grid_sizer_3.Add(self.st24, 0, 0, 0)
+#        grid_sizer_3.Add(self.st24, 0, 0, 0)
         grid_sizer_3.Add(self.tc24, 0, 0, 0)
         
         sizer_11.Add(grid_sizer_3, 1, wx.ALL|wx.EXPAND, 20)
@@ -372,6 +488,11 @@ class PanelQ7(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------
 
+    def display(self):
+        self.clear()
+        self.fillPage()
+        self.Show()
+
 
     def clear(self):
         self.checkBox1.SetValue(False)
@@ -392,19 +513,24 @@ class PanelQ7(wx.Panel):
         self.tc10_2.Clear()
         self.tc11.Clear()
         self.tc12.Clear()
-        self.tc14.Clear()
-        self.tc15_1.Clear()
-        self.tc15_2.Clear()
-        self.tc16.Clear()
-        self.tc17.Clear()
-        self.tc18.Clear()
-        self.tc19.Clear()
-        self.tc20.Clear()
-        self.tc21.Clear()
-        self.tc22.Clear()
-        self.tc23_1.Clear()
-        self.tc23_2.Clear()
-        self.tc24.Clear()
+
+#HS2008-06-18: Clear substituted by entry.Clear() in order to make it run
+        self.tc14.entry.Clear()
+
+#date-pickers -> don't know how to clear ... CHECK CHECK CHECK ...
+#        self.tc15_1.Clear()
+#        self.tc15_2.Clear()
+        self.tc16.entry.Clear()
+        self.tc17.entry.Clear()
+        self.tc18.entry.Clear()
+        self.tc19.entry.Clear()
+        self.tc20.entry.Clear()
+        self.tc21.entry.Clear()
+        self.tc22.entry.Clear()
+#date-pickers -> don't know how to clear ... CHECK CHECK CHECK ...
+#        self.tc23_1.entry.Clear()
+#        self.tc23_2.entry.Clear()
+        self.tc24.entry.Clear()
 
 
 

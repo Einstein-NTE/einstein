@@ -72,7 +72,7 @@ def getConnections():
     
     whees = Status.prj.getWHEEs()
     Status.NWHEE = len(whees)
-    NWHEE = Status.NWHEE
+    NN = Status.NWHEE
 
 #..............................................................................
 # 1. FETi-FETj-Link: fuels used in equipment
@@ -157,16 +157,19 @@ def getConnections():
     procName_k = Status.prj.getProcessList("Process")
     pipeName_m = Status.prj.getPipeList("Pipeduct")
     equipeName_j = Status.prj.getEquipmentList("Equipment")
+    wheeName_n = Status.prj.getWHEEList("WHEEName")
 
     print "Connect: sourceName_h",sourceName_h
     print "Connect: sinkName_h",sinkName_h
     print "Connect: procName_k",procName_k
     print "Connect: pipeName_m",pipeName_m
     print "Connect: equipeName_j",equipeName_j
+    print "Connect: wheeName_n",wheeName_j
        
     Status.QWHEqLink = arange(NJ*NH).reshape(NJ,NH)  
     Status.QWHPipeLink = arange(NM*NH).reshape(NM,NH)
     Status.QWHProcLink = arange(NK*NH).reshape(NK,NH)
+    Status.QWHEELink = arange(NN*NH).reshape(NN,NH)
 
     Status.QHXEqLink = arange(NJ*NH).reshape(NJ,NH)
     Status.QHXPipeLink = arange(NM*NH).reshape(NM,NH)
@@ -206,6 +209,12 @@ def getConnections():
             else:
                 Status.QHXProcLink[k][h] = 0
         
+        for n in range(NN):                         #WHEE can only be source, not sink !!!
+            if sourceName_h[h] == wheeName_n[n]:
+                Status.QWHEELink[n][h] = 1
+            else:
+                Status.QWHEELink[n][h] = 0
+                        
     print "Connect: QWHEqLink created"
     print Status.QWHEqLink
     print "Connect: QHXEqLink created"
@@ -218,6 +227,8 @@ def getConnections():
     print Status.QWHProcLink
     print "Connect: QHXProcLink created"
     print Status.QHXProcLink
+    print "Connect: QWHEELink created"
+    print Status.QWHEELink
 
 
 #==============================================================================

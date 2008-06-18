@@ -61,13 +61,18 @@ UNITS = {
         's' : (1.0/3600,0.0)
         },
 
+# conversion to internal unit: [a]
+    'LONGTIME' : {
+        'a' : (1.0,0.0),
+        },
+
 # conversion to internal unit: [m]
     'LENGTH' : {
         'm' :       (1.0,       0.0),
         'km' :      (1000.0,    0.0),
         'mm' :      (1.0e-3,    0.0),
         'yards':    (0.9144,    0.0),
-        'ft'   :    (0,3048,    0.0),
+        'ft'   :    (0.3048,    0.0),
         'in'   :    (0.0254,    0.0)
         },
     
@@ -84,6 +89,13 @@ UNITS = {
         'MPa' : (10.0,0.0)
         },
     
+# conversion to internal unit: [m2]
+    'AREA': {
+        'm2' : (1.0,0.0),
+        'ft2' : (0.3048*0.3048,0.0),
+        'ha' : (1.0e4,0.0),
+        },
+
 # conversion to internal unit: [m3]
     'VOLUME': {
         'm3' : (1.0,0.0),
@@ -181,6 +193,18 @@ UNITS = {
         'btu/hºF' : ((0.0002930711*9)/5,0.0)
         },
 
+# conversion to internal unit: [-]
+    'FRACTION' : {
+        '-' : (1.0,0.0),
+        '%' : (0.01,0.0),
+        },
+
+# conversion to internal unit: [1/a]
+    'GROWTHRATE' : {
+        '1/a' : (1.0,0.0),
+        '%/a' : (0.01,0.0),
+        },
+
 # conversion to internal unit: [¤/kWh]
     'ENERGYTARIFF': {
         '%s/kWh'%CURRENCY : (1.0,0.0),
@@ -205,8 +229,10 @@ UNITSYSTEM = {
                 'TEMPERATURE':'ºC',
                 'TEMPERATUREDIFF':'K',
                 'TIME':'s',
+                'LONGTIME':'a',
                 'LENGTH': 'm',
                 'PRESSURE':'bar',
+                'AREA':'m2',
                 'VOLUME':'m3',
                 'VOLUMEFLOW':'m3/s',
                 'MASS':'kg',
@@ -218,6 +244,8 @@ UNITSYSTEM = {
                 'SPECIFICENTHALPY':'kJ/kg',
                 'SPECIFICHEAT':'kJ/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
+                'FRACTION':'%',
+                'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/kJ'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
@@ -226,8 +254,10 @@ UNITSYSTEM = {
                 'TEMPERATURE':'ºC',
                 'TEMPERATUREDIFF':'K',
                 'TIME':'h',
+                'LONGTIME':'a',
                 'LENGTH': 'm',
                 'PRESSURE':'bar',
+                'AREA':'m2',
                 'VOLUME':'m3',
                 'VOLUMEFLOW':'m3/h',
                 'MASS':'kg',
@@ -239,6 +269,8 @@ UNITSYSTEM = {
                 'SPECIFICENTHALPY':'kWh/kg',
                 'SPECIFICHEAT':'kWh/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
+                'FRACTION':'%',
+                'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/kWh'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
@@ -247,8 +279,10 @@ UNITSYSTEM = {
                 'TEMPERATURE':'ºF',
                 'TEMPERATUREDIFF':'ºF',
                 'TIME':'h',
+                'LONGTIME':'a',
                 'LENGTH': 'ft',
                 'PRESSURE':'lb/ft2',
+                'AREA':'ft2',
                 'VOLUME':'US gal',
                 'VOLUMEFLOW':'US gal/h',
                 'MASS':'lb',
@@ -260,6 +294,8 @@ UNITSYSTEM = {
                 'SPECIFICENTHALPY':'btu/lb',
                 'SPECIFICHEAT':'btu/lbºF',
                 'HEATTRANSFERCOEF':'btu/hºF',
+                'FRACTION':'%',
+                'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 }
