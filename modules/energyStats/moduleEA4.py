@@ -158,25 +158,32 @@ class ModuleEA4(object):
         tableReport = []
         for process in processes:
             k = process.ProcNo - 1
-            if k < 3:   #present master limited to 3 processes !!! XXXXXXX TO BE CHANGED XXXXX
-#                tableReport.append([process.Process,"",
-#                                    "here should be the process description text","","","","","","",
-#                                    process.Description,"","","","","","",
-#                                    process.UPH,"",
-#                                    UPHPercentage[k],"",
-#                                    "",process.PT])
+            if k < 10:   #present master limited to 10 processes !!!
 
-                tableReport.append([process.Process,                              # col C.
-                                    "",                                           # col D is empty
-                                    "here should be the process description text",# cols E-K are merged,
-                                                                                  # so they count as
-                                                                                  # a single cell
+                tableReport.append([process.Process,                              # col C-D
+                                    process.Description,                            # cols E-K 
                                     process.UPH,                                  # cols L-M are merged
                                     UPHPercentage[k],                             # cols N-O are merged
-                                    process.PT,                                   # col P
-                                   ""])                                           # col Q is empty
+                                    process.PT])                                  # col P-Q
+            elif k == 10:
+                print "WARNING: present standard report is limited to a maximum of 10 processes !!!"
+
+        for k in range(len(processes),10):
+                tableReport.append([" ",                             # col C-D
+                                    " ",                             # cols E-K 
+                                    " ",                             # cols L-M are merged
+                                    " ",                             # cols N-O are merged
+                                    " "])                             # col P-Q
+
+
+        tableReport.append([_("Total"),                                           # col C-D
+                            " ",                                                 # cols E-K 
+                            TotalUPH,                                           # cols L-M are merged
+                            100,                                                # cols N-O are merged
+                            " "])                                                 # col P-Q
 
         Status.int.setGraphicsData("PROCESSES", array(tableReport))
+        print "ModuleEA4 -> data table for processes",array(tableReport)
 
         return "ok"
 

@@ -11,10 +11,14 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Tom Sobota	30/04/2008
 #
+#       Last revised by:    Hans Schweiger  18/06/2008
+#
 #       Changes to previous version:
+#
+#       18/06/2008: HS  Call to function prepareDataForReport() in control.py added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -74,6 +78,7 @@ import os
 from numpy import *
 import wx
 from einstein.modules.interfaces import *
+from einstein.modules.control import *
 #
 # constants
 #
@@ -138,6 +143,8 @@ class PanelReport(wx.Panel):
     #
     def generateReport(self): 
         self.main.logMessage('Generating report from ' + self.master)
+
+        prepareDataForReport()
 
         folder = os.path.dirname(self.master)
         thisreport = os.path.join(folder,NEWREPORT)

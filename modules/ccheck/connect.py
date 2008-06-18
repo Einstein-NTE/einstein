@@ -164,7 +164,7 @@ def getConnections():
     print "Connect: procName_k",procName_k
     print "Connect: pipeName_m",pipeName_m
     print "Connect: equipeName_j",equipeName_j
-    print "Connect: wheeName_n",wheeName_j
+    print "Connect: wheeName_n",wheeName_n
        
     Status.QWHEqLink = arange(NJ*NH).reshape(NJ,NH)  
     Status.QWHPipeLink = arange(NM*NH).reshape(NM,NH)
