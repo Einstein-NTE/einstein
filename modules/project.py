@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.11
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
@@ -41,6 +41,7 @@
 #       13/06/08: HS    several functions getXY + getXYList for subsystems
 #                       creation of new entry in uheatpump added in createNewProject
 #       16/06/08: SD    addPipeDummy changed: now returning table, not ID
+#       18/06/08: HS    getNaceDict added
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1514,6 +1515,28 @@ class Project(object):
             unitOpDict.update({unitOperationID:unitOperationName})
 
         return unitOpDict
+
+#------------------------------------------------------------------------------
+    def getNACEDict(self,branch=None):
+#------------------------------------------------------------------------------
+#   returns a list of unit operations in DB
+#------------------------------------------------------------------------------
+
+        sqlQuery = "% ORDER BY DBNaceCode_ID"
+#        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
+        naceTable = Status.DB.dbnacecode       
+        naceDict = {}
+        naceSubDict = {}
+        for entry in naceTable:
+            naceCode = naceTable["CodeNACE"]
+            naceSubCode = naceTable["CodeNACEsub"]
+            naceName = naceTable["NameNACE"]
+            naceSubName = naceTable["NameNACEsub"]
+            naceDict.update({naceCode:naceName})
+            if branch == naceName:
+                naceSubDict.update({naceSubCode:naceSubName})
+            
+        return (naceDict,naceSubDict)
 
 
 #==============================================================================
