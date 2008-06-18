@@ -99,12 +99,12 @@ class PanelReport(wx.Panel):
         self.SetClientSize(wx.Size(800, 600))
 
         self.staticText1 = wx.StaticText(id=-1,
-              label=u'Report generation', name='staticText1', parent=self,
+              label=_(u'Report generation'), name='staticText1', parent=self,
               pos=wx.Point(352, 25), size=wx.Size(127, 17), style=0)
         self.staticText1.SetFont(wx.Font(12, wx.SWISS,wx.NORMAL,wx.BOLD, False))
 
         self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
-              label=u'Select report', name=u'btnSelectReport', parent=self,
+              label=_(u'Select report'), name=u'btnSelectReport', parent=self,
               pos=wx.Point(304, 88), size=wx.Size(240, 40), style=0)
         self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
               id=wxID_BTNSELECTREPORT)
@@ -126,7 +126,7 @@ class PanelReport(wx.Panel):
         # Open an existing OpenDocument workbook
         # for processing
         #
-        dialog = wx.FileDialog(parent=None,message='Choose a master report file',
+        dialog = wx.FileDialog(parent=None,message=_('Choose a master report file'),
                                defaultDir=os.path.join(os.getcwd(),'reports'),
                      wildcard='Open Office spreadsheets files (*.ods)|*.ods',
                      style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
@@ -163,7 +163,7 @@ class PanelReport(wx.Panel):
         try:
             outfile = ZipFile(thisreport, "w", ZIP_DEFLATED)
         except IOError,e:
-            self.main.showError('Error creating report %s. You have probably another version opened:%s' %\
+            self.main.showError(_('Error creating report %s. You have probably another version opened:%s') %\
                   (thisreport,str(e)))
             return
 
@@ -188,8 +188,8 @@ class PanelReport(wx.Panel):
 
         outfile.close()
         infile.close()
-        self.main.showInfo('Report generation is finished\n'
-                             'The generated report is:' + thisreport)
+        self.main.showInfo(_('Report generation is finished\n'
+                             'The generated report is:') + thisreport)
 
 
     def close(self):
