@@ -46,6 +46,9 @@ import einstein.GUI.HelperClass as HelperClass
 
 #------------------------------------------------------------------------------		
 def setDebugMode(mode):
+#------------------------------------------------------------------------------		
+#   function that can be called from somewhere for setting the mode of debugging
+#------------------------------------------------------------------------------		
 
     global DEBUG
 
@@ -57,6 +60,10 @@ def setDebugMode(mode):
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
 def logTrack(message):
+#------------------------------------------------------------------------------		
+#   keeps track of what the user does within the EINSTEIN log-file
+#   this information can be very useful for debuggig
+#   e.g. each user interaction on the GUI should be logged
 #------------------------------------------------------------------------------		
     try:
         Status.doLog.LogThis(message)
@@ -70,35 +77,62 @@ def logTrack(message):
 #------------------------------------------------------------------------------		
 def logMessage(message):
 #------------------------------------------------------------------------------		
+#   writes a message to the EINSTEIN GUI and parallely to the log-file
+#------------------------------------------------------------------------------		
     Status.main.logMessage(message)
 
 #------------------------------------------------------------------------------		
 def logError(message):
+#------------------------------------------------------------------------------		
+#   writes a message to the EINSTEIN GUI and parallely to the log-file
+#   highlights as ERROR
 #------------------------------------------------------------------------------		
     Status.main.logMessage(message)
 
 #------------------------------------------------------------------------------		
 def logWarning(message):
 #------------------------------------------------------------------------------		
+#   writes a message to the EINSTEIN GUI and parallely to the log-file
+#   highlights as WARNING
+#------------------------------------------------------------------------------		
     Status.main.logMessage(message)
 
 #------------------------------------------------------------------------------		
 def logDebug(message):
+#------------------------------------------------------------------------------		
+#   writes a message to the log-file or to the screen (depending on DEBUG mode)
+#   doesn't do anything if DEBUG = "OFF"
+#------------------------------------------------------------------------------		
     if DEBUG == "SCREEN":
         print message
     elif DEBUG == "LOGFILE":
         logTrack("DEBUG: "+message)
     
 #------------------------------------------------------------------------------		
+def showError(text):
+#------------------------------------------------------------------------------		
+#   like logError, but opens a pop-up for confirmation
+#------------------------------------------------------------------------------		
+    Status.main.showError(text)
+#------------------------------------------------------------------------------		
 def showWarning(text):
+#------------------------------------------------------------------------------		
+#   like logWarning, but opens a pop-up for confirmation
+#------------------------------------------------------------------------------		
     Status.main.showWarning(text)
 
 #------------------------------------------------------------------------------		
-def showInfo(text):
+def showMessage(text):
+#------------------------------------------------------------------------------		
+#   like logMessage, but opens a pop-up for confirmation
+#------------------------------------------------------------------------------		
     Status.main.showInfo(text)
         
 #------------------------------------------------------------------------------		
 def askConfirmation(self, text):
+#------------------------------------------------------------------------------		
+#   like showMessage, but returns the answer of the user (wx.YES_NO)
+#------------------------------------------------------------------------------		
     return Status.main.askConfirmation(text)
 #------------------------------------------------------------------------------		
 
