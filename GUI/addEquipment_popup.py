@@ -19,9 +19,11 @@
 #	Version No.: 0.02
 #	Created by: 	    Tom Sobota	    April 2008
 #	Last revised by:    Hans Schweiger      25/04/2008
+#                           Stoyan Danov        19/06/2008
 #
 #       Changes in last update:
 #       25/04/08:       preselection added as input
+#       19/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,14 +50,14 @@ class ManualAddDialog(wx.Dialog):
 	self.prnt = prnt
         wx.Dialog.__init__(self, id=-1, name=u'ManualAddDialog',
               parent=prnt, pos=wx.Point(0, 0), size=wx.Size(800, 600),
-              style=wx.DEFAULT_DIALOG_STYLE, title='Manual equipment add')
+              style=wx.DEFAULT_DIALOG_STYLE, title=_('Manual equipment add'))
 
         print "AddEquipment_popup (ManualAddDialog): eqId = ",eqId
         self.equipeType = None
         
 	self.p4 = PanelQ4(self, prnt, eqId)
 	self.eqId = eqId
-	print "AddEquipment_popup (ManualAddDialog): new type = ",self.equipeType
+	print _("AddEquipment_popup (ManualAddDialog): new type = "),self.equipeType
 
 
 class AddEquipment(wx.Dialog):
@@ -67,7 +69,7 @@ class AddEquipment(wx.Dialog):
         self.SetClientSize(wx.Size(529, 447))
 
         self.btnSelectFromDatabase = wx.Button(id=wxID_AEPOPUP1BTNSELECTFROMDATABASE,
-              label=u'Select from database', name=u'btnSelectFromDatabase',
+              label=_('Select from database'), name=u'btnSelectFromDatabase',
               parent=self, pos=wx.Point(160, 24), size=wx.Size(192, 32),
               style=0)
         self.btnSelectFromDatabase.Bind(wx.EVT_BUTTON,
@@ -75,13 +77,13 @@ class AddEquipment(wx.Dialog):
               id=wxID_AEPOPUP1BTNSELECTFROMDATABASE)
 
         self.btnEnterManually = wx.Button(id=wxID_AEPOPUP1BTNENTERMANUALLY,
-              label=u'Enter manually', name=u'btnEnterManually', parent=self,
+              label=_('Enter manually'), name=u'btnEnterManually', parent=self,
               pos=wx.Point(160, 64), size=wx.Size(192, 32), style=0)
         self.btnEnterManually.Bind(wx.EVT_BUTTON, self.OnBtnEnterManuallyButton,
               id=wxID_AEPOPUP1BTNENTERMANUALLY)
 
         self.staticText1 = wx.StaticText(id=wxID_AEPOPUP1STATICTEXT1,
-              label=u'Retrieve from previously deleted equipment',
+              label=_('Retrieve from previously deleted equipment'),
               name='staticText1', parent=self, pos=wx.Point(120, 128),
               size=wx.Size(302, 17), style=0)
 
@@ -89,11 +91,11 @@ class AddEquipment(wx.Dialog):
               name='listBox1', parent=self, pos=wx.Point(128, 160),
               size=wx.Size(288, 232), style=0)
 
-        self.btnCancel = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
+        self.btnCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name=u'btnCancel', parent=self, pos=wx.Point(206, 408),
               size=wx.Size(104, 32), style=0)
 
-        self.btnAccept = wx.Button(id=wx.ID_OK, label=u'OK',
+        self.btnAccept = wx.Button(id=wx.ID_OK, label=_('OK'),
               name=u'btnAccept', parent=self, pos=wx.Point(312, 408),
               size=wx.Size(104, 32), style=0)
 
@@ -135,9 +137,9 @@ class AddEquipment(wx.Dialog):
                 print "trying to set equipment row in DB "
 		self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
 		self.prnt.mode = "DB"
-		print "addEquipment popup (Database button): equipment added to Q/C"
+		print _("addEquipment popup (Database button): equipment added to Q/C")
 	    except:
-		print 'addEquipment popup (Database button): setEquipmentFromDB from module did not execute'
+		print _('addEquipment popup (Database button): setEquipmentFromDB from module did not execute')
 
 	    # close this dialog
 	    self.EndModal(wx.ID_OK)
@@ -150,19 +152,19 @@ class AddEquipment(wx.Dialog):
 #   Manual entry selected
 #------------------------------------------------------------------------------		
         self.prnt.mode = "Manual"
-        print "AddEquipment_popup (Manual Button): adding equipe ID", self.prnt.equipe.QGenerationHC_ID
+        print _("AddEquipment_popup (Manual Button): adding equipe ID"), self.prnt.equipe.QGenerationHC_ID
 	self.dMan = ManualAddDialog(self, self.prnt.equipe.QGenerationHC_ID)
         if self.dMan.ShowModal() == wx.ID_OK:
-            print "AddEquipment_popup (Manual Button): OK"
+            print _("AddEquipment_popup (Manual Button): OK")
 	    self.EndModal(wx.ID_OK)
 	else:
-            print "AddEquipment_popup (Manual Button): Cancelled"
+            print _("AddEquipment_popup (Manual Button): Cancelled")
             self.EndModal(wx.ID_CANCEL)
 
 #------------------------------------------------------------------------------		
     def RetrieveDeleted(self):
 #------------------------------------------------------------------------------		
-        print 'RetrieveDeleted() not yet implemented'
+        print _('RetrieveDeleted() not yet implemented')
 #------------------------------------------------------------------------------		
 
     

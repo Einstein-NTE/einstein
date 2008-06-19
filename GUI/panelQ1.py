@@ -12,17 +12,33 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.12
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger 02/05/2008
 #                           Tom Sobota 04/05/2008
 #                           Hans Schweiger 05/05/2008
+#                           Stoyan Danov    06/06/2008
+#                           Hans Schweiger  10/06/2008
+#                           Stoyan Danov    11/06/2008
+#                           Hans Schweiger  12/06/2008
+#                           Stoyan Danov    17/06/2008
+#                           Stoyan Danov    18/06/2008
+#                           Hans Schweiger  18/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
 #       04/05/2008      Changed position of OK/Quit buttons
 #       05/05/2008      Eventhandlers linked to OK/Cancel
+#       06/06/2008      New label/tooltips according to new displayClasses defined;
+#                       do_layout still not adapted
+#       10/06/2008 HS   Minor bug corrections to get it running:
+#                       SetValue for eliminated labels tc25_1/tc25_2 eliminated
+#       17/06/2008 SD   adapt to new unitdict
+#       18/06/2008 SD   create display()
+#                   HS  some bug corrections; SetValue in date-entry cancelled
+#                       temporarily due to problems ...
+#                       NACE code list added
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -38,6 +54,17 @@ import wx
 import pSQL
 import HelperClass
 from status import Status
+from GUITools import *
+from displayClasses import *
+from units import *
+
+# constants that control the default field sizes
+
+HEIGHT          =  27 #SD
+LABELWIDTHLEFT  = 260
+LABELWIDTHRIGHT = 500
+DATAENTRYWIDTH  = 100
+UNITSWIDTH      =  90
 
 class PanelQ1(wx.Panel):
     def __init__(self, parent, main):
@@ -47,7 +74,7 @@ class PanelQ1(wx.Panel):
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
-        self.fillPage()
+        self.branch = ""
 
     def _init_ctrls(self, parent):
 
@@ -55,411 +82,223 @@ class PanelQ1(wx.Panel):
 #--- UI setup
 #------------------------------------------------------------------------------
 
+##        wx.Panel.__init__(self, id=-1, name='PanelQ1', parent=parent,
+##              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
         wx.Panel.__init__(self, id=-1, name='PanelQ1', parent=parent,
-              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.Hide()
 
         self.notebook = wx.Notebook(self, -1, style=0)
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
         self.page2 = wx.Panel(self.notebook)
 
-        self.notebook.AddPage(self.page0, _('General information'))
+        self.notebook.AddPage(self.page0, _('General information')) #SD put this later in do_layout
         self.notebook.AddPage(self.page1, _('Statistical and economical data'))
         self.notebook.AddPage(self.page2, _('Information on products'))
 
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("General information")) #SD added
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_7_staticbox = wx.StaticBox(self.page1, -1, _("Statistical and economical data")) #SD added
+        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_8_staticbox = wx.StaticBox(self.page1, -1, _("Period of operation")) #SD added
+        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_9_staticbox = wx.StaticBox(self.page2, -1, _("Information on products")) #SD added
+        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_10_staticbox = wx.StaticBox(self.page2, -1, _("Energy consumption by product")) #SD added
+        self.sizer_10_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.sizer_11_staticbox = wx.StaticBox(self.page2, -1, _("Product list")) #SD added
+        self.sizer_11_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        f = FieldSizes(wHeight=HEIGHT,wLabel=LABELWIDTHLEFT,wData=DATAENTRYWIDTH,wUnits=UNITSWIDTH)#SD
+
         # panel 0 - General information
-        self.stInfo1 = wx.StaticText(id=-1,
-                                     label=_('General information'),
-                                     name='stInfo1',
-                                     parent=self.page0,
-                                     pos=wx.Point(100, 10),
-                                     style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS,wx.NORMAL,wx.BOLD, False, 'Tahoma'))
-
-        self.st1 = wx.StaticText(id=-1,
-                                 label=_('Name of the company'),
-                                 name='st1',
-                                 parent=self.page0,
-                                 pos=wx.Point(16,48),
-                                 style=0)
-
-        self.tc1 = wx.TextCtrl(id=-1,
-                               name='tc1',
-                               parent=self.page0,
-                               pos=wx.Point(200, 48),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
-
-        self.st2 = wx.StaticText(id=-1,
-                                 label=_('City / Country'),
-                                 name='st2',
-                                 parent=self.page0,
-                                 pos=wx.Point(16,88),
-                                 style=0)
-
-        self.tc2 = wx.TextCtrl(id=-1,
-                               name='tc2',
-                               parent=self.page0,
-                               pos=wx.Point(200,88),
-                               size=wx.Size(400,21),
-                               style=0,
-                               value='')
-
-        self.st3 = wx.StaticText(id=-1,
-                                 label=_('Name of contact person'),
-                                 name='st3',
-                                 parent=self.page0,
-                                 pos=wx.Point(16,128),
-                                 style=0)
-
-        self.tc3 = wx.TextCtrl(id=-1,
-                               name='tc3',
-                               parent=self.page0,
-                               pos=wx.Point(200,128),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
-
-        self.st4 = wx.StaticText(id=-1,
-                                 label=_('Role of contact person\nin the company'),
-                                 name='st4',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 168),
-                                 style=0)
-
-        self.tc4 = wx.TextCtrl(id=-1,
-                               name='tc4',
-                               parent=self.page0,
-                               pos=wx.Point(200,168),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
-
-        self.st5 = wx.StaticText(id=-1,
-                                 label=_('Address'),
-                                 name='st5',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 208),
-                                 style=0)
-
-        self.tc5 = wx.TextCtrl(id=-1,
-                               name='tc5',
-                               parent=self.page0,
-                               pos=wx.Point(200, 208),
-                               size=wx.Size(400, 56),
-                               style=wx.TE_MULTILINE,
-                               value='')
-
-        self.st6 = wx.StaticText(id=-1,
-                                 label=_('Telephone No'),
-                                 name='st6',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 286),
-                                 style=0)
-
-        self.tc6 = wx.TextCtrl(id=-1,
-                               name='tc6',
-                               parent=self.page0,
-                               pos=wx.Point(200, 286),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
+        self.tc1 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Name of the company"),
+                             tip=_("Legal name of the company"))
 
 
-        self.st7 = wx.StaticText(id=-1,
-                                 label=_('Fax No'),
-                                 name='st7',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 328),
-                                 style=0)
+        self.tc2 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("City / Country"),
+                             tip=_("City where production is located"))
 
-        self.tc7 = wx.TextCtrl(id=-1,
-                               name='tc7',
-                               parent=self.page0,
-                               pos=wx.Point(200, 328),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
 
-        self.st8 = wx.StaticText(id=-1,
-                                 label=_('E-mail'),
-                                 name='st8',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 368),
-                                 style=0)
+        self.tc3 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Name of contact person"),
+                             tip=_(" "))
 
-        self.tc8 = wx.TextCtrl(id=-1,
-                               name='tc8',
-                               parent=self.page0,
-                               pos=wx.Point(200, 368),
-                               size=wx.Size(400, 21),
-                               style=0,
-                               value='')
+        self.tc4 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Position of contact person in the company"),
+                             tip=_(" "))
 
-        self.st9 = wx.StaticText(id=-1,
-                                 label=_('Description of the industry'),
-                                 name='st9',
-                                 parent=self.page0,
-                                 pos=wx.Point(16, 408),
-                                 style=0)
+        self.tc5 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Address"),
+                             tip=_(" "))
 
-        self.tc9 = wx.TextCtrl(id=-1,
-                               name='tc9',
-                               parent=self.page0,
-                               pos=wx.Point(200, 408),
-                               size=wx.Size(400,56),
-                               style=wx.TE_MULTILINE,
-                               value='')
+        self.tc6 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Telephone No"),
+                             tip=_(" "))
 
-        self.st10 = wx.StaticText(id=-1,
-                                  label=_('Branch'),
-                                  name='st10',
-                                  parent=self.page0,
-                                  pos=wx.Point(16, 468),
-                                  style=0)
+        self.tc7 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Fax No"),
+                             tip=_(" "))
 
-        self.tc10 = wx.TextCtrl(id=-1,
-                                name='tc10',
-                                parent=self.page0,
-                                pos=wx.Point(200, 468),
-                                size=wx.Size(400, 21),
-                                style=0,
-                                value='')
+        self.tc8 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("E-mail"),
+                             tip=_(" "))
 
-        self.st11 = wx.StaticText(id=-1,
-                                  label=_('NACE code'),
-                                  name='st11',
-                                  parent=self.page0,
-                                  pos=wx.Point(16, 498),
-                                  style=0)
+        self.tc9 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Description of the industry"),
+                             tip=_(" "))
 
-        self.choiceOfNaceCode = wx.Choice(id=-1,
-                                          choices=[],
-                                          name='choiceOfNaceCode',
-                                          parent=self.page0,
-                                          pos=wx.Point(200,498),
-                                          size=wx.Size(200, 21),
-                                          style=0)
+        self.tc10 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Branch"),
+                             tip=_(" "))
+
+        self.tc11 = ChoiceEntry(self.page0, 
+                               values=['NACE code list','one source'],
+                               label=_("NACE code branch"),
+                               tip=_(" "))
+
+        self.tc12 = TextEntry(self.page0,maxchars=255,value='',
+                             label=_("Sub-branch"),
+                             tip=_(""))
+
+
+        self.tc13 = ChoiceEntry(self.page0, 
+                               values=['NACE code sublist','one source'],
+                               label=_("NACE code sub-branch"),
+                               tip=_(" "))
+
+
 
         # panel 1 - Left. Statistical and economical data
 
 
-        self.stInfo2 = wx.StaticText(id=-1,
-                                     label=_('Statistical and economical data'),
-                                     name='stInfo2',
-                                     parent=self.page1,
-                                     pos=wx.Point(100,10),
-                                     style=0)
-        self.stInfo2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-        
-        self.st14 = wx.StaticText(id=-1,
-                                  label=_('Number of employees'),
-                                  name='st14',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 48),
-                                  style=0)
+        self.tc14 = IntEntry(self.page1,
+                              minval=0, maxval=999999, value=0,
+                              unitdict=None,
+                              label=_("Number of employees"),
+                              tip=_(" "))
 
-        self.tc14 = wx.TextCtrl(id=-1,
-                                name='tc14',
-                                parent=self.page1,
-                                pos=wx.Point(220, 48),
-                                size=wx.Size(100, 21),
-                                style=0,
-                                value='')
+        self.tc15 = FloatEntry(self.page1,
+                              ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
+                              unitdict='PRICE',
+                              label=_("Annual turnover"),
+                              tip=_("Million of euro per year"))
 
-        self.st15 = wx.StaticText(id=-1,
-                                  label=_('Annual turnover (M?/year)'),
-                                  name='st15',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 88),
-                                  style=0)
+        self.tc16 = FloatEntry(self.page1,
+                              ipart=10, decimals=1, minval=0., maxval=1.0e+9, value=0.,
+                              unitdict='PRICE',
+                              label=_("Annual production cost"),
+                              tip=_("Specify total factor inputs for production"))
 
-        self.tc15 = wx.TextCtrl(id=-1,
-                                name='tc15',
-                                parent=self.page1,
-                                pos=wx.Point(220, 88),
-                                size=wx.Size(100, 21),
-                                style=0,
-                                value='')
+        self.tc17 = IntEntry(self.page1,
+                              minval=2000, maxval=2050, value=0,
+                              unitdict=None,
+                              label=_("Base year for economic data"),
+                              tip=_("Specify the reference year for economic parameters"))
 
-        self.st16 = wx.StaticText(id=-1,
-                                  label=_('Annual production cost\n(M?/year)'),
-                                  name='st16',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 128),
-                                  style=0)
+        self.tc18 = FloatEntry(self.page1,
+                              ipart=3, decimals=1, minval=0., maxval=100, value=0.,
+                              unitdict=None,
+                              label=_("Growth rate of the production volume foreseen for the next 5 years [%/year]"),
+                              tip=_(" "))
 
-        self.tc16 = wx.TextCtrl(id=-1,
-                                name='tc16',
-                                parent=self.page1,
-                                pos=wx.Point(220, 128),
-                                size=wx.Size(150, 21),
-                                style=0,
-                                value='')
+        self.tc19 = ChoiceEntry(self.page1, 
+                               values=YESNO,
+                               label=_("Is the company independent?"),
+                               tip=_(" "))
 
-        self.st17 = wx.StaticText(id=-1,
-                                  label=_('Base year for ec. Data'),
-                                  name='st17',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 168),
-                                  style=0)
+        self.tc20 = FloatEntry(self.page1,
+                              ipart=10, decimals=1, minval=0., maxval=1.0e+9, value=0.,
+                              unitdict='PRICE',
+                              label=_("Yearly O&M heat & cold"),
+                              tip=_(" "))
 
-        self.tc17 = wx.TextCtrl(id=-1,
-                                name='tc17',
-                                parent=self.page1,
-                                pos=wx.Point(220, 168),
-                                size=wx.Size(100, 21),
-                                style=0,
-                                value='')
+        self.tc21 = FloatEntry(self.page1,
+                              ipart=10, decimals=1, minval=0., maxval=1.0e+9, value=0.,
+                              unitdict='PRICE',
+                              label=_("Yearly O&M electrical"),
+                              tip=_(" "))
 
-        self.st18 = wx.StaticText(id=-1,
-                                  label=_('Growth rate of the production volume\nforeseen for the next 5 years (%/year)'),
-                                  name='st18',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 210),
-                                  style=0)
+#new fields added SD
+        self.tc22 = FloatEntry(self.page1,
+                              ipart=2, decimals=2, minval=0., maxval=99.9, value=0.,
+                              unitdict=None,
+                              label=_("Percentage of fuel cost on overall production cost"),
+                              tip=_(" "))
 
-        self.tc18 = wx.TextCtrl(id=-1,
-                                name='tc18',
-                                parent=self.page1,
-                                pos=wx.Point(220, 208),
-                                size=wx.Size(150, 21),
-                                style=0,
-                                value='')
-
-        self.st19 = wx.StaticText(id=-1,
-                                  label=_('Is the company independent?\n(yes/no)'),
-                                  name='st19',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 248),
-                                  style=0)
-
-        self.tc19 = wx.TextCtrl(id=-1,
-                                name='tc19',
-                                parent=self.page1,
-                                pos=wx.Point(220, 248),
-                                size=wx.Size(50, 21),
-                                style=0,
-                                value='')
-
-        self.st20 = wx.StaticText(id=-1,
-                                  label=_('Yearly O&M heat & cold (?/year)'),
-                                  name='st20',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 288),
-                                  style=0)
-
-        self.tc20 = wx.TextCtrl(id=-1,
-                                name='tc20',
-                                parent=self.page1,
-                                pos=wx.Point(220, 288),
-                                size=wx.Size(150, 21),
-                                style=0,
-                                value='')
-
-        self.st21 = wx.StaticText(id=-1,
-                                  label=_('Yearly O&M electrical (?/year)'),
-                                  name='st21',
-                                  parent=self.page1,
-                                  pos=wx.Point(16, 328),
-                                  style=0)
-
-        self.tc21 = wx.TextCtrl(id=-1,
-                                name='tc21',
-                                parent=self.page1,
-                                pos=wx.Point(220, 328),
-                                size=wx.Size(150, 21),
-                                style=0,
-                                value='')
+        self.tc23 = FloatEntry(self.page1,
+                              ipart=2, decimals=2, minval=0., maxval=99.9, value=0.,
+                              unitdict=None,
+                              label=_("Percentage of electricity cost on overall production cost"),
+                              tip=_(" "))        
 
         # panel 1 - Right. Statistical and economical data
 
-        self.stInfo3 = wx.StaticText(id=-1,
-                                     label=_('Period of operation'),
-                                     name='stInfo3',
-                                     parent=self.page1,
-                                     pos=wx.Point(550, 10),
-                                     style=0)
-        self.stInfo3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.tc24 = FloatEntry(self.page1,
+                              ipart=2, decimals=2, minval=0., maxval=24, value=0.,
+                              unitdict=None,
+                              label=_("Total hours of operation per working day"),
+                              tip=_(" "))
 
-        self.st22 = wx.StaticText(id=-1,
-                                  label=_('Total hours of operation\nper working day (h/day)'),
-                                  name='st22',
-                                  parent=self.page1,
-                                  pos=wx.Point(416, 48),
-                                  style=0)
+        self.tc25 = FloatEntry(self.page1,
+                              ipart=2, decimals=0, minval=0., maxval=10, value=0.,
+                              unitdict=None,
+                              label=_("Number of shifts"),
+                              tip=_(" "))
 
-        self.tc22 = wx.TextCtrl(id=-1,
-                                name='tc22',
-                                parent=self.page1,
-                                pos=wx.Point(620, 48),
-                                size=wx.Size(50, 21),
-                                style=0,
-                                value='')
+        self.tc26 = FloatEntry(self.page1,
+                              ipart=3, decimals=0, minval=0, maxval=365, value=0.,
+                              unitdict=None,
+                              label=_("Days of production / operation per year"),
+                              tip=_(" "))
 
-        self.st23 = wx.StaticText(id=-1,
-                                  label=_('Number of shifts'),
-                                  name='st23',
-                                  parent=self.page1,
-                                  pos=wx.Point(416, 88),
-                                  style=0)
 
-        self.tc23 = wx.TextCtrl(id=-1,
-                                name='tc23',
-                                parent=self.page1,
-                                pos=wx.Point(620, 88),
-                                size=wx.Size(50, 21),
-                                style=0,
-                                value='')
 
-        self.st24 = wx.StaticText(id=-1,
-                                  label=_('Days of production /\nOperation per year (days)'),
-                                  name='st24',
-                                  parent=self.page1,
-                                  pos=wx.Point(416, 128),
-                                  style=0)
-
-        self.tc24 = wx.TextCtrl(id=-1,
-                                name='tc24',
-                                parent=self.page1,
-                                pos=wx.Point(620, 128),
-                                size=wx.Size(50, 21),
-                                style=0,
-                                value='')
-
-        self.st25_1 = wx.StaticText(id=-1,
-                                    label=_('Principal period of holidays or stops for maintenance'),
+        self.st27 = wx.StaticText(id=-1,
+                                    label=_('Principal periods of holidays or stops for maintenance'),
                                     name='st25',
                                     parent=self.page1,
                                     pos=wx.Point(416, 178),
                                     style=0)
-        self.st25_1a = wx.StaticText(id=-1,
-                                     label=_('Start date'),
-                                     parent=self.page1,
-                                     pos=wx.Point(416, 208),
-                                     style=0)
-        self.st25_1b = wx.StaticText(id=-1,
-                                     label=_('End date'),
-                                     parent=self.page1,
-                                     pos=wx.Point(580, 208),
-                                     style=0)
 
-        self.tc25_1 = wx.TextCtrl(id=-1,
-                                  name='tc25_1',
-                                  parent=self.page1,
-                                  pos=wx.Point(486, 208),
-                                  size=wx.Size(90, 21),
-                                  style=0,
-                                  value='')
+#three start-stop dates entered
+        self.tc27_10 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 1 - start date"),
+                              tip=_(" "))
 
-        self.tc25_2 = wx.TextCtrl(id=-1,
-                                  name='tc25_2',
-                                  parent=self.page1,
-                                  pos=wx.Point(650, 208),
-                                  size=wx.Size(90, 21),
-                                  style=0,
-                                  value='')
+        self.tc27_11 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 1 - stop date"),
+                              tip=_(" "))
+
+        self.tc27_20 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 2 - start date"),
+                              tip=_(" "))
+
+        self.tc27_21 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 2 - stop date"),
+                              tip=_(" "))
+
+        self.tc27_30 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 3 - start date"),
+                              tip=_(" "))
+
+        self.tc27_31 = DateEntry(self.page1,
+                              value='',
+                              label=_("Period of holidays No. 3 - stop date"),
+                              tip=_(" "))
 
 
         # panel 2 - Left. Products
@@ -473,82 +312,32 @@ class PanelQ1(wx.Panel):
         self.stInfo6.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
 
-        self.st26 = wx.StaticText(id=-1,
-                                  label=_('Type of product'),
-                                  name='st26',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 48),
-                                  style=0)
+        self.tc30 = TextEntry(self.page2,maxchars=255,value='',
+                             label=_("Type of product"),
+                             tip=_(" "))
 
-        self.tc26 = wx.TextCtrl(id=-1,
-                                name='tc26',
-                                parent=self.page2,
-                                pos=wx.Point(220, 48),
-                                size=wx.Size(200, 21),
-                                style=0,
-                                value='')
+        self.tc31 = ChoiceEntry(self.page2, 
+                               values=['Product code list to be defined'],
+                               label=_("Product's code"),
+                               tip=_(" "))
 
-        self.st27 = wx.StaticText(id=-1,
-                                  label=_('Product code'),
-                                  name='st27',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 88),
-                                  style=0)
+        self.tc32 = FloatEntry(self.page2,
+                              ipart=10, decimals=2, minval=0., maxval=1.e+9, value=0.,
+                              unitdict=None,
+                              label=_("Quantity of product(s) per year [product-units/year]"),
+                              tip=_(" "))
 
-        self.tc27 = wx.TextCtrl(id=-1,
-                                name='tc27',
-                                parent=self.page2,
-                                pos=wx.Point(220, 88),
-                                size=wx.Size(200, 21),
-                                style=0,
-                                value='')
+        self.tc33 = TextEntry(self.page2,maxchars=255,value='',
+                             label=_("Measurement unit for\nproduct quantity"),
+                             tip=_(" "))
 
-        self.st28 = wx.StaticText(id=-1,
-                                  label=_('Quantity of product(s) per\nyear (product-units/year)'),
-                                  name='st28',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 128),
-                                  style=0)
+        self.tc34 = FloatEntry(self.page2,
+                              ipart=10, decimals=2, minval=0., maxval=1e+9, value=0.,
+                              unitdict='PRICE',
+                              label=_("Annual turnover per product"),
+                              tip=_(" "))
 
-        self.tc28 = wx.TextCtrl(id=-1,
-                                name='tc28',
-                                parent=self.page2,
-                                pos=wx.Point(220, 128),
-                                size=wx.Size(200, 21),
-                                style=0,
-                                value='')
-
-        self.st29 = wx.StaticText(id=-1,
-                                  label=_('Measurement unit for\nproduct quantity'),
-                                  name='st29',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 168),
-                                  style=0)
-
-        self.tc29 = wx.TextCtrl(id=-1,
-                                name='tc29',
-                                parent=self.page2,
-                                pos=wx.Point(220, 168),
-                                size=wx.Size(50, 21),
-                                style=0,
-                                value='')
-
-        self.st32 = wx.StaticText(id=-1,
-                                  label=_('Electricity consumption per\nproduct (MWh / year)'),
-                                  name='st32',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 210),
-                                  style=0)
-
-        self.tc31 = wx.TextCtrl(id=-1,
-                                name='tc31',
-                                parent=self.page2,
-                                pos=wx.Point(220, 210),
-                                size=wx.Size(100, 21),
-                                style=0,
-                                value='')
-
-
+#substitute by StaticBox
         self.stInfo5 = wx.StaticText(id=-1,
                                      label=_('Energy consumption by product'),
                                      name='stInfo5',
@@ -557,39 +346,21 @@ class PanelQ1(wx.Panel):
                                      style=0)
         self.stInfo5.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.st31 = wx.StaticText(id=-1,
-                                  label=_('Fuel consumption per\nproduct (MWh/year) (LCV)'),
-                                  name='st31',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 280),
-                                  style=0)
+        self.tc35 = FloatEntry(self.page2,
+                              ipart=10, decimals=2, minval=0., maxval=1.e+9, value=0.,
+                              unitdict='ENERGY',
+                              label=_("Electricity consumption per product"),
+                              tip=_(" "))
 
-        self.tc32 = wx.TextCtrl(id=-1,
-                                name='tc32',
-                                parent=self.page2,
-                                pos=wx.Point(220, 280),
-                                size=wx.Size(200, 21),
-                                style=0,
-                                value='')
-
-        self.st30 = wx.StaticText(id=-1,
-                                  label=_('Anual turnover per\nproduct (M?/year)'),
-                                  name='st30',
-                                  parent=self.page2,
-                                  pos=wx.Point(16, 328),
-                                  style=0)
-
-        self.tc30 = wx.TextCtrl(id=-1,
-                                name='tc30',
-                                parent=self.page2,
-                                pos=wx.Point(220, 328),
-                                size=wx.Size(200, 21),
-                                style=0,
-                                value='')
-
+        self.tc36 = FloatEntry(self.page2,
+                              ipart=10, decimals=2, minval=0., maxval=1.e+9, value=0.,
+                              unitdict='ENERGY',
+                              label=_("Fuel consumption per product(LCV)"),
+                              tip=_("Specify energy content of fuels in LCV "))
 
         # panel 2 - Right. Product list
 
+#substitute by StaticBox
         self.stInfo4 = wx.StaticText(id=-1,
                                      label=_('Product list'),
                                      name='stInfo4',
@@ -635,6 +406,7 @@ class PanelQ1(wx.Panel):
 
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)#SD added
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
         sizer_1.Add(self.notebook, 3, wx.EXPAND, 0)
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
@@ -649,13 +421,19 @@ class PanelQ1(wx.Panel):
     def OnListBoxProductsListboxClick(self, event):
         self.productName = str(self.listBoxProducts.GetStringSelection())
         p = Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Product[str(self.listBoxProducts.GetStringSelection())][0]
-        self.tc26.SetValue(str(p.Product))
-        self.tc27.SetValue(str(p.ProductCode))
-        self.tc28.SetValue(str(p.QProdYear))
-        self.tc29.SetValue(str(p.ProdUnit))
-        self.tc30.SetValue(str(p.TurnoverProd))
-        self.tc32.SetValue(str(p.ElProd))
-        self.tc31.SetValue(str(p.FuelProd))
+        self.tc30.SetValue(str(p.Product))
+        self.tc31.SetValue(str(p.ProductCode))
+        self.tc32.SetValue(str(p.QProdYear))
+        self.tc33.SetValue(str(p.ProdUnit))
+        self.tc34.SetValue(str(p.TurnoverProd))
+        self.tc35.SetValue(str(p.ElProd))
+        self.tc36.SetValue(str(p.FuelProd))
+        event.Skip()
+
+    def OnSelectBranch(self, event):
+        branch = self.tc11.GetValue(text=True).split(":")[1]
+        self.branch = branch
+        self.fillChoiceOfNaceCode
         event.Skip()
 
     def OnButtonAddProduct(self, event):
@@ -675,11 +453,16 @@ class PanelQ1(wx.Panel):
         if Status.PId <> 0 and self.notebook.GetSelection()<2:
             if self.check(self.tc1.GetValue()) <> 'NULL' and \
                 Status.DB.questionnaire.Name[self.check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
+
+                branch = self.tc11.GetValue(text=True).split(":")[1]
+                self.branch = branch
+                subBranch = self.tc13.GetValue(text=True).split(":")[1]
                 tmp = {
                     "Name":self.check(self.tc1.GetValue()),
                     "City":self.check(self.tc2.GetValue()),
                     "DescripIndustry":self.check(self.tc9.GetValue()),
-                    "Branch":self.check(self.tc10.GetValue()),                                      
+                    "Branch":self.check(branch),
+                    "SubBranch":self.check(subBranch),
                     "Contact":self.check(self.tc3.GetValue()),
                     "Role":self.check(self.tc4.GetValue()),
                     "Address":self.check(self.tc5.GetValue()),
@@ -694,16 +477,19 @@ class PanelQ1(wx.Panel):
                     "Independent":self.check(self.tc19.GetValue()),
                     "OMThermal":self.check(self.tc20.GetValue()),
                     "OMElectrical":self.check(self.tc21.GetValue()),
-                    "HPerDayInd":self.check(self.tc22.GetValue()),
-                    "NShifts":self.check(self.tc23.GetValue()),
-                    "NDaysInd":self.check(self.tc24.GetValue()),
-                    "NoProdStart":self.check(self.tc25_1.GetValue()),
-                    "NoProdStop":self.check(self.tc25_2.GetValue())
+                    "PercentFuelTotcost":self.check(self.tc22.GetValue()),
+                    "PercentElTotcost":self.check(self.tc23.GetValue()),
+                    "HPerDayInd":self.check(self.tc24.GetValue()),
+                    "NShifts":self.check(self.tc25.GetValue()),
+                    "NDaysInd":self.check(self.tc26.GetValue()),
+                    "NoProdStart_1":self.check(self.tc27_10.GetValue()),
+                    "NoProdStop_1":self.check(self.tc27_11.GetValue()),
+                    "NoProdStart_2":self.check(self.tc27_20.GetValue()),
+                    "NoProdStop_2":self.check(self.tc27_21.GetValue()),
+                    "NoProdStart_3":self.check(self.tc27_30.GetValue()),
+                    "NoProdStop_3":self.check(self.tc27_31.GetValue())
                     }
-                
-                if str(self.choiceOfNaceCode.GetStringSelection()) <> 'None':
-                    tmp["DBNaceCode_id"] = Status.DB.dbnacecode.CodeNACE[str(self.choiceOfNaceCode.GetStringSelection())][0].DBNaceCode_ID
-                
+                                
                 q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
                 Status.SQL.commit()
@@ -719,42 +505,42 @@ class PanelQ1(wx.Panel):
         print "PanelQ1 (OK): selected page",self.notebook.GetSelection()
         if Status.PId <> 0 and self.notebook.GetSelection()==2:
             
-            if self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].\
+            if self.check(self.tc30.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc30.GetValue()].\
                                                                   Questionnaire_id[Status.PId].\
                                                                   AlternativeProposalNo[Status.ANo]) == 0:
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
-                    "Product":self.check(self.tc26.GetValue()),
-                    "ProductCode":self.check(self.tc27.GetValue()),
-                    "QProdYear":self.check(self.tc28.GetValue()),
-                    "ProdUnit":self.check(self.tc29.GetValue()),
-                    "TurnoverProd":self.check(self.tc30.GetValue()),
-                    "ElProd":self.check(self.tc32.GetValue()),
-                    "FuelProd":self.check(self.tc31.GetValue())
+                    "Product":self.check(self.tc30.GetValue()),
+                    "ProductCode":self.check(self.tc31.entry.GetStringSelection()),
+                    "QProdYear":self.check(self.tc32.GetValue()),
+                    "ProdUnit":self.check(self.tc33.GetValue()),
+                    "TurnoverProd":self.check(self.tc34.GetValue()),
+                    "ElProd":self.check(self.tc35.GetValue()),
+                    "FuelProd":self.check(self.tc36.GetValue())
                     }
 
                 Status.DB.qproduct.insert(tmp)               
                 Status.SQL.commit()
                 self.fillProductList()
 
-            elif self.check(self.tc26.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc26.GetValue()].\
+            elif self.check(self.tc30.GetValue()) <> 'NULL' and len(Status.DB.qproduct.Product[self.tc30.GetValue()].\
                                                                     Questionnaire_id[Status.PId].\
                                                                     AlternativeProposalNo[Status.ANo]) == 1:
                 tmp = {
-                    "Product":self.check(self.tc26.GetValue()),
-                    "ProductCode":self.check(self.tc27.GetValue()),
-                    "QProdYear":self.check(self.tc28.GetValue()),
-                    "ProdUnit":self.check(self.tc29.GetValue()),
-                    "TurnoverProd":self.check(self.tc30.GetValue()),
-                    "ElProd":self.check(self.tc32.GetValue()),
-                    "FuelProd":self.check(self.tc31.GetValue())
+                    "Product":self.check(self.tc30.GetValue()),
+                    "ProductCode":self.check(self.tc31.GetValue()),
+                    "QProdYear":self.check(self.tc32.GetValue()),
+                    "ProdUnit":self.check(self.tc33.GetValue()),
+                    "TurnoverProd":self.check(self.tc34.GetValue()),
+                    "ElProd":self.check(self.tc35.GetValue()),
+                    "FuelProd":self.check(self.tc36.GetValue())
                     }
-                q = Status.DB.qproduct.Product[self.tc26.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+                q = Status.DB.qproduct.Product[self.tc30.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillProductList()
-                self.productName = self.tc26.GetValue()
+                self.productName = self.tc30.GetValue()
                           
             else:
                 self.main.showError(_("Product must be an unique value!"))
@@ -762,6 +548,7 @@ class PanelQ1(wx.Panel):
 #------------------------------------------------------------------------------
 #--- Private methods
 #------------------------------------------------------------------------------      
+
     def __makeColorPanel(self, color):
         p = wx.Panel(self, -1)
         win = ColorPanel.ColoredPanel(p, color)
@@ -775,29 +562,44 @@ class PanelQ1(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------      
 
+    def display(self):
+        self.fillChoiceOfNaceCode()
+        self.clear()
+        self.fillPage()
+        self.Show()
+
     def fillChoiceOfNaceCode(self):
-        self.choiceOfNaceCode.Clear()
-        self.choiceOfNaceCode.Append ("None")
-        for n in Status.DB.dbnacecode.CodeNACE["%"]:
-            self.choiceOfNaceCode.Append(n.CodeNACE)
-        self.choiceOfNaceCode.SetSelection(0)
+        naceDict,naceSubDict = Status.prj.getNACEDict(self.branch)
+        self.tc11.entry.Clear()
+        self.tc13.entry.Clear()
+        for code in naceDict.keys():
+            self.tc11.entry.Append("%s:%s"%(code,naceDict[code]))
+        for code in naceSubDict.keys():
+            self.tc13.entry.Append("%s:%s"%(code,naceSubDict[code]))
 
-
+        return naceDict,naceSubDict
 
     def fillPage(self):
         if Status.PId == 0:
             return
+
+        naceDict,naceSubDict = self.fillChoiceOfNaceCode()
+
         q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
+        
         self.tc1.SetValue(str(q.Name))
         self.tc2.SetValue(str(q.City))
-        self.tc9.SetValue(str(q.DescripIndustry))
-        self.tc10.SetValue(str(q.Branch))
         self.tc3.SetValue(str(q.Contact))
         self.tc4.SetValue(str(q.Role))
         self.tc5.SetValue(str(q.Address))
         self.tc6.SetValue(str(q.Phone))
         self.tc7.SetValue(str(q.Fax))
         self.tc8.SetValue(str(q.Email))
+        self.tc9.SetValue(str(q.DescripIndustry))
+        self.tc10.SetValue(str(q.Branch))
+        if str(q.Branch) in naceDict.values(): self.tc11.SetValue(findKey(naceDict,str(q.Branch)))
+        self.tc12.SetValue(str(q.SubBranch))
+        if str(q.SubBranch) in naceSubDict.values(): self.tc13.SetValue(findKey(naceSubDict,str(q.SubBranch)))
         self.tc14.SetValue(str(q.NEmployees))
         self.tc15.SetValue(str(q.Turnover))
         self.tc16.SetValue(str(q.ProdCost))
@@ -806,13 +608,18 @@ class PanelQ1(wx.Panel):
         self.tc19.SetValue(str(q.Independent))
         self.tc20.SetValue(str(q.OMThermal))
         self.tc21.SetValue(str(q.OMElectrical))
-        self.tc22.SetValue(str(q.HPerDayInd))
-        self.tc23.SetValue(str(q.NShifts))
-        self.tc24.SetValue(str(q.NDaysInd))
-        self.tc25_1.SetValue(str(q.NoProdStart))
-        self.tc25_2.SetValue(str(q.NoProdStop))
-        if q.DBNaceCode_id <> None:
-            self.choiceOfNaceCode.SetSelection(self.choiceOfNaceCode.FindString(str(Status.DB.dbnacecode.DBNaceCode_ID[q.DBNaceCode_id][0].CodeNACE)))
+        self.tc22.SetValue(str(q.PercentFuelTotcost))
+        self.tc23.SetValue(str(q.PercentElTotcost))
+        self.tc24.SetValue(str(q.HPerDayInd))
+        self.tc25.SetValue(str(q.NShifts))
+        self.tc26.SetValue(str(q.NDaysInd))
+#XXXXXXX CHECK XXXXXXXXX: SetValue of date entry gave problems ...
+#        self.tc27_10.SetValue(str(q.NoProdStart_1))
+#        self.tc27_11.SetValue(str(q.NoProdStop_1))
+#        self.tc27_20.SetValue(str(q.NoProdStart_2))
+#        self.tc27_21.SetValue(str(q.NoProdStop_2))
+#        self.tc27_30.SetValue(str(q.NoProdStart_3))
+#        self.tc27_31.SetValue(str(q.NoProdStop_3))
         self.fillProductList()
 
 
@@ -833,14 +640,15 @@ class PanelQ1(wx.Panel):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc9.SetValue('')
-        self.tc10.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
+        self.tc9.SetValue('')
+        self.tc10.SetValue('')
+        self.tc12.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
         self.tc16.SetValue('')
@@ -849,27 +657,36 @@ class PanelQ1(wx.Panel):
         self.tc19.SetValue('')
         self.tc20.SetValue('')
         self.tc21.SetValue('')
-        self.tc22.SetValue('')
-        self.tc23.SetValue('')
+        self.tc22.SetValue('')#SD
+        self.tc23.SetValue('')#SD
         self.tc24.SetValue('')
-        self.tc25_1.SetValue('')
-        self.tc25_2.SetValue('')
+        self.tc25.SetValue('')
         self.tc26.SetValue('')
-        self.tc27.SetValue('')
-        self.tc28.SetValue('')
-        self.tc29.SetValue('')
+
+#XXXXXXX CHECK XXXXXXXXX: SetValue of date entry gave problems ...
+#        self.tc27_10.SetValue('')
+#        self.tc27_11.SetValue('')
+#        self.tc27_20.SetValue('')
+#        self.tc27_21.SetValue('')
+#        self.tc27_30.SetValue('')
+#        self.tc27_31.SetValue('')
+                           
         self.tc30.SetValue('')
-        self.tc32.SetValue('')
         self.tc31.SetValue('')
+        self.tc32.SetValue('')
+        self.tc33.SetValue('')
+        self.tc34.SetValue('')
+        self.tc35.SetValue('')
+        self.tc36.SetValue('')
 
     def clearProduct(self):
-        self.tc26.SetValue('')
-        self.tc27.SetValue('')
-        self.tc28.SetValue('')
-        self.tc29.SetValue('')
         self.tc30.SetValue('')
         self.tc31.SetValue('')
         self.tc32.SetValue('')
+        self.tc33.SetValue('')
+        self.tc34.SetValue('')
+        self.tc35.SetValue('')
+        self.tc36.SetValue('')
 
 if __name__ == '__main__':
     import pSQL

@@ -21,11 +21,13 @@
 #	Last revised by:    Hans Schweiger      13/04/2008
 #                           Tom Sobota          21/04/2008
 #                           Tom Sobota          07/05/2008
+#                           Stoyan Danov        19/06/2008
 #
 #       Changes in last update:
 #       13/04/08:       preselection added as input
 #       21/04/08: TS    Intercepted error when non existing table
 #       07/05/08: TS    Changed layout, added Delete row, Add row buttons
+#       19/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -68,10 +70,10 @@ class DBEditFrame(wx.Dialog):
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid1)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellLeftDClick, self.grid1)
 
-        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,'Cancel')
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_('Cancel'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.buttonOK = wx.Button(self,wx.ID_OK,'OK')
+        self.buttonOK = wx.Button(self,wx.ID_OK,_('OK'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
         if self.can_edit:
@@ -101,10 +103,10 @@ class DBEditFrame(wx.Dialog):
         self.grid1.EnableEditing(can_edit)
 	if can_edit:
 	    self.backcolor = GRID_BACKGROUND_COLOR_EDITABLE
-            self.lblTableName.SetLabel(" Editing table "+tablename)
+            self.lblTableName.SetLabel(_(" Editing table ")+tablename)
 	else:
 	    self.backcolor = GRID_BACKGROUND_COLOR_NOEDITABLE
-            self.lblTableName.SetLabel(" Viewing table "+tablename)
+            self.lblTableName.SetLabel(_(" Viewing table ")+tablename)
 
         self.lastEditRow = 0
         self.lastEditCol = 0
@@ -143,7 +145,7 @@ class DBEditFrame(wx.Dialog):
             #HS         self.keys = sqlTable.keys()
             return True
         except:
-            dlg = wx.MessageDialog(None, 'Error accessing table '+self.tablename,
+            dlg = wx.MessageDialog(None, _('Error accessing table ')+self.tablename,
                                    'Error', wx.OK | wx.ICON_ERROR)
             dlg.ShowModal()
             dlg.Destroy()
@@ -266,16 +268,16 @@ class DBEditFrame(wx.Dialog):
 
     def OnButtonDeleteRow(self,event):
         if self.col0 is None:
-            dlg = wx.MessageDialog(None,'A row must be selected!\n'\
+            dlg = wx.MessageDialog(None,_('A row must be selected!\n'\
                                    'Please click on any data cell\n'\
-                                   'to select a row',
-                                   'Warning', wx.OK | wx.ICON_EXCLAMATION)
+                                   'to select a row'),
+                                   _('Warning'), wx.OK | wx.ICON_EXCLAMATION)
             ret = dlg.ShowModal()
             dlg.Destroy()
         else:
             field = self.table.columns()[0]
-            dlg = wx.MessageDialog(None, 'Delete row with %s=%s?' % (field,self.col0),
-                                   'Confirm delete', wx.YES_NO | wx.ICON_QUESTION)
+            dlg = wx.MessageDialog(None, _('Delete row with %s=%s?') % (field,self.col0),
+                                   _('Confirm delete'), wx.YES_NO | wx.ICON_QUESTION)
             ret = dlg.ShowModal()
             dlg.Destroy()
             if ret == wx.ID_NO:
@@ -288,8 +290,8 @@ class DBEditFrame(wx.Dialog):
                     row.delete()
                     self.displayData()
             except:
-                dlg = wx.MessageDialog(None,'Cannot delete row with %s=%s' % (field,self.col0),
-                                       'Warning', wx.OK | wx.ICON_EXCLAMATION)
+                dlg = wx.MessageDialog(None,_('Cannot delete row with %s=%s') % (field,self.col0),
+                                       _('Warning'), wx.OK | wx.ICON_EXCLAMATION)
                 ret = dlg.ShowModal()
                 dlg.Destroy()
         event.Skip()

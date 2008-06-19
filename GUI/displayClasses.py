@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota 06/06/2008
 #
 #       Changes to previous version:
@@ -29,16 +29,29 @@
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
+import sys
+import re
 import locale
 import wx
 import wx.lib.masked.numctrl
 import wx.lib.intctrl
 import wx.lib.stattext
 import wx.lib.masked
+from status import Status
+import units
+from fonts import FontProperties
 
-CHOOSERBCGCOLOR = (250,250,230)
-TEXTBKGCOLOR    = (250,250,255)
+CHOOSERBCGCOLOR = (255,255,255)
+TEXTBKGCOLOR    = (255,255,255)
+LOWERACCEPTEDDATE = '01/02/1970'
+UPPERACCEPTEDDATE = '12/31/2050'
 
+def error(text):
+    dlg = wx.MessageDialog(None,text,'Error',wx.OK | wx.ICON_ERROR)
+    ret = dlg.ShowModal()
+    dlg.Destroy()
+    
+        
 class FieldSizes(object):
     # sizes of subwidgets
     labelWidth=100
@@ -46,40 +59,8 @@ class FieldSizes(object):
     unitsWidth=80
     totalWidth = labelWidth + dataWidth + unitsWidth
     Height=32
-    # font parameters
-    fontSize=10
-    fontFamily=wx.FONTFAMILY_ROMAN
-    fontStyle=wx.FONTSTYLE_NORMAL
-    fontWeight=wx.FONTWEIGHT_NORMAL
-    fontUnderline=False
-    fontFacename='Verdana'
-    #fontEncoding = wx.FONTENCODING_DEFAULT
     
-    def __init__(self, wHeight=None, wLabel=None,wData=None,wUnits=None,
-                 fSize=None, fFamily=None, fStyle=None, fWeight=None,
-                 fUnderline=None, fFacename=None, fEncoding=None):
-        #---------------------------------------------------------------
-        # stores the default properties for font and field sizes
-        #---------------------------------------------------------------
-        # font properties
-        # family constants:
-        # wx.FONTFAMILY_DEFAULT, wx.FONTFAMILY_DECORATIVE, wx.FONTFAMILY_ROMAN,
-        # wx.FONTFAMILY_SCRIPT, wx.FONTFAMILY_SWISS, wx.FONTFAMILY_MODERN,
-        # wx.FONTFAMILY_TELETYPE
-        #
-        # style constants:
-        # wx.FONTSTYLE_NORMAL, wx.FONTSTYLE_SLANT and wx.FONTSTYLE_ITALIC
-        #
-        # weight constants:
-        # wx.FONTWEIGHT_NORMAL, wx.FONTWEIGHT_LIGHT, wx.FONTWEIGHT_BOLD
-        #
-        if fSize is not None: FieldSizes.fontSize=fSize
-        if fFamily is not None: FieldSizes.fontFamily=fFamily
-        if fStyle is not None: FieldSizes.fontStyle=fStyle
-        if fWeight is not None: FieldSizes.fontWeight=fWeight
-        if fUnderline is not None: FieldSizes.fontUnderline=fUnderline
-        if fFacename is not None: FieldSizes.fontFacename=fFacename
-        #if fEncoding is not None: FieldSizes.fontEncoding=fEncoding
+    def __init__(self, wHeight=None, wLabel=None,wData=None,wUnits=None):
         #
         # size properties
         #
@@ -90,12 +71,10 @@ class FieldSizes(object):
             if wUnits is not None: FieldSizes.unitsWidth = int(wUnits)
             FieldSizes.totalWidth = int(FieldSizes.labelWidth+FieldSizes.dataWidth+FieldSizes.unitsWidth+6)
         except:
-            dlg = wx.MessageDialog(None,'Error in FieldSizes: wHeight=%s, wLabel=%s,wData=%s,wUnits=%s' % \
-                                   (wHeight,wLabel,wData,wUnits),'Error',wx.OK | wx.ICON_ERROR)
-            ret = dlg.ShowModal()
-            dlg.Destroy()
+            error('Error in FieldSizes: wHeight=%s, wLabel=%s,wData=%s,wUnits=%s' % \
+                                   (wHeight,wLabel,wData,wUnits))
 
-            
+        
 class Generics(object):
     def makeColour(self, something):
         if isinstance(something,tuple):
@@ -103,11 +82,7 @@ class Generics(object):
                 newcolor = wx.Colour(something[0],something[1],something[2])
                 something = newcolor
             except:
-                dlg = wx.MessageDialog(None,
-                                       repr(something)+' is not a valid color, sorry', 'Error',
-                                       wx.OK | wx.ICON_ERROR)
-                ret = dlg.ShowModal()
-                dlg.Destroy()
+                error(repr(something)+' is not a valid color, sorry')
                 something = wx.Colour(100,100,100)
                 
         return something
@@ -124,26 +99,30 @@ class Generics(object):
                     pass
 
     def setUnits(self,other,tip,unitdict):
-        if other.hasunits:
+        defaultDisplayUnit = None
+        if unitdict is not None:
             other.units.Clear()
             try:
-                if unitdict.__class__.__name__ == 'dict':
-                    for u in unitdict.keys():
-                        other.units.Append(u)
-                elif unitdict.__class__.__name__ == 'list':
-                    for u in unitdict:
-                        other.units.Append(u)
+                if unitdict.__class__.__name__ == 'str':
+                    try:
+                        # find default display unit
+                        defaultDisplayUnit = units.UNITSYSTEM[Status.Units][unitdict]
+                        # find the whole list of possible units of this class
+                        unitlist = units.UNITS[unitdict].keys()
+                        # load the choice
+                        for u in unitlist:
+                            other.units.Append(u)
+                        # set the choice to the default unit
+                        other.units.SetStringSelection(defaultDisplayUnit)
+                    except:
+                        error(unitdict+' is not a defined measurement class')
                 else:
-                    dlg = wx.MessageDialog(None,
-                                           repr(unitdict)+' is not a dictionary or a list', 'Error',
-                                           wx.OK | wx.ICON_ERROR)
-                    ret = dlg.ShowModal()
-                    dlg.Destroy()
+                    error(repr(unitdict)+' is not a string')
             except:
-                pass
-            other.units.SetToolTipString(tip)
-            other.units.SetSelection(0)
+                error(repr(unitdict)+' is not a string')
 
+            other.units.SetToolTipString(tip)
+        return defaultDisplayUnit
 
     def setSizes(self,wLabel,wData,hasunits,wUnits):
         h = FieldSizes.Height
@@ -177,85 +156,6 @@ class Generics(object):
         totSize = wx.Size(lW + lD + lU + 2, h+1)
         return (totSize,lblSize,datSize,uniSize)
 
-
-    def fillChoice(self,other,choice,choiceList,preselected=0,nonePossible=True):
-        #
-        #   fills the list of possible choices from a list of strings
-        #
-        other.choice.Clear()
-        if nonePossible==True:
-            other.choice.Append("None")
-        for c in choiceList:
-            other.choice.Append(str(c))
-        try:
-            other.choice.SetSelection(preselected)
-        except:
-            other.choice.SetSelection(0)
-
-    def setChoice(self, other, choice, strChoice):
-        #
-        #   sets a choice to the string
-        #
-        try:
-            other.choice.SetSelection(other.choice.FindString(strChoice))
-        except:
-            try:
-                other.choice.SetSelection(other.choice.FindString("None"))
-            except:
-                other.choice.SetSelection(0)
-
-    def __sz(self,alist):
-        for a in alist:
-            if a is not None:
-                return a
-    
-    def setFont(self, other, size=None, family=None, style=None, weight=None,
-                underline=None, facename=None, encoding=None, font=None):
-        self.resetFont(other)
-        if font is not None:
-            # a full wx.Font specification.
-            # in this case the rest of args are ignored
-            try:
-                if font.__class__.__name__ == 'Font':
-                    other.SetFont(font)
-                    return
-            except:
-                pass
-        try:
-            si = self.__sz([size,FieldSizes.fontSize,10])
-            fa = self.__sz([family,FieldSizes.fontFamily,wx.FONTFAMILY_DEFAULT])
-            st = self.__sz([style,FieldSizes.fontStyle,wx.FONTSTYLE_NORMAL])
-            we = self.__sz([weight,FieldSizes.fontWeight,wx.FONTWEIGHT_NORMAL])
-            fn = self.__sz([facename,FieldSizes.fontFacename,'Roman'])
-            un = self.__sz([underline,FieldSizes.fontUnderline,False])
-            #en = self.__sz([encoding,FieldSizes.fontEncoding,wx.FONTENCODING_SYSTEM])
-            fnt = wx.Font(si,fa,st,we)
-            #fnt.SetFaceName(fn)
-            fnt.SetUnderlined(un)
-            #fnt.SetDefaultEncoding(en)
-            other.SetFont(fnt)
-        except:
-            # some error in font specification. notify
-            dlg = wx.MessageDialog(None,
-                                   'Error in font specification, sorry', 'Error',
-                                   wx.OK | wx.ICON_ERROR)
-            ret = dlg.ShowModal()
-            dlg.Destroy()
-
-    def resetFont(self, other):
-        # reset font to initial values
-        si=FieldSizes.fontSize
-        fa=FieldSizes.fontFamily
-        st=FieldSizes.fontStyle
-        we=FieldSizes.fontWeight
-        un=FieldSizes.fontUnderline
-        fn=FieldSizes.fontFacename
-        #en=FieldSizes.fontEncoding
-        font = wx.Font(si,fa,st,we)
-        #font.SetFaceName(fn)
-        font.SetUnderlined(un)
-        #font.SetDefaultEncoding(en)
-        other.SetFont(font)
 
     def getChoiceValues(self, other, multiple, text):
         if multiple:
@@ -300,6 +200,7 @@ class MskFC(wx.lib.masked.numctrl.NumCtrl):
                  style=0,
                  value=0.0,
                  allowNegative=True,
+                 allowNone=True,
                  integerWidth=10,
                  fractionWidth=2):
         u = Generics()
@@ -312,9 +213,10 @@ class MskFC(wx.lib.masked.numctrl.NumCtrl):
         wx.lib.masked.numctrl.NumCtrl.__init__(self,id=id,parent=prnt,
                                                pos=pos,
                                                size=size,style=style,
-                                               value=value,allowNone=True,
-                                               selectOnEntry=True,
+                                               value=value,
+                                               selectOnEntry=False,
                                                allowNegative=allowNegative,
+                                               allowNone=allowNone,
                                                min=min,max=max,
                                                integerWidth=integerWidth,
                                                fractionWidth=fractionWidth,
@@ -324,13 +226,15 @@ class MskFC(wx.lib.masked.numctrl.NumCtrl):
                                                validBackgroundColour=validBackgroundColour,
                                                invalidBackgroundColour=invalidBackgroundColour,
                                                autoSize=False)
-        self.SetAutoSize(False)
+        #self.SetAutoSize(False)
+        self.SetLimited(False)
+        #self.SetAllowNone(True)
         self.SetMaxSize(size)
         # get a dictionary of local parameters
         loc = locale.localeconv()
         #for key in loc.keys():
         #    print 'LOC[%s] = [%s]' % (key,loc[key])
-        self.SetDefaultValue('')
+        #self.SetDefaultValue('')
         # extract decimal and thousands separator from
         # locale and use them to setup this control
         #
@@ -358,8 +262,8 @@ class MskIC(wx.lib.intctrl.IntCtrl):
                  prnt,
                  id=-1,
                  pos=wx.DefaultPosition,
-                 allow_long=True,
-                 allow_none=True,
+                 allowLong=True,
+                 allowNone=True,
                  size=(100,32),
                  min= None,
                  max= None,
@@ -377,7 +281,7 @@ class MskIC(wx.lib.intctrl.IntCtrl):
         wx.lib.intctrl.IntCtrl.__init__(self,id=id,
                                         parent=prnt,oob_color=invalidBackgroundColour,
                                         pos=pos,
-                                        allow_long=allow_long,allow_none=allow_none,
+                                        allow_long=allowLong,allow_none=allowNone,
                                         size=size,style=style,value=value)
         self.SetMaxSize(size)
         # allowable range of number
@@ -390,6 +294,7 @@ class MskIC(wx.lib.intctrl.IntCtrl):
         #self.SetValue(initialvalue)
 
 
+
 class FloatEntry(wx.Panel):
     def __init__(self, parent=None,
                  ipart=6,                                      # max digits in the integer part
@@ -397,18 +302,22 @@ class FloatEntry(wx.Panel):
                  minval=None,                                  # min value
                  maxval=None,                                  # max value
                  value=0.,                                     # initial value
-                 unitdict={},                                  # unit dict for the unit selector
+                 unitdict=None,                                # unit dict for the unit selector
                  wLabel=None,                                  # width of the label
                  wData=None,                                   # width of the data entry
                  wUnits=None,                                  # width of the unit selector
                  label='',                                     # text of the label
                  tip='',                                       # text of the tip
-                 hasunits=True,                                # unit selector shown?
-                 fontsize=None,                                # fontsize for subwidgets
-                 font=None):                                   # full wx.Font specification
+                 fontsize=None):                                # fontsize for subwidgets
+
+        self.unitdict = unitdict
+        self.lastInternalValue = None
+        self.defaultDisplayUnit = None
+        self.lastTypedString = ''
+
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
-        self.hasunits = hasunits
         self.g = Generics()
+        self.f = FontProperties()
 
         (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,True,wUnits)
 
@@ -417,10 +326,10 @@ class FloatEntry(wx.Panel):
         if label.strip():
             # creates label
             sty = wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT|wx.BORDER_NONE
-            #self.label = wx.lib.stattext.GenStaticText(self,ID=-1,label=label,size=lblSize,pos=(0,0),style = sty)
             self.label = wx.StaticText(self,id=-1,label=label,size=lblSize,pos=(0,0),style = sty)
-            self.g.setFont(self.label,size=fontsize,font=font)
+            self.f.setFont(self.label,size=fontsize)
             self.label.Wrap(lblSize.GetWidth())
+            self.label.Center(wx.VERTICAL)
 
         # create a masked float-point control
         self.entry = MskFC(self,pos=(lblSize[0]+1,0),
@@ -433,46 +342,124 @@ class FloatEntry(wx.Panel):
                 validBackgroundColour=TEXTBKGCOLOR,  # very light blue
                 invalidBackgroundColour=(255,255,0), # yellow
                 allowNegative=True,                  # negative values allowed?
+                allowNone=True,                      # empty value allowed?
                 integerWidth=ipart,                  # size of integer part
                 fractionWidth=decimals,              # number of decimals
-                value=value,                         # initial value
                 style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
-        self.g.setFont(self.entry,size=fontsize,font=font)
-
+        self.f.setFont(self.entry,size=fontsize)
+        self.entry.Center(wx.VERTICAL)
+        self.entry.Bind(wx.EVT_TEXT, self.OnEntry)
+        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
 
         # load and show a unit selector
-        if self.hasunits:
+        # also sets the default display unit
+        if self.unitdict is not None:
             self.units = wx.Choice(self, -1, pos=(lblSize[0]+datSize[0]+2,0),
                                      choices=[], size=uniSize)
             self.setUnits('Select a measurement unit', unitdict)
             backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
             self.units.SetBackgroundColour(backgroundcolour)
-            self.g.setFont(self.units,size=fontsize,font=font)
+            self.f.setFont(self.units,size=fontsize)
+            self.units.Center(wx.VERTICAL)
+            self.units.Bind(wx.EVT_CHOICE, self.OnUnits)
+        
+
+        # set initial value (must be after loading the selector)
+        self.SetValue(value)
 
         # set tooltips
         self.g.setTooltips(self,tip)
 
+        # create popup menu for easy clearing/setting to zero
+        self.popupmenu = wx.Menu()
+        for text in "Clear Zero".split():
+            item = self.popupmenu.Append(-1, text)
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+    def OnShowPopup(self, event):
+        pos = event.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu(self.popupmenu, pos)
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        if text == 'Clear':
+            self.entry.SetValue(None)
+        elif text == 'Zero':
+            self.entry.SetValue(0.0)
+            
+    def OnEntry(self, event):
+        s = event.GetString()
+        self.lastTypedString = s
+        self.lastInternalValue = self.GetValue()
+
+    def OnUnits(self, event):
+        # read new measurement unit and convert to internal encoding
+        self.defaultDisplayUnit = event.GetString().encode('iso-8859-15')
+        # recalculate to display units
+        self.SetValue(self.lastInternalValue)
 
     def setUnits(self,tip,unitdict):
-        self.g.setUnits(self,tip, unitdict)
+        if self.unitdict:
+            self.defaultDisplayUnit = self.g.setUnits(self,tip, unitdict)
 
     def GetValue(self):
-        return str(self.entry.GetValue())
-
-    def SetValue(self, value):
+        dValue = self.entry.GetValue()
+        # trick for detecting a Null value
+        if self.lastTypedString.strip() == u',00' or self.lastTypedString.strip() == u'.00':
+            return None
+        if self.defaultDisplayUnit is None:
+            return dValue
         try:
-            f = float(value)
-            self.entry.SetValue(f)
+            iValue = units.internalValue(dValue,self.defaultDisplayUnit,self.unitdict)
+            return iValue
         except:
-            self.entry.SetValue(0.0)
+            print 'FloatEntry: error in conversion disp->int ' \
+                  'disp=%s class=%s default=%s' % (dValue,self.unitdict,
+                                                   repr(self.defaultDisplayUnit))
+
+    def SetValue(self, iValue):
+        #
+        # saves internal value for an eventual unit change by user
+        #
+        self.lastInternalValue = iValue
+        #
+        # find display value
+        #
+        if iValue is None or iValue == '' or iValue == 'None':
+            self.entry.SetValue(None)
+        else:
+            try:
+                f = float(iValue)
+            except:
+                print 'FloatEntry: bad value for SetValue ' % (repr(iValue),)
+                self.entry.SetValue(0.0)
+                return
+            
+            if self.defaultDisplayUnit is None:
+                dValue = f
+            else:
+                try:
+                    dValue = units.displayValue(f,self.defaultDisplayUnit,self.unitdict)
+                except:
+                    print 'FloatEntry: error in conversion int->disp ' \
+                          'int=%s class=%s default=%s' % (f, self.unitdict,
+                                                          repr(self.defaultDisplayUnit))
+
+                self.entry.SetValue(dValue)
 
     def GetUnit(self,text=False):
-        return self.g.getChoiceValues(self.units, False, text)
+        if self.unitdict:
+            return self.g.getChoiceValues(self.units, False, text)
+        else:
+            return None
 
     def setUnit(self,n):
-        # n is the 0-based index to the contents
-        self.units.SetSelection(n)
-    
+        if self.unitdict:
+            # n is the 0-based index to the contents
+            self.units.SetSelection(n)
+
 
 
 class IntEntry(wx.Panel):
@@ -480,19 +467,21 @@ class IntEntry(wx.Panel):
                  minval=None,                                  # min value
                  maxval=None,                                  # max value
                  value=0,                                      # initial value
-                 unitdict={},                                  # unit dict for the unit selector
+                 unitdict=None,                                # unit dict for the unit selector
                  wLabel=None,                                  # width of the label
                  wData=None,                                   # width of the data entry
                  wUnits=None,                                  # width of the unit selector
                  label='',                                     # text of the label
                  tip='',                                       # text of the tip
-                 hasunits=True,                                # unit selector shown?
-                 fontsize=None,
-                 font=None):                                   # full wx.Font specification
-        style = wx.NO_BORDER|wx.TAB_TRAVERSAL
-        self.hasunits = hasunits
-        self.g = Generics()
+                 fontsize=None):
 
+        self.unitdict = unitdict
+        self.lastInternalValue = None
+        self.defaultDisplayUnit = None
+
+        style = wx.NO_BORDER|wx.TAB_TRAVERSAL
+        self.g = Generics()
+        self.f = FontProperties()
         (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,True,wUnits)
 
         wx.Panel.__init__(self, parent, id=-1, size=size, style=style)
@@ -501,50 +490,125 @@ class IntEntry(wx.Panel):
             # creates label
             self.label = wx.lib.stattext.GenStaticText(self,ID=-1,label=label,size=lblSize,pos=(0,0),
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-            self.g.setFont(self.label,size=fontsize,font=font)
+            self.f.setFont(self.label,size=fontsize)
 
         # create a masked fixed-point control
         self.entry = MskIC(self,pos=(lblSize[0]+1,0),
-                           size=datSize,                       # size of control
+                           size=datSize,                     # size of control
                            min=minval,                       # minimum value admitted
                            max=maxval,                       # maximum value admitted
-                           value=value,                      # initial value
                            style=wx.ALIGN_RIGHT)
-        self.g.setFont(self.entry,size=fontsize,font=font)
+        self.f.setFont(self.entry,size=fontsize)
+        self.entry.Bind(wx.EVT_TEXT, self.OnEntry)
+        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
 
         # load and show a unit selector
-        if self.hasunits:
+        # also sets the default display unit
+        if self.unitdict is not None:
             self.units = wx.Choice(self, -1, pos=(lblSize[0]+datSize[0]+2,0),
                                      choices=[], size=uniSize)
             self.setUnits('Select a measurement unit', unitdict)
             backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
             self.units.SetBackgroundColour(backgroundcolour)
-            self.g.setFont(self.units,size=fontsize,font=font)
+            self.f.setFont(self.units,size=fontsize)
+            self.units.Bind(wx.EVT_CHOICE, self.OnUnits)
+
+        # set initial value (must be after loading the selector
+        self.SetValue(value)
 
         # set tooltips
         self.g.setTooltips(self,tip)
 
+        # create popup menu for easy clearing/setting to zero
+        self.popupmenu = wx.Menu()
+        for text in "Clear Zero".split():
+            item = self.popupmenu.Append(-1, text)
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
 
-    def setUnits(self,tip,unitdict):
-        self.g.setUnits(self,tip, unitdict)
+    def OnShowPopup(self, event):
+        pos = event.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu(self.popupmenu, pos)
 
-    def GetValue(self):
-        return str(self.entry.GetValue())
-
-    def SetValue(self, value):
-        try:
-            j = int(value)
-            self.entry.SetValue(j)
-        except:
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        if text == 'Clear':
+            self.entry.SetValue(None)
+        elif text == 'Zero':
             self.entry.SetValue(0)
 
+    def OnEntry(self, event):
+        s = event.GetString()
+        self.lastInternalValue = self.GetValue()
+
+    def OnUnits(self, event):
+        # read new measurement unit and convert to internal encoding
+        self.defaultDisplayUnit = event.GetString().encode('iso-8859-15')
+        # recalculate to display units
+        self.SetValue(self.lastInternalValue)
+
+    def setUnits(self,tip,unitdict):
+        if self.unitdict:
+            self.defaultDisplayUnit = self.g.setUnits(self,tip, unitdict)
+
+    def GetValue(self):
+        dValue = self.entry.GetValue()
+        if dValue is None:
+            return None
+        if self.defaultDisplayUnit is None:
+            return dValue
+        try:
+            iValue = units.internalValue(float(dValue),self.defaultDisplayUnit,self.unitdict)
+            return int(iValue)
+        except:
+            print 'IntEntry: error in conversion disp->int '\
+                  'disp=%s class=%s default=%s' % (dValue,self.unitdict,
+                                                   repr(self.defaultDisplayUnit))
+
+
+    def SetValue(self, iValue):
+        #
+        # saves internal value for an eventual unit change by user
+        #
+        self.lastInternalValue = iValue
+        #
+        # find display value
+        #
+        if iValue is None or iValue == '' or iValue == 'None':
+            self.entry.SetValue(None)
+        else:
+            try:
+                f = int(iValue)
+            except:
+                print 'IntEntry: bad value for SetValue ' % (repr(iValue),)
+                self.entry.SetValue(0)
+                return
+            
+            if self.defaultDisplayUnit is None:
+                dValue = f
+            else:
+                try:
+                    dValue = units.displayValue(float(f),self.defaultDisplayUnit,self.unitdict)
+                except:
+                    print 'IntEntry: error in conversion int->disp ' \
+                          'int=%s class=%s default=%s' % (f, self.unitdict,
+                                                          repr(self.defaultDisplayUnit))
+
+                self.entry.SetValue(int(dValue))
+
+
+
     def GetUnit(self,text=False):
-        return self.g.getChoiceValues(self.units, False, text)
+        if self.unitdict:
+            return self.g.getChoiceValues(self.units, False, text)
+        else:
+            return None
 
     def setUnit(self,n):
-        self.units.SetSelection(n)
-
-
+        if self.unitdict:
+            # n is the 0-based index to the contents
+            self.units.SetSelection(n)
 
 
 class TextEntry(wx.Panel):
@@ -556,12 +620,11 @@ class TextEntry(wx.Panel):
                  wUnits=None,      # width of the unit selector (not used)
                  label='',         # text of the label
                  tip='',           # text of the tip
-                 fontsize=None,
-                 font=None):                                   # full wx.Font specification
+                 fontsize=None):
 
-        self.hasunits = False
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
+        self.f = FontProperties()
 
         (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,False,wUnits)
 
@@ -571,12 +634,13 @@ class TextEntry(wx.Panel):
             # creates label
             self.label = wx.lib.stattext.GenStaticText(self,ID=-1,label=label,size=lblSize,pos=(0,0),
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-            self.g.setFont(self.label,size=fontsize,font=font)
+            self.f.setFont(self.label,size=fontsize)
 
         # create a text control
         self.entry = wx.TextCtrl(self,-1,pos=(lblSize[0]+1,0),
                                  value=value,size=datSize,style=wx.ALIGN_RIGHT)
-        self.g.setFont(self.entry,size=fontsize,font=font)
+        self.f.setFont(self.entry,size=fontsize)
+        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
 
         foregroundColour=(0,0,100)
         foregroundColour = self.g.makeColour(foregroundColour)
@@ -588,6 +652,25 @@ class TextEntry(wx.Panel):
 
         # set tooltips
         self.g.setTooltips(self,tip)
+
+        # create popup menu for easy clearing
+        self.popupmenu = wx.Menu()
+        for text in "Clear Unknown".split():
+            item = self.popupmenu.Append(-1, text)
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+    def OnShowPopup(self, event):
+        pos = event.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu(self.popupmenu, pos)
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        if text == 'Clear':
+            self.entry.SetValue('')
+        if text == 'Unknown':
+            self.entry.SetValue('None')
 
 
     def setUnits(self,tip,unitdict):
@@ -618,13 +701,11 @@ class DateEntry(wx.Panel):
                  wUnits=None,    # width of the unit selector (not used)
                  label='',       # text of the label
                  tip='',         # text of the tip
-                 fontsize=None,
-                 font=None):     # full wx.Font specification
+                 fontsize=None):
 
-        self.hasunits = False
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
-        locale.setlocale(locale.LC_ALL, '')
+        self.f = FontProperties()
 
         (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,True,wUnits)
 
@@ -634,22 +715,23 @@ class DateEntry(wx.Panel):
             # creates label
             self.label = wx.lib.stattext.GenStaticText(self,ID=-1,label=label,size=lblSize,pos=(0,0),
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-            self.g.setFont(self.label,size=fontsize,font=font)
+            self.f.setFont(self.label,size=fontsize)
 
-        # create a masked control
-        self.entry  = wx.lib.masked.TextCtrl(self, -1, "", pos=(lblSize[0]+1,0),
-                                             mask         = "##/##/####",
-                                             excludeChars = "",
-                                             formatcodes  = "DF>",
-                                             includeChars = "",
-                                             validRegex   = "",
-                                             validRange   = "",
-                                             choices      = "",
-                                             choiceRequired = False,
-                                             defaultValue = wx.DateTime_Now().Format("%d/%m/%Y"),
-                                             size         = datSize,
-                                             style        = wx.ALIGN_RIGHT)
-        self.g.setFont(self.entry,size=fontsize,font=font)
+
+        self.entry = wx.DatePickerCtrl(self, id=-1, pos=(lblSize[0]+1,0), size=datSize,
+                                style=wx.DP_DROPDOWN | wx.DP_SHOWCENTURY)
+        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
+
+        # sets range of accepted values
+        lowerLimit = wx.DateTime()
+        lowerLimit.ParseDate(LOWERACCEPTEDDATE)
+        upperLimit = wx.DateTime()
+        upperLimit.ParseDate(UPPERACCEPTEDDATE)
+        self.entry.SetRange(lowerLimit, upperLimit)
+
+        self.SetValue(value)
+
+        self.f.setFont(self.entry,size=fontsize)
 
         foregroundColour=(0,0,100)
         foregroundColour = self.g.makeColour(foregroundColour)
@@ -660,16 +742,51 @@ class DateEntry(wx.Panel):
         # set tooltips
         self.g.setTooltips(self,tip)
 
+        # create popup menu for easy clearing/setting to zero
+        self.popupmenu = wx.Menu()
+        for text in "Today|Unknown (sets date to 1/1/1970)".split('|'):
+            item = self.popupmenu.Append(-1, text)
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+    def OnShowPopup(self, event):
+        pos = event.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu(self.popupmenu, pos)
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        if text.startswith('Unknown'):
+            self.SetValue('1/1/1970')
+        elif text == 'Today':
+            theDate = wx.DateTime().Today()
+            y = theDate.GetYear()
+            m = theDate.GetMonth()
+            d = theDate.GetDay()
+            self.SetValue('%02d/%02d/%4d' % (m+1,d,y))
 
     def setUnits(self,tip,unitdict):
         # this method is just for compatibility
         pass
 
     def GetValue(self):
-        return self.entry.GetValue()
+        theDate = self.entry.GetValue()
+        y = theDate.GetYear()
+        m = theDate.GetMonth()
+        d = theDate.GetDay()
+        if y == 1970 and m == 0 and d == 1:
+            # campo vacío
+            return None
+        # campo con fecha
+        return '%4d/%02d/%02d' % (y,m+1,d)
 
     def SetValue(self, value):
-        self.entry.SetValue(value)
+        if not value:
+            value = '1/1/1970'
+
+        theDate = wx.DateTime()
+        theDate.ParseDate(value)
+        self.entry.SetValue(theDate)
     
     def getUnit(self):
         # this method is just for compatibility
@@ -690,13 +807,12 @@ class ChoiceEntry(wx.Panel):
                  wUnits=None,     # width of the unit selector (not used)
                  label='',        # text of the label
                  tip='',          # text of the tip
-                 fontsize=None,
-                 font=None):      # full wx.Font specification
+                 fontsize=None):
 
-        self.hasunits = False
         self.multiple = multiple
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
+        self.f = FontProperties()
 
         (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,False,wUnits)
 
@@ -707,7 +823,7 @@ class ChoiceEntry(wx.Panel):
             self.label = wx.lib.stattext.GenStaticText(self,ID=-1,pos=(0,0),
                                                        label=label,size=lblSize,
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
-            self.g.setFont(self.label,size=fontsize,font=font)
+            self.f.setFont(self.label,size=fontsize)
 
         if multiple:
             # if multiple choice, create a listbox
@@ -720,7 +836,7 @@ class ChoiceEntry(wx.Panel):
                                    choices=values, size=datSize)
         backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
         self.entry.SetBackgroundColour(backgroundcolour)
-        self.g.setFont(self.entry,size=fontsize,font=font)
+        self.f.setFont(self.entry,size=fontsize)
 
         # set tooltips
         self.g.setTooltips(self,tip)
@@ -746,6 +862,10 @@ class ChoiceEntry(wx.Panel):
                 except:
                     self.entry.SetSelection(0)
             elif t == 'str':
+                if thing.strip() == '':
+                    # clear the choice
+                    self.entry.Clear()
+                    return
                 try:
                     self.entry.SetSelection(self.entry.FindString(thing))
                 except:
@@ -831,36 +951,5 @@ class Label(wx.lib.stattext.GenStaticText):
             if len(tiplist.strip()) > 0:
                 self.SetToolTipString(tiplist)
                 txtlist.SetToolTipString(tiplist)
-
-
-
-if __name__ == '__main__':
-    global ce
-    def OnButtonOK(event):
-        global ce
-        print repr(ce.GetValue(text=True))
-
-    app = wx.PySimpleApp()
-    frame = wx.Frame(parent=None, id=-1, size=wx.Size(500, 80), title="Einstein - displayClasses test")
-
-    ce = ChoiceEntry(parent=frame,
-                     multiple=False,
-                     values=['one','two','three'],
-                     wLabel=200,
-                     wData=200,
-                     label='This is the label',
-                     tip='This is a tip')
-
-    buttonOK = wx.Button(frame,wx.ID_OK, 'OK')
-    frame.Bind(wx.EVT_BUTTON, OnButtonOK, buttonOK)
-
-    sizer_1 = wx.BoxSizer(wx.VERTICAL)
-    sizer_1.Add(ce, 1, wx.ALL|wx.EXPAND, 5)
-    sizer_1.Add(buttonOK, 0, 0, 1)
-    frame.SetSizer(sizer_1)
-    frame.Layout()
-
-    frame.Show(True)
-    app.MainLoop()
 
 

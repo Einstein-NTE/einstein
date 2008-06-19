@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.93
+#   Version No.: 0.92
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -51,7 +51,8 @@
 #                       Hans Schweiger                      10/06/2008
 #                       Hans Schweiger                      12/06/2008
 #                       Stoyan Danov                        16/06/2008
-#                       Hans Schweiger                      17/06/2008
+#                       Stoyan Danov                        18/06/2008
+#                       Tom Sobota                          18/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -117,7 +118,8 @@
 #       10/06/2008  HS panelHR included
 #       12/06/2008  HS function display in PanelQ3 and PanelQ4 called
 #       16/06/2008  SD function display in PanelQ5
-#       17/06/2008  HS function display in other panels Q1 - Q9
+#       18/06/2008  SD function display in PanelQ1,Q2,Q7,Q8,Q9
+#       18/06/2008  TS added fonts management facility
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -206,6 +208,9 @@ from dialogLanguage import *
 from panelReport import *
 #TS2008-05-16 export data
 from einstein.modules.exportdata import *
+#TS2008-06-18 fonts management
+from fonts import FontProperties
+
 #----- Constants
 qPageSize = (800, 600)
 KFramesize = (1024, 740)
@@ -592,6 +597,10 @@ class EinsteinFrame(wx.Frame):
             self.splitter2.SetSashPosition(-1)
             self.message.Hide()
 
+    def OnMenuSettingsManageFonts(self,event):
+        fp = FontProperties()
+        fp.chooseFont()
+        
 #..............................................................................
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
@@ -649,19 +658,21 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.Page1 = PanelQ1(self.leftpanel2, self)
             self.Page1.display()
-#            self.Page1.clear()
-#            self.Page1.fillChoiceOfNaceCode()
-#            self.Page1.fillPage()
-#            self.Page1.Show()
+##            self.Page1.clear()
+##            self.Page1.fillChoiceOfNaceCode()
+##            self.Page1.fillPage()
+##            self.Page1.Show()
+            
         #Page2
         elif select == _("Energy consumption"): #Energy consumption
             self.hidePages()
             self.Page2 = PanelQ2(self.leftpanel2, self)
             self.Page2.display()
-#            self.Page2.clear()
-#            self.Page2.fillChoiceOfDBFuelType()
-#            self.Page2.fillPage()
-#            self.Page2.Show()
+##            self.Page2.clear()
+##            self.Page2.fillChoiceOfDBFuelType()
+##            self.Page2.fillPage()
+##            self.Page2.Show()
+            
         #Page3
         elif select == _("Processes data"): #Processes data
             self.hidePages()
@@ -685,32 +696,38 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.Page6 = PanelQ6(self.leftpanel2, self)
             self.Page6.display()
+##            self.Page6.clear()
+##            self.Page6.fillPage()
+##            self.Page6.Show()
 
         #Page7
         elif select == _("Renewable energies"): # Renewable energies
             self.hidePages()
             self.Page7 = PanelQ7(self.leftpanel2, self)
+            self.logMessage(_("city / country"))
             self.Page7.display()
-#            self.logMessage(_("city / country"))
-#            self.Page7.clear()
-#            self.Page7.fillPage()
-#            self.Page7.Show()
+##            self.Page7.clear()
+##            self.Page7.fillPage()
+##            self.Page7.Show()
+            
         #Page8
         elif select == _("Buildings"): #Buildings
             self.hidePages()
             self.Page8 = PanelQ8(self.leftpanel2, self)
             self.Page8.display()
-#            self.Page8.clear()
-#            self.Page8.fillPage()
-#            self.Page8.Show()
+##            self.Page8.clear()
+##            self.Page8.fillPage()
+##            self.Page8.Show()
+            
         #Page9
         elif select == _("Economic parameters"): #Economic parameters
             self.hidePages()
             self.Page9 = PanelQ9(self.leftpanel2, self)
             self.Page9.display()
-#            self.Page9.clear()
-#            self.Page9.fillPage()
-#            self.Page9.Show()
+##            self.Page9.clear()
+##            self.Page9.fillPage()
+##            self.Page9.Show()
+            
         #qDataCheck
         elif select == _("Consistency Check"):
             #TS 2008-3-26 No action here
@@ -1116,6 +1133,9 @@ class EinsteinFrame(wx.Frame):
         i = wx.NewId()
         self.ViewMessages = self.menuSettings.AppendCheckItem(i, _("View message log"))
 
+        self.ManageFonts = self.menuSettings.Append(-1, _("Fonts"))
+
+        
         self.HelpUserManual = self.menuHelp.Append(-1, _("&Documentation"))
         self.menuHelp.AppendSeparator()
         self.HelpAbout = self.menuHelp.Append(-1, _("&About"))
@@ -1166,9 +1186,12 @@ class EinsteinFrame(wx.Frame):
 
 
     def CreateTree(self):
+        # access to font properties object
+        fp = FontProperties()
         self.tree = wx.TreeCtrl(self.treepanel, -1, wx.Point(0, 0), wx.Size(200, 740),
                                 wx.TR_DEFAULT_STYLE | wx.TR_NO_LINES | \
                                 wx.TR_FULL_ROW_HIGHLIGHT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+        self.tree.SetFont(fp.getFont())
         self.qRoot = self.tree.AddRoot("Einstein")
         self.qPage0 = self.tree.AppendItem (self.qRoot, _("Edit Industry Data"),0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, _("General data"),0)
@@ -1330,6 +1353,7 @@ class EinsteinFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsLanguage, self.Language)
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsViewMessages, self.ViewMessages)
+        self.Bind(wx.EVT_MENU, self.OnMenuSettingsManageFonts, self.ManageFonts)
 
         self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)
         self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)
@@ -1353,7 +1377,7 @@ class EinsteinApp(wx.App):
         self.Bind(wx.EVT_QUERY_END_SESSION , self._onQueryEndSession )
         self.Bind(wx.EVT_END_SESSION       , self._onEndSession )
         self.frame = EinsteinFrame(parent=None, id=-1, title="Einstein")
-
+        self.SetTopWindow(self.frame)
         # initialize Einstein support
         self.frame.doLog = HelperClass.LogHelper()
         self.frame.conf = HelperClass.ConfigHelper()
@@ -1371,6 +1395,11 @@ class EinsteinApp(wx.App):
             print 'Cannot connect to database. Error is:\n\n%s\n\nPlease verify.' % (str(e),)
             sys.exit(1)
 
+        #initialize fonts management
+        # (needs database connected)
+        fp = FontProperties()
+        fp.initializeFont()
+        
 #HS2008-05-28: Status.main has to exist BEFORE instantiating project
             
         Status.main = self.frame

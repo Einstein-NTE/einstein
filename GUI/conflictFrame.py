@@ -18,10 +18,12 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	25/04/2008
-#	Last revised by:    
+#	Last revised by:
+#                           Stoyan Danov        19/06/2008
 #                           
 #
 #       Changes in last update:
+#       19/06/2008 SD: change to translatable text _(...)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -79,20 +81,20 @@ class conflictFrame(wx.Dialog):
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellLeftDClick,
               id=wxID_CONFLICTFRAMEGRID)
 
-        self.button1 = wx.Button(id=wx.ID_CANCEL, label=u'Cancel',
+        self.button1 = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='button1', parent=self, pos=wx.Point(772, 610),
               size=wx.Size(128, 32), style=0)
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, id=wx.ID_CANCEL)
 
-        self.button2 = wx.Button(id=wx.ID_OK, label=u'OK', name='button2',
+        self.button2 = wx.Button(id=wx.ID_OK, label=_('OK'), name='button2',
               parent=self, pos=wx.Point(632, 610), size=wx.Size(128, 32),
               style=0)
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, id=wx.ID_OK)
 
     def __init__(self, parent):
-	self.title = "conflicts in parameter specifications"
+	self.title = _("conflicts in parameter specifications")
         self._init_ctrls(parent)
 
         #self.maxrow = 25
@@ -127,9 +129,9 @@ class conflictFrame(wx.Dialog):
 
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
-        self.grid.SetColLabelValue(0, "parameter\n(values)")
-        self.grid.SetColLabelValue(1, "accuracy")
-        self.grid.SetColLabelValue(2, "calculated from")
+        self.grid.SetColLabelValue(0, _("parameter\n(values)"))
+        self.grid.SetColLabelValue(1, _("accuracy"))
+        self.grid.SetColLabelValue(2, _("calculated from"))
 
         for r in range(MAXROWS):
 

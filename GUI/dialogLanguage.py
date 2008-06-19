@@ -13,8 +13,11 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	April 2008
+#	Last revised by:
+#                           Stoyan Danov        19/06/2008
 #
 #       Changes to previous version:
+#       19/06/2008 SD: change to translatable text _(...)
 #
 #
 #------------------------------------------------------------------------------
@@ -55,7 +58,7 @@ class DialogLanguage(wx.Dialog):
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxLangDclick, self.listBoxLang)
 
         self.buttonOK = wx.Button(id=wx.ID_OK,
-                                  label='OK',
+                                  label=_('OK'),
                                   name='buttonOK',
                                   parent=self,
                                   pos=wx.Point(220, 50),
@@ -64,7 +67,7 @@ class DialogLanguage(wx.Dialog):
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton, id=wx.ID_OK)
 
         self.buttonCancel = wx.Button(id=wx.ID_CANCEL,
-                                      label='Cancel',
+                                      label=_('Cancel'),
                                       name='buttonCancel',
                                       parent=self,
                                       pos=wx.Point(220, 80),
@@ -100,7 +103,7 @@ class DialogLanguage(wx.Dialog):
         self.listBoxLang.Clear()
 
     def fillPage(self):
-	self.SetLangList(['en-English','de-Deutsch','it-Italiano','es-Castellano'])
+	self.SetLangList([_('en-English'),_('de-Deutsch'),_('it-Italiano'),_('es-Castellano')])
 
     def GetLanguage(self):
         return self.language

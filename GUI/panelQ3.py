@@ -63,10 +63,15 @@ from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
+from fonts import *
 
-# constants that control the default field sizes
+# constants that control the default sizes
+# 1. font sizes
 TYPE_SIZE_LEFT    =   9
 TYPE_SIZE_RIGHT   =   9
+TYPE_SIZE_TITLES  =  10
+
+# 2. field sizes
 HEIGHT_LEFT       =  29
 HEIGHT_RIGHT      =  26
 LABEL_WIDTH_LEFT  = 260
@@ -89,46 +94,51 @@ class PanelQ3(wx.Panel):
         wx.Panel.__init__(self, id=-1, name='PanelQ3', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
+
+        # access to font properties object
+        fp = FontProperties()
+
         self.notebook = wx.Notebook(self, -1, style=0)
+        self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
 
         self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Process list"))
-        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Processes description"))
-        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("Schedule"))
-        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_11_staticbox = wx.StaticBox(self.page1, -1,_("Waste heat (heat available for recovery)"))
-        self.sizer_11_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_12_staticbox = wx.StaticBox(self.page1, -1, _("Waste heat recovery for this process"))
-        self.sizer_12_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_13_staticbox = wx.StaticBox(self.page1, -1,
                                                _("Data of existing heat (or cold) supply to the process"))
-        self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        #
+        # set font for titles
+        # 1. save actual font parameters on the stack
+        fp.pushFont()
+        # 2. change size and weight
+        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
+        self.sizer_5_staticbox.SetFont(fp.getFont())
+        self.sizer_7_staticbox.SetFont(fp.getFont())
+        self.sizer_8_staticbox.SetFont(fp.getFont())
+        self.sizer_11_staticbox.SetFont(fp.getFont())
+        self.sizer_12_staticbox.SetFont(fp.getFont())
+        self.sizer_13_staticbox.SetFont(fp.getFont())
+        # 3. recover previous font state
+        fp.popFont()
+
         # set field sizes for the left tab.
         # Each data entry class has several configurable parameters:
         # 1. The height. This is the same for all the widgets that make the class
         # 2. The width of the label
         # 3. The width of the entry widget
         # 4. The width of the unit chooser.
-        # Parameters pertaining to the font
         #
-        f = FieldSizes(wHeight=HEIGHT_LEFT,wLabel=LABEL_WIDTH_LEFT,
-                       wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH,
-                       fFamily=wx.FONTFAMILY_SWISS,
-                       fStyle=wx.FONTSTYLE_NORMAL,
-                       fWeight=wx.FONTWEIGHT_NORMAL,
-                       fFacename='TAHOMA',
-                       fSize=TYPE_SIZE_LEFT)
+        fs = FieldSizes(wHeight=HEIGHT_LEFT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH)
+
+        # set font for labels of left tab
+        fp.pushFont()
+        fp.changeFont(size=TYPE_SIZE_LEFT)
 
         #
         # left panel controls
@@ -136,6 +146,7 @@ class PanelQ3(wx.Panel):
 
         # process list
         self.listBoxProcesses = wx.ListBox(self.page0,-1,choices=[])
+        self.listBoxProcesses.SetFont(fp.getFont())
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxProcessesClick, self.listBoxProcesses)
 
         #
@@ -145,6 +156,9 @@ class PanelQ3(wx.Panel):
                              label=_("Process short name"),
                              tip=_("Give an organizational diagram of the production process \
 (e.g. the flux of crude milk in chease production or the the flux of car chasis in the automobile industry)"))
+        self.tc1_1 = TextEntry(self.page0,maxchars=200,value='',
+                             label=_("Description"),
+                             tip=_("Give a short description of the process"))
 
         self.tc2 = ChoiceEntry(self.page0,
                                values=TRANSPROCTYPES.values(),
@@ -241,9 +255,9 @@ e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
 
         # Right panel controls
-        # make width of labels larger for this panel
-        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT,
-                       fSize=TYPE_SIZE_RIGHT)
+        # make width of labels larger for this panel and change fontsize
+        fp.changeFont(size=TYPE_SIZE_RIGHT)
+        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT)
 
         #
         # waste heat
@@ -343,20 +357,25 @@ using the nomenclature of the hydraulic scheme"))
                                label=_("Annual consumption of UPH"),
                                tip=_("Only for the process"))
 
+        fp.popFont()
         self.buttonAddProcess = wx.Button(self.page0,-1,_("Add process"))
         self.buttonAddProcess.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddProcess, self.buttonAddProcess)
+        self.buttonAddProcess.SetFont(fp.getFont())
 
         self.buttonDeleteProcess = wx.Button(self.page0,-1,_("Delete process"))
         self.buttonDeleteProcess.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProcess, self.buttonDeleteProcess)
+        self.buttonDeleteProcess.SetFont(fp.getFont())
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+        self.buttonCancel.SetFont(fp.getFont())
 
         self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
+        self.buttonOK.SetFont(fp.getFont())
 
 
     def __do_layout(self):
@@ -387,16 +406,17 @@ using the nomenclature of the hydraulic scheme"))
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM
         flagText = wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM
         # Left tab. Processes description
-        sizer_21.Add(self.tc1, 0, flagText, 2)
-        sizer_21.Add(self.tc2, 0, flagText, 2)
-        sizer_21.Add(self.tc3, 0, flagText, 2)
-        sizer_21.Add(self.tc4, 0, flagText, 2)
-        sizer_21.Add(self.tc5, 0, flagText, 2)
-        sizer_21.Add(self.tc6, 0, flagText, 2)
-        sizer_21.Add(self.tc7, 0, flagText, 2)
-        sizer_21.Add(self.tc8, 0, flagText, 2)
-        sizer_21.Add(self.tc9, 0, flagText, 2)
-        sizer_21.Add(self.tc10, 0, flagText, 2)
+        sizer_21.Add(self.tc1, 0, flagText, 1)
+        sizer_21.Add(self.tc1_1, 0, flagText, 1)
+        sizer_21.Add(self.tc2, 0, flagText, 1)
+        sizer_21.Add(self.tc3, 0, flagText, 1)
+        sizer_21.Add(self.tc4, 0, flagText, 1)
+        sizer_21.Add(self.tc5, 0, flagText, 1)
+        sizer_21.Add(self.tc6, 0, flagText, 1)
+        sizer_21.Add(self.tc7, 0, flagText, 1)
+        sizer_21.Add(self.tc8, 0, flagText, 1)
+        sizer_21.Add(self.tc9, 0, flagText, 1)
+        sizer_21.Add(self.tc10, 0, flagText, 1)
 
         sizer_7.Add(sizer_21, 1, wx.LEFT|wx.EXPAND, 40)
         sizer_6.Add(sizer_7, 2, wx.EXPAND, 0)

@@ -2,6 +2,11 @@
 # v0.02
 #
 # 21/04/2008 Tom
+#	Last revised by:    
+#                           Stoyan Danov        19/06/2008
+#
+#       Changes in last update:
+#       19/06/2008 SD: change to translatable text _(...)
 
 import wx
 
@@ -18,16 +23,16 @@ class DialogP(wx.Dialog):
         # generated method, don't edit
         wx.Dialog.__init__(self, id=wxID_DIALOGP, name='DialogP', parent=prnt,
               pos=wx.Point(433, 283), size=wx.Size(400, 188),
-              style=wx.DEFAULT_DIALOG_STYLE, title='New project')
+              style=wx.DEFAULT_DIALOG_STYLE, title=_('New project'))
         self.SetClientSize(wx.Size(392, 154))
 
         self.stDialog1 = wx.StaticText(id=wxID_DIALOGPSTDIALOG1,
-              label='shortname:', name='stDialog1', parent=self,
+              label=_('shortname:'), name='stDialog1', parent=self,
               pos=wx.Point(24, 16), size=wx.Size(56, 13), style=0)
         self.stDialog1.Center(wx.HORIZONTAL)
 
         #TS20080421 changed ID
-        self.buttonOK = wx.Button(id=wx.ID_OK, label='OK',
+        self.buttonOK = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonOK', parent=self, pos=wx.Point(176, 112),
               size=wx.Size(91, 23), style=0)
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton,
@@ -35,22 +40,22 @@ class DialogP(wx.Dialog):
 
         #TS20080421 changed ID. Deleted innecessary bind
         self.buttonCancel = wx.Button(id=wx.ID_CANCEL,
-              label='Cancel', name='buttonCancel', parent=self,
+              label=_('Cancel'), name='buttonCancel', parent=self,
               pos=wx.Point(280, 112), size=wx.Size(91, 23), style=0)
 
         self.stDescription = wx.StaticText(id=wxID_DIALOGPSTDESCRIPTION,
-              label='description:', name='stDescription', parent=self,
+              label=_('description:'), name='stDescription', parent=self,
               pos=wx.Point(24, 40), size=wx.Size(57, 13), style=0)
         self.stDescription.Center(wx.HORIZONTAL)
 
         self.tcShortName = wx.TextCtrl(id=wxID_DIALOGPTCSHORTNAME,
               name='tcShortName', parent=self, pos=wx.Point(96, 16),
-              size=wx.Size(280, 21), style=0, value='New alternative')
+              size=wx.Size(280, 21), style=0, value=_('New alternative'))
 
         self.tcDescription = wx.TextCtrl(id=wxID_DIALOGPTCDESCRIPTION,
               name='tcDescription', parent=self, pos=wx.Point(96, 40),
               size=wx.Size(280, 64), style=wx.TE_MULTILINE,
-              value='Describe briefly the new alternative')
+              value=_('Describe briefly the new alternative'))
 
     def __init__(self, parent):
         self._init_ctrls(parent)

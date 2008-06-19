@@ -25,6 +25,7 @@
 #                           Stoyan Danov    06/06/2008
 #                           Hans Schweiger  16/06/2008
 #                           Stoyan Danov    17/06/2008
+#                           Hans Schweiger  19/06/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -38,6 +39,7 @@
 #       06/06/2008  SD  label/tooltip, new displayClasses
 #       16/06/2008: HS  clean-up and adapt SQL-I/O to new label names/numbers
 #       17/06/2008: SD  order the parameters as in paper Q4H, unitdict, OnButtonOK
+#       19/06/2008: HS  variable hasunits eliminated
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -134,8 +136,7 @@ class PanelQ4(wx.Panel):
         self.tc3 = IntEntry(self,
                             minval=2000, maxval=2050, value=0,
                             label=_("Year of  manufacturing or/and installation?"),
-                            tip=_("Year of manufacturing or installation"),
-                            hasunits=False)
+                            tip=_("Year of manufacturing or installation"))
 
         self.tc4 = TextEntry(self,maxchars=255,value='',
                              label=_("Model"),
@@ -149,8 +150,7 @@ class PanelQ4(wx.Panel):
         self.tc6 = IntEntry(self,
                             minval=0, maxval=100, value=0,
                             label=_("Number of units of the same type"),
-                            tip=_("Specify how many units of this type exist"),
-                            hasunits=False)
+                            tip=_("Specify how many units of this type exist"))
 #In Technical data
 
         self.tc7 = FloatEntry(self,

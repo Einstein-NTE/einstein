@@ -12,13 +12,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.13
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
 #                           Tom Sobota      02/05/2008
 #                           Hans Schweiger  05/05/2008
 #                           Hans Schweiger  10/05/2008
+#                           Stoyan Danov    06/06/2008
+#                           Hans Schweiger  10/06/2008
+#                           Stoyan Danov    11/06/2008
+#                           Hans Schweiger  12/06/2008
+#                           Stoyan Danov    17/06/2008
+#                           Stoyan Danov    18/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
@@ -26,6 +32,14 @@
 #       05/05/08:   HS  Event handlers changed; resize of grid so that it fits
 #                       into the window
 #       10/05/08:   HS  FuelOwn substituted by FECFuel
+#       06/06/2008  SD  New label/tooltips according to new displayClasses defined;
+#                       do_layout still not adapted
+#       10/06/2008: HS  Adapted size of decimal numbers in order to bring it to run ...
+#       11/06/2008: SD  changed tips, unitdict filling, tc1 - choice fuels DB arranged
+#       12/06/2008: HS  unitdict adapted to new version of units
+#       17/06/2008 SD   adapt to new unitdict
+#       18/06/2008 SD   create display()
+#                   HS  some clean-up of old comments.
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,7 +55,17 @@ import wx.grid
 import pSQL
 import HelperClass
 from status import Status
+from GUITools import *
+from displayClasses import *
+from units import *
 
+# constants that control the default field sizes
+
+HEIGHT          =  27 #SD
+LABELWIDTHLEFT  = 260
+LABELWIDTHRIGHT = 500
+DATAENTRYWIDTH  = 100
+UNITSWIDTH      =  90
 
 class PanelQ2(wx.Panel):
     def __init__(self, parent, main):
@@ -57,19 +81,26 @@ class PanelQ2(wx.Panel):
 #--- UI setup
 #------------------------------------------------------------------------------
 
+##        wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
+##                             pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
         wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
-                             pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
+              pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
+        self.Hide()
         
         self.notebook = wx.Notebook(self, -1, style=0)
-
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))
+
+        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))#SD put this later in do_layout
         self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
+
         self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Fuels list"))
         self.sizer_3_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.fuelListBox = wx.ListBox(self.page0, -1, style=wx.LC_LIST|wx.SUNKEN_BORDER)
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Fuel consumption data"))
+        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        self.fuelListBox = wx.ListBox(self.page0, -1, style=wx.LC_LIST|wx.SUNKEN_BORDER)#SD added
         self.Bind(wx.EVT_LISTBOX, self.OnFuelListBoxClick, self.fuelListBox)
 
         self.buttonRemoveFuelFromList = wx.Button(self.page0, -1, _("Remove from list"))
@@ -80,18 +111,36 @@ class PanelQ2(wx.Panel):
         self.buttonAddFuel.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddFuel, self.buttonAddFuel)
 
-        self.st1 = wx.StaticText(self.page0, -1, _("Fuels used"))
-        self.choiceOfDBFuelType = wx.Choice(self.page0,-1,choices=[])
-        self.st2 = wx.StaticText(self.page0, -1, _("Unit"))
-        self.tc2 = wx.TextCtrl(self.page0, -1, "")
-        self.st3 = wx.StaticText(self.page0, -1, _("Units/year"))
-        self.tc3 = wx.TextCtrl(self.page0, -1, "")
-        self.st4 = wx.StaticText(self.page0, -1, _("MWh / year (LCV)"))
-        self.tc4 = wx.TextCtrl(self.page0, -1, "")
-        self.st5 = wx.StaticText(self.page0, -1, _("Fuel price EUR/kWh LCV"))
-        self.tc5 = wx.TextCtrl(self.page0, -1, "")
-        self.st6 = wx.StaticText(self.page0, -1, _("Annual energy cost EUR/year"))
-        self.tc6 = wx.TextCtrl(self.page0, -1, "")
+        self.tc1 = ChoiceEntry(self.page0, 
+                               values=[],
+                               label=_("Fuels used"),
+                               tip=_(" "))
+        
+        self.tc3 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              unitdict='MASSORVOLUMEFLOW',
+                              label=_("Annual consumption (fuel units)"),
+                              tip=_("If possible, provide the monthly data in separate sheet and/or the fuel bills. \
+Specify the energy equivalent in base of LCV (lower calorific value)"))  
+        
+        
+        self.tc4 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              unitdict='ENERGY',
+                              label=_("Annual consumption (LCV)"),
+                              tip=_(" "))  
+        
+        self.tc5 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              unitdict='ENERGYTARIFF',
+                              label=_("Fuel price(LCV)"),
+                              tip=_("Specify expenditures without VAT"))  
+        
+        self.tc6 = FloatEntry(self.page0,
+                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              unitdict='PRICE',
+                              label=_("Annual energy cost"),
+                              tip=_("Total cost"))  
 
         self.dummy1 = wx.StaticText(self.page0, -1, "")
         self.dummy2 = wx.StaticText(self.page0, -1, "")
@@ -201,9 +250,12 @@ class PanelQ2(wx.Panel):
 
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)#SD added
         sizerPage1 = wx.BoxSizer(wx.VERTICAL)
         sizerPage0 = wx.BoxSizer(wx.HORIZONTAL)
-        grid_sizer_1 = wx.FlexGridSizer(7, 2, 5, 2)
+#        grid_sizer_1 = wx.FlexGridSizer(7, 2, 5, 2)#SD
+        grid_sizer_1 = wx.BoxSizer(wx.VERTICAL) #SD
+
         sizer_3 = wx.StaticBoxSizer(self.sizer_3_staticbox, wx.VERTICAL)
         sizer_3.Add(self.fuelListBox, 1, wx.EXPAND, 0)
         sizer_3.Add(self.buttonRemoveFuelFromList, 0, wx.ALIGN_RIGHT, 0)
@@ -214,17 +266,19 @@ class PanelQ2(wx.Panel):
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
         flagText = wx.ALIGN_CENTER_VERTICAL
 
-        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.choiceOfDBFuelType, 0, 0, 0)
-        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
+##        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
+##        grid_sizer_1.Add(self.choiceOfDBFuelType, 0, 0, 0)
+        grid_sizer_1.Add(self.tc1, 0, flagText, 0)#SD added
+        
+#        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
+##        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
+#        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
+#        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
         grid_sizer_1.Add(self.tc6, 0, flagText, 0)
 
         sizerPage0.Add(grid_sizer_1, 2, wx.LEFT|wx.RIGHT|wx.EXPAND, 20)
@@ -262,7 +316,8 @@ class PanelQ2(wx.Panel):
             self.storeElectricityData()
 
     def storeFuelData(self):
-        fuelName = str(self.choiceOfDBFuelType.GetStringSelection())
+##        fuelName = str(self.choiceOfDBFuelType.GetStringSelection())#SD1
+        fuelName = str(self.tc1.GetStringSelection())#SD1
         dbfuels = Status.DB.dbfuel.FuelName[fuelName]
         if len(dbfuels) > 0:
             dbfid = dbfuels[0].DBFuel_ID
@@ -274,7 +329,7 @@ class PanelQ2(wx.Panel):
             if len(fuels) == 0:
                 newID = Status.prj.addFuelDummy()
                 tmp = {
-                    "FuelUnit":self.check(self.tc2.GetValue()),
+##                    "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
                     "FECFuel":self.check(self.tc4.GetValue()),
@@ -290,7 +345,7 @@ class PanelQ2(wx.Panel):
 
             elif len(fuels) == 1:
                 tmp = {
-                    "FuelUnit":self.check(self.tc2.GetValue()),
+##                    "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
                     "FECFuel":self.check(self.tc4.GetValue()),
@@ -403,12 +458,13 @@ class PanelQ2(wx.Panel):
             self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
             print "PanelQ2: fuel selection -> ",self.selectedFuelName,self.selectedFuelID
             q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
-            self.tc2.SetValue(str(q.FuelUnit))
+##            self.tc2.SetValue(str(q.FuelUnit))
             self.tc3.SetValue(str(q.MFuelYear))
             self.tc4.SetValue(str(q.FECFuel))
             self.tc5.SetValue(str(q.FuelTariff))
             self.tc6.SetValue(str(q.FuelCostYear))
-            self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))
+#            self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))#SD1
+            self.tc1.SetSelection(self.tc1.FindString(self.selectedFuelName))#SD1
         except IndexError:
             # no data available
             self.clear()
@@ -426,13 +482,20 @@ class PanelQ2(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------		
 
+    def display(self):
+        self.fillChoiceOfDBFuelType()
+        self.clear()
+        self.fillPage()
+        self.Show()
+
 
     def fillChoiceOfDBFuelType(self):
-        self.choiceOfDBFuelType.Clear()
-        self.choiceOfDBFuelType.Append ("None")
-        for n in Status.DB.dbfuel.FuelName["%"]:
-            self.choiceOfDBFuelType.Append (n.FuelName)
-        self.choiceOfDBFuelType.SetSelection(0)
+#SD2008-06-11
+        fuelDict = Status.prj.getFuelDict()
+        fuelNames = fuelDict.values()
+        self.tc1.entry.Clear()
+        for name in fuelNames:
+            self.tc1.entry.Append(name)        
 
     def fillPage(self):
 	if Status.PId == 0:
@@ -500,7 +563,7 @@ class PanelQ2(wx.Panel):
             return 'NULL'
 
     def clearFuelData(self):
-        self.tc2.SetValue('')
+##        self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
