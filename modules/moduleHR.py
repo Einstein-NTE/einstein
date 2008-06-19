@@ -41,6 +41,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
+from einstein.modules.exportdata import *
 
 class ModuleHR(object):
 
@@ -95,8 +96,8 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
 
         Status.schedules.create()   #creates the process and equipment schedules
+        ex = ExportDataHR(pid=Status.PId, ano=Status.ANo,fuels=[1,2,3], fluids=[1,2,3,4])
 
-#        self.exportDataToHR()
 #        self.runHR()
 #        self.importDataFromHR()
 

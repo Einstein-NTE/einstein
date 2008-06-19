@@ -12,16 +12,18 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
-#	Created by: 	    Tom Sobota 21/03/2008
-#       Revised by:         Tom Sobota 29/03/2008
-#       Revised by:         Tom Sobota  28/04/2008
-#                           Stoyan Danov            18/06/2008
+#	Version No.: 0.05
+#	Created by: 	    Tom Sobota      21/03/2008
+#       Revised by:         Tom Sobota      29/03/2008
+#       Revised by:         Tom Sobota      28/04/2008
+#                           Stoyan Danov    18/06/2008
+#                           Hans Schweiger  19/06/2008
 #
 #       Changes to previous version:
-#       29/03/08:           mod. to use external graphics module
-#       28/04/2008          created method display
-#       18/06/2008 SD: change to translatable text _(...)
+#       29/03/08:       mod. to use external graphics module
+#       28/04/2008      created method display
+#       18/06/2008: SD  change to translatable text _(...)
+#       19/06/2008: HS  some security features added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -35,6 +37,7 @@
 
 import wx
 from einstein.GUI.graphics import drawPiePlot
+from numCtrl import *
 
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
@@ -106,8 +109,14 @@ class PanelEA4(wx.Panel):
         #
         key = keys[0]
         data = Interfaces.GData[key]
-        (rows,cols) = data.shape
-        self.grid1.CreateGrid(max(rows,20), cols)
+
+        
+#####Security feature against non existing GData entry
+        COLNO1 = 3 #grid has usually a fixed column size, not necessary to read from GData
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO1)
+        
+        self.grid1.CreateGrid(max(rows,20), COLNO1)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
@@ -136,12 +145,18 @@ class PanelEA4(wx.Panel):
         #
         key = keys[1]
         data = Interfaces.GData[key]
-        (rows,cols) = data.shape
-        self.grid2.CreateGrid(max(rows,20), cols)
+#####Security feature against non existing GData entry
+        COLNO2 = 4 #grid has usually a fixed column size, not necessary to read from GData
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO2)
+        self.grid2.CreateGrid(max(rows,20), COLNO2)
 
         self.grid2.EnableGridLines(True)
+#######LAYOUT: here the default row size is fixed
         self.grid2.SetDefaultRowSize(20)
         self.grid2.SetRowLabelSize(30)
+
+#######LAYOUT: here the column size of the table is fixed (in pixels)
         self.grid2.SetColSize(0,115)
         self.grid2.SetColSize(1,100)
         self.grid2.SetColSize(2,100)
@@ -155,10 +170,20 @@ class PanelEA4(wx.Panel):
         #
         # copy values from dictionary to grid
         #
+
+#######LAYOUT: use of function numCtrl
+
+        decimals = [-1,1,1,0]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid2.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid2.SetCellValue(r, c, data[r][c])
+#                try:
+                if decimals[c] >= 0: # -1 indicates text
+                    self.grid2.SetCellValue(r, c, \
+                        convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                else:
+                    self.grid2.SetCellValue(r, c, data[r][c])
+#                except: pass
                 if c == labels_column:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -185,24 +210,34 @@ class PanelEA4(wx.Panel):
               parent=self, pos=wx.Point(220, 70), size=wx.Size(270, 17),
               style=0)
 
+#######LAYOUT: here the position (pos) and size (size) of the grid is fixed.
+#######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
+        
         self.grid1 = wx.grid.Grid(id=wxID_PANELEA4GRID1, name='grid1',
               parent=self, pos=wx.Point(40, 84), size=wx.Size(322, 210),
               style=0)
 
+#######LAYOUT: here the position (pos) and size (size) of the figure-panels is fixed.
+#######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
         self.panelGraphUPH = wx.Panel(id=wxID_PANELEA4PANELGRAPHUPH,
               name=u'panelGraphUPH', parent=self, pos=wx.Point(512, 84),
               size=wx.Size(296, 210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphUPH.SetBackgroundColour(wx.Colour(127, 127, 127))
 
+#######LAYOUT: static text can be moved in a similar way
         self.staticText3 = wx.StaticText(id=wxID_PANELEA4STATICTEXT3,
               label=_(u'Heat demand by process temperature.'), name='staticText3',
               parent=self, pos=wx.Point(40, 324), size=wx.Size(580, 20),
               style=0)
 
+#######LAYOUT: here the position (pos) and size (size) of the grid is fixed.
+#######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
         self.grid2 = wx.grid.Grid(id=wxID_PANELEA4GRID2, name='grid2',
               parent=self, pos=wx.Point(40, 386), size=wx.Size(462, 210),
               style=0)
 
+#######LAYOUT: here the position (pos) and size (size) of the figure-panels is fixed.
+#######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
         self.panelGraphHD = wx.Panel(id=wxID_PANELEA4PANELGRAPHHD,
               name=u'panelGraphHD', parent=self, pos=wx.Point(512, 386),
               size=wx.Size(296, 210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
@@ -210,6 +245,10 @@ class PanelEA4(wx.Panel):
 
 
     def display(self):
-        self.panelGraphUPH.draw()
-        self.panelGraphHD.draw()
+
+#####Security feature against any strange thing in graphs
+        try: self.panelGraphUPH.draw()
+        except: pass
+        try: self.panelGraphHD.draw()
+        except: pass
         self.Show()
