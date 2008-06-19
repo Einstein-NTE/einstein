@@ -18,9 +18,14 @@
 #       logTrack: tracks messages in data file for further analysis
 #
 #==============================================================================
-#	Version No.: 0.01
+#	Version No.: 0.02
 #
 #       Created by:     Hans Schweiger      17/04/2008
+#
+#       Last modified by:   Hans Schweiger  19/06/2008
+#
+#       Changes:
+#       
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,11 +37,24 @@
 #
 #==============================================================================
 
-DEBUG = True
+DEBUG = "LOGFILE"    #SCREEN: prints debug information on the screen
+                    #LOGFILE: writes debug information to the log-File
+                    #OFF: no debug information written
 
 from einstein.GUI.status import Status
 import einstein.GUI.HelperClass as HelperClass
 
+#------------------------------------------------------------------------------		
+def setDebugMode(mode):
+
+    global DEBUG
+
+    if mode in ["SCREEN","LOGFILE","OFF"]:
+        DEBUG = mode
+    else:
+        DEBUG = "OFF"
+        logWARNING("messageLogger (setDebugMode): error in debug mode [%s]"%mode)
+#------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
 def logTrack(message):
 #------------------------------------------------------------------------------		
@@ -46,31 +64,41 @@ def logTrack(message):
         Status.doLog = HelperClass.LogHelper()
         Status.doLog.LogThis(message)
 
-    if DEBUG:
+    if DEBUG == "SCREEN":
         print(message)
 
 #------------------------------------------------------------------------------		
 def logMessage(message):
 #------------------------------------------------------------------------------		
     Status.main.logMessage(message)
-    logTrack("#MESSAGE: "+message)
 
 #------------------------------------------------------------------------------		
 def logError(message):
 #------------------------------------------------------------------------------		
     Status.main.logMessage(message)
-    logTrack("#ERROR: "+message)
 
 #------------------------------------------------------------------------------		
 def logWarning(message):
 #------------------------------------------------------------------------------		
     Status.main.logMessage(message)
-    logTrack("#WARNING: "+message)
 
 #------------------------------------------------------------------------------		
 def logDebug(message):
-    if DEBUG:
+    if DEBUG == "SCREEN":
+        print message
+    elif DEBUG == "LOGFILE":
         logTrack("DEBUG: "+message)
+    
+#------------------------------------------------------------------------------		
+def showWarning(text):
+    Status.main.showWarning(text)
+
+#------------------------------------------------------------------------------		
+def showInfo(text):
+    Status.main.showInfo(text)
+        
+#------------------------------------------------------------------------------		
+def askConfirmation(self, text):
+    return Status.main.askConfirmation(text)
 #------------------------------------------------------------------------------		
 
-        

@@ -44,6 +44,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
+from einstein.modules.messageLogger import *
 
 from checkMatrix import *
 from checkCon import *
@@ -53,6 +54,7 @@ from checkFETfuel import *
 from checkFETel import *
 from checkPipe import *
 from checkHX import *
+from checkWHEE import *
 from checkTotals import *
 from connect import *
 
@@ -82,7 +84,10 @@ class ModuleCC(object):
         self.NPipeDuct = 0
 
         self.ccHX = []
-        self.NHx = 0
+        self.NHX = 0
+
+        self.ccWHEE = []
+        self.NWHEE = 0
 
         self.screen_priority = 2
         
@@ -107,18 +112,18 @@ class ModuleCC(object):
 
         format_percentage = '%3.2f'
 
-        print "ModuleCC (updatePanel): screening with priority ",self.screen_priority        
+        logDebug("ModuleCC (updatePanel): screening with priority %s"%self.screen_priority)       
         CCList = []
         nMissingVarsOfPriority=0
         for entry in CCScreen.screenList:
             if entry[4] <= self.screen_priority:
 
                 if entry[4] == 1:
-                    action = "Calculations w/o this are nonsense !!!"
+                    action = _("Calculations w/o this are nonsense !!!")
                 elif entry[4] == 2:
-                    action = "Value required for detail analysis !!!"
+                    action = _("Value required for detail analysis !!!")
                 else:
-                    action = "not strictly necessary"
+                    action = _("not strictly necessary")
                 row = [entry[0]+"["+entry[3]+"]",
                        "here should be the description",
                        entry[1],
@@ -189,7 +194,7 @@ class ModuleCC(object):
 #------------------------------------------------------------------------------
 #   is called at entering the CC panel
 #------------------------------------------------------------------------------
-        print "ModuleCC: setting priority level to ",level
+        logDebug("ModuleCC: setting priority level to "%level)
         self.screen_priority = level
         self.updatePanel()
     
@@ -213,10 +218,12 @@ class ModuleCC(object):
 
         self.ccHX = []
 
+        self.ccWHEE = []
+
         if Status.UserInteractionLevel == "automatic":
             #predefined testCase. to be eliminated once the general case works well
 
-            print "ModuleCC (getQuestionnaireData): running in fix test-case-mode"
+            logDebug("ModuleCC (getQuestionnaireData): running in fix test-case-mode")
 
 #..............................................................................
 # import data on fuel and electricity consumption (FET)
@@ -318,7 +325,7 @@ class ModuleCC(object):
             # general case: uses the information from the SQL
             # eliminate "else" and raise one level once this is the only option
 
-            print "ModuleCC (getQuestionnaireData): running in new general mode (import connections from SQL)"
+            logDebug("ModuleCC (getQuestionnaireData): running in new general mode (import connections from SQL)")
 
 #..............................................................................
 # import data on link of fuels and equipment
@@ -443,9 +450,9 @@ class ModuleCC(object):
 #        while not cycle.converged():
 
         if DEBUG in ["ALL","BASIC"]:
-            print "===================================================="
-            print "ModuleCC: getting Test data"
-            print "===================================================="
+            logDebug("====================================================")
+            logDebug("ModuleCC: getting Test data")
+            logDebug("====================================================")
         
         self.getQuestionnaireData()
 
@@ -581,7 +588,7 @@ class ModuleCC(object):
             NH = self.NHX
 
             for h in range(self.NHX):
-                print "checking HX no. %s"%h
+                logDebug("checking HX no. %s"%h)
                 conflict.setDataGroup("HX",h+1)
 
                 self.ccHX[h].check()             # ejecuta la función check para proceso k
