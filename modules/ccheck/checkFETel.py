@@ -413,6 +413,24 @@ class CheckFETel():
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllFETel()
 
+#------------------------------------------------------------------------------
+    def estimate(self):  
+#------------------------------------------------------------------------------
+#   estimates some of the data that are not sufficiently precise
+#   should be a subset of the data that are within screen
+#   (not necessarily ALL data have to be estimated)
+#------------------------------------------------------------------------------
+
+# if nothing is specified, suppose that electricity sales and generation are 0
+# could be improved later on looking whether there's some CHP in the system or
+# not ...
+
+        self.ElectricityGen.setEstimate(0,limits=(0,0))
+        self.ElectricitySales.setEstimate(0,limits=(0,0))
+        
+# limits: optional and fix absolute minimum and maximum values
+# sqerr: optional input that fixes the (stochastic) relative square error
+
 #==============================================================================
 
 if __name__ == "__main__":

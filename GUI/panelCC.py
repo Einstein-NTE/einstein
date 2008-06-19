@@ -294,7 +294,6 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
 
         popup =  DialogOK(self,_("confirm basic check"),\
-                          _("DEMO VERSION. Check works only for 1 fuel+elect., 2 equipes and 3 processes !!!")+\
                           _("\nTake care: running the check will invalidate existing alternative proposals")+\
                           _("\nDo You want to continue ?"))
         if popup.ShowModal() == wx.ID_OK:
@@ -318,9 +317,15 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
 #   Generate new porposal copying from existing alternative
 #------------------------------------------------------------------------------		
-        popup =  DialogOK(self,_("confirm data estimation","DATA ESTIMATE NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"))
+        popup =  DialogOK(self,_("confirm data estimation"),\
+                          _("\nTake care: running data estimate will automatically estimate missing data.")+\
+                          _("\nAlternatively you can also manually add estimated data to the questionnaire and rerun basic check")+\
+                          _("\nDo You want to continue ?"))
         if popup.ShowModal() == wx.ID_OK:
-            pass
+            nc = self.mod.dataEstimate()
+            self.display()
+
+        event.Skip()
 #------------------------------------------------------------------------------		
     def OnCheckListButton(self, event):
 #------------------------------------------------------------------------------		
@@ -391,8 +396,7 @@ class PanelCC(wx.Panel):
 
     def OnButtonpanelFwdButton(self, event):
         self.Hide()
-        self.main.tree.SelectItem(self.main.qEM1, select=True)
-        print "Button exitModuleFwd: now I should show another window"
+        self.main.tree.SelectItem(self.main.qEA1, select=True)
 
 
 

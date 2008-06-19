@@ -440,10 +440,12 @@ class ModuleCC(object):
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def basicCheck(self,matrixCheck = True):
+    def basicCheck(self,matrixCheck = True,continueCheck = False):
 #------------------------------------------------------------------------------
 #   runs the first basic Check
 #   (basic = still without estimation procedures for missing data)
+#   continueCheck: continues a check after data estimate, without reloading
+#   data from questionnaire ...
 #------------------------------------------------------------------------------
 
 #        cycle = Status.cycle.initCycle()
@@ -454,7 +456,8 @@ class ModuleCC(object):
             logDebug("ModuleCC: getting Test data")
             logDebug("====================================================")
         
-        self.getQuestionnaireData()
+        if continueCheck == False:
+            self.getQuestionnaireData()
 
 #..............................................................................
 # reset the counters of conflicts before starting
@@ -753,7 +756,7 @@ class ModuleCC(object):
 #                    self.ccProc[k].QWHProcRec.update(self.QWHProc[k])
 
                 for n in range(NN):
-                    self.ccWHEE[n].QHXWHEERec.update(self.QWHEE[n])
+                    self.ccWHEE[n].QWHEERec.update(self.QWHEE[n])
 
                 for h in range(NH):
                     self.ccHX[h].QWH.update(self.QWH[h])
@@ -822,6 +825,35 @@ class ModuleCC(object):
         return conflict.nConflicts
 
 #==============================================================================
+#------------------------------------------------------------------------------
+    def dataEstimate(self):
+#------------------------------------------------------------------------------
+#   calls the functions "estimate()" of all the checkers ...
+#------------------------------------------------------------------------------
+
+        for i in range(NI):       #then check all the Nfuels = NI-1 fuels
+#            self.ccFET[i].estimate()
+            pass
+        self.ccFET[0].estimate() #for the moment estimate implemented only in
+                                    #FETel as an example
+        
+        for j in range(NJ):       
+#            self.ccEq[j].estimate()
+            pass
+        
+        for k in range(NK):       
+#            self.ccProc[k].estimate()
+            pass
+
+        if VERSION != "M2_DEMO":
+            for m in range(NM):      
+#                self.ccPipe[m].estimate()
+                pass
+
+        for h in range(NH):       
+#            self.ccHX[h].estimate()
+            pass
+        self.basicCheck(continueCheck = True)
 
 if __name__ == "__main__":
 

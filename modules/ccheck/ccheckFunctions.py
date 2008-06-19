@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.09
+#	Version No.: 0.10
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni     9/04/2008
 #                           Hans Schweiger      09/04/2008
@@ -30,6 +30,7 @@
 #                           Hans Schweiger      25/04/2008
 #                           Claudia Vannoni     02/05/2008
 #                           Hans Schweiger      07/05/2008
+#                           Hans Schweiger      19/06/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -48,6 +49,8 @@
 #       02/05/08 CV calcH,adjustH provisional: TO BE IMPROVED
 #       07/05/08 HS entry for process/equipe/pipe no added in conflict list
 #                   adjustProd/ProdC -> changed
+#       19/06/08 HS constraints added
+#                   introduction of "setEstimate" in function CCPar
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -280,6 +283,21 @@ class CCPar():
         if DEBUG in ["ALL","BASIC"]:
             print "CCPar (screen): screening parameter"
             self.show()
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def setEstimate(self,val,newSqErr=None,limits=None):
+#------------------------------------------------------------------------------
+#   creates a register entry if the parameter is None or with a high error
+#------------------------------------------------------------------------------
+        if (self.val == None) or (self.sqerr > MAX_SQERR):
+            self.val = val
+            if limits is not None:
+                (newMin,newMax) = limits
+                self.valMin = max(newMin,self.valMin)
+                self.valMax = min(newMax,self.valMax)
+            if newSqErr is not None: self.sqerr = min(self.sqerr,newSqErr)
+            self.constrain()
+            
 #------------------------------------------------------------------------------
 
 
@@ -2077,6 +2095,68 @@ def meanOfRow(row,m):
         print "___________________________________________________"
             
     return mean              
+#------------------------------------------------------------------------------
+def calcConstraintLT(y,xlim):
+#------------------------------------------------------------------------------
+#   Changes y so that y <= xlim
+#------------------------------------------------------------------------------
+
+    if DEBUG in ["ALL","CALC"]:
+        print "constrainLT(x1,x2)_________________________________"
+        y.show()
+
+    y.valMin = min(y.valMin,ylim.valMax)
+    y.valMax = min(y.valMax,ylim.valMax)
+    y.val = min(y.val,xlim.val)
+    y.constrain()
+
+    if DEBUG in ["ALL","CALC"]:
+        xlim.show()
+        print "y (constrained) = "
+        y.show()
+        print "___________________________________________________"
+
+    return y
+
+#------------------------------------------------------------------------------
+def adjConstraintLT(y,xlim):
+#------------------------------------------------------------------------------
+#   Changes y so that y <= xlim
+#------------------------------------------------------------------------------
+
+    calcConstraintGT(xlim,y)
+
+#------------------------------------------------------------------------------
+def calcConstraintGT(y,xlim):
+#------------------------------------------------------------------------------
+#   Changes y so that y >= xlim
+#------------------------------------------------------------------------------
+
+    if DEBUG in ["ALL","CALC"]:
+        print "constrainLT(x1,x2)_________________________________"
+        y.show()
+
+    y.valMin = max(y.valMin,ylim.valMin)
+    y.valMax = max(y.valMax,ylim.valMin)
+    y.val = max(y.val,xlim.val)
+    y.constrain()
+
+    if DEBUG in ["ALL","CALC"]:
+        xlim.show()
+        print "y (constrained) = "
+        y.show()
+        print "___________________________________________________"
+
+    return y
+
+#------------------------------------------------------------------------------
+def adjConstraintGT(y,xlim):
+#------------------------------------------------------------------------------
+#   Changes y so that y <= xlim
+#------------------------------------------------------------------------------
+
+    calcConstraintLT(xlim,y)
+
 #------------------------------------------------------------------------------
 def isequal(a,b):
 #------------------------------------------------------------------------------
