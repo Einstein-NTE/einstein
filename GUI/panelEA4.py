@@ -18,12 +18,15 @@
 #       Revised by:         Tom Sobota      28/04/2008
 #                           Stoyan Danov    18/06/2008
 #                           Hans Schweiger  19/06/2008
+#                           Stoyan Danov    20/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
 #       28/04/2008      created method display
 #       18/06/2008: SD  change to translatable text _(...)
 #       19/06/2008: HS  some security features added
+#       20/06/2008: SD  change esthetics - continue: layout, security features
+#                       grid1 decimals control, changes of position and size of objects
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -116,12 +119,15 @@ class PanelEA4(wx.Panel):
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO1)
         
-        self.grid1.CreateGrid(max(rows,20), COLNO1)
+        self.grid1.CreateGrid(max(rows,10), COLNO1)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
+
         self.grid1.SetColSize(0,115)
+        self.grid1.SetColSize(1,91)#SD added
+        self.grid1.SetColSize(2,91)#SD added
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Process"))
@@ -130,121 +136,117 @@ class PanelEA4(wx.Panel):
         #
         # copy values from dictionary to grid
         #
+##        for r in range(rows): #SD: initial state
+##            self.grid1.SetRowAttr(r, attr)
+##            for c in range(cols):
+##                self.grid1.SetCellValue(r, c, data[r][c])
+##                if c == labels_column:
+##                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+##                else:
+##                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+##
+##        self.grid1.SetGridCursor(0, 0)
+
+#######LAYOUT: use of function numCtrl, SD new one with decimals control
+
+        decimals = [-1,0,1]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r][c])
+                try:
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid1.SetCellValue(r, c, \
+                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid1.SetCellValue(r, c, data[r][c])
+                except: pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         self.grid1.SetGridCursor(0, 0)
-        #
-        # set lower grid
-        #
-        key = keys[1]
-        data = Interfaces.GData[key]
-#####Security feature against non existing GData entry
-        COLNO2 = 4 #grid has usually a fixed column size, not necessary to read from GData
-        try: (rows,cols) = data.shape
-        except: (rows,cols) = (0,COLNO2)
-        self.grid2.CreateGrid(max(rows,20), COLNO2)
 
-        self.grid2.EnableGridLines(True)
-#######LAYOUT: here the default row size is fixed
-        self.grid2.SetDefaultRowSize(20)
-        self.grid2.SetRowLabelSize(30)
+        
 
-#######LAYOUT: here the column size of the table is fixed (in pixels)
-        self.grid2.SetColSize(0,115)
-        self.grid2.SetColSize(1,100)
-        self.grid2.SetColSize(2,100)
-        self.grid2.SetColSize(3,100)
-        self.grid2.EnableEditing(False)
-        self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, _("Process"))
-        self.grid2.SetColLabelValue(1, _("Process\ntemperature"))
-        self.grid2.SetColLabelValue(2, _("Distribution\ntemperature"))
-        self.grid2.SetColLabelValue(3, _("Heat\ndemand MWh"))
-        #
-        # copy values from dictionary to grid
-        #
-
-#######LAYOUT: use of function numCtrl
-
-        decimals = [-1,1,1,0]   #number of decimal digits for each colum
-        for r in range(rows):
-            self.grid2.SetRowAttr(r, attr)
-            for c in range(cols):
-#                try:
-                if decimals[c] >= 0: # -1 indicates text
-                    self.grid2.SetCellValue(r, c, \
-                        convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
-                else:
-                    self.grid2.SetCellValue(r, c, data[r][c])
-#                except: pass
-                if c == labels_column:
-                    self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
-                else:
-                    self.grid2.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
-
-        self.grid2.SetGridCursor(0, 0)
-
-        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-        self.staticText3.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-        self.staticText2.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELEA4, name=u'PanelEA4', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
-        self.staticText1 = wx.StaticText(id=wxID_PANELEA4STATICTEXT1,
-              label=_(u'Useful process heat (UPH) demand by process.'),
-              name='staticText1', parent=self, pos=wx.Point(40, 8),
-              size=wx.Size(580, 20), style=0)
 
-        self.staticText2 = wx.StaticText(id=wxID_PANELEA4STATICTEXT2,
-              label=_(u'UPH by process'), name='staticText2',
-              parent=self, pos=wx.Point(220, 70), size=wx.Size(270, 17),
-              style=0)
+        self.box1 = wx.StaticBox(self, -1, _(u'Useful process heat (UPH) demand by process'),
+                                 pos = (10,10),size=(780,240))
 
+        
 #######LAYOUT: here the position (pos) and size (size) of the grid is fixed.
 #######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
-        
-        self.grid1 = wx.grid.Grid(id=wxID_PANELEA4GRID1, name='grid1',
-              parent=self, pos=wx.Point(40, 84), size=wx.Size(322, 210),
+        self.grid1 = wx.grid.Grid(id=wxID_PANELEA4GRID1, name='grid1',#SD
+              parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 200),
               style=0)
+
+#######LAYOUT: static text can be moved in a similar way
+        self.box2 = wx.StaticBox(self, -1, _(u'Heat demand by process temperature'),
+                                 pos = (10,270),size=(380,280))
 
 #######LAYOUT: here the position (pos) and size (size) of the figure-panels is fixed.
 #######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
         self.panelGraphUPH = wx.Panel(id=wxID_PANELEA4PANELGRAPHUPH,
-              name=u'panelGraphUPH', parent=self, pos=wx.Point(512, 84),
-              size=wx.Size(296, 210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+              name=u'panelGraphUPH', parent=self, pos=wx.Point(20, 300),
+              size=wx.Size(360, 240), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphUPH.SetBackgroundColour(wx.Colour(127, 127, 127))
 
 #######LAYOUT: static text can be moved in a similar way
-        self.staticText3 = wx.StaticText(id=wxID_PANELEA4STATICTEXT3,
-              label=_(u'Heat demand by process temperature.'), name='staticText3',
-              parent=self, pos=wx.Point(40, 324), size=wx.Size(580, 20),
-              style=0)
-
-#######LAYOUT: here the position (pos) and size (size) of the grid is fixed.
-#######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
-        self.grid2 = wx.grid.Grid(id=wxID_PANELEA4GRID2, name='grid2',
-              parent=self, pos=wx.Point(40, 386), size=wx.Size(462, 210),
-              style=0)
-
+        self.box3 = wx.StaticBox(self, -1, _(u'Heat demand by ?????'),
+                                 pos = (410,270),size=(380,280))
+        
 #######LAYOUT: here the position (pos) and size (size) of the figure-panels is fixed.
 #######        default PANEL size = 800 x 600 pixels. (0,0) is the left upper corner.
         self.panelGraphHD = wx.Panel(id=wxID_PANELEA4PANELGRAPHHD,
-              name=u'panelGraphHD', parent=self, pos=wx.Point(512, 386),
-              size=wx.Size(296, 210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+              name=u'panelGraphHD', parent=self, pos=wx.Point(420, 300),
+              size=wx.Size(360, 240), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphHD.SetBackgroundColour(wx.Colour(127, 127, 127))
 
+#..............................................................................
+#   default buttons
+#..............................................................................
+        self.btnBack = wx.Button(id=wx.ID_BACKWARD, label=u'<<<',
+              name=u'btnBack', parent=self, pos=wx.Point(500, 560),
+              size=wx.Size(80, 20), style=0)
+        self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
+              id=-1)
 
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+              parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
+              style=0)
+        self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,
+              id=-1)
+
+        self.btnForward = wx.Button(id=wx.ID_FORWARD, label=u'>>>',
+              name=u'btnForward', parent=self, pos=wx.Point(700, 560),
+              size=wx.Size(80, 20), style=0)
+        self.btnForward.Bind(wx.EVT_BUTTON, self.OnBtnForwardButton,
+              id=-1)
+
+#------------------------------------------------------------------------------		
+#   Event handlers for default buttons
+#------------------------------------------------------------------------------		
+    def OnBtnOKButton(self, event):
+        event.Skip()
+
+    def OnBtnBackButton(self, event):
+        event.Skip()
+
+    def OnBtnForwardButton(self, event):
+        event.Skip()
+
+#------------------------------------------------------------------------------		
     def display(self):
+#------------------------------------------------------------------------------		
+#   display function. carries out all the necessary calculations before
+#   showing the panel
+#------------------------------------------------------------------------------		
 
 #####Security feature against any strange thing in graphs
         try: self.panelGraphUPH.draw()
