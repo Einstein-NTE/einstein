@@ -219,7 +219,7 @@ class CheckFETfuel():
             print "-------------------------------------------------"
 
         
-        for n in range(10):
+        for n in range(1):
             
             if DEBUG in ["ALL"]:
                 print "-------------------------------------------------"

@@ -341,7 +341,7 @@ class CheckFETel():
             print " Checking FETel"
             print "-------------------------------------------------"
 
-        for n in range(3):
+        for n in range(1):
 
             if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"

@@ -51,6 +51,7 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 
 from math import *
 from ccheckFunctions import *
+from einstein.modules.fluids import *
 
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
@@ -168,14 +169,22 @@ class CheckPipe():
 
         self.PercentRecirc1 = CCPar("PercentRecirc1")
         self.PercentRecirc2 = CCPar("PercentRecirc2")
+
         self.PercentFeedUp = CCPar("PercentFeedUp")
-        self.PercentFeedUp1 = CCPar("PercentFeedUp")
+        self.PercentFeedUp1 = CCPar("PercentFeedUp1")
+        self.PercentFeedUp2 = CCPar("PercentFeedUp2")
         
-        self.FeedUpFlow1 = CCPar("FeedUpFlow1")
         self.FeedUpFlow = CCPar("FeedUpFlow")
+        self.FeedUpFlow1 = CCPar("FeedUpFlow1")
+        self.FeedUpFlow2 = CCPar("FeedUpFlow2")
+        
         self.DistribCircFlow1 = CCPar("DistribCircFlow1")
         self.DistribCircFlow2 = CCPar("DistribCircFlow2")
         self.DistribCircFlow3 = CCPar("DistribCircFlow3")
+        self.DistribCircFlow4 = CCPar("DistribCircFlow4")
+        self.DistribCircFlow5 = CCPar("DistribCircFlow5")
+
+        
         self.RecFlow1 = CCPar("RecFlow1")
         self.RecFlow2 = CCPar("RecFlow2")
         self.RecFlow = CCPar("RecFlow")
@@ -276,7 +285,6 @@ class CheckPipe():
         self.UPHProcm = CCPar("UPHProcm")# It comes from the matrix (and from calculation from questionnaire??)
         self.USHm = CCPar("USHm")# It comes from the matrix (and from calculation from questionnaire??)
 
-        self.FluidCp = 0.001 #[kWh/kgK] From dbfluid
         
 #..............................................................................
 # reading data from table "qdistributionhc"
@@ -285,6 +293,9 @@ class CheckPipe():
         
             if len(qdistributionhcTable) > 0:
                 qdistributionhc = qdistributionhcTable[0]
+
+                fluid = Fluid(qdistributionhc.HeatDistMedium)
+                self.FluidCp = fluid.cp
 
                 self.DistribCircFlow.setValue(qdistributionhc.DistribCircFlow)
                 self.ToutDistrib.setValue(qdistributionhc.ToutDistrib)
@@ -299,20 +310,10 @@ class CheckPipe():
                 self.TrefPipe.setValue(0)   #°C, NOT USED
                 self.QHXPipe.setValue(0.0)
 
-# reading data from table "dbfluid"
-        #try:
-            #dbfluidTable = Status.DB.dbfluid.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].
-        
-            #if len(dbfluidTable) > 0:
-                #dbfluid = dbfluidTable[0]
-
-                #self.FluidCp.setValue(dbfluid.FluidCp)
-        #except:
-            #print "CheckPipe(importData): error reading data from dbfluid"
-            #pass
-                
                 
         except:
+            fluid = Fluid(0)
+            self.FluidCp = fluid.cp
             print "CheckPipe(importData): error reading data from qdistributionhc"
             pass
 
@@ -542,7 +543,6 @@ class CheckPipe():
 #   screens all variables in the block
 #------------------------------------------------------------------------------
 
-        
         self.DistribCircFlow.screen()
         self.ToutDistrib.screen()
         self.TreturnDistrib.screen()
@@ -572,7 +572,10 @@ class CheckPipe():
             print " PipeDucts checking"
             print "-------------------------------------------------"
 
-        for n in range(6):
+        for n in range(1):
+
+            cycle.initCheckBalance()
+
 
             if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"
@@ -599,11 +602,18 @@ class CheckPipe():
 
 
             self.PercentFeedUp1 = calcDiff("PercentFeedUp1",self.ONE,self.PercentRecirc)#hFeedUp,hRetRec
+
+#
+# The following block is based on the equation:
+#
+#   hRetOut = %FeedUp*hFeedUp + %Recirc*hRetRec
+#           = hFeedUp + %Recirc*(hRetRec - hFeedUp) =: hFeedUp + DhRetRecFeedUp%
+#           = hRetRec + %FeedUp*(hFeedUp - hRedRec) = hRetRec - %FeedUp*(hRedRec - hFeedUp) =: hFeedUp - DhRetRecFeedUp%INV
             self.DhRetRecFeedup1 = calcDiff("DhRetRecFeedup1",self.hRetRec,self.hFeedUp)#hFeedUp,hRetRec
             self.DhRetRecFeedupPercent1 = calcProd("DhRetRecFeedupPercent1",self.DhRetRecFeedup,self.PercentRecirc1)#PercentRecirc1
             self.DhRetRecFeedupPercInv1 = calcProd("DhRetRecFeedupPercInv1",self.DhRetRecFeedup2,self.PercentFeedUp)#PercentRecirc1
             self.hRetOut2 = calcSum("hRetOut2",self.DhRetRecFeedupPercent,self.hFeedUp1)#hFeedUp2
-            self.hRetOut3 = calcSum("hRetOut3",self.DhRetRecFeedupPercInv,self.hRetRec)#hFeedUp2
+            self.hRetOut3 = calcDiff("hRetOut3",self.hRetRec,self.DhRetRecFeedupPercInv)#hFeedUp2
 
             self.DhForw1 = calcDiff("DhForw1",self.hForwIn,self.hForwOut)#hForwIn, hForwOut
             self.DhRet1 = calcDiff("DhRet1",self.hRetIn4,self.hRetOut4)
@@ -615,10 +625,11 @@ class CheckPipe():
             self.DhIn2 = calcSum3("DhIn2",self.DhForw,self.DhOut,self.DhRet)
 
             self.RecFlow1 = calcProd ("RecFlow1",self.DistribCircFlow,self.PercentRecirc2)#PercentRecirc2
+            self.FeedUpFlow2 = calcProd ("FeedUpFlow2",self.DistribCircFlow,self.PercentFeedUp2)#PercentRecirc2
 #HS substituted diff by sum            self.FeedUpFlow1 = calcDiff("FeedUpFlow1",self.DistribCircFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
             self.DistribCircFlow1 = calcSum("DistribCircFlow1",self.FeedUpFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
 
-            self.QdotLossForw1 = calcProd("QdotLossForw1",self.DhForw,self.DistribCircFlow)#DistribCircFlow
+            self.QdotLossForw1 = calcProd("QdotLossForw1",self.DhForw,self.DistribCircFlow4)#DistribCircFlow
             self.QdotLossRet1 = calcProd("QdotLossRet1",self.DhRec,self.RecFlow2) #calculated from DHRec, RecFlow2
             self.QdotWHPipe1 = calcProd("QdotWHPipe1",self.DhWH,self.FeedUpFlow)
             self.USHdotPipe1 = calcProd("USHdotPipe1",self.DhIn,self.DistribCircFlow2)#DistribCircFlow2
@@ -677,8 +688,9 @@ class CheckPipe():
             adjustProd(self.USHdotPipe1,self.DhIn,self.DistribCircFlow2)
             adjustProd(self.QdotWHPipe1,self.DhWH,self.FeedUpFlow)
             adjustProd(self.QdotLossRet1,self.DhRec,self.RecFlow2)
-            adjustProd(self.QdotLossForw1,self.DhForw,self.DistribCircFlow)
+            adjustProd(self.QdotLossForw1,self.DhForw,self.DistribCircFlow4)
             adjustSum(self.DistribCircFlow1,self.FeedUpFlow1,self.RecFlow)
+            adjustProd(self.FeedUpFlow2,self.DistribCircFlow5,self.PercentFeedUp2)#PercentRecirc2
             adjustProd (self.RecFlow1,self.DistribCircFlow,self.PercentRecirc2)
             adjustDiff(self.DhWH1,self.hRetIn3,self.hFeedUp2)
             adjustDiff(self.DhRec1,self.hRetIn2,self.hRetRec2)
@@ -689,7 +701,7 @@ class CheckPipe():
             adjustDiff(self.DhForw1,self.hForwIn,self.hForwOut)
 
 
-            adjustSum(self.hRetOut3,self.DhRetRecFeedupPercInv,self.hRetRec)#hFeedUp2
+            adjustDiff(self.hRetOut3,self.hRetRec,self.DhRetRecFeedupPercInv)#hFeedUp2
             adjustSum(self.hRetOut2,self.DhRetRecFeedupPercent,self.hFeedUp2)
             adjustProd(self.DhRetRecFeedupPercInv1,self.DhRetRecFeedup2,self.PercentFeedUp)#PercentRecirc1
             adjustProd(self.DhRetRecFeedupPercent1,self.DhRetRecFeedup,self.PercentRecirc1)
@@ -733,6 +745,12 @@ class CheckPipe():
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllPipe()
 
+        print "-------------------------------------------------"
+        print "Cycle balance: mean %s max %s "%(cycle.getMeanBalance(),cycle.getMaxBalance())
+        print "-------------------------------------------------"
+
+        return cycle.getMeanBalance()
+    
 #------------------------------------------------------------------------------
     def ccheckAll(self):     
 #------------------------------------------------------------------------------
@@ -748,13 +766,14 @@ class CheckPipe():
             ccheck2(self.TreturnDistrib,self.TreturnDistrib1,self.TreturnDistrib2)
             ccheck3(self.hFeedUp,self.hFeedUp1,self.hFeedUp2,self.hFeedUp3)
             ccheck2(self.PercentRecirc,self.PercentRecirc1,self.PercentRecirc2)
-            ccheck1(self.PercentFeedUp,self.PercentFeedUp1)
+            ccheck2(self.PercentFeedUp,self.PercentFeedUp1,self.PercentFeedUp2)
 
             ccheck2(self.hForwIn,self.hForwIn1,self.hForwIn2)
             ccheck2(self.hRetIn,self.hRetIn1,self.hRetIn2)
             ccheck2(self.hRetIn,self.hRetIn3,self.hRetIn4)
             ccheck2(self.hRetRec,self.hRetRec1,self.hRetRec2)
-            ccheck3(self.DistribCircFlow,self.DistribCircFlow1,self.DistribCircFlow2,self.DistribCircFlow3)
+            ccheck5(self.DistribCircFlow,self.DistribCircFlow1,self.DistribCircFlow2,self.DistribCircFlow3,\
+                    self.DistribCircFlow4,self.DistribCircFlow5)
             ccheck2(self.RecFlow,self.RecFlow1,self.RecFlow2)
             ccheck2(self.DTForwLoss,self.DTForwLoss1,self.DTForwLoss2)
             ccheck2(self.UPHdotProcm,self.UPHdotProcm1,self.UPHdotProcm2)
@@ -774,7 +793,7 @@ class CheckPipe():
             ccheck1(self.DhRec,self.DhRec1)
             ccheck1(self.DhWH,self.DhWH1)
 
-            ccheck1(self.FeedUpFlow,self.FeedUpFlow1)
+            ccheck2(self.FeedUpFlow,self.FeedUpFlow1,self.FeedUpFlow2)
             ccheck2(self.QdotLossForw,self.QdotLossForw1,self.QdotLossForw2)
             ccheck2(self.QdotLossRet,self.QdotLossRet1,self.QdotLossRet2)
             ccheck1(self.QdotWHPipe,self.QdotWHPipe1)

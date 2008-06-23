@@ -45,7 +45,7 @@ from einstein.GUI.status import *
 import einstein.GUI.pSQL as pSQL, MySQLdb
 
 #------------------------------------------------------------------------------
-class CheckHX():
+class CheckWHEE():
 #------------------------------------------------------------------------------
 #   Carries out consistency checking for heat exchanger h
 #------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ class CheckHX():
         self.QWHEE1 = CCPar("QWHEE1")
         self.QWHEERec = CCPar("QWHEERec")
         self.QWHEERec1 = CCPar("QWHEERec1")
-        self.QWHEEAmb = CCPAr("QWHEEAmb")
-        self.QWHEEAmb1 = CCPAr("QWHEEAmb1")
+        self.QWHEEAmb = CCPar("QWHEEAmb")
+        self.QWHEEAmb1 = CCPar("QWHEEAmb1")
 
         self.importData(n)
 

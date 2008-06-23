@@ -95,7 +95,7 @@ class PanelCC(wx.Panel):
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
 
         key = keys[0]
 
@@ -106,8 +106,8 @@ class PanelCC(wx.Panel):
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
         self.grid.SetDefaultColSize(80)
-        self.grid.SetColSize(0,120)
-        self.grid.SetColSize(1,240)
+        self.grid.SetColSize(0,100)
+        self.grid.SetColSize(1,264)
         self.grid.SetColSize(4,180)
         
         self.grid.EnableEditing(False)
@@ -116,7 +116,7 @@ class PanelCC(wx.Panel):
         self.grid.SetColLabelValue(0, _("Name"))
         self.grid.SetColLabelValue(1, _("Description"))
         self.grid.SetColLabelValue(2, _("Value"))
-        self.grid.SetColLabelValue(3, _("Accuracy"))
+        self.grid.SetColLabelValue(3, _("max.Error"))
         self.grid.SetColLabelValue(4, _("Action to be taken"))
         #
         # copy values from dictionary to grid
@@ -124,7 +124,7 @@ class PanelCC(wx.Panel):
         for r in range(MAXROWS):
             self.grid.SetRowAttr(r, attr)
             for c in range(COLNO):
-                if c == labels_column:
+                if c <= labels_column:
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
@@ -136,11 +136,32 @@ class PanelCC(wx.Panel):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELCC, name='PanelCC', parent=prnt,
-              pos=wx.Point(0, 0), size=wx.Size(808, 634), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
+#..............................................................................
+# box 1: grid display
+
+        self.box1 = wx.StaticBox(self, -1, _('Cross checking of data'),
+                                 pos = (10,10),size=(780,400))
+
+        self.st1panel = wx.StaticText(id=-1, label=_('list of data with unsufficient accuracy'),
+              name='st1panel', parent=self, pos=wx.Point(20, 30), style=0)
+
+        self.cbSetAccuracy = wx.ComboBox(choices=[_("quick & dirty"),_("standard"),_("detailed")],
+              id=wxID_PANELCCCBSETACCURACY, name='cbSetAccuracy', parent=self,
+              pos=wx.Point(616, 26), size=wx.Size(162, 32), style=0,
+              value=_("quick and dirty"))
+        self.cbSetAccuracy.SetLabel(_("quick and dirty"))
+        self.cbSetAccuracy.Bind(wx.EVT_COMBOBOX, self.OnCbSetAccuracyCombobox,
+              id=wxID_PANELCCCBSETACCURACY)
+
+        self.stSetAccuracy = wx.StaticText(id=wxID_PANELCCSTSETACCURACY,
+              label=_('required accuracy'), name='stSetAccuracy', parent=self,
+              pos=wx.Point(512, 30), size=wx.Size(87, 13), style=0)
+
         self.grid = wx.grid.Grid(id=wxID_PANELCCGRID, name='gridpanel',
-              parent=self, pos=wx.Point(24, 56), size=wx.Size(752, 296),
+              parent=self, pos=wx.Point(20, 60), size=wx.Size(760, 340),
               style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPanelGridCellLeftDclick, id=wxID_PANELCCGRID)
@@ -149,14 +170,59 @@ class PanelCC(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
               self.OnGridPanelGridCellLeftClick)
 
-        self.st1panel = wx.StaticText(id=-1, label=_('list of data to be checked'),
-              name='st1panel', parent=self, pos=wx.Point(24, 40), style=0)
 
-        self.stTitlePanel = wx.StaticText(id=wxID_PANELCCSTTITLEPANEL,
-              label=_('Cross checking of data'), name='stTitlePanel', parent=self,
-              pos=wx.Point(24, 16), style=0)
-        self.stTitlePanel.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
-              False, 'Tahoma'))
+#..............................................................................
+# action buttons
+
+        self.BasicCheck = wx.Button(id=wxID_PANELCCBASICCHECK,
+              label='basic check', name='BasicCheck', parent=self,
+              pos=wx.Point(24, 420), size=wx.Size(136, 24), style=0)
+        self.BasicCheck.Bind(wx.EVT_BUTTON, self.OnBasicCheckButton,
+              id=wxID_PANELCCBASICCHECK)
+
+        self.estimateData = wx.Button(id=wxID_PANELCCESTIMATEDATA,
+              label=_('estimate data'), name='estimateData', parent=self,
+              pos=wx.Point(176, 420), size=wx.Size(136, 24), style=0)
+        self.estimateData.Bind(wx.EVT_BUTTON, self.OnEstimateDataButton,
+              id=wxID_PANELCCESTIMATEDATA)
+
+        self.checkList = wx.Button(id=wxID_PANELCCCHECKLIST, label=_('check list'),
+              name='checkList', parent=self, pos=wx.Point(328, 420),
+              size=wx.Size(136, 24), style=0)
+        self.checkList.Bind(wx.EVT_BUTTON, self.OnCheckListButton,
+              id=wxID_PANELCCCHECKLIST)
+
+#..............................................................................
+# box 2: display of statistics
+        self.box2 = wx.StaticBox(self, -1, _('Cross check statistics'),
+                                 pos = (10,460),size=(780,80))
+
+        self.stStatistics1 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1,
+              label=_('No. of data checked'), name='stStatistics1', parent=self,
+              pos=wx.Point(24, 480), size=wx.Size(98, 13), style=0)
+
+        self.stStatistics2 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS2,
+              label=_('No. of input data fixed'), name='stStatistics2',
+              parent=self, pos=wx.Point(24, 500), size=wx.Size(110, 13),
+              style=0)
+
+        self.stStatistics3 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS3,
+              label=_('No. of missing data'), name='stStatistics3', parent=self,
+              pos=wx.Point(24, 520), size=wx.Size(93, 13), style=0)
+
+        self.stStatistics1Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1VAL,
+              label='---', name='stStatistics1Val', parent=self,
+              pos=wx.Point(176, 480), size=wx.Size(12, 13), style=0)
+
+        self.stStatistics2Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS2VAL,
+              label='---', name='stStatistics2Val', parent=self,
+              pos=wx.Point(176, 500), size=wx.Size(12, 13), style=0)
+
+        self.stStatistics3Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS3VAL,
+              label='---', name='stStatistics3Val', parent=self,
+              pos=wx.Point(176, 520), size=wx.Size(12, 13), style=0)
+#..............................................................................
+# default action buttons
 
         self.buttonpanelOk = wx.Button(id=wx.ID_OK, label='OK',
               name='buttonpanelOk', parent=self, pos=wx.Point(528, 544),
@@ -182,67 +248,9 @@ class PanelCC(wx.Panel):
         self.buttonpanelBack.Bind(wx.EVT_BUTTON, self.OnButtonpanelBackButton,
               id=wxID_PANELCCBUTTONPANELBACK)
 
-        self.BasicCheck = wx.Button(id=wxID_PANELCCBASICCHECK,
-              label='basic check', name='BasicCheck', parent=self,
-              pos=wx.Point(24, 360), size=wx.Size(136, 24), style=0)
-        self.BasicCheck.Bind(wx.EVT_BUTTON, self.OnBasicCheckButton,
-              id=wxID_PANELCCBASICCHECK)
 
-        self.st3panel = wx.StaticText(id=wxID_PANELCCST3PANEL,
-              label=_('Cross check statistics'), name='st3panel', parent=self,
-              pos=wx.Point(24, 392), size=wx.Size(122, 13), style=0)
-        self.st3panel.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
-              'Tahoma'))
 
-        self.estimateData = wx.Button(id=wxID_PANELCCESTIMATEDATA,
-              label=_('estimate data'), name='estimateData', parent=self,
-              pos=wx.Point(176, 360), size=wx.Size(136, 24), style=0)
-        self.estimateData.Bind(wx.EVT_BUTTON, self.OnEstimateDataButton,
-              id=wxID_PANELCCESTIMATEDATA)
-
-        self.checkList = wx.Button(id=wxID_PANELCCCHECKLIST, label=_('check list'),
-              name='checkList', parent=self, pos=wx.Point(328, 360),
-              size=wx.Size(136, 24), style=0)
-        self.checkList.Bind(wx.EVT_BUTTON, self.OnCheckListButton,
-              id=wxID_PANELCCCHECKLIST)
-
-        self.stStatistics1 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1,
-              label=_('No. of data checked'), name='stStatistics1', parent=self,
-              pos=wx.Point(24, 424), size=wx.Size(98, 13), style=0)
-
-        self.stStatistics2 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS2,
-              label=_('No. of input data fixed'), name='stStatistics2',
-              parent=self, pos=wx.Point(24, 456), size=wx.Size(110, 13),
-              style=0)
-
-        self.stStatistics3 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS3,
-              label=_('No. of missing data'), name='stStatistics3', parent=self,
-              pos=wx.Point(24, 488), size=wx.Size(93, 13), style=0)
-
-        self.stStatistics1Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1VAL,
-              label='---', name='stStatistics1Val', parent=self,
-              pos=wx.Point(176, 424), size=wx.Size(12, 13), style=0)
-
-        self.stStatistics2Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS2VAL,
-              label='---', name='stStatistics2Val', parent=self,
-              pos=wx.Point(176, 456), size=wx.Size(12, 13), style=0)
-
-        self.stStatistics3Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS3VAL,
-              label='---', name='stStatistics3Val', parent=self,
-              pos=wx.Point(176, 488), size=wx.Size(12, 13), style=0)
-
-        self.cbSetAccuracy = wx.ComboBox(choices=[_("quick & dirty"),_("standard"),_("detailed")],
-              id=wxID_PANELCCCBSETACCURACY, name='cbSetAccuracy', parent=self,
-              pos=wx.Point(616, 8), size=wx.Size(162, 21), style=0,
-              value='"quick and dirty"')
-        self.cbSetAccuracy.SetLabel('_("quick and dirty")')
-        self.cbSetAccuracy.Bind(wx.EVT_COMBOBOX, self.OnCbSetAccuracyCombobox,
-              id=wxID_PANELCCCBSETACCURACY)
-
-        self.stSetAccuracy = wx.StaticText(id=wxID_PANELCCSTSETACCURACY,
-              label=_('required accuracy'), name='stSetAccuracy', parent=self,
-              pos=wx.Point(512, 16), size=wx.Size(87, 13), style=0)
-
+#------------------------------------------------------------------------------		
     def display(self):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree

@@ -41,7 +41,7 @@
 #============================================================================== 				
 
 MAXBALANCEERROR = 1.e-3
-NMAXITERATIONS = 5
+NMAXITERATIONS = 1
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 
 from math import *

@@ -78,6 +78,7 @@ class CheckProc():
         self.PT1 = CCPar("PT1") 
         self.PT2 = CCPar("PT2")         
         self.PT3 = CCPar("PT3") 
+        self.PT4 = CCPar("PT4") 
         self.PTInFlow1 = CCPar("PTInFlow1")
         self.PTInFlowRec1 = CCPar("PTInFlowRec1")
         self.PTOutFlow1 = CCPar("PTInFlow1")
@@ -117,14 +118,14 @@ class CheckProc():
         self.UPHsdot1 = CCPar("UPHsdot1")
         self.UPHsdot = CCPar("UPHsdot")
         self.UPHs1 = CCPar("UPHs1")
-        self.UPHs = CCPar("UPHs")
+        self.UPHs = CCPar("UPHs",priority=2)
         self.UPH1 = CCPar("UPH1")
         self.UPH2 = CCPar("UPH2")
         self.UPH = CCPar("UPH",priority=2)
         self.UPHProc1 = CCPar("UPHProc1")
         self.QHXProc1 = CCPar("QHXProc1")
         self.UAProc = CCPar("UAProc")
-        self.QEvapProc = CCPar("UAProc")
+        self.QEvapProc = CCPar("QEvapProc")
         self.UPHcGross = CCPar("UPHcGross")
         self.QHXProcInt = CCPar("QHXProcInt")
 
@@ -182,7 +183,7 @@ class CheckProc():
                 self.PTInFlow.setValue(qprocessdata.PTInFlow)
                 self.PT.setValue(qprocessdata.PT)
                 self.PTOutFlow.setValue(qprocessdata.PTOutFlow)
-#                self.PTOutFlowRec.setValue(qprocessdata.PTOutFlowRec)  #does not exist yet
+                self.PTOutFlowRec.setValue(qprocessdata.PTOutFlowRec)
                 self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
                 self.PTStartUp.setValue(qprocessdata.PTStartUp)
                 self.VInFlowDay.setValue(qprocessdata.VInFlowDay) 
@@ -669,7 +670,7 @@ class CheckProc():
             print " Process checking"
             print "-------------------------------------------------"
 
-        for n in range(5):
+        for n in range(1):
 
             if DEBUG in ["ALL","MAIN"]:
                 print "-------------------------------------------------"
@@ -770,7 +771,7 @@ class CheckProc():
                 print "Step 4: cross checking"
                 print "-------------------------------------------------"
                 
-            ccheck3(self.PT,self.PT1,self.PT2,self.PT3)  
+            ccheck4(self.PT,self.PT1,self.PT2,self.PT3,self.PT4)  
             ccheck1(self.PTInFlow,self.PTInFlow1)
             ccheck1(self.PTInFlowRec,self.PTInFlowRec1)
             ccheck2(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2)
