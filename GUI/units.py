@@ -38,7 +38,16 @@
 #
 #==============================================================================
 
+from einstein.modules.fluids import Fluid
 CURRENCY = 'EUR'
+
+UNITSFLUIDDENSITY = 1000.0
+
+def setUnitsFluidDensity(fluidID):
+    global UNITSFLUIDDENSITY
+
+    fluid = Fluid(fluidID)
+    UNITSFLUIDDENSITY = fluid.rho
 
 UNITS = {
 # conversion to internal unit: [ºC]
@@ -132,12 +141,12 @@ UNITS = {
         'kg' : (1.0,0.0),
         'lb' : (0.45359,0.0),
         't' : (1000.0,0.0),
-        'm3' : (1.0,0.0),
-        'l' : (1.0e-3,0.0),
-        'ft3' : (0.028317,0.0),
-        'U.S. gal' : (0.003785,0.0),
-        'Brit. gal' : (0.004546,0.0),
-        'barrel (U.S. pet.)' : (0.15898,0.0)
+        'm3' : (1.0*UNITSFLUIDDENSITY,0.0),
+        'l' : (1.0e-3*UNITSFLUIDDENSITY,0.0),
+        'ft3' : (0.028317*UNITSFLUIDDENSITY,0.0),
+        'U.S. gal' : (0.003785*UNITSFLUIDDENSITY,0.0),
+        'Brit. gal' : (0.004546*UNITSFLUIDDENSITY,0.0),
+        'barrel (U.S. pet.)' : (0.15898*UNITSFLUIDDENSITY,0.0)
         },
 
 # conversion to internal unit: [kg/h]
@@ -146,13 +155,15 @@ UNITS = {
         'kg/s' : (3600.0,0.0),
         'lb/h' : (0.45359,0.0),
         'lb/s' : (1632.924,0.0),
-        'm3/h' : (1.0,0.0),
-        'm3/s' : (3600.0,0.0)
+        'm3/h' : (1.0*UNITSFLUIDDENSITY,0.0),
+        'm3/s' : (3600.0*UNITSFLUIDDENSITY,0.0)
         },
 
 # conversion to internal unit: [kWh]
     'ENERGY': {
         'kWh' : (1.0,0.0),
+        'MWh' : (1.0e+3,0.0),
+        'GWh' : (1.0e+6,0.0),
         'kJ': (1.0/3600,0.0),
         'MJ': (1.0/3.6,0.0),
         'GJ': (1.0e6/3600,0.0),
@@ -208,6 +219,7 @@ UNITS = {
 # conversion to internal unit: [¤/kWh]
     'ENERGYTARIFF': {
         '%s/kWh'%CURRENCY : (1.0,0.0),
+        '%s/MWh'%CURRENCY : (1000.0,0.0),
         '%s/kJ'%CURRENCY: (3600.0,0),
         '%s/MJ'%CURRENCY: (3.6,0.0),
         '%s/GJ'%CURRENCY: (3.6e-3,0.0),
@@ -239,14 +251,14 @@ UNITSYSTEM = {
                 'MASSFLOW':'kg/s',
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
-                'ENERGY':'kJ',
+                'ENERGY':'GJ',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kJ/kg',
                 'SPECIFICHEAT':'kJ/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
                 'FRACTION':'%',
                 'GROWTHRATE':'%/a',
-                'ENERGYTARIFF':'%s/kJ'%CURRENCY,
+                'ENERGYTARIFF':'%s/GJ'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
     
@@ -264,14 +276,14 @@ UNITSYSTEM = {
                 'MASSFLOW':'kg/h',
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
-                'ENERGY':'kWh',
+                'ENERGY':'MWh',
                 'POWER':'kW',
-                'SPECIFICENTHALPY':'kWh/kg',
-                'SPECIFICHEAT':'kWh/kgK',
+                'SPECIFICENTHALPY':'kJ/kg',
+                'SPECIFICHEAT':'kJ/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
                 'FRACTION':'%',
                 'GROWTHRATE':'%/a',
-                'ENERGYTARIFF':'%s/kWh'%CURRENCY,
+                'ENERGYTARIFF':'%s/MWh'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
 

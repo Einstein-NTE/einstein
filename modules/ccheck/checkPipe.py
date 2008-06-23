@@ -321,7 +321,8 @@ class CheckPipe():
 
         if self.DDistPipe.val is not None and self.DeltaDistPipe.val is not None:
             self.DoPipe.setValue (self.DDistPipe.val + (2*self.DeltaDistPipe.val))
-            self.dUAPipe.setValue(0.000314 /(log(self.DoPipe.val) - log(self.DDistPipe.val)))
+            try: self.dUAPipe.setValue(0.000314 /(log(self.DoPipe.val) - log(self.DDistPipe.val)))
+            except: pass
         else:   ####### for testing. IMPORTANT THAT THERE's A VALUE
             self.dUAPipe.setValue(0.0005)   # in kW/mK !!!!
             self.dUAPipe.sqerr = 0.25
@@ -615,7 +616,7 @@ class CheckPipe():
 
             self.RecFlow1 = calcProd ("RecFlow1",self.DistribCircFlow,self.PercentRecirc2)#PercentRecirc2
 #HS substituted diff by sum            self.FeedUpFlow1 = calcDiff("FeedUpFlow1",self.DistribCircFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
-            self.DistribCircFlow1 = calcSum("FeedUpFlow1",self.FeedUpFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
+            self.DistribCircFlow1 = calcSum("DistribCircFlow1",self.FeedUpFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
 
             self.QdotLossForw1 = calcProd("QdotLossForw1",self.DhForw,self.DistribCircFlow)#DistribCircFlow
             self.QdotLossRet1 = calcProd("QdotLossRet1",self.DhRec,self.RecFlow2) #calculated from DHRec, RecFlow2

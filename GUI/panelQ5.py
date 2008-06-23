@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.12
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -22,6 +22,9 @@
 #                           Stoyan Danov    10/06/2008
 #                           Stoyan Danov    16/06/2008
 #                           Stoyan Danov    17/06/2008
+#                           Hans Schweiger  21/06/2008
+#                           Tom Sobota      21/06/2008
+#                           Hans Schweiger  23/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
@@ -36,6 +39,9 @@
 #                           changed IntEntry->FloatEntry tc7,tc10,tc13,tc14
 #                           in OnButtonOK: -> VUnitStorage in turn of VtotStorage
 #       17/06/2008      SD: unitdict, staticboxes
+#       21/06/2008      HS: bug-fix -> elimination of fsize in Fieldsizes
+#       21/06/2008      TS  General beautification and font awareness.
+#       23/06/2008      HS: filling of choices
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -53,14 +59,22 @@ from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
+from fonts import *
 
 
-# constants that control the default field sizes
+# constants that control the default sizes
+# 1. font sizes
+TYPE_SIZE_LEFT    =   9
+TYPE_SIZE_RIGHT   =   9
+TYPE_SIZE_TITLES  =  10
 
-HEIGHT         =  27
-LABELWIDTH     = 180
-DATAENTRYWIDTH = 100
-UNITSWIDTH     =  90
+# 2. field sizes
+HEIGHT_LEFT       =  27
+HEIGHT_RIGHT      =  27
+LABEL_WIDTH_LEFT  = 250
+LABEL_WIDTH_RIGHT = 180
+DATA_ENTRY_WIDTH  = 100
+UNITS_WIDTH       =  90
 
 
 class PanelQ5(wx.Panel):
@@ -80,51 +94,52 @@ class PanelQ5(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
 
+        # access to font properties object
+        fp = FontProperties()
+
         self.notebook = wx.Notebook(self, -1, style=0)
+        self.notebook.SetFont(fp.getFont())
+
         self.page0 = wx.Panel(self.notebook) # left panel
         self.page1 = wx.Panel(self.notebook) # right panel
 
-        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Distribution list"))
-        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.frame_distrib_list = wx.StaticBox(self.page0, -1, _("Distribution list"))
+        self.frame_distrib_heat_cold = wx.StaticBox(self.page0, -1, _("Distribution of heat/cold"))
+        self.frame_general_data = wx.StaticBox(self.page0, -1, _("General data"))
+        self.frame_temp_pressures = wx.StaticBox(self.page0, -1, _("Temperatures, pressures and flow rates"))
+        self.frame_piping_specs = wx.StaticBox(self.page0, -1, _("Piping specifications"))
+        self.frame_storage = wx.StaticBox(self.page1, -1, "Storage")
 
-        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Distribution of heat/cold"))
-        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        # set font for titles
+        # 1. save actual font parameters on the stack
+        fp.pushFont()
+        # 2. change size and weight
+        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
+        self.frame_distrib_list.SetFont(fp.getFont())
+        self.frame_distrib_heat_cold.SetFont(fp.getFont())
+        self.frame_general_data.SetFont(fp.getFont())
+        self.frame_temp_pressures.SetFont(fp.getFont())
+        self.frame_piping_specs.SetFont(fp.getFont())
+        self.frame_storage.SetFont(fp.getFont())
+        # 3. recover previous font state
+        fp.popFont()
 
-        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("General data"))
-        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.sizer_9_staticbox = wx.StaticBox(self.page0, -1, _("Temperatures and pressures"))
-        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        fs = FieldSizes(wHeight=HEIGHT_LEFT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH)
 
-        self.sizer_10_staticbox = wx.StaticBox(self.page0, -1, _("Piping specifications"))
-        self.sizer_10_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
 
-        self.sizer_13_staticbox = wx.StaticBox(self.page1, -1, "Storage")
-        self.sizer_13_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        # set font for labels of left tab
+        fp.pushFont()
+        fp.changeFont(size=TYPE_SIZE_LEFT)
 
-        # left panel
-        
+        #
+        # left panel controls
+        #
+
         self.listBoxDistributionList = wx.ListBox(self.page0,-1,choices=[])
+        self.listBoxDistributionList.SetFont(fp.getFont())
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxDistributionListListboxClick, self.listBoxDistributionList)
-
-        #
-        # set default field sizes and font properties.
-        # Each data entry class has 4 configurable parameters for field size:
-        # 1. The height. This is the same for all the widgets that make the class
-        # 2. The width of the label
-        # 3. The width of the entry widget
-        # 4. The width of the unit chooser.
-        # and 7 parameters for font:
-        # 1. fSize font size
-        # 2. fFamily font family
-        # 3. fStyle font style
-        # 4. fWeight font weight
-        # 5. fUnderline underlined or not
-        # 6. fFacename font face
-        # 7. fEncoding font encoding
-        # All these parameters have reasonable defaults.
-        #
-        f = FieldSizes(wHeight=HEIGHT,wLabel=LABELWIDTH,wData=DATAENTRYWIDTH,wUnits=UNITSWIDTH,fSize=9)
 
 
 #In StaticBox "Distribution of heat/cold"
@@ -137,7 +152,7 @@ class PanelQ5(wx.Panel):
         self.tc3 = ChoiceEntry(self.page0,
                                values=[],
                                label=_("Heat or cold distribution medium"),
-                               tip=_("e.g air for drying process, vapour, hot water, refrigerant,..."))
+                               tip=_("e.g. air for drying process, vapour, hot water, refrigerant,..."))
 
         self.tc4 = FloatEntry(self.page0,
                               ipart=6,                       # max n. of characters left of decimal point
@@ -148,8 +163,7 @@ class PanelQ5(wx.Panel):
                               unitdict='MASSORVOLUMEFLOW',            # values for the units chooser
                               #label=_("Nominal production"), # label
                               label=_("Nominal production or circulation rate (specify units)"),
-                              tip=_(" "),
-                              fontsize=6)
+                              tip=_(" "))
 
 #In StaticBox "Temperatures and pressures" within "Distribution of heat/cold" 
         self.tc5 = FloatEntry(self.page0,
@@ -162,7 +176,7 @@ class PanelQ5(wx.Panel):
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_("Return temperature"),
-                              tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vepour system)"))
+                              tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vapour system)"))
 
         self.tc7 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
@@ -208,8 +222,11 @@ class PanelQ5(wx.Panel):
                               unitdict='LENGTH',
                               label=_("Insulation thickness"),
                               tip=_(" "))
-
-        # right panel
+        #
+        # Right panel controls
+        #
+        fp.changeFont(size=TYPE_SIZE_RIGHT)
+        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT)
 
         self.tc15 = IntEntry(self.page1,
                              minval=0, maxval=100, value=0,
@@ -242,88 +259,86 @@ class PanelQ5(wx.Panel):
 
 
         self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
-        #self.buttonOK.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
-        #self.buttonCancel.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
         self.buttonDeleteDistribution = wx.Button(self.page0,-1,_("Delete distribution"))
         self.buttonDeleteDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteDistribution, self.buttonDeleteDistribution)
+        self.buttonDeleteDistribution.SetFont(fp.getFont())
 
         self.buttonAddDistribution = wx.Button(self.page0, -1, _("Add distribution"))
         self.buttonAddDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddDistribution, self.buttonAddDistribution)
+        self.buttonAddDistribution.SetFont(fp.getFont())
 
 
 
     def __do_layout(self):
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_10 = wx.BoxSizer(wx.VERTICAL)
-        sizer_13 = wx.StaticBoxSizer(self.sizer_13_staticbox, wx.VERTICAL)
-        #grid_sizer_5 = wx.FlexGridSizer(5, 2, 3, 3)
-        sizer_15 = wx.BoxSizer(wx.VERTICAL)
-        sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_6 = wx.BoxSizer(wx.VERTICAL)
-        sizer_7 = wx.StaticBoxSizer(self.sizer_7_staticbox, wx.VERTICAL)
-        #grid_sizer_1 = wx.FlexGridSizer(10, 2, 3, 3)# r,c,seph,sepv
-        sizer_11 = wx.BoxSizer(wx.VERTICAL)
-        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
+        # global sizer for panel. Contains notebook w/two tabs + buttons Cancel and Ok
+        sizerGlobal = wx.BoxSizer(wx.VERTICAL)
+        # sizer for left tab
+        sizerPage0 = wx.BoxSizer(wx.HORIZONTAL)
 
         # panel 0, left part, distribution list
-        sizer_5.Add(self.listBoxDistributionList, 1, wx.EXPAND, 0)
-        sizer_5.Add(self.buttonAddDistribution, 0, wx.ALIGN_RIGHT, 0)
-        sizer_5.Add(self.buttonDeleteDistribution, 0, wx.ALIGN_RIGHT, 0)
-        sizer_4.Add(sizer_5, 1, wx.EXPAND, 0)
+        sizer_dl = wx.StaticBoxSizer(self.frame_distrib_list, wx.VERTICAL)
+        sizer_dl.Add(self.listBoxDistributionList, 1, wx.EXPAND, 0)
+        sizer_dl.Add(self.buttonAddDistribution, 0, wx.ALIGN_RIGHT, 0)
+        sizer_dl.Add(self.buttonDeleteDistribution, 0, wx.ALIGN_RIGHT, 0)
+        sizerPage0.Add(sizer_dl, 1, wx.EXPAND|wx.TOP, 20)
 
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_VERTICAL
         flagText = wx.ALIGN_CENTER_VERTICAL
 
         # panel 0, right part, distribution
-        sizer_11.Add(self.tc1, 0, flagText, 2)
-#        sizer_11.Add(self.tc2, 0, flagText, 2)
-        sizer_11.Add(self.tc3, 0, flagText, 2)
-        sizer_11.Add(self.tc4, 0, flagText, 2)
-        sizer_11.Add(self.tc5, 0, flagText, 2)
-        sizer_11.Add(self.tc6, 0, flagText, 2)
-        sizer_11.Add(self.tc7, 0, flagText, 2)
-        sizer_11.Add(self.tc8, 0, flagText, 2)
-        sizer_11.Add(self.tc9, 0, flagText, 2)
-##        sizer_11.Add(self.tc10, 0, flagText, 2)
-        sizer_11.Add(self.tc11, 0, flagText, 2)
-        sizer_11.Add(self.tc12, 0, flagText, 2)
-        sizer_11.Add(self.tc13, 0, flagText, 2)
-        sizer_11.Add(self.tc14, 0, flagText, 2)
+        sizer_gd = wx.StaticBoxSizer(self.frame_general_data, wx.VERTICAL)
+        sizer_gd.Add(self.tc1, 0, flagText, 2)
+        sizer_gd.Add(self.tc3, 0, flagText, 2)
+        sizer_gd.Add(self.tc4, 0, flagText, 2)
+        
+        sizer_tp = wx.StaticBoxSizer(self.frame_temp_pressures, wx.VERTICAL)
+        sizer_tp.Add(self.tc5, 0, flagText, 2)
+        sizer_tp.Add(self.tc6, 0, flagText, 2)
+        sizer_tp.Add(self.tc7, 0, flagText, 2)
+        sizer_tp.Add(self.tc8, 0, flagText, 2)
+        sizer_tp.Add(self.tc9, 0, flagText, 2)
+        
+        sizer_ps = wx.StaticBoxSizer(self.frame_piping_specs, wx.VERTICAL)
+        sizer_ps.Add(self.tc11, 0, flagText, 2)
+        sizer_ps.Add(self.tc12, 0, flagText, 2)
+        sizer_ps.Add(self.tc13, 0, flagText, 2)
+        sizer_ps.Add(self.tc14, 0, flagText, 2)
 
-        sizer_7.Add(sizer_11, 1, wx.LEFT|wx.EXPAND, 40)
-        sizer_6.Add(sizer_7, 3, wx.EXPAND, 0)#
+        sizer_hc = wx.StaticBoxSizer(self.frame_distrib_heat_cold, wx.VERTICAL)
+        sizer_hc.Add(sizer_gd, 3, wx.EXPAND|wx.ALL, 4)
+        sizer_hc.Add(sizer_tp, 5, wx.EXPAND|wx.ALL, 4)
+        sizer_hc.Add(sizer_ps, 4, wx.EXPAND|wx.ALL, 4)
 
-        sizer_4.Add(sizer_6, 2, wx.EXPAND, 0)
-        self.page0.SetSizer(sizer_4)
+        sizerPage0.Add(sizer_hc, 2, wx.EXPAND|wx.TOP, 20)
+        self.page0.SetSizer(sizerPage0)
 
         #panel 1, storage
-        sizer_15.Add(self.tc15, 0, flagText, 0)
-        sizer_15.Add(self.tc16, 0, flagText, 0)
-        sizer_15.Add(self.tc17, 0, flagText, 0)
-        sizer_15.Add(self.tc18, 0, flagText, 0)
-        sizer_15.Add(self.tc19, 0, flagText, 0)
-
-        sizer_13.Add(sizer_15, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
-        sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
-        self.page1.SetSizer(sizer_10)
+        sizer_st = wx.StaticBoxSizer(self.frame_storage, wx.VERTICAL)
+        sizer_st.Add(self.tc15, 0, flagText, 0)
+        sizer_st.Add(self.tc16, 0, flagText, 0)
+        sizer_st.Add(self.tc17, 0, flagText, 0)
+        sizer_st.Add(self.tc18, 0, flagText, 0)
+        sizer_st.Add(self.tc19, 0, flagText, 0)
+        self.page1.SetSizer(sizer_st)
+        
         self.notebook.AddPage(self.page0, _('Distribution'))
         self.notebook.AddPage(self.page1, _('Storage'))
-        sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizerGlobal.Add(self.notebook, 1, wx.EXPAND, 0)
+
+        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
-        sizer_2.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
-        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
-        self.SetSizer(sizer_1)
+        sizerGlobal.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+
+        self.SetSizer(sizerGlobal)
         self.Layout()
 
 
@@ -343,10 +358,14 @@ class PanelQ5(wx.Panel):
         self.tc1.SetValue(str(p.Pipeduct))
 #        self.tc2.SetValue(str(p.HeatFromQGenerationHC_id)) #SD: parameter excluded)  
 
-        fluidDict = Status.prj.getFluidDict()        
+        fluidDict = Status.prj.getFluidDict()
+        
         if p.HeatDistMedium is not None:
+            fluidID = int(p.HeatDistMedium)
+            fluid = Fluid(fluidID)
+            setUnitsFluidDensity(fluid.rho)
             #fluidName = fluidDict[p.HeatDistMedium]#SD
-            fluidName = fluidDict[int(p.HeatDistMedium)] #SD key must be immutable type, changed to -> int       
+            fluidName = fluidDict[fluidID] #SD key must be immutable type, changed to -> int       
             self.tc3.SetValue(fluidName)  
 
         self.tc4.SetValue(str(p.DistribCircFlow))
@@ -368,7 +387,7 @@ class PanelQ5(wx.Panel):
 
 
     def OnButtonOK(self, event):
-        #TS20080530 tc2 getvalue is missing.
+
         if Status.PId == 0:
 	    return
         pipeName = self.check(self.tc1.GetValue())
@@ -380,32 +399,36 @@ class PanelQ5(wx.Panel):
         elif pipeName != 'NULL' and len(pipes) == 1:
             pipe = pipes[0]
         else:
-	    print "PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"
+	    self.main.showError(_("PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"))
 	    return
 
-	print 'PanelQ5 (ButtonOK): pipe =', pipe
-	print 'PanelQ5 (ButtonOK): pipes =', pipes
 
-	fluidDict = Status.prj.getFluidDict()#SD
+	fluidDict = Status.prj.getFluidDict()
+        fluidID = findKey(fluidDict,self.tc3.GetValue(text=True))
+        if fluidID is not None:
+            setUnitsFluidDensity(fluidID)
+	
+	massFlow = self.tc4.GetValue()
 
 	tmp = {
 		"Questionnaire_id":Status.PId,
 		"Pipeduct":self.check(self.tc1.GetValue()),
-		"HeatDistMedium":check(findKey(fluidDict,self.tc3.entry.GetStringSelection())), #SD               
-		"DistribCircFlow":self.check(self.tc4.GetValue()), 
+                
+		"HeatDistMedium":check(fluidID),                
+		"DistribCircFlow":check(massFlow), 
 		"ToutDistrib":self.check(self.tc5.GetValue()), 
 		"TreturnDistrib":self.check(self.tc6.GetValue()), 
 		"PercentRecirc":self.check(self.tc7.GetValue()), 
 		"Tfeedup":self.check(self.tc8.GetValue()), 
-		"PressDistMedium":self.check(self.tc9.GetValue()), 
-##		"PercentCondRecovery":self.check(self.tc10.GetValue()), 
+		"PressDistMedium":self.check(self.tc9.GetValue()),
+                
 		"TotLengthDistPipe":self.check(self.tc11.GetValue()), 
 		"UDistPipe":self.check(self.tc12.GetValue()), 
 		"DDistPipe":self.check(self.tc13.GetValue()), 
 		"DeltaDistPipe":self.check(self.tc14.GetValue()), 		
 		"NumStorageUnits":self.check(self.tc15.GetValue()),  
 		"VUnitStorage":self.check(self.tc16.GetValue()),
-                "TypeStorage":check(findKey(TRANSSTORAGETYPES,self.tc17.entry.GetStringSelection())),#SD
+                "TypeStorage":check(findKey(TRANSSTORAGETYPES,self.tc17.GetValue(text=True))),
 		"PmaxStorage":self.check(self.tc18.GetValue()), 
 		"TmaxStorage":self.check(self.tc19.GetValue())
 	}
@@ -413,7 +436,6 @@ class PanelQ5(wx.Panel):
 	Status.SQL.commit()
 	self.fillPage()
                           
-
     def OnButtonCancel(self, event):
         self.clear()
         event.Skip()
@@ -431,10 +453,10 @@ class PanelQ5(wx.Panel):
 #--- Public methods
 #------------------------------------------------------------------------------		
 
-#SD2008-6-16
     def display(self):
-        self.fillChoiceOfHDMedium()
         self.clear()
+        self.fillChoiceOfHDMedium()
+        self.tc17.SetValue(TRANSSTORAGETYPES.values())
         self.fillPage()
         self.Show()
 
@@ -479,7 +501,7 @@ class PanelQ5(wx.Panel):
         self.tc14.SetValue('')
         self.tc15.SetValue('')
         self.tc16.SetValue('')
-        self.tc17.SetValue('')
+##        self.tc17.SetValue('')
         self.tc18.SetValue('')
         self.tc19.SetValue('')
         

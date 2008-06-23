@@ -23,9 +23,11 @@
 #	Created by: 	    Tom Sobota	    June 2008
 #
 #       Last modified by:   Hans Schweiger  19/06/2008
+#                           Tom Sobota      20/06/2008
 #
 #       Changes to previous version:
 #       19/06/2008: HS  ExportDataHR created based on ExportDataXML
+#       20/06/2008: TS  Compatibility changes: substituted 'information_schema' by 'show tables'
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,21 +56,34 @@ def openfilecreate(text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
 
     return dialog.GetPath()
 
-def openconnection(main):
-    try:
-        # get a new connection
-        conn = main.connectToDB()
-    except MySQLdb.Error, e:
-        main.showError('Cannot connect to database. '\
-                       'Error is:\n\n%s\n\nPlease verify.' % (str(e),))
-        return None
-
+def openconnection():
+    frame = wx.GetApp().GetTopWindow()
+    conn = frame.connectToDB()
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     return (conn,cursor)
 
 
 
 class ImportDataXML(object):
+#=> todos los ID's principales de las tablas importadas se deberían sustituir por
+#   las ID's auto-incrementadas de la database receptora.
+#
+#=> más problemático son los vínculos: hay una forma de actualizar los vínculos entre
+#   tablas sustituyendolos por las nuevas ID's ? sino, no te preocupes, entonces esto
+#   ya lo hacemos de forma manual (solamente necesitaríamos algun diccionario para cada
+#   tabla para poder asociar ID antigua en el original e ID nueva en el database ...)
+#
+#=> lo más complicado, pero de momento solo ocurre en un único lugar, es actualizar los
+#   vínculos de equipments con pipes, ya que un equipment puede dar calor a varios pipes,
+#   y eso está resuelto de tal forma de momento, que en la columna del vínculo hay un
+#   string "IDPipe1;IDPipe2;IDPipe3 ...". Eso último supongo que no habrá nada estándar
+#   para resolverlo ... ¿ o sí ... ?
+#
+#(no sé si pueden servir, pero yo tengo una función copyProject que hace algo similar,
+#que es crear un duplicado de un proyecto DENTRO de la misma database. la problemática
+#es idéntica ... y lo de los vínculos todavía por resolver :-) ). Así tal vez podemos
+#matar dos pájaros con un tiro ...
+
     def __init__(self,parent,infile=None):
         self.parent = parent
         if infile is None:
@@ -77,10 +92,7 @@ class ImportDataXML(object):
             if infile is None:
                 return None
 
-        res = openconnection(parent)
-        if res is None:
-            return None
-        (conn, cursor) = res
+        (conn, cursor) = openconnection()
         self.fd = open(infile, 'r')
         self.fd.close()
         conn.close()
@@ -93,13 +105,10 @@ class ExportDataXML(object):
             if outfile is None:
                 return None
 
-        res = openconnection(parent)
-        if res is None:
-            return None
-        (conn, cursor) = res
+        (conn, cursor) = openconnection()
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n' +
-                      '<InputXMLDataController xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n')
+                      '<InputXMLDataController>\n')
 
         if pid is not None and ano is not None:
             criterium = "WHERE Questionnaire_id=%s AND AlternativeProposalNo=%s" % (pid,ano)
@@ -125,23 +134,55 @@ class ExportDataXML(object):
         fd.close()
         conn.close()
 
+    def dumpTable(self, cursor, fd, table, criterium, order=None):
+        fieldtypes = {}
+        #cursor.execute("SELECT column_name, data_type FROM information_schema.columns " \
+        #                "WHERE table_name = '%s' AND table_schema = 'einstein'" % (table,))
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
+        result_set = cursor.fetchall()
+        nfields = cursor.rowcount
+        for field in result_set:
+            fname = field['Field']
+            ftype = field['Type']
+            fieldtypes[fname] = ftype
+    
+        sql = "SELECT * FROM %s" % (table,)
+
+        if criterium:
+            sql += (' ' + criterium)
+        if order:
+            sql += (' ' + order)
+        cursor.execute(sql)
+        result_set = cursor.fetchall()
+        nrows = cursor.rowcount
+        if nrows <= 0:
+            fd.write('<!-- table %s has no values -->\n' % (table,))
+        else:
+            fd.write('<ListOf%s>\n' % (table,))
+            for row in result_set:
+                fd.write('<InputXML%s>\n' % (table,))
+                for key in row.keys():
+                    value = row[key]
+                    if value is not None:
+                        s = '<%s>%s</%s>\n' % (key,value,key)
+                        fd.write(s)
+                fd.write('</InputXML%s>\n' % (table,))
+            fd.write('</ListOf%s>\n' % (table,))
+
 #------------------------------------------------------------------------------		
 class ExportDataHR(object):
 #------------------------------------------------------------------------------		
 #   creates the XML input file for the heat recovery module
 #------------------------------------------------------------------------------		
-    def __init__(self,pid=None,ano = None, fuels=[],fluids=[]):
+    def __init__(self, pid=None,ano=None, fuels=[],fluids=[]):
         self.parent = Status.main
         
         outfile = "inputHR.xml"
         
-        res = openconnection(self.parent)
-        if res is None:
-            return None
-        (conn, cursor) = res
+        (conn, cursor) = openconnection()
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n' +
-                      '<InputXMLDataController xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n')
+                      '<HeatRecovery>\n')
 
         if pid is not None:
             criterium = "WHERE Questionnaire_id=%s AND AlternativeProposalNo=%s" % (pid,ano)
@@ -149,7 +190,7 @@ class ExportDataHR(object):
             self.dumpTable(cursor, fd, 'qprocessdata', criterium, 'ORDER BY ProcNo')
             self.dumpTable(cursor, fd, 'qdistributionhc', criterium,'ORDER BY PipeDuctNo')
 
-            criterium = "WHERE Questionnaire_id=%s AND AlternativeProposalNo=%s" % (pid,ano)
+            criterium = "WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (pid,ano)
             self.dumpTable(cursor, fd, 'qheatexchanger', criterium,'ORDER BY HXNo')
             self.dumpTable(cursor, fd, 'qwasteheatelequip', criterium,'ORDER BY WHEENo')
 
@@ -163,7 +204,7 @@ class ExportDataHR(object):
             criterium = criterium.replace('[','(').replace(']',')')
             self.dumpTable(cursor, fd, 'dbfluid', criterium)
             
-        fd.write('</InputXMLDataController>\n')
+        fd.write('</HeatRecovery>\n')
 
         fd.write('<Schedules>\n')
         for scheduleList in [Status.schedules.procOpSchedules,
@@ -184,13 +225,14 @@ class ExportDataHR(object):
 
     def dumpTable(self, cursor, fd, table, criterium, order=None):
         fieldtypes = {}
-        cursor.execute("SELECT column_name, data_type FROM information_schema.columns " \
-                        "WHERE table_name = '%s' AND table_schema = 'einstein'" % (table,))
+        #cursor.execute("SELECT column_name, data_type FROM information_schema.columns " \
+        #                "WHERE table_name = '%s' AND table_schema = 'einstein'" % (table,))
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
         result_set = cursor.fetchall()
         nfields = cursor.rowcount
         for field in result_set:
-            fname = field['column_name']
-            ftype = field['data_type']
+            fname = field['Field']
+            ftype = field['Type']
             fieldtypes[fname] = ftype
     
         sql = "SELECT * FROM %s" % (table,)
@@ -231,19 +273,17 @@ class ExportDataBaseXML(object):
                 return None
             (conn, outfile) = res
 
-        res = openconnection(parent)
-        if res is None:
-            return None
-        (conn, cursor) = res
+        (conn, cursor) = openconnection()
             
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n')
         fd.write('<EinsteinDBDump>\n')
-        cursor.execute("SELECT DISTINCT table_name from information_schema.columns " \
-                        "WHERE table_schema = 'einstein' ORDER BY table_name")
+        #cursor.execute("SELECT DISTINCT table_name from information_schema.columns " \
+        #                "WHERE table_schema = 'einstein' ORDER BY table_name")
+        cursor.execute("SHOW TABLES FROM einstein")
         tables = cursor.fetchall()
         for field in tables:
-            tablename = field['table_name']
+            tablename = field[0]
             self.dumpAllTable(cursor, fd, tablename)
 
         fd.write('</EinsteinDBDump>\n')
@@ -252,15 +292,16 @@ class ExportDataBaseXML(object):
 
     def dumpAllTable(self, cursor, fd, table):
         fieldtypes = {}
-        sql = "SELECT column_name, data_type FROM information_schema.columns " \
-                        "WHERE table_name = '%s' AND table_schema = 'einstein'" \
-                        "ORDER BY column_name" % (table,)
+        #sql = "SELECT column_name, data_type FROM information_schema.columns " \
+        #                "WHERE table_name = '%s' AND table_schema = 'einstein'" \
+        #                "ORDER BY column_name" % (table,)
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
         cursor.execute(sql)
         result_set = cursor.fetchall()
         nfields = cursor.rowcount
         for field in result_set:
-            fname = field['column_name']
-            ftype = field['data_type']
+            fname = field['Field']
+            ftype = field['Type']
             fieldtypes[fname] = ftype
     
         cursor.execute("SELECT * FROM %s" % (table,))
@@ -319,10 +360,7 @@ class ExportSchedulesXML(object):
                 return None
             (conn, outfile) = res
 
-        res = openconnection(parent)
-        if res is None:
-            return None
-        (conn, cursor) = res
+        (conn, cursor) = openconnection()
 
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n')

@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.13
+#	Version No.: 0.15
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -25,6 +25,8 @@
 #                           Hans Schweiger  12/06/2008
 #                           Stoyan Danov    17/06/2008
 #                           Stoyan Danov    18/06/2008
+#                           Tom Sobota      21/06/2008
+#                           Hans Schweiger  23/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
@@ -40,6 +42,9 @@
 #       17/06/2008 SD   adapt to new unitdict
 #       18/06/2008 SD   create display()
 #                   HS  some clean-up of old comments.
+#       21/06/2008 TS   general layout beautification. Adapt to font awareness.
+#       23/06/2008  HS  small changes in eventhandlers (missing adaptations to
+#                       new ChoiceEntry ...
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -58,14 +63,19 @@ from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
+from fonts import *
 
-# constants that control the default field sizes
+# constants that control the default sizes
+# 1. font sizes
+TYPE_SIZE_LEFT    =   9
+TYPE_SIZE_RIGHT   =   9
+TYPE_SIZE_TITLES  =  10
 
-HEIGHT          =  27 #SD
-LABELWIDTHLEFT  = 260
-LABELWIDTHRIGHT = 500
-DATAENTRYWIDTH  = 100
-UNITSWIDTH      =  90
+# 2. field sizes
+HEIGHT_LEFT       =  27
+LABEL_WIDTH_LEFT  = 220
+DATA_ENTRY_WIDTH  = 100
+UNITS_WIDTH       = 110
 
 class PanelQ2(wx.Panel):
     def __init__(self, parent, main):
@@ -81,13 +91,16 @@ class PanelQ2(wx.Panel):
 #--- UI setup
 #------------------------------------------------------------------------------
 
-##        wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
 ##                             pos=wx.Point(0, 0), size=wx.Size(780, 580), style=wx.BK_DEFAULT|wx.BK_TOP)
         wx.Panel.__init__(self, id=-1, name='PanelQ2', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
         
+        # access to font properties object
+        fp = FontProperties()
+
         self.notebook = wx.Notebook(self, -1, style=0)
+        self.notebook.SetFont(fp.getFont())
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
 
@@ -95,20 +108,38 @@ class PanelQ2(wx.Panel):
         self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
 
         self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Fuels list"))
-        self.sizer_3_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-
         self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Fuel consumption data"))
-        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+
+        # set font for titles
+        # 1. save actual font parameters on the stack
+        fp.pushFont()
+        # 2. change size and weight
+        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
+        self.sizer_3_staticbox.SetFont(fp.getFont())
+        self.sizer_5_staticbox.SetFont(fp.getFont())
+        # 3. recover previous font state
+        fp.popFont()
+
+        # set field sizes for the left tab.
+        fs = FieldSizes(wHeight=HEIGHT_LEFT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH)
+
+        # set font for labels of left tab
+        fp.pushFont()
+        fp.changeFont(size=TYPE_SIZE_LEFT)
 
         self.fuelListBox = wx.ListBox(self.page0, -1, style=wx.LC_LIST|wx.SUNKEN_BORDER)#SD added
+        self.fuelListBox.SetFont(fp.getFont())
         self.Bind(wx.EVT_LISTBOX, self.OnFuelListBoxClick, self.fuelListBox)
 
         self.buttonRemoveFuelFromList = wx.Button(self.page0, -1, _("Remove from list"))
         self.buttonRemoveFuelFromList.SetMinSize((125, 32))
+        self.buttonRemoveFuelFromList.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonRemoveFuelFromList, self.buttonRemoveFuelFromList)
 
         self.buttonAddFuel = wx.Button(self.page0, -1, _("Add fuel"))
         self.buttonAddFuel.SetMinSize((125, 32))
+        self.buttonAddFuel.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddFuel, self.buttonAddFuel)
 
         self.tc1 = ChoiceEntry(self.page0, 
@@ -117,7 +148,7 @@ class PanelQ2(wx.Panel):
                                tip=_(" "))
         
         self.tc3 = FloatEntry(self.page0,
-                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='MASSORVOLUMEFLOW',
                               label=_("Annual consumption (fuel units)"),
                               tip=_("If possible, provide the monthly data in separate sheet and/or the fuel bills. \
@@ -125,7 +156,7 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         
         
         self.tc4 = FloatEntry(self.page0,
-                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='ENERGY',
                               label=_("Annual consumption (LCV)"),
                               tip=_(" "))  
@@ -142,15 +173,22 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
                               label=_("Annual energy cost"),
                               tip=_("Total cost"))  
 
+        # fillers
         self.dummy1 = wx.StaticText(self.page0, -1, "")
         self.dummy2 = wx.StaticText(self.page0, -1, "")
 
+        # OK/Cancel buttons
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, _("Cancel"))
+        self.buttonCancel.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK, 'OK')
         self.buttonOK.SetDefault()
+        self.buttonOK.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+
+        # Right panel controls
+        fp.changeFont(size=TYPE_SIZE_RIGHT)
 
         ###-- grid setup
         self.grid = wx.grid.Grid(self.page1, -1, size=(1,1))
@@ -161,13 +199,12 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         self.grid.SetDefaultColSize(100, resizeExistingCols=False)
         self.grid.SetDefaultRowSize(23, resizeExistingRows=False)
 
-        self.grid.SetRowLabelSize(180)
+        self.grid.SetRowLabelSize(250)
         
         
         attr = wx.grid.GridCellAttr()
         attr.SetBackgroundColour("light gray")
-        attr.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-
+        attr.SetFont(fp.getFont())
         self.grid.SetAttr(7, 0, attr)
         self.grid.SetAttr(7, 1, attr)
         self.grid.SetAttr(7, 2, attr)
@@ -178,22 +215,19 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 
         attr2 = wx.grid.GridCellAttr()
         attr2.SetBackgroundColour("light gray")
-        attr2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-
+        attr2.SetFont(fp.getFont())
         self.grid.SetAttr(6, 0, attr2)
         self.grid.SetAttr(6, 3, attr2)
 
         attr3 = wx.grid.GridCellAttr()
         attr3.SetBackgroundColour("light gray")
-        attr3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-
+        attr3.SetFont(fp.getFont())
         self.grid.SetAttr(2, 4, attr3)
 
 
         attr4 = wx.grid.GridCellAttr()
         attr4.SetBackgroundColour("light gray")
-        attr4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-
+        attr4.SetFont(fp.getFont())
         self.grid.SetAttr(1, 4, attr4)
         
         self.grid.SetColLabelValue(0,_('Peak'))
@@ -219,8 +253,6 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         self.grid.SetCellSize(6, 3, 1, 3)
         self.grid.SetCellSize(1, 4, 1, 2)
         self.grid.SetCellSize(2, 4, 4, 1)
-
-
 
         self.grid.SetCellValue(6, 0, _('Electricity for thermal uses'))
         self.grid.SetCellValue(6, 3, _('Electricity for non-thermal uses'))
@@ -249,40 +281,35 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 
 
     def __do_layout(self):
+        # global sizer for panel. Contains notebook w/two tabs + buttons Cancel and Ok
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2 = wx.BoxSizer(wx.VERTICAL)#SD added
-        sizerPage1 = wx.BoxSizer(wx.VERTICAL)
+        # sizer for left tab
         sizerPage0 = wx.BoxSizer(wx.HORIZONTAL)
-#        grid_sizer_1 = wx.FlexGridSizer(7, 2, 5, 2)#SD
-        grid_sizer_1 = wx.BoxSizer(wx.VERTICAL) #SD
+        # sizer for right tab
+        sizerPage1 = wx.BoxSizer(wx.VERTICAL)
 
+        # left part of left tab: Fuel listbox + buttons Add and Remove
         sizer_3 = wx.StaticBoxSizer(self.sizer_3_staticbox, wx.VERTICAL)
-        sizer_3.Add(self.fuelListBox, 1, wx.EXPAND, 0)
+        sizer_3.Add(self.fuelListBox, 1, wx.EXPAND,0)
         sizer_3.Add(self.buttonRemoveFuelFromList, 0, wx.ALIGN_RIGHT, 0)
         sizer_3.Add(self.buttonAddFuel, 0, wx.ALIGN_RIGHT, 2)
-        sizerPage0.Add(sizer_3, 1, wx.EXPAND, 0)
+        sizerPage0.Add(sizer_3, 1, wx.EXPAND|wx.TOP, 20)
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
 
+        # right part of left tab: data entry widgets
         flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
-        flagText = wx.ALIGN_CENTER_VERTICAL
+        flagText = wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.LEFT
 
-##        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
-##        grid_sizer_1.Add(self.choiceOfDBFuelType, 0, 0, 0)
-        grid_sizer_1.Add(self.tc1, 0, flagText, 0)#SD added
-        
-#        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
-##        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
+        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
+        sizer_5.Add(self.tc1, 0, flagText, 2)
+        sizer_5.Add(self.tc3, 0, flagText, 2)
+        sizer_5.Add(self.tc4, 0, flagText, 2)
+        sizer_5.Add(self.tc5, 0, flagText, 2)
+        sizer_5.Add(self.tc6, 0, flagText, 2)
 
-        sizerPage0.Add(grid_sizer_1, 2, wx.LEFT|wx.RIGHT|wx.EXPAND, 20)
+        sizerPage0.Add(sizer_5, 2, wx.LEFT|wx.RIGHT|wx.TOP|wx.EXPAND, 20)
         self.page0.SetSizer(sizerPage0)
+
         sizerPage1.Add(self.grid, 1, wx.EXPAND, 0)
         self.page1.SetSizer(sizerPage1)
 
@@ -316,8 +343,7 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
             self.storeElectricityData()
 
     def storeFuelData(self):
-##        fuelName = str(self.choiceOfDBFuelType.GetStringSelection())#SD1
-        fuelName = str(self.tc1.GetStringSelection())#SD1
+        fuelName = str(self.tc1.GetValue(text=True))
         dbfuels = Status.DB.dbfuel.FuelName[fuelName]
         if len(dbfuels) > 0:
             dbfid = dbfuels[0].DBFuel_ID
@@ -329,7 +355,6 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
             if len(fuels) == 0:
                 newID = Status.prj.addFuelDummy()
                 tmp = {
-##                    "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
                     "FECFuel":self.check(self.tc4.GetValue()),
@@ -345,7 +370,6 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 
             elif len(fuels) == 1:
                 tmp = {
-##                    "FuelUnit":self.check(self.tc2.GetValue()),
                     "DBFuel_id":dbfid,
                     "MFuelYear":self.check(self.tc3.GetValue()), 
                     "FECFuel":self.check(self.tc4.GetValue()),
@@ -456,17 +480,13 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         try:
             self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
             self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
-            print "PanelQ2: fuel selection -> ",self.selectedFuelName,self.selectedFuelID
             q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
-##            self.tc2.SetValue(str(q.FuelUnit))
             self.tc3.SetValue(str(q.MFuelYear))
             self.tc4.SetValue(str(q.FECFuel))
             self.tc5.SetValue(str(q.FuelTariff))
             self.tc6.SetValue(str(q.FuelCostYear))
-#            self.choiceOfDBFuelType.SetSelection(self.choiceOfDBFuelType.FindString(self.selectedFuelName))#SD1
-            self.tc1.SetSelection(self.tc1.FindString(self.selectedFuelName))#SD1
+            self.tc1.SetValue(self.selectedFuelName)
         except IndexError:
-            # no data available
             self.clear()
         event.Skip()
 

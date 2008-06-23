@@ -264,7 +264,7 @@ class Project(object):
 #   deletes all entries for the original ANo
 #------------------------------------------------------------------------------
 
-        if ANo > Status.NoOfAlternatives or ANo == -1 or (ANo == 0 and Status.StatusCC > 0):
+        if ANo > Status.NoOfAlternatives or ANo == -1:
             
             logWarning(_("Project (deleteAlternative) - project %s, cannot delete alternative %s")%(Status.PId,ANo))
             return -1
@@ -383,6 +383,8 @@ class Project(object):
 
 #first remove everything with ANo > -1
 
+        self.cleanUpProject(Status.PId) #use the opportunity to clean-up erroneous entries with ANo > NoOfAlternatives
+        
         n = Status.NoOfAlternatives
         for ANo in range(n,-1,-1):
             self.deleteAlternative(ANo)
@@ -1287,6 +1289,7 @@ class Project(object):
 # deleting Q- and corresponding C-Tables
 
         sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
 
         hxes = Status.DB.qheatexchanger.sql_select(sqlQuery)
         NHX = len(hxes)
@@ -1300,7 +1303,7 @@ class Project(object):
 
         NHX += 1
 
-        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
         cgeneraldata[0].NHX = NHX
 
         Status.SQL.commit()

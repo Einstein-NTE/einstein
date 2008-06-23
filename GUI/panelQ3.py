@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
+#	Version No.: 0.17
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -28,6 +28,8 @@
 #                           Stoyan Danov    13/06/2008
 #                           Hans Schweiger  14/06/2008
 #                           Hans Schweiger  17/06/2008
+#                           Tom Sobota      21/06/2008
+#                           Hans Schweiger  23/06/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -47,6 +49,8 @@
 #       13/06/2008: SD  OnButtonOK changes
 #       14/06/2008: HS  Clean-up
 #       17/06/2008: HS  adaptation to new display_classes
+#       21/06/2008: TS  General beautification and font awareness.
+#       23/06/2008: HS  bug-fix in function display: clear() shifted to the beginning
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -72,13 +76,13 @@ TYPE_SIZE_RIGHT   =   9
 TYPE_SIZE_TITLES  =  10
 
 # 2. field sizes
-HEIGHT_LEFT       =  29
-HEIGHT_RIGHT      =  26
-LABEL_WIDTH_LEFT  = 260
-LABEL_WIDTH_RIGHT = 550
-DATA_ENTRY_WIDTH  = 100
-UNITS_WIDTH       = 100
-    
+HEIGHT_LEFT        =  29
+LABEL_WIDTH_LEFT   = 260
+HEIGHT_RIGHT       =  26
+LABEL_WIDTH_RIGHT  = 400
+DATA_ENTRY_WIDTH   = 100
+UNITS_WIDTH        = 100
+
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -487,21 +491,30 @@ using the nomenclature of the hydraulic scheme"))
     def OnListBoxProcessesClick(self, event):
         self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
         processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+
         q = processes.Process[self.selectedProcessName][0]
         self.selectedProcessID = q.QProcessData_ID
 
-        self.tc1.SetValue(str(q.Process))
-        if q.ProcType in TRANSPROCTYPES: self.tc2.SetValue(TRANSPROCTYPES[str(q.ProcType)])
-
+        fluidDict = Status.prj.getFluidDict()
         unitOpDict = Status.prj.getUnitOpDict()
+
+        self.tc1.SetValue(str(q.Process))
+        if q.ProcType in TRANSPROCTYPES.keys():
+            self.tc2.SetValue(TRANSPROCTYPES[str(q.ProcType)])
+        else:
+            self.tc2.SetValue("None")
+
         if q.DBUnitOperation_id in unitOpDict.keys():
             unitOp = unitOpDict[q.DBUnitOperation_id]
             self.tc3.SetValue(unitOp)
+        else:
+            self.tc3.SetValue("None")
 
-        fluidDict = Status.prj.getFluidDict()
         if q.ProcMedDBFluid_id in fluidDict.keys():
             fluidName = fluidDict[q.ProcMedDBFluid_id]
             self.tc4.SetValue(fluidName)
+        else:
+            self.tc4.SetValue("None")
 
         self.tc5.SetValue(str(q.PT))
         self.tc6.SetValue(str(q.PTInFlow))
@@ -515,16 +528,26 @@ using the nomenclature of the hydraulic scheme"))
         self.tc14.SetValue(str(q.NDaysProc))		
         self.tc15.SetValue(str(q.PTOutFlow))
 
-        fluidDict = Status.prj.getFluidDict()        
         if q.ProcMedOut in fluidDict.keys():
             fluidName = fluidDict[q.ProcMedOut]
             self.tc15_1.SetValue(fluidName)
+        else:
+            self.tc15_1.SetValue("None")
 
         self.tc15_2.SetValue(str(q.HOutFlow))
         self.tc16.SetValue(str(q.PTFinal))
         self.tc17.SetValue(str(q.VOutFlow))
-        if q.HeatRecOK in TRANSYESNO: self.tc18.SetValue(TRANSYESNO[str(q.HeatRecOK)])
-        if q.HeatRecExist in TRANSYESNO: self.tc19.SetValue(TRANSYESNO[str(q.HeatRecExist)])
+        
+        if q.HeatRecOK in TRANSYESNO:
+            self.tc18.SetValue(TRANSYESNO[str(q.HeatRecOK)])
+        else:
+            self.tc18.SetValue("None")
+            
+        if q.HeatRecExist in TRANSYESNO:
+            self.tc19.SetValue(TRANSYESNO[str(q.HeatRecExist)])
+        else:
+            self.tc19.SetValue("None")
+
         self.tc20.SetValue(str(q.SourceWasteHeat))	
         self.tc21.SetValue(str(q.PTInFlowRec))
 
@@ -532,6 +555,8 @@ using the nomenclature of the hydraulic scheme"))
         if q.SupplyMedDBFluid_id in fluidDict.keys():
             fluidName = fluidDict[q.SupplyMedDBFluid_id]
             self.tc22.SetValue(fluidName)
+        else:
+            self.tc22.SetValue("None")
 
         self.tc23.SetValue(str(q.PipeDuctProc))
         self.tc24.SetValue(str(q.TSupply))
@@ -605,12 +630,17 @@ using the nomenclature of the hydraulic scheme"))
 #------------------------------------------------------------------------------		
 
     def display(self):
+        self.clear()
+        self.fillPage()
         self.fillChoiceOfDBUnitOperation()
         self.fillChoiceOfPMDBFluid()
         self.fillChoiceOfODBFluid()
         self.fillChoiceOfSMDBFluid()
-        self.clear()
-        self.fillPage()
+        self.fillChoiceOfPipe()
+        self.fillChoiceOfHX()
+        self.tc2.SetValue(TRANSPROCTYPES.values())
+        self.tc18.SetValue(TRANSYESNO.values())
+        self.tc19.SetValue(TRANSYESNO.values())
         self.Show()
 
 
@@ -630,6 +660,15 @@ using the nomenclature of the hydraulic scheme"))
         fluidDict = Status.prj.getFluidDict()
         self.tc22.SetValue(fluidDict.values())
 
+    def fillChoiceOfPipe(self):
+        pipeList = Status.prj.getPipeList("Pipeduct")
+        self.tc23.SetValue(pipeList)
+
+    def fillChoiceOfHX(self):
+        hxList = Status.prj.getHXList("HXName")
+        self.tc20.SetValue(hxList)
+
+
     def fillPage(self):
         self.listBoxProcesses.Clear()
         processList = Status.prj.getProcessList("Process")
@@ -638,9 +677,9 @@ using the nomenclature of the hydraulic scheme"))
 
     def clear(self):
         self.tc1.SetValue('')
-        self.tc2.SetValue('')
-        self.tc3.SetValue('')
-        self.tc4.SetValue('')
+#        self.tc2.SetValue('')
+#        self.tc3.SetValue('')
+#        self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
