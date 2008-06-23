@@ -49,7 +49,7 @@ class Schedule():
 #   class that defines the standard EINSTEIN format for schedules
 #------------------------------------------------------------------------------		
 
-    def __init__(self):     #by default assigns a constant profile throughout the year
+    def __init__(self,name):     #by default assigns a constant profile throughout the year
         self.daily = [[(0.0,24.0)]]
         self.weekly = [(0.0,120.0)]
         self.monthly = [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
@@ -60,6 +60,7 @@ class Schedule():
         self.NBatch = 1
         self.HBatch = 24.
         self.ScheduleType = "continuous"
+        self.name = name
 
 #------------------------------------------------------------------------------		
     def setPars(self,ScheduleType,NDays,HPerDay,NBatch,HBatch):
@@ -306,7 +307,7 @@ class Schedules(object):
 #..............................................................................
 # schedule for process operation
                     
-            newSchedule = Schedule()
+            newSchedule = Schedule("Process No.%s (%s): Operation"%(process.ProcNo,process.Process))
 
             if process.ProcType == "continuous":
                 scheduleType = "continuous"
@@ -322,7 +323,7 @@ class Schedules(object):
 #..............................................................................
 # schedule for process start-up
 
-            newSchedule = Schedule()
+            newSchedule = Schedule("Process No.%s (%s): Start-Up"%(process.ProcNo,process.Process))
             
             if process.ProcType == "continuous":
                 scheduleType = "batchCharge"
@@ -339,7 +340,7 @@ class Schedules(object):
 #..............................................................................
 # schedule for process in-flows (for the moment only ONE !!!)
 
-            newSchedule = Schedule()
+            newSchedule = Schedule("Process No.%s (%s): InFlow 1"%(process.ProcNo,process.Process))
             
             if process.ProcType == "continuous":
                 scheduleType = "continuous"
@@ -353,7 +354,7 @@ class Schedules(object):
                                    process.HBatch)
             self.procInFlowSchedules.append(newSchedule)
 
-            newSchedule = Schedule()
+            newSchedule = Schedule("Process No.%s (%s): OutFlow 1"%(process.ProcNo,process.Process))
             if process.ProcType == "continuous":
                 scheduleType = "continuous"
             else:
@@ -385,7 +386,7 @@ class Schedules(object):
 #..............................................................................
 # schedule for equipment operation
                     
-            newSchedule = Schedule()
+            newSchedule = Schedule("Equipe No.%s (%s)"%(equipe.EqNo,equipe.Equipment))
 
             newSchedule.setPars("continuous",
                                 equipe.NDaysEq,
@@ -414,7 +415,7 @@ class Schedules(object):
 #..............................................................................
 # schedule for equipment operation
                     
-            newSchedule = Schedule()
+            newSchedule = Schedule("WHEE No.%s (%s)"%(whee.WHEENo,whee.WHEEName))
 
             newSchedule.setPars("continuous",
                                 whee.NDaysWHEE,

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.92
+#   Version No.: 0.93
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -53,6 +53,7 @@
 #                       Stoyan Danov                        16/06/2008
 #                       Stoyan Danov                        18/06/2008
 #                       Tom Sobota                          18/06/2008
+#                       Tom Sobota                          21/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -120,6 +121,7 @@
 #       16/06/2008  SD function display in PanelQ5
 #       18/06/2008  SD function display in PanelQ1,Q2,Q7,Q8,Q9
 #       18/06/2008  TS added fonts management facility
+#       21/06/2008  TS added Project Export and Import
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -508,11 +510,19 @@ class EinsteinFrame(wx.Frame):
             wx.Exit()
 
     def OnMenuExportData(self, event):
-        ex = ExportDataXML(self,pid=Status.PId,ano=Status.ANo, fuels=[1,2,3], fluids=[1,2,3,4])
+        print 'PId='+repr(Status.PId)
+        ex = ExportDataXML(pid=Status.PId,ano=Status.ANo, fuels=[1,2,3], fluids=[1,2,3,4])
 
     def OnMenuImportData(self, event):
-        ex = ImportDataXML(self)
+        ex = ImportDataXML()
 
+    def OnMenuExportProject(self, event):
+        print 'PId='+repr(Status.PId)
+        ex = ExportProject(pid=Status.PId)
+
+    def OnMenuImportProject(self, event):
+        ex = ImportProject()
+        print 'Original project pid = %s\nAssigned pid = %s' % ex.getPid()
 #..............................................................................
 # Scroll-up menu "VIEW"
 
@@ -1335,6 +1345,8 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
         self.Bind(wx.EVT_MENU, self.OnMenuImportData, self.ImportData)
         self.Bind(wx.EVT_MENU, self.OnMenuExportData, self.ExportData)
+        self.Bind(wx.EVT_MENU, self.OnMenuImportProject, self.ImportProject)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportProject, self.ExportProject)
 
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)

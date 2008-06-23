@@ -19,15 +19,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota	    June 2008
 #
 #       Last modified by:   Hans Schweiger  19/06/2008
 #                           Tom Sobota      20/06/2008
+#                           Hans Schweiger  23/06/2008
 #
 #       Changes to previous version:
 #       19/06/2008: HS  ExportDataHR created based on ExportDataXML
-#       20/06/2008: TS  Compatibility changes: substituted 'information_schema' by 'show tables'
+#       20/06/2008: TS  Compatibility changes: substituted 'information_schema'by 'show tables'
+#       23/06/2008: HS  Improvement of ExportDataHR: schedules now exported
+#                       - although not yet correctly :-(
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,6 +44,8 @@
 
 import sys
 import os
+import xml.dom
+import xml.dom.minidom
 import wx
 import MySQLdb
 from einstein.GUI.status import Status
@@ -62,8 +67,10 @@ def openconnection():
     cursor = conn.cursor(MySQLdb.cursors.DictCursor)
     return (conn,cursor)
 
-
-
+def error(text):
+    frame = wx.GetApp().GetTopWindow()
+    frame.showWarning(text)
+    
 class ImportDataXML(object):
 #=> todos los ID's principales de las tablas importadas se deberían sustituir por
 #   las ID's auto-incrementadas de la database receptora.
@@ -84,8 +91,7 @@ class ImportDataXML(object):
 #es idéntica ... y lo de los vínculos todavía por resolver :-) ). Así tal vez podemos
 #matar dos pájaros con un tiro ...
 
-    def __init__(self,parent,infile=None):
-        self.parent = parent
+    def __init__(self,infile=None):
         if infile is None:
             infile = openfilecreate('Choose a data file for importing',
                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -93,13 +99,13 @@ class ImportDataXML(object):
                 return None
 
         (conn, cursor) = openconnection()
-        self.fd = open(infile, 'r')
+        self.document = xml.dom.minidom.parse(infile)
+
         self.fd.close()
         conn.close()
 
 class ExportDataXML(object):
-    def __init__(self,parent,pid=None,ano=None,fuels=[],fluids=[],outfile=None):
-        self.parent = parent
+    def __init__(self,pid=None,ano=None,fuels=[],fluids=[],outfile=None):
         if outfile is None:
             outfile = openfilecreate('Output file for exporting tables')
             if outfile is None:
@@ -214,8 +220,7 @@ class ExportDataHR(object):
                          Status.schedules.equipmentSchedules,
                          Status.schedules.WHEESchedules]:
             for schedule in scheduleList:
-                pass
-#                dumpSchedule(cursor, fd, schedule)
+                self.dumpSchedule(cursor, fd, schedule)
         
         fd.write('</Schedules>\n')
 
@@ -258,6 +263,26 @@ class ExportDataHR(object):
                 fd.write('</InputXML%s>\n' % (table,))
             fd.write('</ListOf%s>\n' % (table,))
 
+    def dumpSchedule(self, cursor, fd, schedule, index=None):
+        fd.write('<schedule name ="%s" nweekly="%s" nholidays="%s"/>\n'%\
+                 (schedule.name,len(schedule.weekly),len(schedule.holidays)))
+        fd.write('<parameters ndays ="%s" hperday="%s" nbatch="%s" hbatch="%s" scheduletype="%s" />\n' % \
+                 (schedule.NDays, schedule.HPerDay, schedule.NBatch, schedule.HBatch, schedule.ScheduleType))
+#        for d in schedule.daily:
+#            fd.write('<daily index="%s" start="%s" end="%s" />\n' % (d[0],d[1]))
+            
+        i = 0
+        for w in schedule.weekly:
+            i+=1
+            fd.write('<weekly index="%s" start="%s" end="%s" />\n' % (i,w[0],w[1]))
+
+        for m in schedule.monthly:
+            fd.write('<monthly wariation="%s" />\n' % (m,))
+
+        i = 0
+        for h in schedule.holidays:
+            i+=1
+            fd.write('<holiday index="%s" start="%s" end="%s" />\n' % (i,h[0],h[1]))
 
 
 
@@ -265,25 +290,21 @@ class ExportDataBaseXML(object):
     #
     # exports whole einstein database in XML format
     #
-    def __init__(self,parent,outfile=None):
-        self.parent = parent
+    def __init__(self,outfile=None):
         if outfile is None:
             outfile = openfilecreate('Output file for exporting database')
             if outfile is None:
                 return None
-            (conn, outfile) = res
 
         (conn, cursor) = openconnection()
             
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n')
         fd.write('<EinsteinDBDump>\n')
-        #cursor.execute("SELECT DISTINCT table_name from information_schema.columns " \
-        #                "WHERE table_schema = 'einstein' ORDER BY table_name")
         cursor.execute("SHOW TABLES FROM einstein")
         tables = cursor.fetchall()
         for field in tables:
-            tablename = field[0]
+            tablename = field['Tables_in_einstein']
             self.dumpAllTable(cursor, fd, tablename)
 
         fd.write('</EinsteinDBDump>\n')
@@ -292,9 +313,6 @@ class ExportDataBaseXML(object):
 
     def dumpAllTable(self, cursor, fd, table):
         fieldtypes = {}
-        #sql = "SELECT column_name, data_type FROM information_schema.columns " \
-        #                "WHERE table_name = '%s' AND table_schema = 'einstein'" \
-        #                "ORDER BY column_name" % (table,)
         cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
         cursor.execute(sql)
         result_set = cursor.fetchall()
@@ -358,7 +376,6 @@ class ExportSchedulesXML(object):
             outfile = openfilecreate('Output file for exporting schedules')
             if outfile is None:
                 return None
-            (conn, outfile) = res
 
         (conn, cursor) = openconnection()
 
@@ -381,8 +398,8 @@ class ExportSchedulesXML(object):
         fd.write('<schedule name ="%s" ndaily="%s" nweekly="%s">\n')
         fd.write('<parameters ndays ="%s" hperday="%s" nbatch="%s" hbatch="%s" scheduletype="%s" />\n' % \
                  (schedule.NDays, schedule.HPerDay, schedule.NBatch, schedule.HBatch, schedule.ScheduleType))
-        for d in schedule.daily:
-            fd.write('<daily index="%s" start="%s" end="%s" />\n' % (d[0],d[1]))
+#        for d in schedule.daily:
+#            fd.write('<daily index="%s" start="%s" end="%s" />\n' % (d[0],d[1]))
             
         for w in schedule.weekly:
             fd.write('<weekly index="%s" start="%s" end="%s" />\n' % (w[0],w[1]))
@@ -391,5 +408,156 @@ class ExportSchedulesXML(object):
             fd.write('<monthly index="%s" value="%s" />\n' % (m,))
 
         for h in schedule.holidays:
-            fd.write('<holiday index="%s" value="%s" />\n' % (h,))
+            fd.write('<holiday index="%s" start="%s" end="%s" />\n' % (h[0],h[1]))
+
+
+
+# Aparte de esto necesitaría una función ExportProject, que debería hacer lo mismo que ExportDataBaseXML,
+# pero exportar los datos de UN SOLO PROYECTO (pero todos los ANo de este proyecto !!!, o sea
+# Query por ProjectID / Questionnaire_id / Questionnaire_ID según tabla.
+# Esta función se debería poder activar desde el menu principal -> export project;
+#
+
+class ExportProject(object):
+    #
+    # exports einstein project in XML format
+    #
+    def __init__(self, pid=None, outfile=None):
+        if pid is None:
+            error('ExportProject: PId missing')
+            return
+        if outfile is None:
+            outfile = openfilecreate('Output file for exporting project')
+            if outfile is None:
+                return None
+
+        (conn, cursor) = openconnection()
+            
+        fd = open(outfile, 'w')
+        fd.write('<?xml version="1.0" encoding="utf-8"?>\n')
+        fd.write('<EinsteinProject pid="%s">\n' % (pid,))
+        cursor.execute("SHOW TABLES FROM einstein")
+        tables = cursor.fetchall()
+        for field in tables:
+            tablename = field['Tables_in_einstein']
+            self.dumpProjectTable(cursor, fd, tablename, pid)
+
+        fd.write('</EinsteinProject>\n')
+        fd.close()
+        conn.close()
+
+
+    def dumpProjectTable(self, cursor, fd, table, pid):
+        fieldtypes = {}
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
+        result_set = cursor.fetchall()
+        nfields = cursor.rowcount
+        criterium = None
+        for field in result_set:
+            fname = field['Field']
+            ftype = field['Type']
+            fextra = field['Extra']
+            fieldtypes[fname] = (ftype,fextra)
+            # find the name of the ID field
+            if fname == 'ProjectID' or fname == 'Questionnaire_id' or fname == 'Questionnaire_ID':
+                criterium = '%s=%s' % (fname,pid)
+        if criterium is None:
+            fd.write('<!-- table %s ignored -->\n' % (table,))
+            return
+
+        sql = "SELECT * FROM %s WHERE %s" % (table, criterium)
+        cursor.execute(sql)
+        result_set = cursor.fetchall()
+        nrows = cursor.rowcount
+        if nrows <= 0:
+            fd.write('<!-- table %s has no values for id=%s -->\n' % (table,pid))
+        else:
+            fd.write('<table name="%s">\n' % (table,))
+            nn = 0
+            for row in result_set:
+                nn += 1
+                fd.write('<row n="%s">\n' % (nn,))
+                for key in row.keys():
+                    value = row[key]
+                    if value is not None:
+                        type,extra = fieldtypes[key]
+                        s = '<element name="%s" type="%s" auto="%s" value="%s" />\n' % (key,type,extra,value)
+                        fd.write(s)
+                fd.write('</row>\n')
+            fd.write('</table>\n')
+
+
+#Y necesitaría evidentemente también la parte complementaria, el "import project", porque sino el pobre
+# ExportProject se siente solo e inutil ...
+
+class ImportProject(object):
+    def __init__(self,infile=None):
+        self.pid = None
+        self.newpid = None
+
+        if infile is None:
+            infile = openfilecreate('Choose a project file for importing',
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if infile is None:
+                return None
+
+        (conn, cursor) = openconnection()
+        #
+        # get the highest project number so far in the database, add 1, and assign to the
+        # imported project
+        cursor.execute('SELECT MAX(Questionnaire_id) AS n FROM cgeneraldata') # must confirm this
+        nrows = cursor.rowcount
+        if nrows <= 0:
+            self.newpid = 1
+        else:
+            field = cursor.fetchone()
+            # new pid for this project
+            self.newpid = int(field['n']) + 1
+
+        # create a dom and import in it the xml project file
+        self.document = xml.dom.minidom.parse(infile)
+        # get the elements from the DOM
+        projects = self.document.getElementsByTagName('EinsteinProject')
+        for project in projects:
+            self.pid = project.getAttribute('pid')
+            tables = self.document.getElementsByTagName("table")
+            for table in tables:
+                tablename =  table.getAttribute('name')
+                rows = table.getElementsByTagName("row")
+                for row in rows:
+                    sqlist = []
+                    nrow =  table.getAttribute('n')
+                    elements = row.getElementsByTagName("element")
+                    for element in elements:
+                        fieldname = element.getAttribute('name')
+                        eltype = element.getAttribute('type')
+                        elauto = element.getAttribute('auto')
+                        elvalue = element.getAttribute('value')
+                        # substitute new pid in id field
+                        if fieldname == 'ProjectID' or \
+                             fieldname == 'Questionnaire_id' or \
+                             fieldname == 'Questionnaire_ID':
+                            elvalue = self.newpid
+                        # substitute invalid chars in char fields and enclose in ''
+                        if eltype.startswith('char') or eltype.startswith('varchar'):
+                            elvalue = "'" + self.subsIllegal(elvalue) + "'"
+                        # substitute auto-increment value with NULL
+                        if elauto == 'auto_increment':
+                            elvalue = 'NULL'
+
+                        sqlist.append("%s=%s" % (fieldname,elvalue))
+                    # create sql sentence and update database
+                    sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
+                    #print sql
+                    cursor.execute(sql)
+        conn.close()
+
+    def subsIllegal(self,text):
+        parts = text.split("'")
+        newtext = "''".join(parts)
+        return newtext
+
+
+    def getPid(self):
+        return (self.pid, self.newpid)
 
