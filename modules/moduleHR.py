@@ -17,9 +17,12 @@
 #
 #   Version No.: 0.01
 #   Created by:         Hans Schweiger  10/06/2008
-#   Last revised by:    
+#   Last revised by:
+#                       Hans Schweiger  23/06/2008
 #
 #   Changes to previous version:
+#
+#   23/06/2008: HS  Query of fluids and fuels used in export XML
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -96,7 +99,28 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
 
         Status.schedules.create()   #creates the process and equipment schedules
-        ex = ExportDataHR(pid=Status.PId, ano=Status.ANo,fuels=[1,2,3], fluids=[1,2,3,4])
+
+        fuelList = Status.prj.getQFuelList("DBFuel_id")
+        fuelIDs = []
+        for fuelID in fuelList:
+            fuelIDs.append(int(fuelID))
+
+        fluidList = []
+        fluidList.extend(Status.prj.getEquipmentList("Refrigerant"))
+        fluidList.extend(Status.prj.getPipeList("HeatDistMedium"))
+        fluidList.extend(Status.prj.getProcessList("ProcMedDBFluid_id"))
+        fluidList.extend(Status.prj.getProcessList("ProcMedOut"))
+        fluidList.extend(Status.prj.getProcessList("SupplyMedDBFluid_id"))
+        fluidList.extend(Status.prj.getWHEEList("WHEEMedium"))
+        
+        fluidIDs = []
+        for fluidID in fluidList:
+            if fluidID is not None:
+                newID = int(fluidID)
+                if newID not in fluidIDs:    #avoid double counting !!!
+                    fluidIDs.append(newID)
+                         
+        ex = ExportDataHR(pid=Status.PId, ano=Status.ANo,fuels=fuelIDs, fluids=fluidIDs)
 
 #        self.runHR()
 #        self.importDataFromHR()

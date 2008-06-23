@@ -1563,6 +1563,31 @@ class Project(object):
         return processList
 
 #------------------------------------------------------------------------------
+    def getQFuels(self):
+#------------------------------------------------------------------------------
+#   returns a list of fluids used in the project
+#------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        self.qfuel = Status.DB.qfuel.sql_select(sqlQuery)
+        
+        return self.qfuel
+
+#------------------------------------------------------------------------------
+    def getQFuelList(self,key):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        fuels = self.getQFuels()
+        
+        fuelList = []
+        for fuel in fuels:
+            fuelList.append(fuel[key])
+
+        return fuelList
+
+#------------------------------------------------------------------------------
     def getFluidDict(self):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
