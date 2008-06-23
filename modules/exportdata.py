@@ -210,8 +210,6 @@ class ExportDataHR(object):
             criterium = criterium.replace('[','(').replace(']',')')
             self.dumpTable(cursor, fd, 'dbfluid', criterium)
             
-        fd.write('</HeatRecovery>\n')
-
         fd.write('<Schedules>\n')
         for scheduleList in [Status.schedules.procOpSchedules,
                          Status.schedules.procStartUpSchedules,
@@ -223,6 +221,7 @@ class ExportDataHR(object):
                 self.dumpSchedule(cursor, fd, schedule)
         
         fd.write('</Schedules>\n')
+        fd.write('</HeatRecovery>\n')
 
         fd.close()
         conn.close()
@@ -277,7 +276,7 @@ class ExportDataHR(object):
             fd.write('<weekly index="%s" start="%s" end="%s" />\n' % (i,w[0],w[1]))
 
         for m in schedule.monthly:
-            fd.write('<monthly wariation="%s" />\n' % (m,))
+            fd.write('<monthly variation="%s" />\n' % (m,))
 
         i = 0
         for h in schedule.holidays:
