@@ -98,7 +98,8 @@ class ModuleHR(object):
 #       runs the calculations on the external HR module
 #------------------------------------------------------------------------------
 
-        Status.schedules.create()   #creates the process and equipment schedules
+        if Status.schedules.outOfDate == True:
+            Status.schedules.create()   #creates the process and equipment schedules
 
         fuelList = Status.prj.getQFuelList("DBFuel_id")
         fuelIDs = []

@@ -625,6 +625,9 @@ using the nomenclature of the hydraulic scheme"))
         Status.SQL.commit()
         self.fillPage()
 
+        Status.processData.outOfDate = True
+        Status.schedules.outOfDate = True
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------		

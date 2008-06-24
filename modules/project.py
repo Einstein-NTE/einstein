@@ -176,6 +176,8 @@ class Project(object):
 # initialisation. does the initialisation of basic parameters in Status
 #------------------------------------------------------------------------------		
 
+        Status.prj = self
+        
 #..............................................................................
 # get last tool settings from table STOOLS (last project opened, etc.)
 
@@ -185,13 +187,12 @@ class Project(object):
 # create instance of Schedules and Processes (does no calculations)
 
         Status.schedules = Schedules()
-        Status.processes = Processes()
+        Status.processData = Processes()
 
 #..............................................................................
 # set active project to the last one opened
 
         self.setActiveProject(Status.PId)
-        self.getStatus()
 
 #------------------------------------------------------------------------------		
         
@@ -358,7 +359,7 @@ class Project(object):
         return alternativeList
             
 #------------------------------------------------------------------------------
-    def setActiveAlternative(self,n):
+    def setActiveAlternative(self,n,checked = False):
 #------------------------------------------------------------------------------
 
         if (n>=-1) and n <= Status.NoOfAlternatives:
@@ -368,7 +369,18 @@ class Project(object):
                 Status.ANo = n
                 Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
                 self.getStatus()
-                
+                print "Project (setActiveAlternative): PId = %s ANo = %s StatusCC = %s"%\
+                      (Status.PId,Status.ANo,Status.StatusCC)
+
+                if checked == True:
+                    Status.prj.setStatus("CC")
+
+                if Status.StatusCC > 0:
+                    Status.schedules.outOfDate=True
+                    Status.processData.outOfDate=True
+                    
+#                    Status.schedules.create()
+                                
             except:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
                 pass
@@ -417,15 +429,21 @@ class Project(object):
 #   for given ANo and PId
 #------------------------------------------------------------------------------
 
+        print "Project (getProjectData)"
+        
         sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
         projects = Status.DB.questionnaire.sql_select(sqlQuery)
         if len(projects)>0: self.projectData = projects[0]
         else: self.projectData = None
 
+        print "-> len(projects) = ",len(projects)
+
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         generaldatasets = Status.DB.cgeneraldata.sql_select(sqlQuery)
         if len(generaldatasets) > 0:self.generalData = generaldatasets[0]
         else: self.generalData = None
+
+        print "-> len(generaldatasets) = ",len(generaldatasets)
         
         return (self.projectData,self.generalData)
 

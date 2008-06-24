@@ -53,7 +53,7 @@ class Schedule():
         self.daily = [[(0.0,24.0)]]
         self.weekly = [(0.0,120.0)]
         self.monthly = [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
-        self.holidays = []
+        self.holidays = [(365,365)]
         self.NHolidays = 1
         self.NDays = 260
         self.HPerDay = 24.      #operating period for the present schedule
@@ -61,7 +61,12 @@ class Schedule():
         self.HBatch = 24.
         self.ScheduleType = "continuous"
         self.name = name
+        self.HPerYear = self.NDays*self.HPerDay
+        self.hop = 1.0          #yearly operation hours from normalisation calculations
+                                #should be finally identical with self.HPerYear
 
+        self.fav = None         #fav is stored as a vector, as calculation seems
+                                #quite time-consuming (-> calc_fav) 
 #------------------------------------------------------------------------------		
     def setPars(self,ScheduleType,NDays,HPerDay,NBatch,HBatch):
 #------------------------------------------------------------------------------		
@@ -77,6 +82,7 @@ class Schedule():
         self.HPerYear = self.NDays*self.HPerDay
 
         self.setDefault(ScheduleType)
+        self.build_fav()
         
 #------------------------------------------------------------------------------		
     def f(self,time):
@@ -102,7 +108,7 @@ class Schedule():
         return fweek*fmonth
 
 #------------------------------------------------------------------------------		
-    def favg(self,time):
+    def calc_fav(self,time):
 #------------------------------------------------------------------------------		
 #   calculates the average value within the interval [time,time+Dt] 
 #------------------------------------------------------------------------------		
@@ -113,41 +119,67 @@ class Schedule():
 
         weekTime = time%WEEK
         fweek = 0.0
+
         for period in self.weekly:
             start,stop = period
-            weekTime1 = weekTime + Status.TimeStep
-            if weekTime >= start and weekTime1 <= stop:     #time interval fully within period
-                fweek = 1.
-                break
-            elif weekTime >= start and weekTime1 > stop:    #time interval ends after period
-                fweek = (stop - weekTime)/Status.TimeStep
-                break
-            elif weekTime < start and weekTime1 <= stop:
-                fweek = (weekTime1 - start)/Status.TimeStep
-                break
+            if weekTime < stop:
+                weekTime1 = weekTime + Status.TimeStep
+                if weekTime1 > start:
+                    if weekTime >= start and weekTime1 <= stop:     #time interval fully within period
+                        fweek = 1.
+                        break
+                    elif weekTime >= start and weekTime1 > stop:    #time interval starts within period, but ends afterwards
+                        fweek = (stop - weekTime)/Status.TimeStep
+                        break
+                    elif weekTime < start and weekTime1 <= stop:    #time interval starts before period, but ends within
+                        fweek = (weekTime1 - start)/Status.TimeStep
+                        break
             
         month = findFirstGE(day,MONTHSTARTDAY)
         fmonth =  self.monthly[month-1]
 
         return fweek*fmonth
         
+#------------------------------------------------------------------------------		
     def isHoliday(self,day):
+#------------------------------------------------------------------------------		
         for period in self.holidays:
             start,stop = period
             if day <= stop and day >= start: return True
+            
         return False
+
+#------------------------------------------------------------------------------		
+    def normalize(self):
+#------------------------------------------------------------------------------		
+        fsum = 0.0
+        for it in range(Status.Nt):
+            fsum += self.fav[it]
+
+        self.hop = fsum
+
+        for it in range(Status.Nt):
+            self.fav[it] /= fsum
+
+        if fabs(self.hop-self.HPerYear) > 1.0:
+            print "Schedule (normalize): WARNING - normalized operating hours (%s) different from specified in HPerYear (%s)"\
+                     %(self.hop,self.HPerYear)
+
+        return fsum
 
         
 #------------------------------------------------------------------------------		
-    def getSchedule(self):
+    def build_fav(self):
 #------------------------------------------------------------------------------		
 #   calculates the vector with average values for all timesteps
 #------------------------------------------------------------------------------		
-        schedule = []
+        self.fav = []
         for it in range(Status.Nt):
             time = Status.TimeStep*it
-            schedule.append(self.favg(time))
-#### TAKE CARE: -> should fractions be allowed, if timeSteps are large ??? 
+            self.fav.append(self.calc_fav(time))
+
+        self.normalize()
+
 
 #------------------------------------------------------------------------------		
     def setDefault(self,scheduleType):
@@ -248,8 +280,7 @@ class Schedule():
                 else:
                     break
 
-        print ("weekly profile created")
-        print self.weekly
+        print "Schedule (setDefault): weekly profile created: %s"%self.weekly
         
 #------------------------------------------------------------------------------		
 class Schedules(object):
@@ -260,12 +291,13 @@ class Schedules(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
-        pass
+        self.outOfDate = True
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
     def create(self):
 #------------------------------------------------------------------------------		
+
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
 
@@ -273,6 +305,7 @@ class Schedules(object):
         self.calculateEquipmentSchedules()
         self.calculateWHEESchedules()
 
+        self.outOfDate = False
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -281,9 +314,11 @@ class Schedules(object):
 #   calulates the Schedules of the processes
 #------------------------------------------------------------------------------		
 
-        print ("Schedules (calcProcS): running")
+        print "Schedules (calcProcS): running"
         
         processes = Status.prj.getProcesses()
+
+        print "-> %s processes found"%len(processes)
 
         self.procOpSchedules = []
         self.procStartUpSchedules = []

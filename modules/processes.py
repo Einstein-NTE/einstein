@@ -54,10 +54,15 @@ class Processes(object):
 #------------------------------------------------------------------------------		
     def createAggregateDemand(self):
 #------------------------------------------------------------------------------		
+
+        print "Processes (createAggregateDemand): starting"
+        
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
 
         processes = Status.prj.getProcesses()
+
+        print "-> %s processes found"%len(processes)
 
         QD_Tt = Status.int.createQ_Tt()
         QA_Tt = Status.int.createQ_Tt()
@@ -68,30 +73,47 @@ class Processes(object):
             UPHc = checkLimits(process.UPHc,0.0,INFINITE,0.0)
             scheduleC = Status.schedules.procInFlowSchedules[k]
             distUPHc = self.createTempDist(process.PT,T0=process.PTInFlowRec)
+            print "distUPHc(%s) = "%(k+1),distUPHc
             
             UPHm = checkLimits(process.UPHm,0.0,INFINITE,0.0)
             scheduleM = Status.schedules.procOpSchedules[k]
             distUPHm = self.createTempDist(process.PT)
+            print "distUPHm(%s) = "%(k+1),distUPHm
 
             UPHs = checkLimits(process.UPHs,0.0,INFINITE,0.0)
             scheduleS = Status.schedules.procStartUpSchedules[k]
             distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
+            print "distUPHs(%s) = "%(k+1),distUPHs
 
             UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
             scheduleW = Status.schedules.procOutFlowSchedules[k]
             distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
+            print "distUPHw(%s) = "%(k+1),distUPHw
 
-            print "Processes (createAggregateDemand) - process %s: ",process.Process,k+1,UPHc,UPHm,UPHs,UPHw            
+            print "Processes (createAggregateDemand) - process %s (%s): "%(process.ProcNo,process.Process),UPHc,UPHm,UPHs,UPHw            
             NT = Status.NT
             Nt = Status.Nt
 
-            for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
-                for it in range(Nt+1):
-                    time = Status.TimeStep*it
-                    QD_Tt[iT][it] += UPHc*distUPHc[iT]*scheduleC.favg(time)
-                    QD_Tt[iT][it] += UPHm*distUPHm[iT]*scheduleM.favg(time)
-                    QD_Tt[iT][it] += UPHs*distUPHs[iT]*scheduleS.favg(time)
-                    QA_Tt[iT][it] += UPHw*distUPHw[iT]*scheduleW.favg(time)
+            print "Processes (createAggregateDemand): now calculating QD_Tt / QA_Tt"
+            for it in range(Nt):
+                time = Status.TimeStep*it
+#                print "schedules - time: %s C: %s M: %s S: %s W: %s"%\
+#                      (time,scheduleC.favg(time),scheduleM.favg(time),scheduleS.favg(time),scheduleW.favg(time))
+
+            for it in range(Nt+1):
+                time = Status.TimeStep*it
+                fC = scheduleC.favg(time)
+                fM = scheduleM.favg(time)
+                fS = scheduleS.favg(time)
+                fW = scheduleW.favg(time)
+                
+                for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
+                    QD_Tt[iT][it] += UPHc*distUPHc[iT]*fC
+                    QD_Tt[iT][it] += UPHm*distUPHm[iT]*fM
+                    QD_Tt[iT][it] += UPHs*distUPHs[iT]*fS
+                    QA_Tt[iT][it] += UPHw*distUPHw[iT]*fW
+
+            print "Processes (createAggregateDemand): calculate QD_Tt concluded ..."
                  
         Status.int.QD_Tt = QD_Tt    
         Status.int.QA_Tt = QA_Tt
@@ -99,6 +121,9 @@ class Processes(object):
 #now calculate annual values
         Status.int.QD_T = Status.int.calcQ_T(QD_Tt)
         Status.int.QA_T = Status.int.calcQ_T(QA_Tt)
+
+        print "Processes (createAggregateDemand): yearly demand = %s yearly availability = %s"%\
+              (Status.int.QD_T[NT+1],Status.int.QA_T[0])
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -118,12 +143,12 @@ class Processes(object):
                     dist.append(0.0)
                 else:
                     dist.append(1.0)
-            dist.append(1.0)
+            dist.append(1.0)    #last entry for T > Tmax
 
         else:
-            for iT in range(0,NT+1):
+            for iT in range(NT+1):
                 dist.append(cutInterval(T[iT],T0,PT))
-            dist.append(1.0)
+            dist.append(1.0)    #last entry for T > Tmax
 
         return dist
                 

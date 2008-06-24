@@ -130,8 +130,6 @@ class PanelCC(wx.Panel):
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         self.grid.SetGridCursor(0, 0)
-
-        self.stTitlePanel.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -382,17 +380,12 @@ class PanelCC(wx.Panel):
             popup =  DialogOK(self,_("accept data"),\
                               _("you have to confirm that data are correct, before continuing"))
             if popup.ShowModal() == wx.ID_OK:
-                Status.prj.setActiveAlternative(0)
-                Status.prj.setStatus("CC")
+                Status.prj.setActiveAlternative(0,checked = True)
                 self.Hide()
                 self.main.tree.SelectItem(self.main.qEA4, select=True)
         else:
             popup =  DialogOK(self,_("revise data"),\
                               _("you first have to eliminate unconsistencies in the data set"))
-
-#        Status.schedules.create()
-#        Status.processes.createAggregateDemand()
-
 
     def OnButtonpanelCancelButton(self, event):
         #warning: do you want to leave w/o saving ???
