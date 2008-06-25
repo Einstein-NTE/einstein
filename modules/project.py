@@ -1195,22 +1195,26 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getPipes(self):
+    def getPipes(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY PipeDuctNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY PipeDuctNo ASC"%(PId)
+            
         pipes = Status.DB.qdistributionhc.sql_select(sqlQuery)
         
         return pipes
 #------------------------------------------------------------------------------
-    def getPipeList(self,key):
+    def getPipeList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        pipes = self.getPipes()
+        pipes = self.getPipes(PId)
         
         pipeList = []
         for pipe in pipes:
@@ -1442,23 +1446,27 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getWHEEs(self):
+    def getWHEEs(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s' ORDER BY WHEENo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "ProjectID = '%s' ORDER BY WHEENo ASC"%(PId)
+            
         whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
         
         return whees
 
 #------------------------------------------------------------------------------
-    def getWHEEList(self,key):
+    def getWHEEList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        whees = self.getWHEEs()
+        whees = self.getWHEEs(PId)
         
         WHEEList = []
         for whee in whees:
@@ -1502,23 +1510,26 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getFuels(self):
+    def getFuels(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY FuelNo ASC"%(PId)
         fuels = Status.DB.qfuel.sql_select(sqlQuery)
         
         return fuels
 
 #------------------------------------------------------------------------------
-    def getFuelList(self,key):
+    def getFuelList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
 #------------------------------------------------------------------------------
 
-        fuels = self.getFuels()
+        fuels = self.getFuels(PId)
         
         fuelList = []
         for fuel in fuels:
@@ -1527,23 +1538,27 @@ class Project(object):
         return fuelList
 
 #------------------------------------------------------------------------------
-    def getEquipments(self):
+    def getEquipments(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY EqNo ASC"%(PId)
+
         equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
         
         return equipments
 
 #------------------------------------------------------------------------------
-    def getEquipmentList(self,key):
+    def getEquipmentList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing equipment
 #------------------------------------------------------------------------------
 
-        eqs = self.getEquipments()
+        eqs = self.getEquipments(PId)
         
         eqList = []
         for eq in eqs:
@@ -1556,23 +1571,27 @@ class Project(object):
         return self.getEquipmentList(key)
 
 #------------------------------------------------------------------------------
-    def getProcesses(self):
+    def getProcesses(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY ProcNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY ProcNo ASC"%(PId)
+
         self.processes = Status.DB.qprocessdata.sql_select(sqlQuery)
         
         return self.processes
 
 #------------------------------------------------------------------------------
-    def getProcessList(self,key):
+    def getProcessList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        processes = self.getProcesses()
+        processes = self.getProcesses(PId)
         
         processList = []
         for process in processes:
@@ -1581,23 +1600,27 @@ class Project(object):
         return processList
 
 #------------------------------------------------------------------------------
-    def getQFuels(self):
+    def getQFuels(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of fluids used in the project
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY FuelNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY FuelNo ASC"%(PId)
+            
         self.qfuel = Status.DB.qfuel.sql_select(sqlQuery)
         
         return self.qfuel
 
 #------------------------------------------------------------------------------
-    def getQFuelList(self,key):
+    def getQFuelList(self,key,PId = None):
 #------------------------------------------------------------------------------
 #   returns a list of existing heat exchangers
 #------------------------------------------------------------------------------
 
-        fuels = self.getQFuels()
+        fuels = self.getQFuels(PId)
         
         fuelList = []
         for fuel in fuels:
@@ -1677,6 +1700,39 @@ class Project(object):
                 naceSubDict.update({naceSubCode:naceSubName})
             
         return (naceDict,naceSubDict)
+
+#------------------------------------------------------------------------------
+    def getFluidAndFuelList(self,PId=None):
+#------------------------------------------------------------------------------
+#   returns a list of all fluids and fuels used in a project
+#   if PId = None: returns for some alternative in the active project
+#   if PId specified: returns for the total project (all alternatives)
+#------------------------------------------------------------------------------
+
+        fuelList = Status.prj.getQFuelList("DBFuel_id",PId)
+        fuelIDs = []
+        for fuelID in fuelList:
+            if fuelID is not None:
+                newID = int(fuelID)
+                if newID not in fuelIDs:    #avoid double counting !!!
+                    fuelIDs.append(newID)
+
+        fluidList = []
+        fluidList.extend(Status.prj.getEquipmentList("Refrigerant",PId))
+        fluidList.extend(Status.prj.getPipeList("HeatDistMedium",PId))
+        fluidList.extend(Status.prj.getProcessList("ProcMedDBFluid_id",PId))
+        fluidList.extend(Status.prj.getProcessList("ProcMedOut",PId))
+        fluidList.extend(Status.prj.getProcessList("SupplyMedDBFluid_id",PId))
+        fluidList.extend(Status.prj.getWHEEList("WHEEMedium",PId))
+        
+        fluidIDs = []
+        for fluidID in fluidList:
+            if fluidID is not None:
+                newID = int(fluidID)
+                if newID not in fluidIDs:    #avoid double counting !!!
+                    fluidIDs.append(newID)
+           
+        return (fluidIDs,fuelIDs)
 
 
 #==============================================================================

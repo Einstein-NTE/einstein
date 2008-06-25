@@ -101,26 +101,7 @@ class ModuleHR(object):
         if Status.schedules.outOfDate == True:
             Status.schedules.create()   #creates the process and equipment schedules
 
-        fuelList = Status.prj.getQFuelList("DBFuel_id")
-        fuelIDs = []
-        for fuelID in fuelList:
-            fuelIDs.append(int(fuelID))
-
-        fluidList = []
-        fluidList.extend(Status.prj.getEquipmentList("Refrigerant"))
-        fluidList.extend(Status.prj.getPipeList("HeatDistMedium"))
-        fluidList.extend(Status.prj.getProcessList("ProcMedDBFluid_id"))
-        fluidList.extend(Status.prj.getProcessList("ProcMedOut"))
-        fluidList.extend(Status.prj.getProcessList("SupplyMedDBFluid_id"))
-        fluidList.extend(Status.prj.getWHEEList("WHEEMedium"))
-        
-        fluidIDs = []
-        for fluidID in fluidList:
-            if fluidID is not None:
-                newID = int(fluidID)
-                if newID not in fluidIDs:    #avoid double counting !!!
-                    fluidIDs.append(newID)
-                         
+        (fluidIDs,fuelIDs) = Status.prj.getFluidAndFuelList()                         
         ex = ExportDataHR(pid=Status.PId, ano=Status.ANo,fuels=fuelIDs, fluids=fluidIDs)
 
 #        self.runHR()
