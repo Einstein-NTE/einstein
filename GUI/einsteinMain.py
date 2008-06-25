@@ -54,6 +54,7 @@
 #                       Stoyan Danov                        18/06/2008
 #                       Tom Sobota                          18/06/2008
 #                       Tom Sobota                          21/06/2008
+#                       Hans Schweiger                      25/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -122,6 +123,7 @@
 #       18/06/2008  SD function display in PanelQ1,Q2,Q7,Q8,Q9
 #       18/06/2008  TS added fonts management facility
 #       21/06/2008  TS added Project Export and Import
+#       25/06/2008  HS rearrangement in tree: branches CC and BM
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -740,24 +742,11 @@ class EinsteinFrame(wx.Frame):
             
         #qDataCheck
         elif select == _("Consistency Check"):
-            #TS 2008-3-26 No action here
-            #self.hidePages()
-            #self.pageDataCheck.Show()
-            pass
-        #qCC
-        elif select == _("Basic check"):
             self.hidePages()
             self.panelCC = PanelCC(id=-1, name='panelCC',
                                    parent=self.leftpanel2, main=self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600))
             self.panelCC.display()
-        #qDataCheckPage2
-        elif select == _("Estimate missing data"):
-            self.hidePages()
-            self.pageDataCheckPage2 = wx.Panel(id=-1, name='pageDataCheckPage2',
-                                               parent=self.leftpanel2, pos=wx.Point(0, 0),
-                                               size=wx.Size(800, 600))
-            self.pageDataCheckPage2.Show()
         #qStatistics
         elif select == _("Energy statistics"):
             #TS 2008-3-26 No action here
@@ -790,8 +779,8 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEA5 = PanelEA5(parent=self.leftpanel2)
             self.panelEA5.display()
-        #qEA6 'Production of CO2 - Yearly'
-        elif select == _("Production of CO2"):
+        #qEA6 'Environmental Impact - Yearly'
+        elif select == _("Environmental Impact"):
             self.hidePages()
             self.panelEA6 = PanelEA6(parent=self.leftpanel2)
             self.panelEA6.display()
@@ -1022,13 +1011,9 @@ class EinsteinFrame(wx.Frame):
         try:self.Page9.Destroy()
         except:pass
 
-        try:self.pageDataCheck.Destroy()
-        except:pass
         try:self.panelCC.Destroy()
         except:pass
-        try:self.pageDataCheckPage2.Destroy()
-        except:pass
-
+        
         #try:self.pageStatistics.Destroy()
         #except:pass
 
@@ -1214,11 +1199,8 @@ class EinsteinFrame(wx.Frame):
         self.qPage8 = self.tree.AppendItem (self.qPage0, _("Buildings"),0)
         self.qPage9 = self.tree.AppendItem (self.qPage0, _("Economic parameters"),0)
 
-        self.qDataCheck = self.tree.AppendItem (self.qRoot, _("Consistency Check"))
-        self.qCC = self.tree.AppendItem (self.qDataCheck, _("Basic check"))
-        self.qDataCheckPage2 = self.tree.AppendItem (self.qDataCheck, _("Estimate missing data"))
-        self.qDataCheckPage3 = self.tree.AppendItem (self.qDataCheck, _("Check list for visit"))
-
+        self.qCC = self.tree.AppendItem (self.qRoot, _("Consistency Check"))
+        
         #
         # statistics subtree
         #
@@ -1232,7 +1214,7 @@ class EinsteinFrame(wx.Frame):
         self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
         self.qEA4 = self.tree.AppendItem (self.qEA, _("Process heat"))
         self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
-        self.qEA6 = self.tree.AppendItem (self.qEA, _("Production of CO2"))
+        self.qEA6 = self.tree.AppendItem (self.qEA, _("Environmental Impact"))
         # monthly statistics subtree
         self.qEM1 = self.tree.AppendItem (self.qEM, _("Monthly demand"))
         self.qEM2 = self.tree.AppendItem (self.qEM, _("Monthly supply"))
@@ -1241,14 +1223,11 @@ class EinsteinFrame(wx.Frame):
         self.qEH2 = self.tree.AppendItem (self.qEH, _("Hourly supply"))
 
 
-        self.qBenchmarkCheck = self.tree.AppendItem (self.qRoot, _("Benchmark check"))
-        self.qBenchmarkCheckPage1 = self.tree.AppendItem (self.qBenchmarkCheck, _("Select appropriate benchmarks"))
-        self.qBenchmarkCheckPage2 = self.tree.AppendItem (self.qBenchmarkCheck, _("Global energy intensity"))
-        self.qBenchmarkCheckPage3 = self.tree.AppendItem (self.qBenchmarkCheck, _("SEC by product"))
-        self.qBenchmarkCheckProduct = self.tree.AppendItem (self.qBenchmarkCheckPage3, _("Product name"))
-        self.qBenchmarkCheckPage4 = self.tree.AppendItem (self.qBenchmarkCheck, _("SEC by process"))
-        self.qBenchmarkCheckProcess = self.tree.AppendItem (self.qBenchmarkCheckPage4, _("Process name"))
-
+        self.qBM = self.tree.AppendItem (self.qRoot, _("Benchmark check"))
+        self.qBM1 = self.tree.AppendItem (self.qBM, _("Global energy intensity"))
+        self.qBM2 = self.tree.AppendItem (self.qBM, _("SEC by product"))
+        self.qBM3 = self.tree.AppendItem (self.qBM, _("SEC by process"))
+        
         #TS20080419 Example of a conditional tree branch.
         # the argument 'data=' is a list of two members:
         #                      a. a boolean function for testing the condition.
@@ -1284,9 +1263,9 @@ class EinsteinFrame(wx.Frame):
                 #H&C Storage
         self.qOptiProSupply1 = self.tree.AppendItem (self.qHC, _("H&C Storage"))
                 #CHP
-        self.qOptiProSupply2 = self.tree.AppendItem (self.qHC, _("CHP"))
+        self.qCHP = self.tree.AppendItem (self.qHC, _("CHP"))
                 #Solar Thermal
-        self.qOptiProSupply3 = self.tree.AppendItem (self.qHC, _("Solar Thermal"))
+        self.qST = self.tree.AppendItem (self.qHC, _("Solar Thermal"))
                 #Heat Pumps
         self.qHP = self.tree.AppendItem (self.qHC, _("Heat Pumps"))
                 #Biomass
@@ -1329,11 +1308,11 @@ class EinsteinFrame(wx.Frame):
         self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _("Report generation"))
         #self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, _("Report Page 2"))
         #self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, _("Print Report"))
+
         self.tree.Expand(self.qRoot)
         self.tree.Expand(self.qPage0)
-        self.tree.Expand(self.qDataCheck)
         self.tree.Expand(self.qStatistics)
-        self.tree.Expand(self.qBenchmarkCheck)
+        self.tree.Expand(self.qBM)
         self.tree.Expand(self.qA)
         self.tree.Expand(self.qFinalReport)
         

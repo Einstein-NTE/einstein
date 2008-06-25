@@ -2,6 +2,10 @@ from math import *
 
 def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
 
+    if nDecimals <> 2:
+        print "convertDoubleToString: WARNING - does not work well for nDecimals <> 2"
+        return "~!$@)/#$"
+    
     decimalSign = '.'
     if x is None:
         return ""
@@ -14,7 +18,10 @@ def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
             integerPart = int(ceil(x))
         decimalPartDouble = abs((x - integerPart))*pow(10.0,nDecimals)
         decimalPart = int(floor(decimalPartDouble+0.5))
-        string = "%d%s%d"%(integerPart,decimalSign,decimalPart)
+        if decimalPart < 10:
+            string = "%d%s0%d"%(integerPart,decimalSign,decimalPart)
+        else:
+            string = "%d%s%d"%(integerPart,decimalSign,decimalPart)
         return string
     else :
         if x >=0:

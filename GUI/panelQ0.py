@@ -172,7 +172,10 @@ class PanelQ0(wx.Panel):
         # so the next line would bomb because self doesn't exist any more)
         self.main.panelinfo.update()
         self.main.showMainMenuAlternatives()
-        self.main.tree.SelectItem(self.main.qPage1, select=True)
+        if Status.StatusCC <=0:
+            self.main.tree.SelectItem(self.main.qPage1, select=True)
+        elif Status.ANo > 0:
+            self.main.tree.SelectItem(self.main.qA,select=True)
 
 #------------------------------------------------------------------------------		
 

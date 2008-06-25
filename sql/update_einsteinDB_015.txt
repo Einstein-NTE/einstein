@@ -1,0 +1,25 @@
+--update einstein database: add BB parameters to UHEATPUMP
+USE einstein;
+
+
+ALTER TABLE dbbenchmark ADD COLUMN NACECode VARCHAR(45) COMMENT 'NaceCode as text' AFTER UnitOperation_id;
+ALTER TABLE dbbenchmark ADD COLUMN UnitOp VARCHAR(45) COMMENT 'UnitOp as text' AFTER NACECode;
+
+ALTER TABLE dbbenchmark CHANGE COLUMN E_SEC E_SEC_MIN DOUBLE COMMENT 'E_Sec_Min';
+ALTER TABLE dbbenchmark ADD COLUMN E_SEC_MAX DOUBLE COMMENT 'E_Sec_Max' AFTER E_SEC_MIN;
+ALTER TABLE dbbenchmark DROP COLUMN E_SEC_AVG;
+
+ALTER TABLE dbbenchmark CHANGE COLUMN H_SEC H_SEC_MIN DOUBLE COMMENT 'H_Sec_Min';
+ALTER TABLE dbbenchmark ADD COLUMN H_SEC_MAX DOUBLE COMMENT 'H_Sec_Max' AFTER H_SEC_MIN;
+ALTER TABLE dbbenchmark DROP COLUMN H_SEC_AVG;
+
+ALTER TABLE dbbenchmark CHANGE COLUMN T_SEC T_SEC_MIN DOUBLE COMMENT 'T_Sec_Min';
+ALTER TABLE dbbenchmark ADD COLUMN T_SEC_MAX DOUBLE COMMENT 'T_Sec_Max' AFTER T_SEC_MIN;
+ALTER TABLE dbbenchmark DROP COLUMN T_SEC_AVG;
+
+ALTER TABLE dbbenchmark ADD COLUMN TurnoverMin DOUBLE COMMENT 'Min. turnover of company' AFTER DataRelevance;
+ALTER TABLE dbbenchmark ADD COLUMN TurnoverMax DOUBLE COMMENT 'Max. turnover of company' AFTER TurnoverMin;
+ALTER TABLE dbbenchmark ADD COLUMN ProductionMin DOUBLE COMMENT 'Min. production volume of company' AFTER TurnoverMax;
+ALTER TABLE dbbenchmark ADD COLUMN ProductionMax DOUBLE COMMENT 'Max. production volume of company' AFTER ProuctionMin;
+ALTER TABLE dbbenchmark ADD COLUMN ProductionUnit DOUBLE COMMENT 'Units in which production volume is expressed' AFTER ProuctionMax;
+

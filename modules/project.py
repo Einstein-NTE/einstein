@@ -812,7 +812,7 @@ class Project(object):
 
         if (Status.PId > 0):
             if (Status.ANo <= 0 and Status.StatusCC > 0):
-                permit = (False,0,_("Data have already been confirmed as consisten. First unblock before modifying"))
+                permit = (False,0,_("Data have already been confirmed as consistent. First unblock before modifying"))
             else:
                 permit = allow           
         else:
@@ -851,10 +851,7 @@ class Project(object):
             permit = (False,0,_("Cannot access this function. First open or define a new project"))
 
         tmp.update({_("Consistency Check"):permit})
-        tmp.update({_("Basic check"):permit})
-        tmp.update({_("Estimate missing data"):permit})
-        tmp.update({_("Check list for visit"):permit})
-
+        
 #..............................................................................
 # StatusCC: actions allowed once consistency check is concluded
 
@@ -876,7 +873,7 @@ class Project(object):
         tmp.update({_("Final energy by equipment"):permit})
         tmp.update({_("Process heat"):permit})
         tmp.update({_("Energy intensity"):permit})
-        tmp.update({_("Production of CO2"):permit})
+        tmp.update({_("Environmental Impact"):permit})
 
         tmp.update({_("Monthly demand"):permit})
         tmp.update({_("Monthly supply"):permit})
@@ -886,13 +883,10 @@ class Project(object):
 
 
         tmp.update({_("Benchmark check"):permit})
-        tmp.update({_("Select appropriate benchmarks"):permit})
         tmp.update({_("Global energy intensity"):permit})
         tmp.update({_("SEC by product"):permit})
-        tmp.update({_("product name"):permit})
         tmp.update({_("SEC by process"):permit})
-        tmp.update({_("process name"):permit})
-
+        
         tmp.update({_("Alternative proposals"):permit})
 
 #..............................................................................
@@ -992,6 +986,35 @@ class Project(object):
                     %(Status.PId,Status.ANo,productName)
 
         deleteSQLRows(DB.qproduct,sqlQueryQ)
+
+#------------------------------------------------------------------------------
+    def getProducts(self,key,PId = None):
+#------------------------------------------------------------------------------
+#   returns a table of existing equipment
+#------------------------------------------------------------------------------
+
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s'"%(PId)
+            
+        products = Status.DB.qproduct.sql_select(sqlQuery)
+        
+        return products
+
+#------------------------------------------------------------------------------
+    def getProductList(self,key,PId = None):
+#------------------------------------------------------------------------------
+#   returns a table of existing equipment
+#------------------------------------------------------------------------------
+
+        products = self.getProducts(PId)
+        
+        productList = []
+        for product in products:
+            productList.append(product[key])
+
+        return productList
 
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):

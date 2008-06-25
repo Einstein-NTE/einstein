@@ -14,19 +14,21 @@
 #------------------------------------------------------------------------------
 #			
 #	Short description:
-#       Benchmark module, part 2: specific energy consumption by product
+#       Benchmark module, part 1: global energy intensity
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    08/04/2008
-#       Revised by:         Tom Sobota  28/04/2008
+#       Revised by:         Tom Sobota              28/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger          25/06/2008
 #                           
 #
 #       Changes to previous version:
-#       28/04/2008          created method display
-#       18/06/2008 SD: change to translatable text _(...)
+#       28/04/2008: TS  created method display
+#       18/06/2008: SD  change to translatable text _(...)
+#       25/06/2008: HS  adaptation to changes in module  
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,9 +43,9 @@
 import wx
 import wx.grid
 from einstein.GUI.graphics import drawPiePlot
-from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
-from einstein.GUI.addEquipment_popup import AddEquipment #TS 20080405 changed
+from numCtrl import *
+from einstein.modules.messageLogger import *
 
 
 import einstein.modules.matPanel as Mp
@@ -52,17 +54,15 @@ from einstein.modules.interfaces import *
 
 [wxID_PANELBM3, wxID_PANELBM3BUTTONPAGEBM3BACK, 
  wxID_PANELBM3BUTTONPAGEBM3CANCEL, wxID_PANELBM3BUTTONPAGEBM3FWD, 
- wxID_PANELBM3BUTTONPAGEBM3OK, wxID_PANELBM3COMBOUNITOPERATION, 
- wxID_PANELBM3COMBOSEARCHCRIT1, wxID_PANELBM3FINDBENCHMARKS, 
- wxID_PANELBM3GRIDPAGE, wxID_PANELBM3FIG, wxID_PANELBM3SEARCHCRIT2, 
- wxID_PANELBM3ST1, wxID_PANELBM3ST1PAGEBM3, wxID_PANELBM3ST2, 
- wxID_PANELBM3ST3PAGEBM3, wxID_PANELBM3STATICTEXT1, wxID_PANELBM3STATICTEXT2, 
- wxID_PANELBM3STUNITOPERATION, wxID_PANELBM3STSEARCHCRIT1, 
- wxID_PANELBM3STSEARCHCRIT2UNIT, wxID_PANELBM3STSEARCHCRIT3, 
- wxID_PANELBM3STTITLE, wxID_PANELBM3TCSEARCHCRIT2A, 
- wxID_PANELBM3TCSEARCHCRIT2B, wxID_PANELBM3TCSEARCHCRIT3A, 
- wxID_PANELBM3TCSEARCHCRIT3B, 
-] = [wx.NewId() for _init_ctrls in range(26)]
+ wxID_PANELBM3BUTTONPAGEBM3OK, wxID_PANELBM3COMBOSEARCHCRIT1, 
+ wxID_PANELBM3FINDBENCHMARKS, wxID_PANELBM3GRIDPAGE, wxID_PANELBM3FIG, 
+ wxID_PANELBM3SEARCHCRIT2, wxID_PANELBM3ST1, wxID_PANELBM3ST1PAGEBM3, 
+ wxID_PANELBM3ST2, wxID_PANELBM3ST3PAGEBM3, wxID_PANELBM3STATICTEXT1, 
+ wxID_PANELBM3STSEARCHCRIT1, wxID_PANELBM3STSEARCHCRIT2UNIT, 
+ wxID_PANELBM3STSEARCHCRIT3, wxID_PANELBM3STTITLEPAGE, 
+ wxID_PANELBM3TCSEARCHCRIT2A, wxID_PANELBM3TCSEARCHCRIT2B, 
+ wxID_PANELBM3TCSEARCHCRIT3A, wxID_PANELBM3TCSEARCHCRIT3B, 
+] = [wx.NewId() for _init_ctrls in range(23)]
 
 # constants
 #
@@ -72,13 +72,88 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGA
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+COLNO = 6
+MAXROWS = 20
 
+
+#------------------------------------------------------------------------------		
+def drawFigure(self):
+#------------------------------------------------------------------------------
+#   defines the figures to be plotted
+#------------------------------------------------------------------------------		
+    if not hasattr(self, 'subplot'):
+        self.subplot = self.figure.add_subplot(1,1,1)
+
+    gdata = Status.int.GData["BM3 Figure"]
+    axis = gdata[0]
+    bmtar_el = gdata[1]
+    bmtar_fuel = gdata[2]
+    bm_el = gdata[3]
+    bm_fuel = gdata[4]
+    ps_el = gdata[5]
+    ps_fuel = gdata[6]
+
+    NBenchmarks = len(bmtar_fuel)
+    print "PanelBM3 (drawFigure): NBenchmarks = ",NBenchmarks
+
+    print "bmtar_el",bmtar_el
+    print "bmtar_fuel",bmtar_fuel
+    
+    for i in range(len(ps_el)):
+        self.subplot.plot(ps_el[i],
+                      ps_fuel[i],
+                      'rs-', label='FEC[%s]'%(i), linewidth=2)
+
+    for i in range(NBenchmarks):
+        self.subplot.plot(bmtar_el[i],
+                          bmtar_fuel[i],
+                          'go',  label='target')
+        self.subplot.plot(bm_el[i],
+                          bm_fuel[i],
+                          'bo-', label='min/max', linewidth=1)
+    self.subplot.axis(axis)
+
+
+#XXXXXX To be checked how to bring x/y- labels to this plot ...
+#    self.figure.xlabel('time (s)')
+#    self.figure.ylabel('current (nA)')
+#    self.figure.title('Gaussian colored noise')
+
+#    self.subplot.legend()
+
+
+#============================================================================== 
 class PanelBM3(wx.Panel):
+#============================================================================== 
 
+#------------------------------------------------------------------------------		
     def __init__(self, parent):
-        self._init_ctrls(parent)
+#------------------------------------------------------------------------------		
+        self.main = parent
+
 	keys = ['BM3 Table']
         self.mod = Status.mod.moduleBM
+
+        print "PanelBM: calling initPanel"
+        self.mod.initPanel()
+        
+        print "PanelBM: calling init_ctrls"
+        try: print "PanelBM - GData",Status.int.GData[keys[0]]
+        except: pass
+
+        gdata = Status.int.GData["BM Info"]
+        self.naceSearch =   gdata[0]
+        self.naceSelector = gdata[1]
+        self.turnover0 =    gdata[2]
+        self.turnover1 =    gdata[3]
+        self.year0 =        gdata[4]
+        self.year1 =        gdata[5]
+
+        self.processes =    gdata[7]
+        self.unitOps =      gdata[8]
+        self.selector =     gdata[9]
+        
+        self._init_ctrls(parent)
         
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
@@ -94,7 +169,7 @@ class PanelBM3(wx.Panel):
 
         dummy = Mp.MatPanel(self.panelFig,
                             wx.Panel,
-                            drawPiePlot,
+                            drawFigure,
                             paramList)
 
         #
@@ -107,73 +182,150 @@ class PanelBM3(wx.Panel):
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
 
-        key = keys[0]
-        data = Interfaces.GData[key]
-        (rows,cols) = data.shape
-        self.gridPage.CreateGrid(max(rows,20), cols)
+        self.gridPage.CreateGrid(MAXROWS, COLNO)
 
+        self.gridPage.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.gridPage.EnableGridLines(True)
-        self.gridPage.SetDefaultRowSize(20)
+        self.gridPage.SetDefaultRowSize(30)
+        self.gridPage.SetDefaultColSize(88)
         self.gridPage.SetRowLabelSize(30)
-        self.gridPage.SetColSize(0,115)
+        self.gridPage.SetColSize(0,180)
+        self.gridPage.SetColSize(1,180)
+        self.gridPage.SetColSize(2,80)
         self.gridPage.EnableEditing(False)
         self.gridPage.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.gridPage.SetColLabelValue(0, _("Source"))
         self.gridPage.SetColLabelValue(1, _("Reference"))
         self.gridPage.SetColLabelValue(2, _("Validity"))
-        self.gridPage.SetColLabelValue(3, _("Electricity (min)"))
-        self.gridPage.SetColLabelValue(4, _("Electricity (target)"))
-        self.gridPage.SetColLabelValue(5, _("Electricity (max)"))
-        self.gridPage.SetColLabelValue(6, _("Fuels (min)"))
-        self.gridPage.SetColLabelValue(7, _("Fuels (target)"))
-        self.gridPage.SetColLabelValue(8, _("Fuels (max)"))
-        self.gridPage.SetColLabelValue(9, _("Primary energy (min)"))
-        self.gridPage.SetColLabelValue(10, _("Primary energy (target)"))
-        self.gridPage.SetColLabelValue(11, _("Primary energy (max)"))
-     #
+        self.gridPage.SetColLabelValue(3, _("Primary energy"))
+        self.gridPage.SetColLabelValue(4, _("Fuels"))
+        self.gridPage.SetColLabelValue(5, _("Electricity"))
+             #
         # copy values from dictionary to grid
         #
-        for r in range(rows):
+        for r in range(MAXROWS):
             self.gridPage.SetRowAttr(r, attr)
-            for c in range(cols):
-                self.gridPage.SetCellValue(r, c, data[r][c])
-                if c == labels_column:
+            for c in range(COLNO):
+                if c <= labels_column:
                     self.gridPage.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
-                    self.gridPage.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+                    self.gridPage.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.gridPage.SetGridCursor(0, 0)
 
-        self.stTitle.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-    
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELBM3, name='PanelBM3', parent=prnt,
-              pos=wx.Point(0, 0), size=wx.Size(808, 634), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(808, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
-        self.panelFig = wx.Panel(id=wxID_PANELBM3FIG, name='panelBM3Figure',
-              parent=self, pos=wx.Point(26, 346), size=wx.Size(382, 220),
-              style=wx.TAB_TRAVERSAL)
+#..............................................................................
+# box 1: grid display
+
+        self.box1 = wx.StaticBox(self, -1, _('Benchmark (3): specific energy consumption (SEC) by unit operation'),
+                                 pos = (10,10),size=(780,260))
+#        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
+#              False, 'Tahoma'))
+
+        self.stProcess = wx.StaticText(id=-1,
+              label=_('Process:'), name='stProcess', parent=self, pos=wx.Point(10,
+              280), size=wx.Size(80, 24), style=0)
+
+        self.comboProcess = wx.ComboBox(choices=self.processes,
+              id=-1, name='comboProcess', parent=self,
+              pos=wx.Point(100, 280), size=wx.Size(140, 24), style=0)
+        self.comboProcess.SetSelection(0)
+        self.comboProcess.Bind(wx.EVT_COMBOBOX, self.OnComboProcessChoice,id=-1)
+
+        self.stUnitOp = wx.StaticText(id=-1,
+              label=self.unitOps[0], name='stUnitOp', parent=self, pos=wx.Point(260,
+              280), size=wx.Size(140, 24), style=0)
 
         self.gridPage = wx.grid.Grid(id=wxID_PANELBM3GRIDPAGE,
-              name='gridpageBM3', parent=self, pos=wx.Point(24, 56),
-              size=wx.Size(752, 216), style=0)
+              name='gridpageBM3', parent=self, pos=wx.Point(20, 40),
+              size=wx.Size(760, 220), style=0)
         self.gridPage.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPageGridCellLeftDclick, id=wxID_PANELBM3GRIDPAGE)
         self.gridPage.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridPageGridCellRightClick, id=wxID_PANELBM3GRIDPAGE)
 
-        self.st1pageBM3 = wx.StaticText(id=-1, label=_('Search criteria'),
-              name='st1pageBM3', parent=self, pos=wx.Point(448, 312), style=0)
+        self.FindBenchmarks = wx.Button(id=wxID_PANELBM3FINDBENCHMARKS,
+              label=_('find benchmarks'), name='FindBenchmarks', parent=self,
+              pos=wx.Point(592, 280), size=wx.Size(184, 24), style=0)
+        self.FindBenchmarks.Bind(wx.EVT_BUTTON, self.OnFindBenchmarksButton,
+              id=wxID_PANELBM3FINDBENCHMARKS)
 
-        self.stTitle = wx.StaticText(id=wxID_PANELBM3STTITLE,
-              label=_('Benchmarks 2: specific energy consumption by product'),
-              name='stTitle', parent=self, pos=wx.Point(24, 16), style=0)
-        self.stTitle.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
-              'Tahoma'))
+#..............................................................................
+# box 2: copmarison benchmarks
+
+        self.box2 = wx.StaticBox(self, -1, _('Comparison benchmark data'),
+                                 pos = (10,310),size=(400,260))
+
+
+        self.panelFig = wx.Panel(id=wxID_PANELBM3FIG, name='panelAFigure',
+              parent=self, pos=wx.Point(22, 340), size=wx.Size(380, 220),
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+
+#..............................................................................
+# box 3: search criteria
+
+        self.box3 = wx.StaticBox(self, -1, _('Search criteria'),
+                                 pos = (430,310),size=(360,220))
+
+        self.stSearchCrit1 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT1,
+              label=_('NACE Code range (digits)'), name='stSearchCrit1',
+              parent=self, pos=wx.Point(448, 352), size=wx.Size(123, 13),
+              style=0)
+
+        self.comboSearchCrit1 = wx.ComboBox(choices=self.naceSelector, id=wxID_PANELBM3COMBOSEARCHCRIT1,
+              name='comboSearchCrit1', parent=self, pos=wx.Point(640, 344),
+              size=wx.Size(136, 21), style=0)
+        self.comboSearchCrit1.SetSelection(self.naceSearch)
+
+        self.st1 = wx.StaticText(id=wxID_PANELBM3ST1, label=_('max.'), name='st1',
+              parent=self, pos=wx.Point(728, 384), size=wx.Size(25, 13),
+              style=0)
+
+        self.st2 = wx.StaticText(id=wxID_PANELBM3ST2, label=_('min.'), name='st2',
+              parent=self, pos=wx.Point(664, 384), size=wx.Size(21, 13),
+              style=0)
+
+        self.SearchCrit2 = wx.StaticText(id=wxID_PANELBM3SEARCHCRIT2,
+              label=_('Volume of process medium'), name='SearchCrit2', parent=self,
+              pos=wx.Point(448, 416), size=wx.Size(120, 13), style=0)
+
+        self.stSearchCrit2Unit = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT2UNIT,
+              label=_('[t/year]'), name='stSearchCrit2Unit', parent=self,
+              pos=wx.Point(592, 416), size=wx.Size(22, 13), style=0)
+
+        self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT3,
+              label=_('Year of data'), name='stSearchCrit3', parent=self,
+              pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
+
+        self.tcSearchCrit2b = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT2B,
+              name='tcSearchCrit2b', parent=self, pos=wx.Point(712, 408),
+              size=wx.Size(64, 24), style=0, value=str(self.turnover1))
+
+        self.tcSearchCrit2a = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT2A,
+              name='tcSearchCrit2a', parent=self, pos=wx.Point(640, 408),
+              size=wx.Size(64, 24), style=0, value=str(self.turnover0))
+
+        self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT3,
+              label=_('Year of data'), name='stSearchCrit3', parent=self,
+              pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
+
+        self.tcSearchCrit3a = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT3A,
+              name='tcSearchCrit3a', parent=self, pos=wx.Point(640, 440),
+              size=wx.Size(64, 24), style=0, value=str(self.year0))
+
+        self.tcSearchCrit3b = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT3B,
+              name='tcSearchCrit3b', parent=self, pos=wx.Point(712, 440),
+              size=wx.Size(64, 24), style=0, value=str(self.year1))
+
+#..............................................................................
+# default action buttons
 
         self.buttonpageBM3Ok = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonpageBM3Ok', parent=self, pos=wx.Point(528, 544),
@@ -200,137 +352,148 @@ class PanelBM3(wx.Panel):
               self.OnButtonpageBM3BackButton,
               id=wxID_PANELBM3BUTTONPAGEBM3BACK)
 
-        self.FindBenchmarks = wx.Button(id=wxID_PANELBM3FINDBENCHMARKS,
-              label=_('find benchmarks'), name='FindBenchmarks', parent=self,
-              pos=wx.Point(592, 280), size=wx.Size(184, 24), style=0)
-        self.FindBenchmarks.Bind(wx.EVT_BUTTON, self.OnGenerateNewButton,
-              id=wxID_PANELBM3FINDBENCHMARKS)
-
-        self.st3pageBM3 = wx.StaticText(id=wxID_PANELBM3ST3PAGEBM3,
-              label=_('Comparison benchmark data'), name='st3pageBM3', parent=self,
-              pos=wx.Point(24, 320), size=wx.Size(137, 13), style=0)
-
-        self.staticText1 = wx.StaticText(id=wxID_PANELBM3STATICTEXT1,
-              label=_('Benchmarks found:'), name='staticText1', parent=self,
-              pos=wx.Point(24, 40), style=0)
-
-        self.stSearchCrit1 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT1,
-              label=_('NACE Code range (digits)'), name='stSearchCrit1',
-              parent=self, pos=wx.Point(448, 352), size=wx.Size(123, 13),
-              style=0)
-
-        self.SearchCrit2 = wx.StaticText(id=wxID_PANELBM3SEARCHCRIT2,
-              label=_('process product volume'), name='SearchCrit2', parent=self,
-              pos=wx.Point(448, 416), size=wx.Size(89, 13), style=0)
-
-        self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT3,
-              label=_('Year of data'), name='stSearchCrit3', parent=self,
-              pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
-
-        self.comboSearchCrit1 = wx.ComboBox(choices=["15500", "1550 _",
-              "155 _ _", "15 _ _ _"], id=wxID_PANELBM3COMBOSEARCHCRIT1,
-              name='comboSearchCrit1', parent=self, pos=wx.Point(640, 344),
-              size=wx.Size(136, 21), style=0, value='1550 _')
-        self.comboSearchCrit1.SetLabel('1550 _')
-
-        self.tcSearchCrit2b = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT2B,
-              name='tcSearchCrit2b', parent=self, pos=wx.Point(712, 408),
-              size=wx.Size(64, 24), style=1000, value='1000')
-
-        self.tcSearchCrit2a = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT2A,
-              name='tcSearchCrit2a', parent=self, pos=wx.Point(640, 408),
-              size=wx.Size(64, 24), style=0, value='0')
-
-        self.st1 = wx.StaticText(id=wxID_PANELBM3ST1, label=_('max.'), name='st1',
-              parent=self, pos=wx.Point(728, 384), size=wx.Size(25, 13),
-              style=0)
-
-        self.st2 = wx.StaticText(id=wxID_PANELBM3ST2, label=_('min.'), name='st2',
-              parent=self, pos=wx.Point(664, 384), size=wx.Size(21, 13),
-              style=0)
-
-        self.tcSearchCrit3a = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT3A,
-              name='tcSearchCrit3a', parent=self, pos=wx.Point(640, 440),
-              size=wx.Size(64, 24), style=0, value='2000')
-
-        self.tcSearchCrit3b = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT3B,
-              name='tcSearchCrit3b', parent=self, pos=wx.Point(712, 440),
-              size=wx.Size(64, 24), style=0, value='2008')
-
-        self.stSearchCrit2Unit = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT2UNIT,
-              label=_('t/year'), name='stSearchCrit2Unit', parent=self,
-              pos=wx.Point(592, 416), size=wx.Size(30, 13), style=0)
-
-        self.staticText2 = wx.StaticText(id=wxID_PANELBM3STATICTEXT2,
-              label=_('staticText2'), name='staticText2', parent=self.panelFig,
-              pos=wx.Point(400, -320), size=wx.Size(55, 13), style=0)
-
-        self.stUnitOperation = wx.StaticText(id=wxID_PANELBM3STUNITOPERATION,
-              label=_('UnitOperation:'), name='stUnitOperation', parent=self, pos=wx.Point(512,
-              16), size=wx.Size(42, 13), style=0)
-
-        self.comboUnitOperation = wx.ComboBox(choices=[_("drying"), _("pasteurisation"), _("fermentation")],
-              id=wxID_PANELBM3COMBOUNITOPERATION, name='comboUnitOperation', parent=self,
-              pos=wx.Point(568, 8), size=wx.Size(210, 21), style=0,
-              value='drying')
-        self.comboUnitOperation.SetLabel(_('drying'))
-
-
+#------------------------------------------------------------------------------		
     def display(self):
+#------------------------------------------------------------------------------		
+
+#..............................................................................		
+#   create data table
+
+        data = Status.int.GData["BM3 Table"]
+        try: (rows,cols) = data.shape
+        except:
+            rows = 0
+
+        for r in range(rows):
+            for c in range(3):
+                try: self.gridPage.SetCellValue(r, c, data[r][c])
+                except:
+                    print "PanelBM (display): problems with data[%s][%s]: %s"%(r,c,data[r][c])
+
+            try:
+                self.gridPage.SetCellValue(r,3,self.displayBM(data[r][3:6]))
+            except:
+                print "PanelBM (display): problems with BMel: %s)"%self.displayBM(data[r][3:6])
+            try:
+                self.gridPage.SetCellValue(r,4,self.displayBM(data[r][6:9]))
+            except:
+                print "PanelBM (display): problems with BMel: %s)"%self.displayBM(data[r][6:9])
+            try:
+                self.gridPage.SetCellValue(r,5,self.displayBM(data[r][9:12]))
+            except:
+                print "PanelBM (display): problems with BMel: %s)"%self.displayBM(data[r][9:12])
+
+        for r in range(rows,MAXROWS):
+            for c in range(COLNO):
+                self.gridPage.SetCellValue(r, c, "")
+            
+#..............................................................................		
+#   create graphic representation
+
         self.panelFig.draw()
+
         self.Show()
-
         
-    def OnACalculateButton(self, event):
-        ret = self.modA.designAssistant1()
-        if (ret == "ManualFinalSelection"):
-            print "here I should edit the data base"
-        ret = self.modA.designAssistant2()
-        if ret == "changed":
-            modA.calculateCascade()
-            #updatePlots
-        
-    def OnGenerateNewButton(self, event):
-        #show pop-up menu for adding equipment
-        #TS20080405 FIXME put dbheatpump table here just for testing! Should be replaced by the
-	#right table when it is created
-        pu1 =  AddEquipment(self, self.modHP, 'Add Heat Pump equipment','dbheatpump', 0, False)
-        if pu1.ShowModal() == wx.ID_OK:
-            print _('PanelBM3 AddEquipment accepted. Id=')+str(pu1.theId)
-#            ret = self.modA.add(AId)
-            #update plots
-        else:
-            print _('Cancelled')
+#------------------------------------------------------------------------------		
+    def OnFindBenchmarksButton(self, event):
+#------------------------------------------------------------------------------		
+        naceSearch = self.comboSearchCrit1.GetSelection()
 
+        turnover0 = float(self.tcSearchCrit2a.GetValue())
+        turnover1 = float(self.tcSearchCrit2b.GetValue())
+
+        if turnover0 < 0 or turnover1 > 1.0e+6 or turnover0 > turnover1:
+            showWarning(_("revise your search criteria: turnover in between %s and %s M€"%(turnover0,turnover1)))
+            print (turnover0<=0.0),(turnover1 > 1.0e+6),(turnover0 > turnover1)
+            return
+
+        year0 = int(self.tcSearchCrit3a.GetValue())
+        year1 = int(self.tcSearchCrit3b.GetValue())
+
+        if (year0 < 1980 or year1 > 2050 or year0 > year1) and year0 > 0:
+            showWarning(_("revise your search criteria: year of data in between %s and %s"%(year0,year1)))
+            return
+
+        process = self.comboProcess.GetValue()
+        selector = self.comboProcess.GetSelection()
+        
+        searchCriteria = [naceSearch,None,turnover0,turnover1,year0,year1,None,process,selector]
+        Status.int.setGraphicsData("BM Info",searchCriteria)
+        self.mod.updateSearch()
+        self.display()
+    
+#------------------------------------------------------------------------------		
+    def OnComboProcessChoice(self, event):
+#------------------------------------------------------------------------------		
+        print "PanelBM3: ComboBox event handler active !!!"
+        self.OnFindBenchmarksButton(event)
+
+#------------------------------------------------------------------------------		
     def OnGridPageGridCellLeftDclick(self, event):
-        print "PanelBM3: Grid - left button Dclick"
+#------------------------------------------------------------------------------		
+        pass
 
+#------------------------------------------------------------------------------		
     def OnGridPageGridCellRightClick(self, event):
-        print "PanelBM3: Grid - right button click: scroll-up should appear"
+#------------------------------------------------------------------------------		
+        pass
         
+#------------------------------------------------------------------------------		
+#   Event handlers default panel buttons: <<< OK Cancel >>>
+#------------------------------------------------------------------------------		
+
     def OnButtonpageBM3OkButton(self, event):
         saveOption = "save"
-        self.mod.exitModule(saveOption)
+#        self.mod.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleOK: now I should go back to HC"
 
     def OnButtonpageBM3CancelButton(self, event):
         #warning: do you want to leave w/o saving ???
         saveOption = "save"
-        self.mod.exitModule(saveOption)
+#        self.mod.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleCancel: now I should go back to HC"
 
     def OnButtonpageBM3BackButton(self, event):
         #pop-up: to save or not to save ...
         saveOption = "save"
-        self.modA.exitModule(saveOption)
+#        self.modA.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleBack: now I should show another window"
 
     def OnButtonpageBM3FwdButton(self, event):
         #pop-up: to save or not to save ...
         saveOption = "save"
-        self.mod.exitModule(saveOption)
+#        self.mod.exitModule(saveOption)
         self.Hide()
         print "Button exitModuleFwd: now I should show another window"
+
+#------------------------------------------------------------------------------		
+#   Auxiliary functions
+#------------------------------------------------------------------------------		
+
+#------------------------------------------------------------------------------		
+    def displayBM(self, bm):
+#------------------------------------------------------------------------------		
+#       displays a benchmark given as a list bm:
+#       0: target 1: minimum 2: maximum
+#
+#       in the format
+#
+#       99.99 (55.55 - 101.00)
+#------------------------------------------------------------------------------		
+
+        try: bm_tar = convertDoubleToString(float(bm[0]))
+        except: target = "---"
+        try: bm_min = convertDoubleToString(float(bm[1]))
+        except: bm_min = "---"
+        try: bm_max = convertDoubleToString(float(bm[2]))
+        except: bm_max = "---"
+        
+        try: displayString = str(bm_tar + "\n(" + bm_min + " - " + bm_max + ")")
+        except:
+            print "PanelBM (displayBM): problems with data tar/min/max",bm_tar,bm_min,bm_max
+            displayString = ""
+        return displayString
+
