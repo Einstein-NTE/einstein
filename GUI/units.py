@@ -171,6 +171,13 @@ UNITS = {
         'btu': (0.0002930711,0.0)
         },
 
+# conversion to internal unit: [kWh]
+    'ENERGYFLOW': {
+        'kWh/m2a' : (1.0,0.0),
+        'MJ/m2a': (1.0/3.6,0.0),
+        'btu/h.ft2a': (0.0002930711/(0.3048*0.3048),0.0)
+        },
+
 # conversion to internal unit: [kW]
     'POWER' : {
         'kW' : (1.0,0.0),
@@ -202,6 +209,12 @@ UNITS = {
         'kW/K' : (1.0,0.0),
         'W/K' : (1.0e-3,0.0),
         'btu/hºF' : ((0.0002930711*9)/5,0.0)
+        },
+
+# conversion to internal unit: [-]
+    'ANGLE' : {
+        'º' : (1.0,0.0),
+        'rad' : (0.017453,0.0),
         },
 
 # conversion to internal unit: [-]
@@ -252,10 +265,12 @@ UNITSYSTEM = {
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'GJ',
+                'ENERGYFLOW':'MJ/m2a',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kJ/kg',
                 'SPECIFICHEAT':'kJ/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
+                'ANGLE':'º',
                 'FRACTION':'%',
                 'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/GJ'%CURRENCY,
@@ -277,10 +292,12 @@ UNITSYSTEM = {
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'MWh',
+                'ENERGYFLOW':'kWh/m2a',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kJ/kg',
                 'SPECIFICHEAT':'kJ/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
+                'ANGLE':'º',
                 'FRACTION':'%',
                 'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/MWh'%CURRENCY,
@@ -302,10 +319,12 @@ UNITSYSTEM = {
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
                 'ENERGY':'btu',
+                'ENERGYFLOW':'btu/h.ft2.a',
                 'POWER':'btu/h',
                 'SPECIFICENTHALPY':'btu/lb',
                 'SPECIFICHEAT':'btu/lbºF',
                 'HEATTRANSFERCOEF':'btu/hºF',
+                'ANGLE':'º',
                 'FRACTION':'%',
                 'GROWTHRATE':'%/a',
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,

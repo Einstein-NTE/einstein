@@ -42,7 +42,7 @@ def _(text):
     return text
 
 #------------------------------------------------------------------------------		
-VERSION = "M2_DEMO"
+VERSION = "NOT_M2_DEMO" #M2_DEMO: deactivates pipes
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99
@@ -116,6 +116,17 @@ PROCESSTYPE = ["condensing",
 
 BBTYPES = [PROCESSTYPE[0], PROCESSTYPE[1]]
 HPTYPES = [PROCESSTYPE[4], PROCESSTYPE[5]]
+
+STTYPES = [ "flat plate",
+            "evacuated tube",
+            "parabolic trough",
+            "linear fresnel concentrating"]
+TRANSSTTYPES = {"flat plate":     _("flat plate"),
+                "evacuated tube":           _("evacuated tube"),
+                "parabolic trough":_("parabolic trough"),
+                "linear fresnel concentrating":    _("linear fresnel concentrating")
+                }
+
 HXTYPES = [ "plate HX (liquid-liquid)",
             "plate HX (air-air)",
             "shell&tube HX (liquid-liquid)",
@@ -159,8 +170,8 @@ EQUIPMENT = {"HP":                 # equipment class
 PROCTYPES = ["continuous",
              "batch"]
 #translatable dictionary
-TRANSPROCTYPES = {"Continuous":_("continuous"),
-                  "Batch":_("batch")}
+TRANSPROCTYPES = {"continuous":_("continuous"),
+                  "batch":_("batch")}
 
 YESNO = ["yes","no"]
 #translatable dictionary
@@ -198,6 +209,36 @@ AMBIENTSINK = ["cooling tower",
 #translatable dictionary
 TRANSAMBIENTSINK = {"cooling tower":_("cooling tower"),
                     "ground heat exchanger":_("ground heat exchanger")}
+
+
+#translatable dictionary
+ORIENTATIONS = {"S":_("S"),
+                "SE":_("SE"),
+                "SW":_("SW"),
+                "E":_("E"),
+                "W":_("W"),
+                "NE":_("NE"),
+                "NW":_("NW"),
+                "N":_("N")}
+
+AZIMUTH = { "S":    0.0,
+            "SE":   -45.0,
+            "SW":   45.0,
+            "E":    -90.0,
+            "W":    90.0,
+            "NE":   -135.0,
+            "NW":   135.0,
+            "N":    180.0}
+
+SHADINGTYPES = {"No":_("No"), 
+                "Yes,partially shaded":_("Yes,partially shaded"),
+                "Yes,fully shaded":_("Yes,fully shaded")}
+
+ROOFTYPES = {"Corrugated metal roof":_("Corrugated metal roof"), 
+                "Composite sandwich panels":_("Composite sandwich panels"),
+                "Concrete roof":_("Concrete roof"),
+                "Tiled roof":_("Tiled roof"),
+                "Other":_("Other")}
 
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries

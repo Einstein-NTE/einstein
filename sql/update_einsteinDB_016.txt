@@ -1,0 +1,54 @@
+-- update einstein database: add ST parameters
+USE einstein;
+
+ALTER TABLE qrenewables ADD COLUMN Latitude DOUBLE COMMENT 'Geographic latitude of site';
+ALTER TABLE qrenewables ADD COLUMN ST_I DOUBLE COMMENT 'Total radiation on horizontal';
+ALTER TABLE qrenewables ADD COLUMN ST_Idn DOUBLE COMMENT 'Direct normal radiaction on horizontal';
+
+ALTER TABLE qrenewables DROP COLUMN SurfAreaRoof;
+ALTER TABLE qrenewables DROP COLUMN SurfAreaGround;
+
+ALTER TABLE qrenewables DROP COLUMN InclinationRoof;
+ALTER TABLE qrenewables DROP COLUMN InclinationGround;
+
+ALTER TABLE qrenewables DROP COLUMN OrientationRoof;
+ALTER TABLE qrenewables DROP COLUMN OrientationGround;
+
+ALTER TABLE qrenewables DROP COLUMN ShadingRoof;
+ALTER TABLE qrenewables DROP COLUMN ShadingGround;
+
+ALTER TABLE qrenewables DROP COLUMN DistanceToRoof;
+ALTER TABLE qrenewables DROP COLUMN DistanceToGround;
+
+ALTER TABLE qrenewables DROP COLUMN RoofType;
+ALTER TABLE qrenewables DROP COLUMN RoofStaticLoadCap;
+ALTER TABLE qrenewables DROP COLUMN EnclBuildGroundSketch;
+
+DROP TABLE IF EXISTS qsurfarea;
+CREATE TABLE qsurfarea (
+  id INTEGER UNSIGNED NOT NULL auto_increment,
+  ProjectID INTEGER UNSIGNED NOT NULL,
+  SurfAreaName VARCHAR(45) default NULL,
+  SurfArea DOUBLE default NULL,
+  Inclination DOUBLE default NULL,
+  Azimuth DOUBLE default NULL,
+  AzimuthClass VARCHAR(4) default NULL,
+  Shading VARCHAR(20) default NULL,
+  Distance DOUBLE default NULL,
+  RoofType VARCHAR(45) default NULL,
+  RoofStaticLoadCap DOUBLE default NULL,
+  Sketch TINYINT default NULL,
+  ST_IbT DOUBLE default NULL,
+  ST_IT DOUBLE default NULL,
+  PRIMARY KEY(id)
+) TYPE=MyISAM;
+
+ALTER TABLE qgenerationhc ADD COLUMN ST_C0 DOUBLE COMMENT 'Solar collector efficiency coefficient';
+ALTER TABLE qgenerationhc ADD COLUMN ST_C1 DOUBLE COMMENT 'Solar collector efficiency coefficient';
+ALTER TABLE qgenerationhc ADD COLUMN ST_C2 DOUBLE COMMENT 'Solar collector efficiency coefficient';
+ALTER TABLE qgenerationhc ADD COLUMN ST_IAM DOUBLE COMMENT 'Solar collector efficiency coefficient';
+ALTER TABLE qgenerationhc ADD COLUMN ST_Volume DOUBLE COMMENT 'Solar system storage volume';
+ALTER TABLE qgenerationhc ADD COLUMN ST_SysEff DOUBLE COMMENT 'Solar system efficiency';
+ALTER TABLE qgenerationhc ADD COLUMN ST_Surfaces VARCHAR(45) COMMENT 'Link to occupied surfaces';
+
+
