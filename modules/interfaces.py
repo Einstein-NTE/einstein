@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.14
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Revised by:         Hans Schweiger      13/03/2008
 #	                    Tom Sobota          17/03/2008
@@ -30,6 +30,7 @@
 #                           Hans Schweiger      14/05/2008
 #                           Stoyan Danov        15/05/2008
 #                           Stoyan Danov        27/05/2008
+#                           Hans Schweiger      26/06/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -49,6 +50,7 @@
 #                   functions added: printCascade_mod, printUSH
 #       27/05/2008  printCascade: change Interfaces.QA_Tt_mod[i][NT+1][0:23] to Interfaces.QA_Tt_mod[i][0][0:23]
 #                   initCascadeArrays: assignment of QD/QA_Tt_mod to avoid copy of the address
+#       26/06/2008: HS  USHj_t and QHX_t added in initCascadeArrays
 #
 #	
 #------------------------------------------------------------------------------		
@@ -201,9 +203,11 @@ class Interfaces(object):
 
             Interfaces.USHj_Tt.append(self.createQ_Tt())
             Interfaces.USHj_T.append(self.createQ_T())
+            Interfaces.USHj_t.append(self.createQ_t())
             Interfaces.QHXj_Tt.append(self.createQ_Tt())
             Interfaces.QHXj_T.append(self.createQ_T())
-
+            Interfaces.QHXj_t.append(self.createQ_t())
+            
 #        self.printCascade_mod()
 
 #------------------------------------------------------------------------------		

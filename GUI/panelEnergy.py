@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 #Boa:FramePanel:PanelEnergy
 #==============================================================================
 #
@@ -20,6 +21,7 @@
 #                           Hans Schweiger  16/04/2008
 #                           Hans Schweiger  29/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger  26/06/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
@@ -27,6 +29,7 @@
 #       16/04/08:   HS      main as argument in __init__
 #       29/04/08:   HS      method display added
 #       18/06/2008 SD: change to translatable text _(...)
+#       26/06/2008: HS  figure of instantaneous supply added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -67,8 +70,28 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
 COLNO = 8
+#------------------------------------------------------------------------------		
+def drawFigure(self):
+#------------------------------------------------------------------------------
+#   defines the figures to be plotted
+#------------------------------------------------------------------------------		
+#    if not hasattr(self, 'subplot'):
+    self.subplot = self.figure.add_subplot(1,1,1)
 
+    gdata = Status.int.GData['ENERGY Plot1']
+    print "len(gdata) = ",len(gdata)
+    for j in range(1,len(gdata)):
+        print "plotting curve 1"
+        print gdata[j],gdata[0]
+        self.subplot.plot(gdata[0],\
+                          gdata[j],\
+                          'go-', label='USH[%s]'%j, linewidth=2)
+    self.subplot.axis([0, 365, 0, 1000.0])
+#    self.subplot.legend()
+
+#------------------------------------------------------------------------------		
 class PanelEnergy(wx.Panel):
+#------------------------------------------------------------------------------		
 
     def __init__(self, parent, main,id, pos, size, style, name):
         self.main = main
@@ -80,18 +103,18 @@ class PanelEnergy(wx.Panel):
         # remaps drawing methods to the wx widgets.
         #
         (rows,cols) = (MAXROWS,COLNO)
-        ignoredrows = [rows-1,rows-2] # ignore totals and savings
+        ignoredrows = [] # ignore totals and savings
 
         # left graphic: Energy demand
-        paramList={'labels'      : labels_column,          # labels column
-                   'data'        : 3,                      # data column for this graph
-                   'key'         : keys[0],                # key for Interface
+        paramList={'labels'      : 0,                       # labels column
+                   'data'        : 1,                      # data column for this graph
+                   'key'         : 'ENERGY Plot1',                # key for Interface
                    'title'       : _('Energy demand'),        # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        #dummy = Mp.MatPanel(self.panelEnergyDemand, wx.Panel, drawPiePlot, paramList)
-
+        dummy = Mp.MatPanel(self.panelEnergyDemand, wx.Panel, drawFigure, paramList)
+        del dummy
 
         # right graphic: Comparative performance
         paramList={'labels'      : labels_column,            # labels column
@@ -102,7 +125,7 @@ class PanelEnergy(wx.Panel):
                    'ignoredrows' : ignoredrows}              # rows that should not be plotted
 
 
-        dummy = Mp.MatPanel(self.panelComPerformance,
+        dummy2 = Mp.MatPanel(self.panelComPerformance,
                             wx.Panel,
                             drawPiePlot,
                             paramList)
@@ -181,7 +204,7 @@ class PanelEnergy(wx.Panel):
               pos=wx.Point(16, 288), size=wx.Size(360, 224), style=0)
         self.panelEnergyDemand = wx.Panel(id=wxID_PANELENERGYPICTURE1, name='panelEnergyDemand', parent=self,
               pos=wx.Point(24, 312), size=wx.Size(344, 192),
-              style=wx.TAB_TRAVERSAL)
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
         self.buttonOK = wx.Button(id=wxID_PANELENERGYBUTTONOK, label=_('ok'),
               name='buttonOK', parent=self, pos=wx.Point(528, 528),
@@ -245,7 +268,7 @@ class PanelEnergy(wx.Panel):
         self.panelComPerformance = wx.Panel(id=wxID_PANELENERGYPICTURE2,
                                             name='panelComPerformance', parent=self,
               pos=wx.Point(424, 312), size=wx.Size(344, 192),
-              style=wx.TAB_TRAVERSAL)
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         
 #------------------------------------------------------------------------------		
     def display(self):
@@ -296,12 +319,14 @@ class PanelEnergy(wx.Panel):
         
 #        self.tcInfo1.SetValue(str(self.info[0]))
 #        self.tcInfo2.SetValue(str(self.info[1]))
-
+        
         self.panelComPerformance.draw()
+        self.panelEnergyDemand.draw()
         self.Show()
 
     def OnButtonRunSimulationButton(self, event):
         self.mod.runSimulation()
+        self.display()
 
     def OnButton1Button(self, event):
         event.Skip()

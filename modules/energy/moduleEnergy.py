@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.11
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
@@ -27,6 +27,7 @@
 #                           Hans Schweiger      18/04/2008
 #                           Stoyan Danov        14/05/2008
 #                           Enrico Facci        11/06/2008
+#                           Hans Schweiger      26/06/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -40,6 +41,9 @@
 #       14/05/2008 runSimulation reperence to C tables eliminated
 #       11/06/2008 modified runSimulation (getEquipmentClass, activated
 #                  calculateEnergyFlows for boilers
+#       26/06/2008: HS  solar thermal system (ST) added in runSimulation
+#                       try-except eliminated in runSimulation for better
+#                       debugging
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -62,31 +66,17 @@ from einstein.modules.interfaces import *
 from einstein.modules.heatPump.moduleHP import ModuleHP
 import einstein.modules.matPanel as mP
 
-def drawEnergyDemand(self):
-    # draws Energy Demand graphic
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-    # this is just an example curve
-    # the curve takes it's data from the dictionary Interfaces.GData, with the key 'Energy_ED'
-    self.subplot.plot(Interfaces.GData['Energy_ED'][0],
-                      Interfaces.GData['Energy_ED'][1],
-                      'go-', label='QD', linewidth=2)
-    self.subplot.plot(Interfaces.GData['Energy_ED'][2],
-                      Interfaces.GData['Energy_ED'][3],
-                      'rs',  label='QA')
-    self.subplot.axis([0, 100, 0, 1e+8])
-    self.subplot.legend()
-
+#============================================================================== 
+#============================================================================== 
 class ModuleEnergy(object):
+#============================================================================== 
+#============================================================================== 
 
+#------------------------------------------------------------------------------
     def __init__(self, keys):
+#------------------------------------------------------------------------------
         self.keys = keys
         
-#..............................................................................
-# getting list of equipment in SQL
-
-        self.getEquipmentList()
-
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
@@ -112,6 +102,65 @@ class ModuleEnergy(object):
 
         #print "ModuleEnergy graphics data initialization"
         #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
+
+#............................................................................................
+# 2. Plot dayly demand and supply
+
+        TimeIntervals=[]
+
+        self.getEquipmentList()
+        NEquipe = self.NEquipe
+
+        print "ModuleEnergy (initPanel): no USH data available"
+        print "NEquipe: %s Length of USH array: %s "%(NEquipe,len(Status.int.USHj_t))
+        print Status.int.USHj_t
+
+        if len(Status.int.USHj_t) < NEquipe:
+            
+            days = []
+            vals = []
+            for i in range(365):
+                days.append(1.0*i)
+                vals.append(0.0)
+            dataList = [days,vals]
+            
+        else:   
+        
+            USHj_daily = []
+            USHj_sum = []
+            days = []
+            
+            for j in range(NEquipe):
+                USHj_daily.append([])
+                USHj_sum.append(0.0)
+
+#            QD_daily = []
+#            QD_sum = 0.0
+                
+            nday = 0.0
+            for it in range(Status.Nt):
+                
+                for j in range(NEquipe):
+                    
+                    USHj_sum[j] += Status.int.USHj_t[j][it]
+#                QD_sum += Status.int.QD_Tt[Status.NT+1][it]
+                    
+                if ((it+1)%24) == 0:  #end of the day
+                    for j in range(NEquipe):
+                        USHj_daily[j].append(USHj_sum[j])
+                        USHj_sum[j] = 0.0
+#                    QD_daily.append(QD_sum)
+#                    QD_sum = 0.0
+                    nday+=1.0
+                    
+                    days.append(nday)
+
+            dataList = [days]
+            for j in range(NEquipe):
+                dataList.append(USHj_daily[j])
+        data = array(dataList)
+       
+        Status.int.setGraphicsData("ENERGY Plot1", data)
         
         return "ok"
 
@@ -132,24 +181,6 @@ class ModuleEnergy(object):
             equipe = self.equipments[j]
             Interfaces.cascade.append({"equipeID":equipe.QGenerationHC_ID,"equipeNo":j})
         print 'ModuleEnergy(getEquipmentList) Status.int.cascade', Status.int.cascade #SD, 16.05.2008
-
-#------------------------------------------------------------------------------
-    def exitModule(self,exit_option):
-#------------------------------------------------------------------------------
-        """
-        carries out any calculations necessary previous to displaying the HP
-        design assitant window
-        """
-#------------------------------------------------------------------------------
-        if exit_option == "save":
-            print "exitModule: here I should save the current configuration"
-        elif exit_option == "cancel":
-            print "exitModule: here I should retreive the previous configuration"
-            
-
-        print "exitModule: function not yet defined"
-
-        return "ok"
 
 #------------------------------------------------------------------------------
     def calculateEnergyFlows(self,equipe,cascadeIndex):
@@ -241,64 +272,69 @@ class ModuleEnergy(object):
 #------------------------------------------------------------------------------
 # updates the energy flows for the full equipment cascade
 #------------------------------------------------------------------------------
-        try:
-            print "ModuleEnergy (runSimulation): QD_T", Status.int.QD_T
-            NT = Status.NT
-            print "Running system simulation..."
+        print "ModuleEnergy (runSimulation): QD_T", Status.int.QD_T
+        NT = Status.NT
+        print "Running system simulation..."
 
-            self.getEquipmentList()
+        self.getEquipmentList()
             
 #..............................................................................
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
-            Status.int.initCascadeArrays(self.NEquipe)
+        Status.int.initCascadeArrays(self.NEquipe)
 
 #..............................................................................
 # now calculate the cascade
 # call the calculation modules for each equipment
 
-            for cascadeIndex in range(1,self.NEquipe+1):
-                equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
+        for cascadeIndex in range(1,self.NEquipe+1):
+            equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
 
-                equipe = self.equipments.QGenerationHC_ID[equipeID][0]
+            equipe = self.equipments.QGenerationHC_ID[equipeID][0]
 #                equipeC = self.equipmentsC.QGenerationHC_ID[equipeID][0]
-                print "ModuleEnergy (runSimulation) [%s] equipeType = : "%cascadeIndex,equipe.EquipType
-                
-                equipeClass = getEquipmentClass(equipe.EquipType)
-                print "ModuleEnergy (runSimulation): equipe type/class = ",equipe.EquipType,equipeClass
-                
+            print "ModuleEnergy (runSimulation) [%s] equipeType = : "%cascadeIndex,equipe.EquipType
+            
+            equipeClass = getEquipmentClass(equipe.EquipType)
+            print "ModuleEnergy (runSimulation): equipe type/class = ",equipe.EquipType,equipeClass
+            
 #                if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL" or equipe.EquipType == "compression heat pump":
-                if equipeClass == "HP":
-                    print "======================================"
-                    print "heat pump"
-                    print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
-                    Status.mod.moduleHP.calculateEnergyFlows(equipe,cascadeIndex)
-                    print "end heat pump"
-                    print "======================================"
-                elif equipeClass == "BB":
-                    print "boiler"
-                    print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
-                    Status.mod.moduleBB.calculateEnergyFlows(equipe,cascadeIndex)
-                    print "boiler"
-                    print "end boiler"
-                    print "======================================"
-                else:
-                    print "equipment type not yet forseen in system simulation module"
-                    print "running calculateEnergyFlows-dummy"
-                    self.calculateEnergyFlows(equipe,cascadeIndex)
+            if equipeClass == "HP":
+                print "======================================"
+                print "heat pump"
+                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
+                Status.mod.moduleHP.calculateEnergyFlows(equipe,cascadeIndex)
+                print "end heat pump"
+                print "======================================"
+            elif equipeClass == "BB":
+                print "boiler"
+                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
+                Status.mod.moduleBB.calculateEnergyFlows(equipe,cascadeIndex)
+                print "boiler"
+                print "end boiler"
+                print "======================================"
+            elif equipeClass == "ST":
+                print "solar thermal"
+                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
+                Status.mod.moduleST.calculateEnergyFlows(equipe,cascadeIndex)
+                print "end solar thermal"
+                print "======================================"
+            else:
+                print "equipment type not yet forseen in system simulation module"
+                print "running calculateEnergyFlows-dummy"
+                self.calculateEnergyFlows(equipe,cascadeIndex)
 
-                print "ModuleEnergy (runSimulation): end simulation"
+            print "ModuleEnergy (runSimulation): end simulation"
 
               
 #..............................................................................
-        except Exception, runSimulation: #in case of an error
-            print 'run Simulation exception', runSimulation
-            return runSimulation
+#        except Exception, runSimulation: #in case of an error
+#            print 'run Simulation exception', runSimulation
+#            return runSimulation
 
 #..............................................................................
-        else:       #everything is fine
-            return 0
+#        else:       #everything is fine
+#            return 0
 
 #==============================================================================
 
