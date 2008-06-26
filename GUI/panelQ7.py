@@ -59,11 +59,11 @@ TYPE_SIZE_TITLES  =  10
 HEIGHT_LEFT        =  29
 LABEL_WIDTH_LEFT   = 260
 HEIGHT_MIDDLE      =  29
-LABEL_WIDTH_MIDDLE = 150
+LABEL_WIDTH_MIDDLE = 230
 HEIGHT_RIGHT       =  26
 LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
-UNITS_WIDTH        = 100
+UNITS_WIDTH        = 120
 
 
 class PanelQ7(wx.Panel):
@@ -97,10 +97,7 @@ class PanelQ7(wx.Panel):
 
         self.frame_surfaceslist = wx.StaticBox(self.page1, -1, _("Solar energy surfaces"))
         self.frame_surfacedata = wx.StaticBox(self.page1, -1, _("Surface  data"))
-
-        #HS2008-06-26: New box added. Tom -> please revise layout !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.frame_weatherData = wx.StaticBox(self.page1, -1, "Weather data")
-
+        self.frame_weatherdata = wx.StaticBox(self.page1, -1, "Weather data")
         self.frame_biomass_processes = wx.StaticBox(self.page2, -1, "Availability of biomass from the processes")
         self.frame_biomass_region = wx.StaticBox(self.page2, -1, "Availability of biomass from the region")
 
@@ -111,6 +108,7 @@ class PanelQ7(wx.Panel):
         fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
         self.frame_surfaceslist.SetFont(fp.getFont())
         self.frame_surfacedata.SetFont(fp.getFont())
+        self.frame_weatherdata.SetFont(fp.getFont())
         self.frame_main_motivation.SetFont(fp.getFont())
         self.frame_biomass_processes.SetFont(fp.getFont())
         self.frame_biomass_region.SetFont(fp.getFont())
@@ -174,7 +172,7 @@ class PanelQ7(wx.Panel):
 
         self.tc8 = ChoiceEntry(self.page1,
                               values=ORIENTATIONS.values(),
-                              label=_("Orientation of the roof, ground, wall area (to south)"),
+                              label=_("Orientation of the roof, ground,\nwall area (to south)"),
 			      tip=_("Give the surface  inclination with respect to the  horizontal ( i.e. tilt angle, in degrees only)"))
 
         self.tc9 = ChoiceEntry(self.page1,
@@ -201,11 +199,10 @@ class PanelQ7(wx.Panel):
 
         self.tc13 = ChoiceEntry(self.page1,
                                 values=TRANSYESNO.values(),
-                                label=_("Is a plant/drawing of building(s) and surface(s) available?"),
+                                label=_("Is a plant/drawing of building(s)\nand surface(s) available?"),
                                 tip=_("Enclose the plant of the building(s) and/or a drawing of the surface(s)"))
 
 
-#HS2008-06-26: New entries added. Tom -> please revise layout !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         self.tc1_21 = FloatEntry(self.page1,
                         decimals=2, minval=-90.0, maxval=90.0,
                         unitdict='ANGLE',label=_("Geographic latitude"),\
@@ -349,22 +346,27 @@ class PanelQ7(wx.Panel):
         sizer_p1_left.Add(self.buttonDeleteEnergy, 0, wx.ALIGN_RIGHT, 2)
         sizerPage1.Add(sizer_p1_left, 1, wx.ALL|wx.EXPAND, 20)
         # tab 1 right part
-        sizer_p1_right = wx.StaticBoxSizer(self.frame_surfacedata, wx.VERTICAL)
-        sizer_p1_right.Add(self.tc6_0, 0, wx.TOP, 2)
-        sizer_p1_right.Add(self.tc6, 0, 0, 0)
-        sizer_p1_right.Add(self.tc7, 0, 0, 0)
-        sizer_p1_right.Add(self.tc8, 0, 0, 0)        
-        sizer_p1_right.Add(self.tc9, 0, 0, 0)        
-        sizer_p1_right.Add(self.tc10, 0, 0, 0)
-        sizer_p1_right.Add(self.tc11, 0, 0, 0)
-        sizer_p1_right.Add(self.tc12, 0, 0, 0)
-        sizer_p1_right.Add(self.tc13, 0, 0, 0)        
-        sizerPage1.Add(sizer_p1_right, 2, wx.ALL|wx.EXPAND, 20)
+        sizer_p1_right = wx.BoxSizer(wx.VERTICAL)
+        sizer_p1_top_right = wx.StaticBoxSizer(self.frame_surfacedata, wx.VERTICAL)
+        sizer_p1_top_right.Add(self.tc6_0, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc6, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc7, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc8, 0, wx.ALL, 2)        
+        sizer_p1_top_right.Add(self.tc9, 0, wx.ALL, 2)        
+        sizer_p1_top_right.Add(self.tc10, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc11, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc12, 0, wx.ALL, 2)
+        sizer_p1_top_right.Add(self.tc13, 0, wx.ALL, 2)        
+        sizer_p1_right.Add(sizer_p1_top_right, 3, wx.ALL|wx.EXPAND, 20)
+
+        sizer_p1_bottom_right = wx.StaticBoxSizer(self.frame_weatherdata, wx.VERTICAL)
+        sizer_p1_bottom_right.Add(self.tc1_21, 0, wx.ALL, 2)
+        sizer_p1_bottom_right.Add(self.tc1_22, 0, wx.ALL, 2)
+        sizer_p1_right.Add(sizer_p1_bottom_right, 1, wx.ALL|wx.EXPAND, 10)
+
+        sizerPage1.Add(sizer_p1_right, 2, wx.ALL|wx.EXPAND, 0)
         self.page1.SetSizer(sizerPage1)
 
-#HS2008-06-26: Tom -> please revise !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111111
-
-        #here box for weather data should be somehow added
         
         # tab 2 Biomass
         sizerPage2 = wx.BoxSizer(wx.VERTICAL)

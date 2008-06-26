@@ -96,7 +96,7 @@ TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
              "CHP fuel cell":_("CHP fuel cell")}
 
 
-PROCESSTYPE = ["condensing",
+EQUIPMENTSUBTYPE = ["condensing",
                "steam",
                "direct heating",
                "indirect heating",
@@ -114,8 +114,8 @@ PROCESSTYPE = ["condensing",
                "shell&tube HX (liquid-liquid)",
                "finned tubes (liquid-air)"]
 
-BBTYPES = [PROCESSTYPE[0], PROCESSTYPE[1]]
-HPTYPES = [PROCESSTYPE[4], PROCESSTYPE[5]]
+BBTYPES = [EQUIPMENTSUBTYPE[0], EQUIPMENTSUBTYPE[1]]
+HPTYPES = [EQUIPMENTSUBTYPE[4], EQUIPMENTSUBTYPE[5]]
 
 STTYPES = [ "flat plate",
             "evacuated tube",
@@ -141,27 +141,27 @@ TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
 EQUIPMENT = {"HP":                 # equipment class
              [(EQUIPTYPE[0],       # type of equipment, untranslated
                _(EQUIPTYPE[0]),    # type of equipment, translated
-               PROCESSTYPE[4],     # type of process, untranslated
-               _(PROCESSTYPE[4])), # type of process, translated
+               EQUIPMENTSUBTYPE[4],     # type of process, untranslated
+               _(EQUIPMENTSUBTYPE[4])), # type of process, translated
 
-              (EQUIPTYPE[1],_(EQUIPTYPE[1]),PROCESSTYPE[5],_(PROCESSTYPE[5]))],
+              (EQUIPTYPE[1],_(EQUIPTYPE[1]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
 
-             "BB": [(EQUIPTYPE[2],_(EQUIPTYPE[2]),PROCESSTYPE[1],_(PROCESSTYPE[1])),
-                    (EQUIPTYPE[3],_(EQUIPTYPE[3]),PROCESSTYPE[0],_(PROCESSTYPE[0])),
-                    (EQUIPTYPE[4],_(EQUIPTYPE[4]),PROCESSTYPE[2],_(PROCESSTYPE[2])),
-                    (EQUIPTYPE[5],_(EQUIPTYPE[5]),PROCESSTYPE[3],_(PROCESSTYPE[3]))],
+             "BB": [(EQUIPTYPE[2],_(EQUIPTYPE[2]),EQUIPMENTSUBTYPE[1],_(EQUIPMENTSUBTYPE[1])),
+                    (EQUIPTYPE[3],_(EQUIPTYPE[3]),EQUIPMENTSUBTYPE[0],_(EQUIPMENTSUBTYPE[0])),
+                    (EQUIPTYPE[4],_(EQUIPTYPE[4]),EQUIPMENTSUBTYPE[2],_(EQUIPMENTSUBTYPE[2])),
+                    (EQUIPTYPE[5],_(EQUIPTYPE[5]),EQUIPMENTSUBTYPE[3],_(EQUIPMENTSUBTYPE[3]))],
 
-             "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),PROCESSTYPE[4],_(PROCESSTYPE[4])),
-                    (EQUIPTYPE[7],_(EQUIPTYPE[7]),PROCESSTYPE[5],_(PROCESSTYPE[5]))],
+             "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),EQUIPMENTSUBTYPE[4],_(EQUIPMENTSUBTYPE[4])),
+                    (EQUIPTYPE[7],_(EQUIPTYPE[7]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
 
-             "ST": [(EQUIPTYPE[8],_(EQUIPTYPE[8]),PROCESSTYPE[6],_(PROCESSTYPE[6])),
-                    (EQUIPTYPE[9],_(EQUIPTYPE[9]),PROCESSTYPE[7],_(PROCESSTYPE[7])),
-                    (EQUIPTYPE[10],_(EQUIPTYPE[10]),PROCESSTYPE[8],_(PROCESSTYPE[8]))],
+             "ST": [(EQUIPTYPE[8],_(EQUIPTYPE[8]),EQUIPMENTSUBTYPE[6],_(EQUIPMENTSUBTYPE[6])),
+                    (EQUIPTYPE[9],_(EQUIPTYPE[9]),EQUIPMENTSUBTYPE[7],_(EQUIPMENTSUBTYPE[7])),
+                    (EQUIPTYPE[10],_(EQUIPTYPE[10]),EQUIPMENTSUBTYPE[8],_(EQUIPMENTSUBTYPE[8]))],
 
-             "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),PROCESSTYPE[11],_(PROCESSTYPE[11])),
-                    (EQUIPTYPE[12],_(EQUIPTYPE[12]),PROCESSTYPE[9],_(PROCESSTYPE[9])),
-                    (EQUIPTYPE[13],_(EQUIPTYPE[13]),PROCESSTYPE[10],_(PROCESSTYPE[10])),
-                    (EQUIPTYPE[14],_(EQUIPTYPE[14]),PROCESSTYPE[12],_(PROCESSTYPE[12]))]
+             "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),EQUIPMENTSUBTYPE[11],_(EQUIPMENTSUBTYPE[11])),
+                    (EQUIPTYPE[12],_(EQUIPTYPE[12]),EQUIPMENTSUBTYPE[9],_(EQUIPMENTSUBTYPE[9])),
+                    (EQUIPTYPE[13],_(EQUIPTYPE[13]),EQUIPMENTSUBTYPE[10],_(EQUIPMENTSUBTYPE[10])),
+                    (EQUIPTYPE[14],_(EQUIPTYPE[14]),EQUIPMENTSUBTYPE[12],_(EQUIPMENTSUBTYPE[12]))]
              }
 
 
