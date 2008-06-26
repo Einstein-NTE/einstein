@@ -43,6 +43,7 @@ from einstein.modules.moduleA import ModuleA
 from einstein.modules.energy.moduleEnergy import ModuleEnergy
 from einstein.modules.moduleHR import ModuleHR
 from einstein.modules.moduleHC import ModuleHC
+from einstein.modules.solar.moduleST import ModuleST
 from einstein.modules.heatPump.moduleHP import ModuleHP
 from einstein.modules.boiler.moduleBB import ModuleBB
 from einstein.modules.energyStats.moduleEA import ModuleEA
@@ -52,6 +53,8 @@ class Modules(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
+
+        print "Modules (__init__): creating module instances"
 
         self.moduleCC = ModuleCC()
         
@@ -69,6 +72,9 @@ class Modules(object):
         
         keys = ['HC Table'] 
         self.moduleHC = ModuleHC(keys)
+        
+        keys = ['ST Table'] 
+        self.moduleST = ModuleST(keys)
         
         keys = ['HP Table'] 
         self.moduleHP = ModuleHP(keys)
