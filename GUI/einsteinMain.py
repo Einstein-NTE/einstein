@@ -124,6 +124,7 @@
 #       18/06/2008  TS added fonts management facility
 #       21/06/2008  TS added Project Export and Import
 #       25/06/2008  HS rearrangement in tree: branches CC and BM
+#                      new panelST included
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -172,6 +173,7 @@ from panelCC import *
 from panelA import *
 from panelHR import *
 from panelHC import *
+from panelST import *
 from panelHP import *
 from panelBB import *
 from panelEnergy import *
@@ -838,32 +840,16 @@ class EinsteinFrame(wx.Frame):
             self.panelA = PanelA(parent=self.leftpanel2,main=self)
             self.panelA.display()
 
-        elif select == _("Report"):
-            #TS 2008-3-26 No action here
-            #self.hidePages()
-            #self.pageFinalReport.Show()
-            pass
-        #qFinalReportPage1
-        #TS20080501 changed 'Report page 1' to 'Report generation'
-        elif select == 'Report generation':
+        #pageBoilers
+        elif select == "Solar Thermal":
             self.hidePages()
-            self.pageFinalReport = PanelReport(parent=self.leftpanel2, main=self)
-            self.pageFinalReport.Show()
-        #TS20080501 took out this
-        #qFinalReportPage2
-        #elif select == _("Report Page 2"):
-        #    self.hidePages()
-        #    self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
-        #                                    parent=self.leftpanel2, pos=wx.Point(0, 0),
-        #                                    size=wx.Size(800, 600), style=0)
-        #    self.pageFinalReport.Show()
-        #qPrintReport
-        #elif select == _("Print Report"):
-        #    self.hidePages()
-        #    self.pageFinalReport = wx.Panel(id=-1, name='pageFinalReport',
-        #                                    parent=self.leftpanel2, pos=wx.Point(0, 0),
-        #                                    size=wx.Size(800, 600), style=0)
-        #    self.pageFinalReport.Show()
+            print "einsteinMain: calling ST panel"
+            dummy = Status.mod.moduleST
+            print "einsteinMain: dummy = ",dummy
+            
+            self.panelST = PanelST(id=-1, name='panelST', parent=self.leftpanel2,main=self)
+            self.panelST.display()
+            
         #panelHP
         elif select == "Heat Pumps":
             ret = self.OnEnterHeatPumpPage()
@@ -871,7 +857,7 @@ class EinsteinFrame(wx.Frame):
                 self.hidePages()
                 self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2,
                                        main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600),
-                                       style=wx.TAB_TRAVERSAL, sql = Status.SQL, db = Status.DB)
+                                       style=wx.TAB_TRAVERSAL)
                 self.panelHP.display()
             else:
                 self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
@@ -905,6 +891,17 @@ class EinsteinFrame(wx.Frame):
             self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelHC.display()
+        elif select == _("Report"):
+            #TS 2008-3-26 No action here
+            #self.hidePages()
+            #self.pageFinalReport.Show()
+            pass
+        #qFinalReportPage1
+        #TS20080501 changed 'Report page 1' to 'Report generation'
+        elif select == 'Report generation':
+            self.hidePages()
+            self.pageFinalReport = PanelReport(parent=self.leftpanel2, main=self)
+            self.pageFinalReport.Show()
 
 
 #------------------------------------------------------------------------------
@@ -1049,6 +1046,8 @@ class EinsteinFrame(wx.Frame):
         try:self.panelHR.Destroy()
         except:pass
         try:self.panelHC.Destroy()
+        except:pass
+        try:self.panelST.Destroy()
         except:pass
         try:self.panelHP.Destroy()
         except:pass
