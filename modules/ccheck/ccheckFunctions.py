@@ -79,9 +79,9 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 MINIMUM_VALUE = 1.e-10
 DEFAULT_SQERR = 1.e-10 # default value for sqerr assigned to questionnaire values
 NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
-MAX_SQERR = 0.25     # critical square error for screening
+MAX_SQERR = 0.1     # critical square error for screening
 
-CONFIDENCE = 10.    #maximum relation between statistical error and abs.min/max
+CONFIDENCE = 4.0    #maximum relation between statistical error and abs.min/max
                     #!!!!!!!!!! at present deactivated (set to 999.) because gave adjustment problems
 
 CHECKMODE = "BEST"  #MEAN or BEST. MEAN recommened as BEST doesn't give consistent results
@@ -330,15 +330,18 @@ class CCPar():
 #   creates a register entry if the parameter is None or with a high error
 #------------------------------------------------------------------------------
         CCScreen.nScreened += 1
-        
-        if (self.val == None):
-            CCScreen.screenList.append([self.name,"---","---",screen.dataGroup,self.priority])
-        elif (self.sqerr > MAX_SQERR):
-            if self.sqerr < 1.0:
-                err = pow(self.sqerr,0.5)*100
-                CCScreen.screenList.append([self.name,'%9.2f'%self.val,'%5.2f'%err,screen.dataGroup,self.priority])
-            else:
-                CCScreen.screenList.append([self.name,'%9.2f'%self.val,'>100.00',screen.dataGroup,self.priority])
+
+        if (self.val == None) or (self.sqerr > MAX_SQERR):
+            CCScreen.screenList.append([self.name,self.val,self.sqerr,screen.dataGroup,self.priority])    
+#        if (self.val == None):
+#            CCScreen.screenList.append([self.name,"---","---",screen.dataGroup,self.priority])
+#        elif (self.sqerr > MAX_SQERR):
+#            if self.sqerr < 1.0:
+#                err = pow(self.sqerr,0.5)
+#                CCScreen.screenList.append([self.name,'%9.2f'%self.val,'%5.2f'%err,screen.dataGroup,self.priority])
+#            CCScreen.screenList.append([self.name,self.val,err,screen.dataGroup,self.priority])
+#            else:
+#                CCScreen.screenList.append([self.name,'%9.2f'%self.val,'>100.00',screen.dataGroup,self.priority])
                 
         if DEBUG in ["ALL","BASIC"]:
             print "CCPar (screen): screening parameter"

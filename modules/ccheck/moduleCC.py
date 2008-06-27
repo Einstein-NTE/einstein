@@ -114,12 +114,13 @@ class ModuleCC(object):
 #..............................................................................
 # export screening data
 
-        format_percentage = '%3.2f'
-
-        logDebug("ModuleCC (updatePanel): screening with priority %s"%self.screen_priority)       
+        logDebug("ModuleCC (updatePanel): screening with priority %s"%self.screen_priority)
+        
         CCList = []
         nMissingVarsOfPriority=0
+        
         for entry in CCScreen.screenList:
+
             if entry[4] <= self.screen_priority:
 
                 if entry[4] == 1:
@@ -134,12 +135,23 @@ class ModuleCC(object):
                     description = ParameterList[varName]
                 else:
                     description = ""
+
+                if entry[1] is not None:
+                    val = '%9.2f'%entry[1]
+                    if entry[2] >= 1.0:
+                        err = '>100.00%'
+                    else:
+                        err = '%5.2f'%(100.0*pow(entry[2],0.5))+"%"
+                else:
+                    val = '---'
+                    err = '---'
                     
                 row = [entry[0]+"["+entry[3]+"]",
                        description,
-                       entry[1],
-                       entry[2]+"%",
+                       val,
+                       err,
                        action]
+                
                 CCList.append(noneFilter(row))
                 nMissingVarsOfPriority+=1
 
@@ -704,6 +716,8 @@ class ModuleCC(object):
 #..............................................................................
 # At the end of the checking, screen the modules
 
+        self.selectMainProcesses()
+
         screen.reset()
 
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
@@ -793,6 +807,71 @@ class ModuleCC(object):
 
         self.basicCheck(continueCheck = True)
 
+#------------------------------------------------------------------------------
+    def selectMainProcesses(self):
+#------------------------------------------------------------------------------
+#   decides which of the processes are the most relevant ones
+#------------------------------------------------------------------------------
+
+        NK = self.NThProc
+        
+        UPH = CCRow("UPHk",NK)
+
+        UPH_Ok = 0
+        UPH_Ok_min = 0
+        UPH_Ok_max = 0
+        
+        UPH_None = 0
+
+        procList = []
+        for k in range(NK):
+            UPH[k] = self.ccProc[k].UPH
+
+            if UPH[k].sqerr < MAX_SQERR:
+                UPH_Ok += UPH[k].val
+                UPH_Ok_min += UPH[k].valMin
+                UPH_Ok_max += UPH[k].valMax
+            else:
+                UPH_None += UPH[k].val
+            procList.append((UPH[k].valMax,UPH[k].val,k))
+            
+        UPHTotal = self.totals.UPH
+
+        if UPHTotal.val > 0:
+            f_Ok = UPH_Ok/UPHTotal.val
+            f_Ok_min = UPH_Ok_min/UPHTotal.val
+        else:
+            f_Ok = 1.0
+            f_Ok_min = 1.0
+        print "ModuleCC (selectMainProcesses): fraction of processes with desired accuracy on\n total heat demand = %s (%s)"%(f_Ok,f_Ok_min)
+
+#..............................................................................
+# sorts the processes by UPH
+# while SUM(UPH_estimated) < 30% of estimated Total (sum of the smallest) or
+#       SUM(UPH_maximum)   < 40% of estimated Total , those processes are
+# considered as secondary processes.
+
+        UPH_Sum = 0
+        UPHMax_Sum = 0
+        mainProcess = False
+        
+        procList.sort()
+        for proc in procList:
+            
+            UPHMax_Sum += proc[0]
+            UPH_Sum += proc[1]
+            k = proc[2]
+            print "ModuleCC (selectMainProcesses): k %s UPH_Sum %s UPHMax_Sum %s:"%(k,UPH_Sum,UPHMax_Sum)
+            if (UPH_Sum > 0.3*UPHTotal.val) or \
+               (UPHMax_Sum > 0.4*UPHTotal.val):
+                mainProcess = True
+
+            self.ccProc[k].definePriority(mainProcess)
+            
+#------------------------------------------------------------------------------
+#==============================================================================
+#==============================================================================
+#==============================================================================
 if __name__ == "__main__":
 
 # direct connecting to SQL database w/o GUI. for testing only
