@@ -371,7 +371,7 @@ class PanelA(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnGridPageAGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
-        OnGridPageAGridCellLeftClick(event)
+        self.OnGridPageAGridCellLeftClick(event)
         event.Skip()
 
     def OnGridPageAGridCellRightClick(self, event):

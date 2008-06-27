@@ -68,6 +68,9 @@
 #                   => "userDefinedPars"-Functions copied from HP (not working yet)
 #       26/05/2008 some changes in functions sortBoiler, designAssistant, redundancy                   
 #       06/06/2008 implemented function updatePannel. Some small changes in designAsssistant
+#       27/06/2008: HS small bug-fixes: - equipment screening moved from __init__ to initPanel.
+#                                       - PowerSumMaxtemp -> PowerSumTmax
+#                   Security feature: where's no table uheatpump, one is created
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -103,9 +106,12 @@ class ModuleBB(object):
 
         self.neweqs = 0 #new equips added
         
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipments)
+#HS2008-06-27
+#small bug-fix: equipment screening should be carried out every time the user enters into the panel
+# PId and ANo may have changed in between
+#        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+#        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+#        self.NEquipe = len(self.equipments)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -114,6 +120,10 @@ class ModuleBB(object):
 #       screens existing equipment, whether there are already heat pumps
 #       XXX to be implemented
 #------------------------------------------------------------------------------
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+        self.NEquipe = len(self.equipments)
 
         Status.int.initCascadeArrays(self.NEquipe)
         Status.mod.moduleEnergy.runSimulation()
@@ -301,7 +311,9 @@ class ModuleBB(object):
         info.append(max(0,(QD80C[0]-PowerSum80)))  #power for T-level
         if self.maxTemp>160:
             info.append(max(0,(QD140C[0]-QD80C[0]-PowerSum140)))  #power for T-level
-            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSummaxTemp)))  #power for T-level
+#HS2008-06-27: small bug-fix: PowerSummaxTemp -> PowerSumTmax
+            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSumTmax)))  #power for T-level
+#            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSummaxTemp)))  #power for T-level
         else:
             info.append(0)
             if self.maxTemp>80:
@@ -327,8 +339,14 @@ class ModuleBB(object):
         if len(urows) == 0:
             print 'getUserDefinedParamBB: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
             print 'Error: confusion in PId and ANo'
+            dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
+            Status.DB.uheatpump.insert(dummy)
+
             maintainExisting = True
             config = [False,10,True,"Natural Gas",100,500,85]            
+            Status.int.setGraphicsData('BB Config',config)
+
+            self.setUserDefinedPars()
 
         else:
             u = urows[0]

@@ -813,6 +813,12 @@ class ModuleCC(object):
 #   decides which of the processes are the most relevant ones
 #------------------------------------------------------------------------------
 
+        UPHTotal = self.totals.UPH
+        if UPHTotal.val is None:
+            f_Ok = 0.0
+            f_Ok_min = 0.0
+            return
+
         NK = self.NThProc
         
         UPH = CCRow("UPHk",NK)
@@ -831,12 +837,15 @@ class ModuleCC(object):
                 UPH_Ok += UPH[k].val
                 UPH_Ok_min += UPH[k].valMin
                 UPH_Ok_max += UPH[k].valMax
+                procList.append((UPH[k].valMax,UPH[k].val,k))
             else:
-                UPH_None += UPH[k].val
-            procList.append((UPH[k].valMax,UPH[k].val,k))
+                if UPH[k].val is not None:
+                    UPH_None += UPH[k].val
+                    procList.append((UPH[k].valMax,UPH[k].val,k))
+                else:
+                    UPH_None += UPH[k].valMax
+                    procList.append((UPH[k].valMax,UPH[k].valMax,k))
             
-        UPHTotal = self.totals.UPH
-
         if UPHTotal.val > 0:
             f_Ok = UPH_Ok/UPHTotal.val
             f_Ok_min = UPH_Ok_min/UPHTotal.val

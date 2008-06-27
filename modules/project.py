@@ -250,13 +250,17 @@ class Project(object):
 # rename alternative
 
         sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,ANo)
-        a = DB.salternatives.sql_select(sqlQuery)[0]
-        a.ShortName = shortName
-        a.Description = description
+        aa = DB.salternatives.sql_select(sqlQuery)
+        if len(aa) > 0:
+            a = aa[0]
+            a.ShortName = shortName
+            a.Description = description
 
-        Status.SQL.commit()
-        self.setActiveAlternative(ANo)
-
+            Status.SQL.commit()
+            self.setActiveAlternative(ANo)
+        else:
+            logError(_("ERROR: possibly corrupt project data\n cannot copy alternative (PId: %s ANo: %s)")%(Status.PId,ANo))
+                        
 #------------------------------------------------------------------------------
         
 #------------------------------------------------------------------------------
@@ -594,6 +598,7 @@ class Project(object):
             copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","Questionnaire_id",newID)
             copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","Questionnaire_id",newID)
             copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","Questionnaire_id",newID)
+            copySQLRows(DB.qsurfarea,sqlQuery,"QSurfArea_ID","ProjectID",newID)
             copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","ProjectID",newID)
             copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","Questionnaire_id",newID)
 
