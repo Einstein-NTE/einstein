@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.20
+#	Version No.: 0.26
 #	Created by: 	    Stoyan Danov	    31/01/2008
 #	Revised by:         Hans Schweiger          22/03/2008
 #                           Stoyan Danov            27/03/2008
@@ -45,6 +45,7 @@
 #                           Stoyan Danov            16/05/2008
 #                           Stoyan Danov            21/05/2008
 #                           Stoyan Danov            22/05/2008
+#                           Hans Schweiger          28/06/2008
 #   
 #
 #       Changes to previous version:
@@ -94,6 +95,9 @@
 #                       + others -> completely changed
 #       22/05/2005 SD:  calculateEnergyFlows: Interfaces -> Status.int; setUserDefinedParamHP: actuvate maintainExist;
 #                       deleteFromCascade: add at the end runSimulation & updatePanel
+#       28/06/2008: HS  - bug-fix: UHPMaintain added to SQL
+#                       - messageLogger added
+#                       - security feature in getUserDefined: adds missing rows in uheatpump
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -113,6 +117,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.constants import *
+from einstein.modules.messageLogger import *
 
 #from einstein.modules.modules import Modules
 
@@ -141,15 +146,6 @@ class ModuleHP():
 
         self.neweqs = 0 #new equips added
         
-##        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-##        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-###        self.equipmentsC = self.DB.cgenerationhc.sql_select(sqlQuery) #SD change 30/04.2008
-##        self.NEquipe = len(self.equipments)
-##        print "ModuleHP (__init__): %s equipes found"%self.NEquipe
-
-##        self.initUserDefinedParamHP() #puts the user defined parameters from PSetUpData to UHeatPump
-#XXX problems with this function in einsteinMain
-
 #------------------------------------------------------------------------------
     def getUserDefinedParamHP(self):
 #------------------------------------------------------------------------------
@@ -159,10 +155,14 @@ class ModuleHP():
         uHProws = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         if len(uHProws) == 0:
-            print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
-            print 'Error: confusion in PId and ANo'
+            logError(_('getUserDefinedParamHP: Status.PId = %s Status.ANo = %s not defined\n-> adding new row with default values')%(Status.PId,Status.ANo))
             maintainExisting = True
             Status.int.setGraphicsData('HP Config',[maintainExisting, 'not available',0.0,0.0,0.0,0.0,0.0])            
+
+            dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
+            Status.DB.uheatpump.insert(dummy)
+
+            self.setUserDefinedPars()
 
         else:
             uHP = uHProws[0]
@@ -189,7 +189,7 @@ class ModuleHP():
             
         row = uhp[0]
 
-        row.MaintainExisting = UDList[0] # to add in UHeatPump
+        row.UHPMaintain = UDList[0] # to add in UHeatPump
         row.UHPType = UDList[1]
         row.UHPMinHop = UDList[2]
         row.UHPDTMax = UDList[3]
@@ -245,11 +245,7 @@ class ModuleHP():
 
         print 'moduleHP (initPanel): cascade Arrays initialised '
 
-
         self.getUserDefinedParamHP() #returns to the GUI the default user-defined data to be shown in HP panel
-
-        self.updatePanel()
-        print 'moduleHP (initPanel): reached the end '
 
 ########JUST FOR TESTING
         MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)

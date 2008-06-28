@@ -37,6 +37,7 @@
 #                           Stoyan Danov            30/04/2008
 #                           Stoyan Danov            22/05/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger          28/06/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -59,6 +60,8 @@
 #       30/04/08:   in OnButtonpageHPAddButton: delete equipeC in assignment of addEquipmentDummy
 #       22/05/08:   in drawFigure: Interfaces -> Status.int
 #       18/06/2008 SD: change to translatable text _(...)
+#       28/06/2008: HS  eliminated sql and db as input parameters; minor clean-up.
+#                   - bug-fix in read/write of HP type
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -77,6 +80,7 @@ from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
 from einstein.GUI.panelQ4 import PanelQ4
 from einstein.GUI.dialogOK import *
+from GUITools import *
 
 from einstein.modules.interfaces import *
 from einstein.modules.modules import *
@@ -114,9 +118,9 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-TABLECOLS = 6
+COLNO = 6
 
-TYPELIST = HPTYPES
+TYPELIST = TRANSHPTYPES.values()
 
 
 #------------------------------------------------------------------------------		
@@ -150,22 +154,18 @@ class PanelHP(wx.Panel):
 #   Panel of the heat pump design assistant
 #------------------------------------------------------------------------------		
 
-    def __init__(self, parent, main, id, pos, size, style, name, sql, db):
+    def __init__(self, parent, main, id, pos, size, style, name):
 
         print "PanelHP (__init__)"
         self.prnt = parent
         self.main = main
-        
-        self.sql = sql
-        self.db = db
 
-#        self.info = Status.int.GData["HP Info"]
-#        self.config = Status.int.GData["HP Config"]
-        
         self._init_ctrls(parent)
 
 	self.keys = ['HP Table']
         self.mod = Status.mod.moduleHP
+        self.mod.initPanel()        # prepares data for plotting
+        
 #        print "PanelHP (__init__): mod created",self.mod
 
 #   graphic: Cumulative heat demand by hours
@@ -181,8 +181,6 @@ class PanelHP(wx.Panel):
         dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, drawFigure, paramList)
         del dummy
 
-#XXXHS2008-04-02: copied block from PanelBB. Tom, please revise
-#TS20080405 Looks fine ...
         #
         # additional widgets setup
         # here, we modify some widgets attributes that cannot be changed
@@ -197,12 +195,7 @@ class PanelHP(wx.Panel):
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        key = self.keys[0]
-#        data = Status.int.GData[key]
-#        print "data = ",data
-        (rows,cols) = (MAXROWS,TABLECOLS)
-#        self.gridPageHP.CreateGrid(max(rows,20), cols)
-        self.grid.CreateGrid(MAXROWS, cols)
+        self.grid.CreateGrid(MAXROWS, COLNO)
 
         self.grid.EnableGridLines(True)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
@@ -220,6 +213,7 @@ class PanelHP(wx.Panel):
         #
         # copy values from dictionary to grid
         #
+        (rows,cols) = (MAXROWS,COLNO)
         for r in range(rows):
             self.grid.SetRowAttr(r, attr)
             for c in range(cols):
@@ -230,7 +224,7 @@ class PanelHP(wx.Panel):
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         self.grid.SetGridCursor(0, 0)
-    
+
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHP, name='PanelHP', parent=prnt,
@@ -468,7 +462,7 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
-        self.mod.initPanel()        # prepares data for plotting
+        self.mod.updatePanel()        # prepares data for plotting
 
 #..............................................................................
 # update of equipment table
@@ -478,7 +472,7 @@ class PanelHP(wx.Panel):
             (rows,cols) = data.shape
         except:
             rows = 0
-            cols = TABLECOLS
+            cols = COLNO
             
         for r in range(rows):
             for c in range(cols):
@@ -494,11 +488,12 @@ class PanelHP(wx.Panel):
 
         self.config = Status.int.GData["HP Config"]
         self.cbConfig1.SetValue(self.config[0])
-        try:        #try-except necessary if there comes a string that is not in list.
-            self.choiceConfig2.SetSelection(TYPELIST.index(self.config[1]))
-        except:
-            print _("PanelHP (display): was asked to display an erroneous heat pump type"),self.config[1]
-            pass
+        
+        if self.config[1] in TRANSHPTYPES.keys():
+            self.choiceConfig2.SetStringSelection(TRANSHPTYPES[self.config[1]])
+        else:
+            self.main.logWarning(_("PanelHP (display): was asked to display an erroneous heat pump type -> %s")%self.config[1])
+
         self.tcConfig3.SetValue(str(self.config[2]))
         self.tcConfig4.SetValue(str(self.config[3]))
         self.tcConfig5.SetValue(str(self.config[4]))
@@ -530,6 +525,7 @@ class PanelHP(wx.Panel):
 # Step 1 design assistant: gets a preselected list of possible heat pumps
 
         (mode,HPList) = self.mod.designAssistant1()
+        print "PanelHP: preselected heat pumps ",HPList
         
 #..............................................................................
 # In interactive mode open DB Edidor Heat pump and select manually
@@ -537,7 +533,7 @@ class PanelHP(wx.Panel):
         if (mode == "MANUAL"):
             self.dbe = DBEditFrame(self,
                             _('Select heat pump from preselected list'), # title for the dialogs
-			    _('dbheatpump'),              # database table
+			    'dbheatpump',              # database table
 			    0,                         # column to be returned
 			    False,
                             preselection = HPList)      # database table can be edited in DBEditFrame?
@@ -553,7 +549,7 @@ class PanelHP(wx.Panel):
         elif (mode == "CANCEL"):
             HPId = -1 #make designAssistant2 to understand that
         else:
-            print _("PanelHP (DesignAssistant-Button): erroneous panel mode: "),mode
+            logDebug("PanelHP (DesignAssistant-Button): erroneous panel mode: %s"%mode)
 
 #..............................................................................
 # Step 2 design assistant: add selected equipment to the list and update display
@@ -567,27 +563,7 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
-##        try:                #creates space for new equipment in Q/C
-##	    self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
-##
-##            pu1 =  AddEquipment(self,                      # pointer to this panel
-##                                self.mod,                # pointer to the associated module
-##                                'Add Heat Pump equipment', # title for the dialogs
-##                                'dbheatpump',              # database table
-##                                0,                         # column to be returned
-##                                False)                     # database table can be edited in DBEditFrame?
-##
-##            if pu1.ShowModal() == wx.ID_OK:
-##                print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
-##            else:
-##                self.mod.deleteEquipment(None)
-##
-##            self.display()
-##	except:
-##            print "PanelHP (HPAddButton): could not create equipment dummy"
-##	    pass
 
-                #creates space for new equipment in Q/C
 	self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
 
         pu1 =  AddEquipment(self,                      # pointer to this panel
@@ -660,7 +636,9 @@ class PanelHP(wx.Panel):
         self.mod.setUserDefinedParamHP()
 
     def OnChoiceConfig2Choice(self, event):
-        self.config[1] = TYPELIST[self.choiceConfig2.GetSelection()]
+        newType = self.choiceConfig2.GetStringSelection()
+        print "newType =",newType
+        if newType in TRANSHPTYPES.values(): self.config[1] = findKey(TRANSHPTYPES,newType)
         print _("new config[%s] value: ")%1,self.config[1]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
@@ -701,7 +679,7 @@ class PanelHP(wx.Panel):
 
     def OnButtonpageHeatPumpBackButton(self, event):
         self.Hide
-        self.main.tree.SelectItem(self.main.qHC, select=True)
+        self.main.tree.SelectItem(self.main.qST, select=True)
         event.Skip()
 
     def OnButtonpageHeatPumpFwdButton(self, event):

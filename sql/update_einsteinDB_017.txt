@@ -1,0 +1,39 @@
+-- update einstein database: add ST collector parameters
+USE einstein;
+
+
+
+DROP TABLE IF EXISTS dbsolarthermal;
+
+CREATE TABLE dbsolarthermal (
+  DBSolarThermal_ID INTEGER UNSIGNED NOT NULL auto_increment,
+  ProjectID INTEGER UNSIGNED NOT NULL,
+  STManufacturer VARCHAR(20) default NULL,
+  STModel VARCHAR(20) default NULL,
+  STType VARCHAR(45) default NULL,
+  STc0 DOUBLE default NULL,
+  STc1 DOUBLE default NULL,
+  STc2 DOUBLE default NULL,
+  STLengthGross DOUBLE default NULL,
+  STHeightGross DOUBLE default NULL,
+  STAreaGross DOUBLE default NULL,
+  STLengthAper DOUBLE default NULL,
+  STHeightAper DOUBLE default NULL,
+  STAreaAper DOUBLE default NULL,
+  STAreaFactor DOUBLE default NULL,
+  STPnomColl DOUBLE default NULL,
+  STWeightFactor DOUBLE default NULL,
+  STMassFlowRate DOUBLE default NULL,
+  STUnitPrice300kW DOUBLE default NULL,
+  STUnitTurnKeyPrice30kW DOUBLE default NULL,
+  STUnitTurnKeyPrice300kW DOUBLE default NULL,
+  STUnitTurnKeyPrice3000kW DOUBLE default NULL,
+  STOMUnitFix DOUBLE default NULL,
+  STYearUpdate INTEGER default NULL,
+  STReference VARCHAR(200) default NULL,
+  PRIMARY KEY(DBSolarThermal_ID)
+) TYPE=MyISAM;
+
+
+
+
