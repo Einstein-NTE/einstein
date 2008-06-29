@@ -68,10 +68,8 @@ class ModuleHC(object):
         self.DB = Status.DB
         self.sql = Status.SQL
         
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
-
         Status.int.getEquipmentCascade()
         self.cascadeIndex = 0
         
@@ -114,8 +112,7 @@ class ModuleHC(object):
 #        moves equipment up in the cascade sequence
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
 
         idx = 0
@@ -141,6 +138,7 @@ class ModuleHC(object):
                 Status.SQL.commit()
             except:
                 print "ModuleHC (cascadeMoveUp): severe error - couldn't find equipe"
+            Status.int.cascadeUpdateLevel = min(Status.int.cascadeUpdateLevel,actualCascadeIndex-2)
                 
             Status.int.getEquipmentCascade()
 
@@ -180,6 +178,7 @@ class ModuleHC(object):
                 print "ModuleHC (cascadeMoveDown): severe error - couldn't find equipe"
 
             Status.int.getEquipmentCascade()
+            Status.int.cascadeUpdateLevel = min(Status.int.cascadeUpdateLevel,actualCascadeIndex-1)
 
             return actualEquip.CascadeIndex
 

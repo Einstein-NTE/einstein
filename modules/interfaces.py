@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.14
+#	Version No.: 0.15
 #	Created by: 	    Hans Schweiger	10/03/2008
 #	Revised by:         Hans Schweiger      13/03/2008
 #	                    Tom Sobota          17/03/2008
@@ -31,6 +31,7 @@
 #                           Stoyan Danov        15/05/2008
 #                           Stoyan Danov        27/05/2008
 #                           Hans Schweiger      26/06/2008
+#                           Hans Schweiger      28/06/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -51,7 +52,10 @@
 #       27/05/2008  printCascade: change Interfaces.QA_Tt_mod[i][NT+1][0:23] to Interfaces.QA_Tt_mod[i][0][0:23]
 #                   initCascadeArrays: assignment of QD/QA_Tt_mod to avoid copy of the address
 #       26/06/2008: HS  USHj_t and QHX_t added in initCascadeArrays
-#
+#       28/06/2008: HS extendCascadeArrays added for simulations from/to
+#                   cascadeLevel: level of valid entries in cascade
+#                   (calculations are updated ...)
+#                   introduced distinction between cascadeSize and NEquipe
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -105,6 +109,8 @@ class Interfaces(object):
 # dictionary of the HC supply cascade. entries "equipeID" and "equipeNo"
 
     NEquipe = None
+    cascadeSize = None
+    cascadeUpdateLevel = 0
     cascade = []
     EquipTableDataList = []
     
@@ -165,14 +171,26 @@ class Interfaces(object):
         return Q_T
 
 #------------------------------------------------------------------------------		
-    def initCascadeArrays(self,NEquipe):
+    def calcQ_T(self,Q_Tt):
+#------------------------------------------------------------------------------		
+#   Function that calculates the annual integral
+#------------------------------------------------------------------------------		
+
+        Q_T = []
+        for iT in range(Status.NT + 2):
+            Q_T.append([])
+            Q_T[iT] = 0
+            for it in range(Status.Nt):
+                Q_T[iT] += Q_Tt[iT][it]
+        return Q_T
+
+#------------------------------------------------------------------------------		
+    def initCascadeArrays(self,cascadeSize):
 #------------------------------------------------------------------------------		
 #..............................................................................
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
-        self.NEquipe = NEquipe
-            
         Interfaces.QD_Tt_mod = []      
         Interfaces.QD_T_mod = []
         Interfaces.QA_Tt_mod = []       
@@ -195,36 +213,40 @@ class Interfaces(object):
             Interfaces.QD_T_mod[0][iT] = self.QD_T[iT]
             Interfaces.QA_T_mod[0][iT] = self.QA_T[iT]
 
-        for j in range(NEquipe):
-            Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
-            Interfaces.QD_T_mod.append(self.createQ_T())
-            Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
-            Interfaces.QA_T_mod.append(self.createQ_T())
+        self.cascadeSize = 0
 
-            Interfaces.USHj_Tt.append(self.createQ_Tt())
-            Interfaces.USHj_T.append(self.createQ_T())
-            Interfaces.USHj_t.append(self.createQ_t())
-            Interfaces.QHXj_Tt.append(self.createQ_Tt())
-            Interfaces.QHXj_T.append(self.createQ_T())
-            Interfaces.QHXj_t.append(self.createQ_t())
+        self.extendCascadeArrays(cascadeSize)
             
-#        self.printCascade_mod()
+#------------------------------------------------------------------------------		
+    def extendCascadeArrays(self,cascadeSize):
+#------------------------------------------------------------------------------		
+#..............................................................................
+# creates storage space for energy flows in cascade
+# similar to initCascadeArrays, but without changing content of already existing
+# arrays
+        if self.cascadeSize is None:
+            self.initCascadeArrays(0)
 
+        for j in range(self.cascadeSize,cascadeSize):
+            self.addCascadeArrays()
+            
 #------------------------------------------------------------------------------		
     def addCascadeArrays(self):
 #------------------------------------------------------------------------------		
 
-        Interfaces.QD_Tt_mod.append(self.QD_Tt)       
-        Interfaces.QD_T_mod.append(self.QD_T)
-        Interfaces.QA_Tt_mod.append(self.QA_Tt)      
-        Interfaces.QA_T_mod.append(self.QA_T)
+        Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
+        Interfaces.QD_T_mod.append(self.createQ_T())
+        Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
+        Interfaces.QA_T_mod.append(self.createQ_T())
 
         Interfaces.USHj_Tt.append(self.createQ_Tt())
         Interfaces.USHj_T.append(self.createQ_T())
+        Interfaces.USHj_t.append(self.createQ_t())
         Interfaces.QHXj_Tt.append(self.createQ_Tt())
         Interfaces.QHXj_T.append(self.createQ_T())
+        Interfaces.QHXj_t.append(self.createQ_t())
 
-        self.NEquipe += 1
+        self.cascadeSize += 1
 
 #------------------------------------------------------------------------------		
     def deleteCascadeArrays(self,NEquipe):
@@ -237,12 +259,12 @@ class Interfaces(object):
 
         Interfaces.USHj_Tt.pop(NEquipe-1)
         Interfaces.USHj_T.pop(NEquipe-1)
+        Interfaces.USHj_t.pop(NEquipe-1)
         Interfaces.QHXj_Tt.pop(NEquipe-1)
         Interfaces.QHXj_T.pop(NEquipe-1)
+        Interfaces.QHXj_t.pop(NEquipe-1)
 
-        self.NEquipe -= 1
-
-
+        self.cascadeSize += 1
         
 #------------------------------------------------------------------------------		
     def printCascade(self,):
@@ -366,86 +388,7 @@ class Interfaces(object):
         print "Interfaces (set default demand): ",self.QD_T
         print "Interfaces (set default availability): ",self.QA_T
 
-#------------------------------------------------------------------------------		
-    def calcQ_T(self,Q_Tt):
-#------------------------------------------------------------------------------		
-#   Function that calculates the annual integral
-#------------------------------------------------------------------------------		
-
-        Q_T = []
-        for iT in range(Status.NT + 2):
-            Q_T.append([])
-            Q_T[iT] = 0
-            for it in range(Status.Nt):
-                Q_T[iT] += Q_Tt[iT][it]
-        return Q_T
-
 #==============================================================================
-# from here on residuals that probably can be deleted in the future       
-    def chargeCurvesQDQA(self):
-        self.setQDa()
-        self.setQAa()
-        self.setQDh()
-        self.setQAh()
-
-    def getQDa(self):
-        return Interfaces.QDa
-    
-    def getQAa(self):
-        return Interfaces.QAa
-
-    def getQDh(self):
-        return Interfaces.QDh
-
-    def getQAh(self):
-        return Interfaces.QAh
-        
-
-    def setQDa(self):
-        global QUERY
-        sqlQuery = QUERY % (Status.PId, Status.ANo)
-        tableQDa = Status.DB.energyflowsqda.sql_select(sqlQuery)
-        Interfaces.QDa = tableQDa[0].values()
-        Interfaces.QDa.pop() #Delete the last element of the list (empty)
-        Interfaces.QDa.pop(0) #Delete the first 4 elements in the QD, QA lists
-        Interfaces.QDa.pop(0)
-        Interfaces.QDa.pop(0)
-        Interfaces.QDa.pop(0)
-
-    def setQAa(self):
-        global QUERY
-        sqlQuery = QUERY % (Status.PId, Status.ANo)
-        tableQAa = Status.DB.energyflowsqaa.sql_select(sqlQuery)
-        Interfaces.QAa = tableQAa[0].values()
-        Interfaces.QAa.pop() #Delete the last element of the list (empty)
-        Interfaces.QAa.pop(0) #Delete the first 4 elements in the QD, QA lists
-        Interfaces.QAa.pop(0)
-        Interfaces.QAa.pop(0)
-        Interfaces.QAa.pop(0)
-
-    def setQDh(self):
-        global QUERY
-        sqlQuery = QUERY % (Status.PId, Status.ANo)
-        tableQDh = Status.DB.energyflowsqdh.sql_select(sqlQuery)
-        for i in range(len(tableQDh)):
-            Interfaces.QDh.append(tableQDh[i].values())
-            Interfaces.QDh[i].pop() #Delete the last element of the list (empty)
-            Interfaces.QDh[i].pop(0) #Delete the first 4 elements in the QD, QA lists
-            Interfaces.QDh[i].pop(0)
-            Interfaces.QDh[i].pop(0)
-            Interfaces.QDh[i].pop(0)
-
-    def setQAh(self):
-        global QUERY
-        sqlQuery = QUERY % (Status.PId, Status.ANo)
-        tableQAh = Status.DB.energyflowsqah.sql_select(sqlQuery)
-        for i in range(len(tableQAh)):
-            Interfaces.QAh.append(tableQAh[i].values())
-            Interfaces.QAh[i].pop() #Delete the last element of the list (empty)
-            Interfaces.QAh[i].pop(0) #Delete the first 4 elements in the QD, QA lists
-            Interfaces.QAh[i].pop(0)
-            Interfaces.QAh[i].pop(0)
-            Interfaces.QAh[i].pop(0)               
 
 if __name__ == "__main__":
     # for testing purposes only

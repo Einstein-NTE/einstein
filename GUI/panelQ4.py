@@ -484,7 +484,9 @@ class PanelQ4(wx.Panel):
             self.tc17.SetValue(str(q.PartLoad))
             self.tc18.SetValue(str(q.HPerDayEq))
             self.tc19.SetValue(str(q.NDaysEq))
-            self.tc20.SetValue(self.getPipeNames(q.PipeDuctEquip))
+            try: self.tc20.SetValue(self.getPipeNames(q.PipeDuctEquip)[0])
+            except: pass
+                    ###here should be changed to the appropriate thing for multiple selection !!!!
             self.tc30.SetValue(str(q.HeatSourceLT))
             self.tc31.SetValue(str(q.THeatSourceLT))
             
@@ -548,6 +550,7 @@ class PanelQ4(wx.Panel):
     def fillChoiceOfPipe(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
         self.tc20.entry.Clear()
+        if len(pipeList) == 0: self.tc20.entry.Append("---")
         for pipe in pipeList:
             self.tc20.entry.Append(pipe)
 
@@ -562,6 +565,7 @@ class PanelQ4(wx.Panel):
     def fillChoiceOfHTSource(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
         self.tc32.entry.Clear()
+        if len(pipeList) == 0: self.tc32.entry.Append("---")
         for pipe in pipeList:
             self.tc32.entry.Append(pipe)
 
@@ -580,7 +584,11 @@ class PanelQ4(wx.Panel):
     def getPipeNames(self,IDString):
         print "PanelQ4 (getPipeNames): Getting pipenames from :",IDString
         pipeDict = Status.prj.getPipeDict()
-        pipeIDsSQL = IDString.split(';')
+        if IDString is not None:
+            pipeIDsSQL = IDString.split(';')
+        else:
+            pipeIDsSQL = []
+            
         pipes = []
         for i in pipeIDsSQL:
             pipeID = int(i)

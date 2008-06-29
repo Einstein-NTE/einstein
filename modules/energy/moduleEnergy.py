@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
+#	Version No.: 0.12
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
@@ -28,6 +28,7 @@
 #                           Stoyan Danov        14/05/2008
 #                           Enrico Facci        11/06/2008
 #                           Hans Schweiger      26/06/2008
+#                           Hans Schweiger      28/06/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -44,6 +45,8 @@
 #       26/06/2008: HS  solar thermal system (ST) added in runSimulation
 #                       try-except eliminated in runSimulation for better
 #                       debugging
+#       28/06/2008: possibility for simulating from first to last introduced
+#                   in run simulation
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -58,6 +61,7 @@
 from sys import *
 from math import *
 from numpy import *
+import copy
 
 from einstein.modules.constants import *
 from einstein.auxiliary.auxiliary import *
@@ -191,6 +195,8 @@ class ModuleEnergy(object):
         print "ModuleEnergy(calculateEnergyFlows): dummy function"
 
         PNom = equipe.HCGPnom
+        if PNom is None: PNom = 0
+        
         EqName = equipe.Equipment
         EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
         
@@ -205,8 +211,8 @@ class ModuleEnergy(object):
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = Status.int.QD_Tt_mod[cascadeIndex-1]
-        QA_Tt = Status.int.QA_Tt_mod[cascadeIndex-1]
+        QD_Tt = copy.deepcopy(Status.int.QD_Tt_mod[cascadeIndex-1])
+        QA_Tt = copy.deepcopy(Status.int.QA_Tt_mod[cascadeIndex-1])
         
         USHj_Tt = Status.int.createQ_Tt()
         USHj_t = Status.int.createQ_t()
@@ -268,7 +274,7 @@ class ModuleEnergy(object):
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def runSimulation(self):
+    def runSimulation(self,first=None,last=None):
 #------------------------------------------------------------------------------
 # updates the energy flows for the full equipment cascade
 #------------------------------------------------------------------------------
@@ -282,13 +288,21 @@ class ModuleEnergy(object):
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
-        Status.int.initCascadeArrays(self.NEquipe)
+        if (first == None) or (first < 1):
+            first = 1
+
+        first = max(first,Status.int.cascadeUpdateLevel)    #avoid unnecessary calculations
+
+        if last == None or last > self.NEquipe:
+            last = self.NEquipe
+
+        Status.int.extendCascadeArrays(self.NEquipe)
 
 #..............................................................................
 # now calculate the cascade
 # call the calculation modules for each equipment
 
-        for cascadeIndex in range(1,self.NEquipe+1):
+        for cascadeIndex in range(first,last+1):
             equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
 
             equipe = self.equipments.QGenerationHC_ID[equipeID][0]
@@ -326,16 +340,12 @@ class ModuleEnergy(object):
 
             print "ModuleEnergy (runSimulation): end simulation"
 
+#..............................................................................
+# update the pointer to the last calculated cascade
+
+        Status.int.cascadeUpdateLevel = last
+    
               
-#..............................................................................
-#        except Exception, runSimulation: #in case of an error
-#            print 'run Simulation exception', runSimulation
-#            return runSimulation
-
-#..............................................................................
-#        else:       #everything is fine
-#            return 0
-
 #==============================================================================
 
 if __name__ == "__main__":

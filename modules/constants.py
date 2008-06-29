@@ -48,7 +48,7 @@ VERSION = "NOT_M2_DEMO" #M2_DEMO: deactivates pipes
 INFINITE = 1.e99
 YEAR = 8760.
 KELVIN = 273.15
-MAXTEMP = 999.9 #maximum allowed temperature in analyisis 
+MAXTEMP = 999.9 #maximum allowed temperature in analysis 
 
 #------------------------------------------------------------------------------		
 #default values for status variables
@@ -116,6 +116,8 @@ EQUIPMENTSUBTYPE = ["condensing",
 
 BBTYPES = [EQUIPMENTSUBTYPE[0], EQUIPMENTSUBTYPE[1]]
 HPTYPES = [EQUIPMENTSUBTYPE[4], EQUIPMENTSUBTYPE[5]]
+TRANSHPTYPES = {"compression":_("compression"),
+                "thermal":_("thermal")}
 
 STTYPES = [ "flat plate",
             "evacuated tube",
@@ -273,7 +275,7 @@ def getEquipmentClassTrans(equipeType):
 
 
 #------------------------------------------------------------------------------
-def getEquipmentSubClassUntrans(equipeType):
+def getEquipmentSubClass(equipeType):
 #------------------------------------------------------------------------------
 #       returns the untranslated subclass of the untranslated equipment as a function of the equipment type
 #------------------------------------------------------------------------------

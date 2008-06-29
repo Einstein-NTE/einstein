@@ -1052,6 +1052,78 @@ class Project(object):
         return newEquipe
 
 #------------------------------------------------------------------------------
+    def deleteEquipment(self,eqID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given equipment
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QGenerationHC_ID = '%s'"\
+                    %(Status.PId,Status.ANo,eqID)  #query is redundant, but maintained as is for security
+
+        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        if len(equipes) > 0:
+            deletedIndex = equipes[0].CascadeIndex
+
+        deleteSQLRows(DB.qgenerationhc,sqlQuery)
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
+
+        for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
+            equipes[i].EqNo = i+1
+
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
+        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
+
+        for i in range(len(equipes)): #assign new Cascade Index in QGenerationHC table
+            equipes[i].CascadeIndex = i+1
+
+        Status.int.cascadeUpdateLevel = min(Status.int.cascadeUpdateLevel,deletedIndex-1)
+        
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
+        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
+        cgeneraldata[0].NEquipe = len(equipes)
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def getEquipments(self,PId = None):
+#------------------------------------------------------------------------------
+#   returns a table of existing equipment
+#------------------------------------------------------------------------------
+
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s' ORDER BY EqNo ASC"%(PId)
+
+        equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        
+        return equipments
+
+#------------------------------------------------------------------------------
+    def getEquipmentList(self,key,PId = None):
+#------------------------------------------------------------------------------
+#   returns a list of existing equipment
+#------------------------------------------------------------------------------
+
+        eqs = self.getEquipments(PId)
+        
+        eqList = []
+        for eq in eqs:
+            eqList.append(eq[key])
+
+        return eqList
+
+#getEqList maintained for backward compatibility. can be eliminated once being sure that not used any more.
+    def getEqList(self,key):
+        return self.getEquipmentList(key)
+
+#------------------------------------------------------------------------------
     def addFuelDummy(self):
 #------------------------------------------------------------------------------
 #   deletes all entries for the original ANo
@@ -1503,41 +1575,6 @@ class Project(object):
         return WHEEList
 
 #------------------------------------------------------------------------------
-    def deleteEquipment(self,eqID):
-#------------------------------------------------------------------------------
-#   deletes all entries for a given equipment
-#------------------------------------------------------------------------------
-
-#..............................................................................
-# deleting Q- and corresponding C-Tables
-
-        DB = Status.DB
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QGenerationHC_ID = '%s'"\
-                    %(Status.PId,Status.ANo,eqID)  #query is redundant, but maintained as is for security
-
-        deleteSQLRows(DB.qgenerationhc,sqlQuery)
-
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
-
-        for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
-            equipes[i].EqNo = i+1
-            pass
-
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
-        equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
-
-        for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
-            equipes[i].CascadeIndex = i+1
-            pass
-        
-        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
-        cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
-        cgeneraldata[0].NEquipe = len(equipes)
-
-        Status.SQL.commit()
-
-#------------------------------------------------------------------------------
     def getFuels(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
@@ -1564,39 +1601,6 @@ class Project(object):
             fuelList.append(fuel[key])
 
         return fuelList
-
-#------------------------------------------------------------------------------
-    def getEquipments(self,PId = None):
-#------------------------------------------------------------------------------
-#   returns a table of existing equipment
-#------------------------------------------------------------------------------
-
-        if PId is None:
-            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        else:
-            sqlQuery = "Questionnaire_id = '%s' ORDER BY EqNo ASC"%(PId)
-
-        equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
-        
-        return equipments
-
-#------------------------------------------------------------------------------
-    def getEquipmentList(self,key,PId = None):
-#------------------------------------------------------------------------------
-#   returns a list of existing equipment
-#------------------------------------------------------------------------------
-
-        eqs = self.getEquipments(PId)
-        
-        eqList = []
-        for eq in eqs:
-            eqList.append(eq[key])
-
-        return eqList
-
-#getEqList maintained for backward compatibility. can be eliminated once being sure that not used any more.
-    def getEqList(self,key):
-        return self.getEquipmentList(key)
 
 #------------------------------------------------------------------------------
     def getProcesses(self,PId = None):

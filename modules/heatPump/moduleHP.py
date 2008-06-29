@@ -98,6 +98,10 @@
 #       28/06/2008: HS  - bug-fix: UHPMaintain added to SQL
 #                       - messageLogger added
 #                       - security feature in getUserDefined: adds missing rows in uheatpump
+#                       - cascadeUpdateLevel added
+#                       - use of functions add/deleteEquipment from project.py
+#                       - try/except in DA1 eliminated for better debugging, clean-up in DA1
+#                       - use of deepcopy in array-copying
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -112,6 +116,7 @@
 from sys import *
 from math import *
 from numpy import *
+import copy
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
@@ -132,11 +137,9 @@ class ModuleHP():
     equipments = None
     cascadeIndex = None
     
+#------------------------------------------------------------------------------
     def __init__(self,keys):
-#..............................................................................
-# getting list of equipment in SQL
-
-#XXX HS2008-04-02: keys copied here similar to BB. doesn't do anything for the moment
+#------------------------------------------------------------------------------
         self.keys = keys
 
         self.DB = Status.DB
@@ -230,26 +233,16 @@ class ModuleHP():
 #       initialisation of the panel
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
-        print "ModuleHP (initPanel): %s equipes found"%self.NEquipe
 
-########JUST FOR TESTING
-        MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-        print "QD in initPanel (before runRimulation)",MyQD_T
-
-        #creates space/lists for storing the modified QD,QA, assigns total D,A in all positions
-#        Status.int.initCascadeArrays(self.NEquipe)#SD: machaca los QD, QA_Tt_mod -> pone los iniciales,23.05.2008 
-        Status.mod.moduleEnergy.runSimulation() #SD: added in order to start CEF with the correct QD,QA
+#        Status.mod.moduleEnergy.runSimulation() #SD: added in order to start CEF with the correct QD,QA
+                                                    #HS: moved to "update panel" after screening of heat pumps
 
         print 'moduleHP (initPanel): cascade Arrays initialised '
 
         self.getUserDefinedParamHP() #returns to the GUI the default user-defined data to be shown in HP panel
 
-########JUST FOR TESTING
-        MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-        print "QD in initPanel (after runRimulation)",MyQD_T
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -259,18 +252,14 @@ class ModuleHP():
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-#        HPTypes = ["Heat pump","HeatPump","Heat Pump","HP COMP","Compression","compression","Absorption","absorption","COMP"]
-
         Status.int.getEquipmentCascade()
         self.HPList = []
         for row in Status.int.cascade:
-        #    if row['equipeType'] == 'Heat pump' or row['equipeType'] == 'HeatPump' or row['equipeType'] == 'Heat Pump' or row['equipeType'] == 'HP COMP':
             if getEquipmentClass(row["equipeType"]) == "HP":
                 self.HPList.append(row)
 
         HPTableDataList = []
         for row in Status.int.EquipTableDataList:
-#            if row[2] == 'Heat pump' or row[2] == 'HeatPump' or row[2] == 'Heat Pump' or row[2] == 'HP COMP':
             if getEquipmentClass(row[3]) == "HP":
                 HPTableDataList.append(row)
 
@@ -284,9 +273,6 @@ class ModuleHP():
             self.cascadeIndex = len(self.HPList) #by default sets selection to last HP in cascade
         else:
             self.cascadeIndex = 0
-#XXXHS2008-04-02: he puesto cascadeIndex a 0 en vez de None: check que sea consistente esto ...
-
-#        print '\n cascadeIndex =', self.cascadeIndex
         
         return (self.HPList,HPTableDataList)
         
@@ -328,16 +314,8 @@ class ModuleHP():
 #............................................................................................
 # 2. XY Plot
 
-##        try:
-##            Status.int.setGraphicsData('HP Plot',[Status.int.T,
-##                                                      Status.int.QD_T_mod[self.cascadeIndex],
-##                                                      Status.int.QA_T_mod[self.cascadeIndex],
-##                                                      Status.int.QD_T_mod[self.cascadeIndex+1],
-##                                                      Status.int.QA_T_mod[self.cascadeIndex+1]])
-##        except:
-##            pass
+        Status.mod.moduleEnergy.runSimulation(last=self.cascadeIndex)   #simulates only until the level that has to be shown
 
-        #print 'ModuleHP (updatePanel): len(QD_T_mod), len(QA_T_mod), cascadeIndex: ', len(Status.int.QD_T_mod), len(Status.int.QA_T_mod), self.cascadeIndex
         Status.int.setGraphicsData('HP Plot',[Status.int.T,
                                                       Status.int.QD_T_mod[self.cascadeIndex-1],
                                                       Status.int.QA_T_mod[self.cascadeIndex-1],
@@ -378,7 +356,6 @@ class ModuleHP():
         deletes the selected heat pump in the current alternative
         """
 #------------------------------------------------------------------------------
-        print "deleteEquipment: start"
 
         if rowNo == None:   #indicates to delete last added equipment dummy
             HPid = self.dummyEqId
@@ -387,58 +364,9 @@ class ModuleHP():
             HPid = self.getEqId(rowNo)
             print "Module HP (delete): id to be deleted = ",HPid
         
-        eq = self.equipments.QGenerationHC_ID[HPid][0] #select the corresponding rows to HPid in both tables
-
-        eq.delete() #deletes the rows in both tables
-
-        self.sql.commit()
-
-        self.deleteFromCascade(Status.int.cascade, HPid) #actuallise the cascade list
-
-        self.NEquipe -= 1
-
-#------------------------------------------------------------------------------
-    def deleteFromCascade(self, cascade, HPid):
-#------------------------------------------------------------------------------
-        """
-        deletes from the actual list casade and re-assigns the CascadeIndex values in CGenerationHC table
-        """
-#-----------------------------------------------------------------------------
-
-#        print '\n deleteFromCascade():', 'cascade =', cascade
-
-        idx = -1
-        new_cascade = cascade
-        for i in range(len(new_cascade)):
-            if new_cascade[i]['equipeID'] == HPid:
-                idx = i
-
-        new_cascade.pop(idx)           
-
-        for i in range(len(new_cascade)): #assign new CascadeIndex in QGenerationHC table
-            eq = self.equipments.QGenerationHC_ID[new_cascade[i]['equipeID']][0] #SD change 30/04.2008
-            eq.CascadeIndex = i+1 #SD change 30/04.2008
-            print '\n new_CascadeIndex', eq.CascadeIndex #SD change 30/04.2008
-            
-        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
-
-        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
-
-
+        Status.prj.deleteEquipment(HPid)
+        self.screenEquipments()
         
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-
-        for i in range(len(equipments)): #assign new EqNo in QGenerationHC table
-            equipments[i].EqNo = i+1
-
-        self.sql.commit()
-        print 'moduleHP (deleteFromCascade): 1: self.NEquipe =', self.NEquipe
-        Status.int.deleteCascadeArrays(self.NEquipe)
-        print 'moduleHP (deleteFromCascade): 2: self.NEquipe =', self.NEquipe
-        Status.mod.moduleEnergy.runSimulation()
-        self.updatePanel()
-
 
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):
@@ -447,42 +375,45 @@ class ModuleHP():
 #       position in the cascade 
 #------------------------------------------------------------------------------
 
-        print 'moduleHP (addEquipmentDummy): cascade Arrays initialised '
-
-        self.cascadeIndex = self.NEquipe + 1
-        EqNo = self.NEquipe + 1
+        self.equipe = Status.prj.addEquipmentDummy()
+        self.dummyEqId = self.equipe.QGenerationHC_ID
+                             #temporary storage of the equipment ID for undo if necessary
+        
+#............................................................................................
+# assign default name to new equipe
 
         self.neweqs += 1 #No of last equip added
-        NewEquipmentName = "New heat pump %s"%(self.neweqs)
-        
-        EqNo = self.NEquipe + 1
+        newEquipmentName = "New heat pump %s"%(self.neweqs)
 
-        equipe = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo,"EqNo":EqNo,"Equipment":NewEquipmentName,
-                  "EquipType":"compression heat pump","CascadeIndex":self.cascadeIndex} #SD change 30/04.2008
-        QGid = self.DB.qgenerationhc.insert(equipe)
-
-        self.dummyEqId = QGid #temporary storage of the equipment ID for undo if necessary
-        
+        nameList = Status.prj.getEquipmentList("Equipment")
+        while newEquipmentName in nameList:
+            self.neweqs += 1
+            newEquipmentName = "New heat pump %s"%(self.neweqs)
+                    
+        equipeData = {"Equipment":newEquipmentName,\
+                      "EquipType":"compression heat pump"} 
+        self.equipe.update(equipeData)
         Status.SQL.commit()
+        logDebug("ModuleHP (addEquipmentDummy): WARNING - works with compression heat pump only !!!")
+
+#............................................................................................
+# update equipment registers
 
         Status.int.getEquipmentCascade()
-#        print 'ModuleHP (addEquipmentDummy): len(QD_T_mod), len(QA_T_mod), cascadeIndex: ', len(Interfaces.QD_T_mod), len(Interfaces.QA_T_mod), self.cascadeIndex
         Status.int.addCascadeArrays()
-#        print 'ModuleHP (addEquipmentDummy): len(QD_T_mod), len(QA_T_mod), cascadeIndex: ', len(Interfaces.QD_T_mod), len(Interfaces.QA_T_mod), self.cascadeIndex
 
-        print "ModuleHP (addEquipmentDummy): new equip row created"
-        print "ModuleHP (addEquipmentDummy): self.cascadeIndex", self.cascadeIndex
-        print "ModuleHP (addEquipmentDummy): dummyEqId", self.dummyEqId
-        self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
-
-        return(self.equipe) #SD change 30/04.2008
+        self.equipments = Status.prj.getEquipments()
+        self.NEquipe = len(self.equipments)
+        self.cascadeIndex = self.NEquipe
+        
+        return(self.equipe)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def setEquipmentFromDB(self,equipe,modelID): #SD change 30/04.2008
 #------------------------------------------------------------------------------
 #   takes an equipment from the data base and stores it under a given Id in
-#   the equipment data base
+#   the equipment list (qgenerationhc)
 #------------------------------------------------------------------------------
 
         model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
@@ -504,6 +435,8 @@ class ModuleHP():
         equipe.update({"DatabaseNameSelection":"DBHeatPump"})
         if model.HPType != None: equipe.update({"EquipTypeFromDB":model.HPType})
         equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
+
+        Status.int.changeInCascade(equipe.CascadeIndex)
 
         Status.SQL.commit()
 
@@ -576,181 +509,136 @@ class ModuleHP():
 #        temperature and time dependent heat demand and availability curves. 
 #------------------------------------------------------------------------------
         
-########JUST FOR TESTING
-        MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-        print "QD in design assistant 1 (starting)",MyQD_T
-
-        try:
-            #Define errors: Display warnings in GUI
-            err001 = 1 #deactivated at the moment, SD 17/03/2008
-            err002 = 2
-            err003 = 3
-            err004 = 4
-            err005 = 5
-            print "ModuleHP (designAssistant1): starting"
 #............................................................................................
 #   add a new equipment as space holder to the equipment list
 
-#            if (MaintainExistingEquipment == False):
-#                deleteAllHeatPumps()
-
-            equipe = self.addEquipmentDummy()
-###................................................................................................
-##
-##            for cascadeIndex in range(0,len(Status.int.QD_T_mod)):
-##                print 'Status.int.QD_T_mod[%s] =' %cascadeIndex, Status.int.QD_T_mod[cascadeIndex]
-##
-##            print '\n'
-##            print 'ModuleHP (designAssistant1):len(QA_T_mod) =', len(Status.int.QA_T_mod)
-##            for cascadeIndex in range(0,len(Status.int.QA_T_mod)):
-##                print 'Status.int.QA_T_mod[%s] =' %cascadeIndex, Status.int.QA_T_mod[cascadeIndex]
-##
-##            print '\n'
-##            print 'ModuleHP (designAssistant1):len(USHj_T) =', len(Status.int.USHj_T)
-##            for cascadeIndex in range(0,len(Status.int.USHj_T)):
-##                print 'Status.int.USHj_T[%s] ='%cascadeIndex, Status.int.USHj_T[cascadeIndex]
-##
-##            print '\n'
-##            print 'ModuleHP (designAssistant1):len(QHXj_T) =', len(Status.int.QHXj_T)
-##            for cascadeIndex in range(0,len(Status.int.QHXj_T)):
-##                print 'Status.int.QHXj_T[%s] =' %cascadeIndex, Status.int.QHXj_T[cascadeIndex] 
-##
-###............................................................................................
+        equipe = self.addEquipmentDummy()
 
 # get configuration of design assistant and do basic checking
 
-            DA = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+        DA = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
 #....
-            if DA.UHPMinHop > YEAR:        #check of user input
-                raise NameError, 'err002: Warning: Required working hours are greater than the hours of the year!'               
-                            
-            (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA.UHPType)  #get the sorted list of available heat pumps
-            
+        if DA.UHPMinHop > YEAR:        #check of user input
+            raise NameError, 'err002: Warning: Required working hours are greater than the hours of the year!'               
+                        
+        (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA.UHPType)  #get the sorted list of available heat pumps
+        
 #............................................................................................
 #   analyze heat demand for previous checks
 
-            TMinD = self.getTMinD(Status.int.QD_T_mod[self.cascadeIndex-1])
-            TMaxA = self.getTMaxA(Status.int.QA_T_mod[self.cascadeIndex-1])
-            DTMin = TMinD - TMaxA   #minimum necessary temperature lift
+        TMinD = self.getTMinD(Status.int.QD_T_mod[self.cascadeIndex-1])
+        TMaxA = self.getTMaxA(Status.int.QA_T_mod[self.cascadeIndex-1])
+        DTMin = TMinD - TMaxA   #minimum necessary temperature lift
 
 ##            print "ModuleHP (designAssistant1): TMinD,TMaxA,DTMin",TMinD,TMaxA,DTMin
 
 #............................................................................................
 #   preselect list of equipment that fulfils the criteria
 
-            self.preselection = []
+        self.preselection = []
 
-            if DTMin > DTMaxInList:
-                print DTMin,DTMaxInList
-                raise NameError, 'err003: Warning: Heat pump application impossible. Temperature lift from QD-QA greater than limit value!'                
+        if DTMin > DTMaxInList:
+            print DTMin,DTMaxInList
+            showWarning(_('Heat pump application impossible. Required temperature lift %s K greater than limit value (%sK)! ')%(DTMin,DTMaxInList))               
 
-        
-            else:  #in the case heat pump application is possible: calculate all this...
+    
+        else:  #in the case heat pump application is possible: calculate all this...
 
-                if DA.UHPmaxT > TCondMaxInList:
-                    print 'ModuleHP (designAssistant1): UHPmaxT =',DA.UHPmaxT, 'is higher than TCondMaxInList =',TCondMaxInList
-                    print 'ModuleHP (designAssistant1): The value of TCondMaxInList =',TCondMaxInList, 'will be used as initial estimate of Th0'
+            if DA.UHPmaxT > TCondMaxInList:
+                print 'ModuleHP (designAssistant1): UHPmaxT =',DA.UHPmaxT, 'is higher than TCondMaxInList =',TCondMaxInList
+                print 'ModuleHP (designAssistant1): The value of TCondMaxInList =',TCondMaxInList, 'will be used as initial estimate of Th0'
 ##                    raise NameError, 'err004: Warning: User-defined maximum condensing temperature higher than limit temperature for all heat pumps in DB'
-                
-                #Start temperature for calculation Th0 = to the user-defined temperature
-                Th0 = min(DA.UHPmaxT,TCondMaxInList)
+            
+            #Start temperature for calculation Th0 = to the user-defined temperature
+            Th0 = min(DA.UHPmaxT,TCondMaxInList)
 ##                print 'Th0 = ',Th0, 'Th0/Status.TemperatureInterval =', Th0/Status.TemperatureInterval
-                
+            
 #............................................................................................
 # Initial selection: maximum reasonable power for a heat pump
 # From the annual Heat demand curve (QDa): calculate the necesary heating capacity (starting value)
 
-                Qh0 = interpolateList(Th0/Status.TemperatureInterval,Status.int.QD_T_mod[self.cascadeIndex-1]) #calculates the annual energy demand for the Th_o from QDa
-                dotQh0 = Qh0/YEAR #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
+            Qh0 = interpolateList(Th0/Status.TemperatureInterval,Status.int.QD_T_mod[self.cascadeIndex-1]) #calculates the annual energy demand for the Th_o from QDa
+            dotQh0 = Qh0/YEAR #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
 ###                dotQh0 = Qh0/DA.UHPMinHop
 ##                print 'ModuleHP (designAssistant1): Initial Annual energy demand Qh0 =', Qh0
 ##                print 'ModuleHP (designAssistant1): Estimated initially heat capacity (from QDa) dotQh0 =', dotQh0
-                
-                listIndex = findInListASC(dotQh0,HPListPNom)
+            
+            listIndex = findInListASC(dotQh0,HPListPNom)
 
-                if listIndex < 0:
-                    raise NameError, 'err005: Warning: There is no heat pump available in DB for this application'
+            if listIndex < 0:
+                raise NameError, 'err005: Warning: There is no heat pump available in DB for this application'
 
 #............................................................................................
 # Check appropriateness for several heat pumps (preselection)
 
-                PNomMax = 0                 #maximum possible heat pump capacity for desired operating hours
-                while listIndex >= 0:       #decrease gradually until HOp >= MinHOp
+            PNomMax = 0                 #maximum possible heat pump capacity for desired operating hours
+            while listIndex >= 0:       #decrease gradually until HOp >= MinHOp
 
-                    modelID = HPList[listIndex] #a row in the DBHeatPump corresponding to j
-##                    print 'ModuleHP (designAssistant1): modelID = ', modelID
-                                        
-                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list #SD change 30/04.2008
+                modelID = HPList[listIndex] #a row in the DBHeatPump corresponding to j
+                print 'ModuleHP (designAssistant1): modelID = ',modelID
+                                    
+                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list #SD change 30/04.2008
 ##                    print "ModuleHP (designAssistant1): equipment stored"
-                    
-                    USHj = self.calculateEnergyFlows(equipe,self.cascadeIndex) #SD change 30/04.2008
-                    HOp = USHj/equipe.HCGPnom
+                
+                USHj = self.calculateEnergyFlows(equipe,self.cascadeIndex) #SD change 30/04.2008
+                HOp = USHj/equipe.HCGPnom
+                print 'ModuleHP (designAssistant1): USH = %s HOp = %s'%(USHj,HOp)
 
-                   
-                    if (HOp >= DA.UHPMinHop):
-                        self.preselection.append(modelID)
-                        PNomMax = max(PNomMax,equipe.HCGPnom)
-                    if equipe.HCGPnom < POWERRANGE*PNomMax:
-                        break
-                    
-                    listIndex -= 1  #Select next smaller heat pump
+               
+                if (HOp >= DA.UHPMinHop):
+                    self.preselection.append(modelID)
+                    PNomMax = max(PNomMax,equipe.HCGPnom)
+                if equipe.HCGPnom < POWERRANGE*PNomMax:
+                    break
+                
+                listIndex -= 1  #Select next smaller heat pump
 
-            print "ModuleHP (designAssistant1): preselected equipment: ",self.preselection
-
-##########JUST FOR TESTING
-##            MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-##            print "QD in design assistant 1 (after)",MyQD_T
+        print "ModuleHP (designAssistant1): preselected equipment: ",self.preselection
 
 #............................................................................................
 # Automatic final selection:
 
-            print 'after ModuleHP (designAssistant1):len(QD_T_mod) =', len(Status.int.QD_T_mod)
-            for cascadeIndex in range(0,len(Status.int.QD_T_mod)):
-                print 'Status.int.QD_T_mod[%s] =' %cascadeIndex, Status.int.QD_T_mod[cascadeIndex]
+        print 'after ModuleHP (designAssistant1):len(QD_T_mod) =', len(Status.int.QD_T_mod)
+        for cascadeIndex in range(0,len(Status.int.QD_T_mod)):
+            print 'Status.int.QD_T_mod[%s] =' %cascadeIndex, Status.int.QD_T_mod[cascadeIndex]
 
-            print '\n'
-            print 'after ModuleHP (designAssistant1):len(QA_T_mod) =', len(Status.int.QA_T_mod)
-            for cascadeIndex in range(0,len(Status.int.QA_T_mod)):
-                print 'Status.int.QA_T_mod[%s] =' %cascadeIndex, Status.int.QA_T_mod[cascadeIndex]
+        print '\n'
+        print 'after ModuleHP (designAssistant1):len(QA_T_mod) =', len(Status.int.QA_T_mod)
+        for cascadeIndex in range(0,len(Status.int.QA_T_mod)):
+            print 'Status.int.QA_T_mod[%s] =' %cascadeIndex, Status.int.QA_T_mod[cascadeIndex]
 
-            print '\n'
-            print 'after ModuleHP (designAssistant1):len(USHj_T) =', len(Status.int.USHj_T)
-            for cascadeIndex in range(0,len(Status.int.USHj_T)):
-                print 'Status.int.USHj_T[%s] ='%cascadeIndex, Status.int.USHj_T[cascadeIndex]
+        print '\n'
+        print 'after ModuleHP (designAssistant1):len(USHj_T) =', len(Status.int.USHj_T)
+        for cascadeIndex in range(0,len(Status.int.USHj_T)):
+            print 'Status.int.USHj_T[%s] ='%cascadeIndex, Status.int.USHj_T[cascadeIndex]
 
-            print '\n'
-            print 'after ModuleHP (designAssistant1):len(QHXj_T) =', len(Status.int.QHXj_T)
-            for cascadeIndex in range(0,len(Status.int.QHXj_T)):
-                print 'Status.int.QHXj_T[%s] =' %cascadeIndex, Status.int.QHXj_T[cascadeIndex] 
+        print '\n'
+        print 'after ModuleHP (designAssistant1):len(QHXj_T) =', len(Status.int.QHXj_T)
+        for cascadeIndex in range(0,len(Status.int.QHXj_T)):
+            print 'Status.int.QHXj_T[%s] =' %cascadeIndex, Status.int.QHXj_T[cascadeIndex] 
 #............................................................................................
-            nSelected = len(self.preselection)
-            print "ModuleHP (designAssistant1): return to GUI for manual selection "
-            if nSelected <= 0: #no equipment could be selected
-                return("CANCEL",self.preselection)
-            
-            else:   #several options possible -> manual or automatic final selection
+        nSelected = len(self.preselection)
+        print "ModuleHP (designAssistant1): return to GUI for manual selection "
+        if nSelected <= 0: #no equipment could be selected
+            return("CANCEL",self.preselection)
+        
+        else:   #several options possible -> manual or automatic final selection
 
-                if Status.UserInteractionLevel == "interactive" or Status.UserInteractionLevel == "semi-automatic":
+            if Status.UserInteractionLevel == "interactive" or Status.UserInteractionLevel == "semi-automatic":
 
-                        return("MANUAL",self.preselection)  #"MANUAL" indicates to panel to open the dialog
+                    return("MANUAL",self.preselection)  #"MANUAL" indicates to panel to open the dialog
 
-                else:   
-                    maxCOP = 0
-                    for listIndex in self.preselection:
-                        modelID = HPList[listIndex]
-                        model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
-                        if (model.HPHeatCOP > maxCOP):
-                            bestModelID = modelID
-                            maxCOP = model.HPHeatCOP
-                    self.preselection = [bestModelID]
-                    return ("AUTOMATIC",self.preselection)
-                                             
-#............................................................................................
-        except Exception, designAssistant1: #in case of an error
-            print 'design assistant 1', designAssistant1
-            print 'pass Exception'
-            return ("CANCEL",None) #default in case of error: cancel everything    
-
+            else:   
+                maxCOP = 0
+                for listIndex in self.preselection:
+                    modelID = HPList[listIndex]
+                    model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
+                    if (model.HPHeatCOP > maxCOP):
+                        bestModelID = modelID
+                        maxCOP = model.HPHeatCOP
+                self.preselection = [bestModelID]
+                return ("AUTOMATIC",self.preselection)
+                                         
 #------------------------------------------------------------------------------
     def designAssistant2(self,modelID):
 #------------------------------------------------------------------------------
@@ -776,6 +664,10 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
         print "ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
+
+        if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
+            logDebug("ModuleHP (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
+            Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
 #        print "ModuleHP (calculateEnergyFlows): equipe =", equipe, "cascadeIndex =", cascadeIndex
 #..............................................................................
 # get equipment data from equipment list in SQL
@@ -783,6 +675,8 @@ class ModuleHP():
         HPModel = equipe.Model
         HPType = equipe.EquipType
         PNom = equipe.HCGPnom
+        if PNom is None: PNom = 0
+        
         COPh_nom = equipe.HCGTEfficiency
 
         if equipe.HPExHeatCOP is None or 'NULL': #SD change 30/04.2008
@@ -821,23 +715,19 @@ class ModuleHP():
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        QD_Tt = Status.int.QD_Tt_mod[cascadeIndex-1]
-        QA_Tt = Status.int.QA_Tt_mod[cascadeIndex-1]
-
-##########JUST FOR TESTING
-##        MyQD_T = Status.int.calcQ_T(QD_Tt)
-##        print "QD LOCAL in calculateEnergyFlows",MyQD_T
-##        MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-##        print "QD GLOBAL in calculateEnergyFlows",MyQD_T
+        QD_Tt = copy.deepcopy(Status.int.QD_Tt_mod[cascadeIndex-1])
+        print "ModuleHP (calculateEnergyFlows): QD = ",QD_Tt[Status.NT+1]
+        QA_Tt = copy.deepcopy(Status.int.QA_Tt_mod[cascadeIndex-1])
+        print "ModuleHP (calculateEnergyFlows): QA = ",QA_Tt[0]
  
         USHj_Tt = Status.int.createQ_Tt()
         USHj_t = Status.int.createQ_t()
-        USHj_t_rem = USHj_t
+#        USHj_t_rem = copy.deepcopy(USHj_t) #no longer used
         USHj_T = Status.int.createQ_T()
         
         QHXj_Tt = Status.int.createQ_Tt()
         QHXj_t = Status.int.createQ_t()
-        QHXj_t_rem = QHXj_t
+#        QHXj_t_rem = copy.deepcopy(QHXj_t) #no longer used
         QHXj_T = Status.int.createQ_T()
 
 #..............................................................................
@@ -932,31 +822,14 @@ class ModuleHP():
 # level where there is a demand, and consuming waste heat at the highest level
 # this is optimum for the single equipment, but not for the system !!!
             
-            USHj_t_rem[it] = USHj_t[it]     #remaining heat to be distributed
-                            
             for iT in range(Status.NT+2):   #+1 = the > 400 ºC case
-                USHj_Tt[iT][it] = min(QD_Tt[iT][it],USHj_t_rem[it])     #from low to high T
-                USHj_t_rem[it] -= USHj_Tt[iT][it]   
-
+                USHj_Tt[iT][it] = min(QD_Tt[iT][it],USHj_t[it])     #from low to high T
                 QD_Tt[iT][it] -= USHj_Tt[iT][it]
 
-                
-
-            QHXj_t_rem[it] = QHXj_t[it]     #remaining heat to be distributed
-
             for iT in range((Status.NT+1),-1,-1):
-                QHXj_Tt[iT][it] = min(QA_Tt[iT][it],QHXj_t_rem[it])
-                QHXj_t_rem[it] -= QHXj_Tt[iT][it]
-
+                QHXj_Tt[iT][it] = min(QA_Tt[iT][it],QHXj_t)
                 QA_Tt[iT][it] -= QHXj_Tt[iT][it]
 
-##########JUST FOR TESTING
-##        MyQD_T = Status.int.calcQ_T(QD_Tt)
-##        print "QD LOCAL after calculateEnergyFlows",MyQD_T
-##        MyQD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-##        print "QD GLOBAL after calculateEnergyFlows",MyQD_T
-##        MyUSH_T = Status.int.calcQ_T(USHj_Tt)
-##        print "USH after calculateEnergyFlows",MyUSH_T
 
 #..............................................................................
 # End of year reached. Store results in interfaces
@@ -979,8 +852,11 @@ class ModuleHP():
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
 
-##        print "Total energy supplied by equipment ",USHj, " MWh"
-##        print "Total waste heat input  ",QHXj, " MWh"
+        Status.int.cascadeUpdateLevel = cascadeIndex
+
+
+        print "Total energy supplied by equipment ",USHj, " MWh"
+        print "Total waste heat input  ",QHXj, " MWh"
 
 ##        print "ModuleHP (calculateEnergyFlows): ending (cascade no: %s)"%cascadeIndex
 
