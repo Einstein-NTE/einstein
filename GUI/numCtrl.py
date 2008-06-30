@@ -2,8 +2,8 @@ from math import *
 
 def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
 
-    if nDecimals <> 2:
-        print "convertDoubleToString: WARNING - does not work well for nDecimals <> 2"
+    if nDecimals > 6:
+        print "convertDoubleToString: WARNING - does not work well for nDecimals > 6"
         return "~!$@)/#$"
     
     decimalSign = '.'
@@ -12,16 +12,41 @@ def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
     elif abs(x)>= pow(10.0,nMaxDigits):
         return "%s"%x             #aqui poner formato tipo 2.345e+07
     elif nDecimals > 0:
+        x += 0.5 * pow(10.,-(nDecimals))    #rounding ...
         if x >=0:
             integerPart = int(floor(x))
         else:
             integerPart = int(ceil(x))
         decimalPartDouble = abs((x - integerPart))*pow(10.0,nDecimals)
-        decimalPart = int(floor(decimalPartDouble+0.5))
+        decimalPart = int(floor(decimalPartDouble))
+
+        string = "%d"%decimalPart
         if decimalPart < 10:
-            string = "%d%s0%d"%(integerPart,decimalSign,decimalPart)
-        else:
-            string = "%d%s%d"%(integerPart,decimalSign,decimalPart)
+            for i in range(nDecimals-1):
+                newstring = "0%s"%string
+                string = newstring
+        elif decimalPart < 100:
+            for i in range(nDecimals-2):
+                newstring = "0%s"%string
+                string = newstring
+        elif decimalPart < 1000:
+            for i in range(nDecimals-3):
+                newstring = "0%s"%string
+                string = newstring
+        elif decimalPart < 10000:
+            for i in range(nDecimals-4):
+                newstring = "0%s"%string
+                string = newstring
+        elif decimalPart < 100000:
+            for i in range(nDecimals-5):
+                newstring = "0%s"%string
+                string = newstring
+        elif decimalPart < 1000000:
+            for i in range(nDecimals-6):
+                newstring = "0%s"%string
+                string = newstring
+        newstring = "%d%s%s"%(integerPart,decimalSign,string)
+        string = newstring
         return string
     else :
         if x >=0:
