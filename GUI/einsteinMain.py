@@ -649,7 +649,7 @@ class EinsteinFrame(wx.Frame):
 #..............................................................................
 # Scroll-up menu "HELP" and "About ..."
     def OnMenuHelpUserManual(self, event):
-        frameUserManual = FrameHelpUserManual(self, 'einstein_manual.html')
+        frameUserManual = FrameHelpUserManual(self, '../docs/einstein_manual.html')
         frameUserManual.Show()
 
     def OnMenuHelpAbout(self, event):
