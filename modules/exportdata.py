@@ -417,14 +417,36 @@ class ExportSchedulesXML(object):
 # Esta función se debería poder activar desde el menu principal -> export project;
 #
 
+#------------------------------------------------------------------------------
 class ExportProject(object):
-    #
-    # exports einstein project in XML format
-    #
+#------------------------------------------------------------------------------
+#
+# exports einstein project in XML format, including the selected information
+# required from the databases
+#
+#------------------------------------------------------------------------------
     def __init__(self, pid=None, outfile=None):
         if pid is None:
             error('ExportProject: PId missing')
             return
+
+#..............................................................................
+# creates a list of ID's of fluids of fuels that are used in the project
+
+        (fluidIDs,fuelIDs) = Status.prj.getFluidAndFuelList(pid)
+        auditorID = Status.prj.getAuditorID()
+
+#..............................................................................
+#..............................................................................
+# TOM TOM TOM
+#
+#   The corresponding rows of the tables dbfluid and dbfuel should be exported !!!
+#   Idem: the ONE row of the auditorID corresponding to the current auditor
+#   should be exported, too
+#..............................................................................
+#..............................................................................
+
+        
         if outfile is None:
             outfile = openfilecreate('Output file for exporting project')
             if outfile is None:
@@ -485,11 +507,41 @@ class ExportProject(object):
                 fd.write('</row>\n')
             fd.write('</table>\n')
 
+#..............................................................................
+#..............................................................................
+# TOM TOM TOM
+#
+#   The corresponding rows of the tables dbfluid and dbfuel should be imported !!!
+#   If a fluid / fuelname already exists, the user should decide whether to import
+#   via a dialog or take the existing one.
+#   (maybe include the options accept all / skip all in the dialog for projects
+#   with lots of fluids ...)
+#
+#   The REFERENCES to the new IDs should be updated.
+#   For this I created the functions
+#   - substituteFuelID(PId,oldFuelId,newFuelId)
+#   - substituteFluidID(PId,oldFluidId,newFluidId),
+#   as methods of Status.prj (see file project.py)
+#   For that they work well, PId should be the new ProjectID in the receiving
+#   database after having imported the tables.
+#   
+#   Idem: the ONE row of the auditorID corresponding to the current auditor
+#   should be exported, too
+#
+#   - idem substituteAuditorID(PId,oldID,newID). -> substitutes the auditorID
+#   in the table sproject
+#
+#   - idem substitutePipeID(PId,oldID,newID) -> substitutes the pipe ID's in
+#       connections
+#..............................................................................
+#..............................................................................
 
-#Y necesitaría evidentemente también la parte complementaria, el "import project", porque sino el pobre
-# ExportProject se siente solo e inutil ...
 
+#------------------------------------------------------------------------------
 class ImportProject(object):
+#------------------------------------------------------------------------------
+#   complement to ExportProject: imports data from another project
+#------------------------------------------------------------------------------
     def __init__(self,infile=None):
         self.pid = None
         self.newpid = None

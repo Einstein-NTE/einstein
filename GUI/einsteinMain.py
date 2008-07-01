@@ -129,6 +129,8 @@
 #                      new panelST included
 #       30/06/2008  TS added some Database management possibilities
 #       01/07/2008  SD changed panels places EA1 and EA2 to match tree title (were crossed, lines 774-784)
+#                       -> added panelEA4b (Process heat 2) and panelEA4a (Process heat 1)
+#       01/07/2008  HS changed layout tree and title page
 #
 #
 #------------------------------------------------------------------------------
@@ -199,6 +201,8 @@ from panelEA1 import *
 from panelEA2 import *
 from panelEA3 import *
 from panelEA4 import *
+from panelEA4a import *
+from panelEA4b import *
 from panelEA5 import *
 from panelEA6 import *
 from panelEM1 import *
@@ -803,6 +807,16 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEA4 = PanelEA4(parent=self.leftpanel2)
             self.panelEA4.display()
+        #qEA4 'Process heat 1 - Yearly'   #SD2008-07-01
+        elif select == _("Process heat 1"):
+            self.hidePages()
+            self.panelEA4a = PanelEA4a(parent=self.leftpanel2)
+            self.panelEA4a.display()
+        #qEA4 'Process heat 2 - Yearly'   #SD2008-07-01
+        elif select == _("Process heat 2"):
+            self.hidePages()
+            self.panelEA4b = PanelEA4b(parent=self.leftpanel2)
+            self.panelEA4b.display()
         #qEA5 'Energy intensity - Yearly'
         elif select == _("Energy intensity"):
             self.hidePages()
@@ -1045,6 +1059,10 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.panelEA4.Destroy()
         except:pass
+        try:self.panelEA4a.Destroy()
+        except:pass
+        try:self.panelEA4b.Destroy()
+        except:pass
         try:self.panelEA5.Destroy()
         except:pass
         try:self.panelEA6.Destroy()
@@ -1241,6 +1259,8 @@ class EinsteinFrame(wx.Frame):
         self.qEA2 = self.tree.AppendItem (self.qEA, _("Final energy by fuels"))
         self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
         self.qEA4 = self.tree.AppendItem (self.qEA, _("Process heat"))
+        self.qEA4a = self.tree.AppendItem (self.qEA, _("Process heat 1"))
+        self.qEA4b = self.tree.AppendItem (self.qEA, _("Process heat 2"))
         self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
         self.qEA6 = self.tree.AppendItem (self.qEA, _("Environmental Impact"))
         # monthly statistics subtree

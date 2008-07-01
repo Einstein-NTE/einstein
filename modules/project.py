@@ -746,6 +746,7 @@ class Project(object):
             if len(equipes) > 0:
                 equipe = equipes[0]
                 pipeLink = equipe["PipeDuctEquip"]
+                oldPipeLink = pipeLink
                 print "Project (reconnectEquipesToPipes): equipe ",equipe.Equipment,pipeLink
                 pipeIDs = []
                 if pipeLink is not None:
@@ -768,6 +769,7 @@ class Project(object):
                 pipeLink = ';'.join(newPipeIDs)
                 print "Project (reconnectEquipesToPipes): new pipeLink ",pipeLink
                 equipe["PipeDuctEquip"] = pipeLink
+                logTrack("Project (reconnect...): link of equipe %s updated from %s to %s"%(equipeID,oldPipeLink,pipeLink))
                 
         Status.SQL.commit()
                                     
@@ -1790,6 +1792,112 @@ class Project(object):
            
         return (fluidIDs,fuelIDs)
 
+#------------------------------------------------------------------------------
+    def substituteFluidID(self,PId,oldID,newID):
+#------------------------------------------------------------------------------
+#   substitutes the links to fluids in import of project tables
+#------------------------------------------------------------------------------
+
+        eqs = Status.prj.qgenerationhc.Questionnaire_id[PId].Refrigerant[oldID]
+        for eq in eqs:
+            eq.Refrigerant = newID
+            logTrack("Project (substituteFluidID): table qgenerationhc - FluidID %s substituted by %s in ID %s"%\
+                     (oldID,newID,eq.QGenerationHC_ID))
+        
+        pipes = Status.prj.qdistributionhc.Questionnaire_id[PId].HeatDistMedium[oldID]
+        for pipe in pipes:
+            pipe.HeatDistMedium = newID
+            logTrack("Project (substituteFluidID): table qdistributionhc - FluidID %s substituted by %s in ID %s"%\
+                     (oldID,newID,pipe.QDistributionHC_ID))
+        
+        processes = Status.prj.qprocessdata.Questionnaire_id[PId].ProcMedDBFluid_id[oldID]
+        for process in processes:
+            process.ProcMedDBFluid_id = newID
+            logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for process medium"%\
+                     (oldID,newID,process.QProcessData_ID))
+        
+        processes = Status.prj.qprocessdata.Questionnaire_id[PId].ProcMedOut[oldID]
+        for process in processes:
+            process.ProcMedOut = newID
+            logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for ProcMedOut"%\
+                     (oldID,newID,process.QProcessData_ID))
+        
+        processes = Status.prj.qprocessdata.Questionnaire_id[PId].SupplyMedDBFluid_id[oldID]
+        for process in processes:
+            process.SupplyMedDBFluid_id = newID
+            logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for supply medium"%\
+                     (oldID,newID,process.QProcessData_ID))
+        
+        whees = Status.prj.qwasteheatelequip.ProjectID[PId].WHEEMedium[oldID]
+        for whee in whees:
+            whees.WHEEMedium = newID
+            logTrack("Project (substituteFluidID): table qwasteheatelequip - FluidID %s substituted by %s in ID %s"%\
+                     (oldID,newID,process.QWasteHeatElEquip_ID))
+        
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def substituteFuelID(self,PId,oldID,newID):
+#------------------------------------------------------------------------------
+#   substitutes the links to fluids in import of project tables
+#------------------------------------------------------------------------------
+
+        fuels = Status.prj.qfuel.Questionnaire_id[PId].DBFuel_id[oldID]
+        for fuel in fuels:
+            fuel.DBFuel_id = newID
+            logTrack("Project (substituteFuelID): table qfuel - FuelID %s substituted by %s in ID %s"%\
+                     (oldID,newID,fuel.QFuel_ID))
+        
+        eqs = Status.prj.qgenerationhc.Questionnaire_id[PId].DBFuel_id[oldID]
+        for eq in eqs:
+            logTrack("Project (substituteFuelID): table qgenerationhc - FuelID %s substituted by %s in ID %s"%\
+                     (oldID,newID,eq.QGenerationHC_ID))
+            eq.DBFuel_id = newID
+
+        Status.SQL.commit()
+        
+#------------------------------------------------------------------------------
+    def substituteAuditorID(self,PId,oldID,newID):
+#------------------------------------------------------------------------------
+#   substitutes the links to fluids in import of project tables
+#------------------------------------------------------------------------------
+
+        sprojects = Status.prj.sproject.ProjectID[PId].Auditor_ID[oldID]
+        for sproject in sprojects:
+            sproject.Auditor_ID = newID
+            logTrack("Project (substituteAuditorID): table sproject - AuditorID %s substituted by %s in SProject_ID %s"%\
+                     (oldID,newID,sproject.SProject_ID))
+                              
+        Status.SQL.commit()
+        
+#------------------------------------------------------------------------------
+    def substitutePipeID(self,PId,oldID,newID):
+#------------------------------------------------------------------------------
+#   substitutes the links to fluids in import of project tables
+#------------------------------------------------------------------------------
+
+        eqs = Status.DB.qgenerationhc.Questionnaire_id[PId]
+        equipeIDdict = {}
+        for eq in eqs:
+            newID = eq.QGenerationHC_ID
+            equipeIDdict.update({newID:newID})  #only value of pair is used in function "reconnect"
+            
+        pipeIDdict = {oldID:newID}
+        self.reconnectEquipesToPipes(equipeIDdict,pipeIDdict)
+        
+#------------------------------------------------------------------------------
+    def getAuditorID(self):
+#------------------------------------------------------------------------------
+#   returns the ID of the responsible auditor for the present project
+#------------------------------------------------------------------------------
+
+        projectTable = Status.DB.sproject.ProjectID[Status.PId]
+        if len(projectTable) > 0:
+            sproject = projectTable[0]
+        else:
+            logWarning(_("Project (getAuditorID): Corrupt entry for project no. %s: table sproject not found")%Status.PId)
+
+        return sproject.Auditor_ID
 
 #==============================================================================
 

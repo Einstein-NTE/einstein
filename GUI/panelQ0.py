@@ -205,7 +205,7 @@ class PanelQ0(wx.Panel):
             print "PanelP (GenerateNew-Button): calling function createNewProject"
 
             Status.prj.createNewProject(-1,self.shortName,self.description,originalName=projectName)
-            self.fillPage()
+            self.display()
 
 #------------------------------------------------------------------------------		
 
@@ -225,7 +225,6 @@ class PanelQ0(wx.Panel):
             self.main.tree.SelectItem(self.main.qPage1, select=True)
         elif Status.ANo > 0:
             self.main.tree.SelectItem(self.main.qA,select=True)
-        self.display()
 
 #------------------------------------------------------------------------------		
 
@@ -236,9 +235,7 @@ class PanelQ0(wx.Panel):
         if self.main.askConfirmation(_('Delete project %s ?') % (projectName,)) == wx.ID_YES:
             print _("PanelQ0 (ButtonDelete): deleting "),projectName
             Status.prj.deleteProject(-1,name=projectName)
-            self.fillPage()
-            
-        self.display()
+            self.display()
 #------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
