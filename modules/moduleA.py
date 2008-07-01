@@ -15,12 +15,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	03/04/2008
-#	Last revised by:    Hans Schweiger      18/04/2008  
+#	Last revised by:    Hans Schweiger      18/04/2008
+#                           Hans Schweiger      01/07/2008
 #
 #       Changes to previous version:
 #       18/04/2008 HS   Reference to Status.int
+#       01/07/2008: HS  Clean-up; call to updatePanel eliminated in init and
+#                       initPanel
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,36 +35,24 @@
 #
 #============================================================================== 
 
-from sys import *
-from math import *
 from numpy import *
-
-
-from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
-from einstein.modules.interfaces import *
-import einstein.modules.matPanel as mP
 
 class ModuleA(object):
 
-    AList = []
-    
+#------------------------------------------------------------------------------
     def __init__(self, keys):
-        self.keys = keys # the key to the data is sent by the panel
-        self.DB = Status.DB
-        self.sql = Status.SQL
-        
-        self.updatePanel()
+#------------------------------------------------------------------------------
+        self.keys = keys # the key to the data is sent by the panel        
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
+#       functions that have to be called when panel is created
 #------------------------------------------------------------------------------
 
-        self.updatePanel()
+        pass
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -75,22 +66,6 @@ class ModuleA(object):
         Status.int.setGraphicsData(self.keys[0], data)
 
 #------------------------------------------------------------------------------
-
-    def exitModule(self,exit_option):
-        """
-        carries out any calculations necessary previous to displaying the HP
-        design assitant window
-        """
-        if exit_option == "save":
-            print "exitModule: here I should save the current configuration"
-        elif exit_option == "cancel":
-            print "exitModule: here I should retreive the previous configuration"
-            
-
-        print "exitModule: function not yet defined"
-
-        return "ok"
-
 #==============================================================================
 
 if __name__ == "__main__":

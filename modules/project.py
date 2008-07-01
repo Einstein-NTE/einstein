@@ -343,23 +343,45 @@ class Project(object):
     def getAlternativeList(self):
 #------------------------------------------------------------------------------
 
-        defaultList = [[-1, "Present State (original)",
-                            "original data as delivered in questionnaire",
+        defaultList = [[-1, _("Present State (original)"),
+                            _("original data as delivered in questionnaire"),
                             "---","---","---"],
-                            [0,"Present State (checked)",
-                            "complete data set for present state after cross-checking and data estimation",
-                            "---","---","---"]]
+                            [0,_("Present State (checked)"),
+                            _("complete data set for present state after\ncross-checking and data estimation"),
+                            "---",0,0]]
 
         alternativeList = []
         
         for ANo in range(-1,Status.NoOfAlternatives+1):
-            try:
-                a = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo][0]
-                alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,a.StatusA,"par5","par6"])
-            except:
+            aa = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo]
+            if len(aa) > 0:
+                a = aa[0]
+                cc = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+                if len(cc) > 0:
+                    cgeneraldata = cc[0]
+                    try: PEC = float(cgeneraldata.PEC)
+                    except: PEC = 0.0
+
+                    try: EnergyCost = float(cgeneralData.EnergyCost)
+                    except: EnergyCost = 1.0*ANo
+
+                    if a.StatusA == 0:
+                        stat = "-"
+                    elif a.StatusA == 1:
+                        stat = "ok"
+                    else:
+                        stat = "?"
+                    
+                    alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,PEC,EnergyCost])
+                else:
+                    logError(_("Corrupt data in data base. no entry in cgeneraldata for ANo = %s")%ANo)
+                    if ANo in [-1,0]:
+                        alternativeList.append(defaultList[ANo+1])
+            else:
+                logError(_("Corrupt data in data base. no entry in salternative for ANo = %s")%ANo)
                 if ANo in [-1,0]:
                     alternativeList.append(defaultList[ANo+1])
-                pass
+
         return alternativeList
             
 #------------------------------------------------------------------------------
@@ -405,7 +427,7 @@ class Project(object):
         for ANo in range(n,-1,-1):
             self.deleteAlternative(ANo)
         self.createNewAlternative(-1,_("Present State (checked)"),\
-                                _("complete data set for present state after cross-checking and data estimation"))
+                                _("complete data set for present state after\n cross-checking and data estimation"))
         self.setActiveAlternative(-1)
         self.setStatus("Q")
         self.setStatus("CC",0)
@@ -474,12 +496,14 @@ class Project(object):
             if (PId <= 0 or (PId is None)):
                 Status.PId = -1
                 Status.ActiveProjectName = "---"
+                Status.ActiveProjectDescription = "---"
                 
                 logTrack("Project (setActiveProject): no project selected")
 
             else:
 
                 Status.ActiveProjectName = Status.DB.questionnaire.Questionnaire_ID[PId][0].Name
+                Status.ActiveProjectDescription = Status.DB.questionnaire.Questionnaire_ID[PId][0].DescripIndustry
                 sproject = Status.DB.sproject.ProjectID[PId][0]
                 
                 Status.NoOfAlternatives = sproject.NoOfAlternatives
@@ -532,8 +556,8 @@ class Project(object):
 
             newAlternative = {"ProjectID":newID,
                               "AlternativeProposalNo":-1,
-                              "ShortName":"present state (original)",
-                              "Description":"original data as submitted by industry"}
+                              "ShortName":_("present state (original)"),
+                              "Description":_("original data as submitted by industry")}
             salternatives.insert(newAlternative)
             
             newGeneralData = {"Questionnaire_id":newID,

@@ -56,6 +56,8 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 
 class PanelEA2(wx.Panel):
@@ -166,6 +168,8 @@ class PanelEA2(wx.Panel):
         self.box1 = wx.StaticBox(self, -1, _(u'Total primary energy consumption (PEC) and primary energy consumption for thermal use (PET)'),
                                  pos = (10,10),size=(780,240))        
 
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.grid = wx.grid.Grid(id=wxID_PANELEA2GRID, name='grid', parent=self,
               pos=wx.Point(20, 40), size=wx.Size(760, 200),
@@ -174,6 +178,8 @@ class PanelEA2(wx.Panel):
 #SD2008-06-30
         self.box2 = wx.StaticBox(self, -1, _(u'PEC by fuel'),
                                  pos = (10,270),size=(380,280))
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelGraphPEC = wx.Panel(id=wxID_PANELEA2PANELGRAPHPEC,
               name=u'panelGraphPEC', parent=self, pos=wx.Point(20, 300),
@@ -184,6 +190,8 @@ class PanelEA2(wx.Panel):
         self.box3 = wx.StaticBox(self, -1, _(u'PET by fuel'),
                                  pos = (410,270),size=(380,280))
 
+        self.box3.SetForegroundColour(TITLE_COLOR)
+        self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelGraphPET = wx.Panel(id=wxID_PANELEA2PANELGRAPHPET,
               name=u'panelGraphPET', parent=self, pos=wx.Point(420, 300),

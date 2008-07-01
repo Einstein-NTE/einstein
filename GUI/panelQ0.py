@@ -11,13 +11,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.07
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger 12/04/2008
 #                           Hans Schweiger 17/04/2008
 #                           Tom Sobota 21/04/2008
 #                           Tom Sobota 6/05/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger  01/07/2008
 #
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
@@ -28,6 +29,8 @@
 #                       set 1st item from listbox as selected initially
 #       06/05/08  TS    Put a Hide at the gui setup start, to avoid visual "effects"
 #       18/06/2008 SD: change to translatable text _(...)
+#       01/07/2008: HS  Change of lay-out; introduction of auto-run button and field
+#                       for industry description
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -44,6 +47,14 @@ import pSQL
 from status import Status
 from dialogP import DialogP
 
+ORANGE = '#FF6000'
+LIGHTGREY = '#F8F8F8'
+WHITE = '#FFFFFF'
+DARKGREY = '#000060'
+
+TITLE_COLOR = ORANGE
+
+
 class PanelQ0(wx.Panel):
     def __init__(self, parent, main):
 	self.parent = parent
@@ -58,22 +69,24 @@ class PanelQ0(wx.Panel):
 
         wx.Panel.__init__(self, id=-1, name='PanelQ0', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
-        self.Hide()
         
-        self.stInfo1 = wx.StaticText(id=-1,
-				     label=_('Project list'),
-				     name='stInfo1',
-				     parent=self,
-				     pos=wx.Point(32, 48),
-				     style=0)
-        self.stInfo1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+#..............................................................................
+# Description of selected industry
+
+        self.box1 = wx.StaticBox(id=-1,
+              label=_(_('Projects in the database')),
+              name='box1', parent=self, pos=wx.Point(10, 10),
+              size=wx.Size(780, 380), style=0)
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
 
         self.listBoxProjects = wx.ListBox(id=-1,
 					       choices=[],
 					       name='listBoxProjects',
 					       parent=self,
-					       pos=wx.Point(32, 64),
-					       size=wx.Size(300, 312),
+					       pos=wx.Point(20, 40),
+					       size=wx.Size(400, 340),
 					       style=wx.LB_SINGLE|wx.LB_SORT)
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxProjectsDclick, self.listBoxProjects)
 
@@ -82,8 +95,8 @@ class PanelQ0(wx.Panel):
 						 label=_('open project'),
 						 name='buttonOpenProject',
 						 parent=self,
-						 pos=wx.Point(350, 64),
-						 size=wx.Size(192, 32),
+						 pos=wx.Point(450, 40),
+						 size=wx.Size(230, 32),
 						 style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonOpenProject, self.buttonOpenProject)
 
@@ -92,8 +105,8 @@ class PanelQ0(wx.Panel):
 						 label=_('copy project'),
 						 name='buttonCopyProject',
 						 parent=self,
-						 pos=wx.Point(350, 100),
-						 size=wx.Size(192, 32),
+						 pos=wx.Point(450, 100),
+						 size=wx.Size(230, 32),
 						 style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonCopyProject, self.buttonCopyProject)
 
@@ -102,8 +115,8 @@ class PanelQ0(wx.Panel):
 						label=_('new project'),
 						name='buttonNewProject',
 						parent=self,
-						pos=wx.Point(350, 136),
-						size=wx.Size(192, 32),
+						pos=wx.Point(450, 160),
+						size=wx.Size(230, 32),
 						style=0)
         self.Bind(wx.EVT_BUTTON, self.OnButtonNewProject, self.buttonNewProject)
 
@@ -112,12 +125,48 @@ class PanelQ0(wx.Panel):
 						   label=_('delete project'),
 						   name='buttonDeleteProject',
 						   parent=self,
-						   pos=wx.Point(350, 172),
-						   size=wx.Size(192, 32),
+						   pos=wx.Point(450, 220),
+						   size=wx.Size(230, 32),
 						   style=0)        
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProject, self.buttonDeleteProject)
 
+#..............................................................................
+# Description of selected industry
 
+        self.box2 = wx.StaticBox(id=-1,
+              label=_(_('Selected project')),
+              name='box1', parent=self, pos=wx.Point(10, 410),
+              size=wx.Size(780, 160), style=0)
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.tc1 = wx.TextCtrl(id=-1, name='tc1',
+              parent=self, pos=wx.Point(20, 440), size=wx.Size(400, 20), value="")
+
+        self.tc2 = wx.TextCtrl(id=-1, name='tc2',
+              parent=self, pos=wx.Point(20, 480), size=wx.Size(400, 80), value="")
+
+        self.buttonAutoRun = wx.Button(id=-1,
+						 label=_('run EINSTEIN audit procedure'),
+						 name='buttonOpenProject',
+						 parent=self,
+						 pos=wx.Point(450, 440),
+						 size=wx.Size(230, 32),
+						 style=0)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAutoRun, self.buttonAutoRun)
+
+
+        
+#------------------------------------------------------------------------------
+#--- Display function
+#------------------------------------------------------------------------------		
+
+#------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   double click also opens a new Project
+#------------------------------------------------------------------------------		
+        self.fillPage()
 
 #------------------------------------------------------------------------------
 #--- Eventhandlers
@@ -176,6 +225,7 @@ class PanelQ0(wx.Panel):
             self.main.tree.SelectItem(self.main.qPage1, select=True)
         elif Status.ANo > 0:
             self.main.tree.SelectItem(self.main.qA,select=True)
+        self.display()
 
 #------------------------------------------------------------------------------		
 
@@ -187,8 +237,15 @@ class PanelQ0(wx.Panel):
             print _("PanelQ0 (ButtonDelete): deleting "),projectName
             Status.prj.deleteProject(-1,name=projectName)
             self.fillPage()
+            
+        self.display()
 #------------------------------------------------------------------------------		
 
+#------------------------------------------------------------------------------		
+    def OnButtonAutoRun(self, event):
+#------------------------------------------------------------------------------		
+        self.main.showWarning("SORRY: auto-run not yet active")
+#------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -218,7 +275,11 @@ class PanelQ0(wx.Panel):
 
     def fillPage(self):
 	self.SetProjectList(Status.prj.getProjectList())
+	try: self.listBoxProjects.SetStringSelection(Status.ActiveProjectName)
+	except: pass
         self.main.panelinfo.update()
+        self.tc1.SetValue(Status.ActiveProjectName)
+        self.tc2.SetValue(Status.ActiveProjectDescription)
 
 #==============================================================================
 

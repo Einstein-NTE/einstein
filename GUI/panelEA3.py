@@ -56,6 +56,8 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 MAXCOLS = 10
 
@@ -233,6 +235,8 @@ class PanelEA3(wx.Panel):
 
         self.box1 = wx.StaticBox(self, -1, _(u'Final energy consumption for thermal use (FET) by equipment'),
                                  pos = (10,10),size=(780,260))
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
 ##        self.staticText1 = wx.StaticText(id=wxID_PANELEA3STATICTEXT1,
@@ -259,6 +263,8 @@ class PanelEA3(wx.Panel):
 
         self.box2 = wx.StaticBox(self, -1, _(u'Useful supply heat (USH) by equipment'),
                                  pos = (10,290),size=(780,260))
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         
 
 ##        self.staticText3 = wx.StaticText(id=wxID_PANELEA3STATICTEXT3,
