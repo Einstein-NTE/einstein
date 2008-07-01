@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>EINSTEIN Tool User Manual</title>
+</head>
+<body>
+<div style="text-align: center;"><img alt="einstein_logo"
+ src="img/einstein_logo.jpg" style="width: 421px; height: 108px;"><br>
+</div>
+<br>
+<h1 style="text-align: center;">User Manual</h1>
+<br>
+<table style="width: 300px; text-align: left;" border="1"
+ cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">&lt;&lt;&lt;<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">UP<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">&gt;&gt;&gt;<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h1><span style="font-weight: bold;">Chapter 7: Heat &amp; Cold Supply</span></h1>
+<h2><span style="font-weight: bold;">7.x.y.z. Boiler &amp; Burner Module<br>
+</span></h2>
+<span style="font-style: italic;">
+</span>
+<p class="MsoNormal"><span style="" lang="EN-GB">The
+&#8216;Boilers &amp; burners&#8217; module is part of the heat and cold supply
+sheet within
+the design of new proposals.<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB">The &#8216;Boilers
+&amp; burners&#8217; window <span style="background-color: rgb(255, 255, 0);">(fig.
+1)</span> can be subdivided in four areas.<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><!--[if gte vml 1]><v:shapetype
+ id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+ path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:481.5pt;
+ height:342pt'>
+ <v:imagedata src="file:///C:\DOCUME~1\hans\CONFIG~1\Temp\msohtml1\01\clip_image001.png"
+  o:title=""/>
+</v:shape><![endif]--><!--[if !vml]--><img
+ alt="ScreenShotBB" src="img/ScreenShotBB.jpg"
+ style="width: 800px; height: 600px;"><br>
+<!--[endif]--><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-style: italic;">Figure <span
+ style="background-color: rgb(255, 255, 102);">99.99.1</span>
+The boiler &amp; burner (BB) design assistant window<br>
+</span><span style="" lang="EN-GB"></span><span
+ style="font-weight: bold;"><br>
+</span></p>
+<b><span style="" lang="EN-GB">In the
+first quadrant</span></b><span style="" lang="EN-GB">
+(top-left) all the boilers of the current alternative are displayed by
+&#8216;cascade
+index&#8217;. When opening the window this index corresponds to the order in
+which the
+equipments have been filled in the questionnaire; it can be changed
+manually in
+the &#8216;H&amp;C Supply&#8217; window or automatically by running the design
+assistant.
+Besides the name of the equipment some additional information such as
+nominal
+power, efficiency and year of manufacturing are given.<o:p></o:p></span>
+<br>
+<br>
+<b><span style="" lang="EN-GB">In the
+second quadrant</span></b><span style="" lang="EN-GB">
+(top-right) there is a graphic showing the heat demand to be supplied
+by
+boilers. Three curves are displayed each one representing a different
+temperature level. The lower one is the heat demand at a temperature
+till to
+80&deg;C, the second one is the demand at temperature lower than
+140&deg;C while the
+higher curve is the total heat demand. These are all <i>cumulative
+curves</i>
+and it means that the demand at a higher temperature is necessary
+bigger than a
+lower temperature one. Moreover each curve is ordered by descending
+power and
+therefore it represent the demand to be supplied for a certain number
+of hours
+and not the demand at a given hour.<o:p></o:p></span>
+<br>
+<br>
+<b><span style="" lang="EN-GB">In the third
+quadrant</span></b><span style="" lang="EN-GB"> (bottom-left)
+the user can modify some parameters for the configuration of the
+&#8216;design
+assistant&#8217; function. In particular the parameters are:<o:p></o:p></span>
+<ul style="margin-top: 0cm;" type="disc">
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Maintain
+existing equipment?</span></i><span style="" lang="EN-GB"> (default
+value: <i>yes</i>): if <i>no</i> the <i>design assistant </i>deletes
+all the boiler from the equipment list and design a new set of boiler
+to supply the demand.<o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Safety
+factor[%]</span></i><span style="" lang="EN-GB"> (default value: <i>10</i>):
+the peak demand should be raised by a safety factor to consider the
+uncertainty of measurements and the possible increase of the demand
+through time <o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Is
+redundancy necessary? </span></i><span style="" lang="EN-GB">(default
+value: <i>no</i>): allows to specify whether the enterprise can accept
+a reduced heat supply capacity when a boiler is off (for ordinary or
+extraordinary maintenance) or not.<o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Fuel
+type </span></i><span style="" lang="EN-GB">(default value: <i>natural
+gas</i>): some industries are not reached by the natural gas
+distribution net<o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Minimum
+operating hours (baseload boilers) </span></i><span style=""
+ lang="EN-GB">(default value: <i>2000</i>) <o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Minimum
+boiler power [kW] </span></i><span style="" lang="EN-GB">(default
+value: <i>100</i>)<o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><i><span style="" lang="EN-GB">Minimum
+efficiency allowed [%] </span></i><span style="" lang="EN-GB">(default
+value: <i>80</i>): the <i>design assistant </i>automatically deletes
+the low efficiency boilers from the equipments list.<o:p></o:p></span></li>
+</ul>
+<p class="MsoNormal"><span style="" lang="EN-GB">Some of these
+parameters can be introduced only in the interactive mode.<o:p></o:p></span></p>
+<p class="MsoNormal"><b><span style="" lang="EN-GB">In the fourth
+quadrant</span></b><span style="" lang="EN-GB">
+(bottom-right) some additional information such as the <i>residual</i>
+peak
+demand to be supplied (i.e. the demand the actual alternative is cannot
+supply)
+are collected in order to help the user in his decisions. <o:p></o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><b><span style="font-size: 14pt;" lang="EN-GB">How
+to design the boiler system?<o:p></o:p></span></b></p>
+<p class="MsoNormal"><span style="" lang="EN-GB">This tool
+gives the possibility to add/delete boilers to/from the equipment list
+manually
+or to run a design assistant.<o:p></o:p></span></p>
+<ul style="margin-top: 0cm;" type="disc">
+  <li class="MsoNormal" style=""><span style="" lang="EN-GB">The user
+can <b>delete a boiler</b> by <i>right clicking</i> on it. A pop-up
+requests to <i>confirm the choice</i> and then cancellation will be
+effective. Einstein automatically updates the boiler list and the
+residual peak demand to be supplied.<o:p></o:p></span></li>
+</ul>
+<p class="MsoNormal"><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="margin-left: 18pt;"><span style=""
+ lang="EN-GB"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:4in;height:256.5pt'>
+ <v:imagedata src="file:///C:\DOCUME~1\hans\CONFIG~1\Temp\msohtml1\01\clip_image003.png"
+  o:title=""/>
+</v:shape><![endif]--><!--[if !vml]--><img
+ alt="ScreenShotBBPopUp" src="img/ScreenShotBBPopUp.jpg"
+ v:shapes="_x0000_i1026" style="width: 384px; height: 342px;"><!--[endif]--><o:p></o:p></span></p>
+<span style="font-style: italic;" lang="EN-GB">Figure<span
+ style="background-color: rgb(255, 255, 0);"> 7.xyz.2</span>: add
+boiler/burner pop-up<o:p></o:p></span>
+<p class="MsoNormal" style="margin-left: 18pt;"><span style=""
+ lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<ul style="margin-top: 0cm;" type="disc">
+  <li class="MsoNormal" style=""><span style="" lang="EN-GB">Clicking
+on the &#8216;<b>add boiler/burner</b>&#8217; button a pop-up (fig.2) will request
+the user to specify &#8220;where&#8221; to find the new boiler. The user has three
+possibilities: 1)to select the equipment from the boiler database;
+2)enter the boiler data manually; 3)retrieve it from a list of
+previously deleted boilers.<o:p></o:p></span></li>
+  <li class="MsoNormal" style=""><span style="" lang="EN-GB">If the
+user clicks the &#8216;<b>run design assistant</b>&#8217; button Einstein will work
+for him! Indeed the design assistant is able to analyse the heat demand
+and to find a suitable set of boiler to supply it efficiently. Moreover
+the assistant deletes inefficient boilers and modify-if necessary- the
+cascade index ordering them by ascending temperature levels and
+descending efficiency Before running it the user can change some of the
+design assistant parameters (see above).<o:p></o:p></span></li>
+</ul>
+<p class="MsoNormal"><span style="" lang="EN-GB">The user
+can accept the boiler set configuration by clicking the &#8216;<b>ok</b>&#8217;
+button. <o:p></o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><span style="">&nbsp;</span><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<br>
+</body>
+</html>

@@ -55,6 +55,7 @@
 #                       Tom Sobota                          18/06/2008
 #                       Tom Sobota                          21/06/2008
 #                       Hans Schweiger                      25/06/2008
+#                       Tom Sobota                          30/06/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -125,6 +126,7 @@
 #       21/06/2008  TS added Project Export and Import
 #       25/06/2008  HS rearrangement in tree: branches CC and BM
 #                      new panelST included
+#       30/06/2008  TS added some Database management possibilities
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -216,6 +218,8 @@ from panelReport import *
 from einstein.modules.exportdata import *
 #TS2008-06-18 fonts management
 from fonts import FontProperties
+#TS2008-06-30 database management
+from dialogDatabase import DlgDatabase
 
 #----- Constants
 qPageSize = (800, 600)
@@ -379,7 +383,10 @@ class EinsteinFrame(wx.Frame):
         f = item.GetFont()
         f.SetPointSize(8)
         item.SetFont(f)
-        self.message.InsertItem(item)
+        try:
+            self.message.InsertItem(item)
+        except:
+            pass
 
     def logMessage(self,text):
         self._log('#00A000','#FFFFFF',text)
@@ -540,6 +547,12 @@ class EinsteinFrame(wx.Frame):
         self.panelinfo.update()
 
 #..............................................................................
+    def OnMenuEditDBAdmin(self, event):
+        dlgdb = DlgDatabase(parent=None,id=-1)
+        rsp = dlgdb.ShowModal()
+        if dlgdb.getChanges():
+            self.showWarning(_('Any changes will be in effect next time you restart Einstein'))
+            
     def OnMenuEditDBBenchmark(self, event):
         frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
         frameEditDBBenchmark.ShowModal()
@@ -843,10 +856,6 @@ class EinsteinFrame(wx.Frame):
         #pageBoilers
         elif select == "Solar Thermal":
             self.hidePages()
-            print "einsteinMain: calling ST panel"
-            dummy = Status.mod.moduleST
-            print "einsteinMain: dummy = ",dummy
-            
             self.panelST = PanelST(id=-1, name='panelST', parent=self.leftpanel2,main=self)
             self.panelST.display()
             
@@ -1105,6 +1114,7 @@ class EinsteinFrame(wx.Frame):
         self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
         self.EditDBBenchmark = self.menuDatabase.Append(-1, _("&Benchmarks"))
         self.EditDBBAT = self.menuDatabase.Append(-1, "Best available technologies")
+        self.EditDBAdmin = self.menuDatabase.Append(-1, _("Database administration"))
 
         self.EditDBNaceCode = self.submenuClassification.Append(-1, _("&Nace code"))
         self.EditDBUnitOperation = self.submenuClassification.Append(-1, _("&Unit operation"))
@@ -1305,8 +1315,6 @@ class EinsteinFrame(wx.Frame):
 
         self.qFinalReport = self.tree.AppendItem (self.qRoot, _("Report"))
         self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _("Report generation"))
-        #self.qFinalReportPage2 = self.tree.AppendItem (self.qFinalReport, _("Report Page 2"))
-        #self.qFinalReportPrint = self.tree.AppendItem (self.qFinalReport, _("Print Report"))
 
         self.tree.Expand(self.qRoot)
         self.tree.Expand(self.qPage0)
@@ -1326,6 +1334,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuImportProject, self.ImportProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExportProject, self.ExportProject)
 
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBAdmin, self.EditDBAdmin)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
@@ -1376,14 +1385,27 @@ class EinsteinApp(wx.App):
         # initialize language
         self.frame.setLanguage()
 
-        # connect to database
-        try:
-            Status.SQL = self.frame.connectToDB()
-            Status.DB =  pSQL.pSQL(Status.SQL, self.frame.DBName)
-            self.frame.doLog.LogThis('Connected to database %s@%s' % (self.frame.DBName, self.frame.DBHost))
-        except MySQLdb.Error, e:
-            print 'Cannot connect to database. Error is:\n\n%s\n\nPlease verify.' % (str(e),)
-            sys.exit(1)
+        # attempt to connect to database
+        # if not possible, invoke a database setup dialog, so the user can
+        # attempt to change some parameters and fix the problem.
+        while True:
+            try:
+                Status.SQL = self.frame.connectToDB()
+                Status.DB =  pSQL.pSQL(Status.SQL, self.frame.DBName)
+                self.frame.doLog.LogThis('Connected to database %s@%s' % (self.frame.DBName, self.frame.DBHost))
+                break
+            except MySQLdb.Error, e:
+                self.frame.showWarning('Cannot connect to database. ' +\
+                                       'Error is:\n\n%s\n\nPlease verify your database parameters.' % str(e))
+
+                dlgdb = DlgDatabase(parent=None,id=-1)
+                rsp = dlgdb.ShowModal()
+                if rsp == wx.ID_OK:
+                    # read ini file again
+                    self.frame.conf = HelperClass.ConfigHelper()
+                    continue
+                # user has canceled
+                sys.exit(1)
 
         #initialize fonts management
         # (needs database connected)

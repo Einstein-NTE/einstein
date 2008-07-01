@@ -18,7 +18,8 @@
 #       Changes to previous version:
 #       TS20080530          Added several classes for data display and edition
 #       06/06/2008: TS      Some changes for Stoyan's panel changes
-#       14/06/2008: TS      Added multiple choices,
+#       14/06/2008: TS      Added multiple choices
+#       27/06/2008: TS      Rewrote Float and Date entrys
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -32,19 +33,24 @@
 import sys
 import re
 import locale
+import math
 import wx
-import wx.lib.masked.numctrl
+#import wx.lib.masked.numctrl
 import wx.lib.intctrl
 import wx.lib.stattext
-import wx.lib.masked
+#import wx.lib.masked
+import wx.calendar
 from status import Status
 import units
 from fonts import FontProperties
 
-CHOOSERBCGCOLOR = (255,255,255)
-TEXTBKGCOLOR    = (255,255,255)
-LOWERACCEPTEDDATE = '01/02/1970'
-UPPERACCEPTEDDATE = '12/31/2050'
+CHOOSERBCGCOLOR    = (255,255,255)
+FGCOLOR            = (0,0,0)
+TEXTBKGCOLOR       = (255,255,255)
+EMPTYBKGCOLOR      = (230,230,255)
+INVALIDBKGCOLOR    = (255,255,0)
+LOWERACCEPTEDDATE  = '01/01/1900'
+UPPERACCEPTEDDATE  = '12/31/2050'
 
 def error(text):
     dlg = wx.MessageDialog(None,text,'Error',wx.OK | wx.ICON_ERROR)
@@ -103,7 +109,8 @@ class Generics(object):
         if unitdict is not None:
             other.units.Clear()
             try:
-                if unitdict.__class__.__name__ == 'str':
+                #if unitdict.__class__.__name__ == 'str':
+                if isinstance(unitdict,str):
                     try:
                         # find default display unit
                         defaultDisplayUnit = units.UNITSYSTEM[Status.Units][unitdict]
@@ -184,80 +191,386 @@ class Generics(object):
 
 
 
-        
-class MskFC(wx.lib.masked.numctrl.NumCtrl):
+class CFloat(wx.TextCtrl):
     def __init__(self, prnt,
                  id=-1,
                  pos=wx.DefaultPosition,
                  size=(100,32),
-                 min= None,
-                 max= None,
-                 foregroundColour=(0,0,0),
-                 signedForegroundColour=(0,0,0),
-                 emptyBackgroundColour=TEXTBKGCOLOR,
+                 min= -1e38,
+                 max= +1e38,
+                 foregroundColour=FGCOLOR,
+                 emptyBackgroundColour=EMPTYBKGCOLOR,
                  validBackgroundColour=TEXTBKGCOLOR,
-                 invalidBackgroundColour=(255,250,250),
+                 invalidBackgroundColour=INVALIDBKGCOLOR,
                  style=0,
                  value=0.0,
-                 allowNegative=True,
-                 allowNone=True,
-                 integerWidth=10,
-                 fractionWidth=2):
+                 decimals=2,
+                 nosep=False):
+        self.prnt = prnt
+        self.min = min
+        self.max = max
+        self.decimals = decimals
+
         u = Generics()
-        foregroundColour = u.makeColour(foregroundColour)
-        signedForegroundColour = u.makeColour(signedForegroundColour)
-        emptyBackgroundColour = u.makeColour(emptyBackgroundColour)
-        validBackgroundColour = u.makeColour(validBackgroundColour)
-        invalidBackgroundColour = u.makeColour(invalidBackgroundColour)
-        
-        wx.lib.masked.numctrl.NumCtrl.__init__(self,id=id,parent=prnt,
-                                               pos=pos,
-                                               size=size,style=style,
-                                               value=value,
-                                               selectOnEntry=False,
-                                               allowNegative=allowNegative,
-                                               allowNone=allowNone,
-                                               min=min,max=max,
-                                               integerWidth=integerWidth,
-                                               fractionWidth=fractionWidth,
-                                               foregroundColour=foregroundColour,
-                                               signedForegroundColour=signedForegroundColour,
-                                               emptyBackgroundColour=emptyBackgroundColour,
-                                               validBackgroundColour=validBackgroundColour,
-                                               invalidBackgroundColour=invalidBackgroundColour,
-                                               autoSize=False)
-        #self.SetAutoSize(False)
-        self.SetLimited(False)
-        #self.SetAllowNone(True)
-        self.SetMaxSize(size)
+        self.foregroundColour = u.makeColour(foregroundColour)
+        self.emptyBackgroundColour = u.makeColour(emptyBackgroundColour)
+        self.validBackgroundColour = u.makeColour(validBackgroundColour)
+        self.invalidBackgroundColour = u.makeColour(invalidBackgroundColour)
+        self.validFloat = re.compile(r'-?\d*\.?\d*')
+
+        wx.TextCtrl.__init__(self,id=id,parent=prnt,
+                             pos=pos,
+                             size=size,
+                             style=style)
+        # bind some events
+        self.Bind(wx.EVT_CHAR, self.OnChar)
+        self.Bind(wx.EVT_TEXT, self.OnEntry)
+        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
+        self.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
+
         # get a dictionary of local parameters
         loc = locale.localeconv()
-        #for key in loc.keys():
-        #    print 'LOC[%s] = [%s]' % (key,loc[key])
-        #self.SetDefaultValue('')
-        # extract decimal and thousands separator from
-        # locale and use them to setup this control
-        #
-        # a hack, necessary to avoid the error that is produced when
-        # groupchar and decimalchar are the same
-        self.SetDecimalChar(';')
-        try:
-            tsep = loc['thousands_sep']
-            if tsep:
-                self.SetGroupChar(tsep)
-                self.SetGroupDigits(True)
+        self.dc = loc['decimal_point']
+        if nosep:
+            self.tsep = ''
+        else:
+            self.tsep = loc['thousands_sep']
+        self.tsep = ' ' # just for testing
+        self.dc = '.'   # testing
+
+        if self.tsep == self.dc:
+            # if decimal dot is the same as thousands separator,
+            # default to something sensible
+            self.tsep = ','
+            self.dc = '.'
+
+    def OnChar(self, event):
+        # filter all characters except deletes, positioning,
+        # digits, minus sign, decimal point
+        c = event.GetKeyCode()
+        if c == wx.WXK_BACK or c == wx.WXK_DELETE or c == wx.WXK_RIGHT or c == wx.WXK_LEFT:
+            event.Skip()
+        elif (c >= ord('0') and c <= ord('9')) or c == ord('-') or c == ord(self.dc):
+            event.Skip()
+        else:
+            # ignore invalid keys
+            event.Skip(False)
+
+
+    def OnEntry(self, event):
+        s = event.GetString()
+        # sets value in parent (FloatEntry instance)
+        self.prnt.lastInternalValue = s 
+        if s.strip() == '':
+            # don't touch null value
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+        else:
+            t =self.__clean_dot(s)
+            if self.__isValidFloat(t):
+                f = float(t)
+                ignore = self.verifyLimits(f)
             else:
-                self.SetGroupChar(' ') # dummy
-                self.SetGroupDigits(False)
+                self.SetBackgroundColour(self.invalidBackgroundColour)
+                
+        event.Skip()
 
-            # now set the 'real' decimal char
-            self.SetDecimalChar(loc['decimal_point'])
+    def OnFocus(self,event):
+        # clean thousands separators for editing
+        s = self.GetValue()
+        if s.strip() == '':
+            # don't touch null value
+            return
+        s1 = self.__clean_tsep(s)
+        self.ChangeValue(s1)
+        event.Skip()
+
+    
+    def OnKillFocus(self,event):
+        value = self.GetValue()
+        if value.strip() == '':
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+        else:
+            f = self.toFloat(value)
+            if f is not None:
+                value = self.verifyLimits(f)
+        self.showFormatted(str(value))
+        event.Skip()
+
+    def toFloat(self,value):
+        s1 = self.__clean_tsep(value) 
+        s2 = self.__clean_dot(s1)
+        try:
+            f = float(s2)
+            return f
         except:
-            # some error. use European notation
-            self.SetGroupChar('.')
-            self.SetDecimalChar(',')
+            return None
+        
+    def verifyLimits(self,value):
+        if value > self.max:
+            self.SetBackgroundColour(self.invalidBackgroundColour)
+            return self.max
+        elif value < self.min:
+            self.SetBackgroundColour(self.invalidBackgroundColour)
+            return self.min
+        else:
+            self.SetBackgroundColour(self.validBackgroundColour)
+        return value
+        
+    def SetValue(self,value):
+        # several empty field conditions
+        if value is None or (isinstance(value,str) and value == ''):
+            value = ''
+            self.ChangeValue(value)
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+        elif isinstance(value,str) and value != '':
+            # value is a string. must convert to float
+            f = self.toFloat(value)
+            if f is not None:
+                value = f
+            else:
+                value = None
+                self.SetBackgroundColour(self.invalidBackgroundColour)
 
-class MskIC(wx.lib.intctrl.IntCtrl):
+        if isinstance(value,float):
+            # verify limits
+            ignore = self.verifyLimits(value)
+            self.showFormatted(str(value))
+
+        return value
+
+    
+    def showFormatted(self,s):
+        if s.strip() == '':
+            # don't touch null value
+            return
+        s1 = self.__clean_tsep(s)
+        s2 = self.__clean_dot(s1)
+        # if negative, save sign
+        sign = ''
+        if s2.startswith('-'):
+            sign = '-'
+            s2 = s2[1:]
+        # split
+        (integ,dot,frac) = s2.partition('.')
+        # adjust integer part
+        if integ == '':
+            integ = '0'
+        # adjust fraction part, with rounding
+        f = float('0.'+frac) * (10**self.decimals)
+        f1 = math.floor(f+0.5)
+        frac = str(int(f1)) + ('0' * self.decimals)
+        frac = frac[:self.decimals]
+        # set thousands separator
+        sn = ''
+        r0 = integ[::-1] # reverse
+        for i,c in enumerate(r0):
+            if (i % 3) == 0 and len(sn)>1:
+                sn += self.tsep
+            sn += c
+        s3 = sign + sn[::-1] + self.dc + frac
+        self.ChangeValue(s3)
+
+    def __isValidFloat(self, s):
+        if not isinstance(s,str):
+            s = str(s)
+        m = self.validFloat.match(s)
+        if m:
+            ss = m.group(0)
+            if len(s) == len(ss):
+                return True
+        return False
+
+    def __clean_tsep(self,s):
+        if not isinstance(s,str):
+            s = str(s)
+        if not self.__isValidFloat(s):
+            return s.replace(self.tsep,'')
+        return s
+    
+    def __clean_dot(self,s):
+        if not isinstance(s,str):
+            s = str(s)
+        if not self.__isValidFloat(s):
+            return s.replace(self.dc,'.')
+        return s
+
+
+class CDate(wx.TextCtrl):
+    def __init__(self, prnt, prnt2,
+                 id=-1,
+                 pos=wx.DefaultPosition,
+                 size=(100,32),
+                 min= LOWERACCEPTEDDATE,
+                 max= UPPERACCEPTEDDATE,
+                 foregroundColour=FGCOLOR,
+                 emptyBackgroundColour=EMPTYBKGCOLOR,
+                 validBackgroundColour=TEXTBKGCOLOR,
+                 invalidBackgroundColour=INVALIDBKGCOLOR,
+                 style=0,
+                 value=wx.DateTime_Now()):
+
+        self.prnt = prnt
+        self.prnt2 = prnt2
+        self.cal = None
+        self.min = wx.DateTime()
+        self.min.ParseDate(min)
+        self.max = wx.DateTime()
+        self.max.ParseDate(max)
+        if isinstance(value,wx.DateTime):
+            self.initialdate = value
+        else:
+            self.initialdate = wx.DateTime()
+            self.initialdate.ParseDate(value)
+            
+        u = Generics()
+        self.foregroundColour = u.makeColour(foregroundColour)
+        self.emptyBackgroundColour = u.makeColour(emptyBackgroundColour)
+        self.validBackgroundColour = u.makeColour(validBackgroundColour)
+        self.invalidBackgroundColour = u.makeColour(invalidBackgroundColour)
+        self.validDate1 = re.compile(r'\d?\d[/|-]\d?\d[/|-]\d\d\d\d')
+        self.validDate2 = re.compile(r'\d\d\d\d[/|-]\d?\d[/|-]\d?\d')
+
+        wx.TextCtrl.__init__(self,id=id,parent=prnt,
+                             pos=pos,
+                             size=size,
+                             style=style)
+        # bind some events
+        self.Bind(wx.EVT_CHAR, self.OnChar)
+        self.Bind(wx.EVT_TEXT, self.OnEntry)
+        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
+        self.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
+
+    def OnCalSelected(self, event):
+        newdate = event.GetDate()
+        self.showFormatted(newdate)
+        #cal = event.GetEventObject()
+        self.calpanel.Destroy()
+        self.cal = None
+        self.prnt2.SetFocus()
+        
+    def OnCalSelChanged(self, event):
+        cal = event.GetEventObject()
+        date = cal.GetDate()
+        event.Skip()
+
+
+    def OnCharCal(self,event):
+        # any keypress on the calendar closes the window
+        # this works in Windows but not in FreeBSD
+        self.calpanel.Destroy()
+        self.cal = None
+        event.Skip()
+
+    def OnChar(self, event):
+        # if the calendar is displayed, delete it
+        if self.cal is not None:
+            self.calpanel.Destroy()
+            self.cal = None
+        
+        # filter all characters except digits, '-', '/'
+        c = event.GetKeyCode()
+        if c == wx.WXK_BACK or c == wx.WXK_DELETE or c == wx.WXK_RIGHT or c == wx.WXK_LEFT:
+            event.Skip()
+        elif (c >= ord('0') and c <= ord('9')) or c == ord('-') or c == ord('/'):
+            event.Skip()
+        else:
+            # ignore invalid keys
+            event.Skip(False)
+
+
+    def OnEntry(self, event):
+        s = event.GetString()
+        if s.strip() == '':
+            # don't touch null value
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+        else:
+            self.verifyLimits(s)
+                
+        event.Skip()
+
+    def OnFocus(self,event):
+        if self.cal is None:
+            # show calendar control
+            (x,y) = self.GetPositionTuple()
+            (xp,yp) = self.prnt.GetPositionTuple()
+            (w,h) = self.prnt.GetSizeTuple()
+            # frame for the calendar
+            self.calpanel = wx.Frame(self.prnt2, id=-1,
+                                     style=wx.STAY_ON_TOP)
+            self.cal = wx.calendar.CalendarCtrl(self.calpanel, -1,
+                                                self.initialdate, pos=(0,0))
+            (wc,hc) = self.cal.GetSizeTuple()
+            self.calpanel.SetDimensions(x+xp,yp+h,wc,hc)
+            self.calpanel.Show()
+            self.cal.Bind(wx.calendar.EVT_CALENDAR_SEL_CHANGED,self.OnCalSelChanged)
+            self.cal.Bind(wx.calendar.EVT_CALENDAR, self.OnCalSelected)
+            self.cal.Bind(wx.EVT_CHAR, self.OnCharCal)
+
+        event.Skip()
+
+
+    
+    def OnKillFocus(self,event):
+        # if there is input from the calendar control
+        value = self.GetValue()
+        if value.strip() == '':
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+        else:
+            self.verifyLimits(value)
+        self.showFormatted(value)
+        event.Skip()
+    def verifyLimits(self,value):
+        if not self.__isValidDate(value):
+            self.SetBackgroundColour(self.invalidBackgroundColour)
+        else:
+            d = wx.DateTime()
+            rsp = d.ParseDate(value)
+            if rsp == -1:
+                self.SetBackgroundColour(self.invalidBackgroundColour)
+            elif d.IsLaterThan(self.max):
+                self.SetBackgroundColour(self.invalidBackgroundColour)
+                return self.max
+            elif d.IsEarlierThan(self.min):
+                self.SetBackgroundColour(self.invalidBackgroundColour)
+                return self.min
+            else:
+                self.SetBackgroundColour(self.validBackgroundColour)
+        
+    def SetValue(self,value):
+        # several empty field conditions
+        if value is None or value == '':
+            value = ''
+            self.ChangeValue(value)
+            self.SetBackgroundColour(self.emptyBackgroundColour)
+
+        else:
+            # verify limits
+            self.verifyLimits(value)
+            self.showFormatted(value)
+
+        self.lastvalue = value
+        return value
+
+    
+    def showFormatted(self,s):
+        if isinstance(s,wx.DateTime):
+            s1 = s.FormatISODate()
+        elif s.strip() == '':
+            # don't touch null value
+            s1 = ''
+        else:
+            d = wx.DateTime()
+            d.ParseDate(s)
+            s1 = d.FormatISODate()
+        self.ChangeValue(s1)
+
+    def __isValidDate(self, s):
+        m1 = self.validDate1.match(s)
+        m2 = self.validDate2.match(s)
+        return m1 or m2
+
+
+class CInt(wx.lib.intctrl.IntCtrl):
     def __init__(self,
                  prnt,
                  id=-1,
@@ -297,10 +610,11 @@ class MskIC(wx.lib.intctrl.IntCtrl):
 
 class FloatEntry(wx.Panel):
     def __init__(self, parent=None,
-                 ipart=6,                                      # max digits in the integer part
                  decimals=2,                                   # digits in the fraction
-                 minval=None,                                  # min value
-                 maxval=None,                                  # max value
+                 ipart=None,                                   # deprecated (and ignored)
+                 nosep=False,                                  # ignore thousands separator
+                 minval=-1e38,                                 # min value
+                 maxval=+1e38,                                 # max value
                  value=0.,                                     # initial value
                  unitdict=None,                                # unit dict for the unit selector
                  wLabel=None,                                  # width of the label
@@ -308,12 +622,11 @@ class FloatEntry(wx.Panel):
                  wUnits=None,                                  # width of the unit selector
                  label='',                                     # text of the label
                  tip='',                                       # text of the tip
-                 fontsize=None):                                # fontsize for subwidgets
+                 fontsize=None):                               # fontsize for subwidgets
 
         self.unitdict = unitdict
         self.lastInternalValue = None
         self.defaultDisplayUnit = None
-        self.lastTypedString = ''
 
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
@@ -332,23 +645,16 @@ class FloatEntry(wx.Panel):
             self.label.Center(wx.VERTICAL)
 
         # create a masked float-point control
-        self.entry = MskFC(self,pos=(lblSize[0]+1,0),
-                size=datSize,                        # size of control
-                min=minval,                          # minimum value admitted
-                max=maxval,                          # maximum value admitted
-                foregroundColour=(0,0,100),          # dark blue
-                signedForegroundColour=(0,255,0),    # green
-                emptyBackgroundColour=TEXTBKGCOLOR,  # white
-                validBackgroundColour=TEXTBKGCOLOR,  # very light blue
-                invalidBackgroundColour=(255,255,0), # yellow
-                allowNegative=True,                  # negative values allowed?
-                allowNone=True,                      # empty value allowed?
-                integerWidth=ipart,                  # size of integer part
-                fractionWidth=decimals,              # number of decimals
-                style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
+        self.entry = CFloat(self,pos=(lblSize[0]+1,0),
+                           size=datSize,                        # size of control
+                           min=minval,                          # minimum value admitted
+                           max=maxval,                          # maximum value admitted
+                           decimals=decimals,                   # number of decimals
+                           nosep=nosep,
+                           style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
+
         self.f.setFont(self.entry,size=fontsize)
         self.entry.Center(wx.VERTICAL)
-        self.entry.Bind(wx.EVT_TEXT, self.OnEntry)
         self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
 
         # load and show a unit selector
@@ -389,11 +695,6 @@ class FloatEntry(wx.Panel):
         elif text == 'Zero':
             self.entry.SetValue(0.0)
             
-    def OnEntry(self, event):
-        s = event.GetString()
-        self.lastTypedString = s
-        self.lastInternalValue = self.GetValue()
-
     def OnUnits(self, event):
         # read new measurement unit and convert to internal encoding
         self.defaultDisplayUnit = event.GetString().encode('iso-8859-15')
@@ -401,24 +702,27 @@ class FloatEntry(wx.Panel):
         self.SetValue(self.lastInternalValue)
 
     def setUnits(self,tip,unitdict):
+        # only allows change in units when units were initially declared
+        # and the units choice control was created
         if self.unitdict:
             self.defaultDisplayUnit = self.g.setUnits(self,tip, unitdict)
 
     def GetValue(self):
         dValue = self.entry.GetValue()
-        # trick for detecting a Null value
-        if self.lastTypedString.strip() == u',00' or self.lastTypedString.strip() == u'.00':
+        if dValue.strip() == '':
             return None
         if self.defaultDisplayUnit is None:
-            return dValue
+            return float(dValue)
         try:
             iValue = units.internalValue(dValue,self.defaultDisplayUnit,self.unitdict)
-            return iValue
+            return float(iValue)
         except:
-            print 'FloatEntry: error in conversion disp->int ' \
-                  'disp=%s class=%s default=%s' % (dValue,self.unitdict,
-                                                   repr(self.defaultDisplayUnit))
-
+            print 'FloatEntry: error in conversion display->internal ' \
+                  'display=%s class=%s default=%s' % (dValue,self.unitdict,self.defaultDisplayUnit)
+            
+    def Clear(self):
+        self.SetValue(None)
+        
     def SetValue(self, iValue):
         #
         # saves internal value for an eventual unit change by user
@@ -429,25 +733,28 @@ class FloatEntry(wx.Panel):
         #
         if iValue is None or iValue == '' or iValue == 'None':
             self.entry.SetValue(None)
+        elif self.defaultDisplayUnit is None:
+            # no unit conversion necessary
+            f = self.entry.SetValue(iValue)
+            if f is None:
+                print 'FloatEntry: bad value for SetValue %s' % repr(iValue)
+                self.entry.SetValue(None)
+                self.lastInternalValue = None
         else:
+            # convert to user units
             try:
-                f = float(iValue)
-            except:
-                print 'FloatEntry: bad value for SetValue ' % (repr(iValue),)
-                self.entry.SetValue(0.0)
-                return
-            
-            if self.defaultDisplayUnit is None:
-                dValue = f
-            else:
-                try:
+                f = self.entry.toFloat(iValue)
+                if f is not None:
                     dValue = units.displayValue(f,self.defaultDisplayUnit,self.unitdict)
-                except:
-                    print 'FloatEntry: error in conversion int->disp ' \
-                          'int=%s class=%s default=%s' % (f, self.unitdict,
-                                                          repr(self.defaultDisplayUnit))
+                    self.entry.SetValue(dValue)
+                else:
+                    print 'FloatEntry: bad value for SetValue %s' % repr(iValue)
+                    self.entry.SetValue(None)
+                    self.lastInternalValue = None
+            except:
+                print 'FloatEntry: error in conversion internal->display ' \
+                      'internal=%s class=%s default=%s' % (iValue, self.unitdict,self.defaultDisplayUnit)
 
-                self.entry.SetValue(dValue)
 
     def GetUnit(self,text=False):
         if self.unitdict:
@@ -493,7 +800,7 @@ class IntEntry(wx.Panel):
             self.f.setFont(self.label,size=fontsize)
 
         # create a masked fixed-point control
-        self.entry = MskIC(self,pos=(lblSize[0]+1,0),
+        self.entry = CInt(self,pos=(lblSize[0]+1,0),
                            size=datSize,                     # size of control
                            min=minval,                       # minimum value admitted
                            max=maxval,                       # maximum value admitted
@@ -566,6 +873,8 @@ class IntEntry(wx.Panel):
                   'disp=%s class=%s default=%s' % (dValue,self.unitdict,
                                                    repr(self.defaultDisplayUnit))
 
+    def Clear(self):
+        self.SetValue(None)
 
     def SetValue(self, iValue):
         #
@@ -642,8 +951,7 @@ class TextEntry(wx.Panel):
         self.f.setFont(self.entry,size=fontsize)
         self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
 
-        foregroundColour=(0,0,100)
-        foregroundColour = self.g.makeColour(foregroundColour)
+        foregroundColour = self.g.makeColour(FGCOLOR)
         validBackgroundColour = self.g.makeColour(TEXTBKGCOLOR)
         self.entry.SetForegroundColour(foregroundColour)
         self.entry.SetBackgroundColour(validBackgroundColour)
@@ -680,6 +988,9 @@ class TextEntry(wx.Panel):
     def GetValue(self):
         return self.entry.GetValue()
 
+    def Clear(self):
+        self.SetValue('')
+
     def SetValue(self, value):
         self.entry.SetValue(value)
     
@@ -692,15 +1003,16 @@ class TextEntry(wx.Panel):
         pass
 
 
-
 class DateEntry(wx.Panel):
     def __init__(self, parent=None,
-                 value='',       # initial value
-                 wLabel=None,    # width of the label
-                 wData=None,     # width of the data entry
-                 wUnits=None,    # width of the unit selector (not used)
-                 label='',       # text of the label
-                 tip='',         # text of the tip
+                 value=wx.DateTime_Now(), # initial value
+                 min= LOWERACCEPTEDDATE,  # lower accepted date
+                 max= UPPERACCEPTEDDATE,  # upper    "      "
+                 wLabel=None,             # width of the label
+                 wData=None,              # width of the data entry
+                 wUnits=None,             # width of the unit selector (not used)
+                 label='',                # text of the label
+                 tip='',                  # text of the tip
                  fontsize=None):
 
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
@@ -718,75 +1030,32 @@ class DateEntry(wx.Panel):
             self.f.setFont(self.label,size=fontsize)
 
 
-        self.entry = wx.DatePickerCtrl(self, id=-1, pos=(lblSize[0]+1,0), size=datSize,
-                                style=wx.DP_DROPDOWN | wx.DP_SHOWCENTURY)
-        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
-
-        # sets range of accepted values
-        lowerLimit = wx.DateTime()
-        lowerLimit.ParseDate(LOWERACCEPTEDDATE)
-        upperLimit = wx.DateTime()
-        upperLimit.ParseDate(UPPERACCEPTEDDATE)
-        self.entry.SetRange(lowerLimit, upperLimit)
+        self.entry = CDate(self, parent, id=-1, pos=(lblSize[0]+1,0), size=datSize)
 
         self.SetValue(value)
 
         self.f.setFont(self.entry,size=fontsize)
 
-        foregroundColour=(0,0,100)
-        foregroundColour = self.g.makeColour(foregroundColour)
-        validBackgroundColour = self.g.makeColour(TEXTBKGCOLOR)
-        self.entry.SetForegroundColour(foregroundColour)
-        self.entry.SetBackgroundColour(validBackgroundColour)
-
         # set tooltips
         self.g.setTooltips(self,tip)
-
-        # create popup menu for easy clearing/setting to zero
-        self.popupmenu = wx.Menu()
-        for text in "Today|Unknown (sets date to 1/1/1970)".split('|'):
-            item = self.popupmenu.Append(-1, text)
-            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
-
-    def OnShowPopup(self, event):
-        pos = event.GetPosition()
-        pos = self.ScreenToClient(pos)
-        self.PopupMenu(self.popupmenu, pos)
-
-    def OnPopupItemSelected(self, event):
-        item = self.popupmenu.FindItemById(event.GetId())
-        text = item.GetText()
-        if text.startswith('Unknown'):
-            self.SetValue('1/1/1970')
-        elif text == 'Today':
-            theDate = wx.DateTime().Today()
-            y = theDate.GetYear()
-            m = theDate.GetMonth()
-            d = theDate.GetDay()
-            self.SetValue('%02d/%02d/%4d' % (m+1,d,y))
 
     def setUnits(self,tip,unitdict):
         # this method is just for compatibility
         pass
 
     def GetValue(self):
-        theDate = self.entry.GetValue()
-        y = theDate.GetYear()
-        m = theDate.GetMonth()
-        d = theDate.GetDay()
-        if y == 1970 and m == 0 and d == 1:
-            # campo vacío
+        value = self.entry.GetValue()
+        if not value:
             return None
-        # campo con fecha
-        return '%4d/%02d/%02d' % (y,m+1,d)
+        date = wx.DateTime()
+        date.ParseDate(value)
+        return date.FormatISODate()
+
+    def Clear(self):
+        self.SetValue(None)
 
     def SetValue(self, value):
-        if not value:
-            value = '1/1/1970'
-
-        theDate = wx.DateTime()
-        theDate.ParseDate(value)
-        self.entry.SetValue(theDate)
+        self.entry.SetValue(value)
     
     def getUnit(self):
         # this method is just for compatibility
@@ -849,19 +1118,24 @@ class ChoiceEntry(wx.Panel):
     def GetValue(self,text=False):
         return self.g.getChoiceValues(self.entry, self.multiple, text)
 
+    def Clear(self):
+        self.entry.Clear()
+
     def SetValue(self, thing=0):
         # this method has triple functionality:
         # if 'thing' is an integer n, the choice will show the nth element. 
         # if 'thing' is a string, the choice will show the element that contains the string
         # if 'thing' is a list, the elements of the list will be loaded in the choice.
         try:
-            t = thing.__class__.__name__
-            if t == 'int':
+            #t = thing.__class__.__name__
+            #if t == 'int':
+            if isinstance(thing,int):
                 try:
                     self.entry.SetSelection(thing)
                 except:
                     self.entry.SetSelection(0)
-            elif t == 'str':
+            #elif t == 'str':
+            elif isinstance(thing,str):
                 if thing.strip() == '':
                     # clear the choice
                     self.entry.Clear()
@@ -874,12 +1148,15 @@ class ChoiceEntry(wx.Panel):
                     except:
                         self.entry.SetSelection(0)
 
-            elif t == 'list':
+            #elif t == 'list':
+            elif isinstance(thing,list):
                 # thing is a list of values for the choice control
                 self.entry.Clear()
-                self.entry.Append("None")
                 for item in thing:
-                    self.entry.Append(item)
+                    if item is None:
+                        self.entry.Append(' ')
+                    else:
+                        self.entry.Append(item)
                 self.entry.SetSelection(0)
         except:
             # possibly a numeric constant

@@ -16,11 +16,13 @@
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Stoyan Danov    30/06/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
 #       18/06/2008 SD: change to translatable text _(...)
+#       30/06/2008 SD: change esthetics - 2tab2fig
 #
 #	
 #------------------------------------------------------------------------------		
@@ -35,6 +37,8 @@
 
 import wx
 from einstein.GUI.graphics import drawPiePlot
+from numCtrl import *
+
 from status import Status
 from einstein.modules.energyStats.moduleEA3 import *
 import einstein.modules.matPanel as Mp
@@ -147,13 +151,19 @@ class PanelEA3(wx.Panel):
         #
         # copy values from dictionary to grid
         #
+
+#SD2008-06-30
+        decimals = [-1,-1,0,1]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
                 try:
-                    self.grid1.SetCellValue(r, c, data[r][c])
-                except:
-                    pass
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid1.SetCellValue(r, c, \
+                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid1.SetCellValue(r, c, data[r][c])
+                except: pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -186,72 +196,136 @@ class PanelEA3(wx.Panel):
         #
         # copy values from dictionary to grid
         #
+
+#SD2008-06-30
+        decimals = [-1,0,1]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid2.SetRowAttr(r, attr)
             for c in range(cols):
                 try:
-                    self.grid2.SetCellValue(r, c, data[r][c])
-                except:
-                    pass
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid2.SetCellValue(r, c, \
+                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid2.SetCellValue(r, c, data[r][c])
+                except: pass
                 if c == labels_column:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
                     self.grid2.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
+
         self.grid2.SetGridCursor(0, 0)
 
-        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-        self.staticText3.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
+##        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
+##        self.staticText3.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
         self.staticText2.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.staticText4.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        
 
     def _init_ctrls(self, prnt):
+
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELEA3, name=u'PanelEA3', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
+#..............................................................................
+#   box 1
 
-        self.staticText1 = wx.StaticText(id=wxID_PANELEA3STATICTEXT1,
-              label=_(u'Final energy consumption for thermal use (FET) by equipment'),
-              name='staticText1', parent=self, pos=wx.Point(40, 8),
-              size=wx.Size(580, 20), style=0)
+        self.box1 = wx.StaticBox(self, -1, _(u'Final energy consumption for thermal use (FET) by equipment'),
+                                 pos = (10,10),size=(780,260))
+
+
+##        self.staticText1 = wx.StaticText(id=wxID_PANELEA3STATICTEXT1,
+##              label=_(u'Final energy consumption for thermal use (FET) by equipment'),
+##              name='staticText1', parent=self, pos=wx.Point(40, 8),
+##              size=wx.Size(580, 20), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA3STATICTEXT2,
               label=_(u'FET by equipment'),
-              name='staticText2', parent=self, pos=wx.Point(320, 70),
+              name='staticText2', parent=self, pos=wx.Point(320, 24),
               size=wx.Size(50, 17), style=0)
 
-        self.grid1 = wx.grid.Grid(id=wxID_PANELEA3GRID1, name='grid1',
-              parent=self, pos=wx.Point(40, 84), size=wx.Size(440, 210),
+        self.grid1 = wx.grid.Grid(id=wxID_PANELEA3GRID1, name='grid1',#SD
+              parent=self, pos=wx.Point(20, 40), size=wx.Size(440, 220),
               style=0)
 
         self.panelGraphFET = wx.Panel(id=wxID_PANELEA3PANELGRAPHFET,
-              name=u'panelGraphFET', parent=self, pos=wx.Point(512, 84),
-              size=wx.Size(296,210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+              name=u'panelGraphFET', parent=self, pos=wx.Point(480, 40),
+              size=wx.Size(300, 220), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphFET.SetBackgroundColour(wx.Colour(127, 127, 127))
 
+#..............................................................................
+#   box 2
 
-        self.staticText3 = wx.StaticText(id=wxID_PANELEA3STATICTEXT3,
-              label=_(u'Useful supply heat (USH) by equipment'),
-              name='staticText3', parent=self, pos=wx.Point(40, 324),
-              size=wx.Size(580, 20), style=0)
+        self.box2 = wx.StaticBox(self, -1, _(u'Useful supply heat (USH) by equipment'),
+                                 pos = (10,290),size=(780,260))
+        
+
+##        self.staticText3 = wx.StaticText(id=wxID_PANELEA3STATICTEXT3,
+##              label=_(u'Useful supply heat (USH) by equipment'),
+##              name='staticText3', parent=self, pos=wx.Point(40, 324),
+##              size=wx.Size(580, 20), style=0)
 
         self.staticText4 = wx.StaticText(id=wxID_PANELEA3STATICTEXT4,
               label=_(u'USH by equipment'),
-              name='staticText4', parent=self, pos=wx.Point(200, 372),
+              name='staticText4', parent=self, pos=wx.Point(200, 304),#SD:(200,372) before
               size=wx.Size(50, 17), style=0)
 
+
         self.grid2 = wx.grid.Grid(id=wxID_PANELEA3GRID2, name='grid2',
-              parent=self, pos=wx.Point(40, 386), size=wx.Size(322, 210),
+              parent=self, pos=wx.Point(20, 320), size=wx.Size(440, 220),
               style=0)
 
+
         self.panelGraphUSH = wx.Panel(id=wxID_PANELEA3PANELGRAPHUSH,
-              name=u'panelGraphUSH', parent=self, pos=wx.Point(512, 386),
-              size=wx.Size(296,210), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+              name=u'panelGraphUSH', parent=self, pos=wx.Point(480, 320),
+              size=wx.Size(300, 220), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphUSH.SetBackgroundColour(wx.Colour(127, 127, 127))
 
+#..............................................................................
+#   default buttons
+#..............................................................................
+        self.btnBack = wx.Button(id=wx.ID_BACKWARD, label=u'<<<',
+              name=u'btnBack', parent=self, pos=wx.Point(500, 560),
+              size=wx.Size(80, 20), style=0)
+        self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
+              id=-1)
+
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+              parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
+              style=0)
+        self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,
+              id=-1)
+
+        self.btnForward = wx.Button(id=wx.ID_FORWARD, label=u'>>>',
+              name=u'btnForward', parent=self, pos=wx.Point(700, 560),
+              size=wx.Size(80, 20), style=0)
+        self.btnForward.Bind(wx.EVT_BUTTON, self.OnBtnForwardButton,
+              id=-1)
 
 
+#------------------------------------------------------------------------------		
+#   Event handlers for default buttons
+#------------------------------------------------------------------------------		
+    def OnBtnOKButton(self, event):
+        event.Skip()
+
+    def OnBtnBackButton(self, event):
+        event.Skip()
+
+    def OnBtnForwardButton(self, event):
+        event.Skip()
+
+
+#------------------------------------------------------------------------------	
     def display(self):
-        self.panelGraphFET.draw()
-        self.panelGraphUSH.draw()
+#------------------------------------------------------------------------------		
+#   display function. carries out all the necessary calculations before
+#   showing the panel
+#------------------------------------------------------------------------------	
+#####Security feature against any strange thing in graphs
+        try: self.panelGraphFET.draw()
+        except: pass
+        try: self.panelGraphUSH.draw()
+        except: pass
         self.Show()
