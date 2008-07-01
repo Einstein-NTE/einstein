@@ -56,6 +56,7 @@
 #                       Tom Sobota                          21/06/2008
 #                       Hans Schweiger                      25/06/2008
 #                       Tom Sobota                          30/06/2008
+#                       Stoyan Danov                        01/07/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -127,6 +128,8 @@
 #       25/06/2008  HS rearrangement in tree: branches CC and BM
 #                      new panelST included
 #       30/06/2008  TS added some Database management possibilities
+#       01/07/2008  SD changed panels places EA1 and EA2 to match tree title (were crossed, lines 774-784)
+#
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -474,19 +477,30 @@ class EinsteinFrame(wx.Frame):
         ####----PAGE Title
         self.pageTitle = wx.Panel(id=-1, name='pageTitle', parent=self.leftpanel2, pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.pageTitle.Show()
-        self.st1Title = wx.StaticText(id=-1,
-                                      label=_("Welcome to EINSTEIN energy audit tool"),
-                                      parent=self.pageTitle, pos=wx.Point(295, 30),
-                                      size=wx.Size(222, 13), style=0)
-        self.st1Title.Center(wx.HORIZONTAL)
-        self.st1Title.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+#..............................................................................
+# grid for displaying alternatives
+
+        self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
+                                 pos = (10,10),size=(780,580))
+        
+#        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
+        ORANGE = '#FF6000'
+        self.box1.SetForegroundColour(ORANGE)
+        self.box1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','zunge.jpg'),
                                              wx.BITMAP_TYPE_JPEG),
                                              id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
                                              parent=self.pageTitle,
-                                             pos=wx.Point(220, 50),
-                                             size=wx.Size(400, 500),
+                                             pos=wx.Point(140, 100),
+                                             size=wx.Size(400, 480),
+                                             style=wx.SUNKEN_BORDER)
+        self.staticBitmap2 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','einstein_logo_small.jpg'),
+                                             wx.BITMAP_TYPE_JPEG),
+                                             id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
+                                             parent=self.pageTitle,
+                                             pos=wx.Point(280, 0),
+                                             size=wx.Size(478, 130),
                                              style=0)
 
 
@@ -771,14 +785,14 @@ class EinsteinFrame(wx.Frame):
         #qEA1 'Primary energy - Yearly'
         elif select == _("Primary energy"):
             self.hidePages()
-            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
-            self.panelEA1.display()
+            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
+            self.panelEA2.display()
 
         #qEA2 'Final energy by fuels - Yearly'
         elif select == _("Final energy by fuels"):
             self.hidePages()
-            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
-            self.panelEA2.display()
+            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
+            self.panelEA1.display()
         #qEA3 'Final energy by equipment - Yearly'
         elif select == _("Final energy by equipment"):
             self.hidePages()
@@ -1195,8 +1209,13 @@ class EinsteinFrame(wx.Frame):
         self.tree = wx.TreeCtrl(self.treepanel, -1, wx.Point(0, 0), wx.Size(200, 740),
                                 wx.TR_DEFAULT_STYLE | wx.TR_NO_LINES | \
                                 wx.TR_FULL_ROW_HIGHLIGHT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+
+        DARKORANGE = '#DD5000'
         self.tree.SetFont(fp.getFont())
+        self.tree.SetForegroundColour(DARKORANGE)
+        
         self.qRoot = self.tree.AddRoot("Einstein")
+
         self.qPage0 = self.tree.AppendItem (self.qRoot, _("Edit Industry Data"),0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, _("General data"),0)
         self.qPage2 = self.tree.AppendItem (self.qPage0, _("Energy consumption"),0)
