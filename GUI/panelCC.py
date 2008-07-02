@@ -381,6 +381,7 @@ class PanelCC(wx.Panel):
                               _("you have to confirm that data are correct, before continuing"))
             if popup.ShowModal() == wx.ID_OK:
                 Status.prj.setActiveAlternative(0,checked = True)
+                Status.mod.moduleEA.update()
                 self.Hide()
                 self.main.tree.SelectItem(self.main.qEA4, select=True)
         else:

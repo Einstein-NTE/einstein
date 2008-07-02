@@ -1743,19 +1743,24 @@ class Project(object):
 #   returns a list of unit operations in DB
 #------------------------------------------------------------------------------
 
-        sqlQuery = "% ORDER BY DBNaceCode_ID"
-#        fluids = Status.DB.dbfuel.sql_select(sqlQuery)
-        naceTable = Status.DB.dbnacecode       
+        naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']       
         naceDict = {}
         naceSubDict = {}
         for entry in naceTable:
-            naceCode = naceTable["CodeNACE"]
-            naceSubCode = naceTable["CodeNACEsub"]
-            naceName = naceTable["NameNACE"]
-            naceSubName = naceTable["NameNACEsub"]
+            naceCode = entry.CodeNACE
+            naceSubCode = naceCode+"."+entry.CodeNACEsub
+            naceName = entry.NameNACE
+            naceSubName = entry.NameNACEsub
             naceDict.update({naceCode:naceName})
             if branch == naceName:
                 naceSubDict.update({naceSubCode:naceSubName})
+
+        print "Project (getNACEDict): branch = ",branch
+        print "---"
+        print "naceDict = ",naceDict
+        print "---"
+        print "naceSubDict = ",naceSubDict
+        print "------------------------------------------------"
             
         return (naceDict,naceSubDict)
 
