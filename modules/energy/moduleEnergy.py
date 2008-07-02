@@ -344,6 +344,13 @@ class ModuleEnergy(object):
 # update the pointer to the last calculated cascade
 
         Status.int.cascadeUpdateLevel = last
+
+#..............................................................................
+# if a full cascade has been calculated, calculate the balances
+
+        if last == self.NEquipe:
+            Status.mod.moduleEA.calculateEquipmentEnergyBalances()
+            Status.prj.setStatus("Energy")
     
               
 #==============================================================================

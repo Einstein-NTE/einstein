@@ -57,6 +57,7 @@
 #                       Hans Schweiger                      25/06/2008
 #                       Tom Sobota                          30/06/2008
 #                       Stoyan Danov                        01/07/2008
+#                       Stoyan Danov                        02/07/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -131,6 +132,7 @@
 #       01/07/2008  SD changed panels places EA1 and EA2 to match tree title (were crossed, lines 774-784)
 #                       -> added panelEA4b (Process heat 2) and panelEA4a (Process heat 1)
 #       01/07/2008  HS changed layout tree and title page
+#       02/07/2008  SD panelEA4 eliminated (now exist only EA4a and EA4b),panelEA6 eliminated
 #
 #
 #------------------------------------------------------------------------------
@@ -200,11 +202,9 @@ from einstein.GUI.panelQ9 import PanelQ9
 from panelEA1 import *
 from panelEA2 import *
 from panelEA3 import *
-from panelEA4 import *
 from panelEA4a import *
 from panelEA4b import *
 from panelEA5 import *
-from panelEA6 import *
 from panelEM1 import *
 from panelEM2 import *
 #from panelEH1 import *
@@ -802,11 +802,6 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEA3 = PanelEA3(parent=self.leftpanel2)
             self.panelEA3.display()
-        #qEA4 'Process heat - Yearly'
-        elif select == _("Process heat"):
-            self.hidePages()
-            self.panelEA4 = PanelEA4(parent=self.leftpanel2)
-            self.panelEA4.display()
         #qEA4 'Process heat 1 - Yearly'   #SD2008-07-01
         elif select == _("Process heat 1"):
             self.hidePages()
@@ -822,11 +817,6 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEA5 = PanelEA5(parent=self.leftpanel2)
             self.panelEA5.display()
-        #qEA6 'Environmental Impact - Yearly'
-        elif select == _("Environmental Impact"):
-            self.hidePages()
-            self.panelEA6 = PanelEA6(parent=self.leftpanel2)
-            self.panelEA6.display()
         #qEM1 'Energy performance - Monthly'
         elif select == 'Monthly demand':
             self.hidePages()
@@ -1057,15 +1047,11 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.panelEA3.Destroy()
         except:pass
-        try:self.panelEA4.Destroy()
-        except:pass
         try:self.panelEA4a.Destroy()
         except:pass
         try:self.panelEA4b.Destroy()
         except:pass
         try:self.panelEA5.Destroy()
-        except:pass
-        try:self.panelEA6.Destroy()
         except:pass
         try:self.panelEM1.Destroy()
         except:pass
@@ -1229,8 +1215,9 @@ class EinsteinFrame(wx.Frame):
                                 wx.TR_FULL_ROW_HIGHLIGHT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
         DARKORANGE = '#DD5000'
+        DARKGREY = '#0F0F0F'
         self.tree.SetFont(fp.getFont())
-        self.tree.SetForegroundColour(DARKORANGE)
+        self.tree.SetForegroundColour(DARKGREY)
         
         self.qRoot = self.tree.AddRoot("Einstein")
 
@@ -1258,11 +1245,9 @@ class EinsteinFrame(wx.Frame):
         self.qEA1 = self.tree.AppendItem (self.qEA, _("Primary energy"))
         self.qEA2 = self.tree.AppendItem (self.qEA, _("Final energy by fuels"))
         self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
-        self.qEA4 = self.tree.AppendItem (self.qEA, _("Process heat"))
         self.qEA4a = self.tree.AppendItem (self.qEA, _("Process heat 1"))
         self.qEA4b = self.tree.AppendItem (self.qEA, _("Process heat 2"))
         self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
-        self.qEA6 = self.tree.AppendItem (self.qEA, _("Environmental Impact"))
         # monthly statistics subtree
         self.qEM1 = self.tree.AppendItem (self.qEM, _("Monthly demand"))
         self.qEM2 = self.tree.AppendItem (self.qEM, _("Monthly supply"))

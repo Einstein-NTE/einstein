@@ -16,6 +16,7 @@
 #       Revised by:         Stoyan Danov  07/04/2008
 #       Revised by:         Stoyan Danov     11/04/2008
 #                           Stoyan Danov    02/05/2008
+#                           Hans Schweiger  02/07/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
@@ -24,6 +25,8 @@
 #                       Return to original state later!
 #       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int,
 #                                   protection zeroDivision and missing data(PId,ANo)->probably not necessary??
+#       02/07/2008: HS  Adaptation to changes in nomeclature (update_einsteinDB_019)
+#                       Some compacting and clean-up
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -51,12 +54,6 @@ class ModuleEA2(object):
     def __init__(self, keys):
         self.keys = keys
 
-        dummydata = array([['Total Fuels'       ,660.0,  81.48, 583.0,  90.67],
-                      ['Total Electricity' ,150.0,  18.52,  60.0,   9.33],
-                      ['Total (F+E)'       ,810.0, 100.00, 643.0, 100.00]])
-        
-        Status.int.setGraphicsData(self.keys[0], dummydata)        
-     
         self.initModule()
 
     def initModule(self):
@@ -70,36 +67,44 @@ class ModuleEA2(object):
         PId = Status.PId
         ANo = Status.ANo
 
+        Status.mod.moduleEA.update()    #checks if data in SQL are uptodate
+                                        #and otherwise carries out necessary
+                                        #calculations
+
 #..............................................................................
 #Check: Protection for missing data(Pid and ANo)in cgeneraldata
         
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
-        self.cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
-        if len(self.cgeneraldata) == 0:
+        (projectData,generalData) = Status.prj.getProjectData()
+
+        if generalData is None:
         
             PEC = [0.0, 0.0]
             PECTotal = 0.0
-            PECPercentage = [-1,-1]
+            PECPercentage = [0.0,0.0]
 
             PET = [0.0, 0.0]
             PETTotal = 0.0
-            PETPercentage = [-1,-1]
+            PETPercentage = [0.0,0.0]
 
         else:
-            PEC = [self.cgeneraldata[0].PECFuels, self.cgeneraldata[0].PECElect]
+            PEC = [generalData.PECFuels, generalData.PECel]
 
-            PECTotal = self.cgeneraldata[0].PECFuels + self.cgeneraldata[0].PECElect
+            try: PECTotal = generalData.PECFuels + generalData.PECel
+            except: PECTotal = 0.0
+            
             if PECTotal > 0.0 and PECTotal is not None: #SD: zeroDivision and None check
                 PECPercentage = [PEC[0]*100.0/PECTotal, PEC[1]*100.0/PECTotal]
             else:
-                PECPercentage = [-1,-1]
+                PECPercentage = [0.0,0.0]
 
-            PET = [self.cgeneraldata[0].PETFuels, self.cgeneraldata[0].PETElect]
-            PETTotal = self.cgeneraldata[0].PETFuels + self.cgeneraldata[0].PETElect
+            PET = [generalData.PETFuels, generalData.PETel]
+            try: PETTotal = generalData.PETFuels + generalData.PETel
+            except: PETTotal = 0.0
+            
             if PETTotal > 0.0 and PETTotal is not None: #SD: zeroDivision and None check
                 PETPercentage = [PET[0]*100.0/PETTotal, PET[1]*100.0/PETTotal]
             else:
-                PETPercentage = [-1,-1]
+                PETPercentage = [0.0,0.0]
 
 #..............................................................
         #finish the table columns, add total, percentage

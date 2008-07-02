@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.10
+#	Version No.: 0.15
 #	Created by: 	    Tom Sobota	April 2008
 #       Revised by:         Hans Schweiger  13/04/2008
 #                           Stoyan Danov    25/04/2008
@@ -26,6 +26,8 @@
 #                           Hans Schweiger  16/06/2008
 #                           Stoyan Danov    17/06/2008
 #                           Hans Schweiger  19/06/2008
+#                           Tom Sobota      02/07/2008
+#                           Hans Schweiger  02/07/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -40,6 +42,9 @@
 #       16/06/2008: HS  clean-up and adapt SQL-I/O to new label names/numbers
 #       17/06/2008: SD  order the parameters as in paper Q4H, unitdict, OnButtonOK
 #       19/06/2008: HS  variable hasunits eliminated
+#        2/07/2008 TS   General fields arranging
+#       02/07/2008: HS  Read/write functions for tc20 adapted to new MultipleChoiceEntry
+#                       small bug-fix (TRANSEQUIPTYPES)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -56,21 +61,36 @@ from status import Status
 from displayClasses import *
 from GUITools import *  #HS2008-05-07 added
 from units import *
+from fonts import *
 
-### constants
-##LABELWIDTH=150
-TEXTENTRYWIDTH=160
+# constants that control the default sizes
+# 1. font sizes
+TYPE_SIZE_LEFT    =   9
+TYPE_SIZE_MIDDLE  =   9
+TYPE_SIZE_RIGHT   =   9
+TYPE_SIZE_TITLES  =  10
 
-# constants that control the default field sizes
+# 2. field sizes
+HEIGHT               =  32
+HEIGHT_MIDDLE        =  32
+HEIGHT_RIGHT         =  32
 
-HEIGHT         =  27
-LABELWIDTH     = 180
-DATAENTRYWIDTH = 100
-UNITSWIDTH     =  90
+LABEL_WIDTH_LEFT     = 250
+LABEL_WIDTH_MIDDLE   = 420
+LABEL_WIDTH_RIGHT    = 300
+
+DATA_ENTRY_WIDTH     = 100
+DATA_ENTRY_WIDTH_LEFT= 200
+
+UNITS_WIDTH          =  90
+
+# 3. vertical separation between fields
+VSEP_LEFT            =   2
+VSEP_MIDDLE          =   4
+VSEP_RIGHT           =   4
 
 class PanelQ4(wx.Panel):
     def __init__(self, parent, main, eqId,prefill=None):
-        print "PanelQ4 (__init__)"
 	self.parent = parent
 	self.main = main
         self._init_ctrls(parent)
@@ -99,257 +119,314 @@ class PanelQ4(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(780, 580))
         self.Hide()
 
-        # fillers for the gridsizer
-        self.dummy1 = wx.StaticText(self,-1,'')
-        self.dummy2 = wx.StaticText(self,-1,'')
-        self.dummy3 = wx.StaticText(self,-1,'')
+        # access to font properties object
+        fp = FontProperties()
 
-        self.sizer_4_staticbox = wx.StaticBox(self, -1, _("Equipment list"))
-        self.sizer_4_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
-        self.sizer_5_staticbox = wx.StaticBox(self, -1,
-                                              _("Descriptive data"))
-        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.notebook = wx.Notebook(self, -1, style=0)
+        self.notebook.SetFont(fp.getFont())
 
-        self.sizer_7_staticbox = wx.StaticBox(self, -1, _("Thechnical data"))
-        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.page0 = wx.Panel(self.notebook) # left panel
+        self.notebook.AddPage(self.page0, _('Descriptive data'))
 
-        self.sizer_8_staticbox = wx.StaticBox(self, -1, _("Schedule"))
-        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.page1 = wx.Panel(self.notebook) # middle left panel
+        self.notebook.AddPage(self.page1, _('Technical data'))
 
-        self.sizer_9_staticbox = wx.StaticBox(self, -1, _("Heat source / sink"))
-        self.sizer_9_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.page2 = wx.Panel(self.notebook) # middle right panel
+        self.notebook.AddPage(self.page2, _('Heat source / sink'))
 
-        self.listBoxEquipment = wx.ListBox(self,-1,choices=[])
+        self.page3 = wx.Panel(self.notebook) # right panel
+        self.notebook.AddPage(self.page3, _('Schedule'))
+
+        self.frame_descriptive_data = wx.StaticBox(self.page0, -1,_("Descriptive data"))
+        self.frame_equipment_list = wx.StaticBox(self.page0, -1, _("Equipment list"))
+        self.frame_technical_data = wx.StaticBox(self.page1, -1, _("Technical data"))
+        self.frame_heat_source_sink = wx.StaticBox(self.page2, -1, _("Heat source / sink"))
+        self.frame_schedule = wx.StaticBox(self.page3, -1, _("Schedule"))
+
+        # set font for titles
+        # 1. save actual font parameters on the stack
+        fp.pushFont()
+        # 2. change size and weight
+        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
+        self.frame_equipment_list.SetFont(fp.getFont())
+        self.frame_descriptive_data.SetFont(fp.getFont())
+        self.frame_technical_data.SetFont(fp.getFont())
+        self.frame_schedule.SetFont(fp.getFont())
+        self.frame_heat_source_sink.SetFont(fp.getFont())
+        # 3. recover previous font state
+        fp.popFont()
+
+        fs = FieldSizes(wHeight=HEIGHT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH_LEFT,wUnits=UNITS_WIDTH)
+
+        #
+        # left tab controls
+        # tab 0 - General information
+        #
+        fp.pushFont()
+        fp.changeFont(size=TYPE_SIZE_LEFT)
+
+        # left side: equipment list
+        self.listBoxEquipment = wx.ListBox(self.page0,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentClick, self.listBoxEquipment)
 
-        # izquierda
-#In Descriptive data
-        
-        self.tc1 = TextEntry(self,maxchars=255,value='',
+        #right side: entries
+        self.tc1 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Short name of equipment"),
                              tip=_("Give some brief name of the equipments to identify them in the reports"))
         
-        self.tc2 = TextEntry(self,maxchars=255,value='',
+        self.tc2 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Manufacturer"),
                              tip=_("Attach the technical data if available"))
         
-        self.tc3 = IntEntry(self,
+        self.tc3 = IntEntry(self.page0,
                             minval=2000, maxval=2050, value=0,
-                            label=_("Year of  manufacturing or/and installation?"),
+                            label=_("Year of  manufacturing\nor/and installation?"),
                             tip=_("Year of manufacturing or installation"))
 
-        self.tc4 = TextEntry(self,maxchars=255,value='',
+        self.tc4 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Model"),
                              tip=_("Model according manufacturer nomenclature"))
 
-        self.tc5 = ChoiceEntry(self,
+        self.tc5 = ChoiceEntry(self.page0,
                                values=TRANSEQUIPTYPE.values(),
                                label=_("Type of equipment"),
                                tip=_("e.g. boiler / burner / chiller / compressor / CHP motor"))
 
-        self.tc6 = IntEntry(self,
+        self.tc6 = IntEntry(self.page0,
                             minval=0, maxval=100, value=0,
                             label=_("Number of units of the same type"),
                             tip=_("Specify how many units of this type exist"))
-#In Technical data
+        #
+        # middle left tab controls
+        #
+        # tab 1 - Technical data
+        #
+        fp.changeFont(size=TYPE_SIZE_MIDDLE)
+        f = FieldSizes(wHeight=HEIGHT_MIDDLE,wLabel=LABEL_WIDTH_MIDDLE)
 
-        self.tc7 = FloatEntry(self,
+        self.tc7 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
                               label=_("Nominal power (heat or cold, output)"),
                               tip=_("Power at manufacturer nominal conditions"))
 
-        self.tc8 = ChoiceEntry(self,
+        self.tc8 = ChoiceEntry(self.page1,
                                values=[],
                                label=_("Fuel type"),
                                tip=_("Select fuel type from predefined list"))
 
-        self.tc9 = FloatEntry(self,
+        self.tc9 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='MASSORVOLUME',
                               label=_("Fuel consumption (nominal)"),
                               tip=_("Specify the units below"))
 
-        self.tc12 = FloatEntry(self,
+        self.tc12 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
                               label=_("Electrical power input"),
                               tip=_("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
 
-        self.tc13 = FloatEntry(self,
+        self.tc13 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=1., value=0.,
                               label=_("Mean overall thermal conversion efficiency"),
                               tip=_("Specify the efficiency of boiler or EER(COP) for cold generation"))
 
-        self.tc17 = FloatEntry(self,
+        self.tc17 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=1., value=0.,
                               label=_("Mean utilisation factor (full capacity = 100%)"),
                               tip=_("Specify the mean supplied power of the boiler/cooler/etc. with respect to its nominal power"))
 
 
-        self.tc16 = FloatEntry(self,
+        self.tc16 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_("Temperature of exhaust gas at standard operation conditions (boilers only)"),
                               tip=_("Only for boilers and CHP"))
 
-        self.tc16_2 = FloatEntry(self,
+        self.tc16_2 = FloatEntry(self.page1,
                               ipart=2, decimals=2, minval=0., maxval=99.99, value=0.,
                               label=_("Excess air ratio (boilers only)"),
                               tip=_("Only for boilers and CHP"))
 
-        self.tc15 = FloatEntry(self,
+        self.tc15 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
                               label=_("Electricity production (CHP only)"),
                               tip=_("Only for CHP"))
 
-        self.tc14 = FloatEntry(self,
+        self.tc14 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=1., value=0.,
                               label=_("Electrical conversion efficiency (CHP only)"),
                               tip=_("Only for CHP"))
 #next from Q4C
-        self.tc102 = ChoiceEntry(self,
+        self.tc102 = ChoiceEntry(self.page1,
                                values=[],
                                label=_("Refrigerant (HP or Chiller only)"),
                                tip=_("Refrigerant or working fluid (HP or Chiller only)"))
 
-        # derecha
-#In Heat source / sink
-        self.tc20 = ChoiceEntry(self,
-                             values = [],
-                             multiple = True,
-                             label=_("Heat or cold supplyed to the distribution line / branch (piping or duct) no."),
+        #
+        # middle right tab controls
+        # tab 2. Heat source / sink
+        #
+
+        self.tc20 = MultipleChoiceEntry(self.page2,
+                             label=_("Heat or cold supplied to the distribution line / branch\n(piping or duct) no."),
                              tip=_("Specify the tube for supply to the equipment, using the nomenclature of the block ''distribution system''"))
         #
-        self.tc30 = ChoiceEntry(self,
+        self.tc30 = ChoiceEntry(self.page2,
                                values=[],
                                label=_("Low temperature heat source"),
                                tip=_("If waste heat is used, indicate the process or equipment from which waste heat originates"))
 
 
-        self.tc31 = FloatEntry(self,
+        self.tc31 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_("Temperature of low temp. heat source"),
                               tip=_("Temperature of the medium entering the evaporator"))
 
 
-        self.tc34 = FloatEntry(self,
+        self.tc34 = FloatEntry(self.page2,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
                               label=_("Thermal power input high temp. (thermal HP and chillers only)"),
                               tip=_("Power applied to the generator of a thermal heat pump or chiller"))
 
 
-        self.tc33 = FloatEntry(self,
+        self.tc33 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_("Driving temperature (thermal HP and chillers only)"),
                               tip=_("Temperature of heat supply fluid entering the generator"))
 
 
-        self.tc32 = ChoiceEntry(self,
+        self.tc32 = ChoiceEntry(self.page2,
                                values=[],
                                label=_("High temperature heat source (thermal HP and chillers only)"),
                                tip=_("Indicate if the circuit of the heat supply to generator is closed or opened (waste heat released to ambient)"))
 
 #next 2 from Q4C
-        self.tc35 = ChoiceEntry(self,
+        self.tc35 = ChoiceEntry(self.page2,
                                values=[],
                                label=_("Destination of waste heat (chillers only)"),
                                tip=_("If applies, specify heat exchanger where waste heat is used"))
 
-        self.tc36 = FloatEntry(self,
+        self.tc36 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_("Temperature of re-cooling (chillers only)"),
                               tip=_("Outlet temperature of cooling water or hot air stream"))
 
-#In Schedule
+        #
+        # right tab controls
+        #
+        # panel 3. Schedule
+        fp.changeFont(size=TYPE_SIZE_RIGHT)
+        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT)
 
-        self.tc18 = FloatEntry(self,
+        self.tc18 = FloatEntry(self.page3,
                               ipart=2, decimals=1, minval=0., maxval=24., value=0.,
                               label=_("Hours of operation per day"),
                               tip=_("Specify representative mean values"))
 
-        self.tc19 = FloatEntry(self,
+        self.tc19 = FloatEntry(self.page3,
                               ipart=3, decimals=1, minval=0., maxval=365., value=0.,
                               label=_("Days of operation per year"),
                               tip=_("Specify representative mean values"))
 
-
+        #
+        # buttons
+        #
         self.buttonDeleteEquipment = wx.Button(self,-1,label=_("Delete equipment"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
+        self.buttonDeleteEquipment.SetMinSize((136, 32))
+        self.buttonDeleteEquipment.SetFont(fp.getFont())
 
         self.buttonAddEquipment = wx.Button(self,-1,label=_("Add equipment"))
         self.Bind(wx.EVT_BUTTON,self.OnButtonAddEquipment, self.buttonAddEquipment)
+        self.buttonAddEquipment.SetMinSize((136, 32))
+        self.buttonAddEquipment.SetFont(fp.getFont())
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label='Cancel')
-        #self.buttonCancel.SetMinSize((125, 32))
-        #self.buttonCancel.SetMaxSize((125, 32))
         self.Bind(wx.EVT_BUTTON,self.OnButtonCancel, self.buttonCancel)
 
         self.buttonOK = wx.Button(self,wx.ID_OK, label='OK')
-        #self.buttonOK.SetMinSize((125, 32))
-        #self.buttonOK.SetMaxSize((125, 32))
         self.Bind(wx.EVT_BUTTON,self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 
+        # recover previous font parameters from the stack
+        fp.popFont()
+
 
     def __do_layout(self):
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
+        flagText = wx.ALIGN_CENTER_VERTICAL|wx.TOP
+
+        # global sizer for panel. Contains notebook w/three tabs + buttons Cancel and Ok
+        sizerGlobal = wx.BoxSizer(wx.VERTICAL)
+        # sizer for left tab
+        # tab 0, general information
+        sizerPage0 = wx.StaticBoxSizer(self.frame_descriptive_data, wx.HORIZONTAL)
+        # left part: listbox
+        sizerP0Left= wx.StaticBoxSizer(self.frame_equipment_list, wx.VERTICAL)
+        sizerP0Left.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
+        sizerP0Left.Add(self.buttonDeleteEquipment, 0, wx.ALIGN_RIGHT, 0)
+        sizerP0Left.Add(self.buttonAddEquipment, 0, wx.ALIGN_RIGHT, 0)
+        sizerPage0.Add(sizerP0Left,1,wx.EXPAND|wx.TOP,10)
+        # right part: data entries
+        sizerP0Right= wx.BoxSizer(wx.VERTICAL)
+        sizerP0Right.Add(self.tc1, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(self.tc2, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(self.tc3, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(self.tc4, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(self.tc5, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(self.tc6, 0, flagText, VSEP_LEFT)
+        sizerPage0.Add(sizerP0Right,3,wx.EXPAND|wx.TOP,10)
+        self.page0.SetSizer(sizerPage0)
+        # sizer for middle left tab
+        # tab 1, technical data
+        sizerPage1 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
+        sizerPage1.Add(self.tc7, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc8, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc9, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc12, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc13, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc17, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc16, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc16_2, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc15, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc14, 0, flagText, VSEP_MIDDLE)
+        sizerPage1.Add(self.tc102, 0, flagText, VSEP_MIDDLE)
+        self.page1.SetSizer(sizerPage1)
+
+        # sizer for middle right tab
+        # tab 2, heat source/sink
+        sizerPage2 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.VERTICAL)
+        sizerPage2.Add(self.tc20, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc30, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc31, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc34, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc33, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc32, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc35, 0, flagText, VSEP_MIDDLE)
+        sizerPage2.Add(self.tc36, 0, flagText, VSEP_MIDDLE)
+        self.page2.SetSizer(sizerPage2)
+
+        # sizer for right tab
+        # tab 3, schedule
+        sizerPage3 = wx.StaticBoxSizer(self.frame_schedule, wx.VERTICAL)
+        sizerPage3.Add(self.tc18, 0, flagText, VSEP_RIGHT)
+        sizerPage3.Add(self.tc19, 0, flagText, VSEP_RIGHT)
+        self.page3.SetSizer(sizerPage3)
+
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        grid_sizer_1 = wx.FlexGridSizer(14, 2, 10, 10) #r,c,vsep,hsep
-        sizer_4 = wx.StaticBoxSizer(self.sizer_4_staticbox, wx.VERTICAL)
-        sizer_4.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
-        sizer_4.Add(self.buttonDeleteEquipment, 0, wx.EXPAND, 0)
-        sizer_4.Add(self.buttonAddEquipment, 0, wx.EXPAND, 2)
-        sizer_3.Add(sizer_4, 1, wx.EXPAND, 0)
-
-        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
-        sizer_5.Add(grid_sizer_1, 1, wx.EXPAND, 0)
-
-
-        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
-        flagText = wx.EXPAND|wx.ALIGN_CENTER_VERTICAL
-        grid_sizer_1.Add(self.tc1, 0, flagText, 0)
-        grid_sizer_1.Add(self.dummy1, 0, wx.EXPAND, 0)
-#        grid_sizer_1.Add(self.tc11, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc12, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc13, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc14, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc15, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc16, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc7, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc17, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc8, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc18, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc9, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc19, 0, flagText, 0)
-#        grid_sizer_1.Add(self.tc10, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc20, 0, flagText, 0)
-        grid_sizer_1.Add(self.dummy2, 0, wx.EXPAND, 0)
-        grid_sizer_1.Add(self.tc30, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc31, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc32, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc33, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc34, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc35, 0, flagText, 0)
-        grid_sizer_1.Add(self.tc36, 0, flagText, 0)
-            
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
-        sizer_3.Add(sizer_5, 4, wx.LEFT|wx.RIGHT|wx.EXPAND, 0)
-        sizer_1.Add(sizer_3, 1, wx.EXPAND, 0)
-        sizer_1.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
-        self.SetSizer(sizer_1)
+
+        sizerGlobal.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizerGlobal.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        self.SetSizer(sizerGlobal)
         self.Layout()
 
 #------------------------------------------------------------------------------
@@ -405,7 +482,7 @@ class PanelQ4(wx.Panel):
             "Manufact":check(self.tc2.GetValue()),
             "YearManufact":check(self.tc3.GetValue()),
             "Model":check(self.tc4.GetValue()),
-            "EquipType":check(findKey(TRANSEQUIPTYPES,self.tc5.GetValue(text=True))), 
+            "EquipType":check(findKey(TRANSEQUIPTYPE,self.tc5.GetValue(text=True))), 
             "NumEquipUnits":check(self.tc6.GetValue()),
             "HCGPnom":check(self.tc7.GetValue()),
             "DBFuel_id":check(findKey(fuelDict,self.tc8.GetValue(text=True))),
@@ -484,9 +561,11 @@ class PanelQ4(wx.Panel):
             self.tc17.SetValue(str(q.PartLoad))
             self.tc18.SetValue(str(q.HPerDayEq))
             self.tc19.SetValue(str(q.NDaysEq))
-            try: self.tc20.SetValue(self.getPipeNames(q.PipeDuctEquip)[0])
-            except: pass
-                    ###here should be changed to the appropriate thing for multiple selection !!!!
+
+
+            self.tc20.SetSelection(self.getPipeNames(q.PipeDuctEquip))
+#            self.tc20.SetSelection(['ein','zwei','drei'])
+            
             self.tc30.SetValue(str(q.HeatSourceLT))
             self.tc31.SetValue(str(q.THeatSourceLT))
             
@@ -549,10 +628,7 @@ class PanelQ4(wx.Panel):
 
     def fillChoiceOfPipe(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
-        self.tc20.entry.Clear()
-        if len(pipeList) == 0: self.tc20.entry.Append("---")
-        for pipe in pipeList:
-            self.tc20.entry.Append(pipe)
+        self.tc20.SetValue(pipeList)
 
     def fillChoiceOfLTSource(self):
         hxList = Status.prj.getHXList("HXName")
@@ -602,6 +678,7 @@ class PanelQ4(wx.Panel):
         pipeDict = Status.prj.getPipeDict()
         pipeIDs = []
         for name in nameList:
+            print "selected name: ",name
             pipeID = findKey(pipeDict,name)
             pipeIDs.append("%10d"%pipeID)
             

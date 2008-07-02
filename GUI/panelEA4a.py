@@ -20,6 +20,7 @@
 #                           Hans Schweiger  19/06/2008
 #                           Stoyan Danov    20/06/2008
 #                           Stoyan Danov    01/07/2008
+#                           Stoyan Danov    02/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -28,7 +29,8 @@
 #       19/06/2008: HS  some security features added
 #       20/06/2008: SD  change esthetics - continue: layout, security features
 #                       grid1 decimals control, changes of position and size of objects
-#       20/06/2008: SD  adappted as panelEAa - heat demand by temperature, new columns added
+#       01/07/2008: SD  adappted as panelEAa - heat demand by temperature, new columns added
+#       02/07/2008: SD  changed to orange colour (staticBox)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -61,12 +63,14 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 class PanelEA4a(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
-        keys = ['EA4_UPH', 'EA4_HDP'] 
+#        keys = ['EA4_UPH', 'EA4_HDP']
+        keys = ['EA4_UPH','HP Table','UPH Plot']
         self.mod = ModuleEA4(keys)
         labels_column = 0
         # remaps drawing methods to the wx widgets.
@@ -166,6 +170,9 @@ class PanelEA4a(wx.Panel):
         self.box1 = wx.StaticBox(self, -1, _(u'Useful heat demand by process (UPH)'),
                                  pos = (10,10),size=(780,200))
 
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.grid1 = wx.grid.Grid(id=wxID_PANELEA4GRID1, name='grid1',#SD
               parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 160),
               style=0)
@@ -173,6 +180,9 @@ class PanelEA4a(wx.Panel):
 
         self.box2 = wx.StaticBox(self, -1, _(u'Distribution of process heat demand (UPH Total) by processes'),
                                  pos = (10,230),size=(780,320))
+
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelGraphUPH = wx.Panel(id=wxID_PANELEA4PANELGRAPHUPH,
               name=u'panelGraphUPH', parent=self, pos=wx.Point(200, 260),

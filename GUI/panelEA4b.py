@@ -20,6 +20,7 @@
 #                           Hans Schweiger  19/06/2008
 #                           Stoyan Danov    20/06/2008
 #                           Stoyan Danov    01/07/2008
+#                           Stoyan Danov    02/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -28,7 +29,8 @@
 #       19/06/2008: HS  some security features added
 #       20/06/2008: SD  change esthetics - continue: layout, security features
 #                       grid1 decimals control, changes of position and size of objects
-#       20/06/2008: SD  adappted as panelEAb - heat demand by temperature
+#       01/07/2008: SD  adappted as panelEAb - heat demand by temperature
+#       02/07/2008: SD  changed to orange colour (staticBox)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -51,9 +53,8 @@ import einstein.modules.matPanel as Mp
 [wxID_PANELEA4, wxID_PANELEA4GRID1, wxID_PANELEA4GRID2, 
  wxID_PANELEA4PANELGRAPHUPH, wxID_PANELEA4PANELGRAPHHD,
  wxID_PANELEA4STATICTEXT1, wxID_PANELEA4STATICTEXT2,
- wxID_PANELEA4STATICTEXT3,
- wxID_PANELHPFIG ###SD: added
-] = [wx.NewId() for _init_ctrls in range(9)] ###SD: range changed from 8 to 9
+ wxID_PANELEA4STATICTEXT3
+] = [wx.NewId() for _init_ctrls in range(8)]
 #
 # constants
 #
@@ -62,6 +63,9 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
+
 
 ###SD
 #------------------------------------------------------------------------------		
@@ -71,23 +75,41 @@ def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
+
+#SD2008-07-02: from dummydata3 (moduleEA4)
+##    if not hasattr(self, 'subplot'):
+##        self.subplot = self.figure.add_subplot(1,1,1)
+##    print 'Status.int.GData[UPH Plot][0] =', Status.int.GData['UPH Plot'][0]
+##    print 'Status.int.GData[UPH Plot][1] =', Status.int.GData['UPH Plot'][1]
+##    print 'Status.int.GData[UPH Plot][2] =', Status.int.GData['UPH Plot'][2]
+##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+##                      Status.int.GData['UPH Plot'][1],
+##                      'go-', label='UPH', linewidth=2)
+##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+##                      Status.int.GData['UPH Plot'][2],
+##                      'bo-', label='UPH net', linewidth=2)
+##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+##                      Status.int.GData['UPH Plot'][3],
+##                      'rs-',  label='USH', linewidth=2)
+##    self.subplot.axis([0, 15, 0, 10])
+##    self.subplot.legend()
+
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
+    print 'Status.int.GData[UPH Plot][0] =', Status.int.GData['UPH Plot'][0]
+    print 'Status.int.GData[UPH Plot][1] =', Status.int.GData['UPH Plot'][1]
+    print 'Status.int.GData[UPH Plot][2] =', Status.int.GData['UPH Plot'][2]
     self.subplot.plot(Status.int.GData['UPH Plot'][0],
                       Status.int.GData['UPH Plot'][1],
-                      'go-', label='QD', linewidth=2)
+                      'go-', label='UPH', linewidth=2)
     self.subplot.plot(Status.int.GData['UPH Plot'][0],
-                      Status.int.GData['UPU Plot'][2],
-                      'rs',  label='QA')
-##    self.subplot.plot(Status.int.GData['HP Plot'][0],
-##                      Status.int.GData['HP Plot'][3],
-##                      'go-', label='QD_mod', linewidth=2)
-##    self.subplot.plot(Status.int.GData['HP Plot'][0],
-##                      Status.int.GData['HP Plot'][4],
-##                      'rs',  label='QA_mod')
+                      Status.int.GData['UPH Plot'][2],
+                      'bo-', label='UPH net', linewidth=2)
+    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+                      Status.int.GData['UPH Plot'][3],
+                      'rs-',  label='USH', linewidth=2)
     self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
-
 
 class PanelEA4b(wx.Panel):
     def __init__(self, parent):
@@ -96,22 +118,6 @@ class PanelEA4b(wx.Panel):
         self.mod = ModuleEA4(keys)
         labels_column = 0
 
-        
-        # remaps drawing methods to the wx widgets.
-        #
-        # upper graphic: UPH demand by process
-        #
-
-##        paramList={'labels'      : labels_column,              # labels column
-##                   'data'        : 3,                          # data column for this graph
-##                   'key'         : keys[1],                    # key for Interface
-##                   'title'       : _('HD by process temperature'),# title of the graph
-##                   'backcolor'   : GRAPH_BACKGROUND_COLOR}     # graph background color
-##
-##        dummy = Mp.MatPanel(self.panelGraphHD,
-##                            wx.Panel,
-##                            drawPiePlot,
-##                            paramList)
 ###SD
 #   graphic: Cumulative heat demand by hours
         (rows,cols) = Interfaces.GData[keys[1]].shape        
@@ -119,12 +125,12 @@ class PanelEA4b(wx.Panel):
         ignoredrows = rows-1        
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : keys[1],                # key for Interface
+                   'key'         : keys[2],                # key for Interface
                    'title'       : _('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, drawFigure, paramList)
+        dummy = Mp.MatPanel(self.panelEA4bFig, wx.Panel, drawFigure, paramList)
         del dummy
 
         #
@@ -209,6 +215,9 @@ class PanelEA4b(wx.Panel):
         self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) by process temperatures'),
                                  pos = (10,10),size=(780,200))
 
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
 ###SD
 ##        self.staticText1 = wx.StaticText(id=-1,
 ##              label=_(u'Temperature levels'),
@@ -233,15 +242,14 @@ class PanelEA4b(wx.Panel):
         self.box2 = wx.StaticBox(self, -1, _(u'Distribution of heat demand (UPH) by process temperatures'),
                                  pos = (10,230),size=(780,320))
 
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-##        self.panelGraphHD = wx.Panel(id=wxID_PANELEA4PANELGRAPHHD,
-##              name=u'panelGraphHD', parent=self, pos=wx.Point(200, 260),
-##              size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
-##        self.panelGraphHD.SetBackgroundColour(wx.Colour(127, 127, 127))
+
 ###SD
-        self.panelHPFig = wx.Panel(id=wxID_PANELHPFIG, name='panelHPFigure', parent=self,
+        self.panelEA4bFig = wx.Panel(id=-1, name='panelEA4bFig', parent=self,
               pos=wx.Point(200, 260), size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
-        self.panelHPFig.SetBackgroundColour(wx.Colour(127, 127, 127))
+        self.panelEA4bFig.SetBackgroundColour(wx.Colour(127, 127, 127))
 
 
 #..............................................................................
@@ -285,6 +293,6 @@ class PanelEA4b(wx.Panel):
         try:
 ##            self.panelGraphHD.draw()
 ###SD
-            self.panelHPFig.draw()
+            self.panelEA4bFig.draw()
         except: pass
         self.Show()

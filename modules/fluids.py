@@ -51,3 +51,27 @@ class Fluid():
            
            
 #------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+class Fuel():
+#------------------------------------------------------------------------------		
+
+    def __init__(self,fuelID):
+        fuels = Status.DB.dbfuel.DBFuel_ID[fuelID]
+        if len(fuels) > 0:
+            fuel = fuels[0]
+            self.LCV = fuel.FuelLCV
+            self.HCV = fuel.FuelHCV  #data in DB are in kJ/kgK ->
+            self.PEConv = fuel.PEConvFuel
+            self.CO2Conv = fuel.CO2ConvFuel
+            self.rho = fuel.FuelDensity
+                                                #conversion to kWh/kgK
+        else:
+            self.LCV = 10.0
+            self.HCV = 11.0
+            self.PEConv = 1.1
+            self.CO2Conv = 0.20
+            self.rho = 10.0
+            logError(_("Fluid (init): cannot find fuel with ID = %s")%fuelID)
+           
+           
+#------------------------------------------------------------------------------		

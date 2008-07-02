@@ -35,6 +35,7 @@ import re
 import locale
 import math
 import wx
+import wx.combo
 #import wx.lib.masked.numctrl
 import wx.lib.intctrl
 import wx.lib.stattext
@@ -168,13 +169,8 @@ class Generics(object):
         if multiple:
             # multiple values can be selected
             if text:
-                # return the text of the selections
-                # first get the indices
-                ituple = other.GetSelections()
-                slist = []
-                # then look for the text of each index
-                for i in ituple:
-                    slist.append(other.GetString(i))
+                # return a list with the texts of the selections
+                slist = other.GetSelection()
                 return tuple(slist)
                     
             else:
@@ -190,6 +186,110 @@ class Generics(object):
                 return other.GetCurrentSelection()
 
 
+
+class ListCombo(wx.ListCtrl, wx.combo.ComboPopup):
+    def __init__(self):
+        # Since we are using multiple inheritance, and don't know yet
+        # which window is to be the parent, we'll do 2-phase create of
+        # the ListCtrl instead, and call its Create method later in
+        # our Create method.  (See Create below.)
+        self.PostCreate(wx.PreListCtrl())
+        # Init the ComboPopup base class.
+        wx.combo.ComboPopup.__init__(self)
+
+    # This is called immediately after construction finishes.  You can
+    # use self.GetCombo if needed to get to the ComboCtrl instance.
+    def Init(self):
+        self.value = -1
+        self.curitem = -1
+
+
+    def AddItem(self, txt):
+        self.InsertStringItem(self.GetItemCount(), txt)
+
+    def OnMotion(self, evt):
+        item, flags = self.HitTest(evt.GetPosition())
+        if item >= 0:
+            #self.Select(item)
+            self.curitem = item
+
+    def OnLeftDown(self, evt):
+        pass
+        #self.value = self.curitem
+        #self.Dismiss()
+
+    def OnLeftDClick(self, evt):
+        # close the listbox
+        self.Dismiss()
+
+    # The following methods are those that are overridable from the
+    # ComboPopup base class.
+
+    # Create the popup child control.  Return true for success.
+    def Create(self, parent):
+        wx.ListCtrl.Create(self, parent,style=wx.LC_LIST|wx.SIMPLE_BORDER)
+        self.Bind(wx.EVT_MOTION, self.OnMotion)
+        #self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
+        return True
+
+
+    # Return the widget that is to be used for the popup
+    def GetControl(self):
+        return self
+
+    # Called just prior to displaying the popup, you can use it to
+    # 'select' the current item.
+    def SetStringValue(self, val):
+        idx = self.FindItem(-1, val)
+        if idx != wx.NOT_FOUND:
+            self.Select(idx)
+
+    # Return a string representation of the current item.
+    def GetStringValue(self):
+        if self.value >= 0:
+            return self.GetItemText(self.value)
+        return ""
+
+    # Called immediately after the popup is shown
+    def OnPopup(self):
+        wx.combo.ComboPopup.OnPopup(self)
+
+    # Called when popup is dismissed
+    def OnDismiss(self):
+        wx.combo.ComboPopup.OnDismiss(self)
+
+    # Receives key events from the parent ComboCtrl.  Events not
+    # handled should be skipped.
+    def OnComboKeyEvent(self, event):
+        wx.combo.ComboPopup.OnComboKeyEvent(self, event)
+
+    # Implement if you need to support special action when user
+    # double-clicks on the parent wxComboCtrl.
+    def OnComboDoubleClick(self):
+        wx.combo.ComboPopup.OnComboDoubleClick(self)
+
+    def Clear(self):
+        self.ClearAll()
+
+    # utility functions for implementing a GetSelection method
+    def GetFirstSelected(self):
+        """return first selected item, or -1 when none"""
+        return self.GetNextSelected(-1)
+
+    def GetNextSelected(self, item):
+        """return subsequent selected items, or -1 when no more"""
+        return self.GetNextItem(item, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+
+    def GetSelection(self):
+        sel = []
+        i = self.GetFirstSelected()
+        while i >= 0:
+            s = self.GetItemText(i)
+            sel.append(s)
+            i = self.GetNextSelected(i)
+        return sel
+        
 
 class CFloat(wx.TextCtrl):
     def __init__(self, prnt,
@@ -1071,7 +1171,6 @@ class DateEntry(wx.Panel):
 
 class ChoiceEntry(wx.Panel):
     def __init__(self, parent=None,
-                 multiple=False,  # admits choosing multiple elements?
                  values=[],       # initial values list
                  wLabel=None,     # width of the label
                  wData=None,      # width of the data entry
@@ -1080,7 +1179,6 @@ class ChoiceEntry(wx.Panel):
                  tip='',          # text of the tip
                  fontsize=None):
 
-        self.multiple = multiple
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
         self.f = FontProperties()
@@ -1096,15 +1194,8 @@ class ChoiceEntry(wx.Panel):
                                                        style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
             self.f.setFont(self.label,size=fontsize)
 
-        if multiple:
-            # if multiple choice, create a listbox
-            self.entry = wx.ListBox(self, -1, pos=(lblSize[0]+1,0),
-                                    choices=values, size=datSize,
-                                    style=wx.LB_MULTIPLE|wx.LB_ALWAYS_SB)
-        else:
-            #create a choice control
-            self.entry = wx.Choice(self, -1, pos=(lblSize[0]+1,0),
-                                   choices=values, size=datSize)
+        #create a choice control
+        self.entry = wx.Choice(self, -1, pos=(lblSize[0]+1,0),choices=values, size=datSize)
         backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
         self.entry.SetBackgroundColour(backgroundcolour)
         self.f.setFont(self.entry,size=fontsize)
@@ -1112,13 +1203,12 @@ class ChoiceEntry(wx.Panel):
         # set tooltips
         self.g.setTooltips(self,tip)
 
-
     def setUnits(self,tip,unitdict):
         # this method is just for compatibility
         pass
 
     def GetValue(self,text=False):
-        return self.g.getChoiceValues(self.entry, self.multiple, text)
+        return self.g.getChoiceValues(self.entry, False, text)
 
     def Clear(self):
         self.entry.Clear()
@@ -1129,14 +1219,11 @@ class ChoiceEntry(wx.Panel):
         # if 'thing' is a string, the choice will show the element that contains the string
         # if 'thing' is a list, the elements of the list will be loaded in the choice.
         try:
-            #t = thing.__class__.__name__
-            #if t == 'int':
             if isinstance(thing,int):
                 try:
                     self.entry.SetSelection(thing)
                 except:
                     self.entry.SetSelection(0)
-            #elif t == 'str':
             elif isinstance(thing,str):
                 if thing.strip() == '':
                     # clear the choice
@@ -1150,7 +1237,6 @@ class ChoiceEntry(wx.Panel):
                     except:
                         self.entry.SetSelection(0)
 
-            #elif t == 'list':
             elif isinstance(thing,list):
                 # thing is a list of values for the choice control
                 self.entry.Clear()
@@ -1170,6 +1256,105 @@ class ChoiceEntry(wx.Panel):
                     self.entry.SetSelection(0)
             except:
                 self.entry.SetSelection(0)
+    
+    def getUnit(self):
+        # this method is just for compatibility
+        return None
+
+    def setUnit(self,value):
+        # this method is just for compatibility
+        pass
+
+
+
+class MultipleChoiceEntry(wx.Panel):
+    def __init__(self, parent=None,
+                 values=None,       # initial values list
+                 selected=None,     # initial selected values (list of strings)
+                 wLabel=None,     # width of the label
+                 wData=None,      # width of the data entry
+                 wUnits=None,     # width of the unit selector (not used)
+                 label='',        # text of the label
+                 tip='',          # text of the tip
+                 fontsize=None):
+
+        style = wx.NO_BORDER|wx.TAB_TRAVERSAL
+        self.g = Generics()
+        self.f = FontProperties()
+
+        (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,False,wUnits)
+
+        wx.Panel.__init__(self, parent, id=-1, size=size, style=style)
+
+        if label.strip():
+            # creates label
+            self.label = wx.lib.stattext.GenStaticText(self,ID=-1,pos=(0,0),
+                                                       label=label,size=lblSize,
+                                                       style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
+            self.f.setFont(self.label,size=fontsize)
+
+        #create a ListCombo control
+        # 1. Create a ComboCtrl
+        self.cc = wx.combo.ComboCtrl(self, pos=(lblSize[0]+1,0),size=datSize)        
+        # 2. Create a Popup
+        self.entry = ListCombo()
+        # 3. Associate them with each other.  This also triggers the
+        #    creation of the ListCtrl.
+        self.cc.SetPopupControl(self.entry)
+
+        backgroundcolour = self.g.makeColour(CHOOSERBCGCOLOR)
+        self.cc.SetBackgroundColour(backgroundcolour)
+        self.entry.SetBackgroundColour(backgroundcolour)
+        self.f.setFont(self.cc,size=fontsize)
+        self.f.setFont(self.entry,size=fontsize)
+
+        # set tooltips
+        self.g.setTooltips(self,tip)
+
+        # set values
+        if values is not None:
+            self.SetValue(values)
+
+        # set initially selected
+        if selected is not None:
+            self.SetSelection(selected)
+        
+    def setUnits(self,tip,unitdict):
+        # this method is just for compatibility
+        pass
+
+    def GetValue(self,text=False):
+        #print self.entry.GetSelectedItemCount()
+        return self.g.getChoiceValues(self.entry, True, text)
+
+    def Clear(self):
+        self.entry.Clear()
+
+    def SetSelection(self,selection):
+        if isinstance(selection,list):
+            for val in selection:
+                self.entry.SetStringValue(str(val))
+        else:
+            self.entry.SetStringValue(str(selection))
+        
+    def SetValue(self, thing=0):
+        try:
+            if thing is None:
+                self.entry.Append(' ')
+            elif isinstance(thing,str):
+                self.entry.Append(thing)
+            elif isinstance(thing,list):
+                # thing is a list of values for the control
+                self.entry.Clear()
+                for item in thing:
+                    if item is None:
+                        self.entry.AddItem(' ')
+                    else:
+                        self.entry.AddItem(item)
+                self.SetSelection(thing[0])
+        except:
+            print 'Bad SetValue %s' % thing
+
     
     def getUnit(self):
         # this method is just for compatibility

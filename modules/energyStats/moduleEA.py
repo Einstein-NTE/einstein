@@ -32,11 +32,19 @@ from sys import *
 from math import *
 from numpy import *
 
+from moduleEA1 import ModuleEA1
+from moduleEA2 import ModuleEA2
+from moduleEA3 import ModuleEA3
+from moduleEA4 import ModuleEA4
+from moduleEA5 import ModuleEA5
+from moduleEA6 import ModuleEA6
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
+
+from einstein.modules.fluids import *
 
 
 class ModuleEA(object):
@@ -48,8 +56,22 @@ class ModuleEA(object):
 #------------------------------------------------------------------------------
     def update(self):
 #------------------------------------------------------------------------------
+#       updates all the energyStatistics needed for the energyStatisticsDisplay        
+#------------------------------------------------------------------------------
+        if Status.StatusEnergy == 0:
+            if Status.ANo > 0:
+                logMessage(_("EINSTEIN running system simulation for updating energy balances"))
+                logMessage(_("This may take a while. please be patient ..."))
+                Status.mod.moduleEnergy.runSimulation()
+            logMessage(_("EINSTEIN now updating annual energy balances"))
+            self.calculateEquipmentEnergyBalances()
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def updateForReport(self):
+#------------------------------------------------------------------------------
 #       updates all the energyStatistics needed for the report        
 #------------------------------------------------------------------------------
+        self.calculateAnnualResults()
         self.procHeatTemp()
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -80,4 +102,179 @@ class ModuleEA(object):
         print "ModuleEA (procHeatTemp): resulting array"
         print array(tableReport)
 
+#------------------------------------------------------------------------------
+    def calculateAnnualResults(self):
+#------------------------------------------------------------------------------
+#   calculates the full statistics based on the results from the consistency
+#   check
+#------------------------------------------------------------------------------
+
+        ea1 = ModuleEA1()
+        ea2 = ModuleEA2()
+        ea3 = ModuleEA3()
+        ea4 = ModuleEA4()
+        ea5 = ModuleEA5()
+        ea6 = ModuleEA6()
+
+
+#------------------------------------------------------------------------------
+    def calculateEquipmentEnergyBalances(self):
+#------------------------------------------------------------------------------
+#   calculates the annual fuel balances from the results of system simulations
+#   and stores the within the SQL tables
+#------------------------------------------------------------------------------
+        
+        if Status.ANo <= 0:
+            print "ModuleEA (calculateEquipmentEnergyBalances): security feature: -> do not overwrite results from consistency check !!!"
+            return
+        
+        equipments = Status.prj.getEquipments(cascade=True) #equipments ordered by CascadeIndex
+        fuels = Status.prj.getQFuels()
+        fuelList = Status.prj.getQFuelList("DBFuel_id")
+        electricities = Status.prj.getElectricity()
+        if len(electricities) > 0:
+            electricity = electricities[0]
+        else:
+            logDebug("Corrupt entry in electricity table -> no data found for PId %s ANo %s"%(Status.PId,Status.ANo))
+            
+        (projectData,generalData) = Status.prj.getProjectData()
+
+        FETi = []
+        for fuel in fuels:
+            FETi.append(0.0)
+            
+        FETiUnKnown = 0.0
+        FETel = 0.0
+        FETFuel = 0.0
+        FET = 0.0
+
+        for equipe in equipments:
+            jc = equipe.CascadeIndex -  1
+            dFETFuel = Status.int.FETFuel_j[jc]
+            dFETel = Status.int.FETel_j[jc]
+
+            equipe.FETFuel_j = dFETFuel
+            equipe.FETel_j = dFETel
+            equipe.FETj = dFETel + dFETFuel #simple sum of fuel + electricity. doesn't make very much sense, but ... 
+
+            FET += dFETFuel + dFETel
+            FETFuel += dFETFuel
+            FETel += dFETel
+
+            fuelID = equipe.DBFuel_id
+            if fuelID in fuelList:
+                i = fuelList.index(fuelID)
+                FETi[i] += dFETFuel
+            else:
+                FETiUnKnown += dFETFuel
+                print "WARNING: fuel type for equipe %s is not known"
+
+#..............................................................................
+# calculate derived quantities and store in equipment table
+
+        for equipe in equipments:
+            jc = equipe.CascadeIndex -  1
+
+            if equipe.FETFuel_j > 0:
+                equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETFuel_j
+            elif equipe.FETel_j > 0:
+                equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETel_j
+            else:
+                equipe.HCGTEffReal = 0.0
+
+            if equipe.HCGPnom > 0:
+                equipe.PartLoad = Status.int.USHj[jc]/equipe.HCGPnom
+            else:
+                equipe.PartLoad = 0.0
+
+        #HCGEEff -> only for CHP ??? or also for electrically driven chillers ???
+
+
+        #TExhaustGas ????
+
+##### TAKE CARE: here HCGTEfficiency is both an input and a result ... for equipments with
+##### variable COP depending on temperature / ... this may lead to confusions.
+
+#..............................................................................
+# now store fuel and electricity consumption in the corresponding tables
+
+        FETFuels = 0.0
+        for fuel in fuels:
+            i = fuel.FuelNo - 1
+            fuel.FETFuel = FETi[i]
+            FETFuels += FETi[i]
+            if fuel.FEOFuel is not None:
+                fuel.FECFuel = FETi[i] + fuel.FEOFuel
+            else:
+                fuel.FECFuel = FETi[i]
+                fuel.FEOFuel = 0.0
+                logDebug("ModuleEA (calculateEqEnergyBalances): no entry found for FEOFuel of fuel no. %s"%(i+1))
+
+        generalData.FETel = FETel
+        if generalData.FEOel is not None:
+            generalData.FECel = FETel + generalData.FEOel
+            electricity.ElectricityTotYear = generalData.FECel
+        else:
+            generalData.FECel = FETel
+            generalData.FEOel = 0.0
+            electricity.ElectricityTotYear = generalData.FECel
+            logDebug("ModuleEA (cEEBalances): No entry found in FEOel. Set to zero !!!")
+
+        generalData.FET = FETel + FETFuels  #total FET as simple sum
+
+#..............................................................................
+# conversion to primary energy and environmental impact parameters
+
+        if generalData.PEConvEl is None:
+            generalData.PEConvEl = 3.0
+            showWarning(_("No conversion factor electricity - primary energy was specified.\default value 3.0 assumed"))
+
+        generalData.PETel = generalData.FETel * generalData.PEConvEl
+        generalData.PECel = generalData.FECel * generalData.PEConvEl
+
+        if generalData.CO2ConvEl is None:
+            generalData.CO2ConvEl = 0.5
+            showWarning(_("No conversion factor electricity - CO2 emission was specified.\default value 0.5 t/MWh assumed"))
+
+        generalData.ProdCO2el = generalData.FECel * generalData.CO2ConvEl
+
+        if generalData.NoNukesConvEl is None:
+            generalData.NoNukesConvEl = 5.00
+            showWarning(_("No conversion factor electricity - HR nuclear waste was specified.\default value 5.0 g/MWh assumed (15 % nuclear)"))
+
+        generalData.ProdNoNukesEl = generalData.FECel * generalData.NoNukesConvEl
+
+        PETFuels = 0.0
+        PECFuels = 0.0
+        ProdCO2Fuels = 0.0
+        
+        for fuel in fuels:
+            i = fuel.FuelNo - 1
+            f = Fuel(fuel.DBFuel_id)
+            
+            dPET = fuel.FETFuel * f.PEConv
+            dPEC = fuel.FECFuel * f.PEConv
+            dCO2 = fuel.FECFuel * f.CO2Conv
+
+            fuel.PETFuel = dPET
+            fuel.PECFuel = dPEC
+            fuel.ProdCO2Fuel = dCO2
+
+            PETFuels += dPET
+            PECFuels += dPEC
+            ProdCO2Fuels += dCO2
+
+        generalData.PETFuels = PETFuels
+        generalData.PECFuels = PECFuels
+        generalData.ProdCO2Fuels = ProdCO2Fuels
+
+        generalData.PEC = generalData.PECFuels + generalData.PECel
+        generalData.PET = generalData.PETFuels + generalData.PETel
+
+        Status.SQL.commit()
+        
+
+        
+            
+        
 #==============================================================================

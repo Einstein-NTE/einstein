@@ -27,7 +27,8 @@
 #                       Return to original state later!
 #       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int,None resistance,avoid ZeroDivision
 #       08/05/2008: HS  Generation of GDATA table PROCESS for report
-#       02/05/2008: SD: add total row in data
+#       02/05/2008: SD: add total row in data, fill graphics data panelEA4b from default demand (interfaces)
+#                       or from dummydata3, initModule commented (dummy data sent to panels EA4a & EA4b) ->to be arranged later
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -58,15 +59,19 @@ class ModuleEA4(object):
         self.keys = keys
 
 
-#############################################
+##        dummydata3 = array([[0.0, 0.0, 0.0, 0.0],
+##                            [5.0, 2.24,  1.79, 1.43],
+##                            [10.0,  3.16, 2.53, 2.02],
+##                            [15.0, 3.87, 3.1, 2.48]])
+##        dummydata3 = transpose(dummydata3)
+##
+##        Status.int.setGraphicsData(self.keys[2], dummydata3)
+
         Status.int.setGraphicsData(self.keys[2],[Status.int.T[0:Status.NT],
-                                                      Status.int.QD_T[0:Status.NT],
-                                                      Status.int.QA_T[0:Status.NT]])
-##        Interfaces.setDefaultDemand()
-##        Interfaces.setGraphicsData(self.keys[2],[Interfaces.T,
-##                                                      Interfaces.QD_T_mod[0],
-##                                                      Interfaces.QA_T_mod[0]])
-##############################################
+                                                 Status.int.QD_T[0:Status.NT],
+                                                 Status.int.QD_T[0:Status.NT],
+                                                 Status.int.QA_T[0:Status.NT]])
+
 
 
 ##        dummydata1 = array([['Process name 1', 170.0,   33.01],

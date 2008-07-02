@@ -1,0 +1,62 @@
+-- update einstein database: parameters used for energy balances in ModuleEA; 
+-- reordering of parameters 
+
+USE einstein;
+
+ALTER TABLE cgeneraldata ADD COLUMN PEConvEl DOUBLE COMMENT 'PE = PEConv*FE' AFTER ElectricityNonThermUse;
+ALTER TABLE cgeneraldata ADD COLUMN CO2ConvEl DOUBLE COMMENT 'CO2 = CO2Conv*FE' AFTER PEConvEl;
+ALTER TABLE cgeneraldata ADD COLUMN NoNukesConvEl DOUBLE COMMENT 'NoNukes = NoNukesConv*FE' AFTER PEConvEl;
+ALTER TABLE cgeneraldata ADD COLUMN ProdNoNukesEl DOUBLE COMMENT 'Production of nuclear waste' AFTER PEO;
+ALTER TABLE cgeneraldata DROP COLUMN PETElect;
+ALTER TABLE cgeneraldata DROP COLUMN PECElect;
+ALTER TABLE cgeneraldata DROP CoLUMN ElecticityThermUse;
+ALTER TABLE cgeneraldata DROP CoLUMN ElectricityThermUse;
+ALTER TABLE cgeneraldata DROP COLUMN ElectricityNonThermUse;
+ALTER TABLE cgeneraldata CHANGE COLUMN FEC FEC DOUBLE AFTER FET;
+ALTER TABLE cgeneraldata CHANGE COLUMN FECel FECel DOUBLE AFTER FEC;
+ALTER TABLE cgeneraldata CHANGE COLUMN FETel FETel DOUBLE AFTER FET;
+ALTER TABLE cgeneraldata DROP COLUMN PETOTAL;
+ALTER TABLE cgeneraldata CHANGE COLUMN PECFuels PECFuels DOUBLE AFTER PECel;
+ALTER TABLE cgeneraldata CHANGE COLUMN PETFuels PETFuels DOUBLE AFTER PET;
+ALTER TABLE cgeneraldata CHANGE COLUMN PETel PETel DOUBLE AFTER PET;
+ALTER TABLE cgeneraldata CHANGE COLUMN PEO PEO DOUBLE AFTER PECFuels;
+
+ALTER TABLE cgeneraldata CHANGE COLUMN ProdCO2Elect ProdCO2el DOUBLE AFTER PEO;
+ALTER TABLE cgeneraldata CHANGE COLUMN ProdCO2FuelMix ProdCO2Fuels DOUBLE AFTER ProdCO2el;
+
+
+ALTER TABLE cgeneraldata CHANGE COLUMN HoursInd HPerYearInd DOUBLE AFTER HPerDayInd;
+
+ALTER TABLE cgeneraldata CHANGE COLUMN Nfuels NFuels INTEGER AFTER NWHEE;
+ALTER TABLE cgeneraldata CHANGE COLUMN NThProc NThProc INTEGER AFTER NEquipe;
+ALTER TABLE cgeneraldata CHANGE COLUMN NEquipe NEquipe INTEGER AFTER EnergyCost;
+
+ALTER TABLE qgenerationhc ADD COLUMN FETFuel_j DOUBLE AFTER FETj;
+ALTER TABLE qgenerationhc ADD COLUMN FETel_j DOUBLE AFTER FETFuel_j;
+ALTER TABLE qgenerationhc ADD COLUMN HCGTEffReal DOUBLE AFTER HCGTEfficiency;
+
+CREATE TABLE dbelectricitymix (
+  id INTEGER UNSIGNED NOT NULL auto_increment,
+  
+Year INTEGER default NULL,
+  Country VARCHAR(45) default NULL,
+  Reference VARCHAR(200) default NULL,
+  AuditorID INTEGER default NULL,
+  Type VARCHAR(20) default NULL,
+  PE2ConvEl DOUBLE default NULL,
+  CO2ConvEl DOUBLE default NULL,
+  NoNukesConvEl DOUBLE default NULL,
+  PercNaturalGas DOUBLE default NULL,
+  PercCarbon DOUBLE default NULL,
+  PercOil DOUBLE default NULL,
+  PercRenewables DOUBLE default NULL,
+  PercNukes DOUBLE default NULL,
+  PercOther DOUBLE default NULL,
+  PRIMARY KEY(id)
+) TYPE=MyISAM;
+
+ALTER TABLE psetupdata ADD COLUMN ElectricityMix INTEGER COMMENT 'default electricity mix used' AFTER PSetUpData_ID;
+ALTER TABLE psetupdata DROP COLUMN PEConvEl;
+
+ALTER TABLE dbfuel CHANGE COLUMN ConversPrimEnergy PEConvFuel DOUBLE;
+ALTER TABLE dbfuel CHANGE COLUMN tCO2 CO2ConvFuel DOUBLE;

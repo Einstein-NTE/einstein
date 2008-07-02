@@ -106,6 +106,14 @@ class Interfaces(object):
     QHXj_t = []
     QHXj = []
 
+# other required outputs from system simulation (calculateEnergyFlows)
+
+    FETFuel_j = []
+    FETel_j = []
+    FETHeat_j = []
+    QWHj = []
+    HPerYearEq = []
+    
 # dictionary of the HC supply cascade. entries "equipeID" and "equipeNo"
 
     NEquipe = None
@@ -242,9 +250,21 @@ class Interfaces(object):
         Interfaces.USHj_Tt.append(self.createQ_Tt())
         Interfaces.USHj_T.append(self.createQ_T())
         Interfaces.USHj_t.append(self.createQ_t())
+        
         Interfaces.QHXj_Tt.append(self.createQ_Tt())
         Interfaces.QHXj_T.append(self.createQ_T())
         Interfaces.QHXj_t.append(self.createQ_t())
+
+#..............................................................................
+# lists of annual main results
+
+        Interfaces.USHj.append(0.0)
+        Interfaces.QWHj.append(0.0)
+        Interfaces.QHXj.append(0.0)
+        Interfaces.FETFuel_j.append(0.0)
+        Interfaces.FETel_j.append(0.0)
+        Interfaces.FETHeat_j.append(0.0)
+        Interfaces.HPerYearEq.append(0.0)
 
         self.cascadeSize += 1
 
@@ -260,9 +280,21 @@ class Interfaces(object):
         Interfaces.USHj_Tt.pop(NEquipe-1)
         Interfaces.USHj_T.pop(NEquipe-1)
         Interfaces.USHj_t.pop(NEquipe-1)
+
         Interfaces.QHXj_Tt.pop(NEquipe-1)
         Interfaces.QHXj_T.pop(NEquipe-1)
         Interfaces.QHXj_t.pop(NEquipe-1)
+
+#..............................................................................
+# lists of annual main results
+
+        Interfaces.USHj.pop(NEquipe-1)
+        Interfaces.QWHj.pop(NEquipe-1)
+        Interfaces.QHXj.pop(NEquipe-1)
+        Interfaces.FETFuel_j.pop(NEquipe-1)
+        Interfaces.FETel_j.pop(NEquipe-1)
+        Interfaces.FETHeat_j.pop(NEquipe-1)
+        Interfaces.HPerYearEq.pop(NEquipe-1)
 
         self.cascadeSize += 1
         
@@ -347,6 +379,14 @@ class Interfaces(object):
             self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
                                             self.equipments[j].EquipType, self.equipments[j].HPerYearEq, self.equipments[j].YearManufact]) #SD change 30/04.2008
                                                 
+
+#------------------------------------------------------------------------------
+    def changeInCascade(self,index):
+#------------------------------------------------------------------------------
+#   gets the equipment list
+#------------------------------------------------------------------------------
+        self.cascadeUpdateLevel = min(self.cascadeUpdateLevel,index-1)
+        Status.prj.setStatus("Energy",0)
 
 #------------------------------------------------------------------------------		
     def setGraphicsData(self,key, data):

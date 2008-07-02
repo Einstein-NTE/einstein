@@ -643,7 +643,9 @@ class Project(object):
 
         self.setActiveProject(newID)
 
-        if newProject == True: self.setStatus("Q",0)
+        if newProject == True:
+            self.setStatus("Q",0)
+            self.getDefaultSetUp()
 
 #------------------------------------------------------------------------------
 
@@ -685,6 +687,38 @@ class Project(object):
                 cleanUpSQLRows(DB.uheatpump,sqlQueryQ,maxANo)
 
 
+#------------------------------------------------------------------------------
+    def getDefaultSetUp(self,PId):
+#------------------------------------------------------------------------------
+#   charges the default set-up parameters for a NEW project
+#------------------------------------------------------------------------------
+
+        (projectData,generalData) = self.getProjectData()
+        setups = Status.DB.psetupdata.PSetUpData_ID['%']
+        if (len(setups) > 0):
+            setup = setups[0]
+            eMixID = setup.ElectricityMix
+
+        else:
+            logTrack("Project (getDefaultSetUp): no setup table found in DB. Default mix ID = 1")
+            setups.insert({ElectricityMix:1})
+            eMixID = 1
+
+        emixes = Status.DB.dbelectricitymix.id[eMixID]
+        if (len(emixes) > 0):
+            emix = emixes[0]
+            
+            generalData.PEConvEl = emix.PE2ConvEl
+            generalData.CO2ConvEl = emix.CO2ConvEl
+            generalData.NoNukesConvEl = emix.NoNukesConvEl
+
+        else:
+            generalData.PEConvEl = 1./0.34
+            generalData.CO2ConvEl = 0.5
+            generalData.NoNukesConvEl = 99.99
+            logTrack("Project (getDefaultSetUp) Electricity Mix %s specified in Set-Up was not found"%eMixID)
+           
+                     
 #------------------------------------------------------------------------------
     def deleteProject(self,PId,name=None):
 #------------------------------------------------------------------------------
@@ -812,6 +846,9 @@ class Project(object):
         sqlQuery = "ProjectID = '%s'"%(Status.PId)
         sprojects = Status.DB.sproject.sql_select(sqlQuery)
 
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        salternatives = Status.DB.salternatives.sql_select(sqlQuery)
+
         if key=="Q":
             Status.StatusQ = value
             if len(sprojects) > 0: sprojects[0].StatusQ = value
@@ -822,6 +859,9 @@ class Project(object):
             Status.StatusCS = value
 #XXXXXXXX here name confusion between CA and CS -> to be unified to CS once SQL is changed !!!
             if len(sprojects) > 0: sprojects[0].StatusCA = value
+        elif key=="Energy":
+            Status.StatusEnergy = value
+            if len(salternatives) > 0: salternatives[0].StatusEnergy = value
         else:
             print "Project (setStatus): status key %s unknown"%key
 
@@ -982,6 +1022,7 @@ class Project(object):
 
         sqlQuery = "ProjectID = '%s'"%(Status.PId)
         sprojects = Status.DB.sproject.sql_select(sqlQuery)
+
         if len(sprojects) > 0:
             sproject = sprojects[0]
             if sproject.StatusQ is not None: Status.StatusQ = sproject.StatusQ
@@ -998,6 +1039,17 @@ class Project(object):
 #XXX -> getStatus is called BEFORE GUI is built -> logError not yet available !!!
             Status.StatusCC = EINSTEIN_NOTOK
             Status.StatusQ = EINSTEIN_NOTOK
+
+
+        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        salternatives = Status.DB.salternatives.sql_select(sqlQuery)
+
+        if len(salternatives) > 0:
+            a = salternatives[0]
+            if a.StatusEnergy is not None: Status.StatusEnergy = a.StatusEnergy
+            else:
+                a.StatusEnergy = EINSTEIN_NOTOK
+                Status.StatusEnergy = EINSTEIN_NOTOK
 
         self.setTreePermissions()
 
@@ -1117,27 +1169,34 @@ class Project(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def getEquipments(self,PId = None):
+    def getEquipments(self,PId = None,cascade=False):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
 #------------------------------------------------------------------------------
 
         if PId is None:
-            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+            if cascade == False:
+                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
+            else:
+                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
         else:
-            sqlQuery = "Questionnaire_id = '%s' ORDER BY EqNo ASC"%(PId)
+            if cascade == False:
+                sqlQuery = "Questionnaire_id = '%s' ORDER BY EqNo ASC"%(PId)
+            else:
+                sqlQuery = "Questionnaire_id = '%s' ORDER BY CascadeIndex ASC"%(PId)
+                
 
         equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
         
         return equipments
 
 #------------------------------------------------------------------------------
-    def getEquipmentList(self,key,PId = None):
+    def getEquipmentList(self,key,PId = None,cascade=False):
 #------------------------------------------------------------------------------
 #   returns a list of existing equipment
 #------------------------------------------------------------------------------
 
-        eqs = self.getEquipments(PId)
+        eqs = self.getEquipments(PId,cascade)
         
         eqList = []
         for eq in eqs:
@@ -1671,6 +1730,21 @@ class Project(object):
         self.qfuel = Status.DB.qfuel.sql_select(sqlQuery)
         
         return self.qfuel
+
+#------------------------------------------------------------------------------
+    def getElectricity(self,PId = None):
+#------------------------------------------------------------------------------
+#   returns a list of fluids used in the project
+#------------------------------------------------------------------------------
+
+        if PId is None:
+            sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
+        else:
+            sqlQuery = "Questionnaire_id = '%s'"%(PId)
+            
+        self.qelectricity = Status.DB.qelectricity.sql_select(sqlQuery)
+        
+        return self.qelectricity
 
 #------------------------------------------------------------------------------
     def getQFuelList(self,key,PId = None):
