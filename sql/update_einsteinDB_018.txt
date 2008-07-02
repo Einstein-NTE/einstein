@@ -1,0 +1,30 @@
+-- update einstein database: minor bug corrections
+USE einstein;
+
+ALTER TABLE uheatpump ADD COLUMN UHPMaintain TINYINT COMMENT 'Maintain or not maintain';
+
+ALTER TABLE questionnaire CHANGE COLUMN DescripIndustry DescripIndustry VARCHAR(200);
+ALTER TABLE questionnaire CHANGE COLUMN Branch Branch VARCHAR(100);
+ALTER TABLE questionnaire CHANGE COLUMN SubBranch SubBranch VARCHAR(100);
+
+
+ALTER TABLE cgeneraldata ADD COLUMN EnergyCost DOUBLE COMMENT 'Effective yearly energy cost' AFTER OMTotalFung;
+
+ALTER TABLE qheatexchanger ADD COLUMN FlowSource DOUBLE COMMENT 'mass flow of source medium' AFTER HXSource;
+ALTER TABLE qheatexchanger ADD COLUMN FluidIDSource INTEGER COMMENT 'Fluid ID of source medium' AFTER HXSource;
+ALTER TABLE qheatexchanger ADD COLUMN FlowSink DOUBLE COMMENT 'mass flow of source medium' AFTER HXSink;
+ALTER TABLE qheatexchanger ADD COLUMN FluidIDSink INTEGER COMMENT 'Fluid ID of source medium' AFTER HXSink;
+ALTER TABLE qheatexchanger ADD COLUMN HPerYearHX DOUBLE COMMENT 'Hours of operation' AFTER QHX;
+
+-- cleanup of parameters and tables that are no longer used
+
+
+DROP TABLE energyflowsqaa;
+DROP TABLE energyflowsqaarec;
+DROP TABLE energyflowsqah;
+DROP TABLE energyflowsqahrec;
+DROP TABLE energyflowsqda;
+DROP TABLE energyflowsqdarec;
+DROP TABLE energyflowsqdh;
+DROP TABLE energyflowsqdhrec;
+
