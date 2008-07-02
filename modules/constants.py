@@ -242,6 +242,9 @@ ROOFTYPES = {"Corrugated metal roof":_("Corrugated metal roof"),
                 "Tiled roof":_("Tiled roof"),
                 "Other":_("Other")}
 
+PRODUCTCODES = {"ProdCode1":_("ProdCode1"), 
+                "ProdCode2":_("ProdCode2")}
+
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries
 #==============================================================================

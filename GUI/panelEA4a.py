@@ -28,7 +28,7 @@
 #       19/06/2008: HS  some security features added
 #       20/06/2008: SD  change esthetics - continue: layout, security features
 #                       grid1 decimals control, changes of position and size of objects
-#       20/06/2008: SD  adappted as panelEAb - heat demand by temperature
+#       20/06/2008: SD  adappted as panelEAa - heat demand by temperature, new columns added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -103,7 +103,7 @@ class PanelEA4a(wx.Panel):
 
         
 #####Security feature against non existing GData entry
-        COLNO1 = 3 #grid has usually a fixed column size, not necessary to read from GData
+        COLNO1 = 8 #grid has usually a fixed column size, not necessary to read from GData
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO1)
         
@@ -114,20 +114,30 @@ class PanelEA4a(wx.Panel):
         self.grid1.SetRowLabelSize(30)
 
         self.grid1.SetColSize(0,115)
-        self.grid1.SetColSize(1,91)#SD added
-        self.grid1.SetColSize(2,91)#SD added
+        self.grid1.SetColSize(1,90)#SD added
+        self.grid1.SetColSize(2,90)#SD added
+        self.grid1.SetColSize(3,90)
+        self.grid1.SetColSize(4,90)
+        self.grid1.SetColSize(5,90)
+        self.grid1.SetColSize(6,90)
+        self.grid1.SetColSize(7,90)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Process"))
-        self.grid1.SetColLabelValue(1, _("UPH\n[MWh]"))
+        self.grid1.SetColLabelValue(1, _("UPH Total\n[MWh]"))
         self.grid1.SetColLabelValue(2, _("Share of total\n[%]"))
+        self.grid1.SetColLabelValue(3, _("UPH Circulation\n[MWh]"))
+        self.grid1.SetColLabelValue(4, _("UPH Maintain.\n[MWh]"))
+        self.grid1.SetColLabelValue(5, _("UPH Start-up\n[MWh]"))
+        self.grid1.SetColLabelValue(6, _("Process\ntemperature[C]"))
+        self.grid1.SetColLabelValue(7, _("Central supply\ntemperature[C]"))
         #
         # copy values from dictionary to grid
         #
 
 #######LAYOUT: use of function numCtrl, SD new one with decimals control
 
-        decimals = [-1,0,1]   #number of decimal digits for each colum
+        decimals = [-1,2,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
@@ -161,7 +171,7 @@ class PanelEA4a(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of process heat demand (UPH) by processes'),
+        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of process heat demand (UPH Total) by processes'),
                                  pos = (10,230),size=(780,320))
 
         self.panelGraphUPH = wx.Panel(id=wxID_PANELEA4PANELGRAPHUPH,

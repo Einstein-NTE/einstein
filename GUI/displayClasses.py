@@ -427,8 +427,6 @@ class CDate(wx.TextCtrl):
         self.emptyBackgroundColour = u.makeColour(emptyBackgroundColour)
         self.validBackgroundColour = u.makeColour(validBackgroundColour)
         self.invalidBackgroundColour = u.makeColour(invalidBackgroundColour)
-        self.validDate1 = re.compile(r'\d?\d[/|-]\d?\d[/|-]\d\d\d\d')
-        self.validDate2 = re.compile(r'\d\d\d\d[/|-]\d?\d[/|-]\d?\d')
 
         wx.TextCtrl.__init__(self,id=id,parent=prnt,
                              pos=pos,
@@ -519,36 +517,45 @@ class CDate(wx.TextCtrl):
             self.verifyLimits(value)
         self.showFormatted(value)
         event.Skip()
+
     def verifyLimits(self,value):
-        if not self.__isValidDate(value):
-            self.SetBackgroundColour(self.invalidBackgroundColour)
+        if isinstance(value,wx.DateTime):
+            d = value
         else:
+            # value is a string
             d = wx.DateTime()
             rsp = d.ParseDate(value)
             if rsp == -1:
                 self.SetBackgroundColour(self.invalidBackgroundColour)
-            elif d.IsLaterThan(self.max):
-                self.SetBackgroundColour(self.invalidBackgroundColour)
-                return self.max
-            elif d.IsEarlierThan(self.min):
-                self.SetBackgroundColour(self.invalidBackgroundColour)
-                return self.min
-            else:
-                self.SetBackgroundColour(self.validBackgroundColour)
+                return
+
+        if d.IsLaterThan(self.max):
+            self.SetBackgroundColour(self.invalidBackgroundColour)
+        elif d.IsEarlierThan(self.min):
+            self.SetBackgroundColour(self.invalidBackgroundColour)
+        else:
+            self.SetBackgroundColour(self.validBackgroundColour)
         
     def SetValue(self,value):
         # several empty field conditions
-        if value is None or value == '':
+        if value is None:
             value = ''
             self.ChangeValue(value)
             self.SetBackgroundColour(self.emptyBackgroundColour)
-
-        else:
-            # verify limits
+        elif isinstance(value,wx.DateTime):
+            s = value.FormatISODate()
+            value = s
             self.verifyLimits(value)
-            self.showFormatted(value)
+            self.ChangeValue(value)
+        elif isinstance(value,str):
+            if value.strip() == '' or value.strip() == 'None':
+                self.ChangeValue('')
+                self.SetBackgroundColour(self.emptyBackgroundColour)
+            else:
+                # verify limits
+                self.verifyLimits(value)
+                self.showFormatted(value)
 
-        self.lastvalue = value
         return value
 
     
@@ -563,11 +570,6 @@ class CDate(wx.TextCtrl):
             d.ParseDate(s)
             s1 = d.FormatISODate()
         self.ChangeValue(s1)
-
-    def __isValidDate(self, s):
-        m1 = self.validDate1.match(s)
-        m2 = self.validDate2.match(s)
-        return m1 or m2
 
 
 class CInt(wx.lib.intctrl.IntCtrl):
@@ -712,10 +714,10 @@ class FloatEntry(wx.Panel):
         if dValue.strip() == '':
             return None
         if self.defaultDisplayUnit is None:
-            return float(dValue)
+            return self.entry.toFloat(dValue)
         try:
             iValue = units.internalValue(dValue,self.defaultDisplayUnit,self.unitdict)
-            return float(iValue)
+            return self.entry.toFloat(iValue)
         except:
             print 'FloatEntry: error in conversion display->internal ' \
                   'display=%s class=%s default=%s' % (dValue,self.unitdict,self.defaultDisplayUnit)
@@ -888,9 +890,9 @@ class IntEntry(wx.Panel):
             self.entry.SetValue(None)
         else:
             try:
-                f = int(iValue)
+                f = int(float(iValue))
             except:
-                print 'IntEntry: bad value for SetValue ' % (repr(iValue),)
+                print 'IntEntry: bad value for SetValue %s' % (repr(iValue),)
                 self.entry.SetValue(0)
                 return
             

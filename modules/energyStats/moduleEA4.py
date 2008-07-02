@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 #==============================================================================#
 #	E I N S T E I N
 #
@@ -17,6 +18,7 @@
 #                           Stoyan Danov    11/04/2008
 #                           Stoyan Danov    02/05/2008
 #                           Hans Schweiger  08/05/2008
+#                           Stoyan Danov    02/07/2008
 #
 #       Changes to previous version:
 #       29/3/2008          Adapted to numpy arrays
@@ -25,6 +27,7 @@
 #                       Return to original state later!
 #       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int,None resistance,avoid ZeroDivision
 #       08/05/2008: HS  Generation of GDATA table PROCESS for report
+#       02/05/2008: SD: add total row in data
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,21 +57,49 @@ class ModuleEA4(object):
         
         self.keys = keys
 
-        dummydata1 = array([['Process name 1', 170.0,   33.01],
-                      ['Process name 2', 280.0,   54.37],
-                      ['Process name 3',  65.0,   12.62],
-                      ['Total'         , 515.0,  100.00]])
+
+#############################################
+        Status.int.setGraphicsData(self.keys[2],[Status.int.T[0:Status.NT],
+                                                      Status.int.QD_T[0:Status.NT],
+                                                      Status.int.QA_T[0:Status.NT]])
+##        Interfaces.setDefaultDemand()
+##        Interfaces.setGraphicsData(self.keys[2],[Interfaces.T,
+##                                                      Interfaces.QD_T_mod[0],
+##                                                      Interfaces.QA_T_mod[0]])
+##############################################
+
+
+##        dummydata1 = array([['Process name 1', 170.0,   33.01],
+##                      ['Process name 2', 280.0,   54.37],
+##                      ['Process name 3',  65.0,   12.62],
+##                      ['Total'         , 515.0,  100.00]])
+        
+        dummydata1 = array([['Process name 1', 6.0, 60.0, 5.0, 0.5, 0.5, 90.0, 180.0],
+                            ['Process name 2', 4.0, 40.0, 2.0, 1.0, 1.0, 110.0, 180.0],
+                            ['Total'         , 10.0, 100.0, 7.0, 1.5, 1.5, 0, 0]])
 
         Status.int.setGraphicsData(self.keys[0], dummydata1)
 
-        dummydata2 = array([['Process name 1',  40.0, 180.0, 170.0],
-                      ['Process name 2',  75.0, 180.0, 280.0],
-                      ['Process name 3',  90.0, 180.0,  65.0]])
+##        dummydata2 = array([['Process name 1',  40.0, 180.0, 170.0],
+##                            ['Process name 2',  75.0, 180.0, 280.0],
+##                            ['Process name 3',  90.0, 180.0,  65.0],
+##                            ['Total'         , 205.0, 540.0, 515.00]])
 
+        dummydata2 = array([['< 60 C', 2, 8.51, 8.51, 2, 8.51, 8.51],
+                            ['60 – 80 C', 1, 7.75, 7.75, 1, 7.75, 7.75],
+                            ['80 – 100 C', 1, 7.75, 7.75, 1, 7.75, 7.75],
+                            ['100 – 120 C', 1, 7.75, 7.75, 1, 7.75, 7.75],
+                            ['120 – 140 C', 1, 7.75, 7.75, 1, 7.75, 7.75],
+                            ['140 – 180 C',0, 7.75, 7.75, 0, 7.75, 7.75],
+                            ['180 – 220 C', 0, 7.75, 7.75, 0, 7.75, 7.75],
+                            ['220 – 300 C', 0, 7.75, 7.75, 0, 7.75, 7.75],
+                            ['300 – 400 C',  0, 7.75, 7.75, 0, 7.75, 7.75],
+                            ['> 400 C', 0, 8.75, 8.75, 0, 8.75, 8.75],
+                            ['Total', 16, 100.0, 100.0, 16, 100.0, 100.0]])	
 
         Status.int.setGraphicsData(self.keys[1], dummydata2)
 
-        self.initModule()
+#        self.initModule()
 
 
     def initModule(self):

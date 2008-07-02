@@ -51,8 +51,9 @@ import einstein.modules.matPanel as Mp
 [wxID_PANELEA4, wxID_PANELEA4GRID1, wxID_PANELEA4GRID2, 
  wxID_PANELEA4PANELGRAPHUPH, wxID_PANELEA4PANELGRAPHHD,
  wxID_PANELEA4STATICTEXT1, wxID_PANELEA4STATICTEXT2,
- wxID_PANELEA4STATICTEXT3, 
-] = [wx.NewId() for _init_ctrls in range(8)]
+ wxID_PANELEA4STATICTEXT3,
+ wxID_PANELHPFIG ###SD: added
+] = [wx.NewId() for _init_ctrls in range(9)] ###SD: range changed from 8 to 9
 #
 # constants
 #
@@ -62,28 +63,69 @@ GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
+###SD
+#------------------------------------------------------------------------------		
+#HS2008-03-22: 
+#------------------------------------------------------------------------------		
+def drawFigure(self):
+#------------------------------------------------------------------------------
+#   defines the figures to be plotted
+#------------------------------------------------------------------------------		
+    if not hasattr(self, 'subplot'):
+        self.subplot = self.figure.add_subplot(1,1,1)
+    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+                      Status.int.GData['UPH Plot'][1],
+                      'go-', label='QD', linewidth=2)
+    self.subplot.plot(Status.int.GData['UPH Plot'][0],
+                      Status.int.GData['UPU Plot'][2],
+                      'rs',  label='QA')
+##    self.subplot.plot(Status.int.GData['HP Plot'][0],
+##                      Status.int.GData['HP Plot'][3],
+##                      'go-', label='QD_mod', linewidth=2)
+##    self.subplot.plot(Status.int.GData['HP Plot'][0],
+##                      Status.int.GData['HP Plot'][4],
+##                      'rs',  label='QA_mod')
+    self.subplot.axis([0, 100, 0, 3e+7])
+    self.subplot.legend()
+
 
 class PanelEA4b(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
-        keys = ['EA4_UPH', 'EA4_HDP'] 
+        keys = ['EA4_UPH','HP Table','UPH Plot']###SD: keys[1] changed from 'EA4_HDP' 
         self.mod = ModuleEA4(keys)
         labels_column = 0
+
+        
         # remaps drawing methods to the wx widgets.
         #
         # upper graphic: UPH demand by process
         #
 
-        paramList={'labels'      : labels_column,              # labels column
-                   'data'        : 3,                          # data column for this graph
-                   'key'         : keys[1],                    # key for Interface
-                   'title'       : _('HD by process temperature'),# title of the graph
-                   'backcolor'   : GRAPH_BACKGROUND_COLOR}     # graph background color
+##        paramList={'labels'      : labels_column,              # labels column
+##                   'data'        : 3,                          # data column for this graph
+##                   'key'         : keys[1],                    # key for Interface
+##                   'title'       : _('HD by process temperature'),# title of the graph
+##                   'backcolor'   : GRAPH_BACKGROUND_COLOR}     # graph background color
+##
+##        dummy = Mp.MatPanel(self.panelGraphHD,
+##                            wx.Panel,
+##                            drawPiePlot,
+##                            paramList)
+###SD
+#   graphic: Cumulative heat demand by hours
+        (rows,cols) = Interfaces.GData[keys[1]].shape        
+#        ignoredrows = []
+        ignoredrows = rows-1        
+        paramList={'labels'      : labels_column,          # labels column
+                   'data'        : 3,                      # data column for this graph
+                   'key'         : keys[1],                # key for Interface
+                   'title'       : _('Some title'),           # title of the graph
+                   'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
+                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        dummy = Mp.MatPanel(self.panelGraphHD,
-                            wx.Panel,
-                            drawPiePlot,
-                            paramList)
+        dummy = Mp.MatPanel(self.panelHPFig, wx.Panel, drawFigure, paramList)
+        del dummy
 
         #
         # additional widgets setup
@@ -121,13 +163,13 @@ class PanelEA4b(wx.Panel):
         self.grid1.SetColSize(6,105)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Process"))
-        self.grid1.SetColLabelValue(1, _("Process\ntemperature [C]"))
-        self.grid1.SetColLabelValue(2, _("Process supply\ntemperature [C]"))
-        self.grid1.SetColLabelValue(3, _("UPH Total\n[MWh]"))
-        self.grid1.SetColLabelValue(4, _("UPH Circulation\n[MWh]"))
-        self.grid1.SetColLabelValue(5, _("UPH Maintenance\n[MWh]"))
-        self.grid1.SetColLabelValue(6, _("UPH Start-up\n[MWh]"))
+        self.grid1.SetColLabelValue(0, _("Temperature levels\n[C]"))
+        self.grid1.SetColLabelValue(1, _("no cumulative\n[MWh]"))
+        self.grid1.SetColLabelValue(2, _("total\n[%]"))
+        self.grid1.SetColLabelValue(3, _("cumulative\n[%]"))
+        self.grid1.SetColLabelValue(4, _("no cumulative\n[MWh]"))
+        self.grid1.SetColLabelValue(5, _("total\n[%]"))
+        self.grid1.SetColLabelValue(6, _("cumulative\n[%]"))
 
         #
         # copy values from dictionary to grid
@@ -135,7 +177,7 @@ class PanelEA4b(wx.Panel):
 
 #######LAYOUT: use of function numCtrl
 
-        decimals = [-1,1,1,0]   #number of decimal digits for each colum
+        decimals = [-1,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
@@ -147,12 +189,16 @@ class PanelEA4b(wx.Panel):
                         self.grid1.SetCellValue(r, c, data[r][c])
                 except: pass
                 if c == labels_column:
-                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
                 else:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         self.grid1.SetGridCursor(0, 0)        
 
+###SD
+##        self.staticText1.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.staticText2.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.staticText3.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -163,6 +209,22 @@ class PanelEA4b(wx.Panel):
         self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) by process temperatures'),
                                  pos = (10,10),size=(780,200))
 
+###SD
+##        self.staticText1 = wx.StaticText(id=-1,
+##              label=_(u'Temperature levels'),
+##              name='staticText1', parent=self, pos=wx.Point(60, 24),
+##              size=wx.Size(50, 17), style=0)
+
+        self.staticText2 = wx.StaticText(id=-1,
+              label=_(u'Heat consumption by process temperature'),
+              name='staticText2', parent=self, pos=wx.Point(200, 24),
+              size=wx.Size(50, 17), style=0)
+
+        self.staticText3 = wx.StaticText(id=-1,
+              label=_(u'Total heat supply by central supply temperature'),
+              name='staticText3', parent=self, pos=wx.Point(470, 24),
+              size=wx.Size(50, 17), style=0)
+
         self.grid1 = wx.grid.Grid(id=wxID_PANELEA4GRID1, name='grid1',#SD
               parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 160),
               style=0)
@@ -172,10 +234,14 @@ class PanelEA4b(wx.Panel):
                                  pos = (10,230),size=(780,320))
 
 
-        self.panelGraphHD = wx.Panel(id=wxID_PANELEA4PANELGRAPHHD,
-              name=u'panelGraphHD', parent=self, pos=wx.Point(200, 260),
-              size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
-        self.panelGraphHD.SetBackgroundColour(wx.Colour(127, 127, 127))
+##        self.panelGraphHD = wx.Panel(id=wxID_PANELEA4PANELGRAPHHD,
+##              name=u'panelGraphHD', parent=self, pos=wx.Point(200, 260),
+##              size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+##        self.panelGraphHD.SetBackgroundColour(wx.Colour(127, 127, 127))
+###SD
+        self.panelHPFig = wx.Panel(id=wxID_PANELHPFIG, name='panelHPFigure', parent=self,
+              pos=wx.Point(200, 260), size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+        self.panelHPFig.SetBackgroundColour(wx.Colour(127, 127, 127))
 
 
 #..............................................................................
@@ -216,6 +282,9 @@ class PanelEA4b(wx.Panel):
     def display(self):
 
 #####Security feature against any strange thing in graphs
-        try: self.panelGraphHD.draw()
+        try:
+##            self.panelGraphHD.draw()
+###SD
+            self.panelHPFig.draw()
         except: pass
         self.Show()
