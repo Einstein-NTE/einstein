@@ -16,6 +16,18 @@ ALTER TABLE qheatexchanger ADD COLUMN FlowSink DOUBLE COMMENT 'mass flow of sour
 ALTER TABLE qheatexchanger ADD COLUMN FluidIDSink INTEGER COMMENT 'Fluid ID of source medium' AFTER HXSink;
 ALTER TABLE qheatexchanger ADD COLUMN HPerYearHX DOUBLE COMMENT 'Hours of operation' AFTER QHX;
 
+ALTER TABLE qheatexchanger ADD COLUMN Area DOUBLE COMMENT 'Heat exchanger area' AFTER HXLMTD;
+ALTER TABLE qheatexchanger ADD COLUMN UA DOUBLE COMMENT 'UA-Value' AFTER HXLMTD;
+
+ALTER TABLE qheatexchanger ADD COLUMN StorageSize DOUBLE COMMENT 'RecommendedStorageSize' AFTER HXTSinkOutLet;
+
+ALTER TABLE qheatexchanger ADD COLUMN TurnKeyPrice DOUBLE COMMENT 'TurnKeyPrice' AFTER HXTSinkOutLet;
+ALTER TABLE qheatexchanger ADD COLUMN OMFix DOUBLE COMMENT 'Fix O&M Cost' AFTER TurnKeyPrice;
+ALTER TABLE qheatexchanger ADD COLUMN OMVar DOUBLE COMMENT 'Variable O&M Cost' AFTER OMFix;
+
+ALTER TABLE qheatexchanger ADD COLUMN StreamStatus INTEGER COMMENT 'liquid gaseous or condensation' AFTER StorageSize;
+ALTER TABLE qheatexchanger ADD COLUMN StreamType INTEGER COMMENT 'sensible or latent' AFTER StreamStatus;
+
 -- cleanup of parameters and tables that are no longer used
 
 
