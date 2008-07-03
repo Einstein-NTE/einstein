@@ -19,7 +19,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.08
 #	Created by: 	    Hans Schweiger	    February 2008
 #	Last revised by:    Hans Schweiger          24/03/2008
 #                           Hans Schweiger          03/04/2008
@@ -27,6 +27,7 @@
 #                           Hans Schweiger          16/04/2008
 #                           Hans Schweiger          29/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger          03/07/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
@@ -36,6 +37,8 @@
 #       16/04/2008: HS  main as argument in __init__
 #       29/04/2008: HS  method draw for panelBBFig
 #       18/06/2008 SD: change to translatable text _(...)
+#       03/07/2008: HS  change in display: call to updatePanel instead of
+#                       initPanel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -124,6 +127,7 @@ class PanelBB(wx.Panel):
         
 	self.keys = ['BB Table']
         self.mod = Status.mod.moduleBB
+        self.mod.initPanel()
         
 #   graphic: Cumulative heat demand by hours
         labels_column = 0
@@ -195,7 +199,7 @@ class PanelBB(wx.Panel):
 
         self.panelFig = wx.Panel(id=wxID_PANELBBPANELFIG, name='panelFig', parent=self,
               pos=wx.Point(450, 66), size=wx.Size(316, 220),
-              style=wx.TAB_TRAVERSAL)
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
         self.grid = wx.grid.Grid(id=wxID_PANELBBGRID, name='gridpageBB',
               parent=self, pos=wx.Point(40, 48), size=wx.Size(376, 168),
@@ -391,7 +395,7 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
-        self.mod.initPanel()        # prepares data for plotting
+        self.mod.updatePanel()        # prepares data for plotting
 
 #..............................................................................
 # update of equipment table

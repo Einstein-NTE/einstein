@@ -21,6 +21,7 @@
 #                           Stoyan Danov    17/06/2008
 #                           Stoyan Danov    18/06/2008
 #                           Hans Schweiger  18/06/2008
+#                           Tom Sobota      03/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -29,6 +30,7 @@
 #       17/06/2008 SD   adapt to new unitdict, change tc numbers to old one + add new
 #       18/06/2008 SD   create display(), add imports
 #                   HS: bug corrections and clean-up
+#       03/07/2008 TS   general layout fix.
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -45,11 +47,33 @@ from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
+from fonts import *
 
-# constants
-LABELWIDTH=200
-TEXTENTRYWIDTH=160
+# constants that control the default sizes
+# 1. font sizes
+TYPE_SIZE_LEFT    =   9
+TYPE_SIZE_MIDDLE  =   9
+TYPE_SIZE_RIGHT   =   9
+TYPE_SIZE_TITLES  =  10
 
+# 2. field sizes
+HEIGHT                 =  32
+HEIGHT_RIGHT           =  32
+
+LABEL_WIDTH_LEFT       = 300
+LABEL_WIDTH_RIGHT      = 200
+
+DATA_ENTRY_WIDTH_RIGHT = 100
+DATA_ENTRY_WIDTH_LEFT  = 100
+
+UNITS_WIDTH            =  90
+
+# 3. vertical separation between fields
+VSEP_LEFT              =   2
+VSEP_RIGHT             =   2
+
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 class PanelQ8(wx.Panel):
     def __init__(self, parent, main):
@@ -69,167 +93,186 @@ class PanelQ8(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
 
-        self.sizer_4_staticbox = wx.StaticBox(self, -1, _("Building list"))
-        self.sizer_4_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        # access to font properties object
+        fp = FontProperties()
 
-        self.sizer_5_staticbox = wx.StaticBox(self, -1, _("Building (or part of building)"))
-        self.sizer_5_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.notebook = wx.Notebook(self, -1, style=0)
+        self.notebook.SetFont(fp.getFont())
 
-        self.sizer_6_staticbox = wx.StaticBox(self, -1, _("General data"))
-        self.sizer_6_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.page0 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page0, _('General data'))
 
-        self.sizer_7_staticbox = wx.StaticBox(self, -1, _("Energy demand"))
-        self.sizer_7_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        self.page1 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page1, _('Occupation'))
+        
+        self.frame_building_list = wx.StaticBox(self.page0, -1, _("Building list"))
+        self.frame_building_list.SetForegroundColour(TITLE_COLOR)
+        self.frame_building_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_8_staticbox = wx.StaticBox(self, -1, _("Period of occupation"))
-        self.sizer_8_staticbox.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Tahoma'))
+        #self.frame_building = wx.StaticBox(self.page0, -1, _("Building (or part of building)"))
+        self.frame_general_data = wx.StaticBox(self.page0, -1, _("General data"))
+        self.frame_general_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_general_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.frame_energy_demand = wx.StaticBox(self.page0, -1, _("Energy demand"))
+        self.frame_energy_demand.SetForegroundColour(TITLE_COLOR)
+        self.frame_energy_demand.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.frame_occupation = wx.StaticBox(self.page1, -1, _("Period of occupation"))
+        self.frame_occupation.SetForegroundColour(TITLE_COLOR)
+        self.frame_occupation.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        # set font for titles
+        # 1. save actual font parameters on the stack
+        fp.pushFont()
+        # 2. change size and weight
+        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
+        self.frame_building_list.SetFont(fp.getFont())
+        #self.frame_building.SetFont(fp.getFont())
+        self.frame_general_data.SetFont(fp.getFont())
+        self.frame_energy_demand.SetFont(fp.getFont())
+        self.frame_occupation.SetFont(fp.getFont())
+        # 3. recover previous font state
+        fp.popFont()
 
 
-        # left side
+        fs = FieldSizes(wHeight=HEIGHT,wLabel=LABEL_WIDTH_LEFT,
+                       wData=DATA_ENTRY_WIDTH_LEFT,wUnits=UNITS_WIDTH)
 
-        self.listBoxBuildingList = wx.ListBox(self,-1,choices=[])
+        #
+        # left tab controls
+        # tab 0 - general data
+        #
+        # tab 0 left side. building list
+
+        self.listBoxBuildingList = wx.ListBox(self.page0,-1,choices=[])
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxBuildingListClick, self.listBoxBuildingList)
 
-        self.buttonDeleteBuilding = wx.Button(self,-1,_("Delete building"))
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteBuilding, self.buttonDeleteBuilding)
 
-        self.buttonAddBuilding = wx.Button(self,-1,_("Add building"))
-	self.Bind(wx.EVT_BUTTON, self.OnButtonAddBuilding, self.buttonAddBuilding)
+        # tab 0 right side. data entries
+        # tab 0 top staticbox: General data
 
-
-        # right side
-
-#In staticbox: General data
-
-        self.tc1 = TextEntry(self,maxchars=255,value='',
+        self.tc1 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Building short name"),
                              tip=_("Give some brief name of the buildings to identify them in the reports"))
 
 
-        self.tc2 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='AREA',
                               label=_("Constructed surface"),
                               tip=_("Surface limited by building's perimeter multiplied by number of floors"))
 
-        self.tc3 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='AREA',
                               label=_("Useful surface"),
                               tip=_("Total useful surface of building (excluding walls)"))
 
-        self.tc4 = TextEntry(self,maxchars=255,value='',
+        self.tc4 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Use of the building"),
                              tip=_("Specify use, e.g. offices, production, storage,..."))
 
 
-#In staticbox: Energy demand
+        # tab 0 bottom staticbox: Energy demand
         
-        self.tc5 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='POWER',
                               label=_("Maximum heating power"),
                               tip=_("Maximum heating power (without including the security coefficient of the equipment)"))
 
-        self.tc6 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc6 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='POWER',
                               label=_("Maximum cooling power"),
                               tip=_(" "))
 
-        self.tc7 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc7 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='ENERGY',
                               label=_("Annual heating demand"),
                               tip=_("Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate table (if available)"))
 
-        self.tc8 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc8 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='ENERGY',
                               label=_("Annual demand of air conditioning"),
                               tip=_(" "))
 
-        self.tc9 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc9 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='VOLUME',
                               label=_("Daily consumption of  DHW"),
-                              tip=_("Only consumption of hot water that is not included yet in ''Processes''"))
+                              tip=_("Only consumption of hot water that is not included yet in 'Processes'"))
 
+        #
+        # right tab controls
+        # tab 0 - Period of occupation
+        #
+        fs = FieldSizes(wHeight=HEIGHT,wLabel=LABEL_WIDTH_RIGHT,
+                        wData=DATA_ENTRY_WIDTH_RIGHT,wUnits=UNITS_WIDTH)
 
-#In staticbox: Period of occupation
-        
-        self.tc10 = FloatEntry(self,#SD:change type of entry?? -> time start - time stop?? or change tip: hours of occupation per day??
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
-                              unitdict=None,
-                              label=_("Hours of occupation"),
-                              tip=_("Hours of occupation of the building, during which heating and air conditionning is active"))
+        #SD:change type of entry?? -> time start - time stop?? or change tip: hours of occupation per day??
+        self.tc10 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
+                               unitdict=None,
+                               label=_("Hours of occupation"),
+                               tip=_("Hours of occupation of the building, during which "+\
+                               "heating and air conditionning is active"))
 
-        self.tc11 = FloatEntry(self,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
-                              unitdict=None,
-                              label=_("Days of use per year"),
-                              tip=_(" "))
+        self.tc11 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
+                               unitdict=None,
+                               label=_("Days of use per year"),
+                               tip=_(" "))
 
-        self.tc12_10 = DateEntry(self,
-                              value='',
-                              label=_("Start period 1"),
+        self.tc12_10 = DateEntry(self.page1, value='',
+                              label=_("Start holiday period 1"),
                               tip=_("Period of year that the building is not used"))
 
-        self.tc12_11 = DateEntry(self,
-                              value='',
-                              label=_("Stop period 1"),
+        self.tc12_11 = DateEntry(self.page1, value='',
+                              label=_("Stop holiday period 1"),
                               tip=_("Period of year that the building is not used"))
 
-#### CHECK CHECK CHECK Tom => please check the use of these labels ...
-        self.st12 = Label(self, [self.tc12_10,self.tc12_11], _("Holidays period"),
-                           [_("Holidays period (from)"),_("Holidays period (to)")])
-
-        self.tc12_20 = DateEntry(self,
-                              value='',
-                              label=_("Start period 2"),
+        self.tc12_20 = DateEntry(self.page1, value='',
+                              label=_("Start holiday period 2"),
                               tip=_("Period of year that the building is not used"))
 
-        self.tc12_21 = DateEntry(self,
-                              value='',
-                              label=_("Stop period 2"),
+        self.tc12_21 = DateEntry(self.page1, value='',
+                              label=_("Stop holiday period 2"),
                               tip=_("Period of year that the building is not used"))
 
-        self.tc12_30 = DateEntry(self,
-                              value='',
-                              label=_("Start period 3"),
+        self.tc12_30 = DateEntry(self.page1, value='',
+                              label=_("Start holiday period 3"),
                               tip=_("Period of year that the building is not used"))
 
-        self.tc12_31 = DateEntry(self,
-                              value='',
-                              label=_("Stop period 3"),
+        self.tc12_31 = DateEntry(self.page1, value='',
+                              label=_("Stop holiday period 3"),
                               tip=_("Period of year that the building is not used"))
 
 
-        self.tc13_1 = DateEntry(self,
-                              value='',
+        self.tc13_1 = DateEntry(self.page1, value='',
                               label=_("Start of heating period"),
                               tip=_(" "))
 
-        self.tc13_2 = DateEntry(self,
-                              value='',
+        self.tc13_2 = DateEntry(self.page1, value='',
                               label=_("Stop of heating period"),
                               tip=_(" "))
-        self.st13 = Label(self,[self.tc13_1,self.tc13_2],_("Heating period"),
-                          [_("Heating period (from)"), _("Heating period (to)")])
 
-        self.tc14_1 = DateEntry(self,
-                              value='',
-                              label=_("Start of air conditioning period"),
+
+        self.tc14_1 = DateEntry(self.page1, value='',
+                              label=_("Start of air\nconditioning period"),
                               tip=_(" "))
 
-        self.tc14_2 = DateEntry(self,
-                              value='',
-                              label=_("Stop of air conditioning period"),
+        self.tc14_2 = DateEntry(self.page1, value='',
+                              label=_("Stop of air\nconditioning period"),
                               tip=_(" "))
 
-        self.st14 = Label(self,[self.tc14_1,self.tc14_2],_("Air cond. period"),
-                          [_("Air conditioning period (from)"), _("Air conditioning period (to)")])
-
+        #
+        # buttons
+        #
+        self.buttonDeleteBuilding = wx.Button(self,-1,_("Delete building"))
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteBuilding, self.buttonDeleteBuilding)
+        self.buttonDeleteBuilding.SetMinSize((136, 32))
+        self.buttonDeleteBuilding.SetFont(fp.getFont())
+        
+        self.buttonAddBuilding = wx.Button(self,-1,_("Add building"))
+	self.Bind(wx.EVT_BUTTON, self.OnButtonAddBuilding, self.buttonAddBuilding)
+        self.buttonAddBuilding.SetMinSize((136, 32))
+        self.buttonAddBuilding.SetFont(fp.getFont())
+        
         self.buttonOK = wx.Button(self,wx.ID_OK, label=_("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
@@ -237,72 +280,72 @@ class PanelQ8(wx.Panel):
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label=_("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
-    def __do_layout(self):
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
-        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_tc12 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_tc13 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_tc14 = wx.BoxSizer(wx.HORIZONTAL)
-        grid_sizer_1 = wx.FlexGridSizer(14, 2, 1, 2) #r,c,vsep,hsep
-        sizer_4 = wx.StaticBoxSizer(self.sizer_4_staticbox, wx.VERTICAL)
-        sizer_4.Add(self.listBoxBuildingList, 1, wx.EXPAND, 0)
-        sizer_4.Add(self.buttonDeleteBuilding, 0, wx.EXPAND, 0)
-        sizer_4.Add(self.buttonAddBuilding, 0, wx.EXPAND, 2)
-        sizer_3.Add(sizer_4, 1, wx.EXPAND, 0)
-
-        sizer_5 = wx.StaticBoxSizer(self.sizer_5_staticbox, wx.VERTICAL)
-        sizer_5.Add(grid_sizer_1, 1, wx.EXPAND, 2)
-
-
-        flagLabel = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL
-        flagText = wx.EXPAND|wx.ALIGN_CENTER_VERTICAL
-
-#HS: 2008-06-18: st's eliminated from grid sizer (except st12,13,14)
-#        grid_sizer_1.Add(self.st1, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc1, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st2, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc2, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st3, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc3, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st4, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc4, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st5, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc5, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st6, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc6, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st7, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc7, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st8, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc8, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st9, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc9, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st10, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc10, 0, flagText, 0)
-#        grid_sizer_1.Add(self.st11, 0, flagLabel, 0)
-        grid_sizer_1.Add(self.tc11, 0, flagText, 0)
-
-        grid_sizer_1.Add(self.st12, 0, flagLabel, 0)
-        sizer_tc12.Add(self.tc12_10, 0, flagText, 0)
-        sizer_tc12.Add(self.tc12_11, 0, flagText, 0)
-        grid_sizer_1.Add(sizer_tc12, 0, flagText, 0)
-
-        grid_sizer_1.Add(self.st13, 0, flagLabel, 0)
-        sizer_tc13.Add(self.tc13_1, 0, flagText, 0)
-        sizer_tc13.Add(self.tc13_2, 0, flagText, 0)
-        grid_sizer_1.Add(sizer_tc13, 0, flagLabel, 0)
+         # recover previous font parameters from the stack
+        fp.popFont()
         
-        grid_sizer_1.Add(self.st14, 0, flagLabel, 0)
-        sizer_tc14.Add(self.tc14_1, 0, flagText, 0)
-        sizer_tc14.Add(self.tc14_2, 0, flagText, 0)
-        grid_sizer_1.Add(sizer_tc14, 0, flagText, 0)
-            
+    def __do_layout(self):
+        flagText = wx.ALIGN_CENTER_VERTICAL|wx.TOP
+
+        # global sizer for panel. Contains notebook w/two tabs + buttons Cancel and Ok
+        sizerGlobal = wx.BoxSizer(wx.VERTICAL)
+        
+        # sizer for left tab
+        # tab 0, general data
+        sizerPage0 = wx.BoxSizer(wx.HORIZONTAL)
+        # left part: listbox
+        sizerP0Left= wx.StaticBoxSizer(self.frame_building_list, wx.VERTICAL)
+        sizerP0Left.Add(self.listBoxBuildingList, 1, wx.EXPAND, 0)
+        sizerP0Left.Add(self.buttonDeleteBuilding, 0, wx.ALIGN_RIGHT, 0)
+        sizerP0Left.Add(self.buttonAddBuilding, 0, wx.ALIGN_RIGHT, 0)
+        sizerPage0.Add(sizerP0Left,2,wx.EXPAND|wx.TOP,10)
+
+        # right part: data entries
+        sizerP0Right= wx.BoxSizer(wx.VERTICAL)
+        sizerP0RightTop= wx.StaticBoxSizer(self.frame_general_data, wx.VERTICAL)
+        sizerP0RightTop.Add(self.tc1, 0, flagText, VSEP_LEFT)
+        sizerP0RightTop.Add(self.tc2, 0, flagText, VSEP_LEFT)
+        sizerP0RightTop.Add(self.tc3, 0, flagText, VSEP_LEFT)
+        sizerP0RightTop.Add(self.tc4, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(sizerP0RightTop,4,wx.EXPAND,0)
+        
+        sizerP0RightBottom= wx.StaticBoxSizer(self.frame_energy_demand, wx.VERTICAL)
+        sizerP0RightBottom.Add(self.tc5, 0, flagText, VSEP_LEFT)
+        sizerP0RightBottom.Add(self.tc6, 0, flagText, VSEP_LEFT)
+        sizerP0RightBottom.Add(self.tc7, 0, flagText, VSEP_LEFT)
+        sizerP0RightBottom.Add(self.tc8, 0, flagText, VSEP_LEFT)
+        sizerP0RightBottom.Add(self.tc9, 0, flagText, VSEP_LEFT)
+        sizerP0Right.Add(sizerP0RightBottom,4,wx.EXPAND,0)
+        sizerPage0.Add(sizerP0Right,5,wx.EXPAND|wx.TOP,10)
+        self.page0.SetSizer(sizerPage0)
+
+        # sizer for right tab
+        # tab 1, occupation
+
+        sizerPage1 = wx.StaticBoxSizer(self.frame_occupation, wx.VERTICAL)
+        grid_sizer_P1 = wx.FlexGridSizer(6, 2, 1, 2) #r,c,vsep,hsep
+        grid_sizer_P1.Add(self.tc10, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc11, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_10, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_11, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_20, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_21, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_30, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc12_31, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc13_1, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc13_2, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc14_1, 0, flagText, 0)
+        grid_sizer_P1.Add(self.tc14_2, 0, flagText, 0)
+        sizerPage1.Add(grid_sizer_P1,0,wx.EXPAND|wx.TOP,10)
+
+        self.page1.SetSizer(sizerPage1)
+
+        sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
-        sizer_3.Add(sizer_5, 4, wx.LEFT|wx.RIGHT|wx.EXPAND, 0)
-        sizer_1.Add(sizer_3, 1, wx.EXPAND, 0)
-        sizer_1.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
-        self.SetSizer(sizer_1)
+
+        sizerGlobal.Add(self.notebook, 3, wx.EXPAND, 0)
+        sizerGlobal.Add(sizerOKCancel, 0, wx.TOP|wx.ALIGN_RIGHT, 0)
+        self.SetSizer(sizerGlobal)
         self.Layout()
 
 #------------------------------------------------------------------------------
@@ -434,6 +477,7 @@ class PanelQ8(wx.Panel):
         self.clear()
         self.fillPage()
         self.Show()
+        self.main.showWarning(_("You can fill in data if you are happy with this, but building H&C demand is not yet considered in this version of EINSTEIN"))
 
     def fillBuildingList(self):
         self.listBoxBuildingList.Clear()

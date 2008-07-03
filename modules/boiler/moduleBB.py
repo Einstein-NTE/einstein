@@ -15,7 +15,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.09
+#	Version No.: 0.18
 #	Created by: 	    Hans Schweiger	11/03/2008
 #	Last revised by:    Tom Sobota          15/03/2008
 #                           Enrico Facci /
@@ -32,6 +32,8 @@
 #                           Hans Schweiger      15/04/2008
 #                           Enrico Facci        26/05/2008
 #                           Enrico Facci        06/06/2008
+#                           Hans Schweiger      02/07/2008
+#                           Hans Schweiger      03/07/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -71,6 +73,9 @@
 #       27/06/2008: HS small bug-fixes: - equipment screening moved from __init__ to initPanel.
 #                                       - PowerSumMaxtemp -> PowerSumTmax
 #                   Security feature: where's no table uheatpump, one is created
+#       02/07/2008: HS Calulation of FETFuel_j,FETel_j and HPerYearEq added to
+#                       calculateEnergyFlows
+#       03/07/2008: HS  Call to updatePanel eliminated in initPanel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -128,7 +133,6 @@ class ModuleBB(object):
         Status.int.initCascadeArrays(self.NEquipe)
         Status.mod.moduleEnergy.runSimulation()
         Status.int.printCascade()
-        self.updatePanel()
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -477,7 +481,9 @@ class ModuleBB(object):
             if new_cascade[i]['equipeID'] == BBid:
                 idx = i
 
-        new_cascade.pop(idx)           
+        new_cascade.pop(idx)
+
+        Status.int.changeInCascade(idx)
 
 ###HS: CGENERATIONHC CHANGED TO QGENERATIONHC
         for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
@@ -546,6 +552,8 @@ class ModuleBB(object):
 
         self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
 
+        Status.int.changeInCascade(self.cascadeIndex)
+
         return(self.equipe)
 
 
@@ -598,6 +606,10 @@ class ModuleBB(object):
 #   calculates the energy flows in the equipment identified by "cascadeIndex"
 #------------------------------------------------------------------------------
 
+        if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
+            logDebug("ModuleBB (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
+            Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
+
         print "ModuleBB (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
 #..............................................................................
 # get equipment data from equipment list in SQL
@@ -636,6 +648,7 @@ class ModuleBB(object):
 
         USHj = 0
         QHXj = 0
+        HPerYear = 0
 
         for it in range(Status.Nt):
 
@@ -655,6 +668,8 @@ class ModuleBB(object):
                         USHj_Tt[iT][it] = 0
                 QD_Tt[iT][it]= QD_Tt[iT][it]- USHj_Tt[iT][it]
             USHj += USHj_Tt[Status.NT+1][it]
+            if USHj_Tt[Status.NT+1][it]>0:
+                HPerYear += Status.TimeStep
 #            print USHj_Tt[Status.NT+1][it]      #total heat supplied at present timestep
 #........................................................................
 # End of year reached. Store results in interfaces
@@ -684,6 +699,22 @@ class ModuleBB(object):
         print "Total energy supplied by equipment ",USHj, " MWh"
         print "Total waste heat input  ",QHXj, " MWh"
 
+        Status.int.cascadeUpdateLevel = cascadeIndex
+
+#........................................................................
+# Global results (annual energy flows)
+
+        Interfaces.USHj[cascadeIndex-1] = USHj
+
+        if COPh_nom > 0:
+            FETFuel_j = USHj/COPh_nom
+        else:
+            FETFuel_j = 0.0
+            showWarning("Strange boiler with COP = 0.0")
+        Interfaces.FETFuel_j[cascadeIndex-1] = FETFuel_j
+        Interfaces.FETel_j[cascadeIndex-1] = 0.0
+        Interfaces.HPerYearEq[cascadeIndex-1] = HPerYear
+        
         return USHj    
 
 

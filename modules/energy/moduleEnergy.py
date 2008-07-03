@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
@@ -29,6 +29,7 @@
 #                           Enrico Facci        11/06/2008
 #                           Hans Schweiger      26/06/2008
 #                           Hans Schweiger      28/06/2008
+#                           Hans Schweiger      03/07/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -47,6 +48,7 @@
 #                       debugging
 #       28/06/2008: possibility for simulating from first to last introduced
 #                   in run simulation
+#       03/07/2008: check and update of cascadeUpdateLevel incorporated
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -291,7 +293,7 @@ class ModuleEnergy(object):
         if (first == None) or (first < 1):
             first = 1
 
-        first = max(first,Status.int.cascadeUpdateLevel)    #avoid unnecessary calculations
+        first = max(first,Status.int.cascadeUpdateLevel+1)    #avoid unnecessary calculations
 
         if last == None or last > self.NEquipe:
             last = self.NEquipe

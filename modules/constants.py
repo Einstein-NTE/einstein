@@ -18,15 +18,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    22/03/2008
 #
 #       Last modified by:   Stoyan Danov            04/06/2008
 #                           Hans Schweiger          10/06/2008
+#                           Claudia Vannoni         02/07/2008
 #
 #       Changes to previous version:
 #       04/06/2008  SD: traduceable lists creation
 #       10/06/2008  HS: function findKey added
+#       02/07/2008  CV: ST parameters
 #
 #
 #------------------------------------------------------------------------------		
@@ -70,9 +72,9 @@ EQUIPTYPE = ["compression heat pump",
              "burner (indirect heating)",
              "compression chiller",
              "thermal chiller",
-             "solar thermal (single-glazed selective)",
-             "solar thermal (double-glazed selective)",
-             "solar thermal (vacuum pump)",
+             "solar thermal (flat-plate)",
+             "solar thermal (evacuated tubes)",
+             "solar thermal (concentrating solar systems)",
              "CHP engine",
              "CHP steam turbine",
              "CHP gas turbine",
@@ -87,9 +89,9 @@ TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
              "burner (indirect heating)":_("burner (indirect heating)"),
              "compression chiller":_("compression chiller"),
              "thermal chiller":_("thermal chiller"),
-             "solar thermal (single-glazed selective)":_("solar thermal (single-glazed selective)"),
-             "solar thermal (double-glazed selective)":_("solar thermal (double-glazed selective)"),
-             "solar thermal (vacuum pump)":_("solar thermal (vacuum pump)"),
+             "solar thermal (flat-plate)":_("solar thermal (flat-plate)"),
+             "solar thermal (evacuated tubes)":_("solar thermal (evacuated tubes)"),
+             "solar thermal (concentrating solar systems)":_("solar thermal (concentrating solar systems)"),
              "CHP engine":_("CHP engine"),
              "CHP steam turbine":_("CHP steam turbine"),
              "CHP gas turbine":_("CHP gas turbine"),
@@ -102,9 +104,9 @@ EQUIPMENTSUBTYPE = ["condensing",
                "indirect heating",
                "compression",
                "thermal",
-               "single-glazed selective",
-               "double-glazed selective",
-               "vacuum tube",
+               "flat-plate",
+               "evacuated tubes",
+               "concentrating solar systems",
                "steam turbine",
                "gas turbine",
                "engine",
@@ -119,14 +121,13 @@ HPTYPES = [EQUIPMENTSUBTYPE[4], EQUIPMENTSUBTYPE[5]]
 TRANSHPTYPES = {"compression":_("compression"),
                 "thermal":_("thermal")}
 
-STTYPES = [ "flat plate",
-            "evacuated tube",
-            "parabolic trough",
-            "linear fresnel concentrating"]
-TRANSSTTYPES = {"flat plate":     _("flat plate"),
-                "evacuated tube":           _("evacuated tube"),
-                "parabolic trough":_("parabolic trough"),
-                "linear fresnel concentrating":    _("linear fresnel concentrating")
+STTYPES = [ "Flat-plate collector",
+            "Evacuated tube collector",
+            "Concentrating collector"]
+
+TRANSSTTYPES = {"Flat-plate collector":     _("Flat-plate collector"),
+                "Evacuated tube collector":           _("Evacuated tube collector"),
+                "Concentrating collector":_("Concentrating collector")
                 }
 
 HXTYPES = [ "plate HX (liquid-liquid)",
