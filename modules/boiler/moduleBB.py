@@ -76,6 +76,8 @@
 #       02/07/2008: HS Calulation of FETFuel_j,FETel_j and HPerYearEq added to
 #                       calculateEnergyFlows
 #       03/07/2008: HS  Call to updatePanel eliminated in initPanel
+#                       change in setting of cascadeIndex in screenEquipments
+#                       some bug-fixing and clean-up
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -97,6 +99,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
+from einstein.modules.messageLogger import *
 
 class ModuleBB(object):
 
@@ -104,7 +107,6 @@ class ModuleBB(object):
     
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
-        Status.int = Interfaces()
 
         self.DB = Status.DB
         self.sql = Status.SQL
@@ -126,13 +128,10 @@ class ModuleBB(object):
 #       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipments)
-
-        Status.int.initCascadeArrays(self.NEquipe)
-        Status.mod.moduleEnergy.runSimulation()
-        Status.int.printCascade()
+        if Status.int.cascadeUpdateLevel < 0:
+            Status.int.initCascadeArrays(0)
+            #Status.mod.moduleEnergy.runSimulation() no longer necessary
+            #Status.int.printCascade()
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -142,9 +141,18 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 
 #............................................................................................
-# 1. List of equipments
+# get list of equipments and boilers in the system
+# and update the energetic calculation up to the level needed for representation
 
+        self.equipments = Status.prj.getEquipments()
+        self.NEquipe = len(self.equipments)
         (BBList,BBTableDataList) = self.screenEquipments()
+
+        if Status.int.cascadeUpdateLevel < self.cascadeIndex:
+            Status.mod.moduleEnergy.runSimulation(self.cascadeIndex)
+
+#............................................................................................
+# 1. List of equipments
 
         matrix = []
         for row in BBTableDataList:
@@ -160,25 +168,29 @@ class ModuleBB(object):
         PowerSum80=0
         PowerSum140=0
         PowerSumTmax=0
-        if self.maxTemp>80:
+
+        if self.maxTemp > 80:
             if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
                 for i in BBList:
-                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>80 and \
-                                                        self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=140:
-                        PowerSum140 +=i["equipePnom"]
-                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>140:
-                        PowerSumTmax += i["equipePnom"]
+                    bbs = Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]]
+                    if len(bbs) > 0:
+                        bb = bbs[0]
+                        if bb.TExhaustGas > 80 and bb.TExhaustGas <= 140:
+                            PowerSum140 += i["equipePnom"]
+                        if bb.TExhaustGas > 140:
+                            PowerSumTmax += i["equipePnom"]
             else :
                 for i in BBList:
-                    if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]>80:
-                        PowerSumTmax += i["equipePnom"]
-            print "starting block for calculation of PowerSum80"
+                    bbs = Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]]
+#                    bbs = self.equipments.QGenerationHC_ID[i["equipeID"]]  #HS2008-07-03: changed. gave some strange SQL error
+                    if len(bbs) > 0:
+                        bb = bbs[0]
+                        if bb.TExhaustGas > 80:
+                            PowerSumTmax += i["equipePnom"]
+                            
             for i in BBList:
-                print "i = ",i
-                print "TExhaustGas = ",self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]
-                if self.equipments.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=80:
+                if Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=80:
                     PowerSum80 += i["equipePnom"]
-                    print "PowerSum80",PowerSum80
         else:
             for i in BBList:
                PowerSumTmax += i["equipePnom"] 
@@ -186,7 +198,8 @@ class ModuleBB(object):
         if len(BBList)==0:
             index=len(self.equipments)-1
         else:
-            index = self.equipments.QGenerationHC_ID[BBList[0]["equipeID"]][0]["CascadeIndex"]
+            index = Status.DB.qgenerationhc.QGenerationHC_ID[BBList[0]["equipeID"]][0]["CascadeIndex"]
+
         print "length of QD_Tt_mod is", len(Status.int.QD_Tt_mod)
         print "the element we are looking at is", index
         QD80C=Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval)]
@@ -235,66 +248,7 @@ class ModuleBB(object):
                                                                 QD80C])
                 except:
                     pass
-#        try:
 
-#####ENRICO, you should substitute this by the graphics you want to show
-#            Status.int.setGraphicsData('BB Plot',[Status.int.T,
-#                                                      Status.int.QD_T_mod[self.cascadeIndex],
-#                                                      Status.int.QA_T_mod[self.cascadeIndex],
-#                                                      Status.int.QD_T_mod[self.cascadeIndex+1],
-#                                                      Status.int.QA_T_mod[self.cascadeIndex+1]])
-###HS2008-05-16
-# This is how it should look like:
-# Time interval should be a list containing the time steps of the data file
-# You can use 0,1,2,3 .... 8760 or just a subset, e.g. 0,10,20,...
-#   CHD should be the demand curves, probably something like
-#   for i in range(Status.Nt):
-#       CHD1[it] = QD_Tt_mod[self.cascadeIndex_boiler1][NT1][it] #NT1 is the index of a given temperature level
-#       CHD2[it] = QD_Tt_mod[self.cascadeIndex_boiler1][NT2][it] #NT1 is the index of a given temperature level
-#       CHD3[it] = QD_Tt_mod[self.cascadeIndex_boiler1][NT3][it] #NT1 is the index of a given temperature level
-#       ...
-#       Supply1 = USHj_Tt[self.cascadeIndex_boiler1][it]
-#       Supply2 = USHj_Tt[self.cascadeIndex_boiler2][it]
-#       Supply3 = USHj_Tt[self.cascadeIndex_boiler3][it]
-#
-#   Take care: the length of TimeIntervals and the data lists CHD1..3,Supply1..3 should be identical.
-#   Tell me how much curves you want to display. actually the GUI shows 4, and I don't know if it adapts automatically
-#   to more than 4 (should be so, but I'm not sure. I'll check it in the meanwhile)
-#
-#            Status.int.setGraphicsData('BB Plot',[TimeIntervals,
-#                                                      CHD1,
-#                                                      CHD2,
-#                                                      CHD3,
-#                                                      Supply1,
-#                                                      Supply2,
-#                                                      Supply3])
-
-#            pass
-        
-#        except:
-#            pass
-#............................................................................................
-#this is just a test. you should substitute the 2nd - nth "TimeIntervals" by the right list
-# i put it here out of the try-except, in order to SEE the error messages, if they occur
-# afterwards should be returned to WITHIN the try-except.
-#............................................................................................
-#        TimeIntervals = []
-#        CHD_80 = []
-#        NT80 = int(ceil(80/Status.TemperatureInterval))
-#        for it in range(Status.Nt):
-#            TimeIntervals.append(1.0*(it+1))
-#            CHD_80.append(Status.int.QD_Tt_mod[self.cascadeIndex][NT80][it]/Status.TimeStep)
-#                          
-#        CHD_80.sort()
-#        CHD_80.reverse()
-            
-#        Status.int.setGraphicsData('BB Plot',[TimeIntervals,
-#                                            CHD_80,
-#                                            TimeIntervals,
-#                                            TimeIntervals,
-#                                            TimeIntervals])
-
-#............................................................................................
 #............................................................................................
 # 3. Configuration design assistant
 
@@ -400,9 +354,13 @@ class ModuleBB(object):
 
         Status.int.getEquipmentCascade()
         self.BBList = []
+        maxIndex = 0
+        index = 0
         for row in Status.int.cascade:
+            index += 1
             if getEquipmentClass(row["equipeType"]) == "BB":
                 self.BBList.append(row)
+                maxIndex = index
 
         BBTableDataList = []
         for row in Status.int.EquipTableDataList:
@@ -416,7 +374,8 @@ class ModuleBB(object):
                     BBTableDataList[i][j] = 'not available'        
 
         if(len(self.BBList)>0):
-            self.cascadeIndex = len(self.BBList) #by default sets selection to last BB in cascade
+            self.cascadeIndex = maxIndex
+#            self.cascadeIndex = len(self.BBList) #by default sets selection to last BB in cascade
         else:
             self.cascadeIndex = 0
         return (self.BBList,BBTableDataList)

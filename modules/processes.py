@@ -37,6 +37,7 @@ from math import *
 from einstein.auxiliary.auxiliary import *
 from einstein.modules.constants import *
 from einstein.GUI.status import Status
+from einstein.modules.messageLogger import *
 
 
 #------------------------------------------------------------------------------		
@@ -52,78 +53,149 @@ class Processes(object):
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
+    def createYearlyDemand(self):
+#------------------------------------------------------------------------------		
+#       is created automatically in an alternative after cchecking or
+#       after selecting a new alternative that is already cchecked
+#------------------------------------------------------------------------------		
+
+        logTrack("Processes (createYearlyDemand): starting")
+        
+        (projectData,generalData) = Status.prj.getProjectData()
+
+        processes = Status.prj.getProcesses()
+
+        UPH_T = []
+        UPHs_T = []
+        UPHm_T = []
+        UPHc_T = []
+        UPHw_T = []
+        UPHTotal_T = Status.int.createQ_T()
+        UPHwTotal_T = Status.int.createQ_T()
+
+        for process in processes:
+
+            UPH_T.append(Status.int.createQ_T())
+            UPHc_T.append(Status.int.createQ_T())
+            UPHm_T.append(Status.int.createQ_T())
+            UPHs_T.append(Status.int.createQ_T())
+            UPHw_T.append(Status.int.createQ_T())
+
+            k = process.ProcNo - 1
+
+            UPHc = checkLimits(process.UPHc,0.0,INFINITE,0.0)
+            distUPHc = self.createTempDist(process.PT,T0=process.PTInFlowRec)
+            
+            UPHm = checkLimits(process.UPHm,0.0,INFINITE,0.0)
+            distUPHm = self.createTempDist(process.PT)
+
+            UPHs = checkLimits(process.UPHs,0.0,INFINITE,0.0)
+            distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
+
+            UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
+            distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
+
+            NT = Status.NT
+
+            for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
+                UPHc_T[k][iT] = UPHc*distUPHc[iT]
+                UPHm_T[k][iT] = UPHm*distUPHm[iT]
+                UPHs_T[k][iT] = UPHs*distUPHs[iT]
+                UPH_T[k][iT] = UPHc_T[k][iT] + UPHm_T[k][iT] + UPHs_T[k][iT]
+                UPHw_T[k][iT] = UPHw*distUPHw[iT]
+                UPHTotal_T[iT] += UPH_T[k][iT]
+                UPHwTotal_T[iT] += UPHw_T[k][iT]
+                 
+        Status.int.UPH_T = UPH_T   
+        Status.int.UPHc_T = UPHc_T   
+        Status.int.UPHm_T = UPHm_T   
+        Status.int.UPHs_T = UPHs_T   
+        Status.int.UPHw_T = UPHw_T
+        Status.int.UPHTotal_T = UPHTotal_T
+        Status.int.UPHwTotal_T = UPHwTotal_T
+
+        logMessage("Processes (createYearlyDemand): yearly heat demand = %s yearly waste heat availability = %s"%\
+              (Status.int.UPHTotal_T[NT+1],Status.int.UPHwTotal_T[0]))
+
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
     def createAggregateDemand(self):
 #------------------------------------------------------------------------------		
 
-        print "Processes (createAggregateDemand): starting"
+        logMessage(_("Processes (createAggregateDemand): Creating time and temperature dependent heat demand"))
         
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
 
+        if Status.processData.outOfDate == False:
+            logTrack("Processes (createAggregateDemand): WARNING - someone wants to create demand profile which is already up to date")
+
+        if Status.schedules.outOfDate == True:
+            logMessage("Processes (createAggregateDemand): creating process schedules")
+            Status.schedules.create()
+
         processes = Status.prj.getProcesses()
 
-        print "-> %s processes found"%len(processes)
-
-        QD_Tt = Status.int.createQ_Tt()
-        QA_Tt = Status.int.createQ_Tt()
+        UPH_Tt = []
+        UPHw_Tt =[]
 
         for process in processes:
             k = process.ProcNo - 1
 
-            UPHc = checkLimits(process.UPHc,0.0,INFINITE,0.0)
-            scheduleC = Status.schedules.procInFlowSchedules[k]
-            distUPHc = self.createTempDist(process.PT,T0=process.PTInFlowRec)
-            print "distUPHc(%s) = "%(k+1),distUPHc
+            UPH_Tt.append(Status.int.createQ_Tt())
+            UPHw_Tt.append(Status.int.createQ_Tt())
             
-            UPHm = checkLimits(process.UPHm,0.0,INFINITE,0.0)
+            scheduleC = Status.schedules.procInFlowSchedules[k]
             scheduleM = Status.schedules.procOpSchedules[k]
-            distUPHm = self.createTempDist(process.PT)
-            print "distUPHm(%s) = "%(k+1),distUPHm
-
-            UPHs = checkLimits(process.UPHs,0.0,INFINITE,0.0)
             scheduleS = Status.schedules.procStartUpSchedules[k]
-            distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
-            print "distUPHs(%s) = "%(k+1),distUPHs
-
-            UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
             scheduleW = Status.schedules.procOutFlowSchedules[k]
+            
             distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
-            print "distUPHw(%s) = "%(k+1),distUPHw
 
-            print "Processes (createAggregateDemand) - process %s (%s): "%(process.ProcNo,process.Process),UPHc,UPHm,UPHs,UPHw            
             NT = Status.NT
             Nt = Status.Nt
 
-            print "Processes (createAggregateDemand): now calculating QD_Tt / QA_Tt"
             for it in range(Nt):
                 time = Status.TimeStep*it
-#                print "schedules - time: %s C: %s M: %s S: %s W: %s"%\
-#                      (time,scheduleC.favg(time),scheduleM.favg(time),scheduleS.favg(time),scheduleW.favg(time))
+                fC = scheduleC.fav[it]
+                fM = scheduleM.fav[it]
+                fS = scheduleS.fav[it]
+                fW = scheduleW.fav[it]
 
-            for it in range(Nt+1):
-                time = Status.TimeStep*it
-                fC = scheduleC.favg(time)
-                fM = scheduleM.favg(time)
-                fS = scheduleS.favg(time)
-                fW = scheduleW.favg(time)
-                
                 for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
-                    QD_Tt[iT][it] += UPHc*distUPHc[iT]*fC
-                    QD_Tt[iT][it] += UPHm*distUPHm[iT]*fM
-                    QD_Tt[iT][it] += UPHs*distUPHs[iT]*fS
-                    QA_Tt[iT][it] += UPHw*distUPHw[iT]*fW
-
-            print "Processes (createAggregateDemand): calculate QD_Tt concluded ..."
+                    UPH_Tt[k][iT][it] = Status.int.UPHc_T[k][iT]*fC +\
+                                        Status.int.UPHm_T[k][iT]*fM +\
+                                        Status.int.UPHs_T[k][iT]*fS
+                    UPHw_Tt[k][iT][it] = Status.int.UPHw_T[k][iT]*fW
                  
-        Status.int.QD_Tt = QD_Tt    
-        Status.int.QA_Tt = QA_Tt
+        Status.int.UPH_Tt = UPH_Tt    
+        Status.int.UPHw_Tt = UPHw_Tt
+                           
+#..............................................................................
+# to be improved here. pass from demand in terms of UPH to demand in terms of USHm
+# for the moment just set identical ...
+                           
+        Status.int.QD_Tt = Status.int.createQ_Tt()   
+        Status.int.QA_Tt = Status.int.createQ_Tt()
 
-#now calculate annual values
-        Status.int.QD_T = Status.int.calcQ_T(QD_Tt)
-        Status.int.QA_T = Status.int.calcQ_T(QA_Tt)
+        for k in range(len(processes)):
+            for iT in range(Status.NT+1):
+                for it in range(Status.Nt):
+                    Status.int.QD_Tt[iT][it] += UPH_Tt[k][iT][it]
+                    Status.int.QA_Tt[iT][it] += UPHw_Tt[k][iT][it]
 
-        print "Processes (createAggregateDemand): yearly demand = %s yearly availability = %s"%\
-              (Status.int.QD_T[NT+1],Status.int.QA_T[0])
+        Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
+        Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
+
+        Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
+
+        showMessage("New FEATURE: calculation of heat demand from process data\n"+\
+                    "For testing in the old mode using default heat demand set"+\
+                    "user interaction level to ""automatic""")
+        if Status.UserInteractionLevel == "automatic":
+            Status.int.setDefaultDemand()
+
+        print "Processes (calculateAggregateDemand): cascadeUpdateLevel set to 0"
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		

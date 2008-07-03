@@ -389,29 +389,36 @@ class Project(object):
 #------------------------------------------------------------------------------
 
         if (n>=-1) and n <= Status.NoOfAlternatives:
-            try:
+
+            sprojects = Status.DB.sproject.ProjectID[Status.PId]
+            if len(sprojects) > 0:
                 Status.DB.sproject.ProjectID[Status.PId][0].ActiveAlternative = n
                 Status.SQL.commit()
                 Status.ANo = n
-                Status.ActiveAlternativeName = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n][0].ShortName
+            else:
+                logTrack("Project (setActiveAlternative): error writing active alternative no. to project table PId %s"%\
+                         Status.PId)
+
+            salternatives = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n]
+            if len(salternatives) > 0:
+                Status.ActiveAlternativeName = salternatives[0].ShortName
                 self.getStatus()
-                print "Project (setActiveAlternative): PId = %s ANo = %s StatusCC = %s"%\
-                      (Status.PId,Status.ANo,Status.StatusCC)
+                logTrack("Project (setActiveAlternative): PId = %s ANo = %s StatusCC = %s"%\
+                  (Status.PId,Status.ANo,Status.StatusCC))
 
                 if checked == True:
                     Status.prj.setStatus("CC")
 
                 if Status.StatusCC > 0:
-                    Status.schedules.outOfDate=True
-                    Status.processData.outOfDate=True
-                    
-#                    Status.schedules.create()
-                                
-            except:
+                    Status.processData.createYearlyDemand()
+                
+                Status.schedules.outOfDate=True
+                Status.processData.outOfDate=True
+            else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
-                pass
+
         else:
-            logTrack("Project (setActiveAlternative): alternative number out of range")
+            logTrack("Project (setActiveAlternative): alternative number out of range [%s,%s]"%(-1,Status.NoOfAlternatives))
             
 #------------------------------------------------------------------------------
     def copyQuestionnaire(self):
@@ -489,37 +496,49 @@ class Project(object):
 #   If PId <= 0 and no name is given, then all projects are deselected
 #------------------------------------------------------------------------------
         
-        try:
-            if name is not None:    #if a name is given, overwrite ID
-                PId = self.getProjectID(name)
+        if name is not None:    #if a name is given, overwrite ID
+            PId = self.getProjectID(name)
 
-            if (PId <= 0 or (PId is None)):
-                Status.PId = -1
-                Status.ActiveProjectName = "---"
-                Status.ActiveProjectDescription = "---"
-                
-                logTrack("Project (setActiveProject): no project selected")
+        if (PId <= 0 or (PId is None)):
+            Status.PId = -1
+            Status.ActiveProjectName = "---"
+            Status.ActiveProjectDescription = "---"
+            
+            logTrack("Project (setActiveProject): no project selected")
 
-            else:
+        else:
 
+            try:
                 Status.ActiveProjectName = Status.DB.questionnaire.Questionnaire_ID[PId][0].Name
                 Status.ActiveProjectDescription = Status.DB.questionnaire.Questionnaire_ID[PId][0].DescripIndustry
+            except:
+                Status.ActiveProjectName = "unknown"
+                Status.ActiveProjectDescription = "unknown"
+                logTrack("Project (setActiveProject): error in table questionnaire")
+                
+            try:
                 sproject = Status.DB.sproject.ProjectID[PId][0]
-                
                 Status.NoOfAlternatives = sproject.NoOfAlternatives
+                Status.ANo = sproject.ActiveAlternative
                 logTrack("Project (setActiveProject): number of alternatives in the project %s"%Status.NoOfAlternatives)
+                logTrack("Project (setActiveProject): active alternative %s"%Status.ANo)
+            except:
+                Status.NoOfAlternatives = -1
+                Status.ANo = -1
+                logTrack("Project (setActiveProject): error in table sproject")
                 
-                Status.PId = PId
+            Status.PId = PId
+
+            try:
                 Status.DB.stool.STool_ID[1][0].ActiveProject = PId
                 logTrack("Project (setActiveProject): active project set to %s"%PId)
+            except:
+                logTrack("Project (setActiveProject): error writing new active project ID to stool")                
 
-                self.setActiveAlternative(sproject.ActiveAlternative)
-                logTrack("Project (setActiveProject): active alternative %s"%Status.ANo)
+            self.setActiveAlternative(Status.ANo)
 
-            Status.SQL.commit()            
+        Status.SQL.commit()            
             
-        except:
-            logTrack("Project (setActiveProject): Error opening project %s"%PId)
 
 #------------------------------------------------------------------------------
     def createNewProject(self,originalPId,shortName,description,originalName=None):

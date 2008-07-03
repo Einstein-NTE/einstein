@@ -56,6 +56,7 @@ class ModuleHC(object):
     
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
+        print "ModuleHC (__init__)"
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

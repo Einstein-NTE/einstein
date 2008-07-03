@@ -71,6 +71,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.heatPump.moduleHP import ModuleHP
 import einstein.modules.matPanel as mP
+from einstein.modules.messageLogger import *
 
 #============================================================================== 
 #============================================================================== 
@@ -82,6 +83,7 @@ class ModuleEnergy(object):
     def __init__(self, keys):
 #------------------------------------------------------------------------------
         self.keys = keys
+        print "ModuleEnergy (__init__)"
         
 #------------------------------------------------------------------------------
     def initPanel(self):
@@ -198,6 +200,9 @@ class ModuleEnergy(object):
 
         PNom = equipe.HCGPnom
         if PNom is None: PNom = 0
+
+        COPh_nom = equipe.HCGTEfficiency
+        if COPh_nom is None: COPh_nom = 0.90
         
         EqName = equipe.Equipment
         EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
@@ -231,19 +236,23 @@ class ModuleEnergy(object):
         USHj = 0
         QHXj = 0
 
+        HPerYear = 0
+
 #..............................................................................
 # outer iterative cycle: over all time steps
         for it in range(Nt):   
 
 #..............................................................................
 # inner iterative cycle: temperature intervals
-            print "time = ",it
             for iT in range(NT+2):   #+1 = the > 400 ºC case
                 USHj_Tt[iT][it] = min(QD_Tt[iT][it],PNom*Dt) #just max(demand,nom.power) 
                 QHXj_Tt[iT][it] = 0
+
             USHj += USHj_Tt[NT+1][it]
             QHXj += QHXj_Tt[NT+1][it]
-            print "USH = ",USHj_Tt[NT+1][it]
+
+            if USHj_Tt[NT+1][it] > 0:
+                HPerYear += Dt
 #..............................................................................
 # end simulation. 
 
@@ -264,13 +273,28 @@ class ModuleEnergy(object):
         Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
         Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
-#        equipeC.USHj = USHj
-#        equipeC.QHXj = QHXj    #XXX to be defined in data base
 
         print "Total energy supplied by equipment ",USHj, " MWh"
         print "Total waste heat input  ",QHXj, " MWh"
 
         print "Total energy supplied by equipment ",USHj, " MWh"
+
+        Status.int.cascadeUpdateLevel = cascadeIndex
+
+#........................................................................
+# Global results (annual energy flows)
+
+        Interfaces.USHj[cascadeIndex-1] = USHj
+
+        if COPh_nom > 0:
+            FETFuel_j = USHj/COPh_nom
+        else:
+            FETFuel_j = 0.0
+            showWarning("Strange boiler with COP = 0.0")
+
+        Interfaces.FETFuel_j[cascadeIndex-1] = FETFuel_j
+        Interfaces.FETel_j[cascadeIndex-1] = 0.0
+        Interfaces.HPerYearEq[cascadeIndex-1] = HPerYear
 
         
 #------------------------------------------------------------------------------

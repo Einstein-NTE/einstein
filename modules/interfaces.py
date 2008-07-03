@@ -82,8 +82,8 @@ class Interfaces(object):
 
 # total heat demand and availability in the system
 
-    QD_T = []
-    QA_T = []
+    QD_T = []       #aggregate heat demand as seen by the heat supply
+    QA_T = []       #equipment. similar (identical ?) to USHm_T
     QD_Tt = []
     QA_Tt = []
     
@@ -93,6 +93,23 @@ class Interfaces(object):
     QA_T_mod = []
     QD_Tt_mod = []
     QA_Tt_mod = []
+
+# UPH by processes
+# Temperature dependent demand is calculated in createYearlyDemand
+
+    UPH_T = []      #calculated in createYearlyDemand  
+    UPHc_T = []
+    UPHm_T = []
+    UPHs_T = []
+    UPHw_T = []
+    UPH_Tt = []
+    UPHw_Tt = []
+
+    UPHTotal_T = []
+    UPHwTotal_T = []
+
+    USHm_T = []     #demand at entry of distribution pipe
+    USHm_Tt = []    #demand at entry of distribution pipe
 
 # heat supplied by each equipment
     USHj_Tt = []    
@@ -118,7 +135,9 @@ class Interfaces(object):
 
     NEquipe = None
     cascadeSize = None
-    cascadeUpdateLevel = 0
+    cascadeUpdateLevel = -1 #indicates cascadeIndex (from 1 ... N) for which cascade is
+                            #updated
+                            #-1 indicates that not even demand of first cascade level is available
     cascade = []
     EquipTableDataList = []
     
@@ -139,7 +158,7 @@ class Interfaces(object):
             self.T.append(iT*Status.TemperatureInterval)
         self.T.append(999.0)
         
-        self.setDefaultDemand()
+#        self.setDefaultDemand()
         
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -199,6 +218,10 @@ class Interfaces(object):
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
+        if self.cascadeUpdateLevel < 0:
+            print "Interfaces (initCascadeArrays): demand profile not yet created"
+            Status.processData.createAggregateDemand()
+
         Interfaces.QD_Tt_mod = []      
         Interfaces.QD_T_mod = []
         Interfaces.QA_Tt_mod = []       
@@ -222,6 +245,7 @@ class Interfaces(object):
             Interfaces.QA_T_mod[0][iT] = self.QA_T[iT]
 
         self.cascadeSize = 0
+        self.cascadeUpdateLevel = 0
 
         self.extendCascadeArrays(cascadeSize)
             
@@ -405,6 +429,9 @@ class Interfaces(object):
         NT = Status.NT
         Nt = Status.Nt
 
+        self.QD_Tt = []
+        self.QA_Tt = []
+        
         hourlyProfile = [0,0,0,0,0,0,0,1,5,2,3.3,10,4,9,2,8,7,1,0,0,0,0,0,0] 
         Tpinch = 40.0
         for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
