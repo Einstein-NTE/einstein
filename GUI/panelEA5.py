@@ -18,12 +18,14 @@
 #       Revised by:         Tom Sobota  28/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Stoyan Danov    30/06/2008
+#                           Stoyan Danov    03/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
 #       18/06/2008 SD: change to translatable text _(...)
 #       30/06/2008 SD: change esthetics - 2tab2fig
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #
 #	
 #------------------------------------------------------------------------------		
@@ -166,7 +168,7 @@ class PanelEA5(wx.Panel):
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO1)
 
-        self.grid1.CreateGrid(rows, cols)
+        self.grid1.CreateGrid(max(rows,10), COLNO1)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
@@ -351,10 +353,14 @@ class PanelEA5(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA4b, select=True)
+        print "Button exitModuleBack: now I should show another window"
 
     def OnBtnForwardButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEM1, select=True)
+        print "Button exitModuleFwd: now I should show another window"
 
 
 #------------------------------------------------------------------------------	

@@ -16,10 +16,12 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger      03/05/2008
+#                           Hans Schweiger      03/07/2008
 #
 #       Changes to previous versions:
+#       03/07/2008: HS  included condition "is None" in check
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -53,7 +55,7 @@ def setChoice(choice,strChoice):
 #   sets a choice to the string
 #------------------------------------------------------------------------------		
     try:choice.SetSelection(choice.FindString(strChoice))
-    except:choice.SetSelection(choice.FindString("None"))
+    except:choice.SetSelection(-1)
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------
 def check(value):
@@ -61,7 +63,7 @@ def check(value):
 #   auxiliary function. substitutes ""'s and None's by 'NULL'
 #   (should be moved some day to a separate file with sql-tools ...)
 #------------------------------------------------------------------------------
-    if value <> "" and value <> "None":
+    if value <> "" and value <> "None" and value is not None:
         return value
     else:
         return 'NULL'

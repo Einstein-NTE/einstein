@@ -17,12 +17,14 @@
 #       Revised by:         Tom Sobota  28/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Stoyan Danov    30/06/2008
+#                           Stoyan Danov    03/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
 #       18/06/2008 SD: change to translatable text _(...)
 #       30/06/2008 SD: change esthetics - 1tab2fig
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -234,10 +236,14 @@ class PanelEA2(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
+        self.Hide()
+        print "Button exitModuleBack: now I should show another window"
 
     def OnBtnForwardButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA2, select=True)
+        print "Button exitModuleFwd: now I should show another window"
+
 
 #------------------------------------------------------------------------------
     def display(self):

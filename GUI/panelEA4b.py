@@ -1,4 +1,5 @@
 #Boa:Frame:PanelEA4b
+# -*- coding: iso-8859-15 -*- 
 #==============================================================================
 #
 #	E I N S T E I N
@@ -21,6 +22,7 @@
 #                           Stoyan Danov    20/06/2008
 #                           Stoyan Danov    01/07/2008
 #                           Stoyan Danov    02/07/2008
+#                           Stoyan Danov    03/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -31,6 +33,7 @@
 #                       grid1 decimals control, changes of position and size of objects
 #       01/07/2008: SD  adappted as panelEAb - heat demand by temperature
 #       02/07/2008: SD  changed to orange colour (staticBox)
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -169,7 +172,7 @@ class PanelEA4b(wx.Panel):
         self.grid1.SetColSize(6,105)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Temperature levels\n[C]"))
+        self.grid1.SetColLabelValue(0, _("Temperature levels\n[ºC]"))
         self.grid1.SetColLabelValue(1, _("no cumulative\n[MWh]"))
         self.grid1.SetColLabelValue(2, _("total\n[%]"))
         self.grid1.SetColLabelValue(3, _("cumulative\n[%]"))
@@ -280,10 +283,14 @@ class PanelEA4b(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA4a, select=True)
+        print "Button exitModuleBack: now I should show another window"
 
     def OnBtnForwardButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
+        print "Button exitModuleFwd: now I should show another window"
 
         
 

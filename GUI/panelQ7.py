@@ -65,6 +65,8 @@ LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
 UNITS_WIDTH        = 120
 
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 class PanelQ7(wx.Panel):
     def __init__(self, parent, main):
@@ -81,6 +83,7 @@ class PanelQ7(wx.Panel):
         wx.Panel.__init__(self, id=-1, name='PanelQ7', parent=parent,
               pos=wx.Point(0, 0), size=wx.Size(780, 580), style=0)
         self.Hide()
+
         # access to font properties object
         fp = FontProperties()
 
@@ -94,12 +97,28 @@ class PanelQ7(wx.Panel):
         self.page2 = wx.Panel(self.notebook, -1)
 
         self.frame_main_motivation = wx.StaticBox(self.page0, -1, "Main motivation for renewable energy use")
+        self.frame_main_motivation.SetForegroundColour(TITLE_COLOR)
+        self.frame_main_motivation.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.frame_surfaceslist = wx.StaticBox(self.page1, -1, _("Solar energy surfaces"))
+        self.frame_surfaceslist.SetForegroundColour(TITLE_COLOR)
+        self.frame_surfaceslist.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_surfacedata = wx.StaticBox(self.page1, -1, _("Surface  data"))
+        self.frame_surfacedata.SetForegroundColour(TITLE_COLOR)
+        self.frame_surfacedata.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_weatherdata = wx.StaticBox(self.page1, -1, "Weather data")
+        self.frame_weatherdata.SetForegroundColour(TITLE_COLOR)
+        self.frame_weatherdata.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_biomass_processes = wx.StaticBox(self.page2, -1, "Availability of biomass from the processes")
+        self.frame_biomass_processes.SetForegroundColour(TITLE_COLOR)
+        self.frame_biomass_processes.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_biomass_region = wx.StaticBox(self.page2, -1, "Availability of biomass from the region")
+        self.frame_biomass_region.SetForegroundColour(TITLE_COLOR)
+        self.frame_biomass_region.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         # set font for titles
         # 1. save actual font parameters on the stack
@@ -133,8 +152,7 @@ class PanelQ7(wx.Panel):
                                style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE)
         self.tc1.SetMinSize((650, 60))
         self.tc1.SetMaxSize((650, 60))
-
-
+        self.tc1.SetFont(fp.getFont())
 
 
         # recover previous font state
@@ -211,7 +229,10 @@ class PanelQ7(wx.Panel):
                         decimals=1, minval=0., maxval=3000.,
                         unitdict='ENERGYFLOW',label=_("Solar radiation on horizontal"),\
                         tip=_("Annual total solar radiation on horizontal"))
-
+        self.tc1_23 = FloatEntry(self.page1,
+                                 decimals=1, minval=0., maxval=300.,
+                                 unitdict='TEMPERATURE',label=_("Yearly average ambient temperature"),
+                                 tip=_("Yearly average ambient temperature"))
 
         # recover previous font state
         fp.popFont()
@@ -298,8 +319,6 @@ class PanelQ7(wx.Panel):
                               label=_("Number of days biomass is produced"),
                               tip=_(" "))
 
-        fp.popFont()
-
         self.buttonAddEnergy = wx.Button(self.page1,-1,_("Add surface"))
         self.buttonAddEnergy.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEnergy, self.buttonAddEnergy)
@@ -316,6 +335,9 @@ class PanelQ7(wx.Panel):
 
         self.buttonCancel = wx.Button(self,wx.ID_CANCEL,"Cancel")
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+
+        fp.popFont()
+
 
 
     def __do_layout(self):
@@ -344,7 +366,7 @@ class PanelQ7(wx.Panel):
         sizer_p1_left.Add(self.listBoxEnergy,  1, wx.EXPAND,0) 
         sizer_p1_left.Add(self.buttonAddEnergy, 0, wx.ALIGN_RIGHT, 0)
         sizer_p1_left.Add(self.buttonDeleteEnergy, 0, wx.ALIGN_RIGHT, 2)
-        sizerPage1.Add(sizer_p1_left, 1, wx.ALL|wx.EXPAND, 20)
+        sizerPage1.Add(sizer_p1_left, 1, wx.TOP|wx.EXPAND, 10)
         # tab 1 right part
         sizer_p1_right = wx.BoxSizer(wx.VERTICAL)
         sizer_p1_top_right = wx.StaticBoxSizer(self.frame_surfacedata, wx.VERTICAL)
@@ -357,40 +379,40 @@ class PanelQ7(wx.Panel):
         sizer_p1_top_right.Add(self.tc11, 0, wx.ALL, 2)
         sizer_p1_top_right.Add(self.tc12, 0, wx.ALL, 2)
         sizer_p1_top_right.Add(self.tc13, 0, wx.ALL, 2)        
-        sizer_p1_right.Add(sizer_p1_top_right, 3, wx.ALL|wx.EXPAND, 20)
+        sizer_p1_right.Add(sizer_p1_top_right, 8, wx.TOP|wx.EXPAND, 10)
 
         sizer_p1_bottom_right = wx.StaticBoxSizer(self.frame_weatherdata, wx.VERTICAL)
         sizer_p1_bottom_right.Add(self.tc1_21, 0, wx.ALL, 2)
         sizer_p1_bottom_right.Add(self.tc1_22, 0, wx.ALL, 2)
-        sizer_p1_right.Add(sizer_p1_bottom_right, 1, wx.ALL|wx.EXPAND, 10)
+        sizer_p1_bottom_right.Add(self.tc1_23, 0, wx.ALL, 2)
+        sizer_p1_right.Add(sizer_p1_bottom_right, 3, wx.TOP|wx.EXPAND, 10)
 
         sizerPage1.Add(sizer_p1_right, 2, wx.ALL|wx.EXPAND, 0)
         self.page1.SetSizer(sizerPage1)
-
-        
+        #
         # tab 2 Biomass
+        #
         sizerPage2 = wx.BoxSizer(wx.VERTICAL)
 
-        sizer_p2_right = wx.StaticBoxSizer(self.frame_biomass_region, wx.VERTICAL)
-        sizer_p2_left = wx.StaticBoxSizer(self.frame_biomass_processes, wx.VERTICAL)
+        sizer_p2_top = wx.StaticBoxSizer(self.frame_biomass_processes, wx.VERTICAL)
+        sizer_p2_top.Add(self.tc21, 0, 0, 0)
+        sizer_p2_top.Add(self.tc22, 0, 0, 0)
+        sizer_p2_top.Add(self.tc23_1, 0, 0, 0)
+        sizer_p2_top.Add(self.tc23_2, 0, 0, 0)
+        sizer_p2_top.Add(self.tc24, 0, 0, 0)
+        sizerPage2.Add(sizer_p2_top, 5, wx.EXPAND|wx.TOP, 20)
 
-        sizer_p2_right.Add(self.tc14, 0, 0, 0)
-        sizer_p2_right.Add(self.tc15_1, 0, 0, 0)
-        sizer_p2_right.Add(self.tc15_2, 0, 0, 0)
-        sizer_p2_right.Add(self.tc16, 0, 0, 0)
-        sizer_p2_right.Add(self.tc17, 0, 0, 0)
-        sizer_p2_right.Add(self.tc18, 0, 0, 0)
-        sizer_p2_right.Add(self.tc19, 0, 0, 0)
-        sizer_p2_right.Add(self.tc20, 0, 0, 0)
+        sizer_p2_bottom = wx.StaticBoxSizer(self.frame_biomass_region, wx.VERTICAL)
+        sizer_p2_bottom.Add(self.tc14, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc15_1, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc15_2, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc16, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc17, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc18, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc19, 0, 0, 0)
+        sizer_p2_bottom.Add(self.tc20, 0, 0, 0)
+        sizerPage2.Add(sizer_p2_bottom, 8, wx.EXPAND|wx.TOP, 20)
 
-        sizer_p2_left.Add(self.tc21, 0, 0, 0)
-        sizer_p2_left.Add(self.tc22, 0, 0, 0)
-        sizer_p2_left.Add(self.tc23_1, 0, 0, 0)
-        sizer_p2_left.Add(self.tc23_2, 0, 0, 0)
-        sizer_p2_left.Add(self.tc24, 0, 0, 0)
-
-        sizerPage2.Add(sizer_p2_left, 1, wx.EXPAND|wx.TOP, 20)
-        sizerPage2.Add(sizer_p2_right, 1, wx.EXPAND|wx.TOP, 20)
         self.page2.SetSizer(sizerPage2)
         self.notebook.AddPage(self.page0, "Main motivation")
         self.notebook.AddPage(self.page1, "Solar thermal energy")
@@ -402,9 +424,6 @@ class PanelQ7(wx.Panel):
         sizerGlobal.Add(sizerOKCancel, 0, wx.ALIGN_RIGHT, 0)
         self.SetSizer(sizerGlobal)
         self.Layout()
-
-
-
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -426,6 +445,7 @@ class PanelQ7(wx.Panel):
             tmp = {
                 "Latitude":check(self.tc1_21.GetValue()),
                 "ST_I":check(self.tc1_22.GetValue()),
+                "TAmb":check(self.tc1_23.GetValue()),
                 "BiomassFromProc":check(self.tc14.GetValue()),
                 "PeriodBiomassProcStart":check(self.tc15_1.GetValue()),
                 "PeriodBiomassProcStop":check(self.tc15_2.GetValue()),
@@ -455,7 +475,7 @@ class PanelQ7(wx.Panel):
                 Status.SQL.commit()
 
 
-            orientation = findKey(check(self.tc8.GetValue(text=True)))
+            orientation = findKey(ORIENTATIONS,check(self.tc8.GetValue(text=True)))
             if orientation in AZIMUTH.keys():
                 azimuth = check(AZIMUTH[orientation])
             else:
@@ -466,7 +486,7 @@ class PanelQ7(wx.Panel):
                 "SurfArea":check(self.tc6.GetValue()),
                 "Inclination":check(self.tc7.GetValue()),
                 "Azimuth":azimuth,
-                "AzimuthClass":check(findKey(self.tc8.GetValue(text=True))),
+                "AzimuthClass":check(orientation),
                 "Shading":check(findKey(self.tc9.GetValue(text=True))),
                 "Distance":check(self.tc10.GetValue()),
                 "RoofType":check(findKey(self.tc11.GetValue(text=True))),
@@ -515,7 +535,8 @@ class PanelQ7(wx.Panel):
 
 
         self.tc1_21.Clear()
-        self.tc1_21.Clear()
+        self.tc1_22.Clear()
+        self.tc1_23.Clear()
 
         self.tc14.Clear()
         self.tc16.Clear()
@@ -542,6 +563,7 @@ class PanelQ7(wx.Panel):
 
             self.tc1_21.SetValue(str(p.Latitude))
 	    self.tc1_22.SetValue(str(p.ST_I))
+	    self.tc1_23.SetValue(str(p.TAmb))
 	    
 	    self.tc14.SetValue(str(p.BiomassFromProc))
 	    self.tc15_1.SetValue(str(p.PeriodBiomassProcStart))
@@ -563,12 +585,17 @@ class PanelQ7(wx.Panel):
 	    self.tc6_0.SetValue(str(p.SurfAreaName))
 	    self.tc6.SetValue(str(p.SurfArea))
 	    self.tc7.SetValue(str(p.Inclination))
-	    if p.AzimuthClass in ORIENTATIONS.keys(): self.tc8.SetValue(ORIENTAIONS(str(p.AzimuthClass)))
+	    if p.AzimuthClass in ORIENTATIONS.keys():
+                self.tc8.SetValue(ORIENTATIONS[str(p.AzimuthClass)])
+                
 	    if p.Shading in SHADINGTYPES.keys():
                 self.tc9.SetValue(SHADINGTYPES[str(p.Shading)])
+                
 	    self.tc10.SetValue(str(p.Distance))
+	    
 	    if p.RoofType in ROOFTYPES.keys():
                 self.tc11.SetValue(ROOFTYPES[str(p.RoofType)])
+                
 	    self.tc12.SetValue(str(p.RoofStaticLoadCap))
 
 	    if p.Sketch in TRANSYESNOTYPES.keys():

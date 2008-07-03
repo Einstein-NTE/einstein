@@ -1,4 +1,5 @@
 #Boa:Frame:PanelEA4a
+# -*- coding: iso-8859-15 -*- 
 #==============================================================================
 #
 #	E I N S T E I N
@@ -21,6 +22,7 @@
 #                           Stoyan Danov    20/06/2008
 #                           Stoyan Danov    01/07/2008
 #                           Stoyan Danov    02/07/2008
+#                           Stoyan Danov    03/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -31,6 +33,7 @@
 #                       grid1 decimals control, changes of position and size of objects
 #       01/07/2008: SD  adappted as panelEAa - heat demand by temperature, new columns added
 #       02/07/2008: SD  changed to orange colour (staticBox)
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -133,8 +136,8 @@ class PanelEA4a(wx.Panel):
         self.grid1.SetColLabelValue(3, _("UPH Circulation\n[MWh]"))
         self.grid1.SetColLabelValue(4, _("UPH Maintain.\n[MWh]"))
         self.grid1.SetColLabelValue(5, _("UPH Start-up\n[MWh]"))
-        self.grid1.SetColLabelValue(6, _("Process\ntemperature[C]"))
-        self.grid1.SetColLabelValue(7, _("Central supply\ntemperature[C]"))
+        self.grid1.SetColLabelValue(6, _("Process\ntemperature[ºC]"))
+        self.grid1.SetColLabelValue(7, _("Central supply\ntemperature[ºC]"))
         #
         # copy values from dictionary to grid
         #
@@ -218,10 +221,14 @@ class PanelEA4a(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA3, select=True)
+        print "Button exitModuleBack: now I should show another window"
 
     def OnBtnForwardButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA4b, select=True)
+        print "Button exitModuleFwd: now I should show another window"
 
         
 

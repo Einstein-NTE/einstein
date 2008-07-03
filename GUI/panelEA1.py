@@ -19,6 +19,7 @@
 #       Revised by:         Tom Sobota  28/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Stoyan Danov    30/06/2008
+#                           Stoyan Danov    03/07/2008
 #
 #       Changes to previous version:
 #       28/03/08:           included functions draw ... (before in module)
@@ -26,6 +27,7 @@
 #       28/04/2008          changed method display to display graphics the first time
 #       18/06/2008 SD: change to translatable text _(...)
 #       30/06/2008 SD: change esthetics - 1tab2fig
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -256,10 +258,14 @@ class PanelEA1(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
+        Status.main.tree.SelectItem(Status.main.qEA1, select=True)
         event.Skip()
 
     def OnBtnForwardButton(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEA3, select=True)
+        print "Button exitModuleFwd: now I should show another window"
+##        event.Skip()
 
 
 #------------------------------------------------------------------------------		
