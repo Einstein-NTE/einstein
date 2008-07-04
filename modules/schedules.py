@@ -35,11 +35,8 @@
 from math import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import Status
+from einstein.modules.constants import *
 
-YEAR = 8760.0
-DAY = 24.0
-WEEK = DAY*7
-MONTHSTARTDAY = [0,31,59,90,120,151,181,212,243,273,304,334]
 DEFAULTSCHEDULES = ["continuous","batch","batchCharge","batchDischarge"]
 DEFAULTCHARGETIME = 0.2 #20% of batch duration
 

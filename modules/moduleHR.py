@@ -190,7 +190,81 @@ class ModuleHR(object):
 #        self.runHR()
 #        self.importDataFromHR()
 
+        self.simulateHR()
+
         pass
+#------------------------------------------------------------------------------
+    def simulateHR(self):
+#------------------------------------------------------------------------------
+#       simulates the action of the HR module while the module is not yet
+#       available
+#       starting point: USHTotal_Tt -> process heat demand at process entry
+#                       USHwTotal_Tt -> waste heat demand
+#
+#       QHX = min(fHR*USHw_Tt,QHXmax)
+#------------------------------------------------------------------------------
+
+        if Status.processData.outOfDate == True:
+            Status.processData.createAggregateDemand()
+            
+        QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
+        UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes
+        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
+        QWHAmb_Tt = Status.int.createQ_Tt()     # remaining waste heat that currently is dissipated
+
+        UPH_Tt = Status.int.UPHTotal_Tt
+        UPHw_Tt = Status.int.UPHwTotal_Tt
+
+#..............................................................................
+# settings of the conversion
+
+        fHR = 0.8   # fraction of potential heat recovery that is really recovered
+
+        DistributionEfficiency = 0.9
+        logTrack("ModuleHR (simulate): WARNING - still calculating with fixed distribution efficiency")
+        fDist = 1./DistributionEfficiency
+        
+#..............................................................................
+#..............................................................................
+#..............................................................................
+
+        for it in range(Status.Nt):
+
+#..............................................................................
+        
+            QHXmax = 0
+            for iT in range(Status.NT+1,-1,-1):
+                QHXmax = max(QHXmax,min(fHR*UPHw_Tt[iT][it],UPH_Tt[iT][it]))
+                QHXProc_Tt[iT][it] = min(QHXmax,fHR*UPHw_Tt[iT][it])
+                QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - QHXProc_Tt[iT][it]
+
+            for iT in range(Status.NT+1):
+                QHXProc_Tt[iT][it] = QHXProc_Tt[0][it] - QHXProc_Tt[iT][it]
+                UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it]
+                
+
+            DistributionEfficiency = 0.9
+            logTrack("ModuleHR (simulate): WARNING - still calculating with fixed distribution efficiency")
+            fDist = 1./DistributionEfficiency
+            
+#..............................................................................
+# from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
+
+            USH_Tt[0][it] = 0
+            USH_Tt[1][it] = 0
+            for iT in range(2,Status.NT+1):
+                USH_Tt[iT][it] = UPHProc_Tt[iT-2][it]*fDist
+
+#..............................................................................
+#..............................................................................
+#..............................................................................
+                
+        Status.int.USHTotal_Tt = USH_Tt
+        Status.int.UPHProcTotal_Tt = UPHProc_Tt
+        Status.int.QHXProcTotal_Tt = QHXProc_Tt
+        Status.int.QWHAmb_Tt = QWHAmb_Tt
+            
+        
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":

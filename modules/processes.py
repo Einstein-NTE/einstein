@@ -139,6 +139,9 @@ class Processes(object):
         UPH_Tt = []
         UPHw_Tt =[]
 
+        UPHTotal_Tt = Status.int.createQ_Tt()
+        UPHwTotal_Tt = Status.int.createQ_Tt()
+
         for process in processes:
             k = process.ProcNo - 1
 
@@ -167,10 +170,27 @@ class Processes(object):
                                         Status.int.UPHm_T[k][iT]*fM +\
                                         Status.int.UPHs_T[k][iT]*fS
                     UPHw_Tt[k][iT][it] = Status.int.UPHw_T[k][iT]*fW
+
+                    UPHTotal_Tt[iT][it] += UPH_Tt[k][iT][it]
+                    UPHwTotal_Tt[iT][it] += UPHw_Tt[k][iT][it]
                  
         Status.int.UPH_Tt = UPH_Tt    
         Status.int.UPHw_Tt = UPHw_Tt
+
+        Status.int.UPHTotal_Tt = UPHTotal_Tt    
+        Status.int.UPHwTotal_Tt = UPHwTotal_Tt
                            
+#..............................................................................
+# set status-flag (required BEFORE call to runHRModule !!!)
+
+        Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
+        Status.processData.outOfDate = False
+        
+#..............................................................................
+#   now run HR module for calculating heat recovery and effective demand at pipe entry
+
+        Status.mod.moduleHR.runHRModule()
+
 #..............................................................................
 # to be improved here. pass from demand in terms of UPH to demand in terms of USHm
 # for the moment just set identical ...
@@ -178,11 +198,10 @@ class Processes(object):
         Status.int.QD_Tt = Status.int.createQ_Tt()   
         Status.int.QA_Tt = Status.int.createQ_Tt()
 
-        for k in range(len(processes)):
-            for iT in range(Status.NT+1):
-                for it in range(Status.Nt):
-                    Status.int.QD_Tt[iT][it] += UPH_Tt[k][iT][it]
-                    Status.int.QA_Tt[iT][it] += UPHw_Tt[k][iT][it]
+        for iT in range(Status.NT+1):
+            for it in range(Status.Nt):
+                Status.int.QD_Tt[iT][it] = Status.int.USHTotal_Tt[iT][it]
+                Status.int.QA_Tt[iT][it] = Status.int.QWHAmb_Tt[iT][it]
 
         Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
         Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)

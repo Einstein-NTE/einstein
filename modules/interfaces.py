@@ -106,22 +106,34 @@ class Interfaces(object):
     UPHw_Tt = []
 
     UPHTotal_T = []
+    UPHTotal_Tt = []
+    
     UPHwTotal_T = []
+    UPHwTotal_Tt = []
 
-    USHm_T = []     #demand at entry of distribution pipe
-    USHm_Tt = []    #demand at entry of distribution pipe
+    UPHProcTotal_Tt = []    # heat supplied externally to processes (= UPH - QHXProc)
+    UPHProcTotal_T = []
 
+    QWHAmb_Tt = []          # waste heat dissipated to ambient (not used)
+    QWHAmb_T = []
+    
 # heat supplied by each equipment
     USHj_Tt = []    
     USHj_T = []
     USHj_t = []
     USHj = []
     
+    USHTotal_Tt = []
+    USHTotal_T = []
+    
 # waste heat absorbed in each equipment
     QHXj_Tt = []    
     QHXj_T = []
     QHXj_t = []
     QHXj = []
+
+    QHXProcTotal_Tt = []    # heat recovered and fed directly to processes
+    QHXProcTotal_T = []
 
 # other required outputs from system simulation (calculateEnergyFlows)
 

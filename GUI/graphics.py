@@ -11,10 +11,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	28/03/2008
 #
+#       Last modified by:   Hans Schweiger 04/07/2008
+#
 #       Changes to previous version:
+#       04/07/2008: HS  ignoredrows activated also in stackedBarPlot
+#                       TAKE CARE -> others still missing !!!!!
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -250,17 +254,31 @@ def drawStackedBarPlot(self):
         self.subplot = self.figure.add_subplot(1,1,1)
         self.figure.set_facecolor(backcolor)
 
-    for r in range(1,rows-1):
-        row = data[r]
-        if len(legend) <= 0:
-            legendlabels.append(row[0].replace("\n"," "))
-        floatdata = map(lambda a: float(a), row[1:cols-1])
-        if r == 1:
-            p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8])
-        else:
-            p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8], bottom=previous)
-        legendptr.append(p[0])
-        previous = floatdata[:]
+    print "GRAPHICS - data = "
+    print data
+    
+    for r in range(1,rows-1):   
+
+########################################################################
+########################################################################
+### HS: "ignoredrows-check" added
+########################################################################
+########################################################################
+        plotted_r = 0 #HS. added
+        if r not in ignoredrows:
+            plotted_r +=1 #HS. added
+
+            row = data[r]
+            print "Graphics r / plotted_r [%s/%s]"%(r,plotted_r),row
+            if len(legend) <= 0:
+                legendlabels.append(row[0].replace("\n"," "))
+            floatdata = map(lambda a: float(a), row[1:cols-1])
+            if plotted_r == 1: #HS. changed r to plotted_r
+                p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8])
+            else:
+                p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8], bottom=previous)
+            legendptr.append(p[0])
+            previous = floatdata[:]
 
     self.subplot.axes.set_ylabel(ylabel)
     self.subplot.set_title(title, TITLE_FONT_DICT)

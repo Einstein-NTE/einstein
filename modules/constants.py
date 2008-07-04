@@ -18,17 +18,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	    22/03/2008
 #
 #       Last modified by:   Stoyan Danov            04/06/2008
 #                           Hans Schweiger          10/06/2008
 #                           Claudia Vannoni         02/07/2008
+#                           Hans Schweiger          03/07/2008
 #
 #       Changes to previous version:
 #       04/06/2008  SD: traduceable lists creation
 #       10/06/2008  HS: function findKey added
 #       02/07/2008  CV: ST parameters
+#       03/07/2008: HS  subtypes for boilers adapted to DB Boiler
 #
 #
 #------------------------------------------------------------------------------		
@@ -48,9 +50,14 @@ VERSION = "NOT_M2_DEMO" #M2_DEMO: deactivates pipes
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99
-YEAR = 8760.
 KELVIN = 273.15
 MAXTEMP = 999.9 #maximum allowed temperature in analysis 
+
+YEAR = 8760.0
+DAY = 24.0
+WEEK = DAY*7
+MONTHSTARTDAY = [0,31,59,90,120,151,181,212,243,273,304,334,365]
+    #note: time 0:00h of the first day of each month = MONTHSTARTDAY*DAY
 
 #------------------------------------------------------------------------------		
 #default values for status variables
@@ -68,6 +75,7 @@ EQUIPTYPE = ["compression heat pump",
              "thermal heat pump",
              "steam boiler",
              "condensing boiler",
+             "hot water boiler",
              "burner (direct heating)",
              "burner (indirect heating)",
              "compression chiller",
@@ -80,11 +88,18 @@ EQUIPTYPE = ["compression heat pump",
              "CHP gas turbine",
              "CHP fuel cell"]
 
+HPIndex = 0
+BBIndex = 2
+CHIndex = 8
+STIndex = 10
+CHPIndex = 13
+
 #translatable dictionary
 TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
              "thermal heat pump":_("thermal heat pump"),
              "steam boiler":_("steam boiler"),
              "condensing boiler":_("condensing boiler"),
+             "hot water boiler":_("hot water boiler"),
              "burner (direct heating)":_("burner (direct heating)"),
              "burner (indirect heating)":_("burner (indirect heating)"),
              "compression chiller":_("compression chiller"),
@@ -97,29 +112,17 @@ TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
              "CHP gas turbine":_("CHP gas turbine"),
              "CHP fuel cell":_("CHP fuel cell")}
 
+BBTYPES = ["condensing boiler",
+           "steam boiler",
+           "hot water boiler",
+           "burner (direct heating)",
+           "burner (indirect heating)"]
 
-EQUIPMENTSUBTYPE = ["condensing",
-               "steam",
-               "direct heating",
-               "indirect heating",
-               "compression",
-               "thermal",
-               "flat-plate",
-               "evacuated tubes",
-               "concentrating solar systems",
-               "steam turbine",
-               "gas turbine",
-               "engine",
-               "fuel cell",
-               "plate HX (liquid-liquid)",
-               "plate HX (air-air)",
-               "shell&tube HX (liquid-liquid)",
-               "finned tubes (liquid-air)"]
+HPTYPES = ["compression",
+           "thermal"]
 
-BBTYPES = [EQUIPMENTSUBTYPE[0], EQUIPMENTSUBTYPE[1]]
-HPTYPES = [EQUIPMENTSUBTYPE[4], EQUIPMENTSUBTYPE[5]]
-TRANSHPTYPES = {"compression":_("compression"),
-                "thermal":_("thermal")}
+TRANSHPTYPES = {HPTYPES[0]:_(HPTYPES[0]),
+                HPTYPES[1]:_(HPTYPES[1])}
 
 STTYPES = [ "Flat-plate collector",
             "Evacuated tube collector",
@@ -140,6 +143,24 @@ TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
                 "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
                 }
 
+EQUIPMENTSUBTYPE = [BBTYPES[0],
+                    BBTYPES[1],
+                    BBTYPES[2],
+                    BBTYPES[3],
+                    BBTYPES[4],
+               "compression",
+               "thermal",
+               "flat-plate",
+               "evacuated tubes",
+               "concentrating solar systems",
+               "steam turbine",
+               "gas turbine",
+               "engine",
+               "fuel cell",
+               "plate HX (liquid-liquid)",
+               "plate HX (air-air)",
+               "shell&tube HX (liquid-liquid)",
+               "finned tubes (liquid-air)"]
 
 EQUIPMENT = {"HP":                 # equipment class
              [(EQUIPTYPE[0],       # type of equipment, untranslated
@@ -149,10 +170,11 @@ EQUIPMENT = {"HP":                 # equipment class
 
               (EQUIPTYPE[1],_(EQUIPTYPE[1]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
 
-             "BB": [(EQUIPTYPE[2],_(EQUIPTYPE[2]),EQUIPMENTSUBTYPE[1],_(EQUIPMENTSUBTYPE[1])),
-                    (EQUIPTYPE[3],_(EQUIPTYPE[3]),EQUIPMENTSUBTYPE[0],_(EQUIPMENTSUBTYPE[0])),
-                    (EQUIPTYPE[4],_(EQUIPTYPE[4]),EQUIPMENTSUBTYPE[2],_(EQUIPMENTSUBTYPE[2])),
-                    (EQUIPTYPE[5],_(EQUIPTYPE[5]),EQUIPMENTSUBTYPE[3],_(EQUIPMENTSUBTYPE[3]))],
+             "BB": [(EQUIPTYPE[BBIndex+0],_(EQUIPTYPE[BBIndex+0]),BBTYPES[0],_(BBTYPES[0])),
+                    (EQUIPTYPE[BBIndex+1],_(EQUIPTYPE[BBIndex+1]),BBTYPES[1],_(BBTYPES[1])),
+                    (EQUIPTYPE[BBIndex+2],_(EQUIPTYPE[BBIndex+2]),BBTYPES[2],_(BBTYPES[2])),
+                    (EQUIPTYPE[BBIndex+3],_(EQUIPTYPE[BBIndex+3]),BBTYPES[3],_(BBTYPES[3])),
+                    (EQUIPTYPE[BBIndex+4],_(EQUIPTYPE[BBIndex+4]),BBTYPES[4],_(BBTYPES[4]))],
 
              "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),EQUIPMENTSUBTYPE[4],_(EQUIPMENTSUBTYPE[4])),
                     (EQUIPTYPE[7],_(EQUIPTYPE[7]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
