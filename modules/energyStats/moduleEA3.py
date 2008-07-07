@@ -51,28 +51,7 @@ class ModuleEA3(object):
     def __init__(self, keys):
         self.keys = keys # two grids, so a list of (2) keys
 
-        dummydata1 = array([['Equipname 1', 'Natural gas',  90.0,   16.36],
-                      ['Equipname 2', 'Natural gas',  90.0,   16.36],
-                      ['Equipname 3', 'Gas oil'    ,  50.0,  9.09],
-                      ['Equipname 4', 'LPG'        , 150.0, 27.27],
-                      ['Equipname 5', 'LPG'        , 150.0, 27.27],
-                      ['Equipname 6', 'Electricity',  20.0,  3.64],
-                      ['Total'      , ''           , 550.0, 100.00]])        
-                          
-        Status.int.setGraphicsData(self.keys[0], dummydata1)
-
-        dummydata2 = array([['Equipname 1',  76.5,  16.29],
-                      ['Equipname 2',  76.5,  16.29],
-                      ['Equipname 3',  42.5,   9.05],
-                      ['Equipname 4', 127.5,  27.16],
-                      ['Equipname 5', 127.5,  27.16],
-                      ['Equipname 6',  19.0 ,  4.05],
-                      ['Total'      , 469.5, 100.00]])
-
-        Status.int.setGraphicsData(self.keys[1], dummydata2)
-
         self.initModule()
-
 
     def initModule(self):
 #------------------------------------------------------------------------------

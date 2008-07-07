@@ -37,6 +37,10 @@
 
 import wx
 from einstein.modules.constants import *    #not needed here, but in the Panels !!!
+from einstein.modules.messageLogger import *
+
+#..............................................................................
+# color set-up for grids and static boxes
 
 ORANGE = '#FF6000'
 SOFTORANGE = '#FFA066'
@@ -53,6 +57,13 @@ GRID_BACKGROUND_COLOR_HIGHLIGHT = SOFTORANGE # idem
 GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
+#..............................................................................
+#..............................................................................
+#..............................................................................
+#   Several auxiliary functions for GUI 
+#..............................................................................
+#..............................................................................
+#..............................................................................
 
 #------------------------------------------------------------------------------
 def fillChoice(choice,choiceList,nonePossible=True):

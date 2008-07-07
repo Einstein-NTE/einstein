@@ -25,6 +25,7 @@
 #                           Hans Schweiger  21/06/2008
 #                           Tom Sobota      21/06/2008
 #                           Hans Schweiger  23/06/2008
+#                           Hans Schweiger  07/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
@@ -42,6 +43,8 @@
 #       21/06/2008      HS: bug-fix -> elimination of fsize in Fieldsizes
 #       21/06/2008      TS  General beautification and font awareness.
 #       23/06/2008      HS: filling of choices
+#       07/07/2008: HS  bug-fix: substitute self.check by check
+#                       (compatibility with new FloatEntry)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -390,7 +393,7 @@ class PanelQ5(wx.Panel):
 
         if Status.PId == 0:
 	    return
-        pipeName = self.check(self.tc1.GetValue())
+        pipeName = check(self.tc1.GetValue())
         pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
 	if pipeName != 'NULL' and len(pipes) == 0:
@@ -412,25 +415,25 @@ class PanelQ5(wx.Panel):
 
 	tmp = {
 		"Questionnaire_id":Status.PId,
-		"Pipeduct":self.check(self.tc1.GetValue()),
+		"Pipeduct":check(self.tc1.GetValue()),
                 
 		"HeatDistMedium":check(fluidID),                
 		"DistribCircFlow":check(massFlow), 
-		"ToutDistrib":self.check(self.tc5.GetValue()), 
-		"TreturnDistrib":self.check(self.tc6.GetValue()), 
-		"PercentRecirc":self.check(self.tc7.GetValue()), 
-		"Tfeedup":self.check(self.tc8.GetValue()), 
-		"PressDistMedium":self.check(self.tc9.GetValue()),
+		"ToutDistrib":check(self.tc5.GetValue()), 
+		"TreturnDistrib":check(self.tc6.GetValue()), 
+		"PercentRecirc":check(self.tc7.GetValue()), 
+		"Tfeedup":check(self.tc8.GetValue()), 
+		"PressDistMedium":check(self.tc9.GetValue()),
                 
-		"TotLengthDistPipe":self.check(self.tc11.GetValue()), 
-		"UDistPipe":self.check(self.tc12.GetValue()), 
-		"DDistPipe":self.check(self.tc13.GetValue()), 
-		"DeltaDistPipe":self.check(self.tc14.GetValue()), 		
-		"NumStorageUnits":self.check(self.tc15.GetValue()),  
-		"VUnitStorage":self.check(self.tc16.GetValue()),
+		"TotLengthDistPipe":check(self.tc11.GetValue()), 
+		"UDistPipe":check(self.tc12.GetValue()), 
+		"DDistPipe":check(self.tc13.GetValue()), 
+		"DeltaDistPipe":check(self.tc14.GetValue()), 		
+		"NumStorageUnits":check(self.tc15.GetValue()),  
+		"VUnitStorage":check(self.tc16.GetValue()),
                 "TypeStorage":check(findKey(TRANSSTORAGETYPES,self.tc17.GetValue(text=True))),
-		"PmaxStorage":self.check(self.tc18.GetValue()), 
-		"TmaxStorage":self.check(self.tc19.GetValue())
+		"PmaxStorage":check(self.tc18.GetValue()), 
+		"TmaxStorage":check(self.tc19.GetValue())
 	}
 	pipe.update(tmp)               
 	Status.SQL.commit()
@@ -476,13 +479,6 @@ class PanelQ5(wx.Panel):
         if len(pipes) > 0:
             for pipe in pipes:
                 self.listBoxDistributionList.Append (str(pipe.Pipeduct))
-
-
-    def check(self, value):
-        if value <> "" and value <> "None":
-            return value
-        else:
-            return 'NULL'
 
     def clear(self):
         self.tc1.SetValue('')

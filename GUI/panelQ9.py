@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
+#	Version No.: 0.09
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota      06/05/2008
 #                           Stoyan Danov    09/06/2008
@@ -21,6 +21,7 @@
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      03/07/2008
 #                           Hans Schweiger  03/07/2008
+#                           Hans Schweiger  07/07/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -28,8 +29,10 @@
 #       17/06/2008 SD   adapt to new unitdict
 #       18/06/2008 SD   create display(), add imports
 #                  HS: bug corrections and clean-up
-#       03/07/2008 TS   general layout fix.
-#                       some minor retouch in text and colour
+#       03/07/2008: TS  general layout fix.
+#                 : HS  some minor retouch in text and colour
+#       07/07/2008: HS  bug-fix: self.check -> GUITools-check
+#                       (compatibility with Tom's new FloatEntry)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -360,31 +363,31 @@ class PanelQ9(wx.Panel):
         if Status.PId <> 0 and \
 		len(Status.DB.questionnaire.Questionnaire_ID[Status.PId]) == 1:
             tmp = {
-                "InflationRate":self.check(self.tc1.GetValue()),
-                "FuelPriceRate":self.check(self.tc2.GetValue()),
-                "InterestExtFinancing":self.check(self.tc3.GetValue()),
-                "PercentExtFinancing":self.check(self.tc4.GetValue()),
-                "AmortisationTime":self.check(self.tc5.GetValue()),
-                "OMGenTot":self.check(self.tc10_1.GetValue()),
-                "OMGenOP":self.check(self.tc10_2.GetValue()),
-                "OMGenEP":self.check(self.tc10_3.GetValue()),
-                "OMGenFung":self.check(self.tc10_4.GetValue()),
-                "OMBuildTot":self.check(self.tc11_1.GetValue()),
-                "OMBuildOP":self.check(self.tc11_2.GetValue()),
-                "OMBuildEP":self.check(self.tc11_3.GetValue()),
-                "OMBiuildFung":self.check(self.tc11_4.GetValue()),
-                "OMMachEquipTot":self.check(self.tc12_1.GetValue()),
-                "OMMachEquipOP":self.check(self.tc12_2.GetValue()),
-                "OMMachEquipEP":self.check(self.tc12_3.GetValue()),
-                "OMMachEquipFung":self.check(self.tc12_4.GetValue()),
-                "OMHCGenDistTot":self.check(self.tc13_1.GetValue()),
-                "OMHCGenDistOP":self.check(self.tc13_2.GetValue()),
-                "OMHCGenDistEP":self.check(self.tc13_3.GetValue()),
-                "OMHCGenDistFung":self.check(self.tc13_4.GetValue()),
-                "OMTotalTot":self.check(self.tc14_1.GetValue()),
-                "OMTotalOP":self.check(self.tc14_2.GetValue()),
-                "OMTotalEP":self.check(self.tc14_3.GetValue()),
-                "OMTotalFung":self.check(self.tc14_4.GetValue())
+                "InflationRate":check(self.tc1.GetValue()),
+                "FuelPriceRate":check(self.tc2.GetValue()),
+                "InterestExtFinancing":check(self.tc3.GetValue()),
+                "PercentExtFinancing":check(self.tc4.GetValue()),
+                "AmortisationTime":check(self.tc5.GetValue()),
+                "OMGenTot":check(self.tc10_1.GetValue()),
+                "OMGenOP":check(self.tc10_2.GetValue()),
+                "OMGenEP":check(self.tc10_3.GetValue()),
+                "OMGenFung":check(self.tc10_4.GetValue()),
+                "OMBuildTot":check(self.tc11_1.GetValue()),
+                "OMBuildOP":check(self.tc11_2.GetValue()),
+                "OMBuildEP":check(self.tc11_3.GetValue()),
+                "OMBiuildFung":check(self.tc11_4.GetValue()),
+                "OMMachEquipTot":check(self.tc12_1.GetValue()),
+                "OMMachEquipOP":check(self.tc12_2.GetValue()),
+                "OMMachEquipEP":check(self.tc12_3.GetValue()),
+                "OMMachEquipFung":check(self.tc12_4.GetValue()),
+                "OMHCGenDistTot":check(self.tc13_1.GetValue()),
+                "OMHCGenDistOP":check(self.tc13_2.GetValue()),
+                "OMHCGenDistEP":check(self.tc13_3.GetValue()),
+                "OMHCGenDistFung":check(self.tc13_4.GetValue()),
+                "OMTotalTot":check(self.tc14_1.GetValue()),
+                "OMTotalOP":check(self.tc14_2.GetValue()),
+                "OMTotalEP":check(self.tc14_3.GetValue()),
+                "OMTotalFung":check(self.tc14_4.GetValue())
                   }
 
             q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]

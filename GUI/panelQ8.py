@@ -22,6 +22,7 @@
 #                           Stoyan Danov    18/06/2008
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      03/07/2008
+#                           Hans Schweiger  07/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -31,6 +32,8 @@
 #       18/06/2008 SD   create display(), add imports
 #                   HS: bug corrections and clean-up
 #       03/07/2008 TS   general layout fix.
+#       07/07/2008: HS  bug-fix: self.check - GUITools-check
+#                       (compatibility with Tom's new FloatEntry)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -398,7 +401,7 @@ class PanelQ8(wx.Panel):
     def OnButtonAddBuilding(self, event):
         if Status.PId <> 0:
 
-            buildingName = self.check(self.tc1.GetValue())
+            buildingName = check(self.tc1.GetValue())
             buildings = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
             if buildingName <> 'NULL' and len(buildings) == 0:
 
@@ -407,27 +410,27 @@ class PanelQ8(wx.Panel):
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
-                    "BuildName":self.check(self.tc1.GetValue()),
-                    "BuildConstructSurface":self.check(self.tc2.GetValue()),
-                    "BuildUsefulSurface":self.check(self.tc3.GetValue()),
-                    "BuildUsage":self.check(self.tc4.GetValue()),
-                    "BuildMaxHP":self.check(self.tc5.GetValue()),
-                    "BuildMaxCP":self.check(self.tc6.GetValue()),
-                    "BuildAnnualHeating":self.check(self.tc7.GetValue()),
-                    "BuildAnnualAirCond":self.check(self.tc8.GetValue()),
-                    "BuildDailyDHW":self.check(self.tc9.GetValue()),
-                    "BuildHoursOccup":self.check(self.tc10.GetValue()),
-                    "BuildDaysInUse":self.check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart1":self.check(self.tc12_10.GetValue()),
-                    "BuildHolidaysPeriodStop1":self.check(self.tc12_11.GetValue()),
-                    "BuildHolidaysPeriodStart2":self.check(self.tc12_20.GetValue()),
-                    "BuildHolidaysPeriodStop2":self.check(self.tc12_21.GetValue()),
-                    "BuildHolidaysPeriodStart3":self.check(self.tc12_30.GetValue()),
-                    "BuildHolidaysPeriodStop3":self.check(self.tc12_31.GetValue()),
-                    "BuildHeatingPeriodStart":self.check(self.tc13_1.GetValue()),
-                    "BuildHeatingPeriodStop":self.check(self.tc13_2.GetValue()),
-                    "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()),
-                    "BuildAirCondPeriodStop":self.check(self.tc14_2.GetValue())
+                    "BuildName":check(self.tc1.GetValue()),
+                    "BuildConstructSurface":check(self.tc2.GetValue()),
+                    "BuildUsefulSurface":check(self.tc3.GetValue()),
+                    "BuildUsage":check(self.tc4.GetValue()),
+                    "BuildMaxHP":check(self.tc5.GetValue()),
+                    "BuildMaxCP":check(self.tc6.GetValue()),
+                    "BuildAnnualHeating":check(self.tc7.GetValue()),
+                    "BuildAnnualAirCond":check(self.tc8.GetValue()),
+                    "BuildDailyDHW":check(self.tc9.GetValue()),
+                    "BuildHoursOccup":check(self.tc10.GetValue()),
+                    "BuildDaysInUse":check(self.tc11.GetValue()),
+                    "BuildHolidaysPeriodStart1":check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop1":check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart2":check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop2":check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart3":check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop3":check(self.tc12_31.GetValue()),
+                    "BuildHeatingPeriodStart":check(self.tc13_1.GetValue()),
+                    "BuildHeatingPeriodStop":check(self.tc13_2.GetValue()),
+                    "BuildAirCondPeriodStart":check(self.tc14_1.GetValue()),
+                    "BuildAirCondPeriodStop":check(self.tc14_2.GetValue())
                     }
 
                 q = Status.DB.qbuildings.QBuildings_ID[newID][0]
@@ -438,27 +441,27 @@ class PanelQ8(wx.Panel):
             elif buildingName <> 'NULL' and len(buildings) == 1:
 
                 tmp = {
-                    "BuildName":self.check(self.tc1.GetValue()),
-                    "BuildConstructSurface":self.check(self.tc2.GetValue()),
-                    "BuildUsefulSurface":self.check(self.tc3.GetValue()),
-                    "BuildUsage":self.check(self.tc4.GetValue()),
-                    "BuildMaxHP":self.check(self.tc5.GetValue()),
-                    "BuildMaxCP":self.check(self.tc6.GetValue()),
-                    "BuildAnnualHeating":self.check(self.tc7.GetValue()),
-                    "BuildAnnualAirCond":self.check(self.tc8.GetValue()),
-                    "BuildDailyDHW":self.check(self.tc9.GetValue()),
-                    "BuildHoursOccup":self.check(self.tc10.GetValue()),
-                    "BuildDaysInUse":self.check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart1":self.check(self.tc12_10.GetValue()),
-                    "BuildHolidaysPeriodStop1":self.check(self.tc12_11.GetValue()),
-                    "BuildHolidaysPeriodStart2":self.check(self.tc12_20.GetValue()),
-                    "BuildHolidaysPeriodStop2":self.check(self.tc12_21.GetValue()),
-                    "BuildHolidaysPeriodStart3":self.check(self.tc12_30.GetValue()),
-                    "BuildHolidaysPeriodStop3":self.check(self.tc12_31.GetValue()),
-                    "BuildHeatingPeriodStart":self.check(self.tc13_1.GetValue()),
-                    "BuildHeatingPeriodStop":self.check(self.tc13_2.GetValue()),
-                    "BuildAirCondPeriodStart":self.check(self.tc14_1.GetValue()),
-                    "BuildAirCondPeriodStop":self.check(self.tc14_2.GetValue())
+                    "BuildName":check(self.tc1.GetValue()),
+                    "BuildConstructSurface":check(self.tc2.GetValue()),
+                    "BuildUsefulSurface":check(self.tc3.GetValue()),
+                    "BuildUsage":check(self.tc4.GetValue()),
+                    "BuildMaxHP":check(self.tc5.GetValue()),
+                    "BuildMaxCP":check(self.tc6.GetValue()),
+                    "BuildAnnualHeating":check(self.tc7.GetValue()),
+                    "BuildAnnualAirCond":check(self.tc8.GetValue()),
+                    "BuildDailyDHW":check(self.tc9.GetValue()),
+                    "BuildHoursOccup":check(self.tc10.GetValue()),
+                    "BuildDaysInUse":check(self.tc11.GetValue()),
+                    "BuildHolidaysPeriodStart1":check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop1":check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart2":check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop2":check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart3":check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop3":check(self.tc12_31.GetValue()),
+                    "BuildHeatingPeriodStart":check(self.tc13_1.GetValue()),
+                    "BuildHeatingPeriodStop":check(self.tc13_2.GetValue()),
+                    "BuildAirCondPeriodStart":check(self.tc14_1.GetValue()),
+                    "BuildAirCondPeriodStop":check(self.tc14_2.GetValue())
                     }
                 q = buildings[0]
                 q.update(tmp)

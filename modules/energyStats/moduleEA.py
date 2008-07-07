@@ -158,20 +158,39 @@ class ModuleEA(object):
             FETiUnKnown = 0.0
             FETel = 0.0
             FETFuel = 0.0
+            FETHeat = 0.0
             FET = 0.0
+
+            USH = 0.0
+            QHX = 0.0
+            QWH = 0.0
 
             for equipe in equipments:
                 jc = equipe.CascadeIndex -  1
                 dFETFuel = Status.int.FETFuel_j[jc]
                 dFETel = Status.int.FETel_j[jc]
+                dFETHeat = 0.0  #to be added once needed
+                dUSH = Status.int.USHj[jc]
+                dQHX = Status.int.QHXj[jc]
+                dQWH = Status.int.QWHj[jc]
 
                 equipe.FETFuel_j = dFETFuel
                 equipe.FETel_j = dFETel
-                equipe.FETj = dFETel + dFETFuel #simple sum of fuel + electricity. doesn't make very much sense, but ... 
+                equipe.FETHeat_j = dFETHeat
+                equipe.FETj = dFETel + dFETFuel + dFETHeat #simple sum of fuel + electricity. doesn't make very much sense, but ... 
+
+                equipe.USHj = dUSH
+                equipe.QHXj = dQHX       
+                equipe.QWHj = dQWH
 
                 FET += dFETFuel + dFETel
                 FETFuel += dFETFuel
                 FETel += dFETel
+                FETHeat += dFETHeat
+
+                USH += dUSH
+                QHX += dQHX
+                QWH += dQWH
 
                 fuelID = equipe.DBFuel_id
                 if fuelID in fuelList:
@@ -189,6 +208,8 @@ class ModuleEA(object):
 
                 if equipe.FETFuel_j > 0:
                     equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETFuel_j
+                elif equipe.FETHeat_j > 0:
+                    equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETHeat_j
                 elif equipe.FETel_j > 0:
                     equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETel_j
                 else:
@@ -232,7 +253,8 @@ class ModuleEA(object):
                 electricity.ElectricityTotYear = generalData.FECel
                 logDebug("ModuleEA (cEEBalances): No entry found in FEOel. Set to zero !!!")
 
-            generalData.FET = FETel + FETFuels  #total FET as simple sum
+            generalData.FET = FET  #total FET as simple sum
+            generalData.USH = USH  #total USH
 
 #..............................................................................
 #..............................................................................

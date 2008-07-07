@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.15
+#	Version No.: 0.16
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -27,6 +27,8 @@
 #                           Stoyan Danov    18/06/2008
 #                           Tom Sobota      21/06/2008
 #                           Hans Schweiger  23/06/2008
+#                           Hans Schweiger  03/07/2008
+#                           Hans Schweiger  07/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
@@ -45,6 +47,9 @@
 #       21/06/2008 TS   general layout beautification. Adapt to font awareness.
 #       23/06/2008  HS  small changes in eventhandlers (missing adaptations to
 #                       new ChoiceEntry ...
+#       03/07/2008: HS  adjustment of column with in table electricity; 
+#       07/07/2008: HS  bug-fix: self.check substituted by GUITools->check
+#                       the old one didn't work with Tom's new FloatEntry
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -77,15 +82,25 @@ LABEL_WIDTH_LEFT  = 220
 DATA_ENTRY_WIDTH  = 100
 UNITS_WIDTH       = 110
 
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class PanelQ2(wx.Panel):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def __init__(self, parent, main):
+#------------------------------------------------------------------------------
 	self.main = main
         paramlist = HelperClass.ParameterDataHelper()
         self.PList = paramlist.ReadParameterData()
         self._init_ctrls(parent)
         self.__do_layout()
        
+#------------------------------------------------------------------------------
     def _init_ctrls(self, parent):
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 #--- UI setup
@@ -108,7 +123,12 @@ class PanelQ2(wx.Panel):
         self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
 
         self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Fuels list"))
+        self.sizer_3_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_3_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Fuel consumption data"))
+        self.sizer_5_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_5_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         # set font for titles
         # 1. save actual font parameters on the stack
@@ -196,10 +216,10 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         self.grid.EnableGridLines(True)
         self.grid.CreateGrid(9, 6)
 
-        self.grid.SetDefaultColSize(100, resizeExistingCols=False)
+        self.grid.SetDefaultColSize(90, resizeExistingCols=False)
         self.grid.SetDefaultRowSize(23, resizeExistingRows=False)
 
-        self.grid.SetRowLabelSize(250)
+        self.grid.SetRowLabelSize(215)
         
         
         attr = wx.grid.GridCellAttr()
@@ -237,15 +257,15 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         self.grid.SetColLabelValue(4,_('Self-generation'))
         self.grid.SetColLabelValue(5,_('Sales to grid'))
 
-        self.grid.SetRowLabelValue(0,_('Annual consumption MWh/year'))
-        self.grid.SetRowLabelValue(1,_('Contracted power kW'))
+        self.grid.SetRowLabelValue(0,_('Annual consumption [MWh]'))
+        self.grid.SetRowLabelValue(1,_('Contracted power [kW]'))
         self.grid.SetRowLabelValue(2,_('Tariff type'))
-        self.grid.SetRowLabelValue(3,_('Tariff on installed power EUR/kW month'))
-        self.grid.SetRowLabelValue(4,_('Tariff on consumption EUR/kWh'))
-        self.grid.SetRowLabelValue(5,_('Annual electricity cost EUR/MWh'))
+        self.grid.SetRowLabelValue(3,_('Tariff installed power [EUR/kW.month]'))
+        self.grid.SetRowLabelValue(4,_('Tariff on consumption [EUR/kWh]'))
+        self.grid.SetRowLabelValue(5,_('Annual electricity cost [EUR]'))
         self.grid.SetRowLabelValue(6,_('Electric consumption -'))
         self.grid.SetRowLabelValue(7,_('according type of use'))
-        self.grid.SetRowLabelValue(8,_('Annual consumption MWh/year'))
+        self.grid.SetRowLabelValue(8,_('Annual consumption [MWh]'))
 
         self.grid.SetRowLabelAlignment(wx.LEFT, wx.BOTTOM)
 
@@ -356,10 +376,10 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
                 newID = Status.prj.addFuelDummy()
                 tmp = {
                     "DBFuel_id":dbfid,
-                    "MFuelYear":self.check(self.tc3.GetValue()), 
-                    "FECFuel":self.check(self.tc4.GetValue()),
-                    "FuelTariff":self.check(self.tc5.GetValue()),
-                    "FuelCostYear":self.check(self.tc6.GetValue())
+                    "MFuelYear":check(self.tc3.GetValue()), 
+                    "FECFuel":check(self.tc4.GetValue()),
+                    "FuelTariff":check(self.tc5.GetValue()),
+                    "FuelCostYear":check(self.tc6.GetValue())
                     }
                 
                 q = Status.DB.qfuel.QFuel_ID[newID][0]
@@ -371,10 +391,10 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
             elif len(fuels) == 1:
                 tmp = {
                     "DBFuel_id":dbfid,
-                    "MFuelYear":self.check(self.tc3.GetValue()), 
-                    "FECFuel":self.check(self.tc4.GetValue()),
-                    "FuelTariff":self.check(self.tc5.GetValue()),
-                    "FuelCostYear":self.check(self.tc6.GetValue())
+                    "MFuelYear":check(self.tc3.GetValue()), 
+                    "FECFuel":check(self.tc4.GetValue()),
+                    "FuelTariff":check(self.tc5.GetValue()),
+                    "FuelCostYear":check(self.tc6.GetValue())
                     }
                 
                 q = Status.DB.qfuel.DBFuel_id[dbfid].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
@@ -391,42 +411,42 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
-                    "PowerContrTot":self.check(self.grid.GetCellValue(1, 3)),
-                    "PowerContrStd":self.check(self.grid.GetCellValue(1, 1)),
-                    "PowerContrPeak":self.check(self.grid.GetCellValue(1, 0)),
-                    "PowerContrVall":self.check(self.grid.GetCellValue(1, 2)),
-                    "ElectricityTotYear":self.check(self.grid.GetCellValue(0, 3)),
-                    "ElectricityPeakYear":self.check(self.grid.GetCellValue(0, 0)),
-                    "ElectricityStandYear":self.check(self.grid.GetCellValue(0, 1)),
-                    "ElectricityValleyYear":self.check(self.grid.GetCellValue(0, 2)),
-                    "ElGenera":self.check(self.grid.GetCellValue(0, 4)),
-                    "ElSales":self.check(self.grid.GetCellValue(0, 5)),
-                    "ElectricityRef":self.check(self.grid.GetCellValue(8, 0)),
-                    "ElectricityAC":self.check(self.grid.GetCellValue(8, 1)),
-                    "ElectricityThOther":self.check(self.grid.GetCellValue(8, 2)),
-                    "ElectricityMotors":self.check(self.grid.GetCellValue(8, 3)),
-                    "ElectricityChem":self.check(self.grid.GetCellValue(8, 4)),
-                    "ElectricityLight":self.check(self.grid.GetCellValue(8, 5)),
-                    "ElTariffClassTot":self.check(self.grid.GetCellValue(2, 3)),
-                    "ElTariffClassStd":self.check(self.grid.GetCellValue(2, 1)),
-                    "ElTariffClassPeak":self.check(self.grid.GetCellValue(2, 0)),
-                    "ElTariffClassTotVall":self.check(self.grid.GetCellValue(2, 2)),
-                    "ElTariffClassCHP":self.check(self.grid.GetCellValue(2, 5)),
-                    "ElTariffPowTot":self.check(self.grid.GetCellValue(3, 3)),
-                    "ElTariffPowStd":self.check(self.grid.GetCellValue(3, 1)),
-                    "ElTariffPowPeak":self.check(self.grid.GetCellValue(3, 0)),
-                    "ElTariffPowVall":self.check(self.grid.GetCellValue(3, 2)),
-                    "ElTariffPowCHP":self.check(self.grid.GetCellValue(3, 5)),
-                    "ElTariffCTot":self.check(self.grid.GetCellValue(4, 3)),
-                    "ElTariffCStd":self.check(self.grid.GetCellValue(4, 1)),
-                    "ElTariffCPeak":self.check(self.grid.GetCellValue(4, 0)),
-                    "ElTariffCVall":self.check(self.grid.GetCellValue(4, 2)),
-                    "ETariffCHP":self.check(self.grid.GetCellValue(4, 5)),
-                    "ElCostYearTot":self.check(self.grid.GetCellValue(5, 3)),
-                    "ElCostYearStd":self.check(self.grid.GetCellValue(5, 1)),
-                    "ElCostYearPeak":self.check(self.grid.GetCellValue(5, 0)),
-                    "ElCostYearVall":self.check(self.grid.GetCellValue(5, 2)),
-                    "ElSalesYearCHP":self.check(self.grid.GetCellValue(5, 5))
+                    "PowerContrTot":check(self.grid.GetCellValue(1, 3)),
+                    "PowerContrStd":check(self.grid.GetCellValue(1, 1)),
+                    "PowerContrPeak":check(self.grid.GetCellValue(1, 0)),
+                    "PowerContrVall":check(self.grid.GetCellValue(1, 2)),
+                    "ElectricityTotYear":check(self.grid.GetCellValue(0, 3)),
+                    "ElectricityPeakYear":check(self.grid.GetCellValue(0, 0)),
+                    "ElectricityStandYear":check(self.grid.GetCellValue(0, 1)),
+                    "ElectricityValleyYear":check(self.grid.GetCellValue(0, 2)),
+                    "ElGenera":check(self.grid.GetCellValue(0, 4)),
+                    "ElSales":check(self.grid.GetCellValue(0, 5)),
+                    "ElectricityRef":check(self.grid.GetCellValue(8, 0)),
+                    "ElectricityAC":check(self.grid.GetCellValue(8, 1)),
+                    "ElectricityThOther":check(self.grid.GetCellValue(8, 2)),
+                    "ElectricityMotors":check(self.grid.GetCellValue(8, 3)),
+                    "ElectricityChem":check(self.grid.GetCellValue(8, 4)),
+                    "ElectricityLight":check(self.grid.GetCellValue(8, 5)),
+                    "ElTariffClassTot":check(self.grid.GetCellValue(2, 3)),
+                    "ElTariffClassStd":check(self.grid.GetCellValue(2, 1)),
+                    "ElTariffClassPeak":check(self.grid.GetCellValue(2, 0)),
+                    "ElTariffClassTotVall":check(self.grid.GetCellValue(2, 2)),
+                    "ElTariffClassCHP":check(self.grid.GetCellValue(2, 5)),
+                    "ElTariffPowTot":check(self.grid.GetCellValue(3, 3)),
+                    "ElTariffPowStd":check(self.grid.GetCellValue(3, 1)),
+                    "ElTariffPowPeak":check(self.grid.GetCellValue(3, 0)),
+                    "ElTariffPowVall":check(self.grid.GetCellValue(3, 2)),
+                    "ElTariffPowCHP":check(self.grid.GetCellValue(3, 5)),
+                    "ElTariffCTot":check(self.grid.GetCellValue(4, 3)),
+                    "ElTariffCStd":check(self.grid.GetCellValue(4, 1)),
+                    "ElTariffCPeak":check(self.grid.GetCellValue(4, 0)),
+                    "ElTariffCVall":check(self.grid.GetCellValue(4, 2)),
+                    "ETariffCHP":check(self.grid.GetCellValue(4, 5)),
+                    "ElCostYearTot":check(self.grid.GetCellValue(5, 3)),
+                    "ElCostYearStd":check(self.grid.GetCellValue(5, 1)),
+                    "ElCostYearPeak":check(self.grid.GetCellValue(5, 0)),
+                    "ElCostYearVall":check(self.grid.GetCellValue(5, 2)),
+                    "ElSalesYearCHP":check(self.grid.GetCellValue(5, 5))
                     }
                 
                 Status.DB.qelectricity.insert(tmp)
@@ -435,42 +455,42 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
             elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 1:
                 q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
                 tmp = {                    
-                    "PowerContrTot":self.check(self.grid.GetCellValue(1, 3)),
-                    "PowerContrStd":self.check(self.grid.GetCellValue(1, 1)),
-                    "PowerContrPeak":self.check(self.grid.GetCellValue(1, 0)),
-                    "PowerContrVall":self.check(self.grid.GetCellValue(1, 2)),
-                    "ElectricityTotYear":self.check(self.grid.GetCellValue(0, 3)),
-                    "ElectricityPeakYear":self.check(self.grid.GetCellValue(0, 0)),
-                    "ElectricityStandYear":self.check(self.grid.GetCellValue(0, 1)),
-                    "ElectricityValleyYear":self.check(self.grid.GetCellValue(0, 2)),
-                    "ElGenera":self.check(self.grid.GetCellValue(0, 4)),
-                    "ElSales":self.check(self.grid.GetCellValue(0, 5)),
-                    "ElectricityRef":self.check(self.grid.GetCellValue(8, 0)),
-                    "ElectricityAC":self.check(self.grid.GetCellValue(8, 1)),
-                    "ElectricityThOther":self.check(self.grid.GetCellValue(8, 2)),
-                    "ElectricityMotors":self.check(self.grid.GetCellValue(8, 3)),
-                    "ElectricityChem":self.check(self.grid.GetCellValue(8, 4)),
-                    "ElectricityLight":self.check(self.grid.GetCellValue(8, 5)),
-                    "ElTariffClassTot":self.check(self.grid.GetCellValue(2, 3)),
-                    "ElTariffClassStd":self.check(self.grid.GetCellValue(2, 1)),
-                    "ElTariffClassPeak":self.check(self.grid.GetCellValue(2, 0)),
-                    "ElTariffClassTotVall":self.check(self.grid.GetCellValue(2, 2)),
-                    "ElTariffClassCHP":self.check(self.grid.GetCellValue(2, 5)),
-                    "ElTariffPowTot":self.check(self.grid.GetCellValue(3, 3)),
-                    "ElTariffPowStd":self.check(self.grid.GetCellValue(3, 1)),
-                    "ElTariffPowPeak":self.check(self.grid.GetCellValue(3, 0)),
-                    "ElTariffPowVall":self.check(self.grid.GetCellValue(3, 2)),
-                    "ElTariffPowCHP":self.check(self.grid.GetCellValue(3, 5)),
-                    "ElTariffCTot":self.check(self.grid.GetCellValue(4, 3)),
-                    "ElTariffCStd":self.check(self.grid.GetCellValue(4, 1)),
-                    "ElTariffCPeak":self.check(self.grid.GetCellValue(4, 0)),
-                    "ElTariffCVall":self.check(self.grid.GetCellValue(4, 2)),
-                    "ETariffCHP":self.check(self.grid.GetCellValue(4, 5)),
-                    "ElCostYearTot":self.check(self.grid.GetCellValue(5, 3)),
-                    "ElCostYearStd":self.check(self.grid.GetCellValue(5, 1)),
-                    "ElCostYearPeak":self.check(self.grid.GetCellValue(5, 0)),
-                    "ElCostYearVall":self.check(self.grid.GetCellValue(5, 2)),
-                    "ElSalesYearCHP":self.check(self.grid.GetCellValue(5, 5))
+                    "PowerContrTot":check(self.grid.GetCellValue(1, 3)),
+                    "PowerContrStd":check(self.grid.GetCellValue(1, 1)),
+                    "PowerContrPeak":check(self.grid.GetCellValue(1, 0)),
+                    "PowerContrVall":check(self.grid.GetCellValue(1, 2)),
+                    "ElectricityTotYear":check(self.grid.GetCellValue(0, 3)),
+                    "ElectricityPeakYear":check(self.grid.GetCellValue(0, 0)),
+                    "ElectricityStandYear":check(self.grid.GetCellValue(0, 1)),
+                    "ElectricityValleyYear":check(self.grid.GetCellValue(0, 2)),
+                    "ElGenera":check(self.grid.GetCellValue(0, 4)),
+                    "ElSales":check(self.grid.GetCellValue(0, 5)),
+                    "ElectricityRef":check(self.grid.GetCellValue(8, 0)),
+                    "ElectricityAC":check(self.grid.GetCellValue(8, 1)),
+                    "ElectricityThOther":check(self.grid.GetCellValue(8, 2)),
+                    "ElectricityMotors":check(self.grid.GetCellValue(8, 3)),
+                    "ElectricityChem":check(self.grid.GetCellValue(8, 4)),
+                    "ElectricityLight":check(self.grid.GetCellValue(8, 5)),
+                    "ElTariffClassTot":check(self.grid.GetCellValue(2, 3)),
+                    "ElTariffClassStd":check(self.grid.GetCellValue(2, 1)),
+                    "ElTariffClassPeak":check(self.grid.GetCellValue(2, 0)),
+                    "ElTariffClassTotVall":check(self.grid.GetCellValue(2, 2)),
+                    "ElTariffClassCHP":check(self.grid.GetCellValue(2, 5)),
+                    "ElTariffPowTot":check(self.grid.GetCellValue(3, 3)),
+                    "ElTariffPowStd":check(self.grid.GetCellValue(3, 1)),
+                    "ElTariffPowPeak":check(self.grid.GetCellValue(3, 0)),
+                    "ElTariffPowVall":check(self.grid.GetCellValue(3, 2)),
+                    "ElTariffPowCHP":check(self.grid.GetCellValue(3, 5)),
+                    "ElTariffCTot":check(self.grid.GetCellValue(4, 3)),
+                    "ElTariffCStd":check(self.grid.GetCellValue(4, 1)),
+                    "ElTariffCPeak":check(self.grid.GetCellValue(4, 0)),
+                    "ElTariffCVall":check(self.grid.GetCellValue(4, 2)),
+                    "ETariffCHP":check(self.grid.GetCellValue(4, 5)),
+                    "ElCostYearTot":check(self.grid.GetCellValue(5, 3)),
+                    "ElCostYearStd":check(self.grid.GetCellValue(5, 1)),
+                    "ElCostYearPeak":check(self.grid.GetCellValue(5, 0)),
+                    "ElCostYearVall":check(self.grid.GetCellValue(5, 2)),
+                    "ElSalesYearCHP":check(self.grid.GetCellValue(5, 5))
                     }
                 q.update(tmp)
                 Status.SQL.commit()
@@ -575,12 +595,6 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
                 except:
                     fuelName = "unknown fuel"
                 self.fuelListBox.Append(fuelName)
-
-    def check(self, value):
-        if value <> "" and value <> "None":
-            return value
-        else:
-            return 'NULL'
 
     def clearFuelData(self):
 ##        self.tc2.SetValue('')
