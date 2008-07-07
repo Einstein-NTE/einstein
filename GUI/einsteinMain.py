@@ -488,7 +488,8 @@ class EinsteinFrame(wx.Frame):
 #..............................................................................
 # grid for displaying alternatives
 
-        self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
+       # self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
+        self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - the tool that never fails ..."),
                                  pos = (10,10),size=(780,580))
         
 #        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
@@ -496,7 +497,7 @@ class EinsteinFrame(wx.Frame):
         self.box1.SetForegroundColour(ORANGE)
         self.box1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','zunge.jpg'),
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','martillo.jpg'),
                                              wx.BITMAP_TYPE_JPEG),
                                              id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
                                              parent=self.pageTitle,
