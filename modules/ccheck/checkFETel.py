@@ -184,7 +184,7 @@ class CheckFETel():
                 qelectricity.ElectricityRef = self.ElectricityRef.val
                 qelectricity.ElectricityAC = self.ElectricityAC.val
                 qelectricity.ElectricityThOther = self.ElectricityThOther.val
-                qelectricity.ElGenera = 99.99
+                qelectricity.ElGenera = self.ElectricityGen.val
 
                 Status.SQL.commit()
                 

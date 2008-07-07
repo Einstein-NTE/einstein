@@ -90,7 +90,7 @@ def setCheckMode(mode):
     global CHECKMODE
     CHECKMODE = mode
     
-DEBUG = "OFF" #Set to:
+DEBUG = "BASIC" #Set to:
                 #"ALL": highest level,
                 #"CALC": only debug in CALC Functions
                 #"ADJUST": only debug in ADJUST Functions
@@ -200,8 +200,13 @@ class CCPar():
         cleanTrack = []
         for entry in self.track:            
             if entry not in cleanTrack:
-                cleanTrack.append(entry)
+                if len(cleanTrack) < 10:
+                    cleanTrack.append(entry)
+                elif (len(cleanTrack)==10):
+                    cleanTrack.append("etc.")
+                    break                
         self.track = cleanTrack
+        
 
 #------------------------------------------------------------------------------
     def setValue(self,val,err=DEFAULT_SQERR):
@@ -865,7 +870,7 @@ def calcFlow(Qdotname,cp,m,T1,T0,DT,DT1):
 
     diff = calcDiff(DT.name,T1,T0)
     
-    DT.update(diff)
+    DT1.update(diff)    #calcFlow modifies DT1 <-> adjustflow modifies DT !!!
     ccheck1(DT,DT1)
     
     if DEBUG in ["ALL","CALC"]:
@@ -1803,6 +1808,45 @@ def ccheck2(y0,y1,y2):
 #..............................................................................
 
     if DEBUG in ["ALL","CHECK"]:
+        print "CCheck1_(before...)________________________________"
+        y0.show()
+        y1.show()
+        y2.show()
+        print "________________________________Mode = ",CHECKMODE
+
+    row = CCRow("ccheck2-row",3)
+    y = CCPar("ccheck2-y")
+    
+    row[0] = y0
+    row[1] = y1
+    row[2] = y2
+                
+    if CHECKMODE == "BEST":
+        y = bestOfRow(row,3)
+    else:
+        y = meanOfRow(row,3)
+
+    y0.update(y)
+    y1.update(y)
+    y2.update(y)
+
+    if DEBUG in ["ALL","CHECK"]:
+        print "CCheck2_(... and after adjustment)_________________"
+        y0.show()
+        y1.show()
+        y2.show()
+        print "___________________________________________________"
+    
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+def ccheck2old(y0,y1,y2):
+#------------------------------------------------------------------------------
+#   Carries out consistency checking of the actual value with two externally
+#   calculated inputs.
+#------------------------------------------------------------------------------
+#..............................................................................
+
+    if DEBUG in ["ALL","CHECK"]:
         print "CCheck2_(before...)________________________________"
         y0.show()
         y1.show()
@@ -2031,18 +2075,32 @@ def checkIfConflict(y1,y2):
 #------------------------------------------------------------------------------
 #..............................................................................
 
-    dif=abs(y1.val-y2.val)
-    maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
-    
-    if dif > maxDif + NUMERIC_ERR:
+    if y1.val is not None and y2.val is not None:
+        dif=abs(y1.val-y2.val)
+        maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
+        
+        if dif > maxDif + NUMERIC_ERR:
+            print "======================================================"
+            print "WARNING !!!! "
+            print "CCheckFunctions (checkIfConflict): contradiction found"
+            print "-> stochastic error !!!"
+            y1.show()
+            y2.show()
+            print "dif = ",dif," maxDif = ",maxDif
+            print "======================================================"
+            conflict.screen(y1,y2,dif,maxDif)
+
+    difLimits = max(y2.valMin - y1.valMax,y1.valMin - y2.valMax)
+    if difLimits > 0:
         print "======================================================"
         print "WARNING !!!! "
         print "CCheckFunctions (checkIfConflict): contradiction found"
+        print "-> absolute limits error !!!"
         y1.show()
         y2.show()
-        print "dif = ",dif," maxDif = ",maxDif
+        print "difLimits = ",difLimits
         print "======================================================"
-        conflict.screen(y1,y2,dif,maxDif)
+        conflict.screen(y1,y2,difLimits,0.0)
         
 
     
@@ -2096,19 +2154,23 @@ def bestOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
+    checkIfConflict(y1,y2)
+
     if (y1.sqerr < y2.sqerr):
             best = y1
     else:
             best = y2
-    
 
+# adding too much tracks gave problems ... -> back to the roots
+# just following the track of the best
+#    best.track = []
+#    best.track.extend(y1.track)
+#    best.track.extend(y2.track)
+        
     best.valMin = max(y1.valMin,y2.valMin)
     best.valMax = min(y1.valMax,y2.valMax)
-
     best.constrain()
 
-    checkIfConflict(y1,y2)
-    
     return best   
 
 #------------------------------------------------------------------------------
@@ -2132,11 +2194,17 @@ def bestOfRow(row,m):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
-    best = CCPar("bestOfRow")
-    best.val = INFINITE
     for i in range(m):
         if row[i].val is not None:
-            best = bestOf(best,row[i])
+            for j in range(i+1,m):
+                if row[j].val is not None:
+                    checkIfConflict(row[i],row[j])
+
+    best = CCPar("")
+    best.val = 1.0
+    
+    for i in range(m):
+        best = bestOf(best,row[i])
     
     return best   
 
@@ -2148,8 +2216,17 @@ def meanValueOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
+    checkIfConflict(y1,y2)
+
     mean = CCPar("meanValueOf")
-    mean.track = trackBestOf(y1,y2)
+
+#    mean.track = trackBestOf(y1,y2)
+# adding too much tracks gave problems ... -> back to the roots
+# just following the track of the best
+    mean.track = trackBestOf(y1,y2) #assure that the best comes first
+    mean.track.extend(y1.track)
+    mean.track.extend(y2.track)
+    mean.cleanUp()
 
 #    sumSqErr = pow(y1.sqerr,2) + pow(y2.sqerr,2)
     sumSqDev = y1.calcDev() + y2.calcDev()
@@ -2183,9 +2260,7 @@ def meanValueOf(y1,y2):
     mean.calcErr()
 
     mean.constrain()
-    
-    checkIfConflict(y1,y2)
-    
+        
     return mean   
 
 #------------------------------------------------------------------------------
@@ -2196,8 +2271,16 @@ def meanValueOf3(y1,y2,y3):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
+    checkIfConflict(y1,y2)
+    checkIfConflict(y1,y3)
+    checkIfConflict(y2,y3)
+
     mean = CCPar("meanValueOf3")
-    mean.track = trackBestOf3(y1,y2,y3)
+    mean.track = trackBestOf3(y1,y2,y3) #assure that best comes first
+    mean.track.extend(y1.track)
+    mean.track.extend(y2.track)
+    mean.track.extend(y3.track)
+    mean.cleanUp()
 
     sumSqDev = y1.calcDev() + y2.calcDev() + y3.calcDev()
     
@@ -2253,10 +2336,6 @@ def meanValueOf3(y1,y2,y3):
             
     mean.constrain()
 
-    checkIfConflict(y1,y2)
-    checkIfConflict(y1,y3)
-    checkIfConflict(y2,y3)
-
     return mean   
 
 #------------------------------------------------------------------------------
@@ -2266,8 +2345,17 @@ def meanOfRow(row,m):
 #   Calculates the mean value of a row of CCPar values
 #------------------------------------------------------------------------------
 
+    for i in range(m):
+        if row[i].val is not None:
+            for j in range(i+1,m):
+                if row[j].val is not None:
+                    checkIfConflict(row[i],row[j])
+
     mean = CCPar("meanOfRow")
-    mean.track = trackBestOfRow(row,m)
+    mean.track = trackBestOfRow(row,m)  #assure that best comes first
+    for i in range(m):
+        mean.track.extend(row[i].track)
+    mean.cleanUp()
 
     if DEBUG in ["ALL","ADJUST"]:
         print "meanOfRow__________________________________________"
@@ -2299,12 +2387,6 @@ def meanOfRow(row,m):
         mean.calcErr()
 
     mean.constrain()
-
-    for i in range(m):
-        if row[i].val is not None:
-            for j in range(i+1,m):
-                if row[j].val is not None:
-                    checkIfConflict(row[i],row[j])
     
     if DEBUG in ["ALL","ADJUST"]:
         mean.show()

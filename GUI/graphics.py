@@ -11,14 +11,10 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.02
 #	Created by: 	    Tom Sobota	28/03/2008
 #
-#       Last modified by:   Hans Schweiger 04/07/2008
-#
 #       Changes to previous version:
-#       04/07/2008: HS  ignoredrows activated also in stackedBarPlot
-#                       TAKE CARE -> others still missing !!!!!
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -139,10 +135,10 @@ def drawPiePlot(self):
     if len(theValues) == 0:
         #oh oh ... no values -> no graphic
         return
-
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-        self.figure.set_facecolor(backcolor)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.set_facecolor(backcolor)
 
     self.subplot.set_title(title, TITLE_FONT_DICT)
     #
@@ -227,11 +223,16 @@ def drawStackedBarPlot(self):
     except KeyError:
         ignoredrows = []
 
-        
     try:
-        # make a local copy of the transposed data matrix
-        data = Interfaces.GData[key].transpose()
-        # transpose the matrix so each row is a dataset
+        # make a copy of the array without the ignored rows
+        (rows,cols) = Interfaces.GData[key].shape
+        rowList = []
+        for r in range(rows):
+            if r not in ignoredrows:
+                rowList.append(Interfaces.GData[key][r])
+
+        # simultaneously transpose the matrix so each row is a dataset
+        data = array(rowList).transpose()
         # now, row 0 are the vert. labels
         (rows,cols) = data.shape
     except:
@@ -240,45 +241,33 @@ def drawStackedBarPlot(self):
         return
 
     # load the x tick labels
-    labelrow = data[0]
-    xticklabels = labelrow[1:cols-1]
+    xticklabels = data[0]
     # if the legend has been given as a parameter, use it
     # if not, take the texts from col 0
     legendlabels = []
     if len(legend)>0:
         legendlabels = legend
     legendptr = []
-    vx = arange(len(labelrow[1:cols-1])) # intervals on x
-    width = 0.8                          # the width of the bars
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-        self.figure.set_facecolor(backcolor)
+    vx = arange(cols) # intervals on x
+    width = 0.9                          # the width of the bars
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.set_facecolor(backcolor)
 
-    print "GRAPHICS - data = "
-    print data
-    
-    for r in range(1,rows-1):   
-
-########################################################################
-########################################################################
-### HS: "ignoredrows-check" added
-########################################################################
-########################################################################
-        plotted_r = 0 #HS. added
-        if r not in ignoredrows:
-            plotted_r +=1 #HS. added
-
-            row = data[r]
-            print "Graphics r / plotted_r [%s/%s]"%(r,plotted_r),row
-            if len(legend) <= 0:
-                legendlabels.append(row[0].replace("\n"," "))
-            floatdata = map(lambda a: float(a), row[1:cols-1])
-            if plotted_r == 1: #HS. changed r to plotted_r
-                p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8])
-            else:
-                p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8], bottom=previous)
-            legendptr.append(p[0])
-            previous = floatdata[:]
+    # for all rows except 0, which has the labels
+    for r in range(1,rows):
+        row = data[r]
+        if len(legend) <= 0:
+            legendlabels.append(row[0].replace("\n"," "))
+        #floatdata = map(lambda a: float(a), row[0:cols])
+        floatdata = map(lambda a: float(a), row)
+        if r == 1:
+            p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8])
+        else:
+            p = self.subplot.bar(vx, floatdata, width, color=COLORTABLE[r % 8], bottom=previous)
+        legendptr.append(p[0])
+        previous = floatdata[:]
 
     self.subplot.axes.set_ylabel(ylabel)
     self.subplot.set_title(title, TITLE_FONT_DICT)
@@ -372,9 +361,15 @@ def drawSimpleBarPlot(self):
 
 
     try:
-        # make a local copy of the transposed data matrix
-        data = Interfaces.GData[key].transpose()
-        # transpose the matrix so each row is a dataset
+        # make a copy of the array without the ignored rows
+        (rows,cols) = Interfaces.GData[key].shape
+        rowList = []
+        for r in range(rows):
+            if r not in ignoredrows:
+                rowList.append(Interfaces.GData[key][r])
+
+        # simultaneously transpose the matrix so each row is a dataset
+        data = array(rowList).transpose()
         # now, row 0 are the vert. labels
         (rows,cols) = data.shape
     except:
@@ -385,11 +380,12 @@ def drawSimpleBarPlot(self):
     # load the x tick labels (1st. row of the transposed matrix)
     xticklabels = data[0]
     # load the data
-    vx = arange(len(xticklabels))  # intervals on x
+    vx = arange(cols)         # intervals on x
     width = 0.8               # the width of the bars
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-        self.figure.set_facecolor(backcolor)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.set_facecolor(backcolor)
     # extract data from second row on
     legendlabels = legend
     legendptr = []
@@ -497,22 +493,34 @@ def drawComparedBarPlot(self):
     width = 0.3                  # the width of the bars
 
     try:
-        data = Interfaces.GData[key].transpose()
-        (rows,cols) = data.shape
-        xticklabels =  data[0]
+        # make a copy of the array without the ignored rows
+        (rows,cols) = Interfaces.GData[key].shape
+        rowList = []
+        for r in range(rows):
+            if r not in ignoredrows:
+                rowList.append(Interfaces.GData[key][r])
 
+        # simultaneously transpose the matrix so each row is a dataset
+        data = array(rowList).transpose()
+        # now, row 0 are the vert. labels
+        (rows,cols) = data.shape
     except:
         print "drawComparedBarPlot: values %s missing or bad." % (key,)
         print "Interfaces.GData['%s'] contains:\n%s\n" % (key, repr(Interfaces.GData[key]))
         return
 
+    # load the x tick labels
+    xticklabels = data[0]
+
     legendlabels = legend
     legendptr = []
     vx = range(cols)     # the x locations for the groups
 
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
-        self.figure.set_facecolor(backcolor)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+
+    self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.set_facecolor(backcolor)
 
     # extract the transposed data from second row on
     for r in range(1,rows):

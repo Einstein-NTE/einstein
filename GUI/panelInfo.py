@@ -81,7 +81,6 @@ class PanelInfo(wx.StatusBar):
 # public methods
 #------------------------------------------------------------------------------
     def update(self):
-        print "PanelInfo (update) running"
         self.t0.SetValue(Status.ActiveProjectName)
         self.t1.SetValue(Status.ActiveAlternativeName)
         self.choiceAssistant.SetSelection(ASSISTANTLIST.index(Status.UserInteractionLevel))

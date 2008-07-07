@@ -46,14 +46,8 @@ import wx
 import pSQL
 from status import Status
 from dialogP import DialogP
-
-ORANGE = '#FF6000'
-LIGHTGREY = '#F8F8F8'
-WHITE = '#FFFFFF'
-DARKGREY = '#000060'
-
-TITLE_COLOR = ORANGE
-
+import einstein.modules.control as control
+from GUITools import *
 
 class PanelQ0(wx.Panel):
     def __init__(self, parent, main):
@@ -241,7 +235,10 @@ class PanelQ0(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnButtonAutoRun(self, event):
 #------------------------------------------------------------------------------		
-        self.main.showWarning("SORRY: auto-run not yet active")
+        self.main.showInfo("EINSTEIN - thermal energy audit at the speed of the light\n"+\
+                           "fasten your seat belt. put your seats in upright position\n"
+                           "ready for take off ?")
+        control.autoRun(self)
 #------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------

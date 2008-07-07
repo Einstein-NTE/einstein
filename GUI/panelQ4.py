@@ -62,6 +62,7 @@ from displayClasses import *
 from GUITools import *  #HS2008-05-07 added
 from units import *
 from fonts import *
+from einstein.modules.messageLogger import *
 
 # constants that control the default sizes
 # 1. font sizes
@@ -138,10 +139,24 @@ class PanelQ4(wx.Panel):
         self.notebook.AddPage(self.page3, _('Schedule'))
 
         self.frame_descriptive_data = wx.StaticBox(self.page0, -1,_("Descriptive data"))
+        self.frame_descriptive_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_descriptive_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_equipment_list = wx.StaticBox(self.page0, -1, _("Equipment list"))
+        self.frame_equipment_list.SetForegroundColour(TITLE_COLOR)
+        self.frame_equipment_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_technical_data = wx.StaticBox(self.page1, -1, _("Technical data"))
+        self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_heat_source_sink = wx.StaticBox(self.page2, -1, _("Heat source / sink"))
+        self.frame_heat_source_sink.SetForegroundColour(TITLE_COLOR)
+        self.frame_heat_source_sink.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.frame_schedule = wx.StaticBox(self.page3, -1, _("Schedule"))
+        self.frame_schedule.SetForegroundColour(TITLE_COLOR)
+        self.frame_schedule.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         # set font for titles
         # 1. save actual font parameters on the stack
@@ -434,8 +449,10 @@ class PanelQ4(wx.Panel):
 #------------------------------------------------------------------------------
 
     def OnListBoxEquipmentClick(self, event):
-        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Equipment[\
-	    str(self.listBoxEquipment.GetStringSelection())][0]
+        self.equipeName = str(self.listBoxEquipment.GetStringSelection())
+        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].\
+                 AlternativeProposalNo[Status.ANo].Equipment[self.equipeName][0]
+                                 
         self.equipeID = equipe.QGenerationHC_ID
         self.display(equipe)
         event.Skip()
@@ -511,8 +528,10 @@ class PanelQ4(wx.Panel):
         Status.SQL.commit()
         self.fillEquipmentList()
 
-        print "PanelQ4 (add button): equipment type = ",self.tc5.GetValue()
+        logTrack("PanelQ4 (add button): equipment type = %s added"%self.tc5.GetValue())
         self.parent.equipeType = check(self.tc5.GetValue())
+
+        Status.int.changeInCascade(equipe.CascadeIndex)
 
 #HS2008-05-07: event.Skip() added. needed for leaving the dialog
         event.Skip()
@@ -613,6 +632,8 @@ class PanelQ4(wx.Panel):
         if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) > 0:
             for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
                 self.listBoxEquipment.Append (str(n.Equipment))
+	try: self.listBoxEquipment.SetStringSelection(self.equipeName)
+	except: pass
 
     def fillChoiceOfDBFuel(self):
         self.tc8.entry.Clear()

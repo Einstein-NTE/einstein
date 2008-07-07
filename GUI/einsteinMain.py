@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.93
+#   Version No.: 0.100
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -58,6 +58,7 @@
 #                       Tom Sobota                          30/06/2008
 #                       Stoyan Danov                        01/07/2008
 #                       Stoyan Danov                        02/07/2008
+#                       Tom Sobota                          05/07/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -133,6 +134,7 @@
 #                       -> added panelEA4b (Process heat 2) and panelEA4a (Process heat 1)
 #       01/07/2008  HS changed layout tree and title page
 #       02/07/2008  SD panelEA4 eliminated (now exist only EA4a and EA4b),panelEA6 eliminated
+#       05/07/2008  TS Electricity Mix in main menu and menu dispatch
 #
 #
 #------------------------------------------------------------------------------
@@ -204,11 +206,13 @@ from panelEA2 import *
 from panelEA3 import *
 from panelEA4a import *
 from panelEA4b import *
+from panelEA4c import *
 from panelEA5 import *
 from panelEM1 import *
 from panelEM2 import *
 #from panelEH1 import *
 #from panelEH2 import *
+from panelCS1 import *
 from panelBM1 import *
 from panelBM2 import *
 from panelBM3 import *
@@ -601,6 +605,9 @@ class EinsteinFrame(wx.Frame):
     def OnMenuEditDBChiller(self, event):
         frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
         frameEditDBChiller.ShowModal()
+    def OnMenuEditDBElectricityMix(self, event):
+        frameEditDBElectricityMix = DBEditFrame(None, "Edit DBElectricityMix", 'dbelectricitymix', 0, True)
+        frameEditDBElectricityMix.ShowModal()
 
 #..............................................................................
 # Scroll-up menu "USER SELECT LEVEL 1 - 3"
@@ -802,16 +809,21 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelEA3 = PanelEA3(parent=self.leftpanel2)
             self.panelEA3.display()
-        #qEA4 'Process heat 1 - Yearly'   #SD2008-07-01
+        #qEA4a 'Process heat 1 - Yearly'   #SD2008-07-01
         elif select == _("Process heat 1"):
             self.hidePages()
             self.panelEA4a = PanelEA4a(parent=self.leftpanel2)
             self.panelEA4a.display()
-        #qEA4 'Process heat 2 - Yearly'   #SD2008-07-01
+        #qEA4b 'Process heat 2 - Yearly'   #SD2008-07-01
         elif select == _("Process heat 2"):
             self.hidePages()
             self.panelEA4b = PanelEA4b(parent=self.leftpanel2)
             self.panelEA4b.display()
+        #qEA4c 'Process heat 3 - Yearly'   #SD2008-07-01
+        elif select == _("Process heat 3"):
+            self.hidePages()
+            self.panelEA4c = PanelEA4c(parent=self.leftpanel2)
+            self.panelEA4c.display()
         #qEA5 'Energy intensity - Yearly'
         elif select == _("Energy intensity"):
             self.hidePages()
@@ -918,6 +930,11 @@ class EinsteinFrame(wx.Frame):
             self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelHC.display()
+        #qCS1 'Process heat 3 - Yearly'   #SD2008-07-01
+        elif select == _("Comp.study: Primary energy"):
+            self.hidePages()
+            self.panelCS1 = PanelCS1(parent=self.leftpanel2)
+            self.panelCS1.display()
         elif select == _("Report"):
             #TS 2008-3-26 No action here
             #self.hidePages()
@@ -1051,6 +1068,8 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.panelEA4b.Destroy()
         except:pass
+        try:self.panelEA4c.Destroy()
+        except:pass
         try:self.panelEA5.Destroy()
         except:pass
         try:self.panelEM1.Destroy()
@@ -1082,6 +1101,11 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.panelEnergy.Destroy()
         except:pass
+
+
+        try:self.panelCS1.Destroy()
+        except:pass
+        
         try:self.pageFinalReport.Destroy()
         except:pass
 
@@ -1130,6 +1154,7 @@ class EinsteinFrame(wx.Frame):
         self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.subnenuEquipments)
         self.EditDBFuel = self.menuDatabase.Append(-1, _("Fue&ls"))
         self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
+        self.EditDBElectricityMix = self.menuDatabase.Append(-1, _("Electricity mix"))
         self.EditDBBenchmark = self.menuDatabase.Append(-1, _("&Benchmarks"))
         self.EditDBBAT = self.menuDatabase.Append(-1, "Best available technologies")
         self.EditDBAdmin = self.menuDatabase.Append(-1, _("Database administration"))
@@ -1247,6 +1272,7 @@ class EinsteinFrame(wx.Frame):
         self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
         self.qEA4a = self.tree.AppendItem (self.qEA, _("Process heat 1"))
         self.qEA4b = self.tree.AppendItem (self.qEA, _("Process heat 2"))
+        self.qEA4c = self.tree.AppendItem (self.qEA, _("Process heat 3"))
         self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
         # monthly statistics subtree
         self.qEM1 = self.tree.AppendItem (self.qEM, _("Monthly demand"))
@@ -1328,13 +1354,13 @@ class EinsteinFrame(wx.Frame):
 
 
         #Comparative analysis
-        self.qOptiProComparative = self.tree.AppendItem (self.qA, _("Comparative analysis"))
+        self.qCS = self.tree.AppendItem (self.qA, _("Comparative study"))
             #Comparative study – Detail Info 1
-        self.qOptiProComparative1 = self.tree.AppendItem (self.qOptiProComparative, _("Comparative study – Detail Info 1"))
+        self.qCS1 = self.tree.AppendItem (self.qCS, _("Comp.study: Primary energy"))
             #Comparative study – Detail Info 2
-        self.qOptiProComparative2 = self.tree.AppendItem (self.qOptiProComparative, _("Comparative study – Detail Info 2"))
+        self.qCS2 = self.tree.AppendItem (self.qCS, _("Comparative study – Detail Info 2"))
             #Comparative study – Detail Info 3
-        self.qOptiProComparative3 = self.tree.AppendItem (self.qOptiProComparative, _("Comparative study – Detail Info 3"))
+        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comparative study – Detail Info 3"))
 
 
         self.qFinalReport = self.tree.AppendItem (self.qRoot, _("Report"))
@@ -1366,6 +1392,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBHeatPump, self.EditDBHeatPump)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBFluid, self.EditDBFluid)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBElectricityMix, self.EditDBElectricityMix)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)

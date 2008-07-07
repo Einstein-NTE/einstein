@@ -51,6 +51,7 @@ from numCtrl import *
 
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
+from GUITools import *
 import einstein.modules.matPanel as Mp
 
 [wxID_PANELEA4, wxID_PANELEA4GRID1, wxID_PANELEA4GRID2, 
@@ -61,101 +62,76 @@ import einstein.modules.matPanel as Mp
 #
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
-TITLE_COLOR = ORANGE
 
+COLNO = 7
+MAXROWS = 20
 
-###SD
-#------------------------------------------------------------------------------		
-#HS2008-03-22: 
 #------------------------------------------------------------------------------		
 def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
 
-#SD2008-07-02: from dummydata3 (moduleEA4)
-##    if not hasattr(self, 'subplot'):
-##        self.subplot = self.figure.add_subplot(1,1,1)
-##    print 'Status.int.GData[UPH Plot][0] =', Status.int.GData['UPH Plot'][0]
-##    print 'Status.int.GData[UPH Plot][1] =', Status.int.GData['UPH Plot'][1]
-##    print 'Status.int.GData[UPH Plot][2] =', Status.int.GData['UPH Plot'][2]
-##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-##                      Status.int.GData['UPH Plot'][1],
-##                      'go-', label='UPH', linewidth=2)
-##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-##                      Status.int.GData['UPH Plot'][2],
-##                      'bo-', label='UPH net', linewidth=2)
-##    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-##                      Status.int.GData['UPH Plot'][3],
-##                      'rs-',  label='USH', linewidth=2)
-##    self.subplot.axis([0, 15, 0, 10])
-##    self.subplot.legend()
-
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
-    print 'Status.int.GData[UPH Plot][0] =', Status.int.GData['UPH Plot'][0]
-    print 'Status.int.GData[UPH Plot][1] =', Status.int.GData['UPH Plot'][1]
-    print 'Status.int.GData[UPH Plot][2] =', Status.int.GData['UPH Plot'][2]
-    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-                      Status.int.GData['UPH Plot'][1],
+
+    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
+                      Status.int.GData['EA4b Plot'][1],
                       'go-', label='UPH', linewidth=2)
-    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-                      Status.int.GData['UPH Plot'][2],
-                      'bo-', label='UPH net', linewidth=2)
-    self.subplot.plot(Status.int.GData['UPH Plot'][0],
-                      Status.int.GData['UPH Plot'][3],
+    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
+                      Status.int.GData['EA4b Plot'][2],
+                      'bo-', label='UPH proc', linewidth=2)
+    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
+                      Status.int.GData['EA4b Plot'][3],
                       'rs-',  label='USH', linewidth=2)
-    self.subplot.axis([0, 100, 0, 3e+7])
+
+#    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
+#------------------------------------------------------------------------------
 class PanelEA4b(wx.Panel):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def __init__(self, parent):
-        self._init_ctrls(parent)
-        keys = ['EA4_UPH','HP Table','UPH Plot']###SD: keys[1] changed from 'EA4_HDP' 
-        self.mod = ModuleEA4(keys)
-        labels_column = 0
+#------------------------------------------------------------------------------
 
-###SD
-#   graphic: Cumulative heat demand by hours
-        (rows,cols) = Interfaces.GData[keys[1]].shape        
-#        ignoredrows = []
-        ignoredrows = rows-1        
+        self._init_ctrls(parent)
+        keys = ['EA4b Table','EA4b Plot']
+        self.mod = ModuleEA4(keys)
+        self.mod.updatePanel()
+
+#..............................................................................
+# build xy-plot
+
+        labels_column = 0
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : keys[2],                # key for Interface
+                   'key'         : 'EA4b Plot',                # key for Interface
                    'title'       : _('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
-                   'ignoredrows' : ignoredrows}            # rows that should not be plotted
+                   'ignoredrows' : []}            # rows that should not be plotted
 
         dummy = Mp.MatPanel(self.panelEA4bFig, wx.Panel, drawFigure, paramList)
         del dummy
 
-        #
-        # additional widgets setup
-        #
+#..............................................................................
+# build table
+
         # data cell attributes
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
         #
         # set upper grid
         #
 
-        key = keys[1]
-        data = Interfaces.GData[key]
-#####Security feature against non existing GData entry
-        COLNO2 = 7 #grid has usually a fixed column size, not necessary to read from GData
-        try: (rows,cols) = data.shape
-        except: (rows,cols) = (0,COLNO2)
-
-        self.grid1.CreateGrid(max(rows,10), COLNO2)
+        self.grid1.CreateGrid(MAXROWS, COLNO)
 
         self.grid1.EnableGridLines(True)
 #######LAYOUT: here the default row size is fixed
@@ -173,23 +149,36 @@ class PanelEA4b(wx.Panel):
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Temperature levels\n[ºC]"))
-        self.grid1.SetColLabelValue(1, _("no cumulative\n[MWh]"))
-        self.grid1.SetColLabelValue(2, _("total\n[%]"))
+        self.grid1.SetColLabelValue(1, _("[MWh]"))
+        self.grid1.SetColLabelValue(2, _("[%]"))
         self.grid1.SetColLabelValue(3, _("cumulative\n[%]"))
-        self.grid1.SetColLabelValue(4, _("no cumulative\n[MWh]"))
-        self.grid1.SetColLabelValue(5, _("total\n[%]"))
+        self.grid1.SetColLabelValue(4, _("[MWh]"))
+        self.grid1.SetColLabelValue(5, _("[%]"))
         self.grid1.SetColLabelValue(6, _("cumulative\n[%]"))
 
-        #
-        # copy values from dictionary to grid
-        #
+#..............................................................................
+# bring data to table
 
-#######LAYOUT: use of function numCtrl
+        try:
+            data = Status.int.GData['EA4b Table']
+            (rows,cols) = data.shape
+        except:
+            logDebug("PanelEA4b: received corrupt data in key: EA4b Table")
+            (rows,cols) = (0,COLNO)
+
+        print "PanelEA4b: data arriving"
+        print data
+        print rows,cols
 
         decimals = [-1,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
-            self.grid1.SetRowAttr(r, attr)
+            if r == rows-1:
+                self.grid1.SetRowAttr(r, attr2) #highlight totals row
+            else:   
+                self.grid1.SetRowAttr(r, attr)
+                
             for c in range(cols):
+                print r,c,data[r][c]
                 try:
                     if decimals[c] >= 0: # -1 indicates text
                         self.grid1.SetCellValue(r, c, \
@@ -202,38 +191,30 @@ class PanelEA4b(wx.Panel):
                 else:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.grid1.SetGridCursor(0, 0)        
-
-###SD
-##        self.staticText1.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.staticText2.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.staticText3.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
+#------------------------------------------------------------------------------
     def _init_ctrls(self, prnt):
+#------------------------------------------------------------------------------
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELEA4, name=u'PanelEA4b', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) by process temperatures'),
+        self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) and supply (USH) by temperature'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-###SD
-##        self.staticText1 = wx.StaticText(id=-1,
-##              label=_(u'Temperature levels'),
-##              name='staticText1', parent=self, pos=wx.Point(60, 24),
-##              size=wx.Size(50, 17), style=0)
-
         self.staticText2 = wx.StaticText(id=-1,
-              label=_(u'Heat consumption by process temperature'),
+              label=_(u'Heat demand (UPH) by process temperature (PT)'),
               name='staticText2', parent=self, pos=wx.Point(200, 24),
               size=wx.Size(50, 17), style=0)
 
         self.staticText3 = wx.StaticText(id=-1,
-              label=_(u'Total heat supply by central supply temperature'),
+              label=_(u'Heat supply (USH) by central supply temperature (CST)'),
               name='staticText3', parent=self, pos=wx.Point(470, 24),
               size=wx.Size(50, 17), style=0)
 
@@ -248,8 +229,6 @@ class PanelEA4b(wx.Panel):
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-
-###SD
         self.panelEA4bFig = wx.Panel(id=-1, name='panelEA4bFig', parent=self,
               pos=wx.Point(200, 260), size=wx.Size(400, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelEA4bFig.SetBackgroundColour(wx.Colour(127, 127, 127))
@@ -289,17 +268,16 @@ class PanelEA4b(wx.Panel):
 
     def OnBtnForwardButton(self, event):
         self.Hide()
-        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
+        Status.main.tree.SelectItem(Status.main.qEA4c, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
         
 
+#------------------------------------------------------------------------------		
     def display(self):
+#------------------------------------------------------------------------------		
 
-#####Security feature against any strange thing in graphs
         try:
-##            self.panelGraphHD.draw()
-###SD
             self.panelEA4bFig.draw()
         except: pass
         self.Show()

@@ -71,6 +71,7 @@ import MySQLdb
 from einstein.GUI.status import Status
 import einstein.GUI.pSQL as pSQL
 import einstein.GUI.HelperClass as HelperClass
+from einstein.modules.constants import *
 
 QUERY = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY IndexNo ASC"
 
@@ -221,6 +222,7 @@ class Interfaces(object):
             Q_T[iT] = 0
             for it in range(Status.Nt):
                 Q_T[iT] += Q_Tt[iT][it]
+            Q_T[iT] *= YEAR/(Status.Nt*Status.TimeStep)
         return Q_T
 
 #------------------------------------------------------------------------------		
@@ -414,15 +416,20 @@ class Interfaces(object):
         for j in range(self.NEquipe):
             self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
                                             self.equipments[j].EquipType, self.equipments[j].HPerYearEq, self.equipments[j].YearManufact]) #SD change 30/04.2008
-                                                
+
+        self.extendCascadeArrays(self.NEquipe)  #security feature: assure that for all equipes there's enough space                                       
 
 #------------------------------------------------------------------------------
     def changeInCascade(self,index):
 #------------------------------------------------------------------------------
 #   gets the equipment list
 #------------------------------------------------------------------------------
-        self.cascadeUpdateLevel = min(self.cascadeUpdateLevel,index-1)
-        Status.prj.setStatus("Energy",0)
+        if index >= 0:
+            self.cascadeUpdateLevel = min(self.cascadeUpdateLevel,index-1)
+            Status.prj.setStatus("Energy",0)
+        else:
+            logDebug("Interfaces (changeInCascade): cannot change a cascade level "+\
+                     "that does not exist [-> level %s]"%index)
 
 #------------------------------------------------------------------------------		
     def setGraphicsData(self,key, data):

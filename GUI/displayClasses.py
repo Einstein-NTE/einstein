@@ -810,17 +810,28 @@ class FloatEntry(wx.Panel):
             self.defaultDisplayUnit = self.g.setUnits(self,tip, unitdict)
 
     def GetValue(self):
-        dValue = self.entry.GetValue()
-        if dValue.strip() == '':
+        dValue = self.entry.GetValue().encode('iso-8859-15')
+        if dValue is None:
             return None
+        elif isinstance(dValue,str):
+            if dValue.strip() == '':
+                return None
+            f = self.entry.toFloat(dValue)
+        elif isinstance(dValue,float) or isinstance(dValue,int):
+            f = dValue
+            
         if self.defaultDisplayUnit is None:
-            return self.entry.toFloat(dValue)
+            return f
         try:
-            iValue = units.internalValue(dValue,self.defaultDisplayUnit,self.unitdict)
+            iValue = units.internalValue(f,
+                                         self.defaultDisplayUnit,
+                                         self.unitdict)
             return self.entry.toFloat(iValue)
         except:
             print 'FloatEntry: error in conversion display->internal ' \
-                  'display=%s class=%s default=%s' % (dValue,self.unitdict,self.defaultDisplayUnit)
+                  'display=%s class=%s default=%s' % (dValue,
+                                                      self.unitdict,
+                                                      self.defaultDisplayUnit)
             
     def Clear(self):
         self.SetValue(None)
@@ -965,14 +976,22 @@ class IntEntry(wx.Panel):
         dValue = self.entry.GetValue()
         if dValue is None:
             return None
+        elif isinstance(dValue,str):
+            if dValue.strip() == '':
+                return None
+            f = self.entry.toFloat(dValue)
+        elif isinstance(dValue,float) or isinstance(dValue,int):
+            f = dValue
+
         if self.defaultDisplayUnit is None:
-            return dValue
+            return int(f)
         try:
-            iValue = units.internalValue(float(dValue),self.defaultDisplayUnit,self.unitdict)
+            iValue = units.internalValue(f,self.defaultDisplayUnit,self.unitdict)
             return int(iValue)
         except:
             print 'IntEntry: error in conversion disp->int '\
-                  'disp=%s class=%s default=%s' % (dValue,self.unitdict,
+                  'disp=%s class=%s default=%s' % (dValue,
+                                                   self.unitdict,
                                                    repr(self.defaultDisplayUnit))
 
     def Clear(self):

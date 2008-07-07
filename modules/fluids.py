@@ -42,8 +42,21 @@ class Fluid():
         fluids = Status.DB.dbfluid.DBFluid_ID[fluidID]
         if len(fluids) > 0:
             self.rho = fluids[0].FluidDensity
-            self.cp = fluids[0].FluidCp/3600.   #data in DB are in kJ/kgK ->
+            self.cp = fluids[0].FluidCp
+            if self.cp is not None: self.cp = self.cp/3600.0
+                                                #data in DB are in kJ/kgK ->
                                                 #conversion to kWh/kgK
+
+            if self.rho is None or self.rho < 0 or self.rho > 1e+5:
+                logError(_("Severe error in your fluid data for fluid %s: density %s")%\
+                           (fluids[0].FluidName,self.rho))
+                self.rho = 1000.0
+            
+
+            if self.cp is None or self.cp < 0 or self.cp > 5.0:
+                logError(_("Severe error in your fluid data for fluid %s: cp %s")%\
+                           (fluids[0].FluidName,self.cp))
+                self.cp = 1.16/1000.0
         else:
             self.rho = 1000.0                   #kg/m3
             self.cp  = 1.16/1000.0              #water properties in kWh/kgK

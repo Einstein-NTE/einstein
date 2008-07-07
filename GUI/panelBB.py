@@ -61,6 +61,9 @@ from einstein.GUI.dialogOK import *
 
 from einstein.modules.interfaces import *
 from einstein.modules.constants import *
+from einstein.modules.messageLogger import *
+from GUITools import *
+from numCtrl import *
 
 
 [wxID_PANELBB, wxID_PANELBBBBCALCULATE, wxID_PANELBBBUTTONPAGEBBADD, 
@@ -80,16 +83,14 @@ from einstein.modules.constants import *
 
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
 TABLECOLS = 6
 
 TYPELIST = BBTYPES
+FUELLIST = [_("Natural Gas"),\
+            _("Biomass"),\
+            _("Fuel oil")]
 
 #------------------------------------------------------------------------------		
 def drawFigure(self):
@@ -152,7 +153,7 @@ class PanelBB(wx.Panel):
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
 
         key = self.keys[0]
         (rows,cols) = (MAXROWS,TABLECOLS)
@@ -163,6 +164,7 @@ class PanelBB(wx.Panel):
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
         self.grid.SetColSize(0,115)
+        self.grid.SetColSize(2,60)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid.SetColLabelValue(0, _("Short name"))
@@ -185,21 +187,18 @@ class PanelBB(wx.Panel):
 
         self.grid.SetGridCursor(0, 0)
 
-        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-    
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELBB, name='PanelBB', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
-        self.staticText1 = wx.StaticText(id=wxID_PANELBBSTATICTEXT1,
-              label=_('Cumulative heat demand to be covered by boilers'),
-              name='staticText1', parent=self, pos=wx.Point(448, 32),
-              size=wx.Size(239, 13), style=0)
 
-        self.panelFig = wx.Panel(id=wxID_PANELBBPANELFIG, name='panelFig', parent=self,
-              pos=wx.Point(450, 66), size=wx.Size(316, 220),
-              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+#..............................................................................
+# box1: table
+        self.box1 = wx.StaticBox(self, -1, _("Boilers and Burners in the HC Supply System"),
+                                 pos = (10,10),size=(420,220))
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.grid = wx.grid.Grid(id=wxID_PANELBBGRID, name='gridpageBB',
               parent=self, pos=wx.Point(40, 48), size=wx.Size(376, 168),
@@ -209,30 +208,41 @@ class PanelBB(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridPageBBGridCellRightClick, id=wxID_PANELBBGRID)
 
-        self.st1pageBB = wx.StaticText(id=-1,
-              label=_('Existing Boilers and burners in the HC system'),
-              name='st1pageBB', parent=self, pos=wx.Point(40, 32), style=0)
+#..............................................................................
+# box2: figure
+
+        self.box2 = wx.StaticBox(self, -1, _("Cumulative heat demand to be covered by boilers"),
+                                 pos = (440,10),size=(350,270))
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.panelFig = wx.Panel(id=wxID_PANELBBPANELFIG, name='panelFig', parent=self,
+              pos=wx.Point(450, 40), size=wx.Size(320, 220),
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+
+
+#..............................................................................
+#   action buttons
 
         self.BBCalculate = wx.Button(id=wxID_PANELBBBBCALCULATE,
               label=_('run design assistant'), name='BB_Calculate', parent=self,
-              pos=wx.Point(232, 224), size=wx.Size(184, 24), style=0)
+              pos=wx.Point(232, 240), size=wx.Size(184, 24), style=0)
         self.BBCalculate.Bind(wx.EVT_BUTTON, self.OnBBCalculateButton,
               id=wxID_PANELBBBBCALCULATE)
 
         self.buttonpageBBAdd = wx.Button(id=wxID_PANELBBBUTTONPAGEBBADD,
               label=_('add boiler / burner'), name='buttonpageBBAdd', parent=self,
-              pos=wx.Point(32, 224), size=wx.Size(184, 24), style=0)
+              pos=wx.Point(32, 240), size=wx.Size(184, 24), style=0)
         self.buttonpageBBAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageBBAddButton,
               id=wxID_PANELBBBUTTONPAGEBBADD)
 
-#------------------------------------------------------------------------------		
-#       Configuration design assistant
-#------------------------------------------------------------------------------		
-        self.st2pageBB = wx.StaticText(id=-1, label=_('Design assistant options:'),
-              name='st2pageBB', parent=self, pos=wx.Point(40, 272), style=0)
-        self.st2pageBB.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
-              'Tahoma'))
+#..............................................................................
+# box 3     Configuration design assistant
 
+        self.box3 = wx.StaticBox(self, -1, _("Design assistant options:"),
+                                 pos = (10,270),size=(420,300))
+        self.box3.SetForegroundColour(TITLE_COLOR)
+        self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 #..............................................................................
 # 1. Maintain existing equipment ?
@@ -277,8 +287,7 @@ class PanelBB(wx.Panel):
 
         self.stConfig4 = wx.StaticText(id=-1, label=_('Fuel Type'),
               name='stConfig4', parent=self, pos=wx.Point(40, 424), style=0)
-        self.choiceConfig4 = wx.Choice(choices=[_("Natural Gas"),
-              _("Biomass"), _("Fuel oil")],
+        self.choiceConfig4 = wx.Choice(choices=FUELLIST,
               id=wxID_PANELBBCHOICECONFIG4, name='choiceConfig4', parent=self,
               pos=wx.Point(288, 416), size=wx.Size(128, 21), style=0)
         self.choiceConfig4.Bind(wx.EVT_CHOICE, self.OnChoiceConfig4Choice,
@@ -321,20 +330,25 @@ class PanelBB(wx.Panel):
         self.tcConfig7.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig7TextEnter,
               id=wxID_PANELBBTCCONFIG7)
 
-#------------------------------------------------------------------------------		
-#       Display INFO field at the right
-#------------------------------------------------------------------------------		
+#..............................................................................
+# box 4     Info field
+
+        self.box4 = wx.StaticBox(self, -1, _("System Performance Data"),
+                                 pos = (440,320),size=(350,200))
+        self.box4.SetForegroundColour(TITLE_COLOR)
+        self.box4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
 
         self.stInfo1 = wx.StaticText(id=wxID_PANELBBSTINFO1,
               label=_('Safety factor [%]'), name='stInfo1', parent=self,
-              pos=wx.Point(440, 352), style=0)
+              pos=wx.Point(460, 352), style=0)
         self.stInfo1Value = wx.StaticText(id=wxID_PANELBBSTINFO1VALUE,
               label=_('10'), name='stInfo1Value', parent=self, pos=wx.Point(544,
               352), style=0)
 
         self.stInfo2 = wx.StaticText(id=wxID_PANELBBSTINFO2,
               label=_('Residual power to be supplied:'), name='stInfo2',
-              parent=self, pos=wx.Point(440, 392), style=0)
+              parent=self, pos=wx.Point(460, 392), style=0)
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELBBSTINFO2A,
               label=_('Temperature [\xbaC]'), name='stInfo3', parent=self,
@@ -395,6 +409,7 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
+
         self.mod.updatePanel()        # prepares data for plotting
 
 #..............................................................................
@@ -411,7 +426,7 @@ class PanelBB(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, data[r][c])
 
-#XXX Here better would be updating the grid and showing less rows ... ????
+# emptying cells
         for r in range(rows,MAXROWS):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
@@ -420,10 +435,19 @@ class PanelBB(wx.Panel):
 # update of design assistant parameters
 
         self.config = Interfaces.GData["BB Config"]
-        self.cbConfig1.SetValue(self.config[0])
-        self.tcConfig2.SetValue(str(self.config[1]))
+        
+        try: self.cbConfig1.SetValue(self.config[0])
+        except:
+            logTrack("PanelBB: problem loading config[0] value %s "%self.config[0])
 
-        self.cbConfig3.SetValue(self.config[2])
+        try: self.tcConfig2.SetValue(str(self.config[1]))
+        except:
+            logTrack("PanelBB: problem loading config[1] value %s "%self.config[1])
+
+        try: self.cbConfig3.SetValue(self.config[2])
+        except:
+            logTrack("PanelBB: problem loading config[2] value %s "%self.config[2])
+
         try:        #try-except necessary if there comes a string that is not in list.
             self.choiceConfig4.SetSelection(0)
 #            self.choiceConfig4.SetSelection(TYPELIST.index(self.config[1]))
@@ -440,12 +464,14 @@ class PanelBB(wx.Panel):
 
         self.info = Interfaces.GData["BB Info"]
         
-        self.stInfo1Value.SetLabel(str(self.info[0]))
-        self.stInfo2_P1.SetLabel(str(self.info[1]))
-        self.stInfo2_P2.SetLabel(str(self.info[2]))
-        self.stInfo2_P3.SetLabel(str(self.info[3]))
+        self.stInfo1Value.SetLabel(convertDoubleToString(self.info[0]))
+        self.stInfo2_P1.SetLabel(convertDoubleToString(self.info[1]))
+        self.stInfo2_P2.SetLabel(convertDoubleToString(self.info[2]))
+        self.stInfo2_P3.SetLabel(convertDoubleToString(self.info[3]))
 
-        self.panelFig.draw()
+        try: self.panelFig.draw()
+        except: pass
+        
         self.Show()
 #==============================================================================
 #   Event handlers
@@ -470,23 +496,20 @@ class PanelBB(wx.Panel):
 #------------------------------------------------------------------------------		
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
-        try:                #creates space for new equipment in Q/C
-	    self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
-            pu1 =  AddEquipment(self,                      # pointer to this panel
-                                self.mod,                # pointer to the associated module
-                                'Add boiler equipment', # title for the dialogs
-                                'dbboiler',              # database table
-                                0,                         # column to be returned
-                                False)                     # database table can be edited in DBEditFrame?
 
-            if pu1.ShowModal() == wx.ID_OK:
-                print _('PanelBB AddEquipment accepted. Id=')+str(pu1.theId)
-            else:
-                self.mod.deleteEquipment(None)
-            self.display()
-        except:
-            print _("PanelBB (HPAddButton): could not create equipment dummy")
-	    pass
+	self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
+        pu1 =  AddEquipment(self,                      # pointer to this panel
+                            self.mod,                # pointer to the associated module
+                            'Add boiler equipment', # title for the dialogs
+                            'dbboiler',              # database table
+                            0,                         # column to be returned
+                            False)                     # database table can be edited in DBEditFrame?
+
+        if pu1.ShowModal() == wx.ID_OK:
+            print _('PanelBB AddEquipment accepted. Id=')+str(pu1.theId)
+        else:
+            self.mod.deleteEquipment(None)
+        self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		

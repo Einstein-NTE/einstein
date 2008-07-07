@@ -22,10 +22,10 @@
 #	Created by: 	    Claudia Vannoni	10/04/2008
 #	Last revised by:    Claudia Vannoni      17/04/2008
 #                           Claudia Vannoni      27/04/2008
-#
+#                           Claudia Vannoni      3/07/2008
 #       Changes in last update:
 #                   v003: import from SQL, ccheck,labels
-#
+#               3/07/2008: import from FluidDB
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -42,6 +42,7 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 
 from math import *
 from ccheckFunctions import *
+from einstein.modules.fluids import *
 
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
@@ -85,8 +86,7 @@ class CheckFETfuel():
 #..............................................................................
 # assign empty CCPar to all questionnaire parameters
 
-        self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
-
+        
         self.MFuelYear = CCPar("MFuelYear")
         self.FECFuel = CCPar("FECFuel")
         self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
@@ -102,6 +102,10 @@ class CheckFETfuel():
             if len(qfuelTable) > 0:
                 qfuel = qfuelTable[0]
 
+                fuel_number = qfuel.DBFuel_id   #IMPORT from the fuelDB
+                fet_fuel = Fuel(fuel_number)
+                self.FuelLCV = fet_fuel.LCV
+                #self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
 
                 self.MFuelYear.setValue(qfuel.MFuelYear)
                 self.FECFuel.setValue(qfuel.FECFuel)

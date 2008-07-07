@@ -1,0 +1,22 @@
+-- update einstein database: more and more and more parameters
+
+USE einstein;
+
+ALTER TABLE qrenewables ADD COLUMN TAmb DOUBLE COMMENT 'annual average ambient temperature' AFTER ST_Idn;
+
+ALTER TABLE dbsolarthermal ADD COLUMN STIAM DOUBLE COMMENT 'incidence angle modifier' AFTER STc2;
+
+-- add main calculation results from pipe check block
+ALTER TABLE qdistributionhc ADD COLUMN QWHPipe DOUBLE COMMENT 'waste heat not recirculated' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc ADD COLUMN QLossPipe DOUBLE COMMENT 'heat losses' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc ADD COLUMN UPHProcm DOUBLE COMMENT 'heat output to process' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc ADD COLUMN QHXPipe DOUBLE COMMENT 'waste heat input to pipe' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc ADD COLUMN USHPipe DOUBLE COMMENT 'total heat input to pipe' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc ADD COLUMN USHm DOUBLE COMMENT 'equipment heat input to pipe' AFTER HDEffAvg;
+ALTER TABLE qdistributionhc DROP COLUMN PercentCondRecovery;
+
+ALTER TABLE cgeneraldata ADD COLUMN UPH DOUBLE COMMENT 'total UPH' AFTER USH;
+
+ALTER TABLE qprocessdata CHANGE COLUMN HPerYearProc HPerYearProc DOUBLE COMMENT 'yearly operating hours' AFTER HPerDayProc;
+
+ALTER TABLE qgenerationhc ADD COLUMN TMaxSupply DOUBLE COMMENT 'maximum temperature at which heat can be supplied' AFTER TExhaustGas;

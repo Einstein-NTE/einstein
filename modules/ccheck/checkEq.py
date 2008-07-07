@@ -24,11 +24,13 @@
 #                           Claudia Vannoni     16/04/2008
 #                           Hans Schweiger      20/04/2008
 #                           Claudia Vannoni     27/04/2008
-#       Changes in last update:
+#                           Claudia Vannoi      3/07/2008
+#
+#               Changes in last update:
 #                               sqerr NONE eliminated
 #       20/04/2008: HS  Variable HCGTEfficiency1 added. 2nd cross check
 #       26/04/2008: SQL import and export, ccheck, labels
-#	
+#	3/07/2008: parameters in screen list, priorities, import from DBFuel,constraints val max
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -44,6 +46,8 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 
 from math import *
 from ccheckFunctions import *
+from einstein.modules.fluids import *
+from einstein.modules.messageLogger import *
 
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
@@ -60,13 +64,15 @@ class CheckEq():
 # assign a variable to all intermediate/calculated values needed
 
         self.HPerYearEq = CCPar("HPerYearEq")
+        self.HPerYearEq.valMax = 8760
         self.HPerYearEq1 = CCPar("HPerYear1")
         self.HPerYearEqNom = CCPar("HPerYearEqNom")
+        self.HPerYearEqNom.valMax = 8760
         self.HPerYearEqNom1 = CCPar("HPerYearEqNom1")
         self.HCGPnom1 = CCPar("HCGPnom1")
         self.USHBoiler1 = CCPar("USHBoiler1")
         self.USHBoiler2 = CCPar("USHBoiler2")
-        self.USHBoiler = CCPar("USHBoiler")
+        self.USHBoiler = CCPar("USHBoiler",priority=2)
         self.USHj = CCPar("USH",priority=2)
         self.USHj1 = CCPar("USH1")
         self.HCGTEfficiency1 = CCPar("HCGTEfficiency1")
@@ -93,30 +99,29 @@ class CheckEq():
 #..............................................................................
 # assign empty CCPar to all questionnaire parameters
 
-        self.FuelLCV = 10       #IMPORT this parameter from the fuelDB
-
+        
         self.HCGPnom = CCPar("HCGPnom",priority=2)
         self.FuelConsum = CCPar("FuelConsum")
         self.NDaysEq = CCPar("NDaysEq")
         self.HPerDayEq = CCPar("HPerDayEq")
-        self.PartLoad = CCPar("PartLoad")
-        self.HCGTEfficiency = CCPar("HCGTEfficiency")
+        self.PartLoad = CCPar("PartLoad",parType="X")
+        self.HCGTEfficiency = CCPar("HCGTEfficiency",parType="X")
 
         self.FETj = CCPar("FETj",priority=2)   # from the FET matrix
-        self.QHXEq = CCPar("QHXEq") #from the heat recovery matrix
+        self.QHXEq = CCPar("QHXEq",priority=2 ) #from the heat recovery matrix
 
 #..............................................................................
 # reading data from table "qprocessdata"
 #        try:
         if ANo == -1:       
             qgenerationhcTable = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].EqNo[self.EqNo]
-
-            print "CheckEq: importing data"
-            print qgenerationhcTable[0]
             
             if len(qgenerationhcTable) > 0:
                 qgenerationhc = qgenerationhcTable[0]
 
+                fuel_number = qgenerationhc.DBFuel_id   #IMPORT from the fuelDB
+                eq_fuel = Fuel(fuel_number)
+                self.FuelLCV = eq_fuel.LCV
 
                 self.HCGPnom.setValue(qgenerationhc.HCGPnom)
                 self.FuelConsum.setValue(qgenerationhc.FuelConsum)
@@ -126,10 +131,12 @@ class CheckEq():
                 self.HCGTEfficiency.setValue(qgenerationhc.HCGTEfficiency)
                 
                 self.QHXEq.setValue(0)          #from the heat recovery matrix
-
+            else:
+                logTrack("CheckEq(importData): didn't find table entry in qgenerationhc for EqNo = "%self.EqNo)
+                
 #        except:
-            print "CheckEq(importData): error reading data from qgenerationhc"
-            pass
+#            print "CheckEq(importData): error reading data from qgenerationhc PId"
+#            pass
 
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -315,6 +322,13 @@ class CheckEq():
 #------------------------------------------------------------------------------
 #   screens all variables in the block
 #------------------------------------------------------------------------------
+
+########## Change of priority for parameters not needed
+
+        if iszero(self.HCGPnom):
+            self.FuelConsum.priority = 99
+            
+#................................................................................
         self.HCGPnom.screen()
         self.FuelConsum.screen()
         self.NDaysEq.screen()
@@ -323,7 +337,8 @@ class CheckEq():
         self.HCGTEfficiency.screen()
 
         self.HPerYearEq.screen()        
-        self.USHj.screen()       
+        self.USHj.screen()
+        self.USHBoiler.screen()
         self.FETj.screen()
         self.QHXEq.screen()
 
@@ -332,6 +347,11 @@ class CheckEq():
 #------------------------------------------------------------------------------
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
+        print "CheckEq - TESTPRINT TESTPRINT"
+        print "track of USHj"
+        self.USHj.show()
+        print self.USHj.track
+
         if DEBUG in ["ALL"]:
             print "-------------------------------------------------"
             print " Process checking"
@@ -363,16 +383,7 @@ class CheckEq():
 
                 print "Step 2: cross checking"
 
-            ccheck1(self.HCGTEfficiency,self.HCGTEfficiency1)
-            
-            
-            ccheck1(self.HPerYearEq,self.HPerYearEq1)
-            ccheck1(self.HPerYearEqNom,self.HPerYearEqNom1)
-            ccheck1(self.HCGPnom,self.HCGPnom1)
-            ccheck1(self.FETj,self.FETj1)
-            ccheck2(self.USHBoiler,self.USHBoiler1,self.USHBoiler2)
-            ccheck1(self.QHXEq,self.QHXEq1)
-            ccheck1(self.USHj,self.USHj1)
+            self.ccheckAll()
 
             if DEBUG in ["ALL"]:
                 self.showAllUSH()
@@ -396,6 +407,18 @@ class CheckEq():
 
                 print "Step 4: second cross checking"
 
+            self.ccheckAll()
+            
+            if DEBUG in ["ALL"]:
+                self.showAllUSH()
+
+        if DEBUG in ["ALL","BASIC"]:
+            self.showAllUSH()
+        
+#------------------------------------------------------------------------------
+    def ccheckAll(self):     #function that is called at the beginning when object is created
+#------------------------------------------------------------------------------
+
             ccheck1(self.HCGTEfficiency,self.HCGTEfficiency1)
 
             ccheck1(self.HPerYearEq,self.HPerYearEq1)
@@ -406,12 +429,6 @@ class CheckEq():
             ccheck1(self.QHXEq,self.QHXEq1)
             ccheck1(self.USHj,self.USHj1)
 
-            if DEBUG in ["ALL"]:
-                self.showAllUSH()
-
-        if DEBUG in ["ALL","BASIC"]:
-            self.showAllUSH()
-        
 #==============================================================================
 if __name__ == "__main__":
     

@@ -19,13 +19,13 @@
 #	Created by:         Claudia Vannoni     20/04/2008
 #                           Claudia Vannoni     02/05/2008
 #                           Hans Schweiger      13/06/2008
-#
+#                           Hans Schweiger      3/07/2008
 #       Changes to previous version:
 #	v0.02 CV Add CCPipe, Add Matrix and links between matrix
 #       13/06/2008 HS   Connections between sub-systems imported from SQL
 #                       Very basic version of CheckHX added. Not yet coupled
 #                       to the rest.
-#
+#       3/07/2008 HS    Pipe 
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -145,12 +145,18 @@ class ModuleCC(object):
                 else:
                     val = '---'
                     err = '---'
+
+                if entry[4] == 1:
+                    highlight = 1
+                else:
+                    highlight = 0
                     
                 row = [entry[0]+"["+entry[3]+"]",
                        description,
                        val,
                        err,
-                       action]
+                       action,
+                       highlight]
                 
                 CCList.append(noneFilter(row))
                 nMissingVarsOfPriority+=1
@@ -186,13 +192,24 @@ class ModuleCC(object):
             if pair not in conflictPairs:
                 conflictPairs.append(pair)
 
-                row0 = [str(entry[2])+"<>"+str(entry[6]),entry[10],""]
+                listedVarName = str(entry[2])
+                nameParts = listedVarName.split('[')
+                if len(nameParts) > 0:
+                    varName = nameParts[0]
+                    if varName in ParameterList.keys():
+                        description = ParameterList[varName]
+                    else:
+                        description = ""
+                else:
+                    description = ""
+
+                row0 = [str(entry[2])+" [<>"+str(entry[6])+"]",entry[10],description]
 
                 origin1 = ""
                 for parname in entry[3]:
                     origin1 = origin1 + str(parname) + "; "
 
-                row1 = ["%10.4f"%entry[4],
+                row1 = ["%12.2f"%entry[4],
                         "+/- "+"%5.3f"%entry[5]+"%",
                         origin1]
 
@@ -200,7 +217,7 @@ class ModuleCC(object):
                 for parname in entry[7]:
                     origin2 = origin2 + str(parname) + "; "
 
-                row2 = ["%10.4f"%entry[8],
+                row2 = ["%12.2f"%entry[8],
                         "+/- "+"%5.3f"%entry[9]+"%",
                         origin2]
                        
@@ -257,6 +274,7 @@ class ModuleCC(object):
         self.NFET = Status.NFET
         NI = self.NFET
         self.FETi = CCRow("FETi",NI)
+        self.FECi = CCRow("FETi",NI)
 
         self.ccFET.append(CheckFETel())     
         for i in range(1,NI):      
@@ -354,7 +372,7 @@ class ModuleCC(object):
 # import data on existing totals
 
         self.UPHk = CCRow("UPHk",NK) 
-        self.totals = CheckTotals("Totals",self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
+        self.totals = CheckTotals("Totals",self.FECi,self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
 
 
 #------------------------------------------------------------------------------
@@ -424,6 +442,7 @@ class ModuleCC(object):
             conflict.setDataGroup("Electricity","-")
             self.ccFET[0].check()
             self.FETi[0].update(self.ccFET[0].FETel)
+            self.FECi[0].update(self.ccFET[0].FECel)
 
             for i in range(1,NI):       #then check all the Nfuels = NI-1 fuels
 
@@ -433,6 +452,7 @@ class ModuleCC(object):
                 conflict.setDataGroup("Fuel",i)
                 self.ccFET[i].check()
                 self.FETi[i].update(self.ccFET[i].FETFuel)
+                self.FECi[i].update(self.ccFET[i].FECFuel)
             
 #..............................................................................
 # check of equipment
@@ -478,9 +498,9 @@ class ModuleCC(object):
 
                 self.USHm[m].update(self.ccPipe[m].USHm)      #obtain results 
                 self.UPHProcm[m].update(self.ccPipe[m].UPHProcm)
-# here data should be passed to the correspoinding inputs in CheckPipe
-#                   self.QHXPipe[m].update(self.ccPipe[m].QHXPipeRec)
-#                   self.QWHPipe[m].update(self.ccPipe[m].QWHPipeRec)
+
+                self.QHXPipe[m].update(self.ccPipe[m].QHXPipe) 
+                self.QWHPipe[m].update(self.ccPipe[m].QWHPipe) # if necessary change in QWHPipeRec
 
 #..............................................................................
 # check of thermal processes
@@ -670,9 +690,8 @@ class ModuleCC(object):
 
                 for m in range(NM):
                     pass
-# here data should be passed to the correspoinding inputs in CheckPipe
-#                    self.ccPipe[m].QHXPipeRec.update(self.QHXPipe[m])
-#                    self.ccPipe[m].QWHPipeRec.update(self.QWHPipe[m])
+                    self.ccPipe[m].QHXPipe.update(self.QHXPipe[m])
+                    self.ccPipe[m].QWHPipe.update(self.QWHPipe[m]) #to be changed in QWHPipeRec if necessary
 
                 for k in range(NK):
                     pass
@@ -787,8 +806,7 @@ class ModuleCC(object):
         
         NK = self.NThProc
         for k in range(NK):       
-#            self.ccProc[k].estimate()
-            pass
+            self.ccProc[k].estimate()
 
         NM = self.NPipeDuct
         for m in range(NM):      

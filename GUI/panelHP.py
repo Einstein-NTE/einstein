@@ -144,7 +144,7 @@ def drawFigure(self):
     self.subplot.plot(Status.int.GData['HP Plot'][0],
                       Status.int.GData['HP Plot'][4],
                       'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 3e+7])
+#    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
 
@@ -245,7 +245,7 @@ class PanelHP(wx.Panel):
 
         self.panelHPFig = wx.Panel(id=wxID_PANELHPFIG, name='panelHPFigure', parent=self,
               pos=wx.Point(450, 66), size=wx.Size(316, 220),
-              style=wx.TAB_TRAVERSAL)
+              style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
 #..............................................................................
 # Grid for display of existing heat pumps
@@ -426,11 +426,6 @@ class PanelHP(wx.Panel):
 
 #------------------------------------------------------------------------------		
 #       Default action buttons: FWD / BACK / OK / Cancel
-#       TS20080405 Notice: the OK button should always have an ID = wx.ID_OK
-#                  and a label='OK' (uppercase)
-#                  The Cancel button should always have an ID = wx.ID_CANCEL
-#                  and a label 'Cancel' (as written)
-#                  In this way, wxWidgets will show the right icons on the buttons
 #------------------------------------------------------------------------------		
 
         self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label=_('OK'),
@@ -586,17 +581,13 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 #       edits the selected equipment
 #------------------------------------------------------------------------------		
-        print "Grid - left button Dclick: here I should call the Q4H"
+
         rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
         EqId = self.mod.getEqId(rowNo)
-        print _("now editing equipment in row %s with id = ")%rowNo,EqId
-#        self.Hide()
 	dialog = ManualAddDialog(self, EqId)
 
-#Tom: here should be a link between the outcome of the dialog and what continues
         if (dialog.ShowModal() ==wx.ID_OK):
             print _("PanelHP (OnGridLeftDclick) - OK")
-#            ret = self.mod.calculateCascade()
 
         self.display()
 
@@ -609,8 +600,6 @@ class PanelHP(wx.Panel):
 
         rowNo = event.GetRow() #number of the selected boiler should be detected depending on the selected row
 
-        print "Grid - right button click: scroll-up should appear"
-        #here a scroll-up should appear with some options: edit, delete,...
         ret = "delete"
 
 #..............................................................................

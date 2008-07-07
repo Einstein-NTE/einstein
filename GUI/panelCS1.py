@@ -1,4 +1,4 @@
-#Boa:Frame:PanelEM1
+#Boa:Frame:PanelCS1
 #==============================================================================
 #
 #	E I N S T E I N
@@ -8,25 +8,15 @@
 #
 #------------------------------------------------------------------------------
 #
-#	PanelEM1- GUI component for: Energy performance - Monthly data
+#	PanelCS1- GUI component for: Energy performance - Monthly data
 #			
 #==============================================================================
 #
 #	Version No.: 0.01
-#	Created by: 	    Tom Sobota	16/03/2008
-#       Revised by:         Tom Sobota  29/03/2008
-#       Revised by:         Tom Sobota  28/04/2008
-#                           Stoyan Danov            18/06/2008
-#                           Stoyan Danov    03/07/2008
-#                           Stoyan Danov    04/07/2008
+#	Created by: 	    Hans Schweiger  05/07/2008
+#       Revised by:         
 #
-#       Changes to previous version:
-#       29/03/08:           mod. to use external graphics module
-#       28/04/2008          created method display
-#       18/06/2008 SD: change to translatable text _(...)
-#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<, esthetics & security features
-#       04/07/2008 SD: changed min No columns, col width, 
-#
+#       Changes to previous version:#
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,53 +31,48 @@
 import wx
 
 from status import Status
-from einstein.modules.energyStats.moduleEM1 import *
+from einstein.modules.moduleCS import *
 import einstein.modules.matPanel as Mp
 from einstein.GUI.graphics import drawStackedBarPlot
+from GUITools import *
 from numCtrl import *
 
-[wxID_PANELEM1, wxID_PANELEM1BTNBACK, wxID_PANELEM1BTNFORWARD, 
- wxID_PANELEM1BTNOK, wxID_PANELEM1GRID1, wxID_PANELEM1PANELGRAPHMPHD, 
+[wxID_PANELCS1, wxID_PANELCS1BTNBACK, wxID_PANELCS1BTNFORWARD, 
+ wxID_PANELCS1BTNOK, wxID_PANELCS1GRID1, wxID_PANELCS1PANELGRAPHMPHD, 
 ] = [wx.NewId() for _init_ctrls in range(6)]
 
-#
-# constants
-#
-GRID_LETTER_SIZE = 8               # points
-GRID_LABEL_SIZE = 9                # points
-GRID_LETTER_COLOR = '#000060'      # color specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF'  # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
-TITLE_COLOR = ORANGE
 
+COLNO = 4
+MAXROWS = 20
 
-class PanelEM1(wx.Panel):
+#============================================================================== 
+#============================================================================== 
+class PanelCS1(wx.Panel):
+#============================================================================== 
+#============================================================================== 
+#------------------------------------------------------------------------------		
     def __init__(self, parent):
+#------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['EM1'] 
-        self.mod = ModuleEM1(keys)
+        keys = ['CS1'] 
+        self.mod = ModuleCS(keys)
+        self.mod.updatePanel()
 
         labels_column = 0
 
-#####SD
-        (rows,cols) = Interfaces.GData[keys[0]].shape
-        print 'EM1: rows =',rows, 'cols =', cols
-##        ignoredrows = []     
 
         # remaps drawing methods to the wx widgets.
         #
         # single grid: Monthly process heat demand
         #
         paramList={'labels'      : 0,                            # labels column
-                   'data'        : 4,                            # data column for this graph
-                   'key'         : keys[0],                      # key for Interface
-                   'title'       :_('Monthly process heat demand'), # title of the graph
-                   'ylabel'      :_('UPH (MWh)'),                   # y axis label
+                   'data'        : 2,                            # data column for this graph
+                   'key'         : "CS1 Plot",                      # key for Interface
+                   'title'       :_('Primary energy consumption'), # title of the graph
+                   'ylabel'      :_('PEC (MWh)'),                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0,1]}                        # rows that should not be plotted
-##                   'ignoredrows' :ignoredrows}                        # rows that should not be plotted
         
         dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawStackedBarPlot,
                             paramList)
@@ -95,65 +80,37 @@ class PanelEM1(wx.Panel):
         #
         # additional widgets setup
         #
-        # data cell attributes
-        attr = wx.grid.GridCellAttr()
-        attr.SetTextColour(GRID_LETTER_COLOR)
-        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
         #
         # set grid properties
         # warning: this grid has a variable nr. of cols
         # so the 1st.row has the column headings
-        data = Interfaces.GData[keys[0]]
-
-#####Security feature against non existing GData entry
-        COLNO1 = 5 # minimum number of columns-for the case if only ONE process exists
-        try: (rows,cols) = data.shape
-        except: (rows,cols) = (0,COLNO1)
-        
-        self.grid1.CreateGrid(max(rows,20), max(COLNO1, cols))
+        self.grid1.CreateGrid(MAXROWS, COLNO)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
+        self.grid1.SetColLabelSize(40)
         self.grid1.EnableEditing(False)
-        headings = data[0] # extract the array of headings
+        
+#        headings = data[0] # extract the array of headings
+
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        for col in range(len(headings)):
-            self.grid1.SetColSize(col,141)
-            self.grid1.SetColLabelValue(col, headings[col])
-        self.grid1.SetColSize(0,141)
-        #
-        # copy values from dictionary to grid
-        # ignore the 1st. row, the column headings, which has been already
-        # processed
-#######LAYOUT: use of function numCtrl
+#        for col in range(len(headings)):
+#            self.grid1.SetColSize(col,141)
+#            self.grid1.SetColLabelValue(col, headings[col])
+        self.grid1.SetDefaultColSize(140)
+        self.grid1.SetColSize(0,285)
+        self.grid1.SetColLabelValue(0, _("Alternative"))
+        self.grid1.SetColLabelValue(1, _("Primary energy\nconsumption [MWh]"))
+        self.grid1.SetColLabelValue(2, _("Savings\n[MWh]"))
+        self.grid1.SetColLabelValue(3, _("Savings\n[%]"))
 
-        decimals = [-1]   #number of decimal digits for each colum
-        for i in range(cols-1): #fill decimals list according numbers of columns (variable)
-            decimals.append(1)
-            
-        for r in range(rows-1):
-            self.grid1.SetRowAttr(r, attr)
-            for c in range(cols):
-                try:
-                    if decimals[c] >= 0: # -1 indicates text
-                        self.grid1.SetCellValue(r, c, \
-                            convertDoubleToString(float(data[r+1][c]),nDecimals = decimals[c]))
-                    else:
-                        self.grid1.SetCellValue(r, c, data[r+1][c])
-                except: pass
-                if c == labels_column:
-                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
-                else:
-                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+        self.display()
 
-        self.grid1.SetGridCursor(0, 0)
-
-
+#------------------------------------------------------------------------------		
     def _init_ctrls(self, prnt):
-        # generated method, don't edit
-        wx.Panel.__init__(self, id=wxID_PANELEM1, name=u'PanelEM1', parent=prnt,
+#------------------------------------------------------------------------------		
+        wx.Panel.__init__(self, id=wxID_PANELCS1, name=u'PanelCS1', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
 #...........box1....................................................................
@@ -164,7 +121,7 @@ class PanelEM1(wx.Panel):
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.grid1 = wx.grid.Grid(id=wxID_PANELEM1GRID1, name='grid1',
+        self.grid1 = wx.grid.Grid(id=wxID_PANELCS1GRID1, name='grid1',
               parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 160),
               style=0)
 
@@ -176,7 +133,7 @@ class PanelEM1(wx.Panel):
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.panelGraphMPHD = wx.Panel(id=wxID_PANELEM1PANELGRAPHMPHD,
+        self.panelGraphMPHD = wx.Panel(id=wxID_PANELCS1PANELGRAPHMPHD,
               name=u'panelGraphMPHD', parent=self, pos=wx.Point(20, 260),
               size=wx.Size(760, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphMPHD.SetBackgroundColour(wx.Colour(127, 127, 127))
@@ -211,13 +168,11 @@ class PanelEM1(wx.Panel):
 
     def OnBtnBackButton(self, event):
         self.Hide()
-        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
-        print "Button exitModuleBack: now I should show another window"
+#        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
 
     def OnBtnForwardButton(self, event):
         self.Hide()
-        Status.main.tree.SelectItem(Status.main.qEM2, select=True)
-        print "Button exitModuleFwd: now I should show another window"
+        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
 
 #------------------------------------------------------------------------------
     def display(self):
@@ -225,7 +180,50 @@ class PanelEM1(wx.Panel):
 #   display function. carries out all the necessary calculations before
 #   showing the panel
 #------------------------------------------------------------------------------
+
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+        # data cell attributes for totals row
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        data = Status.int.GData["CS1 Table"]
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO)
+        
+        decimals = [-1,2,2]   #number of decimal digits for each colum
+        labels_column = 0
+        
+        for r in range(rows):
+            if r == 0:
+                self.grid1.SetRowAttr(r, attr2)
+            else:
+                self.grid1.SetRowAttr(r,attr)
+                
+            for c in range(cols):
+                try:
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid1.SetCellValue(r, c, \
+                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid1.SetCellValue(r, c, data[r][c])
+                except: pass
+                if c == labels_column:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                else:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
+
+
         try: self.panelGraphMPHD.draw()
         except: pass
+        
         self.Show()
+        
+#============================================================================== 
 

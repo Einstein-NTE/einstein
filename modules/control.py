@@ -35,6 +35,8 @@
 #
 #============================================================================== 
 from einstein.GUI.status import *
+from einstein.modules.messageLogger import *
+from einstein.GUI.conflictFrame import *
 
 #------------------------------------------------------------------------------		
 def prepareDataForReport():
@@ -44,5 +46,116 @@ def prepareDataForReport():
 
     Status.mod.moduleEA.update()
     print "Control (prepareData): here I should do something more ..."
+
+#------------------------------------------------------------------------------		
+def autoRun(parent):
+#------------------------------------------------------------------------------		
+#   calls the functions necessary for writing the report
+#------------------------------------------------------------------------------		
+
+    logTrack("Control (autoRun): starting")
+
+#..............................................................................
+# If there's no data, there's nothing to do ...
+
+    if Status.StatusQ == 0:
+        logError("Control (autoRun): sorry, but SOME data have to be filled in before starting")
+
+#..............................................................................
+# Consistency check ...
+
+    if Status.StatusCC == 0:
+        logMessage("Control (autoRun): starting consistency check")
+
+        Status.prj.copyQuestionnaire()
+        nc = Status.mod.moduleCC.basicCheck(matrixCheck=True)
+
+        if nc > 0:
+            checkOK = False
+            if Status.UserInteractionLevel in ["semi-automatic","interactive"]:
+                Status.mod.moduleCC.updatePanel()
+                cf = conflictFrame(parent)
+                cf.Show()
+            else:
+                showMessage("Control (autoRun): data conflicts detected.\n"+\
+                            "Don't know yet what to do in this case, as I'm in automatic mode")
+                   
+        else:
+            checkOK = True
+            showMessage("Control (autoRun): congratulations. data are consistent.\n"+\
+                        "now let's continue calculating some energy balances")
+            
+            Status.prj.setActiveAlternative(0,checked = True)
+            Status.mod.moduleEA.update()
+            Status.main.tree.SelectItem(Status.main.qEA4a, select=True)
+
+    else:
+        logTrack("Control (autoRun): project already checked")
+
+#..............................................................................
+# Benchmarking
+
+    pass #for the future
+
+#..............................................................................
+# Now let's create some alternative proposals
+
+#..............................................................................
+# Alternative proposal 1: Heat recovery only
+
+    showMessage("First let's test the remaining heat recovery potential (Alternative 1)\n"+\
+                "The result will be used as base for system optimisation")
+    
+    shortName = "Heat recovery (HR)"
+    description = "EINSTEIN default design of heat recovery system"
+    basedOn = 0
+        
+    Status.prj.createNewAlternative(basedOn,shortName,description)
+
+    Status.mod.moduleHR.simulateHR()
+
+# Finally check the boiler dimensioning for the remaining heat demand
+#    Status.mod.moduleBB.designAssistant()
+
+#..............................................................................
+# Alternative proposal 2: Heat recovery + solar system
+
+#    showMessage("Now let's try to install a solar system (Alternative 2)\n")
+    
+#    shortName = "Solar thermal"
+#    description = "EINSTEIN default design of a solar thermal system"
+#    basedOn = 1
+        
+#    Status.prj.createNewAlternative(basedOn,shortName,description)
+
+#    Status.mod.moduleHR.simulateHR()
+
+# Finally check the boiler dimensioning for the remaining heat demand
+#    Status.mod.moduleBB.designAssistant()
+
+#..............................................................................
+# Alternative proposal 3: Heat recovery + heat pump
+
+    showMessage("Now let's try to install a heat pump (Alternative 3)\n")
+    
+    shortName = "Heat pump"
+    description = "EINSTEIN default design of a heat pump based system"
+    basedOn = 1
+        
+    Status.prj.createNewAlternative(basedOn,shortName,description)
+
+    (mode,HPList) = Status.mod.moduleHP.designAssistant1()
+
+    if len(HPList) > 0:  
+        HPId = HPList[0]    #in automatic mode just take first in the list
+    else:
+        HPId = -1
+    logMessage("Control (autoRun): no heat pump application possible")
+    
+    self.mod.designAssistant2(HPId)
+
+# Finally check the boiler dimensioning for the remaining heat demand
+#    Status.mod.moduleBB.designAssistant()
+
 
 #============================================================================== 

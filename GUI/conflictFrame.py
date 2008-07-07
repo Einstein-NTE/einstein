@@ -39,6 +39,7 @@ import wx.grid
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
 from einstein.modules.ccheck.moduleCC import *
+from GUITools import *
 
 def create(parent):
     return conflictFrame(parent)
@@ -50,11 +51,6 @@ def create(parent):
 #
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRID_BACKGROUND_COLOR_MAINLINE = '#FFFFC0' # idem
 
 MAXROWS = 150
 COLNO = 3
@@ -129,16 +125,16 @@ class conflictFrame(wx.Dialog):
 
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
 
-        self.grid.SetColLabelValue(0, _("parameter\n(values)"))
-        self.grid.SetColLabelValue(1, _("accuracy"))
-        self.grid.SetColLabelValue(2, _("calculated from"))
+        self.grid.SetColLabelValue(0, _("parameter\n(values in conflict)"))
+        self.grid.SetColLabelValue(1, _("data group\n(accuracy)"))
+        self.grid.SetColLabelValue(2, _("description\n(calculated from)"))
 
         for r in range(MAXROWS):
 
             if r%3 == 0:    #main row of entry
                 attr = wx.grid.GridCellAttr()
-                attr.SetTextColour(GRID_LETTER_COLOR)
-                attr.SetBackgroundColour(GRID_BACKGROUND_COLOR_MAINLINE)
+                attr.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+                attr.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
                 attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
                 self.grid.SetRowAttr(r, attr)

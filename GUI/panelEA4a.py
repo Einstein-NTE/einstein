@@ -23,6 +23,7 @@
 #                           Stoyan Danov    01/07/2008
 #                           Stoyan Danov    02/07/2008
 #                           Stoyan Danov    03/07/2008
+#                           Hans Schweiger  06/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -34,6 +35,7 @@
 #       01/07/2008: SD  adappted as panelEAa - heat demand by temperature, new columns added
 #       02/07/2008: SD  changed to orange colour (staticBox)
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
+#       06/07/2008: HS  made it work again. finish layout
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,6 +54,7 @@ from numCtrl import *
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
 import einstein.modules.matPanel as Mp
+from GUITools import *
 
 [wxID_PANELEA4, wxID_PANELEA4GRID1, wxID_PANELEA4GRID2, 
  wxID_PANELEA4PANELGRAPHUPH, wxID_PANELEA4PANELGRAPHHD,
@@ -61,26 +64,45 @@ import einstein.modules.matPanel as Mp
 #
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
-TITLE_COLOR = ORANGE
 
+COLNO1 = 8
+MAXROWS = 20
+
+#============================================================================== 
+#============================================================================== 
 class PanelEA4a(wx.Panel):
+#============================================================================== 
+#============================================================================== 
+
+#------------------------------------------------------------------------------		
     def __init__(self, parent):
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-#        keys = ['EA4_UPH', 'EA4_HDP']
-        keys = ['EA4_UPH','HP Table','UPH Plot']
+
+#..............................................................................
+# starting module
+
+        keys = ['EA4a Table','EA4a Plot']
         self.mod = ModuleEA4(keys)
+        self.mod.updatePanel()
+
+        try:
+            data = Interfaces.GData[keys[0]]
+            (rows,cols) = data.shape
+        except:
+            logDebug("PanelEA4a: received corrupt data set [%s]"%keys[0])
+            (rows,cols) = (0,COLNO1)
+
+        
+#..............................................................................
+# Pie-plot
+
         labels_column = 0
         # remaps drawing methods to the wx widgets.
         #
         # upper graphic: UPH demand by process
         #
-        (rows,cols) = Interfaces.GData[keys[0]].shape
         ignoredrows = [rows-1]
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
@@ -94,59 +116,55 @@ class PanelEA4a(wx.Panel):
                             drawPiePlot,
                             paramList)
 
-        #
-        # additional widgets setup
-        #
+#..............................................................................
+# Build-up table
+
         # data cell attributes
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
         #
         # set upper grid
         #
-        key = keys[0]
-        data = Interfaces.GData[key]
-
-        
-#####Security feature against non existing GData entry
-        COLNO1 = 8 #grid has usually a fixed column size, not necessary to read from GData
-        try: (rows,cols) = data.shape
-        except: (rows,cols) = (0,COLNO1)
-        
-        self.grid1.CreateGrid(max(rows,10), COLNO1)
+        self.grid1.CreateGrid(MAXROWS, COLNO1)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
 
-        self.grid1.SetColSize(0,115)
-        self.grid1.SetColSize(1,90)#SD added
-        self.grid1.SetColSize(2,90)#SD added
-        self.grid1.SetColSize(3,90)
-        self.grid1.SetColSize(4,90)
-        self.grid1.SetColSize(5,90)
-        self.grid1.SetColSize(6,90)
-        self.grid1.SetColSize(7,90)
+        self.grid1.SetDefaultColSize(80)
+        self.grid1.SetColSize(0,145)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Process"))
         self.grid1.SetColLabelValue(1, _("UPH Total\n[MWh]"))
-        self.grid1.SetColLabelValue(2, _("Share of total\n[%]"))
-        self.grid1.SetColLabelValue(3, _("UPH Circulation\n[MWh]"))
-        self.grid1.SetColLabelValue(4, _("UPH Maintain.\n[MWh]"))
-        self.grid1.SetColLabelValue(5, _("UPH Start-up\n[MWh]"))
-        self.grid1.SetColLabelValue(6, _("Process\ntemperature[ºC]"))
-        self.grid1.SetColLabelValue(7, _("Central supply\ntemperature[ºC]"))
+        self.grid1.SetColLabelValue(2, _("Share\n[%]"))
+        self.grid1.SetColLabelValue(3, _("Circulation\n[MWh]"))
+        self.grid1.SetColLabelValue(4, _("Maintenance\n[MWh]"))
+        self.grid1.SetColLabelValue(5, _("Start-Up\n[MWh]"))
+        self.grid1.SetColLabelValue(6, _("Process\nTemp. [ºC]"))
+        self.grid1.SetColLabelValue(7, _("Process Supply\nTemp. [ºC]"))
         #
         # copy values from dictionary to grid
         #
 
-#######LAYOUT: use of function numCtrl, SD new one with decimals control
+#..............................................................................
+# Load data into table
 
         decimals = [-1,2,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
-            self.grid1.SetRowAttr(r, attr)
+            if r < rows-1:
+                self.grid1.SetRowAttr(r, attr)
+            else:
+                self.grid1.SetRowAttr(r,attr2)  #highlight totals row
+                
             for c in range(cols):
                 try:
                     if decimals[c] >= 0: # -1 indicates text
@@ -154,17 +172,25 @@ class PanelEA4a(wx.Panel):
                             convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
                     else:
                         self.grid1.SetCellValue(r, c, data[r][c])
-                except: pass
+                except:
+                    logDebug("PanelEA4a: error writing data[%s][%s]: "%(r,c))
+                    
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
-        self.grid1.SetGridCursor(0, 0)
 
+#..............................................................................
+# Finally display everything
 
+        self.display()
 
+#------------------------------------------------------------------------------		
     def _init_ctrls(self, prnt):
+#------------------------------------------------------------------------------		
+#   basic lay-out
+#------------------------------------------------------------------------------		
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELEA4, name=u'PanelEA4a', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600))

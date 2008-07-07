@@ -75,9 +75,11 @@
 #                   Security feature: where's no table uheatpump, one is created
 #       02/07/2008: HS Calulation of FETFuel_j,FETel_j and HPerYearEq added to
 #                       calculateEnergyFlows
-#       03/07/2008: HS  Call to updatePanel eliminated in initPanel
+#       03/07/2008ff: HS  Call to updatePanel eliminated in initPanel
 #                       change in setting of cascadeIndex in screenEquipments
 #                       some bug-fixing and clean-up
+#                       boiler efficiency set as fraction of 1
+#                       introduction of several security items and bug-fixes
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -101,7 +103,11 @@ import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
 
+#============================================================================== 
+#============================================================================== 
 class ModuleBB(object):
+#============================================================================== 
+#============================================================================== 
 
     BBList = []
     
@@ -113,25 +119,14 @@ class ModuleBB(object):
 
         self.neweqs = 0 #new equips added
         
-#HS2008-06-27
-#small bug-fix: equipment screening should be carried out every time the user enters into the panel
-# PId and ANo may have changed in between
-#        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-#        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-#        self.NEquipe = len(self.equipments)
-
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
 #------------------------------------------------------------------------------
 
         if Status.int.cascadeUpdateLevel < 0:
             Status.int.initCascadeArrays(0)
-            #Status.mod.moduleEnergy.runSimulation() no longer necessary
-            #Status.int.printCascade()
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -144,8 +139,6 @@ class ModuleBB(object):
 # get list of equipments and boilers in the system
 # and update the energetic calculation up to the level needed for representation
 
-        self.equipments = Status.prj.getEquipments()
-        self.NEquipe = len(self.equipments)
         (BBList,BBTableDataList) = self.screenEquipments()
 
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
@@ -175,9 +168,9 @@ class ModuleBB(object):
                     bbs = Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]]
                     if len(bbs) > 0:
                         bb = bbs[0]
-                        if bb.TExhaustGas > 80 and bb.TExhaustGas <= 140:
+                        if bb.TMaxSupply > 80 and bb.TMaxSupply <= 140:
                             PowerSum140 += i["equipePnom"]
-                        if bb.TExhaustGas > 140:
+                        if bb.TMaxSupply > 140:
                             PowerSumTmax += i["equipePnom"]
             else :
                 for i in BBList:
@@ -185,93 +178,85 @@ class ModuleBB(object):
 #                    bbs = self.equipments.QGenerationHC_ID[i["equipeID"]]  #HS2008-07-03: changed. gave some strange SQL error
                     if len(bbs) > 0:
                         bb = bbs[0]
-                        if bb.TExhaustGas > 80:
+                        if bb.TMaxSupply > 80:
                             PowerSumTmax += i["equipePnom"]
                             
             for i in BBList:
-                if Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]][0]["TExhaustGas"]<=80:
-                    PowerSum80 += i["equipePnom"]
+                bbs = Status.DB.qgenerationhc.QGenerationHC_ID[i["equipeID"]]
+                if len(bbs) > 0:
+                    bb = bbs[0]
+                    if bb.TMaxSupply <=80:
+                        PowerSum80 += i["equipePnom"]
         else:
             for i in BBList:
                PowerSumTmax += i["equipePnom"] 
 
         if len(BBList)==0:
-            index=len(self.equipments)-1
+            index=max(len(self.equipments),1)     #HS2008-07-06. bug-fix. assures that index >= 0
+                                                  #even if there's NO equipment at all !!!
         else:
-            index = Status.DB.qgenerationhc.QGenerationHC_ID[BBList[0]["equipeID"]][0]["CascadeIndex"]
+            bbs = Status.DB.qgenerationhc.QGenerationHC_ID[BBList[0]["equipeID"]]
+            if len(bbs) > 0:
+                bb = bbs[0]
+                index = bb.CascadeIndex
 
-        print "length of QD_Tt_mod is", len(Status.int.QD_Tt_mod)
-        print "the element we are looking at is", index
-        QD80C=Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval)]
+        QD80C = Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval+0.5)]
         QD80C.sort(reverse=True)
-        print "QD80C: ",QD80C
-        print "the maximum power required at 80°C is",QD80C[0]
+
         if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
             QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
             QD140C.sort(reverse=True)
-            print "QD140C: ",QD140C
         else:
             QD140C=[]
             for i in range(len(QD80C)):
                 QD140C.append(0)
-        QDmaxTemp=Status.int.QD_Tt_mod[index-1][int(self.maxTemp/Status.TemperatureInterval)]
+
+        iT_maxTemp = int(self.maxTemp/Status.TemperatureInterval)
+        QDmaxTemp=Status.int.QD_Tt_mod[index-1][iT_maxTemp]
         QDmaxTemp.sort(reverse=True)
-        print "QDmaxTemp: ",QDmaxTemp
-        print "the maximum power required at maxTemp is",QDmaxTemp[0]                
+
 #............................................................................................
 # 2. XY Plot
         TimeIntervals=[]
         for it in range(Status.Nt+1):
             TimeIntervals.append(1.0*(it+1))
-#        print "TimeInterval len is", len(TimeIntervals)
-#        print "demand len is", len(QD80C)
-        if self.maxTemp>160:
-            try:
+
+        try:
+
+            if self.maxTemp>160:
+                
                 Status.int.setGraphicsData('BB Plot',[TimeIntervals,
                                                             QD80C,
                                                             QD140C,
                                                             QDmaxTemp])
-            except:
-                pass
-        else:
-            if self.maxTemp>80:
-                try:
-                    Status.int.setGraphicsData('BB Plot',[TimeIntervals,
-                                                                QD80C,
-                                                                QD140C,
-                                                                QDmaxTemp])
-                except:
-                    pass
+            elif self.maxTemp>80:
+                Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+                                                            QD80C,
+                                                            QD140C,
+                                                            QDmaxTemp])
             else:
-                try:
-                    Status.int.setGraphicsData('BB Plot',[TimeIntervals,
-                                                                QD80C])
-                except:
-                    pass
+                Status.int.setGraphicsData('BB Plot',[TimeIntervals,
+                                                            QD80C])
+        except:
+            logDebug("ModuleBB (updatePanel): problems sending data for BB Plot")
 
 #............................................................................................
 # 3. Configuration design assistant
 
-###HS2008-05-16: these are the values for the design assistant
-# (Config field). Should later on be taken from U-table in SQL
-
         config = self.getUserDefinedPars()
         Status.int.setGraphicsData('BB Config',config)
-
-    
+        
 #............................................................................................
-# 4. additional information
+# 4. additional information (Info field right side of panel)
 
-###HS2008-05-16: here is what is displayed on the right side of the panel
-# (Info field)
         info = []
         info.append(10)  #first value to be displayed
+        
         info.append(max(0,(QD80C[0]-PowerSum80)))  #power for T-level
+        
         if self.maxTemp>160:
             info.append(max(0,(QD140C[0]-QD80C[0]-PowerSum140)))  #power for T-level
-#HS2008-06-27: small bug-fix: PowerSummaxTemp -> PowerSumTmax
             info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSumTmax)))  #power for T-level
-#            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSummaxTemp)))  #power for T-level
         else:
             info.append(0)
             if self.maxTemp>80:
@@ -283,9 +268,6 @@ class ModuleBB(object):
         Status.int.setGraphicsData('BB Info',info)
 
 #------------------------------------------------------------------------------
-
-###HS2008-05-16: these functions are just copied from HP module
-### have to be adapted for boiler module
 #------------------------------------------------------------------------------
     def getUserDefinedPars(self):
 #------------------------------------------------------------------------------
@@ -346,21 +328,26 @@ class ModuleBB(object):
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------
-    def screenEquipments(self):
+    def screenEquipments(self,setIndex = True):
 #------------------------------------------------------------------------------
 #       screens existing equipment, whether there are already heat pumps
 #------------------------------------------------------------------------------
 
-
+        self.equipments = Status.prj.getEquipments()
         Status.int.getEquipmentCascade()
+        self.NEquipe = len(self.equipments)
+
         self.BBList = []
-        maxIndex = 0
+        maxIndex = self.NEquipe
         index = 0
         for row in Status.int.cascade:
             index += 1
             if getEquipmentClass(row["equipeType"]) == "BB":
                 self.BBList.append(row)
                 maxIndex = index
+
+        if setIndex == True:
+            self.cascadeIndex = maxIndex
 
         BBTableDataList = []
         for row in Status.int.EquipTableDataList:
@@ -373,11 +360,6 @@ class ModuleBB(object):
                 if BBTableDataList[i][j] == None:
                     BBTableDataList[i][j] = 'not available'        
 
-        if(len(self.BBList)>0):
-            self.cascadeIndex = maxIndex
-#            self.cascadeIndex = len(self.BBList) #by default sets selection to last BB in cascade
-        else:
-            self.cascadeIndex = 0
         return (self.BBList,BBTableDataList)
         
 
@@ -396,9 +378,7 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
     def deleteEquipment(self,rowNo,automatic=False):
 #------------------------------------------------------------------------------
-        """
-        deletes the selected boiler in the current alternative
-        """
+#
 #------------------------------------------------------------------------------
 
         if automatic == False:
@@ -412,62 +392,9 @@ class ModuleBB(object):
             BBid= rowNo
             print "Module BB (delete automaticly): id to be deleted = ",BBid
         
-        eq = self.equipments.QGenerationHC_ID[BBid][0] #select the corresponding rows to HPid in both tables
-###HS: CGENERATIONHC ELIMINATED.        eqC = self.equipmentsC.QGenerationHC_id[BBid][0]
+        Status.prj.deleteEquipment(BBid)
+        self.screenEquipments()
 
-        eq.delete() #deletes the rows in both tables, to be activated later, SD
-###HS: CGENERATIONHC ELIMINATED.        eqC.delete()
-        self.sql.commit()
-
-        #actuallise the cascade list: define deleteFromCascade
-        self.deleteFromCascade(Status.int.cascade, BBid)
-
-        self.NEquipe -= 1
-
-#------------------------------------------------------------------------------
-    def deleteFromCascade(self, cascade, BBid):
-#------------------------------------------------------------------------------
-        """
-        deletes from the actual list casade and re-assigns the CascadeIndex values in QGenerationHC table
-        """
-#-----------------------------------------------------------------------------
-
-#        print '\n deleteFromCascade():', 'cascade =', cascade
-
-        idx = -1
-        new_cascade = cascade
-        for i in range(len(new_cascade)):
-            if new_cascade[i]['equipeID'] == BBid:
-                idx = i
-
-        new_cascade.pop(idx)
-
-        Status.int.changeInCascade(idx)
-
-###HS: CGENERATIONHC CHANGED TO QGENERATIONHC
-        for i in range(len(new_cascade)): #assign new CascadeIndex in CGenerationHC table
-            eq = self.equipments.QGenerationHC_ID[new_cascade[i]['equipeID']][0]
-            eq.CascadeIndex = i+1
-#            print '\n new_CascadeIndex', eqC.CascadeIndex
-            
-        self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
-
-        print '\n deleteFromCascade():', 'new_cascade =', new_cascade
-
-
-        
-        sqlQuery = "Questionnaire_ID = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
-        equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-##        print '\n \nequipments', equipments
-
-        for i in range(len(equipments)): #assign new EqNo in QGenerationHC table
-            equipments[i].EqNo = i+1
-
-#        self.sql.commit() #to be activated, SD
-
-        Status.int.deleteCascadeArrays(self.NEquipe)
-
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):
 #------------------------------------------------------------------------------
@@ -475,50 +402,22 @@ class ModuleBB(object):
 #       position in the cascade 
 #------------------------------------------------------------------------------
 
-        print 'moduleBB (addEquipmentDummy): cascade Arrays initialised '
-        self.cascadeIndex = self.NEquipe + 1
-        EqNo = self.NEquipe + 1
-        print 'ModuleBB (addEquipmentDummy): CascadeIndex', self.cascadeIndex
-        print 'ModuleBB (addEquipmentDummy): EqNo', EqNo
+        self.equipe = Status.prj.addEquipmentDummy()
+        self.dummyEqId = self.equipe.QGenerationHC_ID
 
         self.neweqs += 1 #No of last equip added
         NewEquipmentName = "New boiler %s"%(self.neweqs)
 
-        EqNo = self.NEquipe + 1
-
-        equipe = {"Questionnaire_id":Status.PId,\
-                  "AlternativeProposalNo":Status.ANo,\
-                  "EqNo":EqNo,"Equipment":NewEquipmentName,\
-                  "EquipType":"Boiler (specify subtype)","CascadeIndex":self.cascadeIndex}
-        
-        QGid = self.DB.qgenerationhc.insert(equipe)
-###HS: CGENERATIONHC ELIMINATED.
-        self.dummyEqId = QGid #temporary storage of the equipment ID for undo if necessary
-        
+        equipeData = {"Equipment":NewEquipmentName,"EquipType":"Boiler (specify subtype)"}
+        self.equipe.update(equipeData)
         Status.SQL.commit()
 
-        Status.int.getEquipmentCascade()
-        Status.int.addCascadeArrays()
-
-        print "ModuleBB (addEquipmentDummy): new equip row created"
-        print "ModuleBB (addEquipmentDummy): self.cascadeIndex", self.cascadeIndex
-
-###HS2008-05-16: added this three lines for security. had an error when adding an equipment in a project built from scratch. to be tested
-#                   later on ...
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = self.DB.qgenerationhc.sql_select(sqlQuery)
-        self.NEquipe = len(self.equipments)
-
-        self.equipe = self.equipments.QGenerationHC_ID[QGid][0]
-
-        Status.int.changeInCascade(self.cascadeIndex)
-
+        self.screenEquipments()
+        self.cascadeIndex = self.NEquipe
+        
         return(self.equipe)
 
-
 #------------------------------------------------------------------------------
-
-###HS: CGENERATIONHC ELIMINATED IN INPUT LIST.
 #------------------------------------------------------------------------------
     def setEquipmentFromDB(self,equipe,modelID):
 #------------------------------------------------------------------------------
@@ -527,11 +426,19 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 
         model = self.DB.dbboiler.DBBoiler_ID[modelID][0]
-        print "setting equipment from DB"
+
         if model.BBPnom != None: equipe.update({"HCGPnom":model.BBPnom})
-        if model.BBEfficiency != None: equipe.update({"HCGTEfficiency":model.BBEfficiency})
-#        if model.BoilerTemp != None: equipe.update({"TMax":model.BoilerTemp})
-        if model.BoilerTemp != None: equipe.update({"TExhaustGas":model.BoilerTemp}) # This line has to be changed when an appropriate field will be insert in qgenerationhc
+        
+        if model.BBEfficiency != None:
+            if model.BBEfficiency > 1.3 and model.BBEfficiency < 130.0:
+                logTrack("ModuleBB: Efficiency data should be stored internally as fractions of 1")
+                eff = model.BBEfficiency/100.0
+                model.update({"BBEfficiency":eff})
+            else:
+                eff = model.BBEfficiency
+            equipe.update({"HCGTEfficiency":eff})
+            
+        if model.BoilerTemp != None: equipe.update({"TMaxSupply":model.BoilerTemp})
         if model.BoilerManufacturer != None: equipe.update({"Manufact":model.BoilerManufacturer})
         if model.BoilerModel != None: equipe.update({"Model":model.BoilerModel})
         equipe.update({"EquipType":getEquipmentType("BB",model.BoilerType)})
@@ -539,26 +446,10 @@ class ModuleBB(object):
         if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         Status.SQL.commit()
-        print "cascade index is:",
-        print "demand before the add",self.cascadeIndex-1
-        print Status.int.QD_Tt_mod[self.cascadeIndex-1][8]
+
         self.calculateEnergyFlows(equipe,self.cascadeIndex)
-        print "demand after the add"
-        print Status.int.QD_Tt_mod[self.cascadeIndex][8]
+
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-
-    def retrieveDeleted(self):
-        """
-        returns a list of previously deleted equipment that can be retrieved
-        """
-        print "deleteHP: function not yet defined"
-
-        return "ok"
-
-        #--> delete HP from the equipment list under current alternative
-        
-
 #------------------------------------------------------------------------------
     def calculateEnergyFlows(self,equipe,cascadeIndex):
 #------------------------------------------------------------------------------
@@ -569,24 +460,33 @@ class ModuleBB(object):
             logDebug("ModuleBB (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
             Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
 
-        print "ModuleBB (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
+        if cascadeIndex > 0 and cascadeIndex <= Status.NEquipe:
+            logTrack("ModuleBB (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex)
+        else:
+            logError("ModuleBB (calculateEnergyFlows): cannot simulate index %s: out of cascade [%s]"%\
+                     (cascadeIndex,Status.NEquipe))
+            return
 #..............................................................................
 # get equipment data from equipment list in SQL
 
         BBModel = equipe.Model
-        print equipe.Model
         BBType = equipe.EquipType
         PNom = equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
-#XXX TOpMax or something similar should be defined in SQL        TMax = equipe.TOpMax
-# for the moment set equal to TExhaustGas
-        TMax = equipe.TExhaustGas
-    
-#XXX ENRICO: here other equipment parameters should be imported from SQL database
-        self.screenEquipments()
-        EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
+        TMax = equipe.TMaxSupply
+        EquipmentNo = equipe.EqNo
 
-        print 'ModuleBB (calculateEnergyFlows): Model = ', BBModel, ' Type = ', BBType, 'PNom = ', PNom
+        if PNom is None:
+            PNom = 0.0
+            logWarning("ModuleBB (calculateEnergyFlows): No nominal power specified for equipe no. %s"%\
+                 (EquipmentNo))
+
+        if TMax is None:
+            TMax = INFINITE
+            logDebug("ModuleBB (calculateEnergyFlows): no Tmax specified for equipe no. %s"%EquipmentNo)
+  
+        logTrack("ModuleBB (calculateEnergyFlows): Model = %s Type = %s PNom = %s"%\
+                 (BBModel,BBType,PNom))
 
 #..............................................................................
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
@@ -611,12 +511,12 @@ class ModuleBB(object):
 
         for it in range(Status.Nt):
 
-#            print "time = ",it*Status.TimeStep
-
 #..............................................................................
 # Calculate heat delivered by the given equipment for each time interval
+
             for iT in range (Status.NT+2):
                 QHXj_Tt[iT][it] = 0     #for the moment no waste heat considered
+                
                 if TMax >= Status.int.T[iT] :   #TMax is the max operating temperature of the boiler 
                     USHj_Tt[iT][it] = min(QD_Tt[iT][it],PNom*Status.TimeStep)     #from low to high T
                     
@@ -625,16 +525,15 @@ class ModuleBB(object):
                         USHj_Tt[iT][it] = USHj_Tt[iT-1][it]     #no additional heat supply at high temp.
                     else:
                         USHj_Tt[iT][it] = 0
+                        
                 QD_Tt[iT][it]= QD_Tt[iT][it]- USHj_Tt[iT][it]
+                
             USHj += USHj_Tt[Status.NT+1][it]
             if USHj_Tt[Status.NT+1][it]>0:
                 HPerYear += Status.TimeStep
-#            print USHj_Tt[Status.NT+1][it]      #total heat supplied at present timestep
-#........................................................................
-# End of year reached. Store results in interfaces
 
-        print "ModuleBB (calculateEnergyFlows): now storing final results"
-        a=[]
+#..............................................................................
+# End of year reached. Store results in interfaces
        
 # remaining heat demand and availability for next equipment in cascade
         Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
@@ -652,11 +551,8 @@ class ModuleBB(object):
         Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
         Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
 
-#        equipeC.USHj = USHj
-#        equipeC.QHXj = QHXj    #XXX to be defined in data base
-
-        print "Total energy supplied by equipment ",USHj, " MWh"
-        print "Total waste heat input  ",QHXj, " MWh"
+        logTrack("ModuleBB (calculateEnergyFlows): Total energy supplied by equipment %s MWh"%USHj)
+        logTrack("ModuleBB (calculateEnergyFlows): Total waste heat input  %s MWh"%QHXj)
 
         Status.int.cascadeUpdateLevel = cascadeIndex
 
@@ -686,43 +582,6 @@ class ModuleBB(object):
 #   moove all the boilers to the end of the cascade.
 #  sorts boilers by temperature and by efficiency
 #------------------------------------------------------------------------------
-####TAKE CARE: if you look for a property of the equipment at position k in the cascade, you have to look up for it by its ID:
-# e.g. the equipment with myID can be found by
-#            self.equipments.QGenerationHC_ID[myID][0]
-#   and it's efficiency with
-#   my_eta = self.equipments.QGenerationHC_ID[myID][0].HCGTEfficiency
-#
-#           you can also write the following in a more clearer way:
-#
-#   my_equipment = self.equipments.QGenerationHC_ID[myID][0]
-#   my_eta = my_equipment.HCGTEfficiency
-#
-#
-#   A shorter way to get the equipes already sorted into a table is
-#        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
-#        all_my_equipments_sorted = self.DB.qgenerationhc.sql_select(sqlQuery)
-#
-#   Then you can access to the n'th equipment in the cascade just by
-#   my_nth_equipe = all_my_equipments_sorted[n-1] -> listings in python are like in C, from 0 to n-1, not from 1 to n !!!
-#
-# as an example I try to re-write your code a little bit more efficiently:
-#
-#ORIGINAL CODE:
-#        k=0
-#        while k<len(Status.int.cascade):
-#            if getEquipmentClass(Status.int.cascade[k]["equipeType"]) == "BB":
-#                a=0
-#                for h in range (k,len (Status.int.cascade)):
-#
-#                    if self.equipment[Status.int.cascade[k]["equipeID"]].HCGTEfficiency < self.equipments[Status.int.cascade[k].equipeID].HCGTEfficiency:
-#                        a=h-k
-#                for l in range(a):
-#                    self.moduleHC.cascadeMoveDown(k+l)
-#            if a>0:
-#                k=k-1
-#            k=k+1
-#NEW CODE:
-
 #first bring all your boilers in a listing for easier access
 
         boilerList = []
@@ -731,14 +590,10 @@ class ModuleBB(object):
             a=getEquipmentClass(entry["equipeType"])
             if a=="BB":
                 eqID = entry["equipeID"]
-                equipe = self.equipments.QGenerationHC_ID[eqID][0]
+                equipe = Status.DB.qgenerationhc.QGenerationHC_ID[eqID][0]
                 efficiency = equipe.HCGTEfficiency
-                temperature = equipe.TExhaustGas
+                temperature = equipe.TMaxSupply
                 boilerList.append({"equipeID":eqID,"efficiency":efficiency,"temperature":temperature})
-                print boilerList
-
-        print "ModuleBB (sortBoiler): first step done - boilerList created"
-        print boilerList
 
 #then reorganise boilerList by efficiencies (maybe there are more intelligent ways to do this, but here's one ...:
 # if you want the most efficient on top [n-1] instead on bottom [0], just change the sign of the comparison from > to <
@@ -750,10 +605,7 @@ class ModuleBB(object):
                     bj = boilerList[j]
                     boilerList[i] = bj
                     boilerList[j] = bi
-
-        print "ModuleBB (sortBoiler): second step done - boilerList ordered by efficiency"
-        print boilerList
-
+                    
 #then reorganise boilerList by temperature levels:
 #   first level:
 
@@ -785,21 +637,15 @@ class ModuleBB(object):
                     boilerList[i] = bj
                     boilerList[j] = bi
 
-        print "ModuleBB (sortBoiler): third step done - boilerList ordered by temperature and efficiency"
-        print boilerList
-
 
 #then move consecutively to the bottom of the cascade (move the one last, which you finally want to have at the bottom
 
         for i in range(len(boilerList)):
             eqID = boilerList[i]["equipeID"]
-            equipe = self.equipments.QGenerationHC_ID[eqID][0]
+            equipe = Status.DB.qgenerationhc.QGenerationHC_ID[eqID][0]
             cascadeIndex = equipe.CascadeIndex
             if cascadeIndex < Status.int.NEquipe:
                 Status.mod.moduleHC.cascadeMoveToBottom(cascadeIndex)
-
-        print "ModuleBB (sortBoiler): fourth step done - shift in cascade carried out"
-        print Status.int.cascade
 
 #find the position in the cascade of the first and last boiler of each T level
         a=0
@@ -811,6 +657,7 @@ class ModuleBB(object):
                 b+=1
 
         self.firstBB = len(Status.int.cascade)-len(boilerList)
+        
         self.firstBB140 = len(Status.int.cascade)-a
         if self.maxTemp >140:
             self.firstBBmaxTemp = len(Status.int.cascade)-b
@@ -818,58 +665,9 @@ class ModuleBB(object):
             self.firstBBmaxTemp =len(Status.int.cascade)-a
         lastBB = len(Status.int.cascade)-1
             
-#OR JUST CORRECTING YOUR CODE (don't understand it so I can't say if it should work or not ...):
-                
-#        k=0
-#        while k<len(Status.int.cascade):
-#            if getEquipmentClass(Status.int.cascade[k]["equipeType"]) == "BB":
-#                a=0
-#                for h in range (k,len (Status.int.cascade)):
-#                    equipe_k = self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]
-#                    equipe_h = self.equipments.QGenerationHC_ID[Status.int.cascade[h]["equipeID"]][0]
-#                    if equipe_h.HCGTEfficiency < equipe_k.HCGTEfficiency:   #check if h and k has to be changed !!!
-#                        a=h-k
-#                for l in range(a):
-#                    Status.mod.moduleHC.cascadeMoveDown(k+l)
-#            if a>0:
-#                k=k-1
-#            k=k+1
-
-#        for i in range (len(Status.int.cascade)):
-#            if getEquipmentClass(Status.int.cascade[i].equipeType)=="BB" and self.equipments[Status.int.cascade[i].equipeID].Temp <=90:
-#            equipe = self.equipments.QGenerationHC_ID[Status.int.cascade[i]["equipeID"]][0]
-#            if getEquipmentClass(Status.int.cascade[i]["equipeType"])=="BB" and equipe.Temp <=90:
-#            if getEquipmentClass(Status.int.cascade[i]["equipeType"])=="BB" and equipe.TExhaustGas <=90:    #use TExhaustGas until we have an update of the SQL
-#                Status.mod.moduleHC.cascadeMoveToBottom(i)
-#                aa=Status.int.cascade[len(Status.int.cascade)-1]["equipeID"]  #aa is the ID of the last boiler at 80°C
-
-#####TAKE CARE: return means, that the function stops here !!!!
-#            return aa
-#        for i in range (len(Status.int.cascade)):
-#            if getEquipmentClass(Status.int.cascade[i].equipeType)=="BB" and self.equipments[Status.int.cascade[i].equipeID].Temp >90 and \
-#               self.equipments[Status.int.cascade[i].equipeID].Temp <=150:                           
-#                Status.int.cascadeMoveToBottom(i)
-#                bb=Status.int.cascade[len(Status.int.cascade)-1].equipeID #  #bb is the ID of the last boiler at 140°C
-#        for i in range (len(Status.int.cascade)):
-#            if getEquipmentClass(Status.int.cascade[i].equipeType)=="BB" and self.equipments[Status.int.cascade[i].equipeID].Temp >150:
-#                Status.int.cascadeMoveToBottom(i)
-#                cc=Status.int.cascade[len(Status.int.cascade)-1].equipeID #  #bb is the ID of the last boiler at maxTemp
-#            return cc
-#        self.firstBB = 0
-#        for i in range (len(Status.int.cascade)):
-#            if getEquipmentClass(Status.int.cascade[i].equipeType)=="BB" :
-#                self.firstBB = i
-#            break
-            
-#        self.lastBB80=self.equipments[aa].CascadeIndex
-#        self.lastBB140=self.equipments[bb].CascadeIndex
-#        self.lastBB=self.equipments[cc].CascadeIndex
-
-
-    
     
 #------------------------------------------------------------------------------
-    def automDeleteBoiler (self,minEfficencyAccepted=80):  #0.80 is a default value for minimum of efficiency
+    def automDeleteBoiler (self,minEfficencyAccepted=0.80):  #0.80 is a default value for minimum of efficiency
 #------------------------------------------------------------------------------
 # delete unefficient boiler
 #------------------------------------------------------------------------------
@@ -878,7 +676,7 @@ class ModuleBB(object):
         automatic=True
         for i in range (len (self.BBList)):
             print "controlling equipe", self.BBList[i]['equipeID']
-            eff= self.equipments.QGenerationHC_ID[self.BBList[i]['equipeID']][0]['HCGTEfficiency']
+            eff= Status.DB.qgenerationhc.QGenerationHC_ID[self.BBList[i]['equipeID']][0]['HCGTEfficiency']
             print "efficiency of the boiler number '%s'is:'%s'"%(i,eff)
             print "min efficiency accepted:",minEfficencyAccepted
             if eff < minEfficencyAccepted:
@@ -886,22 +684,6 @@ class ModuleBB(object):
                 print "Module BB (): id to be deleted = ",self.BBList[i]['equipeID']
                 self.deleteEquipment(self.BBList[i]['equipeID'],automatic)# The row number should be passed. is this right? 
                 
-                
-
-
-#        i=0
-#        a=[]    # a is an auxiliary variable
-#        e=?     # position of the efficiency in the list of list of equipment 
-#        while i<self.NEquipe +1:
-#            if self.equipmentsC [i][e]>= minEfficiencyAccepted:
-#                # add the fuel criterion: if not biomass,biofuels?,gas methane ->delete ???
-#                a.append (self.equipmentsC [i][e])
-#            i=i+1
-#            return a
-#        self.equipmentsC = a
-# the equip should be deleted from the DB too
-#        NEquip= len(self.equipmentsC) # better to use NEquip_mod?
-
 #------------------------------------------------------------------------------
     def sortDemand(self,T):
 #------------------------------------------------------------------------------
@@ -936,17 +718,22 @@ class ModuleBB(object):
         self.maxPow140=0
         self.maxPowTmax=0
         for k in range(len(Status.int.cascade)):
+
+#HS2008-07-05: here some abbreviations
+            equipeID = Status.int.cascade[k]["equipeID"]
+            
             if getEquipmentClass(Status.int.cascade[k]["equipeType"]) == "BB":
-#                print "the equipment ID is:",Status.int.cascade[k]["equipeID"]
-#                print "the corresponding temp. is:",self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas']
-                if self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas'] <=90 and \
-                   Status.int.cascade[k]["equipePnom"] > self.maxPow80:     # TExhaustGas to be sostituted with tthe operating temperature
-                    self.maxPow80 =Status.int.cascade[k]["equipePnom"]
-                elif 90< self.equipments.QGenerationHC_ID[Status.int.cascade[k]["equipeID"]][0]['TExhaustGas'] <= 150 and \
-                     Status.int.cascade[k]["equipePnom"] > self.maxPow140:
-                    self.maxPow140 =Status.int.cascade[k]["equipePnom"]
-                elif Status.int.cascade[k]["equipePnom"] > self.maxPowTmax:
-                    self.maxPowTmax =Status.int.cascade[k]["equipePnom"]
+                equipe = Status.DB.qgenerationhc.QGenerationHC_ID[equipeID][0]
+                Pnom = Status.int.cascade[k]["equipePnom"]
+                if equipe['TMaxSupply'] <=90 and \
+                   Pnom > self.maxPow80:     # TMaxSupply to be sostituted with tthe operating temperature
+                    self.maxPow80 = Pnom
+                elif 90 < equipe['TMaxSupply'] <= 150 and \
+                     Pnom > self.maxPow140:
+                    self.maxPow140 = Pnom
+                elif Pnom > self.maxPowTmax:
+                    self.maxPowTmax = Pnom
+                    
         if self.maxPow80>0:
             modelID =self.selectBB(self.maxPow80,80)
             equipe = self.addEquipmentDummy()
@@ -1216,170 +1003,144 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
     def designAssistant(self):
 #------------------------------------------------------------------------------
+#   auto-design of boiler cascade
 #------------------------------------------------------------------------------
+
+#............................................................................................
+# getting configuration parameters of DA
 
         DATable = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(DATable) > 0:
             DA = DATable[0]
         else:
-            print "ModuleBB (design assistant): WARNING - no DA configuration parameters available"
+            logTrack("ModuleBB (design assistant): WARNING - no DA configuration parameters available")
             return
 
         if DA.BBRedundancy == True:
             pass
         
-#            if (MaintainExistingEquipment == False):
-#                deleteAllBoilers()
         self.securityMargin=1.2      #  N.B. securityMargin should be choosen by the user!!! At the moment is setted to 1.2############
         self.minPow =100             #  N.B. minPow should be an imput from the boiler window!!! At the moment is setted to 100kW
         self.minOpTime=100          #  N.B. minOpTime should be an imput from the boiler window!!! At the moment is setted to 100 hours:for testing Nt is 168 corresponding to 1 week.
-        self.screenEquipments()
- 
+
+#        self.screenEquipments()
+#HS 2008-07-06: this should not be necessary. should be updated
+
         self.automDeleteBoiler()   # delete unefficient boiler
 
-        self.findmaxTemp(Status.int.QD_T)
+#............................................................................................
+# first do some sorting ...
+
+#        self.findmaxTemp(Status.int.QD_T)
+#HS2008-07-06: CHECK CHECK CHECK -> should this not be the REAL demand seen by the boiler cascade ???
+        self.findmaxTemp(Status.int.QD_T_mod[self.cascadeIndex-1])
+        
         self.findBiggerBB()       
         self.sortBoiler()     # sort boilers by temperature (ascending) and by efficiency (descending)
                                 
+
+#............................................................................................
+# after shifting, the equipment cascade has to be updated, as the modified demand is used
+# in the following
+
+        if Status.int.cascadeUpdateLevel < self.NEquipe:
+            Status.mod.moduleEnergy.runSimulation()
+            
+#............................................................................................
+# low temperature boiler look-up
         exBP=0       #   power of the boiler in the cascade operating at 80°C
+
         for row in Status.int.cascade:
-            equipTry= Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0]
-            print equipTry["HCGPnom"]
-            if getEquipmentClass(row["equipeType"]) == "BB" and equipTry["TExhaustGas"]<=80:
-                exBP += row['equipePnom']
-        print "power of the boilers at 80°C present in the cascade at the moment", exBP
-        zz=int(80/Status.TemperatureInterval)
-#        print zz
-        print "the first boiler in cascade is"
-        print self.firstBB
-#        print Status.int.QD_Tt_mod [0][8]        
-#        print Status.int.QD_Tt_mod [0][zz]
-        yy= maxInList(Status.int.QD_Tt_mod [self.firstBB][zz])
-        print "print the maximum pawer of the demand at 80°C"
-        print yy
-        b=max((yy  - exBP),0)
-        b1= max(((yy * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 80°C
+            bbs = Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]]
+            if len(bbs) > 0:
+                equipTry= bbs[0]
+                if getEquipmentClass(row["equipeType"]) == "BB" and equipTry.TMaxSupply <=80:
+                    exBP += row['equipePnom']
+
+        logTrack("ModuleBB: power of the boilers at 80°C present in the cascade at the moment %s"%exBP)
+
+        if self.firstBB < 0 or self.firstBB > self.NEquipe-1:
+            logDebug("MoudleBB (DA): error in no. of firstBB: %s (NEquipe = %s)"%(self.firstBB,self.NEquipe))
+            
+        iT80 = int(80/Status.TemperatureInterval + 0.5)
+#        zz=int(80/Status.TemperatureInterval)
+#HS2008-07-06: zz substituted by iT80. is more self-understanding
+
+        QDmax = maxInList(Status.int.QD_Tt_mod[self.firstBB][iT80])
+#        yy= maxInList(Status.int.QD_Tt_mod[self.firstBB][iT80])
+#HS2008-07-06. idem yy -> QDmax
+
+        b=max((QDmax  - exBP),0)
+        b1= max(((QDmax  * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 80°C
         c=[]
         for it in range (Status.Nt):
-            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB][zz][it]))
+            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB][iT80][it]))
 
         self.QDh80=c  # demand to be supplied by new boilers at 80°C
 
         self.QDh80.sort(reverse=True)
-        print "the demand at 80°C to be supplied by new boilers"
-        print self.QDh80
-        print "lenght of the demand array (QDh80)"
-        print len(self.QDh80)
         if self.QDh80[0]>0:
             self.designBB80()
-        print" reached point L"
-#        for k in range (self.firstBB , self.firstBB140):
-#            equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]   #self.equipments.QGenerationHC_ID[{"CascadeIndex"}][0]
-#            self.calculateEnergyFlows(equipe,k)
 
+#............................................................................................
+# 140 ºC boilers
             
         if self.maxTemp>160:   # N.B. The difference between temperature levels is now setted in 20°C but in the future could be a parameter.      
                         
             exBP=0       #   power of the boiler in the cascade operating at 140°C
             for row in Status.int.cascade:
-                equipTry= Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0]
-                if getEquipmentClass(row["equipeType"]) == "BB" and 90 <= equipTry["TExhaustGas"]<=140:
-                    exBP += row['equipePnom']
+                bbs = Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]]
+                if len(bbs) > 0:
+                    equipTry= bbs[0]
+                    if getEquipmentClass(row["equipeType"]) == "BB" and 90 <= equipTry.TMaxSupply <=140:
+                        exBP += row['equipePnom']
 
-            zz=int(140/Status.TemperatureInterval)
-            yy= maxInList(Status.int.QD_Tt_mod [self.firstBB140][zz])
-            b=max((yy  - exBP),0) #   minimum power of the new boilers at 140°C
+            iT140 =int(140/Status.TemperatureInterval + 0.5)
+            QDmax = maxInList(Status.int.QD_Tt_mod [self.firstBB140][iT140])
+            b=max((QDmax  - exBP),0) #   minimum power of the new boilers at 140°C
             c=[]
             for it in range (Status.Nt):
-                c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB140][zz][it]))
+                c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB140][iT140][it]))
 
             self.QDh140=c  # demand to be supplied by new boilers at 140°C
-#            print "The total demand at 80°C is:", Status.int.QD_Tt_mod[self.firstBB][8]
-#            print "The total demand at 140°C is:", Status.int.QD_Tt_mod[self.firstBB][14]
-            print " the residual demand at 140°C" 
-            print self.QDh140
             self.QDh140.sort(reverse=True)
 
-            print "The lenght of the demand (temperature levels)is", len (Status.int.QD_T_mod[self.firstBB140])
-            print "the maxTemp is", self.maxTemp
             if self.QDh140[0]>0:
                 self.designBB140()
         
-#            for k in range (self.firstBB140 , self.firstBBmaxTemp):
-#                equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]   #self.equipments.QGenerationHC_ID[{"CascadeIndex"}][0]
-#                self.calculateEnergyFlows(equipe,k)
+#............................................................................................
+# maxTemp boilers
 
 
         exBP=0       #   power of the boiler in the cascade operating at maxTemp
         for row in Status.int.cascade:
-            equipTry= Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0]
+            bbs = Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]]
+            if len(bbs) > 0:
+                equipTry= bbs[0]
 
             if getEquipmentClass(row["equipeType"]) == "BB":
                 exBP += row['equipePnom']
 
         cI= len(Status.int.QD_Tt_mod)+1
-        zz=int(self.maxTemp/Status.TemperatureInterval)
-        print "The maximum temperature is:", self.maxTemp
-        print "the annual energy at 3 temperature level 'around' the max temp is:", Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)-1],\
-        Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)]#,Status.int.QD_T[int(self.maxTemp/Status.TemperatureInterval)+1]
-        print "the cascade index of the first boiler at max temp is:",self.firstBBmaxTemp
-        yy= maxInList(Status.int.QD_Tt_mod [self.firstBBmaxTemp][zz])
-        b=max((yy  - exBP),0) #   minimum power of the new boilers at maxTemp°C
+        
+        iTmax =int(self.maxTemp/Status.TemperatureInterval + 0.5)
+        QDmax = maxInList(Status.int.QD_Tt_mod [self.firstBBmaxTemp][iTmax])
+        b=max((QDmax  - exBP),0) #   minimum power of the new boilers at maxTemp°C
         c=[]
         for it in range (Status.Nt):
-            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBBmaxTemp][zz][it]))
+            c.append ( min (b, Status.int.QD_Tt_mod[self.firstBBmaxTemp][iTmax][it]))
 
         self.QDhmaxTemp=c  # demand to be supplied by new boilers at maxTemp°C
 
         self.QDhmaxTemp.sort(reverse=True)
-        print "the demand at max temp. is:", self.QDhmaxTemp
         if self.QDhmaxTemp[0]>0:
             self.designBBmaxTemp()
 
-#        for k in range (self.firstBBmaxTemp , self.lastBB+1):
-#            equipe = Status.DB.qgenerationhc.CascadeIndex[k][0]
-#            self.calculateEnergyFlows(equipe,k)
-
-        print "set of boiler designed"
         off= False
-        print "can we accept to stop the production?",off
         if off== False:
             self.redundancy()
         
-        self.updatePanel()    
-        print "ModuleBB (design assistant) reached the end"
-
-#..............................................................................                       
-
-#        for k in (80,140,maxTemp)
-                        
-#           calculateCascade()
-
-# QDh_mod represent the residual heat demand to be supplied by new boilers
-#            sortDemand(QDh_mod,k) # sort the heat demand by number of hours
-
- #           for i in range (status.NT+1):
-#                QDh_mod_descending[i][1]=QDh_mod_descending[i][1]*securityMargin  # for each temperature level only the first element (correspondig
-#                                                                             # to 1 hour demand)is moltiplied for the security margin
-#..............................................................................
-#   At the moment I have considered 3 the heat demand temprature levels: 80, 140, maxTemp°C                                                                             
-#..............................................................................
-#            if k=80:
-#                designBB80()
-#            elif if k=140:
-#                        designBB140()
-#                 elif:
-#                        designBBmaxTemp()
-                
-#            sortBoiler()
-
-#            calculateCascade()
-                        
-      
-        
-        
-
-        
+#        self.updatePanel()    #updatePanel should be called only from the Panel !!!
     
 #==============================================================================
 

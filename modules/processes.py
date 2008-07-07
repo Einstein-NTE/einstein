@@ -152,6 +152,9 @@ class Processes(object):
             scheduleM = Status.schedules.procOpSchedules[k]
             scheduleS = Status.schedules.procStartUpSchedules[k]
             scheduleW = Status.schedules.procOutFlowSchedules[k]
+
+            print "Processes: schedule = ",scheduleW.fav
+            print "Processes: UPHw_T[k] = ",Status.int.UPHw_T[k]
             
             distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
 
@@ -173,6 +176,8 @@ class Processes(object):
 
                     UPHTotal_Tt[iT][it] += UPH_Tt[k][iT][it]
                     UPHwTotal_Tt[iT][it] += UPHw_Tt[k][iT][it]
+
+            print "Processes: UPHwTotal = ",UPHwTotal_Tt[Status.NT+1]
                  
         Status.int.UPH_Tt = UPH_Tt    
         Status.int.UPHw_Tt = UPHw_Tt
@@ -198,7 +203,7 @@ class Processes(object):
         Status.int.QD_Tt = Status.int.createQ_Tt()   
         Status.int.QA_Tt = Status.int.createQ_Tt()
 
-        for iT in range(Status.NT+1):
+        for iT in range(Status.NT+2):
             for it in range(Status.Nt):
                 Status.int.QD_Tt[iT][it] = Status.int.USHTotal_Tt[iT][it]
                 Status.int.QA_Tt[iT][it] = Status.int.QWHAmb_Tt[iT][it]
@@ -217,6 +222,17 @@ class Processes(object):
         print "Processes (calculateAggregateDemand): cascadeUpdateLevel set to 0"
 
 #------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+    def changeInProcess(self):
+#------------------------------------------------------------------------------		
+#       function that is called from anywhere in the tool, whenever process data
+#       of the present alternative are changed
+#------------------------------------------------------------------------------		
+        self.outOfDate = True
+        Status.schedules.outOfDate = True
+        Status.int.changeInCascade(0)
+        logTrack("Processes (changeInProcess): process data changed")
+        
 #------------------------------------------------------------------------------		
     def createTempDist(self,PT,T0=None,C=None):
 #------------------------------------------------------------------------------		

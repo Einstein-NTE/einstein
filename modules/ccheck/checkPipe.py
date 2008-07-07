@@ -20,8 +20,8 @@
 #
 #	Version No.: 0.02
 #	Created by: 	    Claudia Vannoni 	30/04/2008
-#	Last revised by:   Hans Schweiger       07/05/2008 
-#            
+#	Last revised by:    Hans Schweiger       07/05/2008 
+#                           Claudia Vannoni 	03/07/2008
 #
 #       Changes in last update:
 #       07/05/2008  HS  HPerYearPipe assigned for testing
@@ -29,7 +29,7 @@
 #                       Tfeedup1 incl. ccheck1 added
 #                       Bug corrected: include hforwout2 in ccheck
 #                       Bug corrected: substitution TForwOut2 by TRetOut1
-#       	
+#       03/07/2008 CV  Priority, constraints val max, parType, balances USHpipe and USHm and UPHProcm
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -52,6 +52,7 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 from math import *
 from ccheckFunctions import *
 from einstein.modules.fluids import *
+from einstein.modules.messageLogger import *
 
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
@@ -170,7 +171,7 @@ class CheckPipe():
         self.PercentRecirc1 = CCPar("PercentRecirc1")
         self.PercentRecirc2 = CCPar("PercentRecirc2")
 
-        self.PercentFeedUp = CCPar("PercentFeedUp")
+        self.PercentFeedUp = CCPar("PercentFeedUp",parType="X")
         self.PercentFeedUp1 = CCPar("PercentFeedUp1")
         self.PercentFeedUp2 = CCPar("PercentFeedUp2")
         
@@ -194,7 +195,7 @@ class CheckPipe():
         self.DTForwLoss = CCPar("DTForwLoss",parType="DT")
 
         self.DTRetLoss1 =CCPar("DTRetLoss1")
-        self.DTRetLoss =CCPar("DTRetLoss")
+        self.DTRetLoss =CCPar("DTRetLoss",parType="DT")
         
         self.QdotLossForw1 = CCPar("QdotLossForw1")
         self.QdotLossRet1 = CCPar("QdotLossRet1")
@@ -208,7 +209,7 @@ class CheckPipe():
 
         self.QdotWHPipe1 = CCPar("QWHdotPipe1")
         self.QdotWHPipe = CCPar("QWHdotPipe")
-        self.QWHPipe = CCPar("QWHPipe")
+        self.QWHPipe = CCPar("QWHPipe",priority = 2)
         self.QWHPipe1 = CCPar("QWHPipe1")
 
         self.QdotLossPipe1 = CCPar("QdotLossPipe1")
@@ -227,6 +228,7 @@ class CheckPipe():
         self.USHm1 = CCPar("USHm1")
         self.USHm2 = CCPar("USHm2")
 
+        self.QHXPipe = CCPar("QHXPipe", priority = 2)
         self.QHXPipe1 = CCPar("QHXPipe1")
 
         self.UPHdotProcm1 = CCPar("UPHdotProcm1")
@@ -242,6 +244,7 @@ class CheckPipe():
         self.HPerYearPipe1 = CCPar("HPerYearPipe1")
         self.HPerYearPipe2 = CCPar("HPerYearPipe2")
         self.HPerYearPipe = CCPar("HPerYearPipe")
+        self.HPerYearPipe.valMax = 8760
         self.HDEffAvg = CCPar("HDEffAvg")
         
         self.UAPipe1 = CCPar("UAPipe1")
@@ -281,41 +284,42 @@ class CheckPipe():
 
         self.TenvPipe = CCPar("TenvPipe",parType="T") 
         self.TrefPipe = CCPar("TrefPipe",parType="T")
-        self.QHXPipe = CCPar("QHXPipe")# It comes from the matrix (and from calculation from questionnaire??)
-        self.UPHProcm = CCPar("UPHProcm")# It comes from the matrix (and from calculation from questionnaire??)
-        self.USHm = CCPar("USHm")# It comes from the matrix (and from calculation from questionnaire??)
+        
+        self.UPHProcm = CCPar("UPHProcm",priority=2)# It comes from the matrix (and from calculation from questionnaire??)
+        self.USHm = CCPar("USHm",priority=2)# It comes from the matrix (and from calculation from questionnaire??)
 
         
 #..............................................................................
 # reading data from table "qdistributionhc"
-        try:
-            qdistributionhcTable = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].PipeDuctNo[self.PipeDuctNo]
-        
-            if len(qdistributionhcTable) > 0:
-                qdistributionhc = qdistributionhcTable[0]
+#        try:
+        qdistributionhcTable = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].PipeDuctNo[self.PipeDuctNo]
+    
+        if len(qdistributionhcTable) > 0:
+            qdistributionhc = qdistributionhcTable[0]
 
-                fluid = Fluid(qdistributionhc.HeatDistMedium)
-                self.FluidCp = fluid.cp
-
-                self.DistribCircFlow.setValue(qdistributionhc.DistribCircFlow)
-                self.ToutDistrib.setValue(qdistributionhc.ToutDistrib)
-                self.TreturnDistrib.setValue(qdistributionhc.TreturnDistrib)
-                self.PercentRecirc.setValue(qdistributionhc.PercentRecirc)
-                self.Tfeedup.setValue(qdistributionhc.Tfeedup)
-                self.TotLengthDistPipe.setValue(qdistributionhc.TotLengthDistPipe)
-                self.DDistPipe.setValue(qdistributionhc.DDistPipe)
-                self.DeltaDistPipe.setValue(qdistributionhc.DeltaDistPipe)
-
-                self.TenvPipe.setValue(18)  #°C
-                self.TrefPipe.setValue(0)   #°C, NOT USED
-                self.QHXPipe.setValue(0.0)
-
-                
-        except:
-            fluid = Fluid(0)
+            fluid = Fluid(qdistributionhc.HeatDistMedium)
             self.FluidCp = fluid.cp
-            print "CheckPipe(importData): error reading data from qdistributionhc"
-            pass
+
+            self.DistribCircFlow.setValue(qdistributionhc.DistribCircFlow)
+            self.ToutDistrib.setValue(qdistributionhc.ToutDistrib)
+            self.TreturnDistrib.setValue(qdistributionhc.TreturnDistrib)
+            self.PercentRecirc.setValue(qdistributionhc.PercentRecirc)
+            self.Tfeedup.setValue(qdistributionhc.Tfeedup)
+            self.TotLengthDistPipe.setValue(qdistributionhc.TotLengthDistPipe)
+            self.DDistPipe.setValue(qdistributionhc.DDistPipe)
+            self.DeltaDistPipe.setValue(qdistributionhc.DeltaDistPipe)
+
+            self.TenvPipe.setValue(18)  #°C
+            self.TrefPipe.setValue(0)   #°C, NOT USED
+            self.QHXPipe.setValue(0.0)
+        else:
+            logTrack("CheckPipe(importData): error reading data from qdistributionhc in PipeNo: %s"%self.PipeDuctNo)
+            
+                
+#        except:
+#            fluid = Fluid(0)
+#            self.FluidCp = fluid.cp
+#            print "CheckPipe(importData): error reading data from qdistributionhc"
 
 #####TESTING ONLY: unknown HPerYearPipe gives problems !!!!
         self.HPerYearPipe.setValue(4000.0)
@@ -341,8 +345,9 @@ class CheckPipe():
         
 #..............................................................................
 # writing data into table " qdistributionhc"
-        try:
-            qdistributionhcTable = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].PipeductNo[self.PipeDuctNo]
+#        try:
+        if ANo == 0:
+            qdistributionhcTable = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].PipeDuctNo[self.PipeDuctNo]
             if len(qdistributionhcTable) > 0:
                 print "exporting data to qdistributionhc"
                 qdistributionhc = qdistributionhcTable[0]
@@ -356,13 +361,15 @@ class CheckPipe():
                 qdistributionhc.DDistPipe = self.DDistPipe.val
                 qdistributionhc.DeltaDistPipe = self.DeltaDistPipe.val
         
-                qdistributionhc.HPerYearPipe = self.HPerYearPipe.val
+#                qdistributionhc.HPerYearPipe = self.HPerYearPipe.val
                 qdistributionhc.HDEffAvg = self.HDEffAvg.val
                 qdistributionhc.QHXPipe = self.QHXPipe.val
                 qdistributionhc.QWHPipe = self.QWHPipe.val
-                qdistributionhc.UAPipe = self.UAPipe.val
+#                qdistributionhc.UAPipe = self.UAPipe.val
                 qdistributionhc.UPHProcm = self.UPHProcm.val
                 qdistributionhc.USHm = self.USHm.val
+                qdistributionhc.USHPipe = self.USHPipe.val
+                qdistributionhc.QLossPipe = self.QLossPipe.val
 
                 #qdistributionhc.TenvPipe = self.TenvPipe .val
                 #qdistributionhc.TrefPipe =  self.TrefPipe.val
@@ -370,10 +377,11 @@ class CheckPipe():
                 #qdistributionhc.QLossPipe = self.QLossPipe.val
                      
                 Status.SQL.commit()
+            else:
+                 logTrack("CheckPipe (exportData): no corresponding entry found in qdistributionhc")
                 
-        except:
-            print "CheckPipe (exportData): error writing data to qdistributionhc"
-            pass
+#        except:
+#            logWarning(_("CheckPipe (exportData): error writing data to qdistributionhc"))
 
 #------------------------------------------------------------------------------
 
@@ -543,6 +551,12 @@ class CheckPipe():
 #   screens all variables in the block
 #------------------------------------------------------------------------------
 
+        if iszero(self.PercentFeedUp):
+            self.Tfeedup.priority = 99
+
+        if iszero(self.PercentRecirc):
+            self.TreturnDistrib.priority = 99
+            
         self.DistribCircFlow.screen()
         self.ToutDistrib.screen()
         self.TreturnDistrib.screen()
@@ -649,8 +663,8 @@ class CheckPipe():
 
             self.UPHProcm1 = calcProd("UPHProcm1",self.UPHdotProcm2,self.HPerYearPipe2) # HPerYearPipe, UPHdotProcm2
 
-            self.USHPipe3 = calcProd("USHPipe3",self.UPHProcm,self.HDEffAvg)
-            self.USHm2 = calcSum3("USHm2",self.QLossPipe1,self.UPHProcm3,self.QWHPipe1)#UPHdotProcm
+            self.UPHProcm2 = calcProd("USHPipe3",self.USHPipe,self.HDEffAvg)
+            self.USHPipe3 = calcSum3("USHm2",self.QLossPipe1,self.UPHProcm3,self.QWHPipe1)#UPHdotProcm
          
    
             if DEBUG in ["ALL","MAIN"]:
@@ -672,8 +686,8 @@ class CheckPipe():
                 print "Step 3: calculating from right to left (ADJUST)"
                 print "-------------------------------------------------"
   
-            adjustSum3(self.USHm2,self.QLossPipe1,self.UPHProcm3,self.QWHPipe1)#UPHdotProcm
-            adjustProd(self.USHPipe3,self.UPHProcm,self.HDEffAvg)
+            adjustSum3(self.USHPipe3,self.QLossPipe1,self.UPHProcm3,self.QWHPipe1)#UPHdotProcm
+            adjustProd(self.UPHProcm2,self.USHPipe,self.HDEffAvg)
             adjustProd(self.UPHProcm1,self.UPHdotProcm2,self.HPerYearPipe2) 
             adjustSum(self.USHPipe2,self.USHm,self.QHXPipe)
             adjustProd(self.USHPipe1,self.USHdotPipe,self.HPerYearPipe1)
@@ -807,7 +821,7 @@ class CheckPipe():
             ccheck1(self.QLossPipe,self.QLossPipe1)
             ccheck3(self.UPHProcm,self.UPHProcm1,self.UPHProcm2,self.UPHProcm3)
             ccheck1(self.QHXPipe,self.QHXPipe1)
-            ccheck2(self.USHPipe,self.USHPipe1,self.USHPipe2)
+            ccheck3(self.USHPipe,self.USHPipe1,self.USHPipe2,self.USHPipe3)
 
 #==============================================================================
 if __name__ == "__main__":

@@ -50,42 +50,27 @@ from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class ModuleHC(object):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
     HCList = []
     
+#------------------------------------------------------------------------------
     def __init__(self, keys):
+#------------------------------------------------------------------------------
         self.keys = keys # the key to the data is sent by the panel
-        print "ModuleHC (__init__)"
-
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
 #       screens existing equipment, whether there are already heat pumps
-#       XXX to be implemented
 #------------------------------------------------------------------------------
 
-        self.DB = Status.DB
-        self.sql = Status.SQL
-        
-        self.equipments = Status.prj.getEquipments()
-        self.NEquipe = len(self.equipments)
-        Status.int.getEquipmentCascade()
-        self.cascadeIndex = 0
-        
-#............................................................................................
-#XXX FOR TESTING PURPOSES ONLY: load default demand
-# here it should be assured that heat demand and availability for position in cascade
-# of presently existing heat pumps is already defined
+        pass    
 
-        Status.int.initCascadeArrays(self.NEquipe)
-       
-#............................................................................................
-#returns HPList to the GUI for displaying in window
-
-        self.updatePanel()
-    
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def updatePanel(self):
@@ -93,19 +78,41 @@ class ModuleHC(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
+        equipments = Status.prj.getEquipments(cascade=True)
+
         dataList = []
-        for i in range(self.NEquipe):
-            row = Status.int.cascade[i]
-            equipmentName=Status.DB.qgenerationhc.QGenerationHC_ID[row["equipeID"]][0].Equipment
-            dataList.append(noneFilter([i+1,row["equipeNo"],equipmentName,row["equipeType"],row["equipePnom"],"???"]))
+        for equipe in equipments:
+#..............................................................................
+# getting pipe names of equipes
+
+            IDString = equipe.PipeDuctEquip
+            pipeDict = Status.prj.getPipeDict()
+            if IDString is not None:
+                pipeIDsSQL = IDString.split(';')
+            else:
+                pipeIDsSQL = []
+                
+            for i in pipeIDsSQL:
+                pipeID = int(i)
+                if pipeID in pipeDict.keys():
+                    if i == 0:
+                        pipes = str(pipeDict[pipeID])
+                    else:
+                        newPipes = pipes+"\n"+str(pipeDict[pipeID])
+                        pipes = newPipes
+
+            print "ModuleHC: pipes = ",pipes
+#..............................................................................
+# getting pipe names of equipes
+
+            dataList.append(noneFilter([equipe.EqNo,
+                                        equipe.Equipment,
+                                        equipe.EquipType,
+                                        equipe.HCGPnom,
+                                        pipes]))
         data = array(dataList)
 
         Status.int.setGraphicsData(self.keys[0], data)
-
-        try:
-            Status.int.setGraphicsData('HC Info',{"noseque":55})
-        except:
-            pass
 
 #------------------------------------------------------------------------------
     def cascadeMoveUp(self,actualCascadeIndex):

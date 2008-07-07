@@ -238,21 +238,16 @@ class ModuleHR(object):
                 QHXProc_Tt[iT][it] = min(QHXmax,fHR*UPHw_Tt[iT][it])
                 QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - QHXProc_Tt[iT][it]
 
-            for iT in range(Status.NT+1):
+            for iT in range(Status.NT+2):
                 QHXProc_Tt[iT][it] = QHXProc_Tt[0][it] - QHXProc_Tt[iT][it]
                 UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it]
-                
-
-            DistributionEfficiency = 0.9
-            logTrack("ModuleHR (simulate): WARNING - still calculating with fixed distribution efficiency")
-            fDist = 1./DistributionEfficiency
-            
+                            
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
 
             USH_Tt[0][it] = 0
             USH_Tt[1][it] = 0
-            for iT in range(2,Status.NT+1):
+            for iT in range(2,Status.NT+2):
                 USH_Tt[iT][it] = UPHProc_Tt[iT-2][it]*fDist
 
 #..............................................................................
@@ -263,6 +258,11 @@ class ModuleHR(object):
         Status.int.UPHProcTotal_Tt = UPHProc_Tt
         Status.int.QHXProcTotal_Tt = QHXProc_Tt
         Status.int.QWHAmb_Tt = QWHAmb_Tt
+
+        Status.int.USHTotal_T = Status.int.calcQ_T(USH_Tt)
+        Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
+        Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
+        Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
             
         
 #------------------------------------------------------------------------------

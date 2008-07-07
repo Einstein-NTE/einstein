@@ -52,6 +52,7 @@ from einstein.GUI.status import Status
 import einstein.modules.matPanel as Mp
 from einstein.GUI.dialogA import *
 from einstein.GUI.dialogOK import *
+from GUITools import *
 
 
 [wxID_PANELA, wxID_PANELABUTTONPAGEABACK, wxID_PANELABUTTONPAGEACANCEL, 
@@ -64,19 +65,6 @@ from einstein.GUI.dialogOK import *
 
 # constants
 #
-ORANGE = '#FF6000'
-LIGHTGREY = '#F8F8F8'
-WHITE = '#FFFFFF'
-DARKGREY = '#000060'
-
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = DARKGREY     # specified as hex #RRGGA
-GRID_LETTER_COLOR2 = WHITE     # specified as hex #RRGGA
-GRID_BACKGROUND_COLOR = LIGHTGREY # idem
-GRID_BACKGROUND_COLOR2 = ORANGE # idem
-GRAPH_BACKGROUND_COLOR = WHITE # idem
-TITLE_COLOR = ORANGE
 
 COLNO = 6
 MAXROWS = 20
@@ -168,8 +156,8 @@ class PanelA(wx.Panel):
 
         # data cell attributes for present state 
         attr2 = wx.grid.GridCellAttr()
-        attr2.SetTextColour(GRID_LETTER_COLOR2)
-        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR2)
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.grid.CreateGrid(MAXROWS, COLNO)

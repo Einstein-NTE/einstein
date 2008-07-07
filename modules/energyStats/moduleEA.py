@@ -45,23 +45,30 @@ from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
 from einstein.modules.fluids import *
+import wx
 
 
 class ModuleEA(object):
 
     def __init__(self):
-        
+        print "ModuleEA (__init__)"
         pass
 
 #------------------------------------------------------------------------------
     def update(self):
 #------------------------------------------------------------------------------
-#       updates all the energyStatistics needed for the energyStatisticsDisplay        
+#       updates all the energyStatistics needed for the energyStatisticsDisplay
+#       - called from PanelCC 
 #------------------------------------------------------------------------------
+
+        if Status.StatusCC > 0:
+            Status.processData.createYearlyDemand()
+            
         if Status.StatusEnergy == 0:
             if Status.ANo > 0:
                 logMessage(_("EINSTEIN running system simulation for updating energy balances"))
                 logMessage(_("This may take a while. please be patient ..."))
+                wx.SafeYield()
                 Status.mod.moduleEnergy.runSimulation()
             logMessage(_("EINSTEIN now updating annual energy balances"))
             self.calculateEquipmentEnergyBalances()
@@ -124,10 +131,7 @@ class ModuleEA(object):
 #   and stores the within the SQL tables
 #------------------------------------------------------------------------------
         
-        if Status.ANo <= 0:
-            print "ModuleEA (calculateEquipmentEnergyBalances): security feature: -> do not overwrite results from consistency check !!!"
-            return
-        
+        (projectData,generalData) = Status.prj.getProjectData()
         equipments = Status.prj.getEquipments(cascade=True) #equipments ordered by CascadeIndex
         fuels = Status.prj.getQFuels()
         fuelList = Status.prj.getQFuelList("DBFuel_id")
@@ -136,91 +140,113 @@ class ModuleEA(object):
             electricity = electricities[0]
         else:
             logDebug("Corrupt entry in electricity table -> no data found for PId %s ANo %s"%(Status.PId,Status.ANo))
-            
-        (projectData,generalData) = Status.prj.getProjectData()
 
-        FETi = []
-        for fuel in fuels:
-            FETi.append(0.0)
-            
-        FETiUnKnown = 0.0
-        FETel = 0.0
-        FETFuel = 0.0
-        FET = 0.0
+#..............................................................................
+# Update of FETi/FECi values based on equipment fuel consumption FETj
+# Carried out only if ANo > 0. For ANo = 0 comes from consistency check
 
-        for equipe in equipments:
-            jc = equipe.CascadeIndex -  1
-            dFETFuel = Status.int.FETFuel_j[jc]
-            dFETel = Status.int.FETel_j[jc]
+        if Status.ANo > 0:
+        
+            if Status.int.cascadeUpdateLevel < len(equipments):
+                logTrack("ModuleEA (calcEq.En.Bal.): calling runSimulation before updating energy balances")
+                Status.mod.moduleEnergy.runSimulation()
+                
+            FETi = []
+            for fuel in fuels:
+                FETi.append(0.0)
+                
+            FETiUnKnown = 0.0
+            FETel = 0.0
+            FETFuel = 0.0
+            FET = 0.0
 
-            equipe.FETFuel_j = dFETFuel
-            equipe.FETel_j = dFETel
-            equipe.FETj = dFETel + dFETFuel #simple sum of fuel + electricity. doesn't make very much sense, but ... 
+            for equipe in equipments:
+                jc = equipe.CascadeIndex -  1
+                dFETFuel = Status.int.FETFuel_j[jc]
+                dFETel = Status.int.FETel_j[jc]
 
-            FET += dFETFuel + dFETel
-            FETFuel += dFETFuel
-            FETel += dFETel
+                equipe.FETFuel_j = dFETFuel
+                equipe.FETel_j = dFETel
+                equipe.FETj = dFETel + dFETFuel #simple sum of fuel + electricity. doesn't make very much sense, but ... 
 
-            fuelID = equipe.DBFuel_id
-            if fuelID in fuelList:
-                i = fuelList.index(fuelID)
-                FETi[i] += dFETFuel
-            else:
-                FETiUnKnown += dFETFuel
-                print "WARNING: fuel type for equipe %s is not known"
+                FET += dFETFuel + dFETel
+                FETFuel += dFETFuel
+                FETel += dFETel
+
+                fuelID = equipe.DBFuel_id
+                if fuelID in fuelList:
+                    i = fuelList.index(fuelID)
+                    FETi[i] += dFETFuel
+                else:
+                    FETiUnKnown += dFETFuel
+                    print "WARNING: fuel type for equipe %s is not known"
 
 #..............................................................................
 # calculate derived quantities and store in equipment table
 
-        for equipe in equipments:
-            jc = equipe.CascadeIndex -  1
+            for equipe in equipments:
+                jc = equipe.CascadeIndex -  1
 
-            if equipe.FETFuel_j > 0:
-                equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETFuel_j
-            elif equipe.FETel_j > 0:
-                equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETel_j
-            else:
-                equipe.HCGTEffReal = 0.0
+                if equipe.FETFuel_j > 0:
+                    equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETFuel_j
+                elif equipe.FETel_j > 0:
+                    equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETel_j
+                else:
+                    equipe.HCGTEffReal = 0.0
 
-            if equipe.HCGPnom > 0:
-                equipe.PartLoad = Status.int.USHj[jc]/equipe.HCGPnom
-            else:
-                equipe.PartLoad = 0.0
+                if equipe.HCGPnom > 0:
+                    equipe.PartLoad = Status.int.USHj[jc]/equipe.HCGPnom
+                else:
+                    equipe.PartLoad = 0.0
 
-        #HCGEEff -> only for CHP ??? or also for electrically driven chillers ???
+            #HCGEEff -> only for CHP ??? or also for electrically driven chillers ???
 
 
-        #TExhaustGas ????
+            #TExhaustGas ????
 
-##### TAKE CARE: here HCGTEfficiency is both an input and a result ... for equipments with
-##### variable COP depending on temperature / ... this may lead to confusions.
+    ##### TAKE CARE: here HCGTEfficiency is both an input and a result ... for equipments with
+    ##### variable COP depending on temperature / ... this may lead to confusions.
 
 #..............................................................................
 # now store fuel and electricity consumption in the corresponding tables
 
-        FETFuels = 0.0
-        for fuel in fuels:
-            i = fuel.FuelNo - 1
-            fuel.FETFuel = FETi[i]
-            FETFuels += FETi[i]
-            if fuel.FEOFuel is not None:
-                fuel.FECFuel = FETi[i] + fuel.FEOFuel
+            FETFuels = 0.0
+            for fuel in fuels:
+                i = fuel.FuelNo - 1
+                fuel.FETFuel = FETi[i]
+                FETFuels += FETi[i]
+                if fuel.FEOFuel is not None:
+                    fuel.FECFuel = FETi[i] + fuel.FEOFuel
+                else:
+                    fuel.FECFuel = FETi[i]
+                    fuel.FEOFuel = 0.0
+                    logDebug("ModuleEA (calculateEqEnergyBalances): no entry found for FEOFuel of fuel no. %s"%(i+1))
+
+            generalData.FETel = FETel
+            if generalData.FEOel is not None:
+                generalData.FECel = FETel + generalData.FEOel
+                electricity.ElectricityTotYear = generalData.FECel
             else:
-                fuel.FECFuel = FETi[i]
-                fuel.FEOFuel = 0.0
-                logDebug("ModuleEA (calculateEqEnergyBalances): no entry found for FEOFuel of fuel no. %s"%(i+1))
+                generalData.FECel = FETel
+                generalData.FEOel = 0.0
+                electricity.ElectricityTotYear = generalData.FECel
+                logDebug("ModuleEA (cEEBalances): No entry found in FEOel. Set to zero !!!")
 
-        generalData.FETel = FETel
-        if generalData.FEOel is not None:
-            generalData.FECel = FETel + generalData.FEOel
-            electricity.ElectricityTotYear = generalData.FECel
+            generalData.FET = FETel + FETFuels  #total FET as simple sum
+
+#..............................................................................
+#..............................................................................
+#..............................................................................
+# in case of present state:
+
         else:
-            generalData.FECel = FETel
-            generalData.FEOel = 0.0
-            electricity.ElectricityTotYear = generalData.FECel
-            logDebug("ModuleEA (cEEBalances): No entry found in FEOel. Set to zero !!!")
+            logTrack("ModuleEA (calculateEquipmentEnergyBalances): security feature: -> do not overwrite results from consistency check !!!")
 
-        generalData.FET = FETel + FETFuels  #total FET as simple sum
+#..............................................................................
+# from here on actions also for ANo = 0
+#..............................................................................
+#..............................................................................
+#..............................................................................
 
 #..............................................................................
 # conversion to primary energy and environmental impact parameters
@@ -271,10 +297,8 @@ class ModuleEA(object):
         generalData.PEC = generalData.PECFuels + generalData.PECel
         generalData.PET = generalData.PETFuels + generalData.PETel
 
+        Status.prj.setStatus("Energy")
         Status.SQL.commit()
-        
-
-        
             
         
 #==============================================================================

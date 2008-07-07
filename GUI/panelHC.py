@@ -23,11 +23,14 @@
 #	Created by: 	    Hans Schweiger	    03/04/2008
 #	Last revised by:    Hans Schweiger          16/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger          06/07/2008
 #                           
 #
 #       Changes to previous version:
 #       16/04/2008  HS  main as argument in __init__
 #       18/06/2008 SD: change to translatable text _(...)
+#       06/07/2008: HS  improvement of design
+#                       update information displayed on table
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,10 +44,8 @@
 
 import wx
 import wx.grid
-from einstein.GUI.graphics import drawPiePlot
-from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
-#from einstein.GUI.panelHC_PopUp1 import HCPopUp1
+from GUITools import *
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
@@ -59,18 +60,19 @@ from einstein.modules.interfaces import *
 
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGHC
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-COLNO = 6
+COLNO = 5
 
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
 class PanelHC(wx.Panel):
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
 
+#------------------------------------------------------------------------------		
     def __init__(self, parent, main, id, pos, size, style, name):
+#------------------------------------------------------------------------------		
         self.main = main
         self._init_ctrls(parent)
 	self.keys = ['HC Table']
@@ -88,7 +90,7 @@ class PanelHC(wx.Panel):
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
 
         self.grid.CreateGrid(MAXROWS, COLNO)
 
@@ -96,18 +98,20 @@ class PanelHC(wx.Panel):
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
-        self.grid.SetDefaultColSize(60)
-        self.grid.SetColSize(2,160)
-        self.grid.SetColSize(3,160)
+        self.grid.SetColLabelSize(40)
+        self.grid.SetDefaultColSize(90)
+        self.grid.SetColSize(0,50)
+        self.grid.SetColSize(1,140)
+        self.grid.SetColSize(2,140)
+        self.grid.SetColSize(4,140)
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Cascade index"))
-        self.grid.SetColLabelValue(1, _("Equipment No."))
-        self.grid.SetColLabelValue(2, _("Equipment"))
-        self.grid.SetColLabelValue(3, _("Type"))
-        self.grid.SetColLabelValue(4, _("Nominal power [kW]"))
-        self.grid.SetColLabelValue(5, _("Heat Supplied to pipe/duct no."))
+        self.grid.SetColLabelValue(0, _("Equipe\nNo."))
+        self.grid.SetColLabelValue(1, _("Equipment"))
+        self.grid.SetColLabelValue(2, _("Type"))
+        self.grid.SetColLabelValue(3, _("Nominal Power\n[kW]"))
+        self.grid.SetColLabelValue(4, _("Heat Supplied to\nPipe/Duct"))
         #
         # copy values from dictionary to grid
         #
@@ -120,18 +124,35 @@ class PanelHC(wx.Panel):
                     self.grid.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.grid.SetGridCursor(0, 0)
-
-        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
     
+#------------------------------------------------------------------------------		
     def _init_ctrls(self, prnt):
+#------------------------------------------------------------------------------		
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHC, name='PanelHC', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
+#..............................................................................
+# autoDesign button
+
+        self.AutoDesign = wx.Button(id=wxID_PANELHCAUTODESIGN,
+              label=_('get recommendations and automatic pre-design'),
+              name='AutoDesign', parent=self, pos=wx.Point(20, 20),
+              size=wx.Size(620, 40), style=0)
+        self.AutoDesign.Bind(wx.EVT_BUTTON, self.OnAutoDesignButton,
+              id=wxID_PANELHCAUTODESIGN)
+#..............................................................................
+# box 1 table
+
+        self.box1 = wx.StaticBox(self, -1, _("Existing equipment in the system"),
+                                 pos = (10,70),size=(640,400))
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.grid = wx.grid.Grid(id=wxID_PANELHCGRID,
-              name='gridpageHC', parent=self, pos=wx.Point(40, 96),
-              size=wx.Size(616, 328), style=0)
+              name='gridpageHC', parent=self, pos=wx.Point(20, 100),
+              size=wx.Size(620, 360), style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridGridCellLeftDclick, id=wxID_PANELHCGRID)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
@@ -139,8 +160,40 @@ class PanelHC(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridGridCellRightClick, id=wxID_PANELHCGRID)
 
-        self.st1pageHC = wx.StaticText(id=-1, label=_('Order equipment cascade'),
-              name='st1pageHC', parent=self, pos=wx.Point(664, 128), style=0)
+#..............................................................................
+# box 2 up/down buttons
+
+        self.box2 = wx.StaticBox(self, -1, _("Order Cascade"),
+                                 pos = (670,70),size=(120,400))
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.MoveToBottom = wx.Button(id=wxID_PANELHCMOVETOBOTTOM,
+              label='to bottom', name='MoveToBottom', parent=self,
+              pos=wx.Point(680, 430), size=wx.Size(96, 24), style=0)
+        self.MoveToBottom.Bind(wx.EVT_BUTTON, self.OnMoveToBottomButton,
+              id=wxID_PANELHCMOVETOBOTTOM)
+
+        self.MoveDownwards = wx.Button(id=wxID_PANELHCMOVEDOWNWARDS,
+              label=_('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
+              310), size=wx.Size(96, 60), style=0)
+        self.MoveDownwards.Bind(wx.EVT_BUTTON, self.OnMoveDownwardsButton,
+              id=wxID_PANELHCMOVEDOWNWARDS)
+
+        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label=_('up'),
+              name='MoveUpwards', parent=self, pos=wx.Point(680, 220),
+              size=wx.Size(96, 60), style=0)
+        self.MoveUpwards.Bind(wx.EVT_BUTTON, self.OnMoveUpwardsButton,
+              id=wxID_PANELHCMOVEUPWARDS)
+
+        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label=_('to top'),
+              name='MoveToTop', parent=self, pos=wx.Point(680, 140),
+              size=wx.Size(96, 24), style=0)
+        self.MoveToTop.Bind(wx.EVT_BUTTON, self.OnMoveToTopButton,
+              id=wxID_PANELHCMOVETOTOP)
+
+#..............................................................................
+# default action buttons
 
         self.buttonpageHCOk = wx.Button(id=wxID_PANELHCBUTTONPAGEHCOK,
               label=_('ok'), name='buttonpageHCOk', parent=self, pos=wx.Point(528,
@@ -167,47 +220,12 @@ class PanelHC(wx.Panel):
         self.buttonpageHCBack.Bind(wx.EVT_BUTTON, self.OnButtonpageHCBackButton,
               id=wxID_PANELHCBUTTONPAGEHCBACK)
 
-        self.MoveToBottom = wx.Button(id=wxID_PANELHCMOVETOBOTTOM,
-              label='to bottom', name='MoveToBottom', parent=self,
-              pos=wx.Point(680, 344), size=wx.Size(96, 24), style=0)
-        self.MoveToBottom.Bind(wx.EVT_BUTTON, self.OnMoveToBottomButton,
-              id=wxID_PANELHCMOVETOBOTTOM)
-
-        self.MoveDownwards = wx.Button(id=wxID_PANELHCMOVEDOWNWARDS,
-              label=_('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
-              304), size=wx.Size(96, 24), style=0)
-        self.MoveDownwards.Bind(wx.EVT_BUTTON, self.OnMoveDownwardsButton,
-              id=wxID_PANELHCMOVEDOWNWARDS)
-
-        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label=_('up'),
-              name='MoveUpwards', parent=self, pos=wx.Point(680, 240),
-              size=wx.Size(96, 24), style=0)
-        self.MoveUpwards.Bind(wx.EVT_BUTTON, self.OnMoveUpwardsButton,
-              id=wxID_PANELHCMOVEUPWARDS)
-
-        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label=_('to top'),
-              name='MoveToTop', parent=self, pos=wx.Point(680, 200),
-              size=wx.Size(96, 24), style=0)
-        self.MoveToTop.Bind(wx.EVT_BUTTON, self.OnMoveToTopButton,
-              id=wxID_PANELHCMOVETOTOP)
-
-        self.AutoDesign = wx.Button(id=wxID_PANELHCAUTODESIGN,
-              label=_('get recommendations and automatic pre-design'),
-              name='AutoDesign', parent=self, pos=wx.Point(40, 32),
-              size=wx.Size(616, 24), style=0)
-        self.AutoDesign.Bind(wx.EVT_BUTTON, self.OnAutoDesignButton,
-              id=wxID_PANELHCAUTODESIGN)
-
-        self.staticText1 = wx.StaticText(id=wxID_PANELHCSTATICTEXT1,
-              label=_('Existing equipment in the system'),
-              name='staticText1', parent=self, pos=wx.Point(40, 72), style=0)
-
 #------------------------------------------------------------------------------		
     def display(self):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
-        self.mod.initPanel()        # prepares data for plotting
+        self.mod.updatePanel()        # prepares data for plotting
 
         data = Interfaces.GData[self.keys[0]]
 
@@ -225,7 +243,6 @@ class PanelHC(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, data[r][c])
 
-#XXX Here better would be updating the grid and showing less rows ... ????
         for r in range(rows,MAXROWS):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
@@ -303,5 +320,8 @@ class PanelHC(wx.Panel):
 #==============================================================================
 
     def OnAutoDesignButton(self, event):
+        self.mod.autoDesign()
+        self.display()
         event.Skip()
 
+#==============================================================================

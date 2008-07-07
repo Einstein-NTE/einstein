@@ -20,10 +20,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	17/06/2008
-#	Last revised by:    
+#	Last revised by:    Claudia Vannoni	3/07/2008
 #       Changes in last update:
 #                               
-#	
+#	3/07/2008: priority
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -55,7 +55,7 @@ class CheckWHEE():
 # assign a variable to all intermediate/calculated values needed
 
         self.QWHEE1 = CCPar("QWHEE1")
-        self.QWHEERec = CCPar("QWHEERec")
+        self.QWHEERec = CCPar("QWHEERec",priority=2)
         self.QWHEERec1 = CCPar("QWHEERec1")
         self.QWHEEAmb = CCPar("QWHEEAmb")
         self.QWHEEAmb1 = CCPar("QWHEEAmb1")
@@ -77,7 +77,7 @@ class CheckWHEE():
 #..............................................................................
 # assign empty CCPar to all questionnaire parameters
 
-        self.QWHEE = CCPar("QWHEE",priority=2)
+        self.QWHEE = CCPar("QWHEE")
         
 #..............................................................................
 # reading data from table "qprocessdata"
@@ -127,7 +127,8 @@ class CheckWHEE():
 #------------------------------------------------------------------------------
 #   screens all variables in the block
 #------------------------------------------------------------------------------
-        self.QWHEE.screen()
+#        self.QWHEE.screen()
+        self.QWHEERec.screen()  #the most important is the recovered one !!!
 
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created

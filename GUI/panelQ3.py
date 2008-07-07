@@ -109,12 +109,29 @@ class PanelQ3(wx.Panel):
         self.page1 = wx.Panel(self.notebook)
 
         self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Process list"))
+        self.sizer_5_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_5_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Processes description"))
+        self.sizer_7_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_7_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("Schedule"))
+        self.sizer_8_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_8_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_11_staticbox = wx.StaticBox(self.page1, -1,_("Waste heat (heat available for recovery)"))
+        self.sizer_11_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_11_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_12_staticbox = wx.StaticBox(self.page1, -1, _("Waste heat recovery for this process"))
+        self.sizer_12_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_12_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.sizer_13_staticbox = wx.StaticBox(self.page1, -1,
                                                _("Data of existing heat (or cold) supply to the process"))
+        self.sizer_13_staticbox.SetForegroundColour(TITLE_COLOR)
+        self.sizer_13_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         # set font for titles
         # 1. save actual font parameters on the stack
@@ -625,8 +642,7 @@ using the nomenclature of the hydraulic scheme"))
         Status.SQL.commit()
         self.fillPage()
 
-        Status.processData.outOfDate = True
-        Status.schedules.outOfDate = True
+        Status.processData.changeInProcess()
 
 #------------------------------------------------------------------------------
 #--- Public methods

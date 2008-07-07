@@ -16,12 +16,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger      03/05/2008
 #                           Hans Schweiger      03/07/2008
+#                           Hans Schweiger      05/07/2008
 #
 #       Changes to previous versions:
 #       03/07/2008: HS  included condition "is None" in check
+#       05/07/2008: HS  colours and font sizes centralised here ...
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -34,10 +36,23 @@
 #==============================================================================
 
 import wx
-import pSQL
-import HelperClass
-from status import Status
-from einstein.modules.constants import *
+from einstein.modules.constants import *    #not needed here, but in the Panels !!!
+
+ORANGE = '#FF6000'
+SOFTORANGE = '#FFA066'
+WHITE = '#FFFFFF'
+LIGHTGREY = '#F6F6F6'
+DARKGREY = '#000060'
+
+GRID_LETTER_SIZE = 8 #points
+GRID_LABEL_SIZE = 9  # points
+GRID_LETTER_COLOR = DARKGREY     # specified as hex #RRGGA
+GRID_LETTER_COLOR_HIGHLIGHT = WHITE     # specified as hex #RRGGA
+GRID_BACKGROUND_COLOR = LIGHTGREY # idem
+GRID_BACKGROUND_COLOR_HIGHLIGHT = SOFTORANGE # idem
+GRAPH_BACKGROUND_COLOR = WHITE # idem
+TITLE_COLOR = ORANGE
+
 
 #------------------------------------------------------------------------------
 def fillChoice(choice,choiceList,nonePossible=True):

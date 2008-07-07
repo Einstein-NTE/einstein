@@ -216,7 +216,7 @@ class Project(object):
         sproject = Status.DB.sproject.ProjectID[Status.PId][0]
         sproject.NoOfAlternatives = Status.NoOfAlternatives
 
-        logDebug("Project (createNewAlternative) - project %s, copying from %s %s"%(Status.PId,originalANo,ANo))
+        logTrack("Project (createNewAlternative) - project %s, copying from %s %s"%(Status.PId,originalANo,ANo))
 
 #..............................................................................
 # copying Q- and corresponding C-Tables
@@ -462,22 +462,16 @@ class Project(object):
 #   for given ANo and PId
 #------------------------------------------------------------------------------
 
-        print "Project (getProjectData)"
-        
         sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
         projects = Status.DB.questionnaire.sql_select(sqlQuery)
         if len(projects)>0: self.projectData = projects[0]
         else: self.projectData = None
-
-        print "-> len(projects) = ",len(projects)
 
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         generaldatasets = Status.DB.cgeneraldata.sql_select(sqlQuery)
         if len(generaldatasets) > 0:self.generalData = generaldatasets[0]
         else: self.generalData = None
 
-        print "-> len(generaldatasets) = ",len(generaldatasets)
-        
         return (self.projectData,self.generalData)
 
 
@@ -595,7 +589,17 @@ class Project(object):
             qelectricity.insert(newElectricity)
 
             newUHeatPump =  {"Questionnaire_id":newID,
-                              "AlternativeProposalNo":-1}
+                             "AlternativeProposalNo":-1,
+                             "BBMaintain:":False,
+                             "BBSafety":10.0,
+                             "BBRedundancy":True,
+                             "BBFuelType":"Natural Gas",
+                             "BBHOp":100,
+                             "BBPmin":500,
+                             "BBEff":0.85}
+
+### fill default values for design assistants ...
+            
             uheatpump.insert(newUHeatPump)
 
             Status.NoOfAlternatives = -1
@@ -634,7 +638,6 @@ class Project(object):
 
             copySQLRows(DB.qbuildings,sqlQueryQ,"QBuildings_ID","Questionnaire_id",newID)
             copyPipeDict = copySQLRows(DB.qdistributionhc,sqlQueryQ,"QDistributionHC_ID","Questionnaire_id",newID)
-            copySQLRows(DB.qelectricity,sqlQueryQ,"QElectricity_ID","Questionnaire_id",newID)
             copySQLRows(DB.qfuel,sqlQueryQ,"QFuel_ID","Questionnaire_id",newID)
             copyEqDict = copySQLRows(DB.qgenerationhc,sqlQueryQ,"QGenerationHC_ID","Questionnaire_id",newID)
             copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","ProjectID",newID)
@@ -674,36 +677,38 @@ class Project(object):
 #   deletes all tables for a given project with AlternativeProposalNo different
 #   than ActiveAlternatives in sproject
 #------------------------------------------------------------------------------
+
+        logTrack("Project (cleanUpProject): cleaning project no. %s"%PId)
 #..............................................................................
-            DB = Status.DB
+        DB = Status.DB
 
-            sqlQuery = "ProjectID = '%s'"%PId
-            sqlQueryQ = "Questionnaire_id = '%s'"%PId
+        sqlQuery = "ProjectID = '%s'"%PId
+        sqlQueryQ = "Questionnaire_id = '%s'"%PId
 
-            sprojects = Status.DB.sproject.sql_select(sqlQuery)
-            if len(sprojects) > 0:
-                sproject = sprojects[0]
-                maxANo = sproject.NoOfAlternatives
+        sprojects = Status.DB.sproject.sql_select(sqlQuery)
+        if len(sprojects) > 0:
+            sproject = sprojects[0]
+            maxANo = sproject.NoOfAlternatives
 
 #..............................................................................
 # copying project data tables
 
-                cleanUpSQLRows(DB.salternatives,sqlQuery,maxANo)
-            
-                cleanUpSQLRows(DB.cgeneraldata,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.salternatives,sqlQuery,maxANo)
+        
+            cleanUpSQLRows(DB.cgeneraldata,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
 
-                cleanUpSQLRows(DB.qbuildings,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qdistributionhc,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qfuel,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qgenerationhc,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qheatexchanger,sqlQuery,maxANo)
-                cleanUpSQLRows(DB.qprocessdata,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qproduct,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qrenewables,sqlQueryQ,maxANo)
-                cleanUpSQLRows(DB.qwasteheatelequip,sqlQuery,maxANo)
-                cleanUpSQLRows(DB.uheatpump,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qbuildings,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qdistributionhc,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qfuel,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qgenerationhc,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qheatexchanger,sqlQuery,maxANo)
+            cleanUpSQLRows(DB.qprocessdata,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qproduct,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qrenewables,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qwasteheatelequip,sqlQuery,maxANo)
+            cleanUpSQLRows(DB.uheatpump,sqlQueryQ,maxANo)
 
 
 #------------------------------------------------------------------------------
@@ -852,9 +857,9 @@ class Project(object):
         if level in INTERACTIONLEVELS:
             Status.UserInteractionLevel = level
             Status.DB.stool.STool_ID[1][0].UserInteractionLevel = level
-            print logDebug("Project (setUserInteractionLevel): "),level
+            logTrack("Project (setUserInteractionLevel): %s"%level)
         else:
-            print logDebug("Project (setUserInteractionLevel): ERROR in level "),level
+            logDebug("Project (setUserInteractionLevel): ERROR in level %s"%level)
 
 #------------------------------------------------------------------------------
     def setStatus(self,key,value=1):
@@ -882,7 +887,7 @@ class Project(object):
             Status.StatusEnergy = value
             if len(salternatives) > 0: salternatives[0].StatusEnergy = value
         else:
-            print "Project (setStatus): status key %s unknown"%key
+            logDebug("Project (setStatus): status key %s unknown"%key)
 
         self.setTreePermissions()
 
@@ -1054,7 +1059,7 @@ class Project(object):
                 sproject.StatusCC = EINSTEIN_NOTOK
                 Status.StatusCC = EINSTEIN_NOTOK
         else:
-#            logError(_("Project (getStatus): could not find project table of last opened project"))
+            print _("Project (getStatus): could not find project table of last opened project")
 #XXX -> getStatus is called BEFORE GUI is built -> logError not yet available !!!
             Status.StatusCC = EINSTEIN_NOTOK
             Status.StatusQ = EINSTEIN_NOTOK
@@ -1078,7 +1083,8 @@ class Project(object):
 #   deletes all entries for the original ANo
 #------------------------------------------------------------------------------
 
-        print "Project (deleteProduct) - project %s, alternative %s, deleting product %s "%(Status.PId,Status.ANo,productName)
+        logTrack("Project (deleteProduct) - project %s, alternative %s, deleting product %s "%\
+                 (Status.PId,Status.ANo,productName))
 
 #..............................................................................
 # deleting Q- and corresponding C-Tables
@@ -1143,9 +1149,13 @@ class Project(object):
 
         generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
         generaldata[0].NEquipe = NEquipe
+        Status.NEquipe = NEquipe
 
         Status.SQL.commit()
 
+        Status.int.extendCascadeArrays(NEquipe) # creates the space in the
+                                                # equipment cascade
+        
         return newEquipe
 
 #------------------------------------------------------------------------------
@@ -1184,6 +1194,7 @@ class Project(object):
         sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)  
         cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQueryQ)
         cgeneraldata[0].NEquipe = len(equipes)
+        Status.NEquipe = len(equipes)
 
         Status.SQL.commit()
 
@@ -1206,6 +1217,9 @@ class Project(object):
                 
 
         equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+
+        if PId is None:
+            Status.NEquipe = len(equipments)
         
         return equipments
 

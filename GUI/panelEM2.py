@@ -15,11 +15,15 @@
 #	Created by: 	    Tom Sobota	28/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
-#                           Stoyan Danov            18/06/2008
+#                           Stoyan Danov    18/06/2008
+#                           Stoyan Danov    03/07/2008
+#                           Stoyan Danov    04/07/2008
 #
 #       Changes to previous version:
 #       28/04/2008          created method display
 #       18/06/2008 SD: change to translatable text _(...)
+#       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<, esthetics & security features
+#       04/07/2008 SD: changed min No columns, col width, 
 #
 #	
 #------------------------------------------------------------------------------		
@@ -51,6 +55,8 @@ GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
 GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+ORANGE = '#FF6000'
+TITLE_COLOR = ORANGE
 
 
 class PanelEM2(wx.Panel):
@@ -72,7 +78,7 @@ class PanelEM2(wx.Panel):
                    'ylabel'      : _('UPH (MWh)'),                   # y axis label
                    'backcolor'   : GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                             # tick label fontsize
-                   'ignoredrows' : [0,12]}                        # rows that should not be plotted
+                   'ignoredrows' : [0,1]}                        # rows that should not be plotted
 
         dummy = Mp.MatPanel(self.panelGraphMPHS,wx.Panel,drawStackedBarPlot,paramList)
 
@@ -89,9 +95,14 @@ class PanelEM2(wx.Panel):
         # warning: this grid has a variable nr. of cols
         # so the 1st.row has the column headings
         data = Interfaces.GData[keys[0]]
-        (rows,cols) = data.shape
-        self.grid1.CreateGrid(max(rows,20), cols)
 
+#####Security feature against non existing GData entry
+        COLNO1 = 5 # minimum number of columns-for the case if only ONE equipment exists
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO1)
+        
+        self.grid1.CreateGrid(max(rows,20), max(COLNO1, cols))
+        
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
@@ -99,17 +110,29 @@ class PanelEM2(wx.Panel):
         headings = data[0] # extract the array of headings
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         for col in range(len(headings)):
-            self.grid1.SetColSize(col,115)
+            self.grid1.SetColSize(col,141)
             self.grid1.SetColLabelValue(col, headings[col])
-        self.grid1.SetColSize(0,120)
+        self.grid1.SetColSize(0,141)
         #
         # copy values from dictionary to grid
         # ignore the 1st. row, the column headings, which has been already
         # processed
+#######LAYOUT: use of function numCtrl
+
+        decimals = [-1]   #number of decimal digits for each colum
+        for i in range(cols-1): #fill decimals list according numbers of columns (variable)
+            decimals.append(1)
+            
         for r in range(rows-1):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
-                self.grid1.SetCellValue(r, c, data[r+1][c])
+                try:
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid1.SetCellValue(r, c, \
+                            convertDoubleToString(float(data[r+1][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid1.SetCellValue(r, c, data[r+1][c])
+                except: pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
                 else:
@@ -121,48 +144,78 @@ class PanelEM2(wx.Panel):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELEM2, name=u'PanelEM2', parent=prnt,
-              pos=wx.Point(6, 0), size=wx.Size(800, 600), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+
+#...........box1....................................................................
+        
+        self.box1 = wx.StaticBox(self, -1, _(u'Monthly useful supply heat'),
+                                 pos = (10,10),size=(780,200))
+
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.grid1 = wx.grid.Grid(id=wxID_PANELEM2GRID1, name='grid1',
-              parent=self, pos=wx.Point(40, 48), size=wx.Size(700, 168),
+              parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 160),
               style=0)
+
+#...........box2....................................................................
+        
+        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of useful supply heat per months'),
+                                 pos = (10,230),size=(780,320))
+
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelGraphMPHS = wx.Panel(id=wxID_PANELEM2PANELGRAPHMPHS,
-              name=u'panelGraphMPHS', parent=self, pos=wx.Point(40, 240),
-              size=wx.Size(700, 272), style=wx.TAB_TRAVERSAL)
-        self.panelGraphMPHS.SetBackgroundColour(wx.Colour(77, 77, 77))
+              name=u'panelGraphMPHS', parent=self, pos=wx.Point(20, 260),
+              size=wx.Size(760, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+        self.panelGraphMPHS.SetBackgroundColour(wx.Colour(127, 127, 127))
 
+
+#..............................................................................
+#   default buttons
+#..............................................................................
         self.btnBack = wx.Button(id=wx.ID_BACKWARD, label=u'<<<',
-              name=u'btnBack', parent=self, pos=wx.Point(160, 520),
-              size=wx.Size(104, 32), style=0)
+              name=u'btnBack', parent=self, pos=wx.Point(500, 560),
+              size=wx.Size(80, 20), style=0)
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
-              id=wxID_PANELEM2BTNBACK)
+              id=-1)
 
         self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
-              parent=self, pos=wx.Point(272, 520), size=wx.Size(104, 32),
+              parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,
-              id=wxID_PANELEM2BTNOK)
+              id=-1)
 
         self.btnForward = wx.Button(id=wx.ID_FORWARD, label=u'>>>',
-              name=u'btnForward', parent=self, pos=wx.Point(384, 520),
-              size=wx.Size(96, 32), style=0)
+              name=u'btnForward', parent=self, pos=wx.Point(700, 560),
+              size=wx.Size(80, 20), style=0)
         self.btnForward.Bind(wx.EVT_BUTTON, self.OnBtnForwardButton,
-              id=wxID_PANELEM2BTNFORWARD)
+              id=-1)
 
-
-    def display(self):
-        self.panelGraphMPHS.draw()
-        self.Show()
-    
+#------------------------------------------------------------------------------		
+#   Event handlers for default buttons
+#------------------------------------------------------------------------------		
     def OnBtnOKButton(self, event):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
-
-    def OnButton1Button(self, event):
-        event.Skip()
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qEM1, select=True)
+        print "Button exitModuleBack: now I should show another window"
 
     def OnBtnForwardButton(self, event):
         event.Skip()
+##        self.Hide()
+##        Status.main.tree.SelectItem(Status.main.qEH1, select=True)
+##        print "Button exitModuleFwd: now I should show another window"
+
+#------------------------------------------------------------------------------
+    def display(self):
+#------------------------------------------------------------------------------		
+#   display function. carries out all the necessary calculations before
+#   showing the panel
+#------------------------------------------------------------------------------
+        try: self.panelGraphMPHS.draw()
+        except: pass
+        self.Show()

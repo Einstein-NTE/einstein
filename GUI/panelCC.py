@@ -48,6 +48,7 @@ from einstein.GUI.status import Status
 from einstein.modules.interfaces import *
 from einstein.GUI.dialogOK import *
 from einstein.GUI.conflictFrame import *
+from GUITools import *
 
 
 [wxID_PANELCC, wxID_PANELCCBASICCHECK, wxID_PANELCCBUTTONPANELBACK, 
@@ -62,11 +63,6 @@ from einstein.GUI.conflictFrame import *
 
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGA
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
 COLNO = 5
@@ -143,6 +139,9 @@ class PanelCC(wx.Panel):
         self.box1 = wx.StaticBox(self, -1, _('Cross checking of data'),
                                  pos = (10,10),size=(780,400))
 
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.st1panel = wx.StaticText(id=-1, label=_('list of data with unsufficient accuracy'),
               name='st1panel', parent=self, pos=wx.Point(20, 30), style=0)
 
@@ -195,6 +194,9 @@ class PanelCC(wx.Panel):
         self.box2 = wx.StaticBox(self, -1, _('Cross check statistics'),
                                  pos = (10,460),size=(780,80))
 
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        
         self.stStatistics1 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1,
               label=_('No. of data checked'), name='stStatistics1', parent=self,
               pos=wx.Point(24, 480), size=wx.Size(98, 13), style=0)
@@ -258,15 +260,31 @@ class PanelCC(wx.Panel):
 #..............................................................................
 # update of alternatives table
 
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         rows = 0
         try:
             data = Interfaces.GData[self.keys[0]]
-            print "data = ",data
             (rows,cols) = data.shape
-            print rows,cols
             for r in range(rows):
                 for c in range(COLNO):
                     self.grid.SetCellValue(r, c, data[r][c])
+                    
+#HS2008-07-05: WAS AN ATTEMPT TO HIGHLIGHT IMPORTANT DATA
+                if data[r][COLNO]==1:
+                    print "PanelCC: here I should highlight a row"
+#                    self.grid.SetRowAttr(r,attr2)
+#                else:
+#                    self.grid.SetRowAttr(r,attr)
+
         except:
             pass
 
@@ -383,7 +401,7 @@ class PanelCC(wx.Panel):
                 Status.prj.setActiveAlternative(0,checked = True)
                 Status.mod.moduleEA.update()
                 self.Hide()
-                self.main.tree.SelectItem(self.main.qEA4, select=True)
+                self.main.tree.SelectItem(self.main.qEA4a, select=True)
         else:
             popup =  DialogOK(self,_("revise data"),\
                               _("you first have to eliminate unconsistencies in the data set"))

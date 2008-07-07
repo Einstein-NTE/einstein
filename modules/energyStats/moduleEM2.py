@@ -13,8 +13,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	28/03/2008
+#                       Stoyan Danov    04/07/2008
 #
 #       Changes to previous version:
+#       04/07/08:   SD changes
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -53,8 +55,9 @@ class ModuleEM2(object):
 #------------------------------------------------------------------------------
         # In this grid the nr. of cols is variable, so we generate the
         # column headings dynamically here
-        data = array([['Process heat\nsupply','Boiler 1\nMWh','Boiler 2\nMWh',
-                       'CHP engine 1\nMWh','TOTAL\nKWh'],
+        data = array([['Process heat\nsupply','Boiler 1\n[MWh]','Boiler 2\n[MWh]',
+                       'CHP engine 1\n[MWh]','TOTAL\n[MWh]'],
+                      ['Total'    ,  47.0,  75.0,    60.0, 182.0],
                       ['January'  ,  10.0,  14.0,   30.0,   54.0],
                       ['February' ,  12.0,  16.0,   20.0,   48.0],
                       ['March'    ,  14.0,  18.0,   10.0,   42.0],
@@ -66,8 +69,7 @@ class ModuleEM2(object):
                       ['September',   7.0,  11.0,    0.0,   18.0],
                       ['October'  ,   9.0,  13.0,    10.0,  32.0],
                       ['November' ,  15.0,  19.0,    20.0,  54.0],
-                      ['December' ,   4.0,   8.0,    30.0,  42.0],
-                      ['Total'    ,  47.0,  75.0,    60.0, 182.0]])
+                      ['December' ,   4.0,   8.0,    30.0,  42.0]])
                           
         self.interface.setGraphicsData(self.keys[0], data)
 

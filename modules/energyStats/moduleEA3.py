@@ -85,9 +85,10 @@ class ModuleEA3(object):
         PId = Status.PId
         ANo = Status.ANo
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(PId,ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
+
+        Status.mod.moduleEA.calculateEquipmentEnergyBalances()
 
         dbfuel = Status.DB.dbfuel
         NDBFuel = len(dbfuel)

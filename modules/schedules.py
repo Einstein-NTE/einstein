@@ -150,9 +150,12 @@ class Schedule():
     def normalize(self):
 #------------------------------------------------------------------------------		
         fsum = 0.0
+        ftot = 0.0
         for it in range(Status.Nt):
             fsum += self.fav[it]
+            ftot += Status.TimeStep
 
+        fsum *= YEAR/ftot
         self.hop = fsum
 
         for it in range(Status.Nt):

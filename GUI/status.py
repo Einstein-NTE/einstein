@@ -64,30 +64,30 @@ class Status(object):
 
   UserInteractionLevel = "interactive" # Selected level of user interaction
   LanguageTool = "english"         # Selected language for tool interface
-  Units = "SI"                     # System of units (default: SI)
+  Units = "SI-kWh"                 # System of units (default: SI-kWh)
   Country = "Spain"                # Configuration for country specific aids ... NOT USED AT PRESENT
   UserType = "Expert"              # type of user: expert, student, end-user ... ???
 
   #------------------------------------------------------------------------------		
   # Status of processing [==> SQL Table STATUS]
 
-  DataImportOK = False
-  ConsistencyCheckOK = False
-  NoOfAlternatives = 0
-  AlternativesOK =[]
-  ComparativeAnalysisOK = False
-  ReportOK = False
+  DataImportOK = False        #no longer used -> CHECK before eliminating !!!
+  ConsistencyCheckOK = False  #no longer used -> CHECK before eliminating !!!
+  NoOfAlternatives = 0 
+  AlternativesOK =[]          #no longer used -> CHECK before eliminating !!!
+  ComparativeAnalysisOK = False #no longer used -> CHECK before eliminating !!!
+  ReportOK = False            #no longer used -> CHECK before eliminating !!!
   LanguageReport = "english"       # Selected language for report
 
   #------------------------------------------------------------------------------		
   # Tool configuration
   TimeStep = 1.0
-  TemperatureInterval = 10.0
-  MaximumTemperature = 100.0
-  NT = (int) (MaximumTemperature / TemperatureInterval)
-  Nt = 168 #1 week simulation for testing
-
+  TemperatureInterval = 5.0
+  MaximumTemperature = 400.0
   
+  NT = (int) (MaximumTemperature / TemperatureInterval + 0.1)
+  Nt = 168
+
   #------------------------------------------------------------------------------		
   # Instance variables
 

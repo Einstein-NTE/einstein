@@ -13,9 +13,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
+#                       Stoyan Danov    04/07/2008
 #
 #       Changes to previous version:
 #	29/03/08:   TS changed functions draw... to use numpy arrays,
+#       04/07/08:   SD changes
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,8 +56,9 @@ class ModuleEM1(object):
 #------------------------------------------------------------------------------
         # In this grid the nr. of cols is variable, so we generate the
         # column headings dynamically here
-        data = array([['Process heat\ndemand','Process 1\nMWh','Process 2\nMWh',
-                       'Office heating\nMWh','TOTAL\nKWh'],
+        data = array([['Process heat\ndemand','Process 1\n[MWh]','Process 2\n[MWh]',
+                       'Office heating\n[MWh]','TOTAL\n[MWh]'],
+                      ['Total'    , 118.0,  75.0,    60.0, 182.0],
                       ['January'  ,  10.0,  14.0,   30.0,   54.0],
                       ['February' ,  12.0,  16.0,   20.0,   48.0],
                       ['March'    ,  14.0,  18.0,   10.0,   42.0],
@@ -67,9 +70,25 @@ class ModuleEM1(object):
                       ['September',   7.0,  11.0,    0.0,   18.0],
                       ['October'  ,   9.0,  13.0,    10.0,  32.0],
                       ['November' ,  15.0,  19.0,    20.0,  54.0],
-                      ['December' ,   4.0,   8.0,    30.0,  42.0],
-                      ['Total'    , 118.0,  75.0,    60.0, 182.0]])
+                      ['December' ,   4.0,   8.0,    30.0,  42.0]])
+
+##        data = array([['Process heat\ndemand','Process 1\n[MWh]','Process 2\n[MWh]',
+##                       'Office heating\n[MWh]','TOTAL\n[MWh]'],
+##                      ['January'  ,  10.0,  14.0,   30.0,   54.0],
+##                      ['February' ,  12.0,  16.0,   20.0,   48.0],
+##                      ['March'    ,  14.0,  18.0,   10.0,   42.0],
+##                      ['April'    ,  16.0,  20.0,    5.0,   41.0],
+##                      ['May'      ,  19.0,  23.0,    0.0,   42.0],
+##                      ['June'     ,   6.0,  10.0,    0.0,   16.0],
+##                      ['July'     ,   4.0,   8.0,    0.0,   12.0],
+##                      ['August'   ,   2.0,   6.0,    0.0,    8.0],
+##                      ['September',   7.0,  11.0,    0.0,   18.0],
+##                      ['October'  ,   9.0,  13.0,    10.0,  32.0],
+##                      ['November' ,  15.0,  19.0,    20.0,  54.0],
+##                      ['December' ,   4.0,   8.0,    30.0,  42.0],
+##                      ['Total'    , 118.0,  75.0,    60.0, 182.0]])
                           
+                         
         self.interface.setGraphicsData(self.keys[0], data)
 
         #print "ModuleEM1 graphics data initialization"

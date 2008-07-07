@@ -47,6 +47,7 @@ from einstein.modules.solar.moduleST import ModuleST
 from einstein.modules.heatPump.moduleHP import ModuleHP
 from einstein.modules.boiler.moduleBB import ModuleBB
 from einstein.modules.energyStats.moduleEA import ModuleEA
+from einstein.modules.messageLogger import *
 
 class Modules(object):
     
@@ -54,7 +55,7 @@ class Modules(object):
     def __init__(self):
 #------------------------------------------------------------------------------		
 
-        print "Modules (__init__): creating module instances"
+        logTrack("Modules (__init__): creating module instances")
 
         self.moduleCC = ModuleCC()
         

@@ -24,6 +24,7 @@
 #                           Stoyan Danov        28/03/2008
 #                           Hans Schweiger      24/04/2008
 #                           Stoyan Danov        05/05/2008
+#                           Hans Schweiger      29/06/2008
 #
 #       Changes:
 #       - introduction of function frange
@@ -32,6 +33,7 @@
 #       28/03/2008 added: transpose(), firstHigher()
 #       24/04/2008  function "noneFilter" added
 #       05/05/2008 bug corrected in interpolateList (yList was used instead of ylist)
+#       29/06/2008: HS  change in findFirst/LastNonZero -> fix of bug in HP module
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -81,11 +83,12 @@ def lastNonZero(ylist):
 #finds the last filled position of the list (different from zero)
 #------------------------------------------------------------------------------
     n = len(ylist)
-    i = n - 1
-    while ylist[i] == 0.0:
-        if i < 1: break
-        i = i - 1
-    return i
+    idx = 0
+    for i in range(n-1,-1,-1):
+        if ylist[i] <> 0.0:
+            idx = i
+            break
+    return idx
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -93,12 +96,14 @@ def firstNonZero(ylist):
 #------------------------------------------------------------------------------
 #finds the first filled position of the list (different from zero)
 #------------------------------------------------------------------------------
-    n = len(ylist)
     i = 0
-    while ylist[i] == 0.0:
-        if i > n -1: break
-        i = i + 1
-    return i
+    n = len(ylist)
+    idx = n
+    for i in range(n):
+        if ylist[i] <> 0:
+            idx = i
+            break
+    return idx
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
