@@ -724,11 +724,6 @@ class ModuleHP():
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
 
-        print "ModuleHP - demand arrays"
-        print Status.int.QD_Tt_mod[0][Status.NT+1]
-        print Status.int.QA_Tt_mod[0][0]
-        print "index = ",cascadeIndex-1
-
         QD_Tt = copy.deepcopy(Status.int.QD_Tt_mod[cascadeIndex-1])
         QA_Tt = copy.deepcopy(Status.int.QA_Tt_mod[cascadeIndex-1])
         
@@ -752,10 +747,17 @@ class ModuleHP():
 
         FETel_j = 0
 
+        COPMin = 3.0    # This is the objective for design of HP power
+                        # -> not MAXIMUM technically possible energy,
+                        # but maximum energy at a reasonable COP
+                        # criterion could be optimised ... e.g. if 80% of the energy
+                        # delivered rises the COP to 4.0, better use this ?
+                        # => minimise  E = Q_HP/COP_HP + (Q_total - QHP)/COP_backup_system
+                        # -> dE/dQ_HP = (1/COP_HP - 1/COP_backup) - (dCOP/dQ_HP) * Q_HP/COP_HP**2
+
         for it in range(Status.Nt):
 
             if  QD_Tt[Status.NT+1][it] == 0.0:
-                print "it = %s, demand zero"%it
                 Tc_i=0.0; COPh_i=0.0; COPht_i=0.0;
                 dotQh_i=0.0; dotQw_i=0.0; dotQc_i=0.0
 #..............................................................................
@@ -773,13 +775,8 @@ class ModuleHP():
 # start estimates for Th,Tc and COP
 
                 dQMax = PNom*Status.TimeStep
-                print "dQMax =", dQMax
-                print "QD_T =", QD_T
-                print "T = ",Status.int.T
-                print "TMax = ",TMax
 
                 Th_max = min(interpolateTable(dQMax,QD_T,Status.int.T),TMax)
-                print "Th_Max = %s [%s|%s]"%(Th_max,QD_T[0],QD_T[Status.NT+1])
                 dotQ_max = min(interpolateTable(TMax,Status.int.T,QD_T),dQMax/Status.TimeStep)
                 
                 Th_i = Th_max
@@ -787,10 +784,6 @@ class ModuleHP():
                 Tc_i = max(Tc_i,TMin)
                             
                 COPh_i = COPex*self.calculateCOPh_Carnot(Th_i + HPTDROP,Tc_i - HPTDROP,Tg)
-
-                
-                print "ModuleHP (cEF): dotQmax %s Th_i %s Tc_i %s COPh_i %s"%(dotQ_max,Th_i,Tc_i,COPh_i)
-                print "--> cycle starting"
 
                 alpha = 0.1 #(subrelaxation coefficient)
 
@@ -807,31 +800,19 @@ class ModuleHP():
                     COPh0_i = COPh_i;
                     Tc0_i = Tc_i 
                                     
+                    dotQh_i = min(dotQh_i,dotQ_max)         #limit to maximum nominal power and maximum demand at TMax
                     dotQw_i = (dotQh_i/COPh_i)              #heat pump input power (mechanical or thermal)
                     dotQc_i = dotQh_i - dotQw_i             #heat pump cooling power
-
-                    print "Qw: %s Qc: %s"%(dotQw_i,dotQc_i)
 
                     Th_i = interpolateTable(dotQh_i*Status.TimeStep,QD_T,Status.int.T)
                     Tc_i = interpolateTable(dotQc_i*Status.TimeStep,QA_T,Status.int.T)
 
-                    print "Th: %s Tc: %s"%(Th_i,Tc_i)
+                    dotQh_i *= min(max(0.95,1 + alpha*(COPh_i - COPMin)),1.05)
 
-                    dotQh_i *= min(max(0.95,1 + alpha*(COPh_i - 3.0)),1.05)
-#                    DTMax_i = min(DTMax,Th_i - TMin)
-#                    dotQh_i = dotQh_i*min(max(0.9,1 + alpha*(1 - (Th_i - Tc_i)/DTMax_i)),1.1)
-#                    if COPh_i < 3.0 or Th_i > TMax or Tc_i < TMin:
-#                        dotQh_i /= 1.1
                     if (Th_i - Tc_i) > DTMax or Th_i > TMax or Tc_i < TMin:
                         dotQh_i *= 0.9
-                    print "dotQh - update 1: %s",dotQh_i
-                    dotQh_i = min(dotQh_i,dotQ_max)
-                    print "dotQh - update 2: %s",dotQh_i
-                    
 
                     COPh_i = COPex*self.calculateCOPh_Carnot(Th_i+HPTDROP,Tc_i-HPTDROP,Tg)
-
-                    print "ModuleHP (cEF): dotQh %s Th_i %s Tc_i %s COPh_i %s"%(dotQh_i,Th_i,Tc_i,COPh_i)
 
                     nits +=1
                     if nits > 30:

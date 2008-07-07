@@ -238,9 +238,11 @@ class ModuleHR(object):
                 QHXProc_Tt[iT][it] = min(QHXmax,fHR*UPHw_Tt[iT][it])
                 QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - QHXProc_Tt[iT][it]
 
+            QHXProc_it = QHXProc_Tt[0][it]
+            
             for iT in range(Status.NT+2):
-                QHXProc_Tt[iT][it] = QHXProc_Tt[0][it] - QHXProc_Tt[iT][it]
-                UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it]
+                QHXProc_Tt[iT][it] = QHXProc_it - QHXProc_Tt[iT][it]    #from descending to ascending cumulative
+                UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it] 
                             
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
