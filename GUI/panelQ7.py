@@ -21,6 +21,7 @@
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      25/06/2008
 #                           Hans Schweiger  26/06/2008
+#                           Hans Schweiger  08/07/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -30,6 +31,9 @@
 #                   HS  bug corrections (reactivation of check-boxes)
 #       25/06/2008 TS   fixed (again) layout
 #       26/06/2008  HS  new event handlers for changes in ST
+#       08/07/2008: HS  bug-fixing
+#                       adding functions related with surface management
+#                       (add/delete/select ...)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,12 +45,12 @@
 #
 #==============================================================================
 import wx
-import pSQL
 from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
 from fonts import *
+from einstein.modules.constants import *
 
 # constants that control the default sizes
 # 1. font sizes
@@ -65,14 +69,17 @@ LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
 UNITS_WIDTH        = 120
 
-ORANGE = '#FF6000'
-TITLE_COLOR = ORANGE
 
+#------------------------------------------------------------------------------
 class PanelQ7(wx.Panel):
+#------------------------------------------------------------------------------
     def __init__(self, parent, main):
 	self.main = main
+	logDebug("PanelQ7 created")
         self._init_ctrls(parent)
         self.__do_layout()
+        self.selectedSurfaceName = None
+        self.selectedSurfaceID = None
 
     def _init_ctrls(self, parent):
 
@@ -177,13 +184,13 @@ class PanelQ7(wx.Panel):
                              tip=_("Define a short name for each surface area available for installation in order to clearly identify them"))
 
         self.tc6 = FloatEntry(self.page1,
-                              decimals=1, minval=0., maxval=99999.,
+                              decimals=0, minval=0., maxval=1e+9,
                               unitdict='AREA',label=_("Available area"),\
                               tip=_("If there are different surfaces available, give the measure of each surface area"))
 
         self.tc7 = FloatEntry(self.page1,
-                              decimals=1, minval=0., maxval=99999.,
-                              unitdict='AREA',
+                              decimals=1, minval=0., maxval=90.,
+                              unitdict='ANGLE',
                               label=_("Inclination of the area"),
                               tip=_("Positioning of the area (inclination in degrees)"))
                                   
@@ -199,7 +206,7 @@ class PanelQ7(wx.Panel):
                              tip=_("Consider shadows due to other buildings, trees, obstacles all over the year, in winter time or in early morning/late afternoon"))
 
         self.tc10 = FloatEntry(self.page1,
-                               decimals=2, minval=0., maxval=99999.,
+                               decimals=2, minval=0., maxval=1e+9,
                                unitdict='LENGTH',
                                label=_("Distance between the roof, ground, wall area(s) and the technical room or process"),
 			       tip=_("Estimate the piping length (single way) from  the roof, ground,wall area to the technical room or to the process"))
@@ -263,32 +270,32 @@ class PanelQ7(wx.Panel):
 
 
         self.tc16 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              ipart=3, decimals=1, minval=0., maxval=365, value=0.,
                               unitdict=None,
                               label=_("Number of days biomass is produced"),
                               tip=_(" "))
 
         self.tc17 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='MASS',
                               label=_("Daily quantity of biomass"),
                               tip=_(" "))
 
 
         self.tc18 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='VOLUME',
                               label=_("Space availability to stock biomass?"),
                               tip=_("Specify the volume"))
 
         self.tc19 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='ENERGY',
                               label=_("LCV biomass"),
                               tip=_(" "))
 
         self.tc20 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict=None,
                               label=_("Humidity"),
                               tip=_("Specify the percentage of humidity in biomass"))
@@ -298,7 +305,7 @@ class PanelQ7(wx.Panel):
                              tip=_(" "))
 
         self.tc22 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='ENERGYTARIFF',
                               label=_("Unit price of biomass"),
                               tip=_(" "))
@@ -314,7 +321,7 @@ class PanelQ7(wx.Panel):
                               tip=_("Specify if the availability is continuous or during some specific season of the year"))
 
         self.tc24 = FloatEntry(self.page2,
-                              ipart=3, decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=365, value=0.,
                               unitdict=None,
                               label=_("Number of days biomass is produced"),
                               tip=_(" "))
@@ -429,19 +436,41 @@ class PanelQ7(wx.Panel):
 #--- UI actions
 #------------------------------------------------------------------------------
     def OnListBoxEnergy(self,event):
-        pass
-    
+#------------------------------------------------------------------------------
+        self.selectedSurfaceName = self.listBoxEnergy.GetStringSelection()
+
+        self.fillPageSurface()
+            
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def OnButtonAddEnergy(self,event):
-        pass
+#------------------------------------------------------------------------------
+        self.clear()
+        event.Skip()
 
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def OnButtonDeleteEnergy(self,event):
-        pass
+#------------------------------------------------------------------------------
+        Status.prj.deleteSurface(self.selectedSurfaceID)
+        self.display()
+        event.Skip()
 
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def OnButtonCancel(self, event):
         event.Skip()
 
+#------------------------------------------------------------------------------
     def OnButtonOK(self, event):
+#------------------------------------------------------------------------------
+
+        logDebug("PanelQ7 (OK button): confirming data")
+        
         if Status.PId != 0:
+
+            logDebug("PanelQ7 (OK button): writing general data")
+            
             tmp = {
                 "Latitude":check(self.tc1_21.GetValue()),
                 "ST_I":check(self.tc1_22.GetValue()),
@@ -464,6 +493,7 @@ class PanelQ7(wx.Panel):
             if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
                 # register does not exist, so store also id
                 tmp["Questionnaire_id"] = Status.PId
+                print tmp
 
                 Status.DB.qrenewables.insert(tmp)
                 Status.SQL.commit()
@@ -474,6 +504,19 @@ class PanelQ7(wx.Panel):
                 q.update(tmp)
                 Status.SQL.commit()
 
+            logDebug("PanelQ7 (OK button): writing surface specific data")
+            
+            self.selectedSurfaceName = check(self.tc6_0.GetValue())
+            surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
+                        SurfAreaName[self.selectedSurfaceName]
+
+            if self.selectedSurfaceName != 'NULL' and len(surfaces) == 0:
+                surface = Status.prj.addSurfaceDummy()
+            elif self.selectedSurfaceName != 'NULL' and len(surfaces) == 1:
+                surface = surfaces[0]
+            else:
+                showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
+                return
 
             orientation = findKey(ORIENTATIONS,check(self.tc8.GetValue(text=True)))
             if orientation in AZIMUTH.keys():
@@ -487,39 +530,39 @@ class PanelQ7(wx.Panel):
                 "Inclination":check(self.tc7.GetValue()),
                 "Azimuth":azimuth,
                 "AzimuthClass":check(orientation),
-                "Shading":check(findKey(self.tc9.GetValue(text=True))),
+                "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
                 "Distance":check(self.tc10.GetValue()),
-                "RoofType":check(findKey(self.tc11.GetValue(text=True))),
-                "RoofStaticLoadCap":check(self.tc12.GetValue()),
-                "EnclBuildGroundSketch":check(findKey(self.tc13.GetValue(text=True))),
+                "RoofType":check(findKey(ROOFTYPES,self.tc11.GetValue(text=True))),
+                "RoofStaticLoadCap":check(self.tc12.GetValue())
+#                "EnclBuildGroundSketch":check(findKey(TRANSYESNO,self.tc13.GetValue(text=True))),
                }
 
-            if len(Status.DB.qsurfarea.ProjectID[Status.PId]) == 0:
-                # register does not exist, so store also id
-                tmp["ProjectID"] = Status.PId
+            surface.update(tmp)
+            Status.SQL.commit()
 
-                Status.DB.qsurfarea.insert(tmp)
-                Status.SQL.commit()
+            logDebug("PanelQ7 (OK button): now filling page again")
 
-            else:
-                # register does exist
-                q = Status.DB.qsurfarea.ProjectID[Status.PId][0]
-                q.update(tmp)
-                Status.SQL.commit()
+            self.fillPage()
+
+            logDebug("PanelQ7 (OK button): and back")
         event.Skip()
-
 
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
     def display(self):
+#------------------------------------------------------------------------------
         self.clear()
         self.fillPage()
         self.Show()
 
 
+#------------------------------------------------------------------------------
     def clear(self):
+#------------------------------------------------------------------------------
+
         self.checkBox1.SetValue(False)
         self.checkBox2.SetValue(False)
         self.checkBox3.SetValue(False)
@@ -550,7 +593,9 @@ class PanelQ7(wx.Panel):
 
 
 
+#------------------------------------------------------------------------------
     def fillPage(self):
+#------------------------------------------------------------------------------
 	if Status.PId == 0:
 	    return
 
@@ -579,8 +624,29 @@ class PanelQ7(wx.Panel):
 	    self.tc23_2.SetValue(str(p.PeriodBiomassRegionStop))
 	    self.tc24.SetValue(str(p.NDaysBiomassRegion))
 
-	if len(Status.DB.qsurfarea.ProjectID[Status.PId]) > 0:
-	    p = Status.DB.qsurfarea.ProjectID[Status.PId][0]
+        surfaceList = Status.prj.getSurfaceList("SurfAreaName")
+        
+        self.listBoxEnergy.Clear()
+        for surface in surfaceList:
+            self.listBoxEnergy.Append(str(surface))
+
+        if len(surfaceList) > 0:
+            if self.selectedSurfaceName == None:
+                self.selectedSurfaceName = str(surfaceList[0])
+            self.listBoxEnergy.SetStringSelection(self.selectedSurfaceName)
+            self.fillPageSurface()
+
+#------------------------------------------------------------------------------
+    def fillPageSurface(self):
+#------------------------------------------------------------------------------
+
+        surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
+                    SurfAreaName[self.selectedSurfaceName]
+        
+        if len(surfaces) > 0:
+            self.selectedSurfaceID = surfaces[0].id
+
+	    p = surfaces[0]
 
 	    self.tc6_0.SetValue(str(p.SurfAreaName))
 	    self.tc6.SetValue(str(p.SurfArea))
@@ -598,7 +664,11 @@ class PanelQ7(wx.Panel):
                 
 	    self.tc12.SetValue(str(p.RoofStaticLoadCap))
 
-	    if p.Sketch in TRANSYESNOTYPES.keys():
-                self.tc13.SetValue(TRANSYESNOTYPES[str(p.Sketch)])
+	    if p.Sketch in TRANSYESNO.keys():
+                self.tc13.SetValue(TRANSYESNO[str(p.Sketch)])
+
+        else:
+            self.selectedSurfaceID = None
 	    
+#==============================================================================
 

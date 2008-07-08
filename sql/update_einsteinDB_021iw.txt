@@ -1,0 +1,13 @@
+-- update einstein database: more and more and more parameters
+
+USE einstein;
+
+ALTER TABLE qgenerationhc ADD COLUMN QHXj DOUBLE COMMENT 'waste heat used' AFTER QHXEq;
+ALTER TABLE qgenerationhc ADD COLUMN QWHj DOUBLE COMMENT 'waste heat dissipated' AFTER QHXEq;
+ALTER TABLE qgenerationhc ADD COLUMN FETHeat_j DOUBLE COMMENT 'heat used as driving source' AFTER FETel_j;
+
+ALTER TABLE uheatpump ADD COLUMN STMinYield DOUBLE COMMENT 'minimum yield' AFTER UHPMaintain;
+ALTER TABLE uheatpump ADD COLUMN STCollType VARCHAR(45) COMMENT 'type of collector' AFTER UHPMaintain;
+ALTER TABLE uheatpump ADD COLUMN STSolFra DOUBLE COMMENT 'solar fraction' AFTER UHPMaintain;
+
+ALTER TABLE qsurfarea ADD COLUMN SurfAreaNo INTEGER COMMENT 'consecutive number' AFTER ProjectID;

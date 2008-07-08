@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
+#	Version No.: 0.12
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
@@ -28,6 +28,7 @@
 #                       Stoyan Danov        11/06/2008
 #                       Hans Schweiger      13/06/2008
 #                       Stoyan Danov        16/06/2008
+#                       Hans Schweiger      08/07/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -42,6 +43,7 @@
 #                       creation of new entry in uheatpump added in createNewProject
 #       16/06/08: SD    addPipeDummy changed: now returning table, not ID
 #       18/06/08: HS    getNaceDict added
+#       08/07/08: HS    functions for surface managemente added
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1691,6 +1693,82 @@ class Project(object):
             WHEEList.append(whee[key])
 
         return WHEEList
+
+#------------------------------------------------------------------------------
+    def addSurfaceDummy(self):
+#------------------------------------------------------------------------------
+#   adds a new empty Surface to qsurfarea
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        surfaces = self.getSurfaces()
+        NSurfaces = len(surfaces)
+        tmp = {
+            "ProjectID":Status.PId,
+            "SurfAreaNo":(NSurfaces+1),
+            "SurfAreaName":"dummy"
+            }          
+        newID = Status.DB.qsurfarea.insert(tmp)
+        newSurface = Status.DB.qsurfarea.id[newID][0]
+
+        Status.SQL.commit()
+
+        return newSurface
+
+#------------------------------------------------------------------------------
+    def deleteSurface(self,surfaceID):
+#------------------------------------------------------------------------------
+#   deletes all entries for a given heat exchanger
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# deleting Q- and corresponding C-Tables
+
+        DB = Status.DB
+        sqlQuery = "ProjectID = '%s' AND id = '%s'"\
+                    %(Status.PId,surfaceID)  #query is redundant, but maintained as is for security
+
+        deleteSQLRows(DB.qsurfarea,sqlQuery)
+
+        surfaces = self.getSurfaces()
+
+        for i in range(len(surfaces)): #assign new EqNo in QGenerationHC table
+            surfaces[i].SurfAreaNo = i+1
+
+        Status.SQL.commit()
+
+#------------------------------------------------------------------------------
+    def getSurfaces(self,PId = None):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        if PId is None:
+            sqlQuery = "ProjectID = '%s' ORDER BY SurfAreaNo ASC"%(Status.PId)
+        else:
+            sqlQuery = "ProjectID = '%s' ORDER BY SurfAreaNo ASC"%(PId)
+            
+        surfaces = Status.DB.qsurfarea.sql_select(sqlQuery)
+        if PId is None:
+            self.surfaces = surfaces
+        
+        return surfaces
+
+#------------------------------------------------------------------------------
+    def getSurfaceList(self,key,PId = None):
+#------------------------------------------------------------------------------
+#   returns a list of existing heat exchangers
+#------------------------------------------------------------------------------
+
+        surfaces = self.getSurfaces(PId)
+        
+        surfaceList = []
+        for surface in surfaces:
+            surfaceList.append(surface[key])
+
+        return surfaceList
 
 #------------------------------------------------------------------------------
     def getFuels(self,PId = None):
