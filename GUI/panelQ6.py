@@ -383,8 +383,8 @@ class PanelQ6(wx.Panel):
         # left part: listbox
         sizerP0Left= wx.StaticBoxSizer(self.frame_exchangers_list, wx.VERTICAL)
         sizerP0Left.Add(self.listBoxHX, 1, wx.EXPAND, 0)
-        sizerP0Left.Add(self.buttonHXDelete, 0, wx.ALIGN_RIGHT, 0)
         sizerP0Left.Add(self.buttonHXAdd, 0, wx.ALIGN_RIGHT, 0)
+        sizerP0Left.Add(self.buttonHXDelete, 0, wx.ALIGN_RIGHT, 0)
         sizerPage0.Add(sizerP0Left,2,wx.EXPAND|wx.TOP,10)
 
         # right part: data entries
@@ -416,8 +416,8 @@ class PanelQ6(wx.Panel):
         # left part: listbox
         sizerP1Left= wx.StaticBoxSizer(self.frame_electrical_equipment_list, wx.VERTICAL)
         sizerP1Left.Add(self.listBoxWHEE, 1, wx.EXPAND, 0)
-        sizerP1Left.Add(self.buttonWHEEDelete, 0, wx.ALIGN_RIGHT, 0)
         sizerP1Left.Add(self.buttonWHEEAdd, 0, wx.ALIGN_RIGHT, 0)
+        sizerP1Left.Add(self.buttonWHEEDelete, 0, wx.ALIGN_RIGHT, 0)
         sizerPage1.Add(sizerP1Left,2,wx.EXPAND|wx.TOP,10)
 
         # right part: data entry

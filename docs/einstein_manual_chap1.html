@@ -27,28 +27,146 @@
 </table>
 <h1><span style="font-weight: bold;">Chapter 1: Installation of EINSTEIN<br>
 </span></h1>
-<a href="einstein_manual_chap1_1.html">1.1. First installation</a><br>
-<a href="einstein_manual_chap1_2.html">1.2. Updates</a> <br>
-&nbsp;
+<a href="#1.1._Installation_of_EINSTEIN_V1.00a_for">1.1. First
+installation</a><br>
+<a href="#1.2._Update_from_previous_Versions_">1.2. Updates</a><br>
+<h2><a name="1.1._Installation_of_EINSTEIN_V1.00a_for"></a><span
+ style="font-weight: bold;">1.1. Installation of EINSTEIN V1.00a for
+Newcomers<br>
+</span></h2>
+Note: V1.00a is still an INTERNAL testing version !!!<br>
 <br>
-This is the first test for the EINSTEIN manual:<br>
+If You already have successfully installed EINSTEIN V.001 (demo version
+of the Sabadell meeting) please <a
+ href="#1.2._Update_from_previous_Versions_">jump to section 1.2</a>.<br>
 <br>
-<h2><span style="font-weight: bold;">Section 1: blabla</span></h2>
-Text text text text text<br>
-Text text text text text<br>
-Text text text text text<br>
-<h2><span style="font-weight: bold;">Section 2: blabla</span></h2>
-Text text text text textText text text text textText text text text
-textText text text text text<br>
-Text text text text textText text text text textText text text text
-textText text text text text<br>
-Text text text text textText text text text textText text text text
-textText text text text text<br>
+<h3>1.1.1. Basic set-up previous to the installation of EINSTEIN<br>
+</h3>
+Einstein uses the following software packages that have to be installed
+PREVIOUSLY to the installation of EINSTEIN itself :<br>
+- MySQL (Version 5.0 or higher)<br>
+- Python (Version 2.5 or higher)<br>
+- Several Python complements: <br>
+&nbsp;&nbsp;&nbsp; a) wxPython<br>
+&nbsp;&nbsp;&nbsp; b) matplotlib<br>
+&nbsp;&nbsp;&nbsp; c) numpy<br>
 <br>
-<div style="text-align: left;"><img alt="under construction"
- src="img/under_construction.gif" style="width: 104px; height: 97px;"><br>
+HOW TO INSTALL THESE PACKAGES ?<br>
+<br>
+Step 1: Create your einstein installation folder, e.g. <span
+ style="font-weight: bold;">C:\MyEINSTEIN</span>.<br>
+<br>
+Step 2: Copy the following files into C:\MyEINSTEIN and then unzip, in
+the order as specified (the second file will overwrite some of the old
+files. When asked, confirm overwriting files with OK):<br>
+- EINSTEIN_InternalRelease_001.zip (-&gt; the installation package of
+the very first Meeting-Sabadell-Demo Installation)<br>
+- EINSTEIN_R1.00a.zip<br>
+<br>
+Please CHECK: After this you should have (at least) the following files
+and folders in your "MyEINSTEIN" directory:<br>
+- EINSTEIN.bat<br>
+- install_mysql.bat<br>
+- install_python.bat<br>
+- install_einstein.bat<br>
+- check_Installation.bat<br>
+- folder "einstein"<br>
+- folder "installer"<br>
+<br>
+Step 3: Set-up of MySQL (skip if you have already MySQL 5.0 or higher
+running, skip this section)<br>
+<br>
+TAKE CARE: Uninstall any older Version of MySQL BEFORE installing the
+new Version !!! Parallel installation of two different MySQL Versions
+may lead to problems.<br>
+<br>
+There are two possible ways to doing MySQL installation. We recomment
+use of the installer (option (a) ), but in case of any problem you can
+try it with option (b).<br>
+<br>
+a) Run the file "install_mysql.bat" and follow the instructions given
+on the screen (NOTE: internet connection is necessary !!!)<br>
+<br>
+b) go to: http://dev.mysql.com/downloads/mysql/5.1.html and download
+the Windows ZIP/Setup.EXE (x86) <br>
+(or one of the other versions, depending on your computer and operating
+system)<br>
+<br>
+Step 4: Set-up of&nbsp; Python and complements<br>
+<br>
+There are two possible ways to doing Python installation. We recomment
+use of the installer (option (a) ), but in case of any problem you can
+try it with option (b).<br>
+<br>
+a) Run the file "install_python.bat" and follow the instructions given
+on the screen (NOTE: internet connection is necessary !!!)<br>
+<br>
+b) Go to www.python.org/download and do it yourself.<br>
+<br>
+The installers for the necessary complements you find at:<br>
+<br>
+http://www.wxpython.org/<br>
+numpy: http://numpy.scipy.org/<br>
+matplotlib: http://matplotlib.sourceforge.net/<br>
+<br>
+Install also these additional packages on your computer.<br>
+<br>
+<h3><a name="1.1.2._Installation_of_EINSTEIN_"></a>1.1.2. Installation
+of EINSTEIN<br>
+</h3>
+Step 1: Installation of the EINSTEIN database<br>
+<br>
+There are two possible ways to doing the EINSTEIN database
+installation. We recomment
+use of the installer (option (a) ), but in case of any problem you can
+try it with option (b).<br>
+<br>
+a) Run the file "install_einsteinDB.bat" and follow the instructions
+given on the screen.<br>
+<br>
+b) Run EINSTEIN (see below) and use the Menu-Option: <br>
+<br>
+Database -&gt; Database Administration -&gt; Restore Database<br>
+<br>
+You should select the file "einstein_R1.00a.sql" in the folder
+&lt;MyEINSTEIN&gt;\einstein\sql<br>
+<br>
+Step 2: Now have a try -&gt; Run EINSTEIN<br>
+<br>
+For any problems check the <a href="einstein_manual_FAQs.html">FAQ
+Section</a> of this manual.<br>
+&nbsp;&nbsp; <br>
+<h2><a name="1.2._Update_from_previous_Versions_"></a><span
+ style="font-weight: bold;">1.2. Update from previous Versions<br>
+</span></h2>
+Step 1:&nbsp; You can use your existing EINSTEIN installation folder,
+e.g. <span style="font-weight: bold;">C:\&lt;MyEINSTEIN&gt;</span> ,
+or you can create a new one, e.g. <span style="font-weight: bold;">C:\&lt;MyEINSTEIN
+V1.00a&gt;<br>
+<br>
+</span>Step 2: Copy the file "EINSTEIN_R1.00a.zip" into
+C:\&lt;MyEINSTEIN&gt; and then unzip. <br>
+(if you use the folder of an existing installation, this may overwrite
+some of the old
+files. When asked, confirm overwriting files with OK).<br>
+<br>
+Please CHECK: After this you should have (at least) the following files
+and folders in your "MyEINSTEIN" directory:<br>
+- EINSTEIN.bat<br>
+- install_einsteinDB.bat<br>
+- folder "einstein"<br>
+<br>
+Step 3: Install the update of the EINSTEIN database (<a
+ href="#1.1.2._Installation_of_EINSTEIN_">-&gt; section 1.1.2</a>)<br>
+<br>
+Step 4: Now have a try -&gt; Run EINSTEIN<br>
+<br>
+For any problems check the <a href="einstein_manual_FAQs.html">FAQ
+Section</a> of this manual.<br>
+<span style="font-weight: bold;"><br>
+</span>
+<div style="text-align: left;"><br>
 </div>
-<span style="font-style: italic;">Figure 99.99.1 This figure is the
-default figure "under construction". here should be the figure title</span><br>
+<span style="font-style: italic;"></span>
 </body>
 </html>

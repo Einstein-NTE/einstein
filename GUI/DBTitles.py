@@ -15,10 +15,10 @@
 #	Version No.: 0.01
 #	Created by: 	    Stoyan Danov    19/06/2008
 #
-#       Revised by:         
+#       Revised by:         Tom Sobota      7/07/2008
 #
 #       Changes to previous version:
-
+#        7/07/2008 TS  Syntax errors fixed.
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -30,21 +30,6 @@
 #
 #==============================================================================
 
-DBTITLES = {
-    'dbchp':CHP,
-    'dbheatpump':HEATPUMP,
-    'dbchiller':CHILLER,
-    'dbboiler':BOILER,
-    'dbstorage':STORAGE,
-    'dbsolar':SOLAR,
-    'dbfuel':FUEL,
-    'dbfluid':FLUID,
-    'dbbenchmark':BENCH,
-    'dbunitoperation':UNITOP,
-    'dbnacecode':NACE
-    }
-    
-    
 CHP = {
 # 'Variable name':('Descriptive name text','Units')
     'DBCHP_ID':(_('Identifier'),_('-')),
@@ -65,15 +50,15 @@ CHP = {
     'Eta_t':(_('Thermal efficiency'),_('-')),# 0-1 or % ??
     'Thigh':(_('High temperature at which energy can be delivered'),_('ºC')),
     'Tlow':(_('Low temperature at which energy can be delivered'),_('ºC')),
-    'PercentPowThigh':(_('Percent of energy at high temperature')_('%')),
+    'PercentPowThigh':(_('Percent of energy at high temperature'),_('%')),
     'PercentPowTlow':(_('Percent of energy at low temperature'),_('%')),
     'EEEmin':(_('Minimum electric efficiency by law'),_('-')),
     'InvRate':(_('Investment cost'),_('¤/kW_el')),
     'Price':(_('Price'),_('¤')),
-    'TurnKeyPrice':(_('Turnkey price',_('¤')),
+    'TurnKeyPrice':(_('Turnkey price'),_('¤')),
     'OandMfix':(_('Fixed Operation and Maintenance costs'),_('¤/kW_el year')),
     'OandMRvar':(_('Variable Operation and Maintenance costs'),_('¤/kW_el')),
-    'YearUpdate':(_('Year of update',_('-'))
+    'YearUpdate':(_('Year of update'),_('-'))
     }
 
 HEATPUMP = {
@@ -358,7 +343,18 @@ NACE = {
     'NameNationalSubCode':(_('National subcode name'),_('-'))
     }
                     
-                    
-
-
-
+DBTITLES = {
+    'dbchp':CHP,
+    'dbheatpump':HEATPUMP,
+    'dbchiller':CHILLER,
+    'dbboiler':BOILER,
+    'dbstorage':STORAGE,
+    'dbsolar':SOLAR,
+    'dbfuel':FUEL,
+    'dbfluid':FLUID,
+    'dbbenchmark':BENCH,
+    'dbunitoperation':UNITOP,
+    'dbnacecode':NACE
+    }
+    
+    

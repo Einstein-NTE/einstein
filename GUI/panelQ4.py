@@ -28,6 +28,7 @@
 #                           Hans Schweiger  19/06/2008
 #                           Tom Sobota      02/07/2008
 #                           Hans Schweiger  02/07/2008
+#                           Tom Sobota      07/07/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -45,6 +46,7 @@
 #        2/07/2008 TS   General fields arranging
 #       02/07/2008: HS  Read/write functions for tc20 adapted to new MultipleChoiceEntry
 #                       small bug-fix (TRANSEQUIPTYPES)
+#        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -354,12 +356,12 @@ class PanelQ4(wx.Panel):
         #
         # buttons
         #
-        self.buttonDeleteEquipment = wx.Button(self,-1,label=_("Delete equipment"))
+        self.buttonDeleteEquipment = wx.Button(self.page0,-1,label=_("Delete equipment"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
         self.buttonDeleteEquipment.SetMinSize((136, 32))
         self.buttonDeleteEquipment.SetFont(fp.getFont())
 
-        self.buttonAddEquipment = wx.Button(self,-1,label=_("Add equipment"))
+        self.buttonAddEquipment = wx.Button(self.page0,-1,label=_("Add equipment"))
         self.Bind(wx.EVT_BUTTON,self.OnButtonAddEquipment, self.buttonAddEquipment)
         self.buttonAddEquipment.SetMinSize((136, 32))
         self.buttonAddEquipment.SetFont(fp.getFont())
@@ -386,8 +388,8 @@ class PanelQ4(wx.Panel):
         # left part: listbox
         sizerP0Left= wx.StaticBoxSizer(self.frame_equipment_list, wx.VERTICAL)
         sizerP0Left.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
-        sizerP0Left.Add(self.buttonDeleteEquipment, 0, wx.ALIGN_RIGHT, 0)
         sizerP0Left.Add(self.buttonAddEquipment, 0, wx.ALIGN_RIGHT, 0)
+        sizerP0Left.Add(self.buttonDeleteEquipment, 0, wx.ALIGN_RIGHT, 0)
         sizerPage0.Add(sizerP0Left,1,wx.EXPAND|wx.TOP,10)
         # right part: data entries
         sizerP0Right= wx.BoxSizer(wx.VERTICAL)

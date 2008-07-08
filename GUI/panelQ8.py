@@ -23,6 +23,7 @@
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      03/07/2008
 #                           Hans Schweiger  07/07/2008
+#                           Tom Sobota      07/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -34,6 +35,7 @@
 #       03/07/2008 TS   general layout fix.
 #       07/07/2008: HS  bug-fix: self.check - GUITools-check
 #                       (compatibility with Tom's new FloatEntry)
+#        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -266,12 +268,12 @@ class PanelQ8(wx.Panel):
         #
         # buttons
         #
-        self.buttonDeleteBuilding = wx.Button(self,-1,_("Delete building"))
+        self.buttonDeleteBuilding = wx.Button(self.page0,-1,_("Delete building"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteBuilding, self.buttonDeleteBuilding)
         self.buttonDeleteBuilding.SetMinSize((136, 32))
         self.buttonDeleteBuilding.SetFont(fp.getFont())
         
-        self.buttonAddBuilding = wx.Button(self,-1,_("Add building"))
+        self.buttonAddBuilding = wx.Button(self.page0,-1,_("Add building"))
 	self.Bind(wx.EVT_BUTTON, self.OnButtonAddBuilding, self.buttonAddBuilding)
         self.buttonAddBuilding.SetMinSize((136, 32))
         self.buttonAddBuilding.SetFont(fp.getFont())
@@ -298,8 +300,8 @@ class PanelQ8(wx.Panel):
         # left part: listbox
         sizerP0Left= wx.StaticBoxSizer(self.frame_building_list, wx.VERTICAL)
         sizerP0Left.Add(self.listBoxBuildingList, 1, wx.EXPAND, 0)
-        sizerP0Left.Add(self.buttonDeleteBuilding, 0, wx.ALIGN_RIGHT, 0)
         sizerP0Left.Add(self.buttonAddBuilding, 0, wx.ALIGN_RIGHT, 0)
+        sizerP0Left.Add(self.buttonDeleteBuilding, 0, wx.ALIGN_RIGHT, 0)
         sizerPage0.Add(sizerP0Left,2,wx.EXPAND|wx.TOP,10)
 
         # right part: data entries

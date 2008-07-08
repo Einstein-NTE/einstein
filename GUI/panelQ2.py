@@ -311,8 +311,8 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         # left part of left tab: Fuel listbox + buttons Add and Remove
         sizer_3 = wx.StaticBoxSizer(self.sizer_3_staticbox, wx.VERTICAL)
         sizer_3.Add(self.fuelListBox, 1, wx.EXPAND,0)
-        sizer_3.Add(self.buttonRemoveFuelFromList, 0, wx.ALIGN_RIGHT, 0)
         sizer_3.Add(self.buttonAddFuel, 0, wx.ALIGN_RIGHT, 2)
+        sizer_3.Add(self.buttonRemoveFuelFromList, 0, wx.ALIGN_RIGHT, 0)
         sizerPage0.Add(sizer_3, 1, wx.EXPAND|wx.TOP, 20)
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
 

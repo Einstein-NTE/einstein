@@ -23,6 +23,7 @@
 #                           Tom Sobota          07/05/2008
 #                           Stoyan Danov        19/06/2008
 #                           Tom Sobota          05/07/2008
+#                           Tom Sobota          07/07/2008
 #
 #       Changes in last update:
 #       13/04/08:       preselection added as input
@@ -30,6 +31,7 @@
 #       07/05/08: TS    Changed layout, added Delete row, Add row buttons
 #       19/06/2008 SD: change to translatable text _(...)
 #       05/07/08: TS    implemented preselection, some cleanup of code...
+#       07/07/08: TS    headers of grid now taken from DBTitles.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -44,6 +46,7 @@ import MySQLdb
 import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
+from DBTitles import *
 
 #
 # constants
@@ -168,9 +171,27 @@ class DBEditFrame(wx.Dialog):
 
 
     def SetupGrid(self):
+        tabledict = DBTITLES[self.tablename]
         self.grid1.CreateGrid(self.nrows, len(self.table.keys()))
         for col in range(len(self.table.keys())):
-            self.grid1.SetColLabelValue(col, self.table.keys()[col])
+            fieldname = self.table.keys()[col]
+            units = ''
+            try:
+                if tabledict.has_key(fieldname):
+                    text = tabledict[fieldname][0].strip()
+                    units = tabledict[fieldname][1].strip()
+                    if units == '-':
+                        units = ''
+                    else:
+                        units = '\n' + units
+                else:
+                    text = fieldname
+
+            except:
+                text = fieldname
+                units = '\n*****'
+                
+            self.grid1.SetColLabelValue(col, text+units)
 
         self.grid1.AutoSizeColumns(setAsMin=True)
         self.grid1.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
@@ -207,7 +228,8 @@ class DBEditFrame(wx.Dialog):
             c = 0
             r +=1
             rownr += 1
-
+        self.grid1.AutoSizeRows(setAsMin=False)
+        
     def OnGridEdit(self, event):
         self.lastEditRow = self.grid1.GetGridCursorRow()
         self.lastEditCol = self.grid1.GetGridCursorCol()
