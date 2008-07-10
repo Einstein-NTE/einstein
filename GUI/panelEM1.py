@@ -19,13 +19,15 @@
 #                           Stoyan Danov            18/06/2008
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    04/07/2008
+#                           Stoyan Danov    07/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
 #       28/04/2008          created method display
 #       18/06/2008 SD: change to translatable text _(...)
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<, esthetics & security features
-#       04/07/2008 SD: changed min No columns, col width, 
+#       04/07/2008 SD: changed min No columns, col width,
+#       07/07/2008 SD: data split: totals eliminated from data to plot, colours, columnwidth, Totals line highlited
 #
 #	
 #------------------------------------------------------------------------------		
@@ -43,6 +45,7 @@ import wx
 from status import Status
 from einstein.modules.energyStats.moduleEM1 import *
 import einstein.modules.matPanel as Mp
+from GUITools import *
 from einstein.GUI.graphics import drawStackedBarPlot
 from numCtrl import *
 
@@ -53,19 +56,25 @@ from numCtrl import *
 #
 # constants
 #
+
+ORANGE = '#FF6000'
+LIGHTGREY = '#F8F8F8'
+WHITE = '#FFFFFF'
+DARKGREY = '#000060'
+LIGHTGREEN = '#F0FFFF'
+
 GRID_LETTER_SIZE = 8               # points
 GRID_LABEL_SIZE = 9                # points
-GRID_LETTER_COLOR = '#000060'      # color specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF'  # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
+GRID_LETTER_COLOR = DARKGREY      # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = LIGHTGREY  # idem
+GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
 
 class PanelEM1(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
-        keys = ['EM1'] 
+        keys = ['EM1 Table','EM Plot'] 
         self.mod = ModuleEM1(keys)
 
         labels_column = 0
@@ -80,8 +89,8 @@ class PanelEM1(wx.Panel):
         # single grid: Monthly process heat demand
         #
         paramList={'labels'      : 0,                            # labels column
-                   'data'        : 4,                            # data column for this graph
-                   'key'         : keys[0],                      # key for Interface
+                   'data'        : 3,                            # data column for this graph ##SD: nothing happens if number changes, error if this line commented
+                   'key'         : keys[1],                      # key for Interface ##SD this points the data
                    'title'       :_('Monthly process heat demand'), # title of the graph
                    'ylabel'      :_('UPH (MWh)'),                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
@@ -100,12 +109,18 @@ class PanelEM1(wx.Panel):
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
         attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         #
         # set grid properties
         # warning: this grid has a variable nr. of cols
         # so the 1st.row has the column headings
         data = Interfaces.GData[keys[0]]
-
+##        print 'EM1: data =', data
 #####Security feature against non existing GData entry
         COLNO1 = 5 # minimum number of columns-for the case if only ONE process exists
         try: (rows,cols) = data.shape
@@ -134,7 +149,11 @@ class PanelEM1(wx.Panel):
             decimals.append(1)
             
         for r in range(rows-1):
-            self.grid1.SetRowAttr(r, attr)
+            if r == 0:
+                self.grid1.SetRowAttr(r, attr2) #SD: set Totals highlited                
+            else:
+                self.grid1.SetRowAttr(r, attr)
+                
             for c in range(cols):
                 try:
                     if decimals[c] >= 0: # -1 indicates text

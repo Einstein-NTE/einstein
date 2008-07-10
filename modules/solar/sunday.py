@@ -180,8 +180,8 @@ def hdh_kt(kt):
         else:
                 hdh = 0.2
     
-    else:
-        print "SUNDAY(hdh_kt): Error en HDH_KT"
+#    else:
+#        print "SUNDAY(hdh_kt): Error en HDH_KT"
 
     return(hdh)
 
@@ -217,7 +217,7 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
     gon = Gsc*(1+0.033*cos(PI2*day_of_year/365))
 
 #ifdef print_imrs
-    print "PREP_SUN: GON = %10.4f\n"%gon
+#    print "PREP_SUN: GON = %10.4f\n"%gon
 #endif
 
 #* declination DB p. 11 */
@@ -228,8 +228,8 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
     sf.sid = sin(sf.decl)
 
 #ifdef print_imrs 
-    print "PREP_SUN: DECL = %10.4f %10.4f %10.4f\n"%\
-        (sf.decl*180./PI,sf.cod,sf.sid)
+#    print "PREP_SUN: DECL = %10.4f %10.4f %10.4f\n"%\
+#        (sf.decl*180./PI,sf.cod,sf.sid)
 #endif
 
     sf.cob = cos(sf.incl)
@@ -242,8 +242,8 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
     sf.siph = sin(sf.lat)
 
 #ifdef print_imrs
-    print "PREP_SUN: LAT = %10.4f %10.4f %10.4f\n"%\
-        (sf.lat*180./PI,sf.coph,sf.siph)
+#    print "PREP_SUN: LAT = %10.4f %10.4f %10.4f\n"%\
+#        (sf.lat*180./PI,sf.coph,sf.siph)
 #endif
 
 #* sunset hour angle */
@@ -254,34 +254,34 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
     sf.siss = sin(sf.sunset)
 
 #ifdef print_imrs 
-    print "PREP_SUN: SUNSET = %10.4f %10.4f %10.4f\n"%\
-        (sf.sunset*180./PI,sf.coss,sf.siss)
+#    print "PREP_SUN: SUNSET = %10.4f %10.4f %10.4f\n"%\
+#        (sf.sunset*180./PI,sf.coss,sf.siss)
 #endif
 
 #* extraterrestial radiation on horizontal surface (DB p.22) */
 
 #ifdef print_imrs 
-    print "PREP_SUN: CCS = %10.4f, WSS = %10.4f\n"%\
-        (sf.coph*sf.cod*sf.siss,sf.sunset*sf.siph*sf.sid)
+#    print "PREP_SUN: CCS = %10.4f, WSS = %10.4f\n"%\
+#        (sf.coph*sf.cod*sf.siss,sf.sunset*sf.siph*sf.sid)
 #endif
 
     ho = (86400./PI)*gon*(sf.coph*sf.cod*sf.siss + sf.sunset*sf.siph*sf.sid)
 
 #ifdef print_imrs 
-    print "PREP_SUN: Ho = %10.4f\n"%ho
+#    print "PREP_SUN: Ho = %10.4f\n"%ho
 #endif
     kt = h.t/ho
 
 #ifdef print_imrs 
-    print "PREP_SUN: KT = %10.4f\n"%kt
+#    print "PREP_SUN: KT = %10.4f\n"%kt
 #endif
 
     h.d = hdh_kt(kt)*(h.t)
     h.b = h.t - h.d
 
 #ifdef print_imrs 
-    print "PREP_SUN: Ht,d,b %10.4f %10.4f %10.4f\n"%\
-        (h.t,h.d,h.b)
+#    print "PREP_SUN: Ht,d,b %10.4f %10.4f %10.4f\n"%\
+#        (h.t,h.d,h.b)
 #endif
 
 #* hourly radiation DB pp.79/80 */
@@ -311,8 +311,8 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
     sf.b /= rtsum
 
 #ifdef print_imrs 
-    print "PREP_SUN: a,b %10.4f %10.4f\n"%\
-        (sf.a,sf.b)
+#    print "PREP_SUN: a,b %10.4f %10.4f\n"%\
+#        (sf.a,sf.b)
 #endif
 
 #------------------------------------------------------------------------------		
@@ -365,7 +365,7 @@ def sun_hourly(sf,h,t,i,sun):
         rt = (sf.a+sf.b*sf.cow)*rd
 
 #ifdef print_imrs
-        print "Sunday (sun_hourly) rd: %10.4e rt: %10.4e\n"%(rd,rt)
+#        print "Sunday (sun_hourly) rd: %10.4e rt: %10.4e\n"%(rd,rt)
 #endif
 #* conversion J/h -> W */
 
@@ -373,8 +373,8 @@ def sun_hourly(sf,h,t,i,sun):
         id = h.d*rd/3600
 
 #ifdef print_imrs
-        print "Sunday (sun_hourly): I = %10.4g Id = %10.4g time after sunrise = %8.2f\n"%\
-            (it,id,(12./PI)*(sf.cow-sf.coss))
+#        print "Sunday (sun_hourly): I = %10.4g Id = %10.4g time after sunrise = %8.2f\n"%\
+#            (it,id,(12./PI)*(sf.cow-sf.coss))
 #endif
 
         if (id<=it):
@@ -384,8 +384,8 @@ def sun_hourly(sf,h,t,i,sun):
         else:
 
     #ifdef print_imrs
-            print "Sunday (sun_hourly): warning I = %10.4g<Id = %10.4g time after sunrise = %8.2f\n"%\
-                (it,id,(12./PI)*(sf.cow-sf.coss))
+#            print "Sunday (sun_hourly): warning I = %10.4g<Id = %10.4g time after sunrise = %8.2f\n"%\
+#                (it,id,(12./PI)*(sf.cow-sf.coss))
     #endif
 
             id = it
@@ -406,10 +406,10 @@ def sun_hourly(sf,h,t,i,sun):
 
     sun_proj(sf,sun,i)
 
-    print "Sunday (sun_hourly): returning gonh = ",gonh.t,gonh.d,gonh.b
-    print "Sunday (sun_hourly): sun = ",sun
-    print "Sunday (sun_hourly): sunonh = ",sunonh
-    print "Sunday (sun_hourly): i = ",i.t,i.d,i.b
+#    print "Sunday (sun_hourly): returning gonh = ",gonh.t,gonh.d,gonh.b
+#    print "Sunday (sun_hourly): sun = ",sun
+#    print "Sunday (sun_hourly): sunonh = ",sunonh
+#    print "Sunday (sun_hourly): i = ",i.t,i.d,i.b
 
     return gonh
 

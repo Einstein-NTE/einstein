@@ -32,6 +32,7 @@
 #                           Stoyan Danov        27/05/2008
 #                           Hans Schweiger      26/06/2008
 #                           Hans Schweiger      28/06/2008
+#                           Hans Schweiger      10/07/2008
 #
 #       Changes in last update:
 #       - new arrays QDh_mod, USHj ...
@@ -56,6 +57,7 @@
 #                   cascadeLevel: level of valid entries in cascade
 #                   (calculations are updated ...)
 #                   introduced distinction between cascadeSize and NEquipe
+#       10/07/2008: all references to general class attributes Interfaces.xy changed to instance attributes self.xy
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -72,6 +74,7 @@ from einstein.GUI.status import Status
 import einstein.GUI.pSQL as pSQL
 import einstein.GUI.HelperClass as HelperClass
 from einstein.modules.constants import *
+from einstein.modules.messageLogger import *
 
 QUERY = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY IndexNo ASC"
 
@@ -222,7 +225,7 @@ class Interfaces(object):
             Q_T[iT] = 0
             for it in range(Status.Nt):
                 Q_T[iT] += Q_Tt[iT][it]
-            Q_T[iT] *= YEAR/(Status.Nt*Status.TimeStep)
+            Q_T[iT] *= Status.EXTRAPOLATE_TO_YEAR
         return Q_T
 
 #------------------------------------------------------------------------------		
@@ -232,32 +235,29 @@ class Interfaces(object):
 # initialising storage space for energy flows in cascade
 # assigning total heat demand and availability to the first row in cascade
 
+        logTrack("Interfaces (initCascadeArrays): creating cascade of size %s"%cascadeSize)
         if self.cascadeUpdateLevel < 0:
             print "Interfaces (initCascadeArrays): demand profile not yet created"
             Status.processData.createAggregateDemand()
 
-        Interfaces.QD_Tt_mod = []      
-        Interfaces.QD_T_mod = []
-        Interfaces.QA_Tt_mod = []       
-        Interfaces.QA_T_mod = []
+        self.QD_Tt_mod = []      
+        self.QD_T_mod = []
+        self.QA_Tt_mod = []       
+        self.QA_T_mod = []
 
-        Interfaces.USHj_Tt = []
-        Interfaces.USHj_T = []
-        Interfaces.QHXj_Tt = []
-        Interfaces.QHXj_T = []
-
-        Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
-        Interfaces.QD_T_mod.append(self.createQ_T())
-        Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
-        Interfaces.QA_T_mod.append(self.createQ_T())
+        self.QD_Tt_mod.append(self.createQ_Tt())       
+        self.QD_T_mod.append(self.createQ_T())
+        self.QA_Tt_mod.append(self.createQ_Tt())      
+        self.QA_T_mod.append(self.createQ_T())
 
         for iT in range(Status.NT+2):
             for it in range(Status.Nt+1):
-                Interfaces.QD_Tt_mod[0][iT][it] = self.QD_Tt[iT][it]
-                Interfaces.QA_Tt_mod[0][iT][it] = self.QA_Tt[iT][it]
-            Interfaces.QD_T_mod[0][iT] = self.QD_T[iT]
-            Interfaces.QA_T_mod[0][iT] = self.QA_T[iT]
+                self.QD_Tt_mod[0][iT][it] = self.QD_Tt[iT][it]
+                self.QA_Tt_mod[0][iT][it] = self.QA_Tt[iT][it]
+            self.QD_T_mod[0][iT] = self.QD_T[iT]
+            self.QA_T_mod[0][iT] = self.QA_T[iT]
 
+        logTrack("Interfaces (initCArrays): QD = %s"%self.QD_T_mod[0])
         self.cascadeSize = 0
         self.cascadeUpdateLevel = 0
 
@@ -280,29 +280,29 @@ class Interfaces(object):
     def addCascadeArrays(self):
 #------------------------------------------------------------------------------		
 
-        Interfaces.QD_Tt_mod.append(self.createQ_Tt())       
-        Interfaces.QD_T_mod.append(self.createQ_T())
-        Interfaces.QA_Tt_mod.append(self.createQ_Tt())      
-        Interfaces.QA_T_mod.append(self.createQ_T())
+        self.QD_Tt_mod.append(self.createQ_Tt())       
+        self.QD_T_mod.append(self.createQ_T())
+        self.QA_Tt_mod.append(self.createQ_Tt())      
+        self.QA_T_mod.append(self.createQ_T())
 
-        Interfaces.USHj_Tt.append(self.createQ_Tt())
-        Interfaces.USHj_T.append(self.createQ_T())
-        Interfaces.USHj_t.append(self.createQ_t())
+        self.USHj_Tt.append(self.createQ_Tt())
+        self.USHj_T.append(self.createQ_T())
+        self.USHj_t.append(self.createQ_t())
         
-        Interfaces.QHXj_Tt.append(self.createQ_Tt())
-        Interfaces.QHXj_T.append(self.createQ_T())
-        Interfaces.QHXj_t.append(self.createQ_t())
+        self.QHXj_Tt.append(self.createQ_Tt())
+        self.QHXj_T.append(self.createQ_T())
+        self.QHXj_t.append(self.createQ_t())
 
 #..............................................................................
 # lists of annual main results
 
-        Interfaces.USHj.append(0.0)
-        Interfaces.QWHj.append(0.0)
-        Interfaces.QHXj.append(0.0)
-        Interfaces.FETFuel_j.append(0.0)
-        Interfaces.FETel_j.append(0.0)
-        Interfaces.FETHeat_j.append(0.0)
-        Interfaces.HPerYearEq.append(0.0)
+        self.USHj.append(0.0)
+        self.QWHj.append(0.0)
+        self.QHXj.append(0.0)
+        self.FETFuel_j.append(0.0)
+        self.FETel_j.append(0.0)
+        self.FETHeat_j.append(0.0)
+        self.HPerYearEq.append(0.0)
 
         self.cascadeSize += 1
 
@@ -310,29 +310,29 @@ class Interfaces(object):
     def deleteCascadeArrays(self,NEquipe):
 #------------------------------------------------------------------------------		
 
-        Interfaces.QD_Tt_mod.pop(NEquipe-1)       
-        Interfaces.QD_T_mod.pop(NEquipe-1)
-        Interfaces.QA_Tt_mod.pop(NEquipe-1)      
-        Interfaces.QA_T_mod.pop(NEquipe-1)
+        self.QD_Tt_mod.pop(NEquipe-1)       
+        self.QD_T_mod.pop(NEquipe-1)
+        self.QA_Tt_mod.pop(NEquipe-1)      
+        self.QA_T_mod.pop(NEquipe-1)
 
-        Interfaces.USHj_Tt.pop(NEquipe-1)
-        Interfaces.USHj_T.pop(NEquipe-1)
-        Interfaces.USHj_t.pop(NEquipe-1)
+        self.USHj_Tt.pop(NEquipe-1)
+        self.USHj_T.pop(NEquipe-1)
+        self.USHj_t.pop(NEquipe-1)
 
-        Interfaces.QHXj_Tt.pop(NEquipe-1)
-        Interfaces.QHXj_T.pop(NEquipe-1)
-        Interfaces.QHXj_t.pop(NEquipe-1)
+        self.QHXj_Tt.pop(NEquipe-1)
+        self.QHXj_T.pop(NEquipe-1)
+        self.QHXj_t.pop(NEquipe-1)
 
 #..............................................................................
 # lists of annual main results
 
-        Interfaces.USHj.pop(NEquipe-1)
-        Interfaces.QWHj.pop(NEquipe-1)
-        Interfaces.QHXj.pop(NEquipe-1)
-        Interfaces.FETFuel_j.pop(NEquipe-1)
-        Interfaces.FETel_j.pop(NEquipe-1)
-        Interfaces.FETHeat_j.pop(NEquipe-1)
-        Interfaces.HPerYearEq.pop(NEquipe-1)
+        self.USHj.pop(NEquipe-1)
+        self.QWHj.pop(NEquipe-1)
+        self.QHXj.pop(NEquipe-1)
+        self.FETFuel_j.pop(NEquipe-1)
+        self.FETel_j.pop(NEquipe-1)
+        self.FETHeat_j.pop(NEquipe-1)
+        self.HPerYearEq.pop(NEquipe-1)
 
         self.cascadeSize += 1
         
@@ -345,14 +345,14 @@ class Interfaces(object):
         print "CascadeIndex - QD_total - QD_Tt(first day)"
         for i in range(self.NEquipe+1):
             print i,\
-            "%10.4f"%Interfaces.QD_T_mod[i][NT+1],\
-            Interfaces.QD_Tt_mod[i][NT+1][0:23]
+            "%10.4f"%self.QD_T_mod[i][NT+1],\
+            self.QD_Tt_mod[i][NT+1][0:23]
         print "Heat Availability"
         print "CascadeIndex - QA_total - QA_Tt(first day)"
         for i in range(self.NEquipe+1):
             print i,\
-            "%10.4f"%Interfaces.QA_T_mod[i][0],\
-            Interfaces.QA_Tt_mod[i][0][0:23]
+            "%10.4f"%self.QA_T_mod[i][0],\
+            self.QA_Tt_mod[i][0][0:23]
         
 #------------------------------------------------------------------------------		
     def printUSH(self):
@@ -363,8 +363,8 @@ class Interfaces(object):
         print "CascadeIndex - USHj_total - USHj_Tt(first day)"
         for i in range(self.NEquipe+1):
             print i,\
-            "%10.4f"%Interfaces.USHj_T[i][NT],\
-            Interfaces.USHj_Tt[i][NT][0:23]
+            "%10.4f"%self.USHj_T[i][NT],\
+            self.USHj_Tt[i][NT][0:23]
         
 #------------------------------------------------------------------------------		
     def printCascade_mod(self,cascade):
@@ -376,8 +376,8 @@ class Interfaces(object):
         for i in range(self.NEquipe+1):
             if i == cascade:
                 print i,\
-                "%10.4f"%Interfaces.QD_T_mod[i][NT+1],\
-                Interfaces.QD_Tt_mod[i][NT+1][0:23]
+                "%10.4f"%self.QD_T_mod[i][NT+1],\
+                self.QD_Tt_mod[i][NT+1][0:23]
             else:
                 pass
         print "Heat Availability"
@@ -385,8 +385,8 @@ class Interfaces(object):
         for i in range(self.NEquipe+1):
             if i == cascade:
                 print i,\
-                "%10.4f"%Interfaces.QA_T_mod[i][0],\
-                Interfaces.QA_Tt_mod[i][0][0:23]
+                "%10.4f"%self.QA_T_mod[i][0],\
+                self.QA_Tt_mod[i][0][0:23]
             else:
                 pass
 #------------------------------------------------------------------------------
@@ -406,7 +406,7 @@ class Interfaces(object):
                             "equipeType":self.equipments[j].EquipType,\
                             "equipePnom":self.equipments[j].HCGPnom})
             if (self.equipments[j].CascadeIndex != j+1):
-                print "Interfaces (getEquipmentCascade): error in SQL data - cascade index %s corrected to new index %s"%\
+                print "self (getEquipmentCascade): error in SQL data - cascade index %s corrected to new index %s"%\
                       (self.equipments[j].CascadeIndex,j+1)
                 self.equipments[j].CascadeIndex = j+1
                 Status.SQL.commit()
@@ -427,6 +427,8 @@ class Interfaces(object):
         if index >= 0:
             self.cascadeUpdateLevel = min(self.cascadeUpdateLevel,index-1)
             Status.prj.setStatus("Energy",0)
+            logDebug("Interfaces (changeInCascade): StatusEnergy %s cascadeUpdateLevel: %s "%\
+                     (Status.StatusEnergy,self.cascadeUpdateLevel))
         else:
             logDebug("Interfaces (changeInCascade): cannot change a cascade level "+\
                      "that does not exist [-> level %s]"%index)
@@ -437,7 +439,7 @@ class Interfaces(object):
 # method for storing graphics data
 # the data are stored in the dictionary GData under the key 'key'
 #------------------------------------------------------------------------------		
-        Interfaces.GData[key] = data
+        self.GData[key] = data
 
 
 #------------------------------------------------------------------------------		

@@ -19,6 +19,7 @@
 #                           Stoyan Danov            18/06/2008
 #                           Stoyan Danov    30/06/2008
 #                           Stoyan Danov    03/07/2008
+#                           Stoyan Danov    06/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -26,6 +27,8 @@
 #       18/06/2008 SD: change to translatable text _(...)
 #       30/06/2008 SD: change esthetics - 2tab2fig
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
+#       06/07/2008 SD: arrange column width, change background colour -> lightgrey,
+#                       security feature modified (see #SD2008-07-06)
 #
 #	
 #------------------------------------------------------------------------------		
@@ -56,18 +59,25 @@ from einstein.GUI.graphics import drawSimpleBarPlot, drawComparedBarPlot
 #
 # constants
 #
+
+ORANGE = '#FF6000'
+LIGHTGREY = '#F8F8F8'
+WHITE = '#FFFFFF'
+DARKGREY = '#000060'
+LIGHTGREEN = '#F0FFFF'
+
 GRID_LETTER_SIZE = 8 #points
 GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
+GRID_LETTER_COLOR = DARKGREY     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = LIGHTGREY # idem
+GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
-##### HS 2006-07-01 aqui simetria de nomenclatura ... 
-COLNO1 = 2#SD
-COLNO2 = 4
-MAXROWS = 10
+
+####### HS 2006-07-01 aqui simetria de nomenclatura ... 
+##COLNO1 = 2#SD
+##COLNO2 = 4
+##MAXROWS = 10
 
 class PanelEA5(wx.Panel):
     def __init__(self, parent):
@@ -84,23 +94,15 @@ class PanelEA5(wx.Panel):
         # upper graphic: Energy intensity
         #
 
-#SD2008-06-30
-        try:
-            (rows,cols) = Interfaces.GData[keys[0]].shape
-        except:
-            print "PanelEA5: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
-            
-        ignoredrows = []
-        ignoredrows.append(rows-1)
+        (rows,cols) = Interfaces.GData[keys[0]].shape   
+        ignoredrows = [rows-1]
 
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
                    'title'       : _('Energy intensity'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
-                   'ignoredrows' : [2]}                    # rows that should not be plotted
+                   'ignoredrows' : ignoredrows}                    # rows that should not be plotted
 
         dummy = Mp.MatPanel(self.panelGraphEI,wx.Panel,drawSimpleBarPlot,paramList)
 
@@ -111,16 +113,8 @@ class PanelEA5(wx.Panel):
         # lower grid: SEC by product
         #
 
-#SD2008-06-30
-        try:
-            (rows,cols) = Interfaces.GData[keys[1]].shape
-        except:
-            print "PanelEA5: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
-        
-        ignoredrows = []
-        ignoredrows.append(rows-1)
+        (rows,cols) = Interfaces.GData[keys[1]].shape        
+        ignoredrows = [rows-1]
 
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
@@ -152,19 +146,8 @@ class PanelEA5(wx.Panel):
 
         data = Interfaces.GData[keys[0]]
 
-#SD2008-06-30: like in EA1
-# HS:2007-07-01 -> los dos controles son exactamente equivalentes
-#       data = Interfaces.GData[keys[0]]
-#       (rows,cols) = data.shape
-#
-#       y
-#
-#       (rows,cols) = Interfaces.GData[keys[0]].shape
-#
-#       -> es idéntico
-#
 #####Security feature against non existing GData entry
-        COLNO1 = 2 #grid has usually a fixed column size, not necessary to read from GData        
+        COLNO1 = 3 #grid has usually a fixed column size, not necessary to read from GData        
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO1)
 
@@ -173,19 +156,23 @@ class PanelEA5(wx.Panel):
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
+
         self.grid1.SetColSize(0,140)
         self.grid1.SetColSize(1,125)
+        self.grid1.SetColSize(2,125)
+        
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Energy type"))
         self.grid1.SetColLabelValue(1, _("Energy intensity\n[kWh/EUR]"))
+        self.grid1.SetColLabelValue(2, _(" "))
         #
         # copy values from dictionary to grid
         #
 
 
 #SD2008-06-30
-        decimals = [-1,2]   #number of decimal digits for each colum
+        decimals = [-1,2,-1]   #number of decimal digits for each colum
         for r in range(rows):
             self.grid1.SetRowAttr(r, attr)
             for c in range(cols):
@@ -208,14 +195,11 @@ class PanelEA5(wx.Panel):
 # write data to grid 2
 
         data = Interfaces.GData[keys[1]]
-
-#SD2008-06-30: like in EA1
 #####Security feature against non existing GData entry
 
-
-        COLNO1 = 4 #grid has usually a fixed column size, not necessary to read from GData        
+        COLNO2 = 4 #grid has usually a fixed column size, not necessary to read from GData        
         try: (rows,cols) = data.shape
-        except: (rows,cols) = (0,COLNO1)
+        except: (rows,cols) = (0,COLNO2)
 
         self.grid2.CreateGrid(max(rows,20), cols)
 
@@ -223,10 +207,12 @@ class PanelEA5(wx.Panel):
         self.grid2.SetDefaultRowSize(20)
         self.grid2.SetRowLabelSize(30)
         self.grid2.SetColLabelSize(50)
-        self.grid2.SetColSize(0,100)
-        self.grid2.SetColSize(1,100)
-        self.grid2.SetColSize(2,100)
-        self.grid2.SetColSize(3,100)
+
+        self.grid2.SetColSize(0,120)
+        self.grid2.SetColSize(1,90)
+        self.grid2.SetColSize(2,90)
+        self.grid2.SetColSize(3,90)
+        
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid2.SetColLabelValue(0, _("Product"))

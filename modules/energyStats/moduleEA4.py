@@ -300,11 +300,20 @@ class ModuleEA4(object):
             Status.int.setGraphicsData(self.keys[0],data1)
                                   
 # data for EA4b plot
-            Status.int.setGraphicsData(self.keys[1],[Status.int.T[0:iTmax],
-                                                     Status.int.UPHTotal_T[0:iTmax],
-                                                     Status.int.UPHProcTotal_T[0:iTmax],
-                                                     Status.int.USHTotal_T[0:iTmax]])
 
+            UPH_plot = []
+            UPHproc_plot = []
+            USH_plot = []
+            
+            for iT in range(iTmax):
+                UPH_plot.append(Status.int.UPHTotal_T[iT]/1000.0)
+                UPHproc_plot.append(Status.int.UPHProcTotal_T[iT]/1000.0)
+                USH_plot.append(Status.int.USHTotal_T[iT]/1000.0)
+                
+            Status.int.setGraphicsData(self.keys[1],[Status.int.T[0:iTmax],
+                                                     UPH_plot,
+                                                     UPHproc_plot,
+                                                     USH_plot])
 
 #..............................................................................
 # Data for Panel EA4c: cumulative heat demand curve

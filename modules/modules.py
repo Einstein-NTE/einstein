@@ -65,7 +65,7 @@ class Modules(object):
         keys = ['A Table'] 
         self.moduleA = ModuleA(keys)
         
-        keys = ['ENERGY'] 
+        keys = ['ENERGY','ENERGY Plot1'] 
         self.moduleEnergy = ModuleEnergy(keys)
 
         keys = ['HR Table'] 

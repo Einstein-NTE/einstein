@@ -67,8 +67,10 @@ def autoRun(parent):
     if Status.StatusCC == 0:
         logMessage("Control (autoRun): starting consistency check")
 
+        showMessage("Control (autoRun): first we start consistency check")
+
         Status.prj.copyQuestionnaire()
-        nc = Status.mod.moduleCC.basicCheck(matrixCheck=True)
+        nc = Status.mod.moduleCC.basicCheck()
 
         if nc > 0:
             checkOK = False
@@ -79,6 +81,20 @@ def autoRun(parent):
             else:
                 showMessage("Control (autoRun): data conflicts detected.\n"+\
                             "Don't know yet what to do in this case, as I'm in automatic mode")
+            Status.main.tree.SelectItem(Status.main.qCC,select=True)
+
+        nc = Status.mod.moduleCC.basicCheck(estimate=True)
+
+        if nc > 0:
+            checkOK = False
+            if Status.UserInteractionLevel in ["semi-automatic","interactive"]:
+                Status.mod.moduleCC.updatePanel()
+                cf = conflictFrame(parent)
+                cf.Show()
+            else:
+                showMessage("Control (autoRun): data conflicts detected.\n"+\
+                            "Don't know yet what to do in this case, as I'm in automatic mode")
+            Status.main.tree.SelectItem(Status.main.qCC,select=True)
                    
         else:
             checkOK = True
@@ -92,6 +108,15 @@ def autoRun(parent):
     else:
         logTrack("Control (autoRun): project already checked")
 
+    Status.mod.moduleEA.update()
+    Status.main.tree.SelectItem(Status.main.qEA4b, select=True)
+
+
+    if Status.NoOfAlternatives >= 5:
+            showMessage("You already have a lot of alternative proposals in your study"+\
+                        "Delete some of them and then call me again ...")
+            return
+        
 #..............................................................................
 # Benchmarking
 
@@ -117,21 +142,45 @@ def autoRun(parent):
 # Finally check the boiler dimensioning for the remaining heat demand
 #    Status.mod.moduleBB.designAssistant()
 
+    Status.mod.moduleEA.update()
+    Status.main.tree.SelectItem(Status.main.qEA4b, select=True)
+
 #..............................................................................
 # Alternative proposal 2: Heat recovery + solar system
 
-#    showMessage("Now let's try to install a solar system (Alternative 2)\n")
+    showMessage("Now let's try to install a solar system (Alternative 2)\n"+\
+                "In the present Version, a fixed size of 500 kW will be the first try")
     
-#    shortName = "Solar thermal"
-#    description = "EINSTEIN default design of a solar thermal system"
-#    basedOn = 1
+    shortName = "Solar thermal"
+    description = "EINSTEIN default design of a solar thermal system"
+    basedOn = 1
         
-#    Status.prj.createNewAlternative(basedOn,shortName,description)
+    Status.prj.createNewAlternative(basedOn,shortName,description)
 
-#    Status.mod.moduleHR.simulateHR()
+    Status.mod.moduleHR.simulateHR()
 
-# Finally check the boiler dimensioning for the remaining heat demand
+    Status.mod.moduleST.initPanel()
+    Status.mod.moduleST.updatePanel()
+    
+    equipe = Status.mod.moduleST.addEquipmentDummy()
+    equipe.HCGPnom = 500.0
+    equipe.ST_SysEff = 0.9
+    equipe.ST_Volume = 25.0
+    equipe.ST_C0 = 0.80
+    equipe.ST_C1 = 3.80
+    equipe.ST_C2 = 0.01
+    equipe.ST_IAM = 0.95
+    Status.SQL.commit()
+
+#    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})
+#    Status.mod.moduleST.setSolarSystemPars()
+
+    Status.mod.moduleST.updatePanel()
+
 #    Status.mod.moduleBB.designAssistant()
+
+    Status.mod.moduleEA.update()
+    Status.main.tree.SelectItem(Status.main.qST, select=True)
 
 #..............................................................................
 # Alternative proposal 3: Heat recovery + heat pump
@@ -144,18 +193,96 @@ def autoRun(parent):
         
     Status.prj.createNewAlternative(basedOn,shortName,description)
 
+    Status.mod.moduleHP.initPanel() #preparation sequence of HP Module
+    Status.mod.moduleHP.updatePanel()
+
     (mode,HPList) = Status.mod.moduleHP.designAssistant1()
 
     if len(HPList) > 0:  
         HPId = HPList[0]    #in automatic mode just take first in the list
+        logMessage(_("Control (autoRun): %s possible HP models found")%len(HPList))
     else:
         HPId = -1
-    logMessage("Control (autoRun): no heat pump application possible")
+        logMessage(_("Control (autoRun): no heat pump application possible"))
     
-    self.mod.designAssistant2(HPId)
+    Status.mod.moduleHP.designAssistant2(HPId)
+    Status.mod.moduleHP.updatePanel()
 
 # Finally check the boiler dimensioning for the remaining heat demand
+
 #    Status.mod.moduleBB.designAssistant()
 
+    Status.mod.moduleEA.update()
+    Status.main.tree.SelectItem(Status.main.qHP, select=True)
+
+#..............................................................................
+# Alternative proposal 4: New boiler cascade
+
+    showMessage("Now let's try to install a new boiler cascade (Alternative 4)\n")
+    
+    shortName = "Boiler cascade"
+    description = "EINSTEIN default design of a new boiler cascade"
+    basedOn = 1
+        
+    Status.prj.createNewAlternative(basedOn,shortName,description)
+
+    Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
+    Status.mod.moduleBB.updatePanel()
+
+    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.updatePanel()
+
+# Finally check the boiler dimensioning for the remaining heat demand
+
+#    Status.mod.moduleBB.designAssistant()
+
+    Status.mod.moduleEA.update()
+    Status.main.tree.SelectItem(Status.main.qBB, select=True)
+
+#..............................................................................
+# Alternative proposal 5: And now lets mix up everything
+
+    showMessage("Now let's try to combine everything (Alternative 5)\n")
+    
+    shortName = "EINSTEIN Super Mix"
+    description = "EINSTEIN default design of a new boiler cascade"
+    basedOn = 3
+        
+    Status.prj.createNewAlternative(basedOn,shortName,description)
+
+    Status.mod.moduleST.initPanel()
+    Status.mod.moduleST.updatePanel()
+    
+    equipe = Status.mod.moduleST.addEquipmentDummy()
+    equipe.HCGPnom = 500.0
+    equipe.ST_SysEff = 0.9
+    equipe.ST_Volume = 25.0
+    equipe.ST_C0 = 0.80
+    equipe.ST_C1 = 3.80
+    equipe.ST_C2 = 0.01
+    equipe.ST_IAM = 0.95
+    Status.SQL.commit()
+
+#    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})
+#    Status.mod.moduleST.setSolarSystemPars()
+
+    Status.mod.moduleST.updatePanel()
+    Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
+    Status.mod.moduleBB.updatePanel()
+
+    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.updatePanel()
+
+    Status.mod.moduleEA.update()
+#    Status.main.tree.SelectItem(Status.main.qEA3, select=True)
+
+#..............................................................................
+# End of the journey
+
+    Status.main.tree.SelectItem(Status.main.qCS1, select=True)
+    
+    showMessage("We arrived at the end of the journey\n"+\
+                "Have a look on the results ...")
+    
 
 #============================================================================== 

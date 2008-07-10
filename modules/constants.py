@@ -91,8 +91,8 @@ EQUIPTYPE = ["compression heat pump",
 HPIndex = 0
 BBIndex = 2
 CHIndex = 8
-STIndex = 10
-CHPIndex = 13
+STIndex = 9
+CHPIndex = 12
 
 #translatable dictionary
 TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
@@ -179,9 +179,9 @@ EQUIPMENT = {"HP":                 # equipment class
              "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),EQUIPMENTSUBTYPE[4],_(EQUIPMENTSUBTYPE[4])),
                     (EQUIPTYPE[7],_(EQUIPTYPE[7]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
 
-             "ST": [(EQUIPTYPE[8],_(EQUIPTYPE[8]),EQUIPMENTSUBTYPE[6],_(EQUIPMENTSUBTYPE[6])),
-                    (EQUIPTYPE[9],_(EQUIPTYPE[9]),EQUIPMENTSUBTYPE[7],_(EQUIPMENTSUBTYPE[7])),
-                    (EQUIPTYPE[10],_(EQUIPTYPE[10]),EQUIPMENTSUBTYPE[8],_(EQUIPMENTSUBTYPE[8]))],
+             "ST": [(EQUIPTYPE[STIndex+0],_(EQUIPTYPE[8]),STTYPES[0],_(EQUIPMENTSUBTYPE[6])),
+                    (EQUIPTYPE[STIndex+1],_(EQUIPTYPE[9]),STTYPES[1],_(EQUIPMENTSUBTYPE[7])),
+                    (EQUIPTYPE[STIndex+2],_(EQUIPTYPE[10]),STTYPES[2],_(EQUIPMENTSUBTYPE[8]))],
 
              "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),EQUIPMENTSUBTYPE[11],_(EQUIPMENTSUBTYPE[11])),
                     (EQUIPTYPE[12],_(EQUIPTYPE[12]),EQUIPMENTSUBTYPE[9],_(EQUIPMENTSUBTYPE[9])),

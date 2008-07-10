@@ -1,8 +1,6 @@
--- update einstein database: some additional parameters ... on the run ... HS 2008-06-18
-USE einstein;
-
--- add Description to qprocessdata
-ALTER TABLE qprocessdata ADD COLUMN Description VARCHAR(200) COMMENT 'description of the process' AFTER Process;
+--
+-- Table structure for table preferences
+--
 
 DROP TABLE IF EXISTS preferences;
 CREATE TABLE preferences (
@@ -16,4 +14,3 @@ CREATE TABLE preferences (
   user varchar(64) default NULL,
   PRIMARY KEY(id)
 ) TYPE=MyISAM;
-

@@ -1,4 +1,4 @@
---update einstein database: add BB parameters to UHEATPUMP
+-- update einstein database: add BB parameters to UHEATPUMP
 USE einstein;
 
 

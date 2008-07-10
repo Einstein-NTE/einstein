@@ -62,12 +62,19 @@ def drawFigure(self):
 
     data = Status.int.GData['EA4c Plot']
     for i in range(1,len(data)):
+        if i == 0:
+            linewidth = 3
+        else:
+            linewidth = 1
         self.subplot.plot(data[0][1:],
                           data[i][1:],
-                          'go-', label=data[i][0], linewidth=2)
+                          LINETYPES[(i-1)%len(LINETYPES)],
+                          color=ORANGECASCADE[(i-1)%len(ORANGECASCADE)],
+                          label=data[i][0],
+                          linewidth=linewidth)
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
-    self.subplot.legend()
+    self.subplot.legend(loc = 0)
 
 #------------------------------------------------------------------------------
 class PanelEA4c(wx.Panel):

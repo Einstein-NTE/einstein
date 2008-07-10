@@ -50,18 +50,6 @@ class ModuleEA5(object):
         print "ModuleEA5(__init__)"
         self.keys = keys
 
-        dummydata1 = array([['Fuels',                1.91],
-                      ['Electricity',          0.18],
-                      ['Total primary energy', 2.65]])
-                          
-        Status.int.setGraphicsData(self.keys[0], dummydata1)
-
-        dummydata2 = array([['Product 1', 500.0, 50.0, 700.0],
-                      ['Product 2', 400.0, 80.0, 680.0],
-                      ['Product 3', 100.0, 10.0, 140.0]])
-                          
-        Status.int.setGraphicsData(self.keys[1], dummydata2)
-
         self.initModule()
 
 
@@ -73,6 +61,8 @@ class ModuleEA5(object):
         """
 #------------------------------------------------------------------------------
 
+        Status.mod.moduleEA.update()
+        
         PId = Status.PId
         ANo = Status.ANo
 

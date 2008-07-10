@@ -407,7 +407,10 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 
     def storeElectricityData(self):
         if Status.PId <> 0:
-            if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 0:
+            if len(Status.DB.qelectricity.\
+                   Questionnaire_id[Status.PId].\
+                   AlternativeProposalNo[Status.ANo]) == 0:
+                
                 tmp = {
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
@@ -452,7 +455,9 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
                 Status.DB.qelectricity.insert(tmp)
                 Status.SQL.commit()                      
 
-            elif len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) == 1:
+            elif len(Status.DB.qelectricity.\
+                     Questionnaire_id[Status.PId].\
+                     AlternativeProposalNo[Status.ANo]) >= 1:
                 q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
                 tmp = {                    
                     "PowerContrTot":check(self.grid.GetCellValue(1, 3)),
@@ -584,7 +589,6 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 	self.fillFuelList()
 
     def fillFuelList(self):
-        print "PanelQ2: Trying to fill fuel list"
         self.fuelListBox.Clear()
         fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(fuels) > 0:

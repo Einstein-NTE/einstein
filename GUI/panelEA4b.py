@@ -77,16 +77,16 @@ def drawFigure(self):
 
     self.subplot.plot(Status.int.GData['EA4b Plot'][0],
                       Status.int.GData['EA4b Plot'][1],
-                      'go-', label='UPH', linewidth=2)
+                      '-', color = DARKGREY,label='UPH', linewidth=1)
     self.subplot.plot(Status.int.GData['EA4b Plot'][0],
                       Status.int.GData['EA4b Plot'][2],
-                      'bo-', label='UPH proc', linewidth=2)
+                      color = ORANGE, label='UPH proc', linewidth=3)
     self.subplot.plot(Status.int.GData['EA4b Plot'][0],
                       Status.int.GData['EA4b Plot'][3],
-                      'rs-',  label='USH', linewidth=2)
+                      'r:',  label='USH', linewidth=3)
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
-    self.subplot.legend()
+    self.subplot.legend(loc = 2)
 
 #------------------------------------------------------------------------------
 class PanelEA4b(wx.Panel):
@@ -166,10 +166,6 @@ class PanelEA4b(wx.Panel):
             logDebug("PanelEA4b: received corrupt data in key: EA4b Table")
             (rows,cols) = (0,COLNO)
 
-        print "PanelEA4b: data arriving"
-        print data
-        print rows,cols
-
         decimals = [-1,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
             if r == rows-1:
@@ -178,7 +174,6 @@ class PanelEA4b(wx.Panel):
                 self.grid1.SetRowAttr(r, attr)
                 
             for c in range(cols):
-                print r,c,data[r][c]
                 try:
                     if decimals[c] >= 0: # -1 indicates text
                         self.grid1.SetCellValue(r, c, \

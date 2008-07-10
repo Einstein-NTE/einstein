@@ -11,3 +11,8 @@ ALTER TABLE uheatpump ADD COLUMN STCollType VARCHAR(45) COMMENT 'type of collect
 ALTER TABLE uheatpump ADD COLUMN STSolFra DOUBLE COMMENT 'solar fraction' AFTER UHPMaintain;
 
 ALTER TABLE qsurfarea ADD COLUMN SurfAreaNo INTEGER COMMENT 'consecutive number' AFTER ProjectID;
+
+ALTER TABLE questionnaire DROP COLUMN HDEffAvg;
+ALTER TABLE questionnaire DROP COLUMN NPIPEDUCT;
+
+ALTER TABLE cgeneraldata ADD COLUMN HDEffAvg DOUBLE COMMENT 'Average distribution efficiency' AFTER UPH;

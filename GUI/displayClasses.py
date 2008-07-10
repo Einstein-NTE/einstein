@@ -175,7 +175,7 @@ class Generics(object):
                     
             else:
                 # we return a tuple with the indices of the selections
-                return other.GetSelections()
+                return other.GetSelection()
         else:
             # single values can be selected
             if text:
@@ -257,6 +257,9 @@ class ListCombo(wx.ListCtrl, wx.combo.ComboPopup):
 
     # Called when popup is dismissed
     def OnDismiss(self):
+        s = ';'.join(self.GetSelection())
+        combo = self.GetCombo()
+        combo.SetText(s)
         wx.combo.ComboPopup.OnDismiss(self)
 
     # Receives key events from the parent ComboCtrl.  Events not
@@ -1350,11 +1353,14 @@ class MultipleChoiceEntry(wx.Panel):
         self.entry.Clear()
 
     def SetSelection(self,selection):
+        combo = self.entry.GetCombo()
         if isinstance(selection,list):
             for val in selection:
                 self.entry.SetStringValue(str(val))
+            combo.SetText(';'.join(selection))
         else:
             self.entry.SetStringValue(str(selection))
+            combo.SetText(selection)
         
     def SetValue(self, thing=0):
         try:

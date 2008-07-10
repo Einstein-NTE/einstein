@@ -600,9 +600,9 @@ class EinsteinFrame(wx.Frame):
     def OnMenuEditDBBoiler(self, event):
         frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
         frameEditDBBoiler.ShowModal()
-    def OnMenuEditDBSolarEquip(self, event):
-        frameEditDBSolarEquip = DBEditFrame(None, "Edit DBSolarEquip", 'dbsolarequip', 0, True)
-        frameEditDBSolarEquip.ShowModal()
+    def OnMenuEditDBSolarThermal(self, event):
+        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)
+        frameEditDBSolarThermal.ShowModal()
     def OnMenuEditDBChiller(self, event):
         frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
         frameEditDBChiller.ShowModal()
@@ -797,14 +797,14 @@ class EinsteinFrame(wx.Frame):
         #qEA1 'Primary energy - Yearly'
         elif select == _("Primary energy"):
             self.hidePages()
-            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
-            self.panelEA2.display()
+            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
+            self.panelEA1.display()
 
         #qEA2 'Final energy by fuels - Yearly'
         elif select == _("Final energy by fuels"):
             self.hidePages()
-            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
-            self.panelEA1.display()
+            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
+            self.panelEA2.display()
         #qEA3 'Final energy by equipment - Yearly'
         elif select == _("Final energy by equipment"):
             self.hidePages()
@@ -1123,7 +1123,7 @@ class EinsteinFrame(wx.Frame):
         self.submenuPrint = wx.Menu()
         self.submenuEditDB = wx.Menu()
 
-        self.subnenuEquipments = wx.Menu()
+        self.submenuEquipments = wx.Menu()
         self.submenuUserLevel = wx.Menu()
         self.submenuClassification = wx.Menu()
 
@@ -1145,14 +1145,14 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, _("E&xit"))
 
-        self.EditDBCHP = self.subnenuEquipments.Append(-1, _("&CHP"))
-        self.EditDBHeatPump = self.subnenuEquipments.Append(-1, _("&Heat pumps"))
-        self.EditDBChiller = self.subnenuEquipments.Append(-1, _("&Chillers"))
-        self.EditDBBoiler = self.subnenuEquipments.Append(-1, _("B&oilers"))
-        self.EditDBStorage = self.subnenuEquipments.Append(-1, _("Stora&ge"))
-        self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, _("&Solar equipment"))
+        self.EditDBCHP = self.submenuEquipments.Append(-1, _("&CHP"))
+        self.EditDBHeatPump = self.submenuEquipments.Append(-1, _("&Heat pumps"))
+        self.EditDBChiller = self.submenuEquipments.Append(-1, _("&Chillers"))
+        self.EditDBBoiler = self.submenuEquipments.Append(-1, _("B&oilers"))
+        self.EditDBStorage = self.submenuEquipments.Append(-1, _("Stora&ge"))
+        self.EditDBSolarThermal = self.submenuEquipments.Append(-1, _("&Solar Thermal"))
 
-        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.subnenuEquipments)
+        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.submenuEquipments)
         self.EditDBFuel = self.menuDatabase.Append(-1, _("Fue&ls"))
         self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
         self.EditDBElectricityMix = self.menuDatabase.Append(-1, _("Electricity mix"))
@@ -1395,7 +1395,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBElectricityMix, self.EditDBElectricityMix)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarThermal, self.EditDBSolarThermal)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
 
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)

@@ -205,8 +205,10 @@ class PanelQ4(wx.Panel):
                              label=_("Model"),
                              tip=_("Model according manufacturer nomenclature"))
 
+        equipeTypeChoices = TRANSEQUIPTYPE.values()
+        equipeTypeChoices.sort()
         self.tc5 = ChoiceEntry(self.page0,
-                               values=TRANSEQUIPTYPE.values(),
+                               values=equipeTypeChoices,
                                label=_("Type of equipment"),
                                tip=_("e.g. boiler / burner / chiller / compressor / CHP motor"))
 
@@ -519,7 +521,7 @@ class PanelQ4(wx.Panel):
             "ThermalConsum":check(self.tc34.GetValue()),
             "THeatSourceHT":check(self.tc33.GetValue()),
             "HeatSourceHT":check(findKey(pipeDict,self.tc32.GetValue(text=True))),
-            "Refrigerant":self.getPipeIDString(),
+            "Refrigerant":check(self.tc102.GetValue(text=True)),
             "DestinationWasteHeat":check(self.tc35.GetValue(text=True)),
             "TemperatureReCooling":check(self.tc36.GetValue()),
             "HPerDayEq":check(self.tc18.GetValue()),
@@ -547,13 +549,13 @@ class PanelQ4(wx.Panel):
 #HS2004-04-13 function display extracted from event handler
 
     def display(self,q=None):
+        self.clear()
         self.fillChoiceOfDBFuel()
         self.fillChoiceOfFluid()
         self.fillChoiceOfPipe()
         self.fillChoiceOfLTSource()
         self.fillChoiceOfLTSink()
         self.fillChoiceOfHTSource()
-        self.clear()
         self.fillPage()
 
         pipeDict = Status.prj.getPipeDict()
@@ -605,7 +607,7 @@ class PanelQ4(wx.Panel):
         self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
-        self.tc5.SetValue('')
+#        self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
@@ -631,9 +633,9 @@ class PanelQ4(wx.Panel):
 
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()
-        if len(Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]) > 0:
-            for n in Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
-                self.listBoxEquipment.Append (str(n.Equipment))
+        equipments = Status.prj.getEquipments()
+        for equipe in equipments:
+            self.listBoxEquipment.Append(str(equipe.Equipment))
 	try: self.listBoxEquipment.SetStringSelection(self.equipeName)
 	except: pass
 

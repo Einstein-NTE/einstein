@@ -313,6 +313,7 @@ class CheckPipe():
             self.TrefPipe.setValue(0)   #°C, NOT USED
             self.QHXPipe.setValue(0.0)
         else:
+            self.FluidCp = 0.00116
             logTrack("CheckPipe(importData): error reading data from qdistributionhc in PipeNo: %s"%self.PipeDuctNo)
             
                 

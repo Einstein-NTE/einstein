@@ -71,26 +71,33 @@ class ModuleCS(object):
 #Panel CS1: Primary energy
         for ANo in range(len(generalData)-1):
             i = ANo+1
-            dPEC = generalData[i].PEC                
+
+            if salternatives[i].StatusEnergy > 0:
+                dPEC = generalData[i].PEC                
             
-            if dPEC is None:
+                if dPEC is None:
+                    dPEC = 0.0
+                    dPEC_Table = "---"
+                else:
+                    dPEC /= 1000.0  #conversion kWh -> MWh
+                    dPEC_Table = dPEC
+
+                if ANo == 0:
+                    PEC0 = dPEC
+
+                PECSaving = dPEC - PEC0
+                if PEC0 > 0:
+                    RelSaving = PECSaving/PEC0
+                else:
+                    RelSaving = 0.0
+
+            else:
                 dPEC = 0.0
                 dPEC_Table = "---"
-            else:
-                dPEC /= 1000.0  #conversion kWh -> MWh
-                dPEC_Table = dPEC
-
-            if ANo == 0.0:
-                PEC0 = dPEC
-
-            PECSaving = dPEC - PEC0
-            if PEC0 > 0:
-                RelSaving = PECSaving/PEC0
-            else:
-                RelSaving = 0.0
-                
-                
-            PEC.append(generalData[i].PEC)
+                PECSaving = "---"
+                RelSaving = "---"
+                    
+            PEC.append(dPEC)
 
             if ANo == 0:
                 tableEntry = noneFilter([str(salternatives[i].ShortName),dPEC_Table,PECSaving,RelSaving*100])

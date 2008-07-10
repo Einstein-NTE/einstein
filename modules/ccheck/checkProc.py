@@ -684,31 +684,38 @@ class CheckProc():
             self.TEnvProc.priority = 99
             self.UAProc.priority = 99
 #................................................................................
-        self.PTInFlow.screen()
+        self.UPH.screen()
+        self.UPHc.screen()
+        self.UPHm.screen()
+        self.UPHs.screen()
+        self.UPHw.screen()
+
+        self.UPHProc.screen()
+        self.QHXProc.screen()
+
+        self.UPHcGross.screen()
+        self.QHXProcInt.screen()
+
         self.PT.screen()
+        self.PTInFlow.screen()
         self.PTOutFlow.screen()
-        self.PTOutFlowRec.screen() #do not exist yet
         self.PTInFlowRec.screen()
+        self.PTOutFlowRec.screen() #do not exist yet
         self.PTStartUp.screen()
+
         self.VInFlowDay.screen()
         self.VOutFlow.screen()
         self.VolProcMed.screen()
+
+        self.HPerYearProc.screen()
         self.NDaysProc.screen()
         self.HPerDayProc.screen()
         self.NBatch.screen()
+
         self.TEnvProc.screen()
         self.QOpProc.screen()
-        self.UPHProc.screen()
-        self.QHXProc.screen()
-        self.HPerYearProc.screen()
         self.UAProc.screen()
         self.QEvapProc.screen()
-        self.UPHcGross.screen()
-        self.QHXProcInt.screen()
-        self.UPHm.screen()
-        self.UPHs.screen()
-        self.UPHc.screen()
-        self.UPH.screen()
         
 #------------------------------------------------------------------------------
     def definePriority(self,mainProcess):
@@ -723,6 +730,7 @@ class CheckProc():
             self.UPHs.priority = 1
             self.UPHc.priority = 1
             self.UPHm.priority = 1 
+            self.UPHw.priority = 1 
             self.PT.priority = 1
             self.QOpProc.priority = 1
 
@@ -758,6 +766,7 @@ class CheckProc():
             self.UPHs.priority = 2
             self.UPHc.priority = 2
             self.UPHm.priority = 2 
+            self.UPHw.priority = 2 
             self.PT.priority = 2
             self.QOpProc.priority = 2
 

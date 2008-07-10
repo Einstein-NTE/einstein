@@ -37,7 +37,6 @@ from moduleEA2 import ModuleEA2
 from moduleEA3 import ModuleEA3
 from moduleEA4 import ModuleEA4
 from moduleEA5 import ModuleEA5
-from moduleEA6 import ModuleEA6
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
@@ -61,6 +60,7 @@ class ModuleEA(object):
 #       - called from PanelCC 
 #------------------------------------------------------------------------------
 
+        logTrack("ModuleEA (update): StatusEnergy %s"%Status.StatusEnergy)
         if Status.StatusCC > 0:
             Status.processData.createYearlyDemand()
             
@@ -121,7 +121,6 @@ class ModuleEA(object):
         ea3 = ModuleEA3()
         ea4 = ModuleEA4()
         ea5 = ModuleEA5()
-        ea6 = ModuleEA6()
 
 
 #------------------------------------------------------------------------------
@@ -131,10 +130,13 @@ class ModuleEA(object):
 #   and stores the within the SQL tables
 #------------------------------------------------------------------------------
         
+        logTrack("ModuleEA (calculateEquipmentEnergyBalances)")
+        
         (projectData,generalData) = Status.prj.getProjectData()
-        equipments = Status.prj.getEquipments(cascade=True) #equipments ordered by CascadeIndex
+        equipments = Status.prj.getEquipments() 
         fuels = Status.prj.getQFuels()
         fuelList = Status.prj.getQFuelList("DBFuel_id")
+        
         electricities = Status.prj.getElectricity()
         if len(electricities) > 0:
             electricity = electricities[0]
@@ -179,6 +181,8 @@ class ModuleEA(object):
                 equipe.FETHeat_j = dFETHeat
                 equipe.FETj = dFETel + dFETFuel + dFETHeat #simple sum of fuel + electricity. doesn't make very much sense, but ... 
 
+                print "CalcEqEnBal: equipe = %s ci = %s FET = %s "%\
+                      (equipe.Equipment,equipe.CascadeIndex,equipe.FETj)
                 equipe.USHj = dUSH
                 equipe.QHXj = dQHX       
                 equipe.QWHj = dQWH
@@ -256,13 +260,23 @@ class ModuleEA(object):
             generalData.FET = FET  #total FET as simple sum
             generalData.USH = USH  #total USH
 
+
 #..............................................................................
 #..............................................................................
 #..............................................................................
 # in case of present state:
+# some global derived quantities that are not calculated in the CCheck module
 
         else:
-            logTrack("ModuleEA (calculateEquipmentEnergyBalances): security feature: -> do not overwrite results from consistency check !!!")
+            if generalData.USH > 0 and generalData.UPH is not None:
+                UPH = generalData.UPH
+                USH = generalData.USH
+                generalData.HDEffAvg = UPH/USH
+                if UPH/USH < 0.5:
+                    logWarning(_("ModuleEA (calcEq.En.Bal): check your input data.\ncalculated distribution efficiency is less than 50 %"))
+            else:
+                logTrack("ModuleEA (calcEq.En.Bal): Error in UPH/USH data. cannot calculate distribution efficiency")
+                generalData.HDEffAvg = 0.0
 
 #..............................................................................
 # from here on actions also for ANo = 0
@@ -318,6 +332,10 @@ class ModuleEA(object):
 
         generalData.PEC = generalData.PECFuels + generalData.PECel
         generalData.PET = generalData.PETFuels + generalData.PETel
+
+#..............................................................................
+# set Status flag indicating that ANNUAL energy balances for the present alternative
+# are up to date
 
         Status.prj.setStatus("Energy")
         Status.SQL.commit()

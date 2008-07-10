@@ -459,6 +459,7 @@ class ModuleBB(object):
         if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
             logDebug("ModuleBB (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
             Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
+            Status.int.extendCascadeArrays(cascadeIndex)
 
         if cascadeIndex > 0 and cascadeIndex <= Status.NEquipe:
             logTrack("ModuleBB (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex)
@@ -508,6 +509,7 @@ class ModuleBB(object):
         USHj = 0
         QHXj = 0
         HPerYear = 0
+        QD = 0
 
         for it in range(Status.Nt):
 
@@ -532,44 +534,60 @@ class ModuleBB(object):
             if USHj_Tt[Status.NT+1][it]>0:
                 HPerYear += Status.TimeStep
 
+            QD += QD_Tt[Status.NT+1][it]
+
 #..............................................................................
 # End of year reached. Store results in interfaces
        
 # remaining heat demand and availability for next equipment in cascade
-        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
+        Status.int.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Status.int.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
+        Status.int.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Status.int.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment
 
-        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Status.int.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_t[cascadeIndex-1] = copy.deepcopy(USHj_Tt[Status.NT+1])
 
 # waste heat absorbed by present equipment
 
-        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
+        Status.int.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
+        Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
-        logTrack("ModuleBB (calculateEnergyFlows): Total energy supplied by equipment %s MWh"%USHj)
-        logTrack("ModuleBB (calculateEnergyFlows): Total waste heat input  %s MWh"%QHXj)
+        logTrack("ModuleBB (calculateEnergyFlows): Total energy supplied by equipment %s MWh"%(USHj*Status.EXTRAPOLATE_TO_YEAR))
+        logTrack("ModuleBB (calculateEnergyFlows): Total waste heat input  %s MWh"%(QHXj*Status.EXTRAPOLATE_TO_YEAR))
 
         Status.int.cascadeUpdateLevel = cascadeIndex
 
 #........................................................................
 # Global results (annual energy flows)
 
-        Interfaces.USHj[cascadeIndex-1] = USHj
+        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
 
         if COPh_nom > 0:
-            FETFuel_j = USHj/COPh_nom
+            FETFuel_j = USHj*Status.EXTRAPOLATE_TO_YEAR/COPh_nom
+            print "ModuelBB (cEF): converting USH [%s] to FET [%s]"%\
+                  (USHj*Status.EXTRAPOLATE_TO_YEAR,FETFuel_j*Status.EXTRAPOLATE_TO_YEAR)
         else:
             FETFuel_j = 0.0
             showWarning("Strange boiler with COP = 0.0")
-        Interfaces.FETFuel_j[cascadeIndex-1] = FETFuel_j
-        Interfaces.FETel_j[cascadeIndex-1] = 0.0
-        Interfaces.HPerYearEq[cascadeIndex-1] = HPerYear
+
+        FETel_j = 0.0
         
+        Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j
+        Status.int.FETel_j[cascadeIndex-1] = FETel_j
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+        
+        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
+                   (equipe.EqNo,\
+                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    FETFuel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
         return USHj    
 
 

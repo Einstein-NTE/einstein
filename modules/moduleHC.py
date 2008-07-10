@@ -91,17 +91,22 @@ class ModuleHC(object):
                 pipeIDsSQL = IDString.split(';')
             else:
                 pipeIDsSQL = []
-                
+
+            idx = 0
+            pipes = "o=="
             for i in pipeIDsSQL:
                 pipeID = int(i)
                 if pipeID in pipeDict.keys():
-                    if i == 0:
+                    if idx == 0:
                         pipes = str(pipeDict[pipeID])
                     else:
-                        newPipes = pipes+"\n"+str(pipeDict[pipeID])
+                        newPipes = pipes+"==]\n[=="+str(pipeDict[pipeID])
                         pipes = newPipes
+                    idx += 1
+            newPipes = pipes+"==o"
+            pipes = newPipes
 
-            print "ModuleHC: pipes = ",pipes
+            print "ModuleHC: %s pipes found >>>%s"%(idx,pipes)
 #..............................................................................
 # getting pipe names of equipes
 
@@ -146,7 +151,7 @@ class ModuleHC(object):
                 Status.SQL.commit()
             except:
                 print "ModuleHC (cascadeMoveUp): severe error - couldn't find equipe"
-            Status.int.cascadeUpdateLevel = min(Status.int.cascadeUpdateLevel,actualCascadeIndex-2)
+            Status.int.changeInCascade(actualCascadeIndex-1)
                 
             Status.int.getEquipmentCascade()
 
@@ -186,7 +191,7 @@ class ModuleHC(object):
                 print "ModuleHC (cascadeMoveDown): severe error - couldn't find equipe"
 
             Status.int.getEquipmentCascade()
-            Status.int.cascadeUpdateLevel = min(Status.int.cascadeUpdateLevel,actualCascadeIndex-1)
+            Status.int.changeInCascade(actualCascadeIndex)
 
             return actualEquip.CascadeIndex
 

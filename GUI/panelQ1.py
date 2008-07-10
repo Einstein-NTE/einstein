@@ -26,6 +26,7 @@
 #                           Stoyan Danov    18/06/2008
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      01/07/2008
+#                           Hans Schwieger  03/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -46,6 +47,7 @@
 #                       but also the list of choices in ChoiceEntry
 #                       -> commented out in tc19
 #                       -> call of self.clear() BEFORE filling list of NACE codes
+#       03/07/2008: HS  bug-fix in read/write of parameter "Independent" (tc19)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -602,7 +604,7 @@ class PanelQ1(wx.Panel):
                     "ProdCost":check(self.tc16.GetValue()),
                     "BaseYear":check(self.tc17.GetValue()),
                     "Growth":check(self.tc18.GetValue()),
-                    "Independent":check(self.tc19.GetValue()),
+                    "Independent":findKey(TRANSYESNO,check(self.tc19.GetValue(text=True))),
                     "OMThermal":check(self.tc20.GetValue()),
                     "OMElectrical":check(self.tc21.GetValue()),
                     "PercentFuelTotcost":check(self.tc22.GetValue()),
@@ -788,7 +790,7 @@ class PanelQ1(wx.Panel):
         self.tc16.SetValue(str(q.ProdCost))
         self.tc17.SetValue(str(q.BaseYear))
         self.tc18.SetValue(str(q.Growth))
-        self.tc19.SetValue(str(q.Independent))
+        if q.Independent in TRANSYESNO.keys(): self.tc19.SetValue(TRANSYESNO[str(q.Independent)])
         self.tc20.SetValue(str(q.OMThermal))
         self.tc21.SetValue(str(q.OMElectrical))
         self.tc22.SetValue(str(q.PercentFuelTotcost))

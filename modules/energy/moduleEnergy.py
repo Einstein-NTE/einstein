@@ -16,7 +16,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.13
+#	Version No.: 0.15
 #	Created by: 	    Hans Schweiger	13/03/2008
 #	Last revised by:    Tom Sobota          17/03/2008
 #                           Hans Schweiger      20/03/2008
@@ -30,6 +30,7 @@
 #                           Hans Schweiger      26/06/2008
 #                           Hans Schweiger      28/06/2008
 #                           Hans Schweiger      03/07/2008
+#                           Hans Schweiger      10/07/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -49,6 +50,7 @@
 #       28/06/2008: possibility for simulating from first to last introduced
 #                   in run simulation
 #       03/07/2008: check and update of cascadeUpdateLevel incorporated
+#       10/07/2008: adaptation to new panel and solar system simulation
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -68,9 +70,6 @@ import copy
 from einstein.modules.constants import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
-from einstein.modules.interfaces import *
-from einstein.modules.heatPump.moduleHP import ModuleHP
-import einstein.modules.matPanel as mP
 from einstein.modules.messageLogger import *
 
 #============================================================================== 
@@ -83,112 +82,125 @@ class ModuleEnergy(object):
     def __init__(self, keys):
 #------------------------------------------------------------------------------
         self.keys = keys
-        print "ModuleEnergy (__init__)"
         
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
-        
-        """
-        carries out any calculations necessary previous to displaying the BB
-        design assitant window
-        """
+        logTrack("ModuleEnergy (initPanel)")
+        pass #there's nothing to do at panel start-up
 #------------------------------------------------------------------------------
-        # send data to GUI panel
-        #
-        # grid: Energetic performance
-        #
-        data = array([['Steam boiler',   100.0,    2.0,  5.0],
-                      ['CHP',            280.0,    3.0,  3.0],
-                      ['Gas burner',      65.0,    4.0,  2.4],
-                      ['Chiller',        105.0,    5.0,  1.8],
-                      ['Chiller',         35.0,    6.0,  7.3],
-                      ['Total',          585.0,   20.0, 19.5],
-                      ['Energy savings',  65.0,   10.0,  3.0]])
-
-        Status.int.setGraphicsData(self.keys[0], data)
-
-        #print "ModuleEnergy graphics data initialization"
-        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
+#------------------------------------------------------------------------------
+    def updatePanel(self):
+#------------------------------------------------------------------------------
+#        carries out any calculations necessary previous to displaying the BB
+#        design assitant window
+#------------------------------------------------------------------------------
 
 #............................................................................................
-# 2. Plot dayly demand and supply
+# Plot global energy data
+
+        Status.mod.moduleEA.update()
+
+        (projectData,generalData) = Status.prj.getProjectData()
+
+        PET = generalData.PET
+        if PET is not None: PET /= 1000.0
+        else: PET = "---"
+        
+        PETFuels = generalData.PETFuels
+        if PETFuels is not None: PETFuels /= 1000.0
+        else: PETFuels = "---"
+        
+        PETel = generalData.PETel
+        if PETel is not None: PETel /= 1000.0
+        else: PETel = "---"
+        
+        USH = generalData.USH
+        if USH is not None: USH /= 1000.0
+        else: USH = "---"
+        
+        UPH = generalData.UPH
+        if UPH is not None: UPH /= 1000.0
+        else: UPH = "---"
+        
+        
+        row = [PET,PETFuels,PETel,USH,UPH]
+        data = array([row])
+        
+        Status.int.setGraphicsData("ENERGY", data)
+
+
+#............................................................................................
+# Plot weekly heat supply
 
         TimeIntervals=[]
 
-        self.getEquipmentList()
-        NEquipe = self.NEquipe
+        equipments = Status.prj.getEquipments(cascade=True)
+        NEquipe = len(equipments)
 
-        print "ModuleEnergy (initPanel): no USH data available"
-        print "NEquipe: %s Length of USH array: %s "%(NEquipe,len(Status.int.USHj_t))
-        print Status.int.USHj_t
+        USHj_weekly = []
+        for equipe in equipments:
+            USHj_weekly.append([str(equipe.Equipment)])
+        
 
-        if len(Status.int.USHj_t) < NEquipe:
+        if Status.int.cascadeUpdateLevel < NEquipe:    #cascade not up to date -> show zero line
             
-            days = []
+            weeks = []
             vals = []
-            for i in range(365):
-                days.append(1.0*i)
+            for i in range(53): 
+                weeks.append(1.0*i)
                 vals.append(0.0)
-            dataList = [days,vals]
+            dataList = [weeks,vals]
             
         else:   
         
-            USHj_daily = []
             USHj_sum = []
-            days = []
+            weeks = ["week"]
             
             for j in range(NEquipe):
-                USHj_daily.append([])
-                USHj_sum.append(0.0)
+                USHj_sum.append(0.0)    #reset of the sum for each equipment
 
-#            QD_daily = []
-#            QD_sum = 0.0
-                
-            nday = 0.0
+            nweek = 0.0
             for it in range(Status.Nt):
                 
                 for j in range(NEquipe):
                     
-                    USHj_sum[j] += Status.int.USHj_t[j][it]
-#                QD_sum += Status.int.QD_Tt[Status.NT+1][it]
+                    USHj_sum[j] += Status.int.USHj_t[j][it]/1000.0
                     
-                if ((it+1)%24) == 0:  #end of the day
-                    for j in range(NEquipe):
-                        USHj_daily[j].append(USHj_sum[j])
-                        USHj_sum[j] = 0.0
-#                    QD_daily.append(QD_sum)
-#                    QD_sum = 0.0
-                    nday+=1.0
-                    
-                    days.append(nday)
+                if ((it+1)%168) == 0:  #end of the week
 
-            dataList = [days]
+                    for j in range(1,NEquipe):
+                        USHj_sum[j] += USHj_sum[j-1]  #sum one above the other
+
+                    for j in range(NEquipe):
+                        USHj_weekly[j].append(USHj_sum[j])  #append twice, for
+                        USHj_weekly[j].append(USHj_sum[j])  #start and stop time of the week
+                        USHj_sum[j] = 0.0                   #reset sum
+
+                    weeks.append(nweek)
+                    nweek+=1.0   
+                    weeks.append(nweek)
+
+            dataList = [weeks]
             for j in range(NEquipe):
-                dataList.append(USHj_daily[j])
+                dataList.append(USHj_weekly[j])
+
         data = array(dataList)
        
         Status.int.setGraphicsData("ENERGY Plot1", data)
         
-        return "ok"
-
 #------------------------------------------------------------------------------
     def getEquipmentList(self):
 #------------------------------------------------------------------------------
 #   gets the equipment list
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.equipments = Status.DB.qgenerationhc.sql_select(sqlQuery)
-#        self.equipmentsC = Status.DB.qgenerationhc.sql_select(sqlQuery)
+        self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
-        print "ModuleEnergy (getEquipmentList): %s equipes found" % self.NEquipe
+        logTrack("ModuleEnergy (getEquipmentList): %s equipes found" % self.NEquipe)
 
-        Interfaces.cascade = []
-        for j in range(self.NEquipe):
-            equipe = self.equipments[j]
-            Interfaces.cascade.append({"equipeID":equipe.QGenerationHC_ID,"equipeNo":j})
-        print 'ModuleEnergy(getEquipmentList) Status.int.cascade', Status.int.cascade #SD, 16.05.2008
+        Status.int.getEquipmentCascade()
 
 #------------------------------------------------------------------------------
     def calculateEnergyFlows(self,equipe,cascadeIndex):
@@ -260,42 +272,45 @@ class ModuleEnergy(object):
 # storing results in Interfaces
 
 # remaining heat demand and availability for next equipment in cascade
-        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
+        Status.int.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Status.int.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
+        Status.int.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Status.int.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
 
 # heat delivered by present equipment                            
-        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Status.int.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_t[cascadeIndex-1] = copy.deepcopy(USHj_Tt[Status.NT+1])
 
 # waste heat absorbed by present equipment                            
-        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
-
-
-        print "Total energy supplied by equipment ",USHj, " MWh"
-        print "Total waste heat input  ",QHXj, " MWh"
-
-        print "Total energy supplied by equipment ",USHj, " MWh"
+        Status.int.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
+        Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
         Status.int.cascadeUpdateLevel = cascadeIndex
 
 #........................................................................
 # Global results (annual energy flows)
 
-        Interfaces.USHj[cascadeIndex-1] = USHj
+        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
 
         if COPh_nom > 0:
             FETFuel_j = USHj/COPh_nom
         else:
             FETFuel_j = 0.0
             showWarning("Strange boiler with COP = 0.0")
+        FETel_j = 0.0
+        
+        Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j
+        Status.int.FETel_j[cascadeIndex-1] = 0.0
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
 
-        Interfaces.FETFuel_j[cascadeIndex-1] = FETFuel_j
-        Interfaces.FETel_j[cascadeIndex-1] = 0.0
-        Interfaces.HPerYearEq[cascadeIndex-1] = HPerYear
-
+        logMessage("Dummy: eq.no.:%s USH: %s FETFuel: %s FETel: %s HPerYear: %s [MWh]"%\
+                   (equipe.EqNo,\
+                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    0.0,\
+                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
         
 #------------------------------------------------------------------------------
 
@@ -304,9 +319,8 @@ class ModuleEnergy(object):
 #------------------------------------------------------------------------------
 # updates the energy flows for the full equipment cascade
 #------------------------------------------------------------------------------
-        print "ModuleEnergy (runSimulation): QD_T", Status.int.QD_T
+        logTrack("ModuleEnergy (runSimulation): starting")
         NT = Status.NT
-        print "Running system simulation..."
 
         self.getEquipmentList()
             
@@ -324,6 +338,7 @@ class ModuleEnergy(object):
 
         Status.int.extendCascadeArrays(self.NEquipe)
 
+        logTrack("ModuleEnergy (runSimulation): simulating from %s to %s"%(first,last))
 #..............................................................................
 # now calculate the cascade
 # call the calculation modules for each equipment
@@ -331,14 +346,14 @@ class ModuleEnergy(object):
         for cascadeIndex in range(first,last+1):
             equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
 
-            equipe = self.equipments.QGenerationHC_ID[equipeID][0]
-#                equipeC = self.equipmentsC.QGenerationHC_ID[equipeID][0]
-            print "ModuleEnergy (runSimulation) [%s] equipeType = : "%cascadeIndex,equipe.EquipType
+            equipe = Status.DB.qgenerationhc.QGenerationHC_ID[equipeID][0]
+            logTrack("ModuleEnergy (runSimulation) [%s]: %s equipeType = : %s"%\
+                     (cascadeIndex,equipe.Equipment,equipe.EquipType))
             
             equipeClass = getEquipmentClass(equipe.EquipType)
-            print "ModuleEnergy (runSimulation): equipe type/class = ",equipe.EquipType,equipeClass
+            logTrack("ModuleEnergy (runSimulation): equipe type/class = %s/%s"%\
+                     (equipe.EquipType,equipeClass))
             
-#                if equipe.EquipType == "HP COMP" or equipe.EquipType == "HP THERMAL" or equipe.EquipType == "compression heat pump":
             if equipeClass == "HP":
                 print "======================================"
                 print "heat pump"
@@ -364,7 +379,7 @@ class ModuleEnergy(object):
                 print "running calculateEnergyFlows-dummy"
                 self.calculateEnergyFlows(equipe,cascadeIndex)
 
-            print "ModuleEnergy (runSimulation): end simulation"
+            logTrack("ModuleEnergy (runSimulation): end simulation")
 
 #..............................................................................
 # update the pointer to the last calculated cascade
@@ -374,7 +389,17 @@ class ModuleEnergy(object):
 #..............................................................................
 # if a full cascade has been calculated, calculate the balances
 
+        logTrack("ModuleEnergy (runSimulation): arrived at the end. %s [%s]"%\
+                 (last,self.NEquipe))
+
         if last == self.NEquipe:
+
+            uncoveredDemand = Status.int.QD_T_mod[last][Status.NT+1]
+            if uncoveredDemand > 0:
+                showWarning("Revise your design.\nCurrent equipment capacity is not sufficient for covering the demand\n"+\
+                            "Remaining heat demand: %s [MWh]"%(uncoveredDemand/1000.0))
+                
+            logTrack("ModuleEnergy (runSimulation): updating Energy balances")
             Status.mod.moduleEA.calculateEquipmentEnergyBalances()
             Status.prj.setStatus("Energy")
     

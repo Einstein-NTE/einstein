@@ -152,6 +152,7 @@ class ModuleHP():
 
         if Status.int.cascadeUpdateLevel < 0:
             Status.int.initCascadeArrays(0)
+
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -159,11 +160,14 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
-                
+               
 #............................................................................................
 # 0. Prepare the system information necessary for starting work
 
         (HPList,HPTableDataList) = self.screenEquipments()
+
+        logTrack("ModuleHP (updatePanel): cascade index %s update level %s"%\
+                 (self.cascadeIndex,Status.int.cascadeUpdateLevel))
 
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
             logTrack("ModuleHP: calling run simulation")
@@ -222,7 +226,7 @@ class ModuleHP():
             print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
             print 'Error: confusion in PId and ANo'
             maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, 'not available',0.0,0.0,0.0,0.0,0.0])            
+            Status.int.setGraphicsData('HP Config',[maintainExisting, 'compression',1000.0,60.0,100.0,-10.0,100.0])            
 
         else:
             uHP = uHProws[0]
@@ -334,8 +338,9 @@ class ModuleHP():
 #   seen by this module
 #------------------------------------------------------------------------------
 
-        iD = firstNonZero(Status.int.QD_T_mod[self.cascadeIndex-1])
-        iA = lastNonZero(Status.int.QA_T_mod[self.cascadeIndex-1])
+        index = max(self.cascadeIndex-1,0)
+        iD = firstNonZero(Status.int.QD_T_mod[index])
+        iA = lastNonZero(Status.int.QA_T_mod[index])
                  #HS2008-07-06: QD_T changed to QD_T_mod !!!
 
         TminD = (iD-1)*Status.TemperatureInterval
@@ -541,13 +546,28 @@ class ModuleHP():
             
         logTrack("ModuleHP (designAssistant1): starting")
 
+#............................................................................................
+#   add a new equipment as space holder to the equipment list
+#   and move it to the top of the list
+
+        equipe = self.addEquipmentDummy()
+        equipeID = equipe.QGenerationHC_ID  #SD change 30/04.2008
+        logTrack("ModuleHP (DA1): equipe before moving - %s %s %s"%\
+              (equipe.Equipment,equipe.EqNo,equipe.CascadeIndex))
+        
+        Status.mod.moduleHC.cascadeMoveToTop(equipe.CascadeIndex)
+
+        equipe = Status.prj.getEquipe(equipeID)
+        logTrack("ModuleHP (DA1): equipe after moving - %s %s %s"%\
+              (equipe.Equipment,equipe.EqNo,equipe.CascadeIndex))
+        self.cascadeIndex = equipe.CascadeIndex
+
+#............................................................................................
+#   now prepare the 
+
         if Status.int.cascadeUpdateLevel < (self.cascadeIndex - 1):
             logDebug("ModuleHP (DA1): calling design assistant w/o having cascade updated")
             Status.mod.moduleEnergy.runSimulation(last=self.cascadeIndex - 1)
-#............................................................................................
-#   add a new equipment as space holder to the equipment list
-
-        equipe = self.addEquipmentDummy() #SD change 30/04.2008
 
 #............................................................................................
 # get configuration of design assistant and do basic checking
@@ -557,24 +577,16 @@ class ModuleHP():
             DA = uTable[0]
         else:
             logDebug("ModuleHP (DA1): no u-Table found")
-            return
-
+            return("CANCEL",[])
+        
         if DA.UHPMinHop > YEAR:        #check of user input
             logWarning('ModuleHP (DA1): Required working hours are greater than the hours of the year!')               
                         
         (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA.UHPType)  #get the sorted list of available heat pumps
 
+        print "ModuleHP (DA1): HPListPNom = ",HPListPNom
 #............................................................................................
 #   analyze heat demand for previous checks
-
-        print "heat demand in the system"
-        print Status.int.QD_T
-        print Status.int.QA_T
-
-        print "heat demand at cascade level %s"%(self.cascadeIndex-1)
-        print Status.int.QD_T_mod[self.cascadeIndex-1]
-        print Status.int.QA_T_mod[self.cascadeIndex-1]
-
         
         TMinD = self.getTMinD(Status.int.QD_T_mod[self.cascadeIndex-1])
         TMaxA = self.getTMaxA(Status.int.QA_T_mod[self.cascadeIndex-1])
@@ -605,7 +617,7 @@ class ModuleHP():
 # From the annual Heat demand curve (QDa): calculate the necesary heating capacity (starting value)
 
             Qh0 = interpolateList(Th0/Status.TemperatureInterval,Status.int.QD_T_mod[self.cascadeIndex-1]) #calculates the annual energy demand for the Th_o from QDa
-            dotQh0 = Qh0/YEAR #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
+            dotQh0 = Qh0/DA.UHPMinHop #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
             
             listIndex = findInListASC(dotQh0,HPListPNom)
 
@@ -621,11 +633,15 @@ class ModuleHP():
                 modelID = HPList[listIndex] #a row in the DBHeatPump corresponding to j
                                     
                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list #SD change 30/04.2008
-                
+
+                print "ModuleHP (DA1): equipe ID %s PNom %s"%\
+                      (modelID,equipe.HCGPnom)
                 USHj = self.calculateEnergyFlows(equipe,self.cascadeIndex) #SD change 30/04.2008
                 HOp = USHj/equipe.HCGPnom
+                print "ModuleHP (DA1): USH %s HOp %s"%\
+                      (USHj,HOp)
                
-                if (HOp >= DA.UHPMinHop):
+                if HOp >= DA.UHPMinHop:    #correction factor for simulations < 1 year
                     self.preselection.append(modelID)
                     PNomMax = max(PNomMax,equipe.HCGPnom)
                 if equipe.HCGPnom < POWERRANGE*PNomMax:
@@ -633,7 +649,7 @@ class ModuleHP():
                 
                 listIndex -= 1  #Select next smaller heat pump
 
-        print "ModuleHP (designAssistant1): preselected equipment: ",self.preselection
+        logTrack("ModuleHP (designAssistant1): preselected equipment: %s"%str(self.preselection))
 
 #............................................................................................
 # Automatic final selection:
@@ -642,7 +658,7 @@ class ModuleHP():
         nSelected = len(self.preselection)
         print "ModuleHP (designAssistant1): return to GUI for manual selection "
         if nSelected <= 0: #no equipment could be selected
-            return("CANCEL",self.preselection)
+            return("CANCEL",[])
         
         else:   #several options possible -> manual or automatic final selection
 
@@ -669,16 +685,12 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 
         if (modelID == None or modelID < 0):
-            print "user cancelled the selection of the heat pump"
-            self.deleteEquipment(None)   #delete the dummy equipment previously created
+            logTrack("ModuleHP (DA2): user cancelled the selection of the heat pump")
+            self.deleteEquipment(None)   
 
         else:                        
             self.setEquipmentFromDB(self.equipe,modelID) #add selected equipment to the equipment list #SD change 30/04.2008
-            print "ModuleHP: heat pump added. model no: ",modelID
-
-        Status.mod.moduleEnergy.runSimulation()
-        self.updatePanel()
-                                
+            logTrack("ModuleHP (DA2): heat pump added. model no: %s"%modelID)
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -689,8 +701,18 @@ class ModuleHP():
 #       
 #------------------------------------------------------------------------------
 
-        print "ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex
-        print "ModuleHP (calculateEnergyFlows): equipe =", equipe, "cascadeIndex =", cascadeIndex
+        if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
+            logDebug("ModuleHP (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
+            Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
+            Status.int.extendCascadeArrays(cascadeIndex)
+
+        if cascadeIndex > 0 and cascadeIndex <= Status.NEquipe:
+            logTrack("ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex)
+        else:
+            logError("ModuleHP (calculateEnergyFlows): cannot simulate index %s: out of cascade [%s]"%\
+                     (cascadeIndex,Status.NEquipe))
+            return
+
 #..............................................................................
 # get equipment data from equipment list in SQL
 
@@ -795,12 +817,10 @@ class ModuleHP():
                 dotQh_i2 = dotQ_max
                 
                 while fabs(COPh_i - COPh0_i) > EPS_COP or fabs(Tc_i - Tc0_i) > EPS_TEMP: 
-
-                    
+        
                     COPh0_i = COPh_i;
                     Tc0_i = Tc_i 
                                     
-                    dotQh_i = min(dotQh_i,dotQ_max)         #limit to maximum nominal power and maximum demand at TMax
                     dotQw_i = (dotQh_i/COPh_i)              #heat pump input power (mechanical or thermal)
                     dotQc_i = dotQh_i - dotQw_i             #heat pump cooling power
 
@@ -813,7 +833,11 @@ class ModuleHP():
                         dotQh_i *= 0.9
 
                     COPh_i = COPex*self.calculateCOPh_Carnot(Th_i+HPTDROP,Tc_i-HPTDROP,Tg)
+                    COPh_i = min(COPh_i,10.0)               #practical limit for COP at small temp. lift
 
+                    dotQh_i = min(dotQh_i,dotQ_max)         #limit to maximum nominal power and maximum demand at TMax
+
+#                    print "HP:",it,COPh_i,dotQh_i,dotQc_i,dotQw_i,"Th",Th_i,"Tc",Tc_i
                     nits +=1
                     if nits > 30:
                         break
@@ -825,6 +849,7 @@ class ModuleHP():
             USHj_t[it] = dotQh_i*Status.TimeStep
             QHXj_t[it] = dotQc_i*Status.TimeStep
             FETel_j += dotQw_i * Status.TimeStep
+#            print "HP:",it,FETel_j,dotQh_i,dotQc_i,dotQw_i
 
             if dotQh_i > 0:
                 HPerYear += Status.TimeStep
@@ -851,18 +876,18 @@ class ModuleHP():
 #..............................................................................
 # End of year reached. Store results in interfaces
 
-        
-        Interfaces.QD_Tt_mod[cascadeIndex] = QD_Tt
-        Interfaces.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
-        Interfaces.QA_Tt_mod[cascadeIndex] = QA_Tt
-        Interfaces.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
+        Status.int.QD_Tt_mod[cascadeIndex] = QD_Tt
+        Status.int.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
+        Status.int.QA_Tt_mod[cascadeIndex] = QA_Tt
+        Status.int.QA_T_mod[cascadeIndex] = Status.int.calcQ_T(QA_Tt)
 
-        Interfaces.USHj_Tt[cascadeIndex-1] = USHj_Tt
-        Interfaces.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_Tt[cascadeIndex-1] = USHj_Tt
+        Status.int.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
+        Status.int.USHj_t[cascadeIndex-1] = copy.deepcopy(USHj_Tt[Status.NT+1])
 
-        Interfaces.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
-        Interfaces.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
-
+        Status.int.QHXj_Tt[cascadeIndex-1] = QHXj_Tt
+        Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
+        Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
 #........................................................................
 
@@ -871,13 +896,20 @@ class ModuleHP():
 #........................................................................
 # Global results (annual energy flows)
 
-        Interfaces.USHj[cascadeIndex-1] = USHj
+        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
 
-        Interfaces.FETFuel_j[cascadeIndex-1] = 0.0
-        Interfaces.FETel_j[cascadeIndex-1] = FETel_j
-        Interfaces.HPerYearEq[cascadeIndex-1] = HPerYear
-        
-        return USHj    
+        Status.int.FETFuel_j[cascadeIndex-1] = 0.0
+        Status.int.FETel_j[cascadeIndex-1] = FETel_j*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+
+        logMessage("ModuleHP: eq.no.:%s USH: %s [MWh] FETFuel: %s [MWh] FETel: %s [MWh] HPerYear: %s [h]"%\
+                   (equipe.EqNo,\
+                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    0.0,\
+                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+                   
+        return USHj*Status.EXTRAPOLATE_TO_YEAR    
 
 #============================================================================== 								
 

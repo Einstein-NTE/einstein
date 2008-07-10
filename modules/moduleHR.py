@@ -218,11 +218,20 @@ class ModuleHR(object):
 #..............................................................................
 # settings of the conversion
 
-        fHR = 0.8   # fraction of potential heat recovery that is really recovered
+        if Status.ANo > 0:
+            fHR = 0.8   # fraction of potential heat recovery that is really recovered
+        else:
+            fHR = 0.0
+        logWarning("Test version. REAL HX network is not taken into consideration !!!!")
 
-        DistributionEfficiency = 0.9
-        logTrack("ModuleHR (simulate): WARNING - still calculating with fixed distribution efficiency")
-        fDist = 1./DistributionEfficiency
+        (projectData,generalData) = Status.prj.getProjectData()
+        if generalData is not None:
+            DistributionEfficiency = generalData.HDEffAvg
+        else:
+            logDebug("SimulateHR: error reading distribution efficiency from cgeneraldata")
+            DistributionEfficiency = 0.9
+            
+        fDist = 1./max(DistributionEfficiency,0.1)  #distribution efficiency < 10% doesn't make much sense
         
 #..............................................................................
 #..............................................................................
@@ -243,7 +252,7 @@ class ModuleHR(object):
             for iT in range(Status.NT+2):
                 QHXProc_Tt[iT][it] = QHXProc_it - QHXProc_Tt[iT][it]    #from descending to ascending cumulative
                 UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it] 
-                            
+                           
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
 

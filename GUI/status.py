@@ -86,7 +86,9 @@ class Status(object):
   MaximumTemperature = 400.0
   
   NT = (int) (MaximumTemperature / TemperatureInterval + 0.1)
-  Nt = 168
+  Nt = 168*12 #12 weeks instead of 52 for speed-up
+  SIMULATED_YEAR = Nt*TimeStep
+  EXTRAPOLATE_TO_YEAR = 8760.0 / SIMULATED_YEAR
 
   #------------------------------------------------------------------------------		
   # Instance variables

@@ -232,6 +232,14 @@ FLUID = {
     'FluidComment':(_('Comment'),_('-'))
     }
 
+ELECTRICITYMIX = {
+    'id':('ID',_('-')),#Actual DB
+    'Year':(_('Year of the data'),_('-')),
+    'Country':(_('Country of the data'),_('kJ/kgK')),
+    'Reference':(_('Reference (data source)'),_('kg/m3')),
+    'AuditorID':(_('ID of auditor'),_('-'))
+    }
+
 
 ##BENCH = {#DB Maribor draft (excel)
 ##Benchcode	
@@ -349,9 +357,10 @@ DBTITLES = {
     'dbchiller':CHILLER,
     'dbboiler':BOILER,
     'dbstorage':STORAGE,
-    'dbsolar':SOLAR,
+    'dbsolarthermal':SOLAR,
     'dbfuel':FUEL,
     'dbfluid':FLUID,
+    'dbelectricitymix':ELECTRICITYMIX,
     'dbbenchmark':BENCH,
     'dbunitoperation':UNITOP,
     'dbnacecode':NACE

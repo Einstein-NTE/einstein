@@ -5,7 +5,7 @@ import wx.html
 class FrameHelpUserManual(wx.Dialog):
     def __init__(self, parent, manualfile):
         wx.Dialog.__init__(self, id=-1, name=u'FrameHelpUserManual',
-              parent=parent, pos=wx.Point(0,0), size=wx.Size(600,800),
+              parent=parent, pos=wx.Point(0,0),size=(1000,700),
               style=wx.DEFAULT_FRAME_STYLE, title='User manual')
 
 	self.html = wx.html.HtmlWindow(self, id=-1, pos=wx.DefaultPosition,

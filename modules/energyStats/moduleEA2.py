@@ -1,135 +1,179 @@
-#==============================================================================#
+#==============================================================================
+#
 #	E I N S T E I N
 #
 #       Expert System for an Intelligent Supply of Thermal Energy in Industry
-#       (www.iee-einstein.org)
+#       (http://www.iee-einstein.org/)
 #
 #------------------------------------------------------------------------------
 #
-#	ModuleEA2- Final energy by fuels- Yearly data
-#			
+#	ModuleEA2- Final energy (FEC/FET) - Yearly data
+#
 #==============================================================================
 #
-#	Version No.: 0.03
-#	Created by: 	    Tom Sobota	21/03/2008
-#       Revised by:         Tom Sobota  29/03/2008
-#       Revised by:         Stoyan Danov  07/04/2008
-#       Revised by:         Stoyan Danov     11/04/2008
+#	Version No.: 0.06
+#	Created by: 	    Tom Sobota	    21/03/2008
+#       Revised by:         Hans Schweiger  28/03/2008
+#                           Tom Sobota      28/03/2008
+#                           Stoyan Danov    07/04/2008
+#                           Stoyan Danov    11/04/2008
+#                           Hans Schweiger  13/04/2008
 #                           Stoyan Danov    02/05/2008
-#                           Hans Schweiger  02/07/2008
+#                           Hans Schweiger  07/07/2008
 #
 #       Changes to previous version:
-#       29/3/2008          Adapted to numpy arrays
-#       07/04/2008           Adapted to use data from sql, not checked
+#	28/03/08:   functions draw_ ... moved to panel
+#	28/03/08:   TS changed functions draw... to use numpy arrays,
+#       07/04/2008: SD Adapted to show data from sql, not checked
 #       11/04/2008: SD: Dummy data added for displaying temporaly, to avoid problems with None.
 #                       Return to original state later!
-#       02/05/2008: SD: sqlQuery -> to initModule; sejf.interfaces -> Status.int,
-#                                   protection zeroDivision and missing data(PId,ANo)->probably not necessary??
-#       02/07/2008: HS  Adaptation to changes in nomeclature (update_einsteinDB_019)
-#                       Some compacting and clean-up
-#	
-#------------------------------------------------------------------------------		
+#       13/04/2008: HS: initialisation moved to function initPanel
+#       02/05/2008: SD: C->Q tables, change FECi,FETi(old) to FECFuel,FEFFuel; self.interfaces -> Status.int #SD, check for None
+#       07/07/2008: HS: Clean-up, conversion to MWh
+#                   
+#------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
-#	www.energyxperts.net / info@energyxperts.net
+#	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
 #	the terms of the GNU general public license as published by the Free
 #	Software Foundation (www.gnu.org).
 #
-#============================================================================== 
+#==============================================================================
 
 from sys import *
 from math import *
 from numpy import *
-import wx
-
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
-import einstein.modules.matPanel as mP
+from einstein.modules.fluids import *
+from einstein.modules.messageLogger import *
 
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 class ModuleEA2(object):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
     def __init__(self, keys):
-        self.keys = keys
-
-        self.initModule()
-
-    def initModule(self):
 #------------------------------------------------------------------------------
+#   instance of module is created at the beginning when GUI is built-up
+#   only basic initialisation
+#------------------------------------------------------------------------------
+        self.keys = keys # keys for accessing the data in Interfaces
+        logTrack("ModuleEA2 (init): starting")
+
+    def initPanel(self):
+#------------------------------------------------------------------------------
+#   initialisation of the Panel before displaying.
+#   activated when EA2 is selected on the tree
+#------------------------------------------------------------------------------
+
+        Status.mod.moduleEA.update()
         
-        """
-        module initialization
-        """
-#------------------------------------------------------------------------------
+#..............................................................................
+#   get access to the info in SQL
 
         PId = Status.PId
         ANo = Status.ANo
 
-        Status.mod.moduleEA.update()    #checks if data in SQL are uptodate
-                                        #and otherwise carries out necessary
-                                        #calculations
+        fuels = Status.prj.getQFuels()
+        (projectData,generalData) = Status.prj.getProjectData()
+        
+        self.NFuels = len(fuels)
 
 #..............................................................................
-#Check: Protection for missing data(Pid and ANo)in cgeneraldata
+# Final energy consumption by fuels (data for panel EA2)
+
+        TotalFEC = 0.0
+        TotalFETi = 0.0
+        FEC = []
+        FETi = []
+        fuelNames = []
+            
+        for fuel in fuels:  #sum all FECFuel/FETFuel for fuels used #SD 
+            fuelID = fuel.DBFuel_id #SD
+
+            f = Fuel(fuelID)   
+            fuelName = f.name
+            
+            fuelNames.append(fuelName)
+            
+            try: dFEC = fuel.FECFuel/1000.0
+            except: dFEC = 0.0
+            
+            TotalFEC += dFEC 
+            FEC.append(dFEC)
+            
+            try: dFET = fuel.FETFuel/1000.0
+            except: dFET = 0.0
+            
+            TotalFETi += dFET
+            FETi.append(dFET)
+
+        try: FECel = generalData[0].FECel / 1000.0
+        except: FECel = 0.0
         
-        (projectData,generalData) = Status.prj.getProjectData()
-
-        if generalData is None:
+        try: FETel = generalData[0].FETel / 1000.0
+        except: FETel = 0.0
         
-            PEC = [0.0, 0.0]
-            PECTotal = 0.0
-            PECPercentage = [0.0,0.0]
-
-            PET = [0.0, 0.0]
-            PETTotal = 0.0
-            PETPercentage = [0.0,0.0]
-
+        if FECel is not None:
+            TotalFEC += FECel  #add FECel to TotalFEC
+            FEC.append(FECel) #SD: check if OK here
         else:
-            PEC = [generalData.PECFuels, generalData.PECel]
+            TotalFEC += 0.0
+            FEC.append(-1) #SD: check if OK here
 
-            try: PECTotal = generalData.PECFuels + generalData.PECel
-            except: PECTotal = 0.0
+        if FETel is not None:
+            TotalFETi += FETel
+            FETi.append(FETel) #SD: check if OK here
+        else:
+            TotalFETi += 0.0
+            FETi.append(-1) #SD: check if OK here
             
-            if PECTotal > 0.0 and PECTotal is not None: #SD: zeroDivision and None check
-                PECPercentage = [PEC[0]*100.0/PECTotal, PEC[1]*100.0/PECTotal]
-            else:
-                PECPercentage = [0.0,0.0]
+        fuelNames.append("Electricity")
 
-            PET = [generalData.PETFuels, generalData.PETel]
-            try: PETTotal = generalData.PETFuels + generalData.PETel
-            except: PETTotal = 0.0
-            
-            if PETTotal > 0.0 and PETTotal is not None: #SD: zeroDivision and None check
-                PETPercentage = [PET[0]*100.0/PETTotal, PET[1]*100.0/PETTotal]
-            else:
-                PETPercentage = [0.0,0.0]
+        FECPercentage = []
+        FETPercentage = []
 
-#..............................................................
-        #finish the table columns, add total, percentage
-        Labels = ['Total fuels','Total electricity','Total (fuels + electricity)']
-        PEC.append(PECTotal)
-        PET.append(PETTotal)
+        for i in range (self.NFuels + 1):
+            if TotalFEC > 0.0: #SD avoid division by zero
+                FECPercentage.append(FEC[i]*100.0/TotalFEC)
+            else:
+                FECPercentage.append(0.0)
+            if TotalFETi > 0.0: #SD avoid division by zero
+                FETPercentage.append(FETi[i]*100.0/TotalFETi)
+            else:
+                FETPercentage.append(0.0)
+
+#.........................................................        
+        #finish the table columns, add total, sum percentage
+        fuelNames.append('Total')
+        FEC.append(TotalFEC)
+        FETi.append(TotalFETi)
 
         suma = 0
-        for i in PECPercentage:
+        for i in FECPercentage:
             suma += i
-        PECPercentage.append(suma)
+        FECPercentage.append(suma)
 
         suma = 0
-        for i in PETPercentage:
+        for i in FETPercentage:
             suma += i
-        PETPercentage.append(suma)
-      
-#.................................................................
+        FETPercentage.append(suma)
 
-        TableColumnList = [Labels,PEC,PECPercentage,PET,PETPercentage]
+#.........................................................
 
+        TableColumnList = [fuelNames,FEC,FECPercentage,FETi,FETPercentage]
         matrix = transpose(TableColumnList)
         data = array(matrix)
-        
+
         Status.int.setGraphicsData(self.keys[0], data)
+
+        print data
 
 #------------------------------------------------------------------------------
 

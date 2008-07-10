@@ -57,9 +57,11 @@ class Fluid():
                 logError(_("Severe error in your fluid data for fluid %s: cp %s")%\
                            (fluids[0].FluidName,self.cp))
                 self.cp = 1.16/1000.0
+            self.name = fluids[0].FluidName
         else:
             self.rho = 1000.0                   #kg/m3
             self.cp  = 1.16/1000.0              #water properties in kWh/kgK
+            self.name = "dummy fluid"
             logError(_("Fluid (init): cannot find fluid with ID = %s")%fluidID)
            
            
@@ -77,6 +79,7 @@ class Fuel():
             self.PEConv = fuel.PEConvFuel
             self.CO2Conv = fuel.CO2ConvFuel
             self.rho = fuel.FuelDensity
+            self.name = fuel.FuelName
                                                 #conversion to kWh/kgK
         else:
             self.LCV = 10.0
@@ -84,6 +87,7 @@ class Fuel():
             self.PEConv = 1.1
             self.CO2Conv = 0.20
             self.rho = 10.0
+            self.name = "dummy fuel"
             logError(_("Fluid (init): cannot find fuel with ID = %s")%fuelID)
            
            

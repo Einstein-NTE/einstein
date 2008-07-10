@@ -49,6 +49,7 @@ from einstein.modules.modules import *
 from einstein.modules.constants import *
 from numpy import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
+from GUITools import *
 
 [wxID_PANEL, wxID_PANELBUTTONADD, 
  wxID_PANELBUTTONBACK, wxID_PANELBUTTONCANCEL, 
@@ -92,19 +93,17 @@ def drawFigure(self):
 #------------------------------------------------------------------------------		
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
-    self.subplot.plot(Status.int.GData['ST Plot'][0],
-                      Status.int.GData['ST Plot'][1],
-                      'go-', label='QD', linewidth=2)
-    self.subplot.plot(Status.int.GData['ST Plot'][0],
-                      Status.int.GData['ST Plot'][2],
-                      'rs',  label='QA')
-    self.subplot.plot(Status.int.GData['ST Plot'][0],
-                      Status.int.GData['ST Plot'][3],
-                      'go-', label='QD_mod', linewidth=2)
-    self.subplot.plot(Status.int.GData['ST Plot'][0],
-                      Status.int.GData['ST Plot'][4],
-                      'rs',  label='QA_mod')
-    self.subplot.axis([0, 100, 0, 3e+7])
+
+    gdata = Status.int.GData['ST Plot']
+    
+    self.subplot.plot(gdata[0],
+                      gdata[1],
+                      '-.',color = DARKGREY, label='QD', linewidth=1)
+    if len(gdata) > 2:
+        self.subplot.plot(gdata[0],
+                          gdata[2],
+                          '-',color=ORANGE,linewidth = 3,  label='USH')
+#    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
 
@@ -126,6 +125,7 @@ class PanelST(wx.Panel):
 
 	self.keys = ['ST Table']
         self.mod = Status.mod.moduleST
+        self.mod.initPanel()
 
 #   graphic: Cumulative heat demand by hours
         labels_column = 1
@@ -193,6 +193,8 @@ class PanelST(wx.Panel):
               label=_('Temperature dependent heat demand with and without solar system'),
               name='staticBox1', parent=self, pos=wx.Point(450, 130),
               size=wx.Size(340, 260), style=0)
+        self.staticBox1.SetForegroundColour(TITLE_COLOR)
+        self.staticBox1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelFig = wx.Panel(id=wxID_PANELFIG, name='panelFigure', parent=self,
               pos=wx.Point(460, 160), size=wx.Size(320, 220),
@@ -205,6 +207,8 @@ class PanelST(wx.Panel):
               label=_('Solar collector'),
               name='boxTable', parent=self, pos=wx.Point(10, 10),
               size=wx.Size(780, 100), style=0)
+        self.boxTable.SetForegroundColour(TITLE_COLOR)
+        self.boxTable.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.grid = wx.grid.Grid(id=wxID_PANELGRIDPAGEST,
               name='gridpageST', parent=self, pos=wx.Point(20, 40),
@@ -241,6 +245,8 @@ class PanelST(wx.Panel):
               label=_('Solar thermal system parameters'),
               name='boxSystem', parent=self, pos=wx.Point(10, 170),
               size=wx.Size(420, 120), style=0)
+        self.boxSystem.SetForegroundColour(TITLE_COLOR)
+        self.boxSystem.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stSys1 = wx.StaticText(id=-1,
               label=_('Installed capacity [kW]'),
@@ -289,6 +295,8 @@ class PanelST(wx.Panel):
               label=_('Configuration of design assistant'),
               name='boxDA', parent=self, pos=wx.Point(10, 330),
               size=wx.Size(420, 120), style=0)
+        self.boxDA.SetForegroundColour(TITLE_COLOR)
+        self.boxDA.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 #..............................................................................
 # 1. Solar fraction
@@ -440,7 +448,7 @@ class PanelST(wx.Panel):
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
 
-        self.mod.initPanel()        # prepares data for plotting
+        self.mod.updatePanel()        # prepares data for plotting
 
 #..............................................................................
 # update of equipment table
@@ -470,13 +478,14 @@ class PanelST(wx.Panel):
 
         #config0..2: DA parameters
         self.tcConfig1.SetValue(str(self.config[0]))
-        self.choiceConfig2.SetSelection(self.config[1])
+        self.choiceConfig2.SetStringSelection(self.config[1])
         self.tcConfig3.SetValue(str(self.config[2]))
         
-        #config3..5: system parameters
-        self.tcSys1.SetValue(str(self.config[3]))
-        self.tcSys2.SetValue(str(self.config[4]))
-        self.tcSys3.SetValue(str(self.config[5]))
+        self.sysPars = Status.int.GData["ST SysPars"]
+
+        self.tcSys1.SetValue(str(self.sysPars[0]))
+        self.tcSys2.SetValue(str(self.sysPars[1]))
+        self.tcSys3.SetValue(str(self.sysPars[2]))
         
 #..............................................................................
 # update of info-values
@@ -493,7 +502,7 @@ class PanelST(wx.Panel):
 #..............................................................................
 # and finally draw the figure
 
-#        self.panelFig.draw()
+        self.panelFig.draw()
         self.Show()
         
 #==============================================================================
@@ -506,40 +515,46 @@ class PanelST(wx.Panel):
 #   Button "Run Design Assistant" pressed
 #------------------------------------------------------------------------------		
 
+
+        print "PanelBB (run design assistant): calling function DA"
+        self.mod.designAssistant1()
+        
+        self.display()
+
 #..............................................................................
 # Step 1 design assistant: gets a preselected list of possible heat pumps
 
-        (mode,STList) = self.mod.designAssistant1()
+#        (mode,STList) = self.mod.designAssistant1()
         
 #..............................................................................
 # In interactive mode open DB Edidor Heat pump and select manually
 
-        if (mode == "MANUAL"):
-            self.dbe = DBEditFrame(self,
-                            _('Select collector from preselected list'), # title for the dialogs
-			    _('dbheatpump'),              # database table
-			    0,                         # column to be returned
-			    False,
-                            preselection = STList)      # database table can be edited in DBEditFrame?
-            if self.dbe.ShowModal() == wx.ID_OK:
-                STId = self.dbe.theId
-            else:
-                STId = -1
-                print "PanelST: no ST selected after DA1 -> check whether this works"
+#        if (mode == "MANUAL"):
+#            self.dbe = DBEditFrame(self,
+#                            _('Select collector from preselected list'), # title for the dialogs
+#			    _('dbheatpump'),              # database table
+#			    0,                         # column to be returned
+#			    False,
+#                            preselection = STList)      # database table can be edited in DBEditFrame?
+#            if self.dbe.ShowModal() == wx.ID_OK:
+#                STId = self.dbe.theId
+#            else:
+#                STId = -1
+#                print "PanelST: no ST selected after DA1 -> check whether this works"
 
-        elif (mode == "AUTOMATIC"):
-            STId = STList[0]    #in automatic mode just take first in the list
+#        elif (mode == "AUTOMATIC"):
+#            STId = STList[0]    #in automatic mode just take first in the list
 
-        elif (mode == "CANCEL"):
-            STId = -1 #make designAssistant2 to understand that
-        else:
-            print _("PanelST (DesignAssistant-Button): erroneous panel mode: "),mode
+#        elif (mode == "CANCEL"):
+#            STId = -1 #make designAssistant2 to understand that
+#        else:
+#            print _("PanelST (DesignAssistant-Button): erroneous panel mode: "),mode
 
 #..............................................................................
 # Step 2 design assistant: add selected equipment to the list and update display
         
-        self.mod.designAssistant2(STId)
-        self.display()
+#        self.mod.designAssistant2(STId)
+#        self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -553,7 +568,7 @@ class PanelST(wx.Panel):
         pu1 =  AddEquipment(self,                      # pointer to this panel
                             self.mod,                  # pointer to the associated module
                             _('Select solar collector'), # title for the dialogs
-                            _('dbheatpump'),              # database table
+                            _('dbsolarthermal'),              # database table
                             0,                         # column to be returned
                             False)                     # database table can be edited in DBEditFrame?
 
@@ -608,32 +623,30 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def OnTcConfig1TextEnter(self, event):
-        self.config[0] = self.cbConfig1.GetValue()
+        self.config[0] = self.tcConfig1.GetValue()
         print _("new config[%s] value: ")%0,self.config[0]
         Status.int.GData["ST Config"] = self.config
-        self.mod.setUserDefinedParamST()
+        self.mod.setUserDefinedPars()
 
     def OnChoiceConfig2Choice(self, event):
-        self.config[1] = self.choiceConfig2.GetSelection()
+        self.config[1] = self.choiceConfig2.GetStringSelection()
         print _("new config[%s] value: ")%1,self.config[1]
         Status.int.GData["ST Config"] = self.config
-        self.mod.setUserDefinedParamST()
+        self.mod.setUserDefinedPars()
 
     def OnTcConfig3TextEnter(self, event):
         print _("new config[%s] value: ")%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
         Status.int.GData["ST Config"] = self.config
-        self.mod.setUserDefinedParamST()
+        self.mod.setUserDefinedPars()
 
     def OnTcSysTextEnter(self, event):
-        self.config[3] = self.tcSys1.GetValue()
-        self.config[4] = self.tcSys2.GetValue()
-        self.config[5] = self.tcSys3.GetValue()
-        print _("new config[%s] value: ")%3,self.config[3]
-        print _("new config[%s] value: ")%4,self.config[4]
-        print _("new config[%s] value: ")%5,self.config[5]
-        Status.int.GData["ST Config"] = self.config
-        self.mod.setUserDefinedParamST()
+        self.sysPars[0] = self.tcSys1.GetValue()
+        self.sysPars[1] = self.tcSys2.GetValue()
+        self.sysPars[2] = self.tcSys3.GetValue()
+        Status.int.GData["ST SysPars"] = self.sysPars
+        self.mod.setSolarSystemPars()
+        self.display()
 
 #------------------------------------------------------------------------------		
 #   Default event handlers: FWD / BACK / OK / Cancel - Buttons

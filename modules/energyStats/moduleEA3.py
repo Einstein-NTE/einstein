@@ -61,13 +61,13 @@ class ModuleEA3(object):
         """
 #------------------------------------------------------------------------------
 
+        Status.mod.moduleEA.update()
+
         PId = Status.PId
         ANo = Status.ANo
 
         self.equipments = Status.prj.getEquipments()
         self.NEquipe = len(self.equipments)
-
-        Status.mod.moduleEA.calculateEquipmentEnergyBalances()
 
         dbfuel = Status.DB.dbfuel
         NDBFuel = len(dbfuel)
@@ -91,15 +91,15 @@ class ModuleEA3(object):
                 TotalFETj += 0.0
                 FETj.append(0.0)
             else:
-                TotalFETj += equipe.FETj
-                FETj.append(equipe.FETj)
+                TotalFETj += equipe.FETj/1000.0
+                FETj.append(equipe.FETj/1000.0)
 
             if equipe.USHj is None:
                 TotalUSHj += 0.0
                 USHj.append(0.0)
             else:
-                TotalUSHj += equipe.USHj
-                USHj.append(equipe.USHj)
+                TotalUSHj += equipe.USHj/1000.0
+                USHj.append(equipe.USHj/1000.0)
 
 
             DBFuel_id = equipe.DBFuel_id

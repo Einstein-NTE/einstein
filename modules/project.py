@@ -347,10 +347,10 @@ class Project(object):
 
         defaultList = [[-1, _("Present State (original)"),
                             _("original data as delivered in questionnaire"),
-                            "---","---","---"],
+                            "-","---","---","---"],
                             [0,_("Present State (checked)"),
                             _("complete data set for present state after\ncross-checking and data estimation"),
-                            "---",0,0]]
+                            "-","---","---","---"]]
 
         alternativeList = []
         
@@ -358,27 +358,38 @@ class Project(object):
             aa = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo]
             if len(aa) > 0:
                 a = aa[0]
-                cc = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
-                if len(cc) > 0:
-                    cgeneraldata = cc[0]
-                    try: PEC = float(cgeneraldata.PEC)
-                    except: PEC = 0.0
-
-                    try: EnergyCost = float(cgeneralData.EnergyCost)
-                    except: EnergyCost = 1.0*ANo
-
-                    if a.StatusA == 0:
-                        stat = "-"
-                    elif a.StatusA == 1:
-                        stat = "ok"
-                    else:
-                        stat = "?"
-                    
-                    alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,PEC,EnergyCost])
+                
+                if a.StatusA == 0:
+                    stat = "-"
+                elif a.StatusA == 1:
+                    stat = "ok"
                 else:
-                    logError(_("Corrupt data in data base. no entry in cgeneraldata for ANo = %s")%ANo)
-                    if ANo in [-1,0]:
-                        alternativeList.append(defaultList[ANo+1])
+                    stat = "?"
+
+#..............................................................................
+# get main energy data if available
+
+                if a.StatusEnergy > 0:
+                    cc = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+                    if len(cc) > 0:
+                        cgeneraldata = cc[0]
+                        try: PEC = float(cgeneraldata.PEC)/1000.0   #conversion to MWh
+                        except:
+                            logTrack("Project (getAlternativeList): no PEC available")
+                            PEC = 0.0
+
+                        try: EnergyCost = float(cgeneralData.EnergyCost)
+                        except:
+                            logTrack("Project (getAlternativeList): no EnergyCost available")
+                            EnergyCost = 0.0
+                        
+                        alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,PEC,EnergyCost])
+                    else:
+                        logError(_("Corrupt data in data base. no entry in cgeneraldata for ANo = %s")%ANo)
+                        if ANo in [-1,0]:
+                            alternativeList.append(defaultList[ANo+1])
+                else:
+                    alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,'---','---'])
             else:
                 logError(_("Corrupt data in data base. no entry in salternative for ANo = %s")%ANo)
                 if ANo in [-1,0]:
@@ -416,6 +427,7 @@ class Project(object):
                 
                 Status.schedules.outOfDate=True
                 Status.processData.outOfDate=True
+                Status.int.changeInCascade(0)
             else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
 
@@ -546,6 +558,7 @@ class Project(object):
         salternatives = Status.DB.salternatives
         cgeneraldata = Status.DB.cgeneraldata
         qelectricity = Status.DB.qelectricity
+        uheatpump = Status.DB.uheatpump
         
         if (originalPId <= 0) and (originalName is None):
 
@@ -646,7 +659,7 @@ class Project(object):
             copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","Questionnaire_id",newID)
             copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","Questionnaire_id",newID)
             copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","Questionnaire_id",newID)
-            copySQLRows(DB.qsurfarea,sqlQuery,"QSurfArea_ID","ProjectID",newID)
+            copySQLRows(DB.qsurfarea,sqlQuery,"id","ProjectID",newID)
             copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","ProjectID",newID)
             copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","Questionnaire_id",newID)
 
@@ -1157,6 +1170,7 @@ class Project(object):
 
         Status.int.extendCascadeArrays(NEquipe) # creates the space in the
                                                 # equipment cascade
+        Status.int.changeInCascade(NEquipe)     # updates Status-flags
         
         return newEquipe
 
@@ -1225,6 +1239,18 @@ class Project(object):
         
         return equipments
 
+#------------------------------------------------------------------------------
+    def getEquipe(self,id):
+#------------------------------------------------------------------------------
+#   returns the equipment with id 
+#------------------------------------------------------------------------------
+
+        equipes = Status.DB.qgenerationhc.QGenerationHC_ID[id]
+        if len(equipes) > 0:
+            return equipes[0]
+        else:
+            return None
+        
 #------------------------------------------------------------------------------
     def getEquipmentList(self,key,PId = None,cascade=False):
 #------------------------------------------------------------------------------

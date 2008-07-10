@@ -5,11 +5,31 @@ def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
     if nDecimals > 6:
         print "convertDoubleToString: WARNING - does not work well for nDecimals > 6"
         return "~!$@)/#$"
-    
+
     decimalSign = '.'
+#None's to blank space
+
     if x is None:
         return ""
-    elif abs(x)>= pow(10.0,nMaxDigits):
+
+#before continuing, assure that it's really a number
+    try:
+        xfloat = float(x)
+        x = xfloat
+    except:
+        print "numCtrl: seems to be a string"
+        return str(x)
+    
+#x is ok, now check the number of decimals ...
+    if nDecimals > 6:
+        print "convertDoubleToString: WARNING - does not work well for nDecimals > 6"
+        return "~!$@)/#$"
+
+    decimalSign = '.'
+
+#... and go ahead
+    
+    if abs(x)>= pow(10.0,nMaxDigits):
         return "%s"%x             #aqui poner formato tipo 2.345e+07
     elif nDecimals > 0:
         x += 0.5 * pow(10.,-(nDecimals))    #rounding ...

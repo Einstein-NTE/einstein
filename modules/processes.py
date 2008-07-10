@@ -93,7 +93,7 @@ class Processes(object):
             distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
 
             UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
-            distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
+            distUPHw = self.createInvTempDist(process.PTOutFlow,T0=process.PTFinal)
 
             NT = Status.NT
 
@@ -152,9 +152,6 @@ class Processes(object):
             scheduleM = Status.schedules.procOpSchedules[k]
             scheduleS = Status.schedules.procStartUpSchedules[k]
             scheduleW = Status.schedules.procOutFlowSchedules[k]
-
-            print "Processes: schedule = ",scheduleW.fav
-            print "Processes: UPHw_T[k] = ",Status.int.UPHw_T[k]
             
             distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
 
@@ -176,8 +173,6 @@ class Processes(object):
 
                     UPHTotal_Tt[iT][it] += UPH_Tt[k][iT][it]
                     UPHwTotal_Tt[iT][it] += UPHw_Tt[k][iT][it]
-
-            print "Processes: UPHwTotal = ",UPHwTotal_Tt[Status.NT+1]
                  
         Status.int.UPH_Tt = UPH_Tt    
         Status.int.UPHw_Tt = UPHw_Tt
@@ -211,15 +206,9 @@ class Processes(object):
         Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
         Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
 
+        logTrack("Aggregate demand = %s"%str(Status.int.QD_T))
+
         Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
-
-        showMessage("New FEATURE: calculation of heat demand from process data\n"+\
-                    "For testing in the old mode using default heat demand set"+\
-                    "user interaction level to ""automatic""")
-        if Status.UserInteractionLevel == "automatic":
-            Status.int.setDefaultDemand()
-
-        print "Processes (calculateAggregateDemand): cascadeUpdateLevel set to 0"
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		

@@ -15,9 +15,11 @@
 #	Created by: 	    Tom Sobota	22/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #       Revised by:         Tom Sobota  28/04/2008
-#                           Stoyan Danov            18/06/2008
+#                           Stoyan Danov    18/06/2008
 #                           Stoyan Danov    30/06/2008
 #                           Stoyan Danov    03/07/2008
+#                           Stoyan Danov    06/07/2008
+#                           Stoyan Danov    07/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -25,6 +27,9 @@
 #       18/06/2008 SD: change to translatable text _(...)
 #       30/06/2008 SD: change esthetics - 2tab2fig
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
+#       06/07/2008 SD: arrange column width, change background colour -> lightgrey,
+#                       security feature modified (see #SD2008-07-06)
+#       07/07/2008 SD:                       ->highlite Total
 #
 #	
 #------------------------------------------------------------------------------		
@@ -44,6 +49,7 @@ from numCtrl import *
 from status import Status
 from einstein.modules.energyStats.moduleEA3 import *
 import einstein.modules.matPanel as Mp
+from GUITools import *
 
 [wxID_PANELEA3, wxID_PANELEA3GRID1, wxID_PANELEA3GRID2, 
  wxID_PANELEA3PANELGRAPHFET, wxID_PANELEA3STATICTEXT1, 
@@ -53,12 +59,18 @@ import einstein.modules.matPanel as Mp
 #
 # constants
 #
+
+ORANGE = '#FF6000'
+LIGHTGREY = '#F8F8F8'
+WHITE = '#FFFFFF'
+DARKGREY = '#000060'
+LIGHTGREEN = '#F0FFFF'
+
 GRID_LETTER_SIZE = 8 #points
 GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
-ORANGE = '#FF6000'
+GRID_LETTER_COLOR = DARKGREY     # specified as hex #RRGGBB
+GRID_BACKGROUND_COLOR = LIGHTGREY # idem
+GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
 MAXCOLS = 10
@@ -73,15 +85,15 @@ class PanelEA3(wx.Panel):
         #
         # upper graph: FET by equipment
         #
-        try:
-            (rows,cols) = Interfaces.GData[keys[0]].shape
-        except:
-            print "PanelEA3: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
-
-        ignoredrows = []
-        ignoredrows.append(rows-1)
+#SD2008-07-06
+##        try:
+##            (rows,cols) = Interfaces.GData[keys[0]].shape
+##        except:
+##            print "PanelEA3: crash during initialisation avoided -> check this"
+##            rows = 1 #xxx dummy for avoiding crash
+##            cols = MAXCOLS #xxx dummy for avoiding crash
+        (rows,cols) = Interfaces.GData[keys[0]].shape
+        ignoredrows = [rows-1]
 
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
@@ -97,15 +109,15 @@ class PanelEA3(wx.Panel):
         #
         # lower graph: USH by equipment
         #
-        try:
-            (rows,cols) = Interfaces.GData[keys[1]].shape
-        except:
-            print "PanelEA3: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
-            
-        ignoredrows = []
-        ignoredrows.append(rows-1)
+#SD2008-07-06
+##        try:
+##            (rows,cols) = Interfaces.GData[keys[1]].shape
+##        except:
+##            print "PanelEA3: crash during initialisation avoided -> check this"
+##            rows = 1 #xxx dummy for avoiding crash
+##            cols = MAXCOLS #xxx dummy for avoiding crash
+        (rows,cols) = Interfaces.GData[keys[1]].shape   
+        ignoredrows = [rows-1]
 
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
@@ -130,22 +142,38 @@ class PanelEA3(wx.Panel):
         #
         # set upper grid
         #
-        try:
-            data = Interfaces.GData[keys[0]]
-            (rows,cols) = data.shape
-        except:
-            data = [[0,0,0,0,0,0,0,0,0,0]]
-            print "PanelEA3: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
+        data = Interfaces.GData[keys[0]]
 
-        self.grid1.CreateGrid(max(rows,20), cols)
+#####Security feature against non existing GData entry
+        COLNO1 = 4 #grid has usually a fixed column size, not necessary to read from GData        
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO1)
+
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+
+        attr2 = wx.grid.GridCellAttr()
+        attr2.SetTextColour(GRID_LETTER_COLOR_HIGHLIGHT)
+        attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
+        attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        #
+        # set upper grid
+        #
+        self.grid1.CreateGrid(max(rows,10), COLNO1)
 
         self.grid1.EnableGridLines(True)
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
-        self.grid1.SetColSize(0,120)
-        self.grid1.SetColSize(1,115)
+
+        self.grid1.SetColSize(0,125)
+        self.grid1.SetColSize(1,110)
+        self.grid1.SetColSize(2,85)
+        self.grid1.SetColSize(3,70)
+
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid1.SetColLabelValue(0, _("Equipment"))
@@ -159,7 +187,10 @@ class PanelEA3(wx.Panel):
 #SD2008-06-30
         decimals = [-1,-1,0,1]   #number of decimal digits for each colum
         for r in range(rows):
-            self.grid1.SetRowAttr(r, attr)
+            if r < rows-1:
+                self.grid1.SetRowAttr(r, attr)
+            else:
+                self.grid1.SetRowAttr(r,attr2)  #highlight totals row
             for c in range(cols):
                 try:
                     if decimals[c] >= 0: # -1 indicates text
@@ -170,6 +201,8 @@ class PanelEA3(wx.Panel):
                 except: pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
+                elif c == 1:
+                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);                
                 else:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
@@ -177,34 +210,41 @@ class PanelEA3(wx.Panel):
         #
         # set lower grid
         #
-        try:
-            data = Interfaces.GData[keys[1]]
-            (rows,cols) = data.shape
-        except:
-            data = [[0,0,0,0,0,0,0,0,0,0]]
-            print "PanelEA3: crash during initialisation avoided -> check this"
-            rows = 1 #xxx dummy for avoiding crash
-            cols = MAXCOLS #xxx dummy for avoiding crash
+        data = Interfaces.GData[keys[1]]
 
-        self.grid2.CreateGrid(max(rows,20), cols)
+#####Security feature against non existing GData entry
+        COLNO1 = 4 #grid has usually a fixed column size, not necessary to read from GData        
+        try: (rows,cols) = data.shape
+        except: (rows,cols) = (0,COLNO1)
+
+        self.grid2.CreateGrid(max(rows,10), COLNO1)
 
         self.grid2.EnableGridLines(True)
         self.grid2.SetDefaultRowSize(20)
         self.grid2.SetRowLabelSize(30)
-        self.grid2.SetColSize(0,120)
+
+        self.grid2.SetColSize(0,125)
+        self.grid2.SetColSize(1,85)
+        self.grid2.SetColSize(2,70)
+        self.grid2.SetColSize(3,110)
+        
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid2.SetColLabelValue(0, _("Equipment"))
         self.grid2.SetColLabelValue(1, _("MWh"))
         self.grid2.SetColLabelValue(2, _("%"))
+        self.grid2.SetColLabelValue(3, _(" "))
         #
         # copy values from dictionary to grid
         #
 
 #SD2008-06-30
-        decimals = [-1,0,1]   #number of decimal digits for each colum
+        decimals = [-1,0,1,-1]   #number of decimal digits for each colum
         for r in range(rows):
-            self.grid2.SetRowAttr(r, attr)
+            if r < rows-1:
+                self.grid2.SetRowAttr(r, attr)
+            else:
+                self.grid2.SetRowAttr(r,attr2)  #highlight totals row
             for c in range(cols):
                 try:
                     if decimals[c] >= 0: # -1 indicates text
@@ -221,12 +261,6 @@ class PanelEA3(wx.Panel):
 
         self.grid2.SetGridCursor(0, 0)
 
-##        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-##        self.staticText3.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
-        self.staticText2.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.staticText4.SetFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        
-
     def _init_ctrls(self, prnt):
 
         # generated method, don't edit
@@ -240,16 +274,6 @@ class PanelEA3(wx.Panel):
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-
-##        self.staticText1 = wx.StaticText(id=wxID_PANELEA3STATICTEXT1,
-##              label=_(u'Final energy consumption for thermal use (FET) by equipment'),
-##              name='staticText1', parent=self, pos=wx.Point(40, 8),
-##              size=wx.Size(580, 20), style=0)
-
-        self.staticText2 = wx.StaticText(id=wxID_PANELEA3STATICTEXT2,
-              label=_(u'FET by equipment'),
-              name='staticText2', parent=self, pos=wx.Point(320, 24),
-              size=wx.Size(50, 17), style=0)
 
         self.grid1 = wx.grid.Grid(id=wxID_PANELEA3GRID1, name='grid1',#SD
               parent=self, pos=wx.Point(20, 40), size=wx.Size(440, 220),
@@ -268,18 +292,6 @@ class PanelEA3(wx.Panel):
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         
-
-##        self.staticText3 = wx.StaticText(id=wxID_PANELEA3STATICTEXT3,
-##              label=_(u'Useful supply heat (USH) by equipment'),
-##              name='staticText3', parent=self, pos=wx.Point(40, 324),
-##              size=wx.Size(580, 20), style=0)
-
-        self.staticText4 = wx.StaticText(id=wxID_PANELEA3STATICTEXT4,
-              label=_(u'USH by equipment'),
-              name='staticText4', parent=self, pos=wx.Point(200, 304),#SD:(200,372) before
-              size=wx.Size(50, 17), style=0)
-
-
         self.grid2 = wx.grid.Grid(id=wxID_PANELEA3GRID2, name='grid2',
               parent=self, pos=wx.Point(20, 320), size=wx.Size(440, 220),
               style=0)

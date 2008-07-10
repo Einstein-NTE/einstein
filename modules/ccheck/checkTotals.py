@@ -100,11 +100,11 @@ class CheckTotals():
             if len(cgeneraldataTable) > 0:
                 cgeneraldata = cgeneraldataTable[0]
 
-                self.FEO.setValue(cgeneraldata.FEO)
-                self.FEC.setValue(cgeneraldata.FEC)
-                self.FET.setValue(cgeneraldata.FET)
-                self.USH.setValue(cgeneraldata.USH)
-                self.UPH.setValue(cgeneraldata.UPH)
+#                self.FEO.setValue(cgeneraldata.FEO)
+#                self.FEC.setValue(cgeneraldata.FEC)
+#                self.FET.setValue(cgeneraldata.FET)
+#                self.USH.setValue(cgeneraldata.USH)
+#                self.UPH.setValue(cgeneraldata.UPH)
                 
         except:
             print "CheckTotals (importData): error reading data from cgeneraldata"

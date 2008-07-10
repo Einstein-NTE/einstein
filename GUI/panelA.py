@@ -50,9 +50,10 @@ import wx.grid
 from einstein.GUI.status import Status
 
 import einstein.modules.matPanel as Mp
-from einstein.GUI.dialogA import *
-from einstein.GUI.dialogOK import *
+from dialogA import *
+from dialogOK import *
 from GUITools import *
+from numCtrl import *
 
 
 [wxID_PANELA, wxID_PANELABUTTONPAGEABACK, wxID_PANELABUTTONPAGEACANCEL, 
@@ -77,7 +78,7 @@ def drawFigure(self):
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
 
-    gdata = Status.int.GData["A Table"]
+    gdata = Status.int.GData["A Plot"]
 
     try: (rows,cols) = gdata.shape
     except: (rows,cols) = (0,COLNO)
@@ -334,15 +335,19 @@ class PanelA(wx.Panel):
 # update of alternatives table
 
         data = Status.int.GData[self.keys[0]]
-        print "data = ",data
         (rows,cols) = data.shape
-        print rows,cols
+
+        decimals = [-1,-1,-1,-1,2,2]
         for r in range(rows):
             for c in range(cols):
                 try:
-                    self.grid.SetCellValue(r, c, data[r][c])
+                    if decimals[c] >= 0: # -1 indicates text
+                        self.grid.SetCellValue(r, c, \
+                            convertDoubleToString((data[r][c]),nDecimals = decimals[c]))
+                    else:
+                        self.grid.SetCellValue(r, c, data[r][c])
                 except:
-                    pass
+                    logDebug("PanelEA4a: error writing data[%s][%s]: "%(r,c))
 
 #XXX Here better would be updating the grid and showing less rows ... ????
         for r in range(rows,MAXROWS):

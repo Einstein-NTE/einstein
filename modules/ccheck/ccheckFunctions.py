@@ -74,6 +74,8 @@
 #
 #============================================================================== 				
 
+from einstein.modules.messageLogger import *
+
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 MINIMUM_VALUE = 1.e-10
@@ -90,7 +92,7 @@ def setCheckMode(mode):
     global CHECKMODE
     CHECKMODE = mode
     
-DEBUG = "BASIC" #Set to:
+DEBUG = "OFF" #Set to:
                 #"ALL": highest level,
                 #"CALC": only debug in CALC Functions
                 #"ADJUST": only debug in ADJUST Functions
@@ -358,6 +360,11 @@ class CCPar():
 #   creates a register entry if the parameter is None or with a high error
 #------------------------------------------------------------------------------
         if (self.val == None) or (self.sqerr > MAX_SQERR):
+
+            logMessage("Parameter %s estimated to %s [%s,%s]"%
+                       (self.name+"["+str(screen.dataGroup)+"]",
+                        self.val,self.valMin,self.valMax))
+            
             self.val = val
             if limits is not None:
                 (newMin,newMax) = limits

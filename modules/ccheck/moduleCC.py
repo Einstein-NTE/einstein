@@ -377,7 +377,7 @@ class ModuleCC(object):
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def basicCheck(self,matrixCheck = True,continueCheck = False):
+    def basicCheck(self,matrixCheck = True,continueCheck = False,estimate = False):
 #------------------------------------------------------------------------------
 #   runs the first basic Check
 #   (basic = still without estimation procedures for missing data)
@@ -392,7 +392,7 @@ class ModuleCC(object):
             logDebug("ModuleCC: getting Test data")
             logDebug("====================================================")
         
-        if continueCheck == False:
+        if continueCheck == False and estimate == False:
             self.getQuestionnaireData()
 
 #..............................................................................
@@ -416,6 +416,9 @@ class ModuleCC(object):
                 setCheckMode("MEAN")
 
             cycle.initTotalBalance()
+
+            if estimate == True:
+                self.dataEstimate()
 
             if DEBUG in ["ALL","BASIC","MAIN"]:
                 print "===================================================="
@@ -740,7 +743,7 @@ class ModuleCC(object):
         screen.reset()
 
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
-            screen.setDataGroup("Fuel",i)
+            screen.setDataGroup("FET",i)
             self.ccFET[i].screen()
         for j in range(NJ):       
             screen.setDataGroup("Eq.",j+1)
@@ -796,6 +799,7 @@ class ModuleCC(object):
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
 #            self.ccFET[i].estimate()
             pass
+        screen.setDataGroup("FET",0)
         self.ccFET[0].estimate() #for the moment estimate implemented only in
                                     #FETel as an example
         
@@ -806,6 +810,7 @@ class ModuleCC(object):
         
         NK = self.NThProc
         for k in range(NK):       
+            screen.setDataGroup("Proc.",k+1)
             self.ccProc[k].estimate()
 
         NM = self.NPipeDuct
@@ -823,7 +828,6 @@ class ModuleCC(object):
 #            self.ccWHEE[n].estimate()
             pass
 
-        self.basicCheck(continueCheck = True)
 
 #------------------------------------------------------------------------------
     def selectMainProcesses(self):

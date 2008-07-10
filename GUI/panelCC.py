@@ -324,7 +324,7 @@ class PanelCC(wx.Panel):
 
             Status.prj.copyQuestionnaire()
 
-            nc = self.mod.basicCheck(matrixCheck=True)
+            nc = self.mod.basicCheck()
             self.display()
 
             if nc > 0:
@@ -346,7 +346,7 @@ class PanelCC(wx.Panel):
                           _("\nAlternatively you can also manually add estimated data to the questionnaire and rerun basic check")+\
                           _("\nDo You want to continue ?"))
         if popup.ShowModal() == wx.ID_OK:
-            nc = self.mod.dataEstimate()
+            nc = self.mod.basicCheck(estimate=True)
             self.display()
 
         event.Skip()

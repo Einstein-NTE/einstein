@@ -65,6 +65,18 @@ class ModuleA(object):
         data = array(alternativeList)
         Status.int.setGraphicsData(self.keys[0], data)
 
+        for alternative in alternativeList:
+            try:
+                E = float(alternative[4])
+            except:
+                alternative[4] = 0.0
+            try:
+                C = float(alternative[5])
+            except:
+                alternative[5] = 0.0
+        plotdata = array(alternativeList)
+        Status.int.setGraphicsData("A Plot",plotdata)
+
 #------------------------------------------------------------------------------
 #==============================================================================
 
