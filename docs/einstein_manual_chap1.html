@@ -92,6 +92,27 @@ the Windows ZIP/Setup.EXE (x86) <br>
 (or one of the other versions, depending on your computer and operating
 system)<br>
 <br>
+CHECK OF MySQL INSTALLATION (On Windows)<br>
+<br>
+To check the correct installation of MySQL, You can open the Control
+Panel, and look for an icon called Administrative Tools. <br>
+Open that, and there is another icon called Services. Open that too. <br>
+You will see a list of programs running in your machine. The list is
+ordered alphabetically. <br>
+Look for MySQL. It should be marked as Running (or Initiated or
+something like that) and in the next column, it should be marked as
+Automatic.
+<br>
+These settings ensure that MySQL is started each time you start your
+computer.<br>
+If it is there, but not running, click on the line with the Right
+button and choose Start. This will start MySQL, but only this once. <br>
+To make it start always, choose Properties. There you can select
+Automatic.
+<br>
+If MySQL refuses to run, please first deinstall and then reinstall it.
+<br>
+<br>
 Step 4: Set-up of&nbsp; Python and complements<br>
 <br>
 There are two possible ways to doing Python installation. We recomment
@@ -110,6 +131,45 @@ numpy: http://numpy.scipy.org/<br>
 matplotlib: http://matplotlib.sourceforge.net/<br>
 <br>
 Install also these additional packages on your computer.<br>
+<br>
+Step 5: Check Your Firewall<br>
+<br>
+Do you have a firewall on your machine? <br>
+If so, you should free port 3306, which is used by MySQL
+<br>
+<br>
+==&gt; HOW CAN I DO THAT?
+<br>
+<br>
+(EXTRACTS&nbsp; FROM E-MAILS REGARDING FIREWALL PROBLEMS ... to be
+checked ...)<br>
+In general firewalls have an icon on the bottom right part of your
+desktop. It says 'security' or 'firewall' or something like that. <br>
+When you open it, there usually is some button called 'advanced
+settings' or something. A precise answer to your question would depend
+on what firewall do you have installed.
+<br>
+<br>
+I think that this is a very concrete and simple matter that you might
+submit to the people that give technical support at your institution.
+They will certainly know.
+<br>
+<br>
+-------------------------------------------------------------------<br>
+<br>
+And, if it is not a problem with the firewall, please try this:
+<br>
+Open a command window and write the command:
+<br>
+<br>
+NET START mysql
+<br>
+<br>
+This should show a more descriptive error diagnostic.
+<br>
+<br>
+<br>
+<br>
 <br>
 <h3><a name="1.1.2._Installation_of_EINSTEIN_"></a>1.1.2. Installation
 of EINSTEIN<br>
@@ -135,6 +195,19 @@ Step 2: Now have a try -&gt; Run EINSTEIN<br>
 <br>
 For any problems check the <a href="einstein_manual_FAQs.html">FAQ
 Section</a> of this manual.<br>
+<br>
+Step 3: Configuration of MySQL password:<br>
+If you configured MySQL with a password, you have to specify this
+password in the Einstein configuration:<br>
+<br>
+There are two possibilities<br>
+a) edit manually the file einstein\GUI\einstein.ini and put the
+password there. You will see that there is no password, originally.
+<br>
+<br>
+b) Use the option&nbsp; "Database -&gt; Database Administration" in
+EINSTEIN, and enter your password there.<br>
+<br>
 &nbsp;&nbsp; <br>
 <h2><a name="1.2._Update_from_previous_Versions_"></a><span
  style="font-weight: bold;">1.2. Update from previous Versions<br>
