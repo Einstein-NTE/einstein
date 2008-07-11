@@ -73,6 +73,8 @@ class Processes(object):
         UPHTotal_T = Status.int.createQ_T()
         UPHwTotal_T = Status.int.createQ_T()
 
+        NT = Status.NT
+
         for process in processes:
 
             UPH_T.append(Status.int.createQ_T())
@@ -94,8 +96,6 @@ class Processes(object):
 
             UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
             distUPHw = self.createInvTempDist(process.PTOutFlow,T0=process.PTFinal)
-
-            NT = Status.NT
 
             for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
                 UPHc_T[k][iT] = UPHc*distUPHc[iT]
