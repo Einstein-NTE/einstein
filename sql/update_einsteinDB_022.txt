@@ -1,0 +1,14 @@
+-- update einstein database: minor bug corrections
+USE einstein;
+
+
+
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatus StreamStatusSource VARCHAR(200);
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamType StreamTypeSource VARCHAR(200);
+
+ALTER TABLE qheatexchanger ADD COLUMN StreamStatusSink INTEGER COMMENT 'liquid gaseous or condensation' AFTER StreamStatusSource;
+ALTER TABLE qheatexchanger ADD COLUMN StreamTypeSink INTEGER COMMENT 'sensible or latent' AFTER StreamStatusSink;
+
+
+
+

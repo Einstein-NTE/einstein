@@ -1,0 +1,27 @@
+-- update einstein database: some additional parameters to fluid and fuel data base (for HR module)
+USE einstein;
+
+-- add columns to DBFluid
+
+ALTER TABLE dbfluid ADD COLUMN SensibleHeat DOUBLE COMMENT 'sensible heat of evaporation at typical working conditions' AFTER FluidDensity;
+
+-- add columns to DBFuel
+ALTER TABLE dbfuel DROP COLUMN Humidity30;
+ALTER TABLE dbfuel DROP COLUMN OffGas30;
+ALTER TABLE dbfuel DROP COLUMN Humidity20;
+ALTER TABLE dbfuel DROP COLUMN OffGas20;
+ALTER TABLE dbfuel DROP COLUMN Humidity15;
+ALTER TABLE dbfuel DROP COLUMN OffGas15;
+ALTER TABLE dbfuel DROP COLUMN Humidity12;
+ALTER TABLE dbfuel DROP COLUMN OffGas12;
+ALTER TABLE dbfuel DROP COLUMN Humidity11;
+ALTER TABLE dbfuel DROP COLUMN OffGas11;
+
+ALTER TABLE dbfuel ADD COLUMN Offgas DOUBLE COMMENT 'FFxx: fuel factor for offgas = x.x (kg/kg)' AFTER FuelDensity;
+ALTER TABLE dbfuel ADD COLUMN CombAir DOUBLE COMMENT 'FFxx: fuel humidity factor = x.x (kg H20/kg offgas)' AFTER FuelDensity;
+ALTER TABLE dbfuel ADD COLUMN Humidity DOUBLE COMMENT 'FFxx: fuel factor for stoich combustion air = x.x (kg/kg)' AFTER FuelDensity;
+ALTER TABLE dbfuel ADD COLUMN OffgasDensity DOUBLE COMMENT 'FFxx: Offgas density = x.x (kg/Nm³ offgas)' AFTER FuelDensity;
+ALTER TABLE dbfuel ADD COLUMN OffgasHeatCapacity DOUBLE COMMENT 'FFxx: off gas heat capacity = x.x (kJ/kgK)' AFTER FuelDensity;
+
+
+

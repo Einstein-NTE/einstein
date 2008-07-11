@@ -1,4 +1,4 @@
-#Boa:Frame:PanelCS1
+#Boa:Frame:PanelCS3
 #==============================================================================
 #
 #	E I N S T E I N
@@ -8,18 +8,17 @@
 #
 #------------------------------------------------------------------------------
 #
-#	PanelCS1- GUI component for: Energy performance - Monthly data
+#	PanelCS3- GUI component for: Energy performance - Monthly data
 #			
 #==============================================================================
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger  05/07/2008
-#       Revised by:         Stoyan Danov    09/07/2008
-#                           Stoyan Danov    10/07/2008 
+#       Revised by:
+#                           Stoyan Danov    10/07/2008
 #
 #       Changes to previous version:#
-#       09/07/2008 SD: keys changed
-#       10/07/2008 SD: legend added to plot, another field added in decimals = [-1,2,2,2], were only 3 before.
+#       10/07/2008 SD: graphic ComparedBarPlot set, labels and legend arranged
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -36,12 +35,12 @@ import wx
 from status import Status
 from einstein.modules.moduleCS import *
 import einstein.modules.matPanel as Mp
-from einstein.GUI.graphics import drawStackedBarPlot
+from einstein.GUI.graphics import drawComparedBarPlot
 from GUITools import *
 from numCtrl import *
 
-[wxID_PANELCS1, wxID_PANELCS1BTNBACK, wxID_PANELCS1BTNFORWARD, 
- wxID_PANELCS1BTNOK, wxID_PANELCS1GRID1, wxID_PANELCS1PANELGRAPHMPHD, 
+[wxID_PANELCS3, wxID_PANELCS3BTNBACK, wxID_PANELCS3BTNFORWARD, 
+ wxID_PANELCS3BTNOK, wxID_PANELCS3GRID1, wxID_PANELCS3PANELGRAPHMPHD, 
 ] = [wx.NewId() for _init_ctrls in range(6)]
 
 
@@ -50,14 +49,14 @@ MAXROWS = 20
 
 #============================================================================== 
 #============================================================================== 
-class PanelCS1(wx.Panel):
+class PanelCS3(wx.Panel):
 #============================================================================== 
 #============================================================================== 
 #------------------------------------------------------------------------------		
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS1 Plot','CS1 Table'] 
+        keys = ['CS3 Plot','CS3 Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -70,15 +69,15 @@ class PanelCS1(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS1 Plot",                      # key for Interface
-                   'title'       :_('Primary energy consumption'), # title of the graph
-                   'ylabel'      :_('PEC [MWh]'),                   # y axis label
-                   'legend'      :[_('PEC [MWh]')],                   # legend (list)
+                   'key'         : "CS3 Plot",                      # key for Interface
+                   'title'       :_('Relative comparison'), # title of the graph
+                   'ylabel'      :_('[%]'),                   # y axis label
+                   'legend'      :[_('CO2'),_('Nuclear waste'),_('Water consumption')],                   # legend (list)
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
-                   'ignoredrows' :[0,1]}                        # rows that should not be plotted
+                   'ignoredrows' :[]}                        # rows that should not be plotted
         
-        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawStackedBarPlot,
+        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawComparedBarPlot,
                             paramList)
 
         #
@@ -105,39 +104,39 @@ class PanelCS1(wx.Panel):
         self.grid1.SetDefaultColSize(140)
         self.grid1.SetColSize(0,285)
         self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Primary energy\nconsumption [MWh]"))
-        self.grid1.SetColLabelValue(2, _("Savings\n[MWh]"))
-        self.grid1.SetColLabelValue(3, _("Savings\n[%]"))
+        self.grid1.SetColLabelValue(1, _("Production of CO2\n[t]"))
+        self.grid1.SetColLabelValue(2, _("Highly Radioactive\nNuclear Waste [kg]"))
+        self.grid1.SetColLabelValue(3, _("Water Consumption\n[m3]"))
 
         self.display()
 
 #------------------------------------------------------------------------------		
     def _init_ctrls(self, prnt):
 #------------------------------------------------------------------------------		
-        wx.Panel.__init__(self, id=wxID_PANELCS1, name=u'PanelCS1', parent=prnt,
+        wx.Panel.__init__(self, id=wxID_PANELCS3, name=u'PanelCS3', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Primary energy consumption (PEC)'),
+        self.box1 = wx.StaticBox(self, -1, _('Environmental impact of the industry'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.grid1 = wx.grid.Grid(id=wxID_PANELCS1GRID1, name='grid1',
+        self.grid1 = wx.grid.Grid(id=wxID_PANELCS3GRID1, name='grid1',
               parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 160),
               style=0)
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Relative comparison of PEC'),
+        self.box2 = wx.StaticBox(self, -1, _(u'Relative comparison of different alternatives'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.panelGraphMPHD = wx.Panel(id=wxID_PANELCS1PANELGRAPHMPHD,
+        self.panelGraphMPHD = wx.Panel(id=wxID_PANELCS3PANELGRAPHMPHD,
               name=u'panelGraphMPHD', parent=self, pos=wx.Point(20, 260),
               size=wx.Size(760, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
         self.panelGraphMPHD.SetBackgroundColour(wx.Colour(127, 127, 127))
@@ -171,12 +170,12 @@ class PanelCS1(wx.Panel):
         event.Skip()
 
     def OnBtnBackButton(self, event):
-        event.Skip()
-#        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
+        self.Hide()
+        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
 
     def OnBtnForwardButton(self, event):
         self.Hide()
-        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
+#        Status.main.tree.SelectItem(Status.main.qCS4, select=True)
 
 #------------------------------------------------------------------------------
     def display(self):
@@ -197,7 +196,7 @@ class PanelCS1(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS1 Table"]
+        data = Status.int.GData["CS3 Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         
