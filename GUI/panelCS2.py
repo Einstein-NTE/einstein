@@ -72,8 +72,8 @@ class PanelCS2(wx.Panel):
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS2 Plot",                      # key for Interface
                    'title'       :_('Relative comparison of prosess & supply heat'), # title of the graph
-                   'ylabel'      :_('[%]'),                   # y axis label
-                   'legend'      :[_('UPH [% of present state]'),_('USH [% of present state]')],                   # y axis label
+                   'ylabel'      :'[MWh]',                   # y axis label
+                   'legend'      :['UPH [MWh]','USH [MWh]'],                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[]}                        # rows that should not be plotted

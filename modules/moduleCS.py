@@ -15,9 +15,15 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	05/07/2008
 #                           Stoyan Danov        10/07/2008
+#                           Stoyan Danov        12/07/2008
+#                           Stoyan Danov        13/07/2008
 #
 #       Changes to previous version:
 #       09/07/2008ff SD: add modules for CS2, CS3,
+#       12/07/2008   SD: algunas correcciones en la parte CS2 (Hans)
+#                       -> parte CS3 re-worked: control StatusEnergy > 0 added,
+#                       -> clean-up
+#       13/07/2008   SD: CS4 added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -123,6 +129,7 @@ class ModuleCS(object):
             Status.int.setGraphicsData("CS1 Plot", data2)
 
 #------------------------------------------------------------------------------
+
 #------------------------------------------------------------------------------
 # Panel CS2: Process & supply heat
         elif self.keys[0] == "CS2 Plot":
@@ -144,16 +151,6 @@ class ModuleCS(object):
                 else:
                     Alternative.append(str(salternatives[i].ShortName))
 
-                if generalData[i].UPH is None: #protection against None
-                    UPH.append(0.0)
-                else:
-                    UPH.append(generalData[i].UPH)
-
-                if generalData[i].USH is None:
-                    USH.append(0.0)
-                else:
-                    USH.append(generalData[i].USH)           
-
                 if salternatives[i].StatusEnergy > 0:
                     dUSH = generalData[i].USH
                     dUPH = generalData[i].UPH
@@ -169,23 +166,27 @@ class ModuleCS(object):
                         dUPH_Table = "---"
                     else:
                         dUPH /= 1000.0  #conversion kWh -> MWh
-                        dUPH_Table = dUSH
+                        dUPH_Table = dUPH #SD: gazapo aqui, era (= dUSH)!!!
 
-                    if ANo == 0:
-                        USH0 = dUSH
+                    if ANo == 0: #SD: here passes the first time only and calculates USH0, UPH0
+                        USH0 = dUSH #can be assigned once, why check each time?
                         UPH0 = dUPH
 
-                    USHSaving = dUSH - USH0
+                    USHSaving = USH0 - dUSH #SD: inverted-changed sign
                     if USH0 > 0:
                         RelSavingUSH = USHSaving/USH0
+                        RatioUSH = dUSH*100.0/USH0 #SD in %
                     else:
                         RelSavingUSH = 0.0
+                        RatioUSH = 0.0 #SD in %
 
-                    UPHSaving = dUPH - UPH0
+                    UPHSaving = UPH0 - dUPH #SD: inverted-changed sign
                     if UPH0 > 0:
                         RelSavingUPH = UPHSaving/UPH0
+                        RatioUPH = dUPH*100.0/UPH0 #SD in %
                     else:
                         RelSavingUPH = 0.0
+                        RatioUPH = 0.0 #SD in %
 
                 else:
                     dUSH = 0.0
@@ -194,11 +195,13 @@ class ModuleCS(object):
                     dUPH_Table = "---"
                     USHSaving = "---"
                     UPHSaving = "---"
-                    RelSavingUSH = "---"
-                    RelSavingUPH = "---"
+                    RelSavingUSH = 0.0 #SD: before "---" (could be plot data)
+                    RelSavingUPH = 0.0 #SD: before "---" (could be plot data)
+                    RatioUSH = 0.0
+                    RatioUPH = 0.0
                         
-                USH.append(dUSH)
-                UPH.append(dUPH)
+                USH.append(dUSH) #SD: these are not used
+                UPH.append(dUPH) #SD: these are not used
 
 
                 if ANo == 0:
@@ -209,8 +212,8 @@ class ModuleCS(object):
                     tableEntry = noneFilter([str(salternatives[i].ShortName),
                                              dUPH_Table,UPHSaving,
                                              dUSH_Table,USHSaving])
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dUSH,dUPH])
-                
+                plotEntry = noneFilter([str(salternatives[i].ShortName),dUSH,dUPH]) #SD: before: dUSH, dUPH
+
                 CS2Table.append(tableEntry)
                 CS2Plot.append(plotEntry)
 #..............................................................................
@@ -220,24 +223,30 @@ class ModuleCS(object):
                               
             Status.int.setGraphicsData("CS2 Table", data1)
 
-            matrix2 = transpose(CS2Plot)
             data2 = array(CS2Plot)
 
             Status.int.setGraphicsData("CS2 Plot", data2)
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # Panel CS3: Ambiental impact
         elif self.keys[0] == "CS3 Plot":
 
 #............................................................................
-# charge data from SQL
-            Alternative = []
+# charge UPH and USH data from SQL
             CO2El = []
             CO2Fuel = []
             CO2Total = []
             NucWaste = []
             WaterConsum = []
-            for i in range(len(generalData)):
+            Alternative = []
+
+            CS3Table = []
+            CS3Plot = []
+
+            for ANo in range(len(generalData)-1):
+                i = ANo+1
+
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
@@ -253,78 +262,221 @@ class ModuleCS(object):
                 else:
                     CO2Fuel.append(generalData[i].ProdCO2Fuels/1000.0)  #kg -> tons
 
-                CO2Total.append(CO2El[i]+CO2Fuel[i])
+                CO2Total.append(CO2El[i-1]+CO2Fuel[i-1])#to i-1 (list from 0 to ANo)
 
-                # charge data from SQL for Nuclear waste and Water consumption
-                #..... now dummydata added ...
-
+                #nuclear waste from sql
                 if generalData[i].ProdNoNukesEl is None:
                     NucWaste.append(0.0)
                 else:
                     NucWaste.append(generalData[i].ProdNoNukesEl*1.e-6) #conversion mg-> kg
 
-#                if generalData[i].WaterConsum is None:
                 WaterConsum.append(0.0)
-#                else:
-#                    NucWaste.append(generalData[i].WaterConsum)
-            
-#.............................................................................
-# calculate savings
-            ComparCO2 = [100.0,100.0]
-            ComparNW = [100.0,100.0]
-            ComparWater = [100.0,100.0]
-            SavingCO2 = [0.0,0.0]
-            SavingNW = [0.0,0.0]
-            SavingWater = [0.0,0.0]
-            for i in range(2,len(generalData)):
-                saveCO2 = CO2Total[1] - CO2Total[i]
-                SavingCO2.append(saveCO2)
-
-                saveNW = NucWaste[1] - NucWaste[i]
-                SavingNW.append(saveNW)
-
-                saveWater = WaterConsum[1] - WaterConsum[i]
-                SavingWater.append(saveWater)
                 
-                if CO2Total[1] != 0.0: #protection division by zero
-                    ComparCO2.append(100.0*CO2Total[i]/CO2Total[1])
+                if salternatives[i].StatusEnergy > 0:
+                    dCO2 = CO2Total[i-1]#to i-1 (list from 0 to ANo)
+                    if dCO2 == 0.0:
+                        dCO2_Table = "--"
+                    else:
+                        dCO2_Table = dCO2
+
+                    dNucWaste = generalData[i].ProdNoNukesEl
+                    if dNucWaste is None:
+                        dNucWaste = 0.0
+                        dNucWaste_Table = "---"
+                    else:
+                        dNucWaste = dNucWaste*1.e-6 #conversion mg-> kg
+                        dNucWaste_Table = dNucWaste
+
+                    dWatConsum = WaterConsum[i-1]#to i-1 (list from 0 to ANo)
+                    dWatConsum_Table = dWatConsum
+            
+                    if ANo == 0:
+                        CO2_0 = dCO2
+                        NucWaste0 = dNucWaste
+                        WatConsum0 = dWatConsum
+
+                    CO2Saving = CO2_0 - dCO2
+                    if CO2_0 > 0:
+                        RelSavingCO2 = CO2Saving/CO2_0
+                        RatioCO2 = dCO2*100.0/CO2_0 #in %
+                    else:
+                        RelSavingCO2 = 0.0
+                        RatioCO2 = 0.0
+
+                    NucWasteSaving = NucWaste0 - dNucWaste
+                    if NucWaste0 > 0:
+                        RelSavingNucWaste = NucWasteSaving/NucWaste0
+                        RatioNucWaste = dNucWaste*100.0/NucWaste0 #in %
+                    else:
+                        RelSavingNucWaste = 0.0
+                        RatioNucWaste = 0.0
+
+                    WatConsumSaving = WatConsum0 - dWatConsum
+                    if WatConsum0 > 0:
+                        RelSavingWatConsum = WatConsumSaving/WatConsum0
+                        RatioWatConsum = dWatConsum*100.0/WatConsum0 #in %
+                    else:
+                        RelSavingWatConsum = 0.0
+                        RatioWatConsum = 0.0
+
                 else:
-                    ComparUPH.append(100.0)
+                    dCO2 = 0.0
+                    dNucWaste = 0.0
+                    dWatConsum = 0.0
+                    dCO2_Table = "---"
+                    dNucWaste_Table = "---"
+                    dWatConsum_Table = "---"
+                    CO2Saving = "---"
+                    NucWasteSaving = "---"
+                    WatConsumSaving = "---"
+                    RelSavingCO2 = 0.0
+                    RelSavingNucWaste = 0.0
+                    RelSavingWatConsum = 0.0
+                    RatioCO2 = 0.0
+                    RatioNucWaste = 0.0
+                    RatioWatConsum = 0.0                    
+                    
 
-                if NucWaste[1] != 0.0: #protection division by zero
-                    ComparNW.append(100.0*NucWaste[i]/NucWaste[1])
-                else:
-                    ComparNW.append(100.0)
+                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                                         dCO2_Table,dNucWaste_Table,dWatConsum_Table])
 
-                if WaterConsum[1] != 0.0: #protection division by zero
-                    ComparWater.append(100.0*WaterConsum[i]/WaterConsum[1])
-                else:
-                    ComparWater.append(100.0)
+                plotEntry = noneFilter([str(salternatives[i].ShortName),RatioCO2,RatioNucWaste,RatioWatConsum])
+               
+                CS3Table.append(tableEntry)
+                CS3Plot.append(plotEntry)
+#..............................................................................
+# then send everything to the GUI
 
-#.............................................................................
-# set data to interfaces
-
-# eliminate the original data (unchecked) entry from lists
-            Alternative.pop(0)
-            CO2El.pop(0)
-            CO2Fuel.pop(0)
-            CO2Total.pop(0)
-            NucWaste.pop(0)
-            WaterConsum.pop(0)
-            SavingCO2.pop(0)
-            SavingNW.pop(0)
-            SavingWater.pop(0)
-            ComparCO2.pop(0)
-            ComparNW.pop(0)
-            ComparWater.pop(0)   
-
-            data1 = array(transpose([Alternative,CO2Total,NucWaste,WaterConsum]))
-            data2 = array(transpose([Alternative,ComparCO2,ComparNW,ComparWater]))
-
-##            print 'Plot: data2 =',data2
-##            print 'Table: data1 =',data1
-
+            data1 = array(CS3Table)
+                              
             Status.int.setGraphicsData("CS3 Table", data1)
+
+            data2 = array(CS3Plot)
+
             Status.int.setGraphicsData("CS3 Plot", data2)
 
+#------------------------------------------------------------------------------
+
+##########################################################################
+#------------------------------------------------------------------------------
+# Panel CS4: Investment cost
+        elif self.keys[0] == "CS4 Plot":
+
+#............................................................................
+# charge UPH and USH data from SQL
+            TotalCost = []
+            OwnCost = []
+            Subsidies = []
+            Alternative = []
+
+            CS4Table = []
+            CS4Plot = []
+
+#####SD2008-07-13: !!! in SQL: cgeneraldata should be created the fields:
+####            TotalInvCost
+####            OwnInvCost
+####            Subsidies
+#### These are supposed to be calculated et this stage and stored to SQL
+##
+##            for ANo in range(len(generalData)-1):
+##                i = ANo+1
+##
+##                if salternatives[i].ShortName is None:
+##                    Alternative.append('--')
+##                else:
+##                    Alternative.append(str(salternatives[i].ShortName))
+##
+##                if generalData[i].TotalInvCost is None: #protection against None
+##                    TotalCost.append(0.0)
+##                else:
+##                    TotalCost.append(generalData[i].TotalInvCost)
+##
+##                if generalData[i].OwnInvCost is None:
+##                    OwnCost.append(0.0)
+##                else:
+##                    OwnCost.append(generalData[i].OwnInvCost)
+##
+##                if generalData[i].Subsidies is None:
+##                    Subsidies.append(0.0)
+##                else:
+##                    Subsidies.append(generalData[i].Subsidies)
+##
+##                
+##                if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
+##                    dTotalCost = generalData[i].TotalInvCost
+##                    if dTotalCost is None:
+##                        dTotalCost = 0.0
+##                        dTotalCost_Table = "---"
+##                    else:
+##                        dTotalCost_Table = dTotalCost
+##
+##                    dOwnCost = generalData[i].OwnInvCost
+##                    if dOwnCost is None:
+##                        dOwnCost = 0.0
+##                        dOwnCost_Table = "---"
+##                    else:
+##                        dOwnCost_Table = dOwnCost
+##
+##                    dSubsidies = generalData[i].Subsidies
+##                    if dSubsidies is None:
+##                        dSubsidies = 0.0
+##                        dSubsidies_Table = "---"
+##                    else:
+##                        dSubsidies_Table = dSubsidies
+##            
+##                    if ANo == 0:
+##                        TotalCost0 = dTotalCost
+##                        OwnCost0 = dOwnCost
+##                        Subsidies0 = dSubsidies
+##
+##
+##                else:
+##                    dTotalCost = 0.0
+##                    dOwnCost = 0.0
+##                    dSubsidies = 0.0
+##                    dTotalCost_Table = "---"
+##                    dOwnCost_Table = "---"
+##                    dSubsidies_Table = "---"  
+##                    
+##
+##                tableEntry = noneFilter([str(salternatives[i].ShortName),
+##                                         dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
+##
+##                plotEntry = noneFilter([str(salternatives[i].ShortName),dOwnCost,dSubsidies])
+##               
+##                CS4Table.append(tableEntry)
+##                CS4Plot.append(plotEntry)
+###..............................................................................
+### then send everything to the GUI
+##
+##            data1 = array(CS4Table)
+##                              
+##            Status.int.setGraphicsData("CS4 Table", data1)
+##
+##            matrix2 = transpose(CS4Plot)
+##            data2 = array(CS4Plot)
+##
+##            Status.int.setGraphicsData("CS4 Plot", data2)
+##
+
+            #dummy data filled here (before creating the necessary fields in SQL)
+
+            data1 = array([['Present State (checked)', 0.0, 0.0, 0.0],
+                           ['Design 1', 100000, 60000, 40000],
+                           ['Design 2', 200000, 100000, 100000],
+                           ['Design 3', 300000, 120000, 180000]])
+                              
+            Status.int.setGraphicsData("CS4 Table", data1)
+
+##            matrix2 = transpose(CS4Plot)
+            data2 = array([['Present State (checked)', 0.0, 0.0],
+                           ['Design 1', 60000, 40000],
+                           ['Design 2', 100000, 100000],
+                           ['Design 3', 120000, 180000]])
+
+            Status.int.setGraphicsData("CS4 Plot", data2)
+            
+
+#------------------------------------------------------------------------------
 #==============================================================================
+

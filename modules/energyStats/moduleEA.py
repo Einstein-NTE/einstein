@@ -50,7 +50,6 @@ import wx
 class ModuleEA(object):
 
     def __init__(self):
-        print "ModuleEA (__init__)"
         pass
 
 #------------------------------------------------------------------------------

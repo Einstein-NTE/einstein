@@ -2087,7 +2087,7 @@ class Project(object):
         Status.SQL.commit()
         
 #------------------------------------------------------------------------------
-    def substitutePipeID(self,PId,oldID,newID):
+    def substitutePipeID(self,PId,pipeIDdict):
 #------------------------------------------------------------------------------
 #   substitutes the links to fluids in import of project tables
 #------------------------------------------------------------------------------
@@ -2098,10 +2098,46 @@ class Project(object):
             newID = eq.QGenerationHC_ID
             equipeIDdict.update({newID:newID})  #only value of pair is used in function "reconnect"
             
-        pipeIDdict = {oldID:newID}
         self.reconnectEquipesToPipes(equipeIDdict,pipeIDdict)
         
 #------------------------------------------------------------------------------
+    def restoreLinks(self,PId,projectDict):
+#------------------------------------------------------------------------------
+#   restores the links in an imported project
+#------------------------------------------------------------------------------
+
+        if u'dbfluid' in projectDict.keys():
+            fluidIDList = projectDict[u'dbfluid']
+            for fluidIDs in fluidIDList:
+                (oldID,newID) = fluidIDs
+                self.substituteFluidID(PId,oldID,newID)
+
+        if u'dbfuel' in projectDict.keys():
+            fuelIDList = projectDict[u'dbfuel']
+            for fuelIDs in fuelIDList:
+                (oldID,newID) = fuelIDs
+                self.substituteFuelID(PId,oldID,newID)
+
+        print "Project (restoreLinks): now restoring pipe links"
+        print "projectDict: ",projectDict
+        if u'qdistributionhc' in projectDict.keys():
+            pipeIDList = projectDict[u'qdistributionhc']
+            print "pipeIDList: ",pipeIDList
+            pipeIDDict = {}
+            for pipeIDs in pipeIDList:
+                (oldID,newID) = pipeIDs
+                pipeIDDict.update({oldID:newID})
+                
+            print "pipeIDDict: ",pipeIDDict
+            self.substitutePipeID(PId,pipeIDDict)
+            
+        if u'auditor' in projectDict.keys():
+            auditorIDList = projectDict[u'auditor']
+            for auditorIDs in auditorIDList:
+                (oldID,newID) = auditorIDs
+                self.substituteAuditorID(PId,oldID,newID)
+
+ #------------------------------------------------------------------------------
     def getAuditorID(self):
 #------------------------------------------------------------------------------
 #   returns the ID of the responsible auditor for the present project

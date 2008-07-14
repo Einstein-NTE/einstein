@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-15 -*-
-#============================================================================== 				
+#==============================================================================
 #
 #	E I N S T E I N
 #
@@ -25,12 +25,15 @@
 #       Last modified by:   Hans Schweiger  19/06/2008
 #                           Tom Sobota      20/06/2008
 #                           Hans Schweiger  23/06/2008
+#                           Tom Sobota      July 2008
+#                           Hans Schweiger  14/07/2008
 #
 #       Changes to previous version:
 #       19/06/2008: HS  ExportDataHR created based on ExportDataXML
 #       20/06/2008: TS  Compatibility changes: substituted 'information_schema'by 'show tables'
 #       23/06/2008: HS  Improvement of ExportDataHR: schedules now exported
 #                       - although not yet correctly :-(
+#       14/07/2008: HS  Call to "RestoreLinks" added in importProject
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -542,6 +545,13 @@ class ImportProject(object):
 #------------------------------------------------------------------------------
 #   complement to ExportProject: imports data from another project
 #------------------------------------------------------------------------------
+#
+#oldKey: es el PRIMARY KEY de la tabla en el file.xml
+#       (p.ej. tabla qdistributionhc -> oldKey = valor de QDistributionHC_ID)
+#newKey: es el PRIMARY KEY de la misma tabla, una vez importada y colocada en la SQL
+#       (allá se hace un auto-increment del QDistributionHC_ID).
+#
+#
     def __init__(self,infile=None):
         self.pid = None
         self.newpid = None
@@ -556,7 +566,7 @@ class ImportProject(object):
         #
         # get the highest project number so far in the database, add 1, and assign to the
         # imported project
-        cursor.execute('SELECT MAX(Questionnaire_id) AS n FROM cgeneraldata') # must confirm this
+        cursor.execute('SELECT MAX(Questionnaire_id) AS n FROM questionnaire')
         nrows = cursor.rowcount
         if nrows <= 0:
             self.newpid = 1
@@ -568,40 +578,56 @@ class ImportProject(object):
         # create a dom and import in it the xml project file
         self.document = xml.dom.minidom.parse(infile)
         # get the elements from the DOM
+        self.projectdict = {}
         projects = self.document.getElementsByTagName('EinsteinProject')
         for project in projects:
             self.pid = project.getAttribute('pid')
-            tables = self.document.getElementsByTagName("table")
+            tables = project.getElementsByTagName("table")
+            tabledict = {}
             for table in tables:
                 tablename =  table.getAttribute('name')
+                tablelist = []
                 rows = table.getElementsByTagName("row")
                 for row in rows:
                     sqlist = []
-                    nrow =  table.getAttribute('n')
+                    nrow =  row.getAttribute('n')
                     elements = row.getElementsByTagName("element")
                     for element in elements:
-                        fieldname = element.getAttribute('name')
+                        fieldname = element.getAttribute('name').lower()
                         eltype = element.getAttribute('type')
                         elauto = element.getAttribute('auto')
                         elvalue = element.getAttribute('value')
                         # substitute new pid in id field
-                        if fieldname == 'ProjectID' or \
-                             fieldname == 'Questionnaire_id' or \
-                             fieldname == 'Questionnaire_ID':
+                        if fieldname == 'projectid' or \
+                             fieldname == 'questionnaire_id':
                             elvalue = self.newpid
                         # substitute invalid chars in char fields and enclose in ''
                         if eltype.startswith('char') or eltype.startswith('varchar'):
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':
+                            # main key field
+                            oldKey = int(elvalue)
                             elvalue = 'NULL'
 
                         sqlist.append("%s=%s" % (fieldname,elvalue))
                     # create sql sentence and update database
                     sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
-                    #print sql
                     cursor.execute(sql)
+                    # get last inserted
+                    cursor.execute('SELECT LAST_INSERT_ID() AS last')
+                    field = cursor.fetchone()
+                    newKey = int(field['last'])
+                    tablelist.append((oldKey,newKey))
+                tabledict[tablename] = tablelist
+            self.projectdict[self.pid] = tabledict
         conn.close()
+
+#####HS2008-07-14: here restoring links added
+
+        for PId in self.projectdict.keys():
+            Status.prj.restoreLinks(self.newpid,self.projectdict[PId])
+        
 
     def subsIllegal(self,text):
         parts = text.split("'")
@@ -610,5 +636,35 @@ class ImportProject(object):
 
 
     def getPid(self):
+        # returns the pid as stored in the xml file,
+        # and the new pid generated when stored in the database.
         return (self.pid, self.newpid)
 
+    def getDict(self):
+        # returns the id correspondence dictionary, which has the form:
+        #{pid_1:
+        # {table_1:
+        #  [(oldkey_row_0, newkey_row_0), (oldkey_row_1, newkey_row_1), ... ]
+        # {table_2:
+        #  [(oldkey_row_0, newkey_row_0), (oldkey_row_1, newkey_row_1), ... ]
+        #  .
+        #  .
+        #  .
+        #  },
+        #  pid_2:
+        #  ...
+        # }
+        # that is:
+        # 1. A dictionary of projects. There can be more than one project
+        #    in the xml file.
+        #    The key is the pid
+        #    The value is:
+        # 2.   A dictionary of tablenames.
+        #      The key is the table name
+        #      The value is a list of tuples, one for each row, containing:
+        #      (old key, new key)
+        #      for the principal key of the row (in general called 'tablename_id')
+        #        The old key is the value contained in the xml file.
+        #        The new key is the value autogenerated when the row has been stored.
+        #
+        return self.projectdict

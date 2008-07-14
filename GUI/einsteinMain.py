@@ -59,6 +59,7 @@
 #                       Stoyan Danov                        01/07/2008
 #                       Stoyan Danov                        02/07/2008
 #                       Tom Sobota                          05/07/2008
+#                       Stoyan Danov                        10/07/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -135,6 +136,7 @@
 #       01/07/2008  HS changed layout tree and title page
 #       02/07/2008  SD panelEA4 eliminated (now exist only EA4a and EA4b),panelEA6 eliminated
 #       05/07/2008  TS Electricity Mix in main menu and menu dispatch
+#       02/07/2008  SD panels CS4,CS5,CS6,CS7 added
 #
 #
 #------------------------------------------------------------------------------
@@ -213,6 +215,12 @@ from panelEM2 import *
 #from panelEH1 import *
 #from panelEH2 import *
 from panelCS1 import *
+from panelCS2 import *
+from panelCS3 import *
+from panelCS4 import *
+from panelCS5 import *
+from panelCS6 import *
+from panelCS7 import *
 from panelBM1 import *
 from panelBM2 import *
 from panelBM3 import *
@@ -556,7 +564,11 @@ class EinsteinFrame(wx.Frame):
 
     def OnMenuImportProject(self, event):
         ex = ImportProject()
-        print 'Original project pid = %s\nAssigned pid = %s' % ex.getPid()
+        print repr(ex.getDict()) # imprime
+        pids = ex.getPid()
+        oldPId,newPId = pids
+        self.showInfo('Project with pid=%s has been imported. New pid set to %s' % pids)
+
 #..............................................................................
 # Scroll-up menu "VIEW"
 
@@ -600,9 +612,9 @@ class EinsteinFrame(wx.Frame):
     def OnMenuEditDBBoiler(self, event):
         frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
         frameEditDBBoiler.ShowModal()
-    def OnMenuEditDBSolarThermal(self, event):
-        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)
-        frameEditDBSolarThermal.ShowModal()
+    def OnMenuEditDBSolarEquip(self, event):
+        frameEditDBSolarEquip = DBEditFrame(None, "Edit DBSolarEquip", 'dbsolarequip', 0, True)
+        frameEditDBSolarEquip.ShowModal()
     def OnMenuEditDBChiller(self, event):
         frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
         frameEditDBChiller.ShowModal()
@@ -797,14 +809,14 @@ class EinsteinFrame(wx.Frame):
         #qEA1 'Primary energy - Yearly'
         elif select == _("Primary energy"):
             self.hidePages()
-            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
-            self.panelEA1.display()
+            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
+            self.panelEA2.display()
 
         #qEA2 'Final energy by fuels - Yearly'
         elif select == _("Final energy by fuels"):
             self.hidePages()
-            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
-            self.panelEA2.display()
+            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
+            self.panelEA1.display()
         #qEA3 'Final energy by equipment - Yearly'
         elif select == _("Final energy by equipment"):
             self.hidePages()
@@ -931,11 +943,41 @@ class EinsteinFrame(wx.Frame):
             self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelHC.display()
-        #qCS1 'Process heat 3 - Yearly'   #SD2008-07-01
+        #qCS1 'Primary energy - Yearly'   #SD2008-07-01
         elif select == _("Comp.study: Primary energy"):
             self.hidePages()
             self.panelCS1 = PanelCS1(parent=self.leftpanel2)
             self.panelCS1.display()
+        #qCS2 'Process & supply heat - Yearly'   #SD2008-07-01
+        elif select == _("Comp.study: Process & supply heat"):
+            self.hidePages()
+            self.panelCS2 = PanelCS2(parent=self.leftpanel2)
+            self.panelCS2.display()
+        #qCS3 'Ambiental impact - Yearly'   #SD2008-07-01
+        elif select == _("Comp.study: Ambiental impact"):
+            self.hidePages()
+            self.panelCS3 = PanelCS3(parent=self.leftpanel2)
+            self.panelCS3.display()
+        #qCS4 'Investment cost - Yearly'   #SD2008-07-10
+        elif select == _("Comp.study: Investment cost"):
+            self.hidePages()
+            self.panelCS4 = PanelCS4(parent=self.leftpanel2)
+            self.panelCS4.display()
+        #qCS5 'Annual cost - Yearly'   #SD2008-07-10
+        elif select == _("Comp.study: Annual cost"):
+            self.hidePages()
+            self.panelCS5 = PanelCS5(parent=self.leftpanel2)
+            self.panelCS5.display()
+        #qCS6 'Additional cost per saved energy - Yearly'   #SD2008-07-10
+        elif select == _("Comp.study: Additional cost per saved energy"):
+            self.hidePages()
+            self.panelCS6 = PanelCS6(parent=self.leftpanel2)
+            self.panelCS6.display()
+        #qCS7 'Internal rate of return - Yearly'   #SD2008-07-10
+        elif select == _("Comp.study: Internal rate of return"):
+            self.hidePages()
+            self.panelCS7 = PanelCS7(parent=self.leftpanel2)
+            self.panelCS7.display()
         elif select == _("Report"):
             #TS 2008-3-26 No action here
             #self.hidePages()
@@ -1106,7 +1148,19 @@ class EinsteinFrame(wx.Frame):
 
         try:self.panelCS1.Destroy()
         except:pass
-        
+        try:self.panelCS2.Destroy()
+        except:pass
+        try:self.panelCS3.Destroy()
+        except:pass
+        try:self.panelCS4.Destroy()
+        except:pass
+        try:self.panelCS5.Destroy()
+        except:pass
+        try:self.panelCS6.Destroy()
+        except:pass
+        try:self.panelCS7.Destroy()
+        except:pass
+
         try:self.pageFinalReport.Destroy()
         except:pass
 
@@ -1123,7 +1177,7 @@ class EinsteinFrame(wx.Frame):
         self.submenuPrint = wx.Menu()
         self.submenuEditDB = wx.Menu()
 
-        self.submenuEquipments = wx.Menu()
+        self.subnenuEquipments = wx.Menu()
         self.submenuUserLevel = wx.Menu()
         self.submenuClassification = wx.Menu()
 
@@ -1145,14 +1199,14 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, _("E&xit"))
 
-        self.EditDBCHP = self.submenuEquipments.Append(-1, _("&CHP"))
-        self.EditDBHeatPump = self.submenuEquipments.Append(-1, _("&Heat pumps"))
-        self.EditDBChiller = self.submenuEquipments.Append(-1, _("&Chillers"))
-        self.EditDBBoiler = self.submenuEquipments.Append(-1, _("B&oilers"))
-        self.EditDBStorage = self.submenuEquipments.Append(-1, _("Stora&ge"))
-        self.EditDBSolarThermal = self.submenuEquipments.Append(-1, _("&Solar Thermal"))
+        self.EditDBCHP = self.subnenuEquipments.Append(-1, _("&CHP"))
+        self.EditDBHeatPump = self.subnenuEquipments.Append(-1, _("&Heat pumps"))
+        self.EditDBChiller = self.subnenuEquipments.Append(-1, _("&Chillers"))
+        self.EditDBBoiler = self.subnenuEquipments.Append(-1, _("B&oilers"))
+        self.EditDBStorage = self.subnenuEquipments.Append(-1, _("Stora&ge"))
+        self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, _("&Solar equipment"))
 
-        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.submenuEquipments)
+        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.subnenuEquipments)
         self.EditDBFuel = self.menuDatabase.Append(-1, _("Fue&ls"))
         self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
         self.EditDBElectricityMix = self.menuDatabase.Append(-1, _("Electricity mix"))
@@ -1359,10 +1413,17 @@ class EinsteinFrame(wx.Frame):
             #Comparative study – Detail Info 1
         self.qCS1 = self.tree.AppendItem (self.qCS, _("Comp.study: Primary energy"))
             #Comparative study – Detail Info 2
-        self.qCS2 = self.tree.AppendItem (self.qCS, _("Comparative study – Detail Info 2"))
+        self.qCS2 = self.tree.AppendItem (self.qCS, _("Comp.study: Process & supply heat"))
             #Comparative study – Detail Info 3
-        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comparative study – Detail Info 3"))
-
+        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comp.study: Ambiental impact"))
+            #Comparative study – Detail Info 4
+        self.qCS4 = self.tree.AppendItem (self.qCS, _("Comp.study: Investment cost"))
+            #Comparative study – Detail Info 5
+        self.qCS5 = self.tree.AppendItem (self.qCS, _("Comp.study: Annual cost"))
+            #Comparative study – Detail Info 6
+        self.qCS6 = self.tree.AppendItem (self.qCS, _("Comp.study: Additional cost per saved energy"))
+            #Comparative study – Detail Info 7
+        self.qCS7 = self.tree.AppendItem (self.qCS, _("Comp.study: Internal rate of return"))
 
         self.qFinalReport = self.tree.AppendItem (self.qRoot, _("Report"))
         self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _("Report generation"))
@@ -1395,7 +1456,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBElectricityMix, self.EditDBElectricityMix)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarThermal, self.EditDBSolarThermal)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
 
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
