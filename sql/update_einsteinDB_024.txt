@@ -1,0 +1,12 @@
+-- update einstein database: some additional parameters to cgeneraldata, SD 14/07/2008
+USE einstein;
+
+-- add columns to cgeneraldata
+
+ALTER TABLE cgeneraldata ADD COLUMN WaterConsum DOUBLE COMMENT 'Water consumption of industry per year [m3/year]' AFTER ProdCO2Fuels;
+ALTER TABLE cgeneraldata ADD COLUMN TotalInvCost DOUBLE COMMENT 'Total investment cost per alternative [EUR]' AFTER EnergyCost;
+
+ALTER TABLE cgeneraldata ADD COLUMN OwnInvCost DOUBLE COMMENT 'Own investment cost per alternative [EUR]' AFTER TotalInvCost;
+ALTER TABLE cgeneraldata ADD COLUMN Subsidies DOUBLE COMMENT 'Total amount of subsidies per alternative [EUR]' AFTER OwnInvCost;
+ALTER TABLE cgeneraldata ADD COLUMN Amortization DOUBLE COMMENT 'Yearly amortization of investment per alternative [EUR]' AFTER Subsidies;
+ALTER TABLE cgeneraldata ADD COLUMN IRR DOUBLE COMMENT 'Internal rate of return [%]' AFTER Amortization;
