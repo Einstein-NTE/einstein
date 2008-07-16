@@ -809,14 +809,14 @@ class EinsteinFrame(wx.Frame):
         #qEA1 'Primary energy - Yearly'
         elif select == _("Primary energy"):
             self.hidePages()
-            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
-            self.panelEA2.display()
+            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
+            self.panelEA1.display()
 
         #qEA2 'Final energy by fuels - Yearly'
         elif select == _("Final energy by fuels"):
             self.hidePages()
-            self.panelEA1 = PanelEA1(parent=self.leftpanel2)
-            self.panelEA1.display()
+            self.panelEA2 = PanelEA2(parent=self.leftpanel2)
+            self.panelEA2.display()
         #qEA3 'Final energy by equipment - Yearly'
         elif select == _("Final energy by equipment"):
             self.hidePages()
@@ -953,8 +953,8 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.panelCS2 = PanelCS2(parent=self.leftpanel2)
             self.panelCS2.display()
-        #qCS3 'Ambiental impact - Yearly'   #SD2008-07-01
-        elif select == _("Comp.study: Ambiental impact"):
+        #qCS3 'Environmental  impact - Yearly'   #SD2008-07-01
+        elif select == _("Comp.study: Environmental  impact"):
             self.hidePages()
             self.panelCS3 = PanelCS3(parent=self.leftpanel2)
             self.panelCS3.display()
@@ -1415,7 +1415,7 @@ class EinsteinFrame(wx.Frame):
             #Comparative study – Detail Info 2
         self.qCS2 = self.tree.AppendItem (self.qCS, _("Comp.study: Process & supply heat"))
             #Comparative study – Detail Info 3
-        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comp.study: Ambiental impact"))
+        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comp.study: Environmental  impact"))
             #Comparative study – Detail Info 4
         self.qCS4 = self.tree.AppendItem (self.qCS, _("Comp.study: Investment cost"))
             #Comparative study – Detail Info 5

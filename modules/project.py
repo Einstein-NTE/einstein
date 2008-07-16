@@ -29,6 +29,7 @@
 #                       Hans Schweiger      13/06/2008
 #                       Stoyan Danov        16/06/2008
 #                       Hans Schweiger      08/07/2008
+#                       Hans Schweiger      16/07/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -44,6 +45,9 @@
 #       16/06/08: SD    addPipeDummy changed: now returning table, not ID
 #       18/06/08: HS    getNaceDict added
 #       08/07/08: HS    functions for surface managemente added
+#       16/07/08: HS    bug-fixes in CreateNewProject:
+#                           Nfuels -> NFuels
+#                           BBMaintain: -> BBMaintain
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -590,7 +594,7 @@ class Project(object):
             
             newGeneralData = {"Questionnaire_id":newID,
                               "AlternativeProposalNo":-1,
-                              "Nfuels":0,
+                              "NFuels":0,
                               "NEquipe":0,
                               "NPipeDuct":0,
                               "NThProc":0,
@@ -605,7 +609,7 @@ class Project(object):
 
             newUHeatPump =  {"Questionnaire_id":newID,
                              "AlternativeProposalNo":-1,
-                             "BBMaintain:":False,
+                             "BBMaintain":False,
                              "BBSafety":10.0,
                              "BBRedundancy":True,
                              "BBFuelType":"Natural Gas",
@@ -1321,7 +1325,7 @@ class Project(object):
         
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
-        generaldata[0].Nfuels = len(fuels)
+        generaldata[0].NFuels = len(fuels)
 
         Status.SQL.commit()
 
@@ -1966,12 +1970,12 @@ class Project(object):
             if branch == naceName:
                 naceSubDict.update({naceSubCode:naceSubName})
 
-        print "Project (getNACEDict): branch = ",branch
-        print "---"
-        print "naceDict = ",naceDict
-        print "---"
-        print "naceSubDict = ",naceSubDict
-        print "------------------------------------------------"
+#        print "Project (getNACEDict): branch = ",branch
+#        print "---"
+#        print "naceDict = ",naceDict
+#        print "---"
+#        print "naceSubDict = ",naceSubDict
+#        print "------------------------------------------------"
             
         return (naceDict,naceSubDict)
 

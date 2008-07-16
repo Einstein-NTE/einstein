@@ -19,6 +19,7 @@
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    04/07/2008
 #                           Stoyan Danov    07/07/2008
+#                           Stoyan Danov    09/07/2008
 #
 #       Changes to previous version:
 #       28/04/2008          created method display
@@ -26,6 +27,7 @@
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<, esthetics & security features
 #       04/07/2008 SD: changed min No columns, col width,
 #       07/07/2008 SD: data split: totals eliminated from data to plot, Tolal highlited
+#       09/07/2008 SD: set initially empty labels to columns and fixed columnwidth to first 5 col
 #
 #	
 #------------------------------------------------------------------------------		
@@ -122,42 +124,28 @@ class PanelEM2(wx.Panel):
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
         self.grid1.EnableEditing(False)
+
+        self.grid1.SetColLabelValue(0, _(" ")) #set initially empty column labels
+        self.grid1.SetColLabelValue(1, _(" "))
+        self.grid1.SetColLabelValue(2, _(" "))
+        self.grid1.SetColLabelValue(3, _(" "))
+        self.grid1.SetColLabelValue(4, _(" "))
+
         headings = data[0] # extract the array of headings
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         for col in range(len(headings)):
             self.grid1.SetColSize(col,141)
             self.grid1.SetColLabelValue(col, headings[col])
         self.grid1.SetColSize(0,141)
+        self.grid1.SetColSize(1,141)
+        self.grid1.SetColSize(2,141)
+        self.grid1.SetColSize(3,141)
+        self.grid1.SetColSize(4,141)
         #
         # copy values from dictionary to grid
         # ignore the 1st. row, the column headings, which has been already
         # processed
 #######LAYOUT: use of function numCtrl
-
-##        decimals = [-1]   #number of decimal digits for each colum
-##        for i in range(cols-1): #fill decimals list according numbers of columns (variable)
-##            decimals.append(1)
-##
-##        for r in range(rows-1):
-##            self.grid1.SetRowAttr(r, attr)
-##            for c in range(cols):
-##                try:
-##                    print 'decimals[c] =', decimals[c]
-##                    if decimals[c] >= 0: # -1 indicates text
-##                        print 'pass if1'
-##                        self.grid1.SetCellValue(r, c, \
-##                            convertDoubleToString(float(data[r+1][c]),nDecimals = decimals[c]))
-##                        print 'pass if2'
-##                    else:
-##                        self.grid1.SetCellValue(r, c, data[r+1][c])
-##                        print 'pass else'
-##                except:
-##                    print 'pass except'
-##                    pass
-##                if c == labels_column:
-##                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_LEFT, wx.ALIGN_CENTRE);
-##                else:
-##                    self.grid1.SetCellAlignment(r, c, wx.ALIGN_RIGHT, wx.ALIGN_CENTRE);
 
         decimals = [-1]   #number of decimal digits for each colum
         for i in range(cols-1): #fill decimals list according numbers of columns (variable)

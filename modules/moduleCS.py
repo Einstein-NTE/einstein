@@ -17,6 +17,8 @@
 #                           Stoyan Danov        10/07/2008
 #                           Stoyan Danov        12/07/2008
 #                           Stoyan Danov        13/07/2008
+#                           Stoyan Danov        14/07/2008
+#                           Stoyan Danov        15/07/2008
 #
 #       Changes to previous version:
 #       09/07/2008ff SD: add modules for CS2, CS3,
@@ -24,6 +26,8 @@
 #                       -> parte CS3 re-worked: control StatusEnergy > 0 added,
 #                       -> clean-up
 #       13/07/2008   SD: CS4 added
+#       14/07/2008   SD: CS5, queries: qelectricity, qfuel
+#       15/07/2008   SD: CS6, CS7
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -70,6 +74,10 @@ class ModuleCS(object):
         sqlQuery = "ProjectID = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId)
         salternatives = Status.DB.salternatives.sql_select(sqlQuery)
 
+        sqlQuery = "Questionnaire_id = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId)
+        qelectricity = Status.DB.qelectricity.sql_select(sqlQuery)
+
+
         PEC = []
 
         PECTable = []
@@ -93,7 +101,7 @@ class ModuleCS(object):
                     if ANo == 0:
                         PEC0 = dPEC
 
-                    PECSaving = dPEC - PEC0
+                    PECSaving = PEC0 - dPEC #SD corrected, was inverted
                     if PEC0 > 0:
                         RelSaving = PECSaving/PEC0
                     else:
@@ -107,7 +115,7 @@ class ModuleCS(object):
                         
                 PEC.append(dPEC)
 
-                if ANo == 0:
+                if ANo != 0: #SD corrected, was ==
                     tableEntry = noneFilter([str(salternatives[i].ShortName),dPEC_Table,PECSaving,RelSaving*100])
                 else:
                     tableEntry = noneFilter([str(salternatives[i].ShortName),dPEC_Table,"---","---"])
@@ -127,6 +135,9 @@ class ModuleCS(object):
             data2 = array(PECPlot)
 
             Status.int.setGraphicsData("CS1 Plot", data2)
+
+            print 'Table: data1\n',data1
+            print 'Plot: data2\n',data2
 
 #------------------------------------------------------------------------------
 
@@ -212,7 +223,7 @@ class ModuleCS(object):
                     tableEntry = noneFilter([str(salternatives[i].ShortName),
                                              dUPH_Table,UPHSaving,
                                              dUSH_Table,USHSaving])
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dUSH,dUPH]) #SD: before: dUSH, dUPH
+                plotEntry = noneFilter([str(salternatives[i].ShortName),RatioUSH,RatioUPH]) #SD: before: dUSH, dUPH
 
                 CS2Table.append(tableEntry)
                 CS2Plot.append(plotEntry)
@@ -223,9 +234,14 @@ class ModuleCS(object):
                               
             Status.int.setGraphicsData("CS2 Table", data1)
 
+##            matrix2 = transpose(CS2Plot)
             data2 = array(CS2Plot)
 
             Status.int.setGraphicsData("CS2 Plot", data2)
+##            print 'CS2 table =', data1
+##            print 'CS2 plot =', data2
+##            print 'USH =', USH
+##            print 'UPH =', UPH
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -351,6 +367,7 @@ class ModuleCS(object):
                               
             Status.int.setGraphicsData("CS3 Table", data1)
 
+##            matrix2 = transpose(CS3Plot)
             data2 = array(CS3Plot)
 
             Status.int.setGraphicsData("CS3 Plot", data2)
@@ -363,7 +380,7 @@ class ModuleCS(object):
         elif self.keys[0] == "CS4 Plot":
 
 #............................................................................
-# charge UPH and USH data from SQL
+# charge data from SQL
             TotalCost = []
             OwnCost = []
             Subsidies = []
@@ -372,111 +389,445 @@ class ModuleCS(object):
             CS4Table = []
             CS4Plot = []
 
-#####SD2008-07-13: !!! in SQL: cgeneraldata should be created the fields:
-####            TotalInvCost
-####            OwnInvCost
-####            Subsidies
-#### These are supposed to be calculated et this stage and stored to SQL
-##
-##            for ANo in range(len(generalData)-1):
-##                i = ANo+1
-##
-##                if salternatives[i].ShortName is None:
-##                    Alternative.append('--')
-##                else:
-##                    Alternative.append(str(salternatives[i].ShortName))
-##
-##                if generalData[i].TotalInvCost is None: #protection against None
-##                    TotalCost.append(0.0)
-##                else:
-##                    TotalCost.append(generalData[i].TotalInvCost)
-##
-##                if generalData[i].OwnInvCost is None:
-##                    OwnCost.append(0.0)
-##                else:
-##                    OwnCost.append(generalData[i].OwnInvCost)
-##
-##                if generalData[i].Subsidies is None:
-##                    Subsidies.append(0.0)
-##                else:
-##                    Subsidies.append(generalData[i].Subsidies)
-##
-##                
-##                if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
-##                    dTotalCost = generalData[i].TotalInvCost
-##                    if dTotalCost is None:
-##                        dTotalCost = 0.0
-##                        dTotalCost_Table = "---"
-##                    else:
-##                        dTotalCost_Table = dTotalCost
-##
-##                    dOwnCost = generalData[i].OwnInvCost
-##                    if dOwnCost is None:
-##                        dOwnCost = 0.0
-##                        dOwnCost_Table = "---"
-##                    else:
-##                        dOwnCost_Table = dOwnCost
-##
-##                    dSubsidies = generalData[i].Subsidies
-##                    if dSubsidies is None:
-##                        dSubsidies = 0.0
-##                        dSubsidies_Table = "---"
-##                    else:
-##                        dSubsidies_Table = dSubsidies
-##            
-##                    if ANo == 0:
-##                        TotalCost0 = dTotalCost
-##                        OwnCost0 = dOwnCost
-##                        Subsidies0 = dSubsidies
-##
-##
-##                else:
-##                    dTotalCost = 0.0
-##                    dOwnCost = 0.0
-##                    dSubsidies = 0.0
-##                    dTotalCost_Table = "---"
-##                    dOwnCost_Table = "---"
-##                    dSubsidies_Table = "---"  
-##                    
-##
-##                tableEntry = noneFilter([str(salternatives[i].ShortName),
-##                                         dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
-##
-##                plotEntry = noneFilter([str(salternatives[i].ShortName),dOwnCost,dSubsidies])
-##               
-##                CS4Table.append(tableEntry)
-##                CS4Plot.append(plotEntry)
-###..............................................................................
-### then send everything to the GUI
-##
-##            data1 = array(CS4Table)
-##                              
-##            Status.int.setGraphicsData("CS4 Table", data1)
-##
-##            matrix2 = transpose(CS4Plot)
-##            data2 = array(CS4Plot)
-##
-##            Status.int.setGraphicsData("CS4 Plot", data2)
-##
+            for ANo in range(len(generalData)-1):
+                i = ANo+1
 
-            #dummy data filled here (before creating the necessary fields in SQL)
+                if salternatives[i].ShortName is None:
+                    Alternative.append('--')
+                else:
+                    Alternative.append(str(salternatives[i].ShortName))
 
-            data1 = array([['Present State (checked)', 0.0, 0.0, 0.0],
-                           ['Design 1', 100000, 60000, 40000],
-                           ['Design 2', 200000, 100000, 100000],
-                           ['Design 3', 300000, 120000, 180000]])
+                if generalData[i].TotalInvCost is None: #protection against None
+                    TotalCost.append(0.0)
+                else:
+                    TotalCost.append(generalData[i].TotalInvCost)
+
+                if generalData[i].OwnInvCost is None:
+                    OwnCost.append(0.0)
+                else:
+                    OwnCost.append(generalData[i].OwnInvCost)
+
+                if generalData[i].Subsidies is None:
+                    Subsidies.append(0.0)
+                else:
+                    Subsidies.append(generalData[i].Subsidies)
+
+                
+                if salternatives[i].StatusECO > 0:
+                    dTotalCost = generalData[i].TotalInvCost
+                    if dTotalCost is None:
+                        dTotalCost = 0.0
+                        dTotalCost_Table = "---"
+                    else:
+                        dTotalCost_Table = dTotalCost
+
+                    dOwnCost = generalData[i].OwnInvCost
+                    if dOwnCost is None:
+                        dOwnCost = 0.0
+                        dOwnCost_Table = "---"
+                    else:
+                        dOwnCost_Table = dOwnCost
+
+                    dSubsidies = generalData[i].Subsidies
+                    if dSubsidies is None:
+                        dSubsidies = 0.0
+                        dSubsidies_Table = "---"
+                    else:
+                        dSubsidies_Table = dSubsidies
+            
+                    if ANo == 0:
+                        TotalCost0 = dTotalCost
+                        OwnCost0 = dOwnCost
+                        Subsidies0 = dSubsidies
+
+
+                else:
+                    dTotalCost = 0.0
+                    dOwnCost = 0.0
+                    dSubsidies = 0.0
+                    dTotalCost_Table = "---"
+                    dOwnCost_Table = "---"
+                    dSubsidies_Table = "---"  
+                    
+
+                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                                         dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
+
+                plotEntry = noneFilter([str(salternatives[i].ShortName),dOwnCost,dSubsidies])
+               
+                CS4Table.append(tableEntry)
+                CS4Plot.append(plotEntry)
+#..............................................................................
+# then send everything to the GUI
+
+            data1 = array(CS4Table)
                               
             Status.int.setGraphicsData("CS4 Table", data1)
 
-##            matrix2 = transpose(CS4Plot)
-            data2 = array([['Present State (checked)', 0.0, 0.0],
-                           ['Design 1', 60000, 40000],
-                           ['Design 2', 100000, 100000],
-                           ['Design 3', 120000, 180000]])
+            matrix2 = transpose(CS4Plot)
+            data2 = array(CS4Plot)
 
             Status.int.setGraphicsData("CS4 Plot", data2)
+
+
+##            #dummy data filled here (before creating the necessary fields in SQL)
+##
+##            data1 = array([['Present State (checked)', 0.0, 0.0, 0.0],
+##                           ['Design 1', 100000, 60000, 40000],
+##                           ['Design 2', 200000, 100000, 100000],
+##                           ['Design 3', 300000, 120000, 180000]])
+##                              
+##            Status.int.setGraphicsData("CS4 Table", data1)
+##
+##            data2 = array([['Present State (checked)', 0.0, 0.0],
+##                           ['Design 1', 60000, 40000],
+##                           ['Design 2', 100000, 100000],
+##                           ['Design 3', 120000, 180000]])
+##
+##            Status.int.setGraphicsData("CS4 Plot", data2)
             
 
 #------------------------------------------------------------------------------
-#==============================================================================
 
+#------------------------------------------------------------------------------
+# Panel CS5: Annual cost
+        elif self.keys[0] == "CS5 Plot":
+
+#............................................................................
+# charge data from SQL
+
+            Amortization = []
+            ElCost = []
+
+            FuelCost = [] # holds the fuels EnergyCost from ANo=0 to the ANo=last (all fuels)
+            for i in range(1,len(generalData)):
+                sumcost = 0.0
+                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,generalData[i].AlternativeProposalNo)
+                fuelsByANo = Status.DB.qfuel.sql_select(sqlQuery)
+                for fuel in fuelsByANo:
+                    fuelcost = fuel['FuelCostYear']
+                    if fuelcost is None:
+                        fuelcost = 0.0
+                    else:
+                        pass                       
+                    sumcost += fuelcost
+                FuelCost.append(sumcost)
+#            print 'FuelCost =', FuelCost 
+
+            EnergyCost = []
+            OMCost = []
+            Alternative = []
+
+            CS5Table = []
+            CS5Plot = []
+
+            for ANo in range(len(generalData)-1):
+                i = ANo+1
+
+                if salternatives[i].ShortName is None:
+                    Alternative.append('--')
+                else:
+                    Alternative.append(str(salternatives[i].ShortName))
+
+                if generalData[i].Amortization is None: #protection against None
+                    Amortization.append(0.0)
+                else:
+                    Amortization.append(generalData[i].Amortization)
+
+                if generalData[i].OMHCGenDistTot is None: #here O&M costs for heat/cold generation and dist. considered
+                    OMCost.append(0.0)
+                else:
+                    OMCost.append(generalData[i].OMHCGenDistTot)
+
+                if qelectricity[i].ElCostYearTot is None:
+                    ElCost.append(0.0)
+                else:
+                    ElCost.append(qelectricity[i].ElCostYearTot)
+
+##                if qfuel[i].FuelCostYear is None:
+##                    FuelCost.append(0.0)
+##                else:
+##                    FuelCost.append(qfuel[i].FuelCostYear)
+
+
+                EnergyCost.append(ElCost[i-1]+FuelCost[i-1])#to i-1 (list from 0 to ANo)
+                
+                if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
+                    dAmortization = generalData[i].Amortization
+                    if dAmortization is None:
+                        dAmortization = 0.0
+                        dAmortization_Table = "---"
+                    else:
+                        dAmortization_Table = dAmortization
+
+                    dOMCost = generalData[i].OMHCGenDistTot
+                    if dOMCost is None:
+                        dOMCost = 0.0
+                        dOMCost_Table = "---"
+                    else:
+                        dOMCost_Table = dOMCost
+
+                    dEnergyCost = EnergyCost[i-1]#to i-1 (list from 0 to ANo)
+                    if dEnergyCost == 0.0:
+                        dEnergyCost_Table = "--"
+                    else:
+                        dEnergyCost_Table = dEnergyCost
+  
+                    if ANo == 0:
+                        Amortization0 = dAmortization
+                        OMCost0 = dOMCost
+                        EnergyCost0 = dEnergyCost
+
+
+                else:
+                    dAmortization = 0.0
+                    dOMCost = 0.0
+                    dEnergyCost = 0.0
+                    dAmortization_Table = "---"
+                    dOMCost_Table = "---"
+                    dEnergyCost_Table = "---"  
+                    
+
+                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                                         dAmortization_Table,dEnergyCost_Table,dOMCost_Table])
+
+                plotEntry = noneFilter([str(salternatives[i].ShortName),dAmortization,dEnergyCost,dOMCost])
+               
+                CS5Table.append(tableEntry)
+                CS5Plot.append(plotEntry)
+#..............................................................................
+# then send everything to the GUI
+
+            data1 = array(CS5Table)
+                              
+            Status.int.setGraphicsData("CS5 Table", data1)
+
+            data2 = array(CS5Plot)
+
+            Status.int.setGraphicsData("CS5 Plot", data2)
+
+
+##            #dummy data filled here (before creating the necessary fields in SQL)
+##
+##            data1 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
+##                           ['Design 1', 50000, 60000, 20000],
+##                           ['Design 2', 70000, 40000, 10000],
+##                           ['Design 3', 100000, 30000, 15000]])
+##                              
+##            Status.int.setGraphicsData("CS5 Table", data1)
+##
+##            data2 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
+##                           ['Design 1', 50000, 60000, 20000],
+##                           ['Design 2', 70000, 40000, 10000],
+##                           ['Design 3', 100000, 30000, 15000]])
+##
+##            Status.int.setGraphicsData("CS5 Plot", data2)
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# Panel CS6: Annual cost
+        elif self.keys[0] == "CS6 Plot":
+
+#............................................................................
+# charge data from SQL
+
+            EnergyCost = []
+            PEC = []
+            AdditCost = []
+            AdditCost_Table = []
+            AdditCostSavedPEC = []#SD check
+            AdditCostSavedPEC_Table = []#SD check
+            SavedPEC = []
+            Alternative = []
+
+            CS6Table = []
+            CS6Plot = []
+
+
+            for ANo in range(len(generalData)-1):
+                i = ANo+1
+
+                if salternatives[i].ShortName is None:
+                    Alternative.append('--')
+                else:
+                    Alternative.append(str(salternatives[i].ShortName))
+
+                if generalData[i].EnergyCost is None: #protection against None
+                    EnergyCost.append(0.0)
+                else:
+                    EnergyCost.append(generalData[i].EnergyCost)
+
+                if salternatives[i].StatusEnergy > 0 and salternatives[i].StatusECO > 0:
+                    print 'ANo = "%s"  PEC = "%s"',(generalData[i].AlternativeProposalNo,generalData[i].PEC)
+                    dPEC = generalData[i].PEC                
+                    if dPEC is None:
+                        dPEC = 0.0
+                    else:
+                        dPEC /= 1000.0  #conversion kWh -> MWh
+
+                    dEnergyCost = generalData[i].EnergyCost
+                    if dEnergyCost is None:
+                        dEnergyCost = 0.0
+                        dEnergyCost_Table = "---"
+                    else:
+                        dEnergyCost_Table = dEnergyCost
+                    
+                    if ANo == 0:
+                        PEC0 = dPEC
+                        EnergyCost0 = dEnergyCost
+
+
+                    PECSaving = PEC0 - dPEC
+
+       
+                    AddCost = dEnergyCost - EnergyCost0
+                    if dEnergyCost_Table == "---":
+                        AddCost_Table = "---"
+                    else:
+                        AddCost_Table = AddCost
+
+
+                    if PECSaving == 0.0:
+                        AddCostSavedPEC = 0.0
+                        AddCostSavedPEC_Table = "---"
+                    else:
+                        AddCostSavedPEC = AddCost/PECSaving
+                        AddCostSavedPEC_Table = AddCostSavedPEC
+   
+
+                else:
+                    dPEC = 0.0
+                    PECSaving = 0.0
+                    dEnergyCost = 0.0
+                    AddCost = 0.0
+                    AddCostSavedPEC = 0.0
+                    dEnergyCost_Table = "---"
+                    AddCost_Table = "---"
+                    AddCostSavedPEC_Table = "---"
+                        
+                PEC.append(dPEC)
+                SavedPEC.append(PECSaving)
+                AdditCost.append(AddCost)
+                AdditCost_Table.append(AddCost_Table)#SD check
+
+                AdditCostSavedPEC.append(AddCostSavedPEC)#SD check
+
+
+                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                                         dEnergyCost_Table,AddCost_Table,AddCostSavedPEC_Table])
+
+                plotEntry = noneFilter([str(salternatives[i].ShortName),AddCostSavedPEC])
+               
+                CS6Table.append(tableEntry)
+                CS6Plot.append(plotEntry)
+#..............................................................................
+# then send everything to the GUI
+            print 'AdditCost_Table =', AdditCost_Table
+            print 'PEC =', PEC
+            print 'AdditCostSavedPEC_Table =', AdditCostSavedPEC_Table
+            print '\n'
+            print 'AdditCost =', AdditCost
+            print 'SavedPEC =', SavedPEC
+            print 'PEC =', PEC
+            print 'AdditCostSavedPEC =', AdditCostSavedPEC          
+
+            data1 = array(CS6Table)
+                              
+            Status.int.setGraphicsData("CS6 Table", data1)
+
+            data2 = array(CS6Plot)
+
+            Status.int.setGraphicsData("CS6 Plot", data2)
+
+
+##            #dummy data filled here (before creating the necessary fields in SQL)
+##
+##            data1 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
+##                           ['Design 1', 50000, 60000, 20000],
+##                           ['Design 2', 70000, 40000, 10000],
+##                           ['Design 3', 100000, 30000, 15000]])
+##                              
+##            Status.int.setGraphicsData("CS6 Table", data1)
+##
+##            data2 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
+##                           ['Design 1', 50000, 60000, 20000],
+##                           ['Design 2', 70000, 40000, 10000],
+##                           ['Design 3', 100000, 30000, 15000]])
+##
+##            Status.int.setGraphicsData("CS6 Plot", data2)
+            
+
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Panel CS7: Annual cost
+        elif self.keys[0] == "CS7 Plot":
+
+#............................................................................
+# charge data from SQL
+
+            IRR = []
+            IRR_Table = []
+            Alternative = []
+
+            CS7Table = []
+            CS7Plot = []
+
+
+            for ANo in range(len(generalData)-1):
+                i = ANo+1
+
+                if salternatives[i].ShortName is None:
+                    Alternative.append('--')
+                else:
+                    Alternative.append(str(salternatives[i].ShortName))
+
+                if salternatives[i].StatusECO > 0:
+                    dIRR = generalData[i].IRR                
+                    if dIRR is None:
+                        dIRR = 0.0
+                        dIRR_Table = "---"
+                    else:
+                        dIRR_Table = dIRR
+
+                else:
+                    dIRR = 0.0
+                    dIRR_Table = "---"
+                        
+                IRR.append(dIRR)
+                IRR_Table.append(dIRR_Table)
+
+                tableEntry = noneFilter([str(salternatives[i].ShortName),dIRR_Table])
+
+                plotEntry = noneFilter([str(salternatives[i].ShortName),dIRR])
+               
+                CS7Table.append(tableEntry)
+                CS7Plot.append(plotEntry)
+#..............................................................................
+# then send everything to the GUI
+
+            data1 = array(CS7Table)
+                              
+            Status.int.setGraphicsData("CS7 Table", data1)
+
+            data2 = array(CS7Plot)
+
+            Status.int.setGraphicsData("CS7 Plot", data2)
+
+
+##            #dummy data filled here (before creating the necessary fields in SQL)
+##
+##            data1 = array([['Present State (checked)', 0.0],
+##                           ['Design 1', 15.0],
+##                           ['Design 2', 18.0],
+##                           ['Design 3', 21.0]])
+##                              
+##            Status.int.setGraphicsData("CS7 Table", data1)
+##
+##            data2 = array([['Present State (checked)', 0.0],
+##                           ['Design 1', 15.0],
+##                           ['Design 2', 18.0],
+##                           ['Design 3', 21.0]])
+##
+##            Status.int.setGraphicsData("CS7 Plot", data2)
+            

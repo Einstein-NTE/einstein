@@ -175,7 +175,7 @@ class PanelCS3(wx.Panel):
 
     def OnBtnForwardButton(self, event):
         self.Hide()
-#        Status.main.tree.SelectItem(Status.main.qCS4, select=True)
+        Status.main.tree.SelectItem(Status.main.qCS4, select=True)
 
 #------------------------------------------------------------------------------
     def display(self):

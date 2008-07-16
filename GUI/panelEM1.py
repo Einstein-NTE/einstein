@@ -20,6 +20,7 @@
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    04/07/2008
 #                           Stoyan Danov    07/07/2008
+#                           Stoyan Danov    09/07/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -28,6 +29,7 @@
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<, esthetics & security features
 #       04/07/2008 SD: changed min No columns, col width,
 #       07/07/2008 SD: data split: totals eliminated from data to plot, colours, columnwidth, Totals line highlited
+#       09/07/2008 SD: set initially emptu labels to columns and fixed columnwidth to first 5 col
 #
 #	
 #------------------------------------------------------------------------------		
@@ -80,8 +82,9 @@ class PanelEM1(wx.Panel):
         labels_column = 0
 
 #####SD
-        (rows,cols) = Interfaces.GData[keys[0]].shape
+        (rows,cols) = Status.int.GData[keys[0]].shape
         print 'EM1: rows =',rows, 'cols =', cols
+        print Status.int.GData[keys[0]]
 ##        ignoredrows = []     
 
         # remaps drawing methods to the wx widgets.
@@ -119,7 +122,7 @@ class PanelEM1(wx.Panel):
         # set grid properties
         # warning: this grid has a variable nr. of cols
         # so the 1st.row has the column headings
-        data = Interfaces.GData[keys[0]]
+        data = Status.int.GData[keys[0]]
 ##        print 'EM1: data =', data
 #####Security feature against non existing GData entry
         COLNO1 = 5 # minimum number of columns-for the case if only ONE process exists
@@ -132,12 +135,23 @@ class PanelEM1(wx.Panel):
         self.grid1.SetDefaultRowSize(20)
         self.grid1.SetRowLabelSize(30)
         self.grid1.EnableEditing(False)
+
+        self.grid1.SetColLabelValue(0, _(" ")) #set initially empty column labels
+        self.grid1.SetColLabelValue(1, _(" "))
+        self.grid1.SetColLabelValue(2, _(" "))
+        self.grid1.SetColLabelValue(3, _(" "))
+        self.grid1.SetColLabelValue(4, _(" "))
+        
         headings = data[0] # extract the array of headings
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         for col in range(len(headings)):
             self.grid1.SetColSize(col,141)
             self.grid1.SetColLabelValue(col, headings[col])
         self.grid1.SetColSize(0,141)
+        self.grid1.SetColSize(1,141)
+        self.grid1.SetColSize(2,141)
+        self.grid1.SetColSize(3,141)
+        self.grid1.SetColSize(4,141)
         #
         # copy values from dictionary to grid
         # ignore the 1st. row, the column headings, which has been already

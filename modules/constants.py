@@ -58,6 +58,18 @@ DAY = 24.0
 WEEK = DAY*7
 MONTHSTARTDAY = [0,31,59,90,120,151,181,212,243,273,304,334,365]
     #note: time 0:00h of the first day of each month = MONTHSTARTDAY*DAY
+MONTHS = [_('January'),
+          _('February'),
+          _('March'),
+          _('April'),
+          _('May'),
+          _('June'),
+          _('July'),
+          _('August'),
+          _('September'),
+          _('October'),
+          _('November'),
+          _('December')]
 
 #------------------------------------------------------------------------------		
 #default values for status variables

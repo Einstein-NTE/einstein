@@ -14,9 +14,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger  05/07/2008
-#       Revised by:         
+#       Revised by:         Stoyan Danov    15/07/2008
 #
-#       Changes to previous version:#
+#       Changes to previous version:
+#       15/07/2008 SD: adaptation to module CS
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -33,7 +34,7 @@ import wx
 from status import Status
 from einstein.modules.moduleCS import *
 import einstein.modules.matPanel as Mp
-from einstein.GUI.graphics import drawStackedBarPlot
+from einstein.GUI.graphics import drawSimpleBarPlot
 from GUITools import *
 from numCtrl import *
 
@@ -68,13 +69,14 @@ class PanelCS7(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS7 Plot",                      # key for Interface
-                   'title'       :_('Primary energy consumption'), # title of the graph
-                   'ylabel'      :_('PEC (MWh)'),                   # y axis label
+                   'title'       :_('Internal rate of return'), # title of the graph
+                   'ylabel'      :_('[%]'),                   # y axis label
+                   'legend'      :[_('IRR')],                   # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
-                   'ignoredrows' :[0,1]}                        # rows that should not be plotted
+                   'ignoredrows' :[0]}                        # rows that should not be plotted
         
-        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawStackedBarPlot,
+        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawSimpleBarPlot,
                             paramList)
 
         #
@@ -98,12 +100,12 @@ class PanelCS7(wx.Panel):
 #        for col in range(len(headings)):
 #            self.grid1.SetColSize(col,141)
 #            self.grid1.SetColLabelValue(col, headings[col])
-        self.grid1.SetDefaultColSize(140)
-        self.grid1.SetColSize(0,285)
+        self.grid1.SetDefaultColSize(155)
+        self.grid1.SetColSize(0,240)
         self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Primary energy\nconsumption [MWh]"))
-        self.grid1.SetColLabelValue(2, _("Savings\n[MWh]"))
-        self.grid1.SetColLabelValue(3, _("Savings\n[%]"))
+        self.grid1.SetColLabelValue(1, _("Internal rate of return\n[%]"))
+        self.grid1.SetColLabelValue(2, _(" "))
+        self.grid1.SetColLabelValue(3, _(" "))
 
         self.display()
 
@@ -115,7 +117,7 @@ class PanelCS7(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Monthly useful process heat'),
+        self.box1 = wx.StaticBox(self, -1, _(u'Internal rate of return (IRR)'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -127,7 +129,7 @@ class PanelCS7(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of useful process heat per months'),
+        self.box2 = wx.StaticBox(self, -1, _(u'Comparative of the internal rate of return'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -168,11 +170,12 @@ class PanelCS7(wx.Panel):
 
     def OnBtnBackButton(self, event):
         self.Hide()
-#        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
+        Status.main.tree.SelectItem(Status.main.qCS6, select=True)
 
     def OnBtnForwardButton(self, event):
-        self.Hide()
-        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
+        event.Skip()
+##        self.Hide()
+##        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
 
 #------------------------------------------------------------------------------
     def display(self):
@@ -197,7 +200,7 @@ class PanelCS7(wx.Panel):
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         
-        decimals = [-1,2,2]   #number of decimal digits for each colum
+        decimals = [-1,2]   #number of decimal digits for each colum
         labels_column = 0
         
         for r in range(rows):

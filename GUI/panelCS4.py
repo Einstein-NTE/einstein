@@ -71,7 +71,7 @@ class PanelCS4(wx.Panel):
                    'key'         : "CS4 Plot",                      # key for Interface
                    'title'       :_('Investment cost'), # title of the graph
                    'ylabel'      :_('Total cost (Own+Subsidies)[EUR]'),  # y axis label
-                   'legend'      :[_('Own cost [Euro]'),_('Subsidies [EUR]')],  # y axis label
+                   'legend'      :[_('Own cost [EUR]'),_('Subsidies [EUR]')],  # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0]}                        # rows that should not be plotted
@@ -170,11 +170,11 @@ class PanelCS4(wx.Panel):
 
     def OnBtnBackButton(self, event):
         self.Hide()
-#        Status.main.tree.SelectItem(Status.main.qEA5, select=True)
+        Status.main.tree.SelectItem(Status.main.qCS3, select=True)
 
     def OnBtnForwardButton(self, event):
         self.Hide()
-        Status.main.tree.SelectItem(Status.main.qCS2, select=True)
+        Status.main.tree.SelectItem(Status.main.qCS5, select=True)
 
 #------------------------------------------------------------------------------
     def display(self):

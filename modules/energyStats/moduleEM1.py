@@ -14,10 +14,16 @@
 #	Created by: 	    Tom Sobota	21/03/2008
 #       Revised by:         Tom Sobota  29/03/2008
 #                       Stoyan Danov    04/07/2008
+#                       Stoyan Danov    07/07/2008
+#                       Stoyan Danov    09/07/2008
+#                       Hans Schweiger  16/07/2008
 #
 #       Changes to previous version:
 #	29/03/08:   TS changed functions draw... to use numpy arrays,
 #       04/07/08:   SD changes
+#       07/07/08:   SD data1 added for plot
+#       09/07/08:   SD calculation of monthly from hourly data
+#       16/07/08:   HS bug-fixing and complete rearrangement
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -36,82 +42,111 @@ import wx
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
-from einstein.modules.interfaces import *
+from einstein.modules.constants import *
 import einstein.modules.matPanel as mP
+import copy
 
 
 class ModuleEM1(object):
 
     def __init__(self, keys):
         self.keys = keys
-        self.interface = Interfaces()
         self.initModule()
 
     def initModule(self):
 #------------------------------------------------------------------------------
-        
-        """
-        module initialization
-        """
-#------------------------------------------------------------------------------
         # In this grid the nr. of cols is variable, so we generate the
         # column headings dynamically here
-        data = array([['Process heat\ndemand','Process 1\n[MWh]','Process 2\n[MWh]',
-                       'Office heating\n[MWh]','TOTAL\n[MWh]'],
-                      ['Total'    , 118.0,  75.0,    60.0, 182.0],
-                      ['January'  ,  10.0,  14.0,   30.0,   54.0],
-                      ['February' ,  12.0,  16.0,   20.0,   48.0],
-                      ['March'    ,  14.0,  18.0,   10.0,   42.0],
-                      ['April'    ,  16.0,  20.0,    5.0,   41.0],
-                      ['May'      ,  19.0,  23.0,    0.0,   42.0],
-                      ['June'     ,   6.0,  10.0,    0.0,   16.0],
-                      ['July'     ,   4.0,   8.0,    0.0,   12.0],
-                      ['August'   ,   2.0,   6.0,    0.0,    8.0],
-                      ['September',   7.0,  11.0,    0.0,   18.0],
-                      ['October'  ,   9.0,  13.0,    10.0,  32.0],
-                      ['November' ,  15.0,  19.0,    20.0,  54.0],
-                      ['December' ,   4.0,   8.0,    30.0,  42.0]])
-
-##        data = array([['Process heat\ndemand','Process 1\n[MWh]','Process 2\n[MWh]',
-##                       'Office heating\n[MWh]','TOTAL\n[MWh]'],
-##                      ['January'  ,  10.0,  14.0,   30.0,   54.0],
-##                      ['February' ,  12.0,  16.0,   20.0,   48.0],
-##                      ['March'    ,  14.0,  18.0,   10.0,   42.0],
-##                      ['April'    ,  16.0,  20.0,    5.0,   41.0],
-##                      ['May'      ,  19.0,  23.0,    0.0,   42.0],
-##                      ['June'     ,   6.0,  10.0,    0.0,   16.0],
-##                      ['July'     ,   4.0,   8.0,    0.0,   12.0],
-##                      ['August'   ,   2.0,   6.0,    0.0,    8.0],
-##                      ['September',   7.0,  11.0,    0.0,   18.0],
-##                      ['October'  ,   9.0,  13.0,    10.0,  32.0],
-##                      ['November' ,  15.0,  19.0,    20.0,  54.0],
-##                      ['December' ,   4.0,   8.0,    30.0,  42.0],
-##                      ['Total'    , 118.0,  75.0,    60.0, 182.0]])
-                          
-                         
-        self.interface.setGraphicsData(self.keys[0], data)
-
-        #print "ModuleEM1 graphics data initialization"
-        #print "Interfaces.GData[%s] contains:\n%s\n" % (self.keys[0],repr(Interfaces.GData[self.keys[0]]))
-
-        return "ok"
 #------------------------------------------------------------------------------
-    def exitModule(self,exit_option):
-#------------------------------------------------------------------------------
-        """
-        carries out any calculations necessary previous to displaying the HP
-        design assitant window
-        """
-#------------------------------------------------------------------------------
-        if exit_option == "save":
-            print "exitModule: here I should save the current configuration"
-        elif exit_option == "cancel":
-            print "exitModule: here I should retreive the previous configuration"
+
+        if Status.int.cascadeUpdateLevel < 0:
+            Status.int.initCascadeArrays(0)     #creates the demand profiles
+#SQL data search
+
+        self.qprocessdata = Status.prj.getProcesses()   #sqlqueries centralised in project-functions
+        processes = self.qprocessdata
+            
+#........................................................................
+# filling the label row (row with 1 + NThProc + 1 entries)
+        #for the graphic data array
+        LabelRow1 =['Process heat\ndemand']
+        for process in processes:
+            LabelRow1.append(process.Process +'\n[MWh]')
+
+        #for the table data array
+        LabelRow = copy.deepcopy(LabelRow1)
+        LabelRow.append('TOTAL\n[MWh]')
+
+
+#........................................................................
+# taking the UPH values from interfaces
+
+        UPH_Tt = Status.int.UPH_Tt
+
+#.........................................................................
+# calculating the monthly data start
+
+        UPHMonthly = [] #UPH all processes (matrix)
+        LabelColumn = [_('Total')]
+        LabelColumn.extend(MONTHS)
+        UPHMonthly.append(LabelColumn)
+
+#.........................................................................
+# start of calculation loop
+
+        UPHMonthlyTotal = []    #Monthly total of ALL PROCESSES
+        for i in range(13):
+            UPHMonthlyTotal.append(0.0)
+            
+        for k in range(len(processes)):
+
+            UPHMonthlyProc = [] #UPH single process
+            for i in range(13):
+                UPHMonthlyProc.append(0.0)
+
+            month = 1
+            for it in range(Status.Nt):
+                time = Status.TimeStep*it*Status.EXTRAPOLATE_TO_YEAR
+                if time >= 24.0*MONTHSTARTDAY[month]:
+                    month += 1
+
+                UPHMonthlyProc[month] += UPH_Tt[k][Status.NT+1][it]/1000 #converted to [MWh]
+
+                #calculating the total for process: UPHMonthlyProc[0]
+
+            for month in range(1,13):
+                UPHMonthlyProc[0] += UPHMonthlyProc[month]  #Yearly total of the process !!!
+                UPHMonthlyTotal[month] += UPHMonthlyProc[month] #Monthly total of all processes
+                
+            UPHMonthly.append(UPHMonthlyProc)
+
             
 
-        print "exitModule: function not yet defined"
+# calculating monthly totals
 
-        return "ok"
+        GraphUPHMonthly = transpose(copy.deepcopy(UPHMonthly))
+        GraphUPHMonthly.insert(0,LabelRow1)
+
+        for month in range(1,13):
+            UPHMonthlyTotal[0] += UPHMonthlyTotal[month]
+        UPHMonthly.append(UPHMonthlyTotal)       #Add as last column the total of all processes
+
+        TableUPHMonthly = transpose(UPHMonthly)
+        TableUPHMonthly.insert(0,LabelRow)
+
+#................................................................................
+# end of the calculatin loop
+
+        data1 = array(GraphUPHMonthly)
+
+# creating the data array for the table
+        data = array(TableUPHMonthly)
+
+# writing the arrays in interfaces
+        Status.int.setGraphicsData(self.keys[0], data)
+        Status.int.setGraphicsData(self.keys[1], data1)
+
+   
 
 #------------------------------------------------------------------------------
 
