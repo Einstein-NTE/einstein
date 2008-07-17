@@ -609,9 +609,9 @@ class Project(object):
 
             newUHeatPump =  {"Questionnaire_id":newID,
                              "AlternativeProposalNo":-1,
-                             "BBMaintain":False,
+                             "BBMaintain":0,
                              "BBSafety":10.0,
-                             "BBRedundancy":True,
+                             "BBRedundancy":1,
                              "BBFuelType":"Natural Gas",
                              "BBHOp":100,
                              "BBPmin":500,
@@ -930,7 +930,7 @@ class Project(object):
             else:
                 permit = allow           
         else:
-            permit = (False,0,_("Cannot access this function. First open or define a new project"))
+            permit = (False,0,_("Cannot access this function. First select a project"))
 
         tmp.update({_("General data"):permit})
         
@@ -940,9 +940,10 @@ class Project(object):
 
 # 1. manipulation of questionnaire
 
+        print "SetTreePermissions: StatusQ = ",Status.StatusQ
         if (Status.StatusQ > 0):
             if (Status.ANo <= 0 and Status.StatusCC > 0):
-                permit = (False,0,_("Data have already been confirmed as consisten. First unblock before modifying"))
+                permit = (False,0,_("Data have already been confirmed as consistent. First unblock before modifying"))
             else:
                 permit = allow           
         else:
@@ -1295,7 +1296,7 @@ class Project(object):
         NFuels += 1
 
         generaldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
-        generaldata[0].Nfuels = NFuels
+        generaldata[0].NFuels = NFuels
 
         Status.SQL.commit()
 

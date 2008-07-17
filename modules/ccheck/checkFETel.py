@@ -46,6 +46,7 @@ from ccheckFunctions import *
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
 import einstein.GUI.pSQL as pSQL, MySQLdb
+from einstein.GUI.GUITools import *
 
 #------------------------------------------------------------------------------
 class CheckFETel():
@@ -155,41 +156,41 @@ class CheckFETel():
                 print "exporting data to cgeneraldata"
                 cgeneraldata = cgeneraldataTable[0]
 
-                cgeneraldata.ElectricityGen = self.ElectricityGen.val
-                cgeneraldata.ElectricitySales = self.ElectricitySales.val
+                cgeneraldata.ElectricityGen = check(self.ElectricityGen.val)
+                cgeneraldata.ElectricitySales = check(self.ElectricitySales.val)
 #                cgeneraldata.ElectricityNet = self.ElectricityNet.val
-                cgeneraldata.FECel = self.FECel.val
-                cgeneraldata.FEOel = self.FEOel.val
-                cgeneraldata.FETel = self.FETel.val
-
-                Status.SQL.commit()
+                cgeneraldata.FECel = check(self.FECel.val)
+                cgeneraldata.FEOel = check(self.FEOel.val)
+                cgeneraldata.FETel = check(self.FETel.val)
                 
+                Status.SQL.commit()
+
 #        except:
-            print "CheckFETel (exportData): error writing data to cgeneraldata"
+#            print "CheckFETel (exportData): error writing data to cgeneraldata"
             pass
 
 #..............................................................................
 # writing data to table "qelectricity"
 
-        try:
-            qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
-            if len(qelectricityTable) > 0:
-                print "exporting data to qelectricity"
-                qelectricity = qelectricityTable[0]
+#        try:
+        qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+        if len(qelectricityTable) > 0:
+            print "exporting data to qelectricity"
+            qelectricity = qelectricityTable[0]
 
-                qelectricity.ElectricityTotYear = self.ElectricityTotYear.val
-                qelectricity.ElectricityMotors = self.ElectricityMotors.val
-                qelectricity.ElectricityChem = self.ElectricityChem.val
-                qelectricity.ElectricityLight = self.ElectricityLight.val
-                qelectricity.ElectricityRef = self.ElectricityRef.val
-                qelectricity.ElectricityAC = self.ElectricityAC.val
-                qelectricity.ElectricityThOther = self.ElectricityThOther.val
-                qelectricity.ElGenera = self.ElectricityGen.val
+            qelectricity.ElectricityTotYear = self.ElectricityTotYear.val
+            qelectricity.ElectricityMotors = self.ElectricityMotors.val
+            qelectricity.ElectricityChem = self.ElectricityChem.val
+            qelectricity.ElectricityLight = self.ElectricityLight.val
+            qelectricity.ElectricityRef = self.ElectricityRef.val
+            qelectricity.ElectricityAC = self.ElectricityAC.val
+            qelectricity.ElectricityThOther = self.ElectricityThOther.val
+            qelectricity.ElGenera = self.ElectricityGen.val
 
-                Status.SQL.commit()
+            Status.SQL.commit()
                 
-        except:
-            print "CheckFETel (exportData): error writing data to qelectricity"
+#        except:
+#            print "CheckFETel (exportData): error writing data to qelectricity"
             pass
 
         #self.ElProd electricty required per product, has to be defined as vector

@@ -48,6 +48,7 @@
 #                       -> commented out in tc19
 #                       -> call of self.clear() BEFORE filling list of NACE codes
 #       03/07/2008: HS  bug-fix in read/write of parameter "Independent" (tc19)
+#       16/07/2008: HS  bug-fix: findKey in reading of Independent ? [yes/no] 
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -604,7 +605,7 @@ class PanelQ1(wx.Panel):
                     "ProdCost":check(self.tc16.GetValue()),
                     "BaseYear":check(self.tc17.GetValue()),
                     "Growth":check(self.tc18.GetValue()),
-                    "Independent":findKey(TRANSYESNO,check(self.tc19.GetValue(text=True))),
+                    "Independent":check(findKey(TRANSYESNO,check(self.tc19.GetValue(text=True)))),
                     "OMThermal":check(self.tc20.GetValue()),
                     "OMElectrical":check(self.tc21.GetValue()),
                     "PercentFuelTotcost":check(self.tc22.GetValue()),
@@ -622,6 +623,7 @@ class PanelQ1(wx.Panel):
                                 
                 q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
+                    
                 Status.SQL.commit()
 
                 Status.prj.setStatus("Q")
