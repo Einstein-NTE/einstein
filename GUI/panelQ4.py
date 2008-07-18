@@ -292,12 +292,14 @@ class PanelQ4(wx.Panel):
 
         self.tc20 = MultipleChoiceEntry(self.page2,
                              label=_("Heat or cold supplied to the distribution line / branch\n(piping or duct) no."),
-                             tip=_("Specify the tube for supply to the equipment, using the nomenclature of the block ''distribution system''"))
+                             tip=_("Specify the pipe(s) or duct(s) receiving heat from the equipment\n")+\
+                                 _("Pipes and ducts are defined in the panel 'distribution of heat and cold'"))
         #
         self.tc30 = ChoiceEntry(self.page2,
                                values=[],
                                label=_("Low temperature heat source"),
-                               tip=_("If waste heat is used, indicate the process or equipment from which waste heat originates"))
+                               tip=_("If waste heat is used, indicate the process or equipment from which waste heat originates\n")+\
+                                _("(e.g.feed-water or combustion air pre-heating, heat source for heat pumps, etc.)"))
 
 
         self.tc31 = FloatEntry(self.page2,

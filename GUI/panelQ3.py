@@ -53,6 +53,7 @@
 #       21/06/2008: TS  General beautification and font awareness.
 #       23/06/2008: HS  bug-fix in function display: clear() shifted to the beginning
 #       18/07/2008: HS  possibility to modify processes in checked state is blocked
+#                       fillPage substituted by display in the button-event handlers
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -509,7 +510,7 @@ using the nomenclature of the hydraulic scheme"))
         
         Status.prj.deleteProcess(self.selectedProcessID)
         self.clear()
-        self.fillPage()
+        self.display()
 
     def OnListBoxProcessesClick(self, event):
         self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
@@ -588,7 +589,7 @@ using the nomenclature of the hydraulic scheme"))
 
     def OnButtonCancel(self, event):
         self.clear()
-        self.fillPage
+        self.display()
 
     def OnButtonOK(self, event):
 
@@ -650,7 +651,7 @@ using the nomenclature of the hydraulic scheme"))
         process.update(tmp)               
 
         Status.SQL.commit()
-        self.fillPage()
+        self.display()
 
         Status.processData.changeInProcess()
 
@@ -703,6 +704,8 @@ using the nomenclature of the hydraulic scheme"))
         processList = Status.prj.getProcessList("Process")
         for n in processList:
             self.listBoxProcesses.Append (str(n))
+	try: self.listBoxProcesses.SetStringSelection(self.selectedProcessName)
+	except: pass
 
     def clear(self):
         self.tc1.SetValue('')

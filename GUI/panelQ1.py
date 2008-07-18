@@ -643,7 +643,7 @@ class PanelQ1(wx.Panel):
             
             product = self.tc30.GetValue()
 
-            print "PanelQ1 (OK): saving product entries for product %s"%product
+#            print "PanelQ1 (OK): saving product entries for product %s"%product
             
             if check(product) <> 'NULL' and len(Status.DB.qproduct.Product[product].\
                                                                   Questionnaire_id[Status.PId].\
