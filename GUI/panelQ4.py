@@ -456,8 +456,13 @@ class PanelQ4(wx.Panel):
 
     def OnListBoxEquipmentClick(self, event):
         self.equipeName = str(self.listBoxEquipment.GetStringSelection())
-        equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].\
-                 AlternativeProposalNo[Status.ANo].Equipment[self.equipeName][0]
+        equipments = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].\
+                 AlternativeProposalNo[Status.ANo].Equipment[self.equipeName]
+        if len(equipments) > 0:
+            equipe = equipments[0]
+        else:
+            logDebug("PanelQ4 (ListBoxClick): equipe %s not found in database"%self.equipeName)
+            return
                                  
         self.equipeID = equipe.QGenerationHC_ID
         self.display(equipe)
