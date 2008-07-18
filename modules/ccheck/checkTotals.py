@@ -120,11 +120,11 @@ class CheckTotals():
         
 #..............................................................................
 # writing data to table "cgeneraldata"
-#        try:
         if ANo == 0:
             cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
             if len(cgeneraldataTable) > 0:
-                print "exporting data to cgeneraldata"
+                logDebug("exporting data to cgeneraldata")
+                
                 cgeneraldata = cgeneraldataTable[0]
 
                 cgeneraldata.FET = self.FET.val
@@ -135,9 +135,8 @@ class CheckTotals():
 
                 Status.SQL.commit()
                 
-#        except:
-            print "CheckTotals (exportData): error writing data to cgeneraldata"
-            pass
+            else:
+                logDebug("CheckTotals (exportData): error writing data to cgeneraldata")
 
 #------------------------------------------------------------------------------        
     def showAll(self):

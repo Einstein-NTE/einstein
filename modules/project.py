@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
@@ -30,6 +30,7 @@
 #                       Stoyan Danov        16/06/2008
 #                       Hans Schweiger      08/07/2008
 #                       Hans Schweiger      16/07/2008
+#                       Hans Schweiger      18/07/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -48,6 +49,8 @@
 #       16/07/08: HS    bug-fixes in CreateNewProject:
 #                           Nfuels -> NFuels
 #                           BBMaintain: -> BBMaintain
+#       18/07/08: HS    several bug-fixes. change in addEquipmentDummy
+#                       -> no longer creates cascade !!! (gives problems in PanelQ4)
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1173,8 +1176,6 @@ class Project(object):
 
         Status.SQL.commit()
 
-        Status.int.extendCascadeArrays(NEquipe) # creates the space in the
-                                                # equipment cascade
         Status.int.changeInCascade(NEquipe)     # updates Status-flags
         
         return newEquipe
@@ -1195,14 +1196,18 @@ class Project(object):
         equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
         if len(equipes) > 0:
             deletedIndex = equipes[0].CascadeIndex
-
-        deleteSQLRows(DB.qgenerationhc,sqlQuery)
+            deleteSQLRows(DB.qgenerationhc,sqlQuery)
+        else:
+            logDebug("Project (deleteEquipment): cannont delete equipment with ID %s. No corresponding entry in database"%eqID)
+            return
 
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY EqNo ASC"%(Status.PId,Status.ANo)
         equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
 
         for i in range(len(equipes)): #assign new EqNo in QGenerationHC table
             equipes[i].EqNo = i+1
+
+        Status.SQL.commit()
 
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY CascadeIndex ASC"%(Status.PId,Status.ANo)
         equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
@@ -1409,6 +1414,7 @@ class Project(object):
 
         NPipes += 1
 
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
         cgeneraldata[0].NPipeDuct = NPipes
 

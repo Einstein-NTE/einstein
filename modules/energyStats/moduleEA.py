@@ -290,7 +290,7 @@ class ModuleEA(object):
             generalData.PEConvEl = 3.0
             showWarning(_("No conversion factor electricity - primary energy was specified.\default value 3.0 assumed"))
 
-        generalData.PETel = generalData.FETel * generalData.PEConvEl
+        generalData.PETel = generalData.FETel * generalData.PEConvEl        
         generalData.PECel = generalData.FECel * generalData.PEConvEl
 
         if generalData.CO2ConvEl is None:

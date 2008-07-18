@@ -85,6 +85,8 @@ class PanelQ5(wx.Panel):
 	self.main = main
         self._init_ctrls(parent)
         self.__do_layout()
+        self.pipeID = None
+        self.pipeName = None
 
         
     def _init_ctrls(self, parent):
@@ -354,7 +356,12 @@ class PanelQ5(wx.Panel):
         self.pipeName = str(self.listBoxDistributionList.GetStringSelection())
         pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Pipeduct[self.pipeName]
 
-        p = pipes[0]
+        if len(pipes) > 0:
+            p = pipes[0]
+        else:
+            logDebug("PanelQ5 (ListBoxClick): no pipe with name %s in database"%self.pipeName)
+            return
+        
         self.pipeNo = p.PipeDuctNo
         self.pipeID = p.QDistributionHC_ID
         
@@ -396,6 +403,8 @@ class PanelQ5(wx.Panel):
         pipeName = check(self.tc1.GetValue())
         pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
+        logTrack("PanelQ5 (OK Button): data entry confirmed for pipe %s"%pipeName)
+
 	if pipeName != 'NULL' and len(pipes) == 0:
             pipe = Status.prj.addPipeDummy()     
 
@@ -415,7 +424,7 @@ class PanelQ5(wx.Panel):
 
 	tmp = {
 		"Questionnaire_id":Status.PId,
-		"Pipeduct":check(self.tc1.GetValue()),
+		"Pipeduct":pipeName,
                 
 		"HeatDistMedium":check(fluidID),                
 		"DistribCircFlow":check(massFlow), 
@@ -444,6 +453,7 @@ class PanelQ5(wx.Panel):
         event.Skip()
 
     def OnButtonDeleteDistribution(self, event):
+        logTrack("PanelQ5 (DELETE Button): deleting pipe ID %s"%self.pipeID)
         Status.prj.deletePipe(self.pipeID)
         self.clear()
         self.fillPage()

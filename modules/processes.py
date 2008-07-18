@@ -133,7 +133,7 @@ class Processes(object):
         if Status.processData.outOfDate == False:
             logTrack("Processes (createAggregateDemand): WARNING - someone wants to create demand profile which is already up to date")
 
-        if Status.schedules.outOfDateYearly == True:
+        if Status.processData.outOfDateYearly == True:
             logMessage("Processes (createAggregateDemand): creating yearly demand UPHk(T)")
             self.createYearlyDemand()
 

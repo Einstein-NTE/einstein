@@ -428,6 +428,7 @@ class CheckFETel():
 
         self.ElectricityGen.setEstimate(0,limits=(0,0))
         self.ElectricitySales.setEstimate(0,limits=(0,0))
+        self.FEOel.setEstimate(0,limits=(0,0))
         
 # limits: optional and fix absolute minimum and maximum values
 # sqerr: optional input that fixes the (stochastic) relative square error

@@ -469,6 +469,7 @@ class PanelQ4(wx.Panel):
         event.Skip()
 
     def OnButtonDeleteEquipment(self, event):
+        logTrack("PanelQ4 (DELETE Button): deleting equipment ID %s"%self.equipeID)
         Status.prj.deleteEquipment(self.equipeID)
         self.clear()
         self.fillPage()
@@ -493,12 +494,14 @@ class PanelQ4(wx.Panel):
         equipments = Status.DB.qgenerationhc.Equipment[equipeName].\
                      Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
+        logTrack("PanelQ4 (OK Button): data entry confirmed for equipment %s"%equipeName)
+
 	if equipeName != 'NULL' and len(equipments) == 0:
             equipe = Status.prj.addEquipmentDummy()
         elif equipeName != 'NULL' and len(equipments) == 1:
             equipe = equipments[0]
         else:
-	    print "PanelQ4 (ButtonOK) Equipment name has to be a unique value!"
+	    showError("PanelQ4 (ButtonOK) Equipment name has to be a unique value!")
 	    return
 
         fuelDict = Status.prj.getFuelDict()
@@ -666,16 +669,19 @@ class PanelQ4(wx.Panel):
         hxList = Status.prj.getHXList("HXName")
         self.tc30.entry.Clear()
         for src in TRANSAMBIENTSOURCE.values():
-            self.tc30.entry.Append(src)
+            if src is not None: #super extra security feature
+                self.tc30.entry.Append(str(src))
         for hx in hxList:
-            self.tc30.entry.Append(hx)
+            if hx is not None:  #super extra security feature
+                self.tc30.entry.Append(str(hx))
 
     def fillChoiceOfHTSource(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
         self.tc32.entry.Clear()
         if len(pipeList) == 0: self.tc32.entry.Append("---")
         for pipe in pipeList:
-            self.tc32.entry.Append(pipe)
+            if pipe is not None: #super extra security feature
+                self.tc32.entry.Append(str(pipe))
 
     def fillChoiceOfLTSink(self):
         hxList = Status.prj.getHXList("HXName")

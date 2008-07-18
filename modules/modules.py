@@ -55,7 +55,7 @@ class Modules(object):
     def __init__(self):
 #------------------------------------------------------------------------------		
 
-        logTrack("Modules (__init__): creating module instances")
+        logDebug("Modules (__init__): creating module instances")
 
         self.moduleCC = ModuleCC()
         
