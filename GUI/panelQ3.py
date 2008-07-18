@@ -30,6 +30,7 @@
 #                           Hans Schweiger  17/06/2008
 #                           Tom Sobota      21/06/2008
 #                           Hans Schweiger  23/06/2008
+#                           Hans Schweiger  18/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -51,6 +52,7 @@
 #       17/06/2008: HS  adaptation to new display_classes
 #       21/06/2008: TS  General beautification and font awareness.
 #       23/06/2008: HS  bug-fix in function display: clear() shifted to the beginning
+#       18/07/2008: HS  possibility to modify processes in checked state is blocked
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -501,6 +503,10 @@ using the nomenclature of the hydraulic scheme"))
         self.clear()
 
     def OnButtonDeleteProcess(self, event):
+        
+        if self.checkIfAllowed()==False:
+            return
+        
         Status.prj.deleteProcess(self.selectedProcessID)
         self.clear()
         self.fillPage()
@@ -588,6 +594,10 @@ using the nomenclature of the hydraulic scheme"))
 
         if Status.PId == 0:
 	    return
+
+        if self.checkIfAllowed()==False:
+            return
+        
         processName = check(self.tc1.GetValue())
         processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].\
                     AlternativeProposalNo[Status.ANo].\
@@ -722,7 +732,17 @@ using the nomenclature of the hydraulic scheme"))
         self.tc23.SetValue('')
         self.tc24.SetValue('')
         self.tc25.SetValue('')
-        self.tc26.SetValue('')        
+        self.tc26.SetValue('')
+
+    def checkIfAllowed(self):
+	if Status.ANo >= 0:
+            showWarning(_("In the present version of EINSTEIN it is not allowed to modify\n")+\
+                        _("processes in the checked state or alternative proposals. Go to the original data view\n")+\
+                        _("Workaround for studying process optimisation: create a copy of your project\nand modify on this copy in original state"))
+            return False
+        else:   
+            return True
+
 
 if __name__ == '__main__':
     import pSQL

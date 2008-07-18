@@ -346,10 +346,15 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 #------------------------------------------------------------------------------		
 
     def OnButtonAddFuel(self, event):
+        if self.checkIfAllowed()==False:
+            return
         self.clearFuelData()
         self.fillPage()
 
     def OnButtonRemoveFuelFromList(self, event):
+        if self.checkIfAllowed()==False:
+            return
+
         Status.prj.deleteFuel(self.selectedFuelID)
         self.clear()
         self.fillPage()
@@ -357,6 +362,9 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
 
 
     def OnButtonOK(self, event):
+        if self.checkIfAllowed()==False:
+            return
+
         if self.notebook.GetSelection()==0:
             self.storeFuelData()
         else:
@@ -645,6 +653,16 @@ Specify the energy equivalent in base of LCV (lower calorific value)"))
         self.grid.SetCellValue(5, 0, '')
         self.grid.SetCellValue(5, 2, '')
         self.grid.SetCellValue(5, 5, '')
+
+    def checkIfAllowed(self):
+	if Status.ANo >= 0:
+            showWarning(_("In the present version of EINSTEIN it is not allowed to modify\n")+\
+                        _("fuel consumption in the checked state or alternative proposals. This is a RESULT of calculation\n")+\
+                        _("Workaround for studying fuel substitution: add all fuels You want to consider already in the original state\n")+\
+                        _("and set original consumption of these additional fuels to 0"))
+            return False
+        else:   
+            return True
 
 
 if __name__ == '__main__':

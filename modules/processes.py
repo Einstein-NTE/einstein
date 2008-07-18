@@ -49,7 +49,8 @@ class Processes(object):
 #------------------------------------------------------------------------------		
     def __init__(self):
 #------------------------------------------------------------------------------		
-        pass
+        self.outOfDate = True
+        self.outOfDateYearly = True
        
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -117,6 +118,8 @@ class Processes(object):
         logMessage("Processes (createYearlyDemand): yearly heat demand = %s yearly waste heat availability = %s"%\
               (Status.int.UPHTotal_T[NT+1],Status.int.UPHwTotal_T[0]))
 
+        self.outOfDateYearly = False
+
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
     def createAggregateDemand(self):
@@ -129,6 +132,10 @@ class Processes(object):
 
         if Status.processData.outOfDate == False:
             logTrack("Processes (createAggregateDemand): WARNING - someone wants to create demand profile which is already up to date")
+
+        if Status.schedules.outOfDateYearly == True:
+            logMessage("Processes (createAggregateDemand): creating yearly demand UPHk(T)")
+            self.createYearlyDemand()
 
         if Status.schedules.outOfDate == True:
             logMessage("Processes (createAggregateDemand): creating process schedules")
@@ -218,6 +225,7 @@ class Processes(object):
 #       of the present alternative are changed
 #------------------------------------------------------------------------------		
         self.outOfDate = True
+        self.outOfDateYearly = True
         Status.schedules.outOfDate = True
         Status.int.changeInCascade(0)
         logTrack("Processes (changeInProcess): process data changed")
