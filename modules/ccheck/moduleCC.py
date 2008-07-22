@@ -209,17 +209,29 @@ class ModuleCC(object):
                 for parname in entry[3]:
                     origin1 = origin1 + str(parname) + "; "
 
-                row1 = ["%12.2f"%entry[4],
-                        "+/- "+"%5.3f"%entry[5]+"%",
-                        origin1]
+                if entry[4] is not None:
+                    row1 = ["%12.2f"%entry[4],
+                            "+/- "+"%5.3f"%entry[5]+"%",
+                            origin1]
+                else:
+                    row1 = ["---",
+                            "+/- "+"%5.3f"%entry[5]+"%",
+                            origin1]
+                    
 
                 origin2 = ""
                 for parname in entry[7]:
                     origin2 = origin2 + str(parname) + "; "
 
-                row2 = ["%12.2f"%entry[8],
-                        "+/- "+"%5.3f"%entry[9]+"%",
-                        origin2]
+                if entry[8] is not None:
+                    row2 = ["%12.2f"%entry[8],
+                            "+/- "+"%5.3f"%entry[9]+"%",
+                            origin2]
+                else:
+                    row2 = ["---",
+                            "+/- "+"%5.3f"%entry[9]+"%",
+                            origin2]
+                    
                        
                 conflictReport.append(noneFilter(row0))
                 conflictReport.append(noneFilter(row1))
@@ -287,6 +299,8 @@ class ModuleCC(object):
         NJ = self.NEquipe
         self.USHj = CCRow("USHj",NJ)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
         self.FETj = CCRow("FETj",NJ)     #creates the space for intermediate storge towards matrix
+        self.FETFuel_j = CCRow("FETFuel_j",NJ)     #creates the space for intermediate storge towards matrix
+        self.FETel_j = CCRow("FETel_j",NJ)     #creates the space for intermediate storge towards matrix
         self.QHXEq = CCRow("QHXEq",NJ)      # incoming waste heat from heat recovery
         self.QWHEq = CCRow("QWHEq",NJ)    # outgoing waste heat to be recovered
 
@@ -344,7 +358,8 @@ class ModuleCC(object):
 #..............................................................................
 # import data on link of fuels and equipment
 
-        self.FETMatrix = CheckMatrix("FET",self.FETi,self.FETj,Status.FETLink)
+        self.FETFuelMatrix = CheckMatrix("FETFuel",self.FETi[1:NI+1],self.FETFuel_j,Status.FETFuelLink)
+        self.FETelMatrix = CheckMatrix("FETel",self.FETi[0:1],self.FETel_j,Status.FETelLink)
 
 #..............................................................................
 # import data on link of equipment and pipes
@@ -422,7 +437,7 @@ class ModuleCC(object):
 
             if DEBUG in ["ALL","BASIC","MAIN"]:
                 print "===================================================="
-                print "ModuleCC: starting cycle no. %s"%(cycle+1)
+                print "ModuleCC: starting cycle no. %s"%(ncycle+1)
                 print "===================================================="
 
 #..............................................................................
@@ -476,6 +491,9 @@ class ModuleCC(object):
 
                 self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
+                self.FETFuel_j[j].update(self.ccEq[j].FETFuel_j)
+                self.FETel_j[j].update(self.ccEq[j].FETel_j)
+                
 # here data should be passed to the correspoinding inputs in CheckEq
 #               self.QHXEq[j].update(self.ccEq[j].QHXEqRec)
 #               self.QWHEq[j].update(self.ccEq[j].QWHEqRec)
@@ -596,14 +614,18 @@ class ModuleCC(object):
 
                 conflict.setDataGroup("FET","-")
 
-                self.FETMatrix.check()
+#                self.FETMatrix.check()
+                self.FETFuelMatrix.check()
+                self.FETelMatrix.check()
 
                 self.ccFET[0].FETel.update(self.FETi[0])
                 for i in range(1,NI):
                     self.ccFET[i].FETFuel.update(self.FETi[i])
 
                 for j in range(NJ):
-                    self.ccEq[j].FETj.update(self.FETj[j])
+#                    self.ccEq[j].FETj.update(self.FETj[j])
+                    self.ccEq[j].FETFuel_j.update(self.FETFuel_j[j])
+                    self.ccEq[j].FETel_j.update(self.FETel_j[j])
 
 #..............................................................................
 # If any matrix conflict appears, break immediately.

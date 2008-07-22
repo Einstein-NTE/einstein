@@ -46,7 +46,6 @@ from ccheckFunctions import *
 #libraries necessary for SQL access:
 from einstein.GUI.status import *
 import einstein.GUI.pSQL as pSQL, MySQLdb
-from einstein.GUI.GUITools import *
 
 #------------------------------------------------------------------------------
 class CheckFETel():
@@ -178,14 +177,14 @@ class CheckFETel():
             print "exporting data to qelectricity"
             qelectricity = qelectricityTable[0]
 
-            qelectricity.ElectricityTotYear = self.ElectricityTotYear.val
-            qelectricity.ElectricityMotors = self.ElectricityMotors.val
-            qelectricity.ElectricityChem = self.ElectricityChem.val
-            qelectricity.ElectricityLight = self.ElectricityLight.val
-            qelectricity.ElectricityRef = self.ElectricityRef.val
-            qelectricity.ElectricityAC = self.ElectricityAC.val
-            qelectricity.ElectricityThOther = self.ElectricityThOther.val
-            qelectricity.ElGenera = self.ElectricityGen.val
+            qelectricity.ElectricityTotYear = check(self.ElectricityTotYear.val)
+            qelectricity.ElectricityMotors = check(self.ElectricityMotors.val)
+            qelectricity.ElectricityChem = check(self.ElectricityChem.val)
+            qelectricity.ElectricityLight = check(self.ElectricityLight.val)
+            qelectricity.ElectricityRef = check(self.ElectricityRef.val)
+            qelectricity.ElectricityAC = check(self.ElectricityAC.val)
+            qelectricity.ElectricityThOther = check(self.ElectricityThOther.val)
+            qelectricity.ElGenera = check(self.ElectricityGen.val)
 
             Status.SQL.commit()
                 

@@ -91,6 +91,7 @@ class PanelQ3(wx.Panel):
 	self.main = main
         self._init_ctrls(parent)
         self.__do_layout()
+        self.fillPage()
 
     def _init_ctrls(self, parent):
 
@@ -651,7 +652,6 @@ using the nomenclature of the hydraulic scheme"))
         process.update(tmp)               
 
         Status.SQL.commit()
-        self.display()
 
         Status.processData.changeInProcess()
 
@@ -660,19 +660,7 @@ using the nomenclature of the hydraulic scheme"))
 #------------------------------------------------------------------------------		
 
     def display(self):
-        self.clear()
-        self.fillPage()
-        self.fillChoiceOfDBUnitOperation()
-        self.fillChoiceOfPMDBFluid()
-        self.fillChoiceOfODBFluid()
-        self.fillChoiceOfSMDBFluid()
-        self.fillChoiceOfPipe()
-        self.fillChoiceOfHX()
-        self.tc2.SetValue(TRANSPROCTYPES.values())
-        self.tc18.SetValue(TRANSYESNO.values())
-        self.tc19.SetValue(TRANSYESNO.values())
         self.Show()
-
 
     def fillChoiceOfDBUnitOperation(self): # tc3
         unitOpDict = Status.prj.getUnitOpDict()
@@ -700,6 +688,16 @@ using the nomenclature of the hydraulic scheme"))
 
 
     def fillPage(self):
+        self.clear()
+        self.fillChoiceOfDBUnitOperation()
+        self.fillChoiceOfPMDBFluid()
+        self.fillChoiceOfODBFluid()
+        self.fillChoiceOfSMDBFluid()
+        self.fillChoiceOfPipe()
+        self.fillChoiceOfHX()
+        self.tc2.SetValue(TRANSPROCTYPES.values())
+        self.tc18.SetValue(TRANSYESNO.values())
+        self.tc19.SetValue(TRANSYESNO.values())
         self.listBoxProcesses.Clear()
         processList = Status.prj.getProcessList("Process")
         for n in processList:

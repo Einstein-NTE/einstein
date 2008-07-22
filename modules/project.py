@@ -1652,9 +1652,7 @@ class Project(object):
 #..............................................................................
 # deleting Q- and corresponding C-Tables
 
-        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-
-        whees = Status.DB.qwasteheatelequip.sql_select(sqlQuery)
+        whees = self.getWHEEs()
         NWHEE = len(whees)
         tmp = {
             "ProjectID":Status.PId,
@@ -1666,6 +1664,7 @@ class Project(object):
 
         NWHEE += 1
 
+        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
         cgeneraldata = Status.DB.cgeneraldata.sql_select(sqlQuery)
         cgeneraldata[0].NWHEE = NWHEE
 

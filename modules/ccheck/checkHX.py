@@ -102,7 +102,7 @@ class CheckHX():
             if len(qheatexchangerTable) > 0:
                 qheatexchanger = qheatexchangerTable[0]
 
-                qheatexchanger.QHX = self.QHX.val
+                qheatexchanger.QHX = check(self.QHX.val)
                 
                 Status.SQL.commit()
                 

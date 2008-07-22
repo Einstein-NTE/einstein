@@ -134,10 +134,10 @@ class CheckFETfuel():
                 qfuel = qfuelTable[0]
 
         
-                qfuel.MFuelYear = self.MFuelYear.val
-                qfuel.FEOFuel = self.FEOFuel.val
-                qfuel.FECFuel = self.FECFuel.val
-                qfuel.FETFuel = self.FETFuel.val
+                qfuel.MFuelYear = check(self.MFuelYear.val)
+                qfuel.FEOFuel = check(self.FEOFuel.val)
+                qfuel.FECFuel = check(self.FECFuel.val)
+                qfuel.FETFuel = check(self.FETFuel.val)
                 
                 Status.SQL.commit()
                 

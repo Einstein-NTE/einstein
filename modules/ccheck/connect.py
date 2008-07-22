@@ -19,12 +19,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	13/06/2008
-#	Last revised by:    
+#	Last revised by:
+#                           Hans Schweiger      21/07/2008
 #                    
 #
-#       Changes in last update: 
+#       Changes in last update:
+#
+#       21/07/2008: HS  Split-up of FETLink into FETFuelLink and FETelLink
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -78,7 +81,6 @@ def getConnections():
 # 1. FETi-FETj-Link: fuels used in equipment
 
     fuelIDs_i = Status.prj.getFuelList("DBFuel_id")
-    fuelIDs_i.insert(0,99) #first fuel is electricity (default_ID = 99)
     
     fuelIDs_j = Status.prj.getEquipmentList("DBFuel_id")
 
@@ -86,17 +88,21 @@ def getConnections():
     print "Connect: fuelIDs_j",fuelIDs_j
    
 
-    Status.FETLink = arange(NI*NJ).reshape(NJ,NI)  # reshape(rows,cols)
+    Status.FETFuelLink = arange((NI-1)*NJ).reshape(NJ,(NI-1))  # reshape(rows,cols)
+    Status.FETelLink = arange(1*NJ).reshape(NJ,1)  # reshape(rows,cols)
+    
     
     for j in range(NJ):
-        for i in range(NI):
+        for i in range(NI-1):
             if fuelIDs_i[i] == fuelIDs_j[j]:
-                Status.FETLink[j][i] = 1
+                Status.FETFuelLink[j][i] = 1
             else:
-                Status.FETLink[j][i] = 0
+                Status.FETFuelLink[j][i] = 0
+        Status.FETelLink[j][0] = 1  #all equipments potentially consume something of (parasitic) electricity.
 
     print "Connect: FETLink created"
-    print Status.FETLink
+    print Status.FETFuelLink
+    print Status.FETelLink
         
 #..............................................................................
 # 2. USHj-USHm-Link: conecction equipment to pipe

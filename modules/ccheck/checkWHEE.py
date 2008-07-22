@@ -106,7 +106,7 @@ class CheckWHEE():
             if len(qwheeTable) > 0:
                 qwhee = qwheeTable[0]
 
-                qwhee.QWHEE = self.QWHEE.val
+                qwhee.QWHEE = check(self.QWHEE.val)
                 
                 Status.SQL.commit()
                 

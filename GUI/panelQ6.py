@@ -476,7 +476,10 @@ class PanelQ6(wx.Panel):
 
     def OnListBoxHXListboxClick(self, event):
         self.HXName = str(self.listBoxHX.GetStringSelection())
-        self.HXNo = self.HXList.index(self.HXName)+1
+        if self.HXName in self.HXList:
+            self.HXNo = self.HXList.index(self.HXName)+1
+        else:
+            self.HXNo = None
 
         self.fillPage()
 
@@ -554,7 +557,10 @@ class PanelQ6(wx.Panel):
 
     def OnListBoxWHEEListboxClick(self, event):
         self.WHEEName = str(self.listBoxWHEE.GetStringSelection())
-        self.WHEENo = self.WHEEList.index(self.WHEEName)+1
+        if self.WHEEName in self.WHEEList:
+            self.WHEENo = self.WHEEList.index(self.WHEEName)+1
+        else:
+            self.WHEENo = None
 
         whees = Status.DB.qwasteheatelequip.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].WHEEName[self.WHEEName]
 

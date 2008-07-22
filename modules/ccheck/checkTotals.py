@@ -127,11 +127,11 @@ class CheckTotals():
                 
                 cgeneraldata = cgeneraldataTable[0]
 
-                cgeneraldata.FET = self.FET.val
-                cgeneraldata.FEO = self.FEO.val
-                cgeneraldata.FEC = self.FEC.val
-                cgeneraldata.USH = self.USH.val
-                cgeneraldata.UPH = self.UPH.val                
+                cgeneraldata.FET = check(self.FET.val)
+                cgeneraldata.FEO = check(self.FEO.val)
+                cgeneraldata.FEC = check(self.FEC.val)
+                cgeneraldata.USH = check(self.USH.val)
+                cgeneraldata.UPH = check(self.UPH.val)                
 
                 Status.SQL.commit()
                 

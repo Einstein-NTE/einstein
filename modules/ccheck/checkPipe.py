@@ -353,29 +353,29 @@ class CheckPipe():
                 print "exporting data to qdistributionhc"
                 qdistributionhc = qdistributionhcTable[0]
 
-                qdistributionhc.DistribCircFlow = self.DistribCircFlow.val
-                qdistributionhc.ToutDistrib = self.ToutDistrib.val
-                qdistributionhc.TreturnDistrib = self.TreturnDistrib.val
-                qdistributionhc.PercentRecirc = self.PercentRecirc.val
-                qdistributionhc.Tfeedup = self.Tfeedup.val
-                qdistributionhc.TotLengthDistPipe = self.TotLengthDistPipe.val
-                qdistributionhc.DDistPipe = self.DDistPipe.val
-                qdistributionhc.DeltaDistPipe = self.DeltaDistPipe.val
+                qdistributionhc.DistribCircFlow = check(self.DistribCircFlow.val)
+                qdistributionhc.ToutDistrib = check(self.ToutDistrib.val)
+                qdistributionhc.TreturnDistrib = check(self.TreturnDistrib.val)
+                qdistributionhc.PercentRecirc = check(self.PercentRecirc.val)
+                qdistributionhc.Tfeedup = check(self.Tfeedup.val)
+                qdistributionhc.TotLengthDistPipe = check(self.TotLengthDistPipe.val)
+                qdistributionhc.DDistPipe = check(self.DDistPipe.val)
+                qdistributionhc.DeltaDistPipe = check(self.DeltaDistPipe.val)
         
-#                qdistributionhc.HPerYearPipe = self.HPerYearPipe.val
-                qdistributionhc.HDEffAvg = self.HDEffAvg.val
-                qdistributionhc.QHXPipe = self.QHXPipe.val
-                qdistributionhc.QWHPipe = self.QWHPipe.val
-#                qdistributionhc.UAPipe = self.UAPipe.val
-                qdistributionhc.UPHProcm = self.UPHProcm.val
-                qdistributionhc.USHm = self.USHm.val
-                qdistributionhc.USHPipe = self.USHPipe.val
-                qdistributionhc.QLossPipe = self.QLossPipe.val
+#                qdistributionhc.HPerYearPipe = check(self.HPerYearPipe.val)
+                qdistributionhc.HDEffAvg = check(self.HDEffAvg.val)
+                qdistributionhc.QHXPipe = check(self.QHXPipe.val)
+                qdistributionhc.QWHPipe = check(self.QWHPipe.val)
+#                qdistributionhc.UAPipe = check(self.UAPipe.val)
+                qdistributionhc.UPHProcm = check(self.UPHProcm.val)
+                qdistributionhc.USHm = check(self.USHm.val)
+                qdistributionhc.USHPipe = check(self.USHPipe.val)
+                qdistributionhc.QLossPipe = check(self.QLossPipe.val)
 
-                #qdistributionhc.TenvPipe = self.TenvPipe .val
-                #qdistributionhc.TrefPipe =  self.TrefPipe.val
+                #qdistributionhc.TenvPipe = check(self.TenvPipe .val)
+                #qdistributionhc.TrefPipe =  check(self.TrefPipe.val)
 
-                #qdistributionhc.QLossPipe = self.QLossPipe.val
+                #qdistributionhc.QLossPipe = check(self.QLossPipe.val)
                      
                 Status.SQL.commit()
             else:

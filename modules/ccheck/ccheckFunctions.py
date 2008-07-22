@@ -75,6 +75,7 @@
 #============================================================================== 				
 
 from einstein.modules.messageLogger import *
+from einstein.GUI.GUITools import *     #needed for function check
 
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"

@@ -257,31 +257,31 @@ class CheckProc():
                 qprocessdata = qprocessdataTable[0]
 
         
-                qprocessdata.PTInFlow = self.PTInFlow.val
-                qprocessdata.PT = self.PT.val
-                qprocessdata.PTOutFlow = self.PTOutFlow.val
-                qprocessdata.PTOutFlowRec = self.PTOutFlowRec.val #do not exist yet
-                qprocessdata.PTInFlowRec = self.PTInFlowRec.val
-                qprocessdata.PTStartUp = self.PTStartUp.val
-                qprocessdata.PTFinal = self.PTFinal.val
-                qprocessdata.VInFlowDay = self.VInFlowDay.val
-                qprocessdata.VolProcMed = self.VolProcMed.val
-                qprocessdata.NDaysProc = self.NDaysProc.val
-                qprocessdata.HPerDayProc = self.HPerDayProc.val
-                qprocessdata.NBatch = self.NBatch.val
-                qprocessdata.TEnvProc = self.TEnvProc.val
-                qprocessdata.QOpProc = self.QOpProc.val
-                qprocessdata.UPHProc = self.UPHProc.val
-                qprocessdata.HPerYearProc = self.HPerYearProc.val
-                qprocessdata.UAProc = self.UAProc.val
-                qprocessdata.QEvapProc = self.QEvapProc.val
-                qprocessdata.UPHcGross = self.UPHcGross.val
-                qprocessdata.QHXProcInt = self.QHXProcInt.val
-                qprocessdata.UPHm = self.UPHm.val
-                qprocessdata.UPHs = self.UPHs.val
-                qprocessdata.UPHc = self.UPHc.val
-                qprocessdata.UPH = self.UPH.val
-                qprocessdata.UPHw = self.UPHw.val
+                qprocessdata.PTInFlow = check(self.PTInFlow.val)
+                qprocessdata.PT = check(self.PT.val)
+                qprocessdata.PTOutFlow = check(self.PTOutFlow.val)
+                qprocessdata.PTOutFlowRec = check(self.PTOutFlowRec.val) #do not exist yet
+                qprocessdata.PTInFlowRec = check(self.PTInFlowRec.val)
+                qprocessdata.PTStartUp = check(self.PTStartUp.val)
+                qprocessdata.PTFinal = check(self.PTFinal.val)
+                qprocessdata.VInFlowDay = check(self.VInFlowDay.val)
+                qprocessdata.VolProcMed = check(self.VolProcMed.val)
+                qprocessdata.NDaysProc = check(self.NDaysProc.val)
+                qprocessdata.HPerDayProc = check(self.HPerDayProc.val)
+                qprocessdata.NBatch = check(self.NBatch.val)
+                qprocessdata.TEnvProc = check(self.TEnvProc.val)
+                qprocessdata.QOpProc = check(self.QOpProc.val)
+                qprocessdata.UPHProc = check(self.UPHProc.val)
+                qprocessdata.HPerYearProc = check(self.HPerYearProc.val)
+                qprocessdata.UAProc = check(self.UAProc.val)
+                qprocessdata.QEvapProc = check(self.QEvapProc.val)
+                qprocessdata.UPHcGross = check(self.UPHcGross.val)
+                qprocessdata.QHXProcInt = check(self.QHXProcInt.val)
+                qprocessdata.UPHm = check(self.UPHm.val)
+                qprocessdata.UPHs = check(self.UPHs.val)
+                qprocessdata.UPHc = check(self.UPHc.val)
+                qprocessdata.UPH = check(self.UPH.val)
+                qprocessdata.UPHw = check(self.UPHw.val)
                                        
 
                 Status.SQL.commit()
@@ -649,9 +649,8 @@ class CheckProc():
         self.QLoss1.show()
         self.DTUPHcGross1.show()
         self.DTUPHcGross.show()
-        self.DTQHX1.show()
-        self.DTQHX2.show()
-        self.DTQHX.show()
+        self.DTQHXIn.show()
+        self.DTQHXOut.show()
         self.QHXdotProcInt1.show()
         self.QHXdotProcInt2.show()
         self.QHXdotProcInt.show()
