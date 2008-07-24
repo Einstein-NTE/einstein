@@ -358,6 +358,22 @@ def displayValue(internalValue,unit,unitType):
     
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
+def conversionFactor(unit):
+#------------------------------------------------------------------------------
+#   returns the conversion factor: X (internal units) = X (user units) * cF
+#------------------------------------------------------------------------------
+
+    for unitType in UNITS.keys():
+        if unit in UNITS[unitType].keys():
+            (a,b) = UNITS[unitType][unit]
+            return a
+
+    logWarning(_("Units (conversionFactor): unknown unit <%s>")%unit)
+        
+    return 1.0
+    
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 def getUnitTypes(unit):
 #------------------------------------------------------------------------------
 #   gets the unit type (TEMPERATURE, MASSFLOW, ...) from the unit (ºC, kg/h, ...)

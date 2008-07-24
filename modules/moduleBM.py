@@ -45,6 +45,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.messageLogger import *
 import einstein.modules.matPanel as mP
+from einstein.GUI.units import *
 
 class ModuleBM(object):
     
@@ -97,6 +98,7 @@ class ModuleBM(object):
 
         self.products = Status.prj.getProductList("Product")
         self.productCodes = Status.prj.getProductList("ProductCode")
+        self.productUnits = Status.prj.getProductList("ProdUnit")
         
         self.processes = Status.prj.getProcessList("Process")
         self.unitOpIDs = Status.prj.getProcessList("DBUnitOperation_id")
@@ -395,11 +397,15 @@ class ModuleBM(object):
                 if self.product in self.products:
                     idx = self.products.index(self.product)
                     self.productCode = self.productCodes[idx]
+                    pu = self.productUnits[idx]
+                    
                 else:
                     self.productCode = None
+                    pu = "t"
                     
                 print "ModuleBM (findBMs): productCode BM: %s - product %s [%s]"%\
                       (productCode,self.product,self.productCode)
+
                 
                 if self.productCode == productCode and productCode is not None:
                                    
@@ -407,17 +413,39 @@ class ModuleBM(object):
                              benchmark.E_SEC_MIN,\
                              benchmark.E_SEC_MAX]
 
+                    pu_BM = benchmark.E_Unit
+                    fc = conversionFactor(pu)/conversionFactor(pu_BM)
+                    for i in range(len(FECel)):
+                        if FECel[i] is not None:
+                            FECel[i] *= fc
+
                     hasFECelData = ((FECel[0] is not None) or (FECel[1]is not None) or (FECel[2] is not None))
                     
                     FECfuel = [benchmark.H_SEC_TARG,\
                              benchmark.H_SEC_MIN,\
                              benchmark.H_SEC_MAX]
 
+                    pu_BM = benchmark.H_Unit
+                    fc = conversionFactor(pu)/conversionFactor(pu_BM)
+
+                    print "pu %s [%s] pu_BM %s [%s] fc %s"%\
+                          (pu,conversionFactor(pu),pu_BM,conversionFactor(pu_BM),fc)
+                    
+                    for i in range(len(FECfuel)):
+                        if FECfuel[i] is not None:
+                            FECfuel[i] *= fc
+
                     hasFECfuelData = ((FECfuel[0] is not None) or (FECfuel[1]is not None) or (FECfuel[2] is not None))
 
                     PEC =   [benchmark.T_SEC_TARG,\
                              benchmark.T_SEC_MIN,\
                              benchmark.T_SEC_MAX]
+
+                    pu_BM = benchmark.T_Unit
+                    fc = conversionFactor(pu)/conversionFactor(pu_BM)
+                    for i in range(len(PEC)):
+                        if PEC[i] is not None:
+                            PEC[i] *= fc
 
                     hasPECData = ((PEC[0] is not None) or (PEC[1]is not None) or (PEC[2] is not None))
 

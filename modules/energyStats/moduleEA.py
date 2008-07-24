@@ -343,8 +343,6 @@ class ModuleEA(object):
 #..............................................................................
 # energy intensity and specific energy consumption
 
-        products = Status.prj.getProducts()
-
 #Part 1: Energy Intensity
 
         Turnover = projectData.Turnover #in euros
@@ -378,18 +376,20 @@ class ModuleEA(object):
                 else:
                     fTurnover = 1./len(products)
 
-                if PEC is not None and QProdYear > 0:
-                    product.PE_SEC = fTurnover*PEC/QProdYear
+                quantity = product.QProdYear
+
+                if PEC is not None and quantity > 0:
+                    product.PE_SEC = fTurnover*PEC/quantity
                 else:
                     product.PE_SEC = 0.0
                 
-                if FECel is not None and QProdYear > 0:
-                    product.EL_SEC = fTurnover*FECel/QProdYear
+                if FECel is not None and quantity > 0:
+                    product.EL_SEC = fTurnover*FECel/quantity
                 else:
                     product.EL_SEC = 0.0
                 
-                if FECFuels is not None and QProdYear > 0:
-                    product.FUEL_SEC = fTurnover*FECFuels/QProdYear
+                if FECFuels is not None and quantity > 0:
+                    product.FUEL_SEC = fTurnover*FECFuels/quantity
                 else:
                     product.FUEL_SEC = 0.0
 

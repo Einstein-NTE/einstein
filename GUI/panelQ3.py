@@ -227,10 +227,10 @@ when process start-up begins"))
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict='MASS',
+                              unitdict='VOLUME',
                               label=_("Daily inflow of process medium"),
                               tip=_("Continuous process: Fluid flow rate times hours of circulation. \
-Batch process with fluid renewal: volume times No. of lots."))
+Batch process with fluid renewal: volume times No. of batches."))
 
 
         self.tc9 = FloatEntry(self.page0,
@@ -238,7 +238,6 @@ Batch process with fluid renewal: volume times No. of lots."))
                               unitdict='VOLUME',
                               label=_("Volume of the process medium within the equipment or storage"),
                               tip=_("e.g. volume of liquid in a bottle for cleaning"))
-
 
         self.tc10 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
@@ -660,6 +659,7 @@ using the nomenclature of the hydraulic scheme"))
 #------------------------------------------------------------------------------		
 
     def display(self):
+        
         self.Show()
 
     def fillChoiceOfDBUnitOperation(self): # tc3
