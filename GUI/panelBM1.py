@@ -46,6 +46,7 @@ from einstein.GUI.graphics import drawPiePlot
 from einstein.GUI.status import Status
 from numCtrl import *
 from einstein.modules.messageLogger import *
+from GUITools import *
 
 
 import einstein.modules.matPanel as Mp
@@ -66,11 +67,6 @@ from einstein.modules.interfaces import *
 
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGA
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 COLNO = 6
 MAXROWS = 20
@@ -81,8 +77,9 @@ def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
+    if hasattr(self, 'subplot'):
+       del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
 
     gdata = Status.int.GData["BM1 Figure"]
     axis = gdata[0]
@@ -102,7 +99,7 @@ def drawFigure(self):
     for i in range(len(ps_el)):
         self.subplot.plot(ps_el[i],
                       ps_fuel[i],
-                      'rs-', label='FEC[%s]'%(i), linewidth=2)
+                      'rs', label='FEC[%s]'%(i), linewidth=2)
 
     for i in range(NBenchmarks):
         self.subplot.plot(bmtar_el[i],
@@ -110,7 +107,7 @@ def drawFigure(self):
                           'go',  label='target')
         self.subplot.plot(bm_el[i],
                           bm_fuel[i],
-                          'bo-', label='min/max', linewidth=1)
+                          'g--', label='min/max', linewidth=1)
     self.subplot.axis(axis)
 
 
@@ -131,11 +128,11 @@ class PanelBM1(wx.Panel):
 #------------------------------------------------------------------------------		
         self.main = parent
 
-	keys = ['BM1 Table']
+	keys = ['BM1']
         self.mod = Status.mod.moduleBM
 
         print "PanelBM: calling initPanel"
-        self.mod.initPanel()
+        self.mod.initPanel(keys)
         
         print "PanelBM: calling init_ctrls"
         try: print "PanelBM - GData",Status.int.GData[keys[0]]
@@ -223,8 +220,8 @@ class PanelBM1(wx.Panel):
 
         self.box1 = wx.StaticBox(self, -1, _('Benchmark (1): global energy intensity'),
                                  pos = (10,10),size=(780,260))
-#        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
-#              False, 'Tahoma'))
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.gridPage = wx.grid.Grid(id=wxID_PANELBM1GRIDPAGE,
               name='gridpageBM1', parent=self, pos=wx.Point(20, 40),
@@ -245,6 +242,8 @@ class PanelBM1(wx.Panel):
 
         self.box2 = wx.StaticBox(self, -1, _('Comparison benchmark data'),
                                  pos = (10,310),size=(400,260))
+        self.box2.SetForegroundColour(TITLE_COLOR)
+        self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
         self.panelFig = wx.Panel(id=wxID_PANELBM1FIG, name='panelAFigure',
@@ -256,6 +255,8 @@ class PanelBM1(wx.Panel):
 
         self.box3 = wx.StaticBox(self, -1, _('Search criteria'),
                                  pos = (430,310),size=(360,220))
+        self.box3.SetForegroundColour(TITLE_COLOR)
+        self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stSearchCrit1 = wx.StaticText(id=wxID_PANELBM1STSEARCHCRIT1,
               label=_('NACE Code range (digits)'), name='stSearchCrit1',
@@ -342,7 +343,7 @@ class PanelBM1(wx.Panel):
 #..............................................................................		
 #   create data table
 
-        data = Status.int.GData["BM1 Table"]
+        data = Status.int.GData["BM1"]
         try: (rows,cols) = data.shape
         except:
             rows = 0
@@ -373,6 +374,7 @@ class PanelBM1(wx.Panel):
 #..............................................................................		
 #   create graphic representation
 
+        self.Hide()
         self.panelFig.draw()
 
         self.Show()
@@ -397,7 +399,7 @@ class PanelBM1(wx.Panel):
             showWarning(_("revise your search criteria: year of data in between %s and %s"%(year0,year1)))
             return
 
-        searchCriteria = [naceSearch,None,turnover0,turnover1,year0,year1,None,None,None]
+        searchCriteria = [naceSearch,None,turnover0,turnover1,year0,year1,None,None,None,None]
         Status.int.setGraphicsData("BM Info",searchCriteria)
         self.mod.updateSearch()
         self.display()
@@ -459,7 +461,7 @@ class PanelBM1(wx.Panel):
 #------------------------------------------------------------------------------		
 
         try: bm_tar = convertDoubleToString(float(bm[0]))
-        except: target = "---"
+        except: bm_tar = "---"
         try: bm_min = convertDoubleToString(float(bm[1]))
         except: bm_min = "---"
         try: bm_max = convertDoubleToString(float(bm[2]))

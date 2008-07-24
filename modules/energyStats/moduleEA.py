@@ -31,6 +31,7 @@
 from sys import *
 from math import *
 from numpy import *
+from GUITools import *  #for the check function
 
 from moduleEA1 import ModuleEA1
 from moduleEA2 import ModuleEA2
@@ -235,18 +236,23 @@ class ModuleEA(object):
 # now store fuel and electricity consumption in the corresponding tables
 
             FETFuels = 0.0
+            FECFuels = 0.0
+            
             for fuel in fuels:
                 i = fuel.FuelNo - 1
                 fuel.FETFuel = FETi[i]
                 FETFuels += FETi[i]
+                FECFuels += FETi[i]
                 if fuel.FEOFuel is not None:
                     fuel.FECFuel = FETi[i] + fuel.FEOFuel
+                    FECFuels += fuel.FEOFuel
                 else:
                     fuel.FECFuel = FETi[i]
                     fuel.FEOFuel = 0.0
                     logDebug("ModuleEA (calculateEqEnergyBalances): no entry found for FEOFuel of fuel no. %s"%(i+1))
 
             generalData.FETel = FETel
+            
             if generalData.FEOel is not None:
                 generalData.FECel = FETel + generalData.FEOel
                 electricity.ElectricityTotYear = generalData.FECel
@@ -258,7 +264,6 @@ class ModuleEA(object):
 
             generalData.FET = FET  #total FET as simple sum
             generalData.USH = USH  #total USH
-
 
 #..............................................................................
 #..............................................................................
@@ -308,12 +313,14 @@ class ModuleEA(object):
         PETFuels = 0.0
         PECFuels = 0.0
         ProdCO2Fuels = 0.0
+        FECFuels = 0.0  # direct sum of fuel FECs -> used for SEC values only !!
         
         for fuel in fuels:
             i = fuel.FuelNo - 1
             f = Fuel(fuel.DBFuel_id)
             
             dPET = fuel.FETFuel * f.PEConv
+            dFEC = fuel.FECFuel
             dPEC = fuel.FECFuel * f.PEConv
             dCO2 = fuel.FECFuel * f.CO2Conv
 
@@ -324,6 +331,7 @@ class ModuleEA(object):
             PETFuels += dPET
             PECFuels += dPEC
             ProdCO2Fuels += dCO2
+            FECFuels += dFEC
 
         generalData.PETFuels = PETFuels
         generalData.PECFuels = PECFuels
@@ -331,6 +339,78 @@ class ModuleEA(object):
 
         generalData.PEC = generalData.PECFuels + generalData.PECel
         generalData.PET = generalData.PETFuels + generalData.PETel
+
+#..............................................................................
+# energy intensity and specific energy consumption
+
+        products = Status.prj.getProducts()
+
+#Part 1: Energy Intensity
+
+        Turnover = projectData.Turnover #in euros
+
+        if (Turnover > 0) and Turnover is not None:    
+            generalData.FUEL_INT = check(FECFuels/Turnover) 
+            generalData.EL_INT = check(generalData.FECel/Turnover) 
+            generalData.PE_INT = check(generalData.PEC/Turnover) 
+        else:
+            generalData.FUEL_INT = check(None)
+            generalData.EL_INT = check(None)
+            generalData.PE_INT = check(None)
+
+#Part 2: SEC by products
+
+        products = Status.prj.getProducts()
+
+        if Status.ANo > 0: # distribution of energy consumption to products by proportion in turnover.
+                    # could later on be improved taking into account the original distribution ...
+                    
+            sumTurnoverProd = 0.0
+            for product in products:
+                if product.TurnoverProd is not None: sumTurnoverProd += product.TurnoverProd
+
+            for product in products:
+                if sumTurnoverProd > 0:
+                    if product.TurnoverProd is not None:
+                        fTurnover = product.TurnoverProd / sumTurnoverProd
+                    else:
+                        fTurnover = 0.0
+                else:
+                    fTurnover = 1./len(products)
+
+                if PEC is not None and QProdYear > 0:
+                    product.PE_SEC = fTurnover*PEC/QProdYear
+                else:
+                    product.PE_SEC = 0.0
+                
+                if FECel is not None and QProdYear > 0:
+                    product.EL_SEC = fTurnover*FECel/QProdYear
+                else:
+                    product.EL_SEC = 0.0
+                
+                if FECFuels is not None and QProdYear > 0:
+                    product.FUEL_SEC = fTurnover*FECFuels/QProdYear
+                else:
+                    product.FUEL_SEC = 0.0
+
+#Part 3: SEC by unit operations
+
+        processes = Status.prj.getProcesses()
+
+        for process in processes:
+            UPH = process.UPH
+            try:
+                quantity = process.VInFlowDay*process.NDaysProc
+            except:
+                quantity = 1.0
+                
+            process.UPH_SEC = UPH/quantity
+            process.PE_SEC = 0.0
+            process.EL_SEC = 0.0
+
+# back-up in SQL                                      
+        Status.SQL.commit() #SD, to be checked
+
 
 #..............................................................................
 # set Status flag indicating that ANNUAL energy balances for the present alternative

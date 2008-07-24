@@ -19,16 +19,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    23/04/2008
 #	Revised by:    
 #                           Hans Schweiger          24/04/2008
 #                           Stoyan Danov            18/06/2008
+#                           Hans Schweiger          17/07/2008
 #
 #       Changes to previous version:
 #       23/04/08: HS    copy based on PanelA
 #       24/04/08: HS    table for error messages adapted
-#       18/06/2008 SD: change to translatable text _(...)
+#       18/06/2008 SD:  change to translatable text _(...)
+#       17/07/2008: HS  bug-fix in translatable text (check list button)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -356,7 +358,7 @@ class PanelCC(wx.Panel):
 #   Delete alternative proposal
 #------------------------------------------------------------------------------		
 
-        pu2 =  DialogOK(self,_("confirm check list","CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"))
+        pu2 =  DialogOK(self,_("confirm check list"),_("CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"))
         if pu2.ShowModal() == wx.ID_OK:
             pass
 #------------------------------------------------------------------------------		
@@ -396,7 +398,8 @@ class PanelCC(wx.Panel):
 
         if self.checkOK == True:
             popup =  DialogOK(self,_("accept data"),\
-                              _("you have to confirm that data are correct, before continuing"))
+                              _("Press OK to confirm that the data are correct\n")+\
+                              _("(This will block the questionnaire for further modifications)"))
             if popup.ShowModal() == wx.ID_OK:
                 Status.prj.setActiveAlternative(0,checked = True)
                 Status.mod.moduleEA.update()
@@ -404,7 +407,7 @@ class PanelCC(wx.Panel):
                 self.main.tree.SelectItem(self.main.qEA4a, select=True)
         else:
             popup =  DialogOK(self,_("revise data"),\
-                              _("you first have to eliminate unconsistencies in the data set"))
+                              _("EINSTEIN cannot accept these data. You first have to eliminate inconsistencies"))
 
     def OnButtonpanelCancelButton(self, event):
         #warning: do you want to leave w/o saving ???

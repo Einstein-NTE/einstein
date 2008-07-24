@@ -55,16 +55,16 @@ class ModuleBM(object):
 #       no project information available yet !!!
 #------------------------------------------------------------------------------
         self.keys = keys # the key to the data is sent by the panel
-
-        self.DB = Status.DB
-        self.sql = Status.SQL
-        
+        self.process = None
+        self.product = None
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def initPanel(self):
+    def initPanel(self, keys):
 #------------------------------------------------------------------------------
 #       function called from the panel once the user enters the panel
 #------------------------------------------------------------------------------
+
+        self.keys = keys # the key to the data is sent by the panel
 
 #..............................................................................
 # first get NACE code of current industry
@@ -96,6 +96,8 @@ class ModuleBM(object):
 # get list of products and processes for BM2 and BM3
 
         self.products = Status.prj.getProductList("Product")
+        self.productCodes = Status.prj.getProductList("ProductCode")
+        
         self.processes = Status.prj.getProcessList("Process")
         self.unitOpIDs = Status.prj.getProcessList("DBUnitOperation_id")
 
@@ -136,14 +138,11 @@ class ModuleBM(object):
 # benchmarks on energy intensity
 
         data = array(noneFilter(self.findBenchmarks()[0]))
+        print "ModuleBM (updatePanel): key %s data %s"%(self.keys[0],data)
 
-        Status.int.setGraphicsData("BM1 Table", data)
-        Status.int.setGraphicsData("BM2 Table", data)
-        Status.int.setGraphicsData("BM3 Table", data)
+        Status.int.setGraphicsData(self.keys[0], data)
 
-        Status.int.setGraphicsData("BM1 Figure", self.createBMgraphs("EINT"))
-        Status.int.setGraphicsData("BM2 Figure", self.createBMgraphs("SECP"))
-        Status.int.setGraphicsData("BM3 Figure", self.createBMgraphs("SECU"))
+        Status.int.setGraphicsData("%s Figure"%self.keys[0], self.createBMgraphs())
 
         Status.int.setGraphicsData('BM Info',[self.naceSearch,\
                                               self.naceSelector,\
@@ -181,7 +180,7 @@ class ModuleBM(object):
         self.updatePanel()
         
 #------------------------------------------------------------------------------
-    def createBMgraphs(self,bmType):
+    def createBMgraphs(self):
 #------------------------------------------------------------------------------
 #       creates benchmark graphs for plots in panel and report
 #------------------------------------------------------------------------------
@@ -199,32 +198,83 @@ class ModuleBM(object):
         fuelmax = 0
         
         for i in range(len(self.bmTable)):
-            bmtar_fuel.append([self.bmTable[i][6]])
-            bmtar_el.append([self.bmTable[i][9]])
+            tar_fuel = self.bmTable[i][6]
+            if tar_fuel is not None:
+                bmtar_fuel.append([tar_fuel])
+            else:
+                bmtar_fuel.append([0.0])
+
+            tar_el = self.bmTable[i][9]
+            if tar_el is not None:
+                bmtar_el.append([tar_el])
+            else:
+                bmtar_el.append([0.0])
 
             e0 = self.bmTable[i][10]
             e1 = self.bmTable[i][11]
             f0 = self.bmTable[i][7]
             f1 = self.bmTable[i][8]
 
-            elmin = min(e0,elmin)
-            elmax = max(e1,elmax)
+            if e0 is not None: elmin = min(e0,elmin)
+            if e1 is not None: elmax = max(e1,elmax)
 
-            fuelmin = min(f0,fuelmin)
-            fuelmax = max(f1,fuelmax)
+            if f0 is not None: fuelmin = min(f0,fuelmin)
+            if f1 is not None: fuelmax = max(f1,fuelmax)
             
             bm_el.append(   [e0,e0,e1,e1,e0])
             bm_fuel.append( [f0,f1,f1,f0,f0])
 
+        sqlQuery = "Questionnaire_id = '%s' AND Process = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId,self.process)        
+        processData = Status.DB.qprocessdata.sql_select(sqlQuery)
+
         for i in range(Status.NoOfAlternatives+1):
 
-            SECel = 55.0
-            SECfuel = 55.0
+            if self.keys[0] == "BM1":
+                generalDataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[i]
+                if len(generalDataTable) > 0:
+                    generalData = generalDataTable[0]
 
-            elmin = min(SECel,elmin)
-            elmax = max(SECel,elmax)
-            fuelmin = min(SECfuel,fuelmin)
-            fuelmax = max(SECfuel,fuelmax)
+                    SECel = generalData.EL_INT
+                    SECfuel = generalData.FUEL_INT
+                else:
+                    SECel = 0.0
+                    SECfuel = 0.0
+                    logDebug("ModuleBM (createBMgraphs): no generalData entry found for ANo = %s"%i)
+                
+            elif self.keys[0] == "BM2":
+                productTable = Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[i].Product[self.product]
+                if len(productTable) > 0:
+                    product = productTable[0]
+
+                    SECel = product.EL_SEC
+                    SECfuel = product.FUEL_SEC
+                else:
+                    SECel = 0.0
+                    SECfuel = 0.0
+                    logDebug("ModuleBM (createBMgraphs): no product data entry found for ANo = %s"%i)
+
+            elif self.keys[0] == "BM3":
+                processTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[i].Process[self.process]
+                if len(processTable) > 0:
+                    process = processTable[0]
+
+                    SECel = process.EL_SEC
+                    SECfuel = process.UPH_SEC
+                else:
+                    SECel = 0.0
+                    SECfuel = 0.0
+                    logDebug("ModuleBM (createBMgraphs): no process data entry found for ANo = %s"%i)
+
+            else:
+                logDebug("ModuleBM (createBMgraphs): called with erroneous key: %s "%self.keys[0])
+
+            if SECel is not None:
+                elmin = min(SECel,elmin)
+                elmax = max(SECel,elmax)
+                
+            if SECfuel is not None:
+                fuelmin = min(SECfuel,fuelmin)
+                fuelmax = max(SECfuel,fuelmax)
             
             ps_el.append([SECel])
             ps_fuel.append([SECfuel])
@@ -255,64 +305,176 @@ class ModuleBM(object):
             
         benchmarks = Status.DB.dbbenchmark.sql_select(sqlQuery)
 
+        print "ModuleBM (findBenchmarks): screening year of reference -> %s benchmarks found"%len(benchmarks)
+        
         self.bmIDs = []
         self.bmTable = []
         plus = 0.1
+
+#..............................................................................
+#energy intensity benchmarks
+        
         for benchmark in benchmarks:
-
-            naceCodeID = benchmark.NaceCode_id
-            naces = Status.DB.dbnacecode.DBNaceCode_ID[naceCodeID]
-
             selected = False
-            
-            if len(naces) > 0:
-                nace = naces[0]
-                naceCode = nace.CodeNACE
-                naceCodeSub = nace.CodeNACEsub
 
-                print "naceCode of benchmark entry: ",naceCode,naceCodeSub
+            if self.keys[0] == "BM1":
+#                naceCodeID = benchmark.NaceCode_id
 
-                if str(naceCode) == self.naceFilter:
+#                print "ModuleBM (findBenchmarks): screening by NACE Code ID %s"%naceCodeID
+#                naces = Status.DB.dbnacecode.DBNaceCode_ID[naceCodeID]
 
-                    level = self.naceSearch #from 0 to 2
+#                if len(naces) > 0:
+#                    nace = naces[0]
+#                    naceCode = nace.CodeNACE
+#                    naceCodeSub = nace.CodeNACEsub
 
-                    print "now comparing with level %s: "%level,self.naceSearch,naceCodeSub,self.naceCodeSub
+                naceBM = benchmark.NACECode
+                if naceBM is not None:
+                    naceBMsplit = naceBM.split('.')
+                else:
+                    naceBMsplit = []
+                    
+                if len(naceBMsplit) > 0:
+                    naceCode = str(naceBMsplit[0])
+                    if len(naceBMsplit) >= 2:
+                        naceCodeSub = str(naceBMsplit[1])
+                    else:
+                        naceCodeSub = "00"                
 
-                    subOK = 2
-                    if ((str(naceCodeSub)[0:1] == self.naceCodeSub[0:1]) or (self.naceCodeSub == "0")):
-                           subOK = 1
-                           if ((str(naceCodeSub)[1:2] == self.naceCodeSub[1:2]) or (self.naceCodeSub[1:2] == "0")):
-                               subOK = 0
+                    print "naceCode of benchmark entry: ",naceCode,naceCodeSub
 
-                    if level >= subOK:
-                               
-                        FECel = [benchmark.E_EnergyInt_TARG_T,\
-                                 benchmark.E_EnergyInt_MIN_T,\
-                                 benchmark.E_EnergyInt_MAX_T]
+                    if str(naceCode) == self.naceFilter:
 
-                        hasFECelData = ((FECel[0] is not None) or (FECel[1]is not None) or (FECel[2] is not None))
-                        
-                        FECfuel = [benchmark.H_EnergyInt_TARG_T,\
-                                 benchmark.H_EnergyInt_MIN_T,\
-                                 benchmark.H_EnergyInt_MAX_T]
+                        level = self.naceSearch #from 0 to 2
 
-                        hasFECfuelData = ((FECfuel[0] is not None) or (FECfuel[1]is not None) or (FECfuel[2] is not None))
+                        print "now comparing with level %s: "%level,self.naceSearch,naceCodeSub,self.naceCodeSub
 
-                        PEC =   [benchmark.T_EnergyInt_TARG_T,\
-                                 benchmark.T_EnergyInt_MIN_T,\
-                                 benchmark.T_EnergyInt_MAX_T]
-  
-                        hasPECData = ((PEC[0] is not None) or (PEC[1]is not None) or (PEC[2] is not None))
+                        subOK = 2
+                        if ((str(naceCodeSub)[0:1] == self.naceCodeSub[0:1]) or (self.naceCodeSub == "0")):
+                               subOK = 1
+                               if ((str(naceCodeSub)[1:2] == self.naceCodeSub[1:2]) or (self.naceCodeSub[1:2] == "0")):
+                                   subOK = 0
 
-                        hasData = hasFECelData or hasFECfuelData or hasPECData
+                        if level >= subOK:
+                                   
+                            FECel = [benchmark.E_EnergyInt_TARG_T,\
+                                     benchmark.E_EnergyInt_MIN_T,\
+                                     benchmark.E_EnergyInt_MAX_T]
 
-                        print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
-                        if hasData:
-                            selected = True
-            else:
-                logWarning(_("Error in benchmark database has been detected: ID %s not found. Update your database")%naceCodeID)
+                            hasFECelData = ((FECel[0] is not None) or (FECel[1]is not None) or (FECel[2] is not None))
+                            
+                            FECfuel = [benchmark.H_EnergyInt_TARG_T,\
+                                     benchmark.H_EnergyInt_MIN_T,\
+                                     benchmark.H_EnergyInt_MAX_T]
 
+                            hasFECfuelData = ((FECfuel[0] is not None) or (FECfuel[1]is not None) or (FECfuel[2] is not None))
+
+                            PEC =   [benchmark.T_EnergyInt_TARG_T,\
+                                     benchmark.T_EnergyInt_MIN_T,\
+                                     benchmark.T_EnergyInt_MAX_T]
+      
+                            hasPECData = ((PEC[0] is not None) or (PEC[1]is not None) or (PEC[2] is not None))
+
+                            hasData = hasFECelData or hasFECfuelData or hasPECData
+
+                            print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+                            if hasData:
+                                selected = True
+                else:
+#                    logWarning(_("Error in benchmark database has been detected: ID %s not found. Update your database")%naceCodeID)
+                    logWarning(_("Error in benchmark database has been detected (id %s): NACE Code %s not found. Update your database")%\
+                               (naceBM,benchmark.DBBenchmark_ID))
+                    
+#..............................................................................
+#specific energy consumption by products benchmarks
+                    
+            elif self.keys[0] == "BM2":       #energy intensity benchmarks
+
+                productCode = benchmark.ProductCode
+
+                if self.product in self.products:
+                    idx = self.products.index(self.product)
+                    self.productCode = self.productCodes[idx]
+                else:
+                    self.productCode = None
+                    
+                print "ModuleBM (findBMs): productCode BM: %s - product %s [%s]"%\
+                      (productCode,self.product,self.productCode)
                 
+                if self.productCode == productCode and productCode is not None:
+                                   
+                    FECel = [benchmark.E_SEC_TARG,\
+                             benchmark.E_SEC_MIN,\
+                             benchmark.E_SEC_MAX]
+
+                    hasFECelData = ((FECel[0] is not None) or (FECel[1]is not None) or (FECel[2] is not None))
+                    
+                    FECfuel = [benchmark.H_SEC_TARG,\
+                             benchmark.H_SEC_MIN,\
+                             benchmark.H_SEC_MAX]
+
+                    hasFECfuelData = ((FECfuel[0] is not None) or (FECfuel[1]is not None) or (FECfuel[2] is not None))
+
+                    PEC =   [benchmark.T_SEC_TARG,\
+                             benchmark.T_SEC_MIN,\
+                             benchmark.T_SEC_MAX]
+
+                    hasPECData = ((PEC[0] is not None) or (PEC[1]is not None) or (PEC[2] is not None))
+
+                    hasData = hasFECelData or hasFECfuelData or hasPECData
+
+                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+                    if hasData:
+                        selected = True
+
+#..............................................................................
+#specific energy consumption by unit operation - benchmarks
+                    
+            elif self.keys[0] == "BM3":       #energy intensity benchmarks
+
+                unitOpCode = benchmark.UnitOp
+                if self.process in self.processes:
+                    idx = self.processes.index(self.process)
+                    self.unitOp = self.unitOps[idx]
+                    unitOpTable = Status.DB.dbunitoperation.UnitOperation[self.unitOp]
+                    if len(unitOpTable) > 0:
+                        self.unitOpCode = unitOpTable[0].UnitOperationCode
+                    else:
+                        self.unitOpCode = None
+                else:
+                    self.unitOp = None
+                    self.unitOpCode = None
+                print "ModuleBM (findBMs): looking for unitOp %s [BM: %s]"%(self.unitOpCode,unitOpCode)
+                    
+                if self.unitOpCode == unitOpCode:
+                                   
+                    FECel = [benchmark.E_SEC_TARG,\
+                             benchmark.E_SEC_MIN,\
+                             benchmark.E_SEC_MAX]
+
+                    hasFECelData = ((FECel[0] is not None) or (FECel[1]is not None) or (FECel[2] is not None))
+                    
+                    FECfuel = [benchmark.H_SEC_TARG,\
+                             benchmark.H_SEC_MIN,\
+                             benchmark.H_SEC_MAX]
+
+                    hasFECfuelData = ((FECfuel[0] is not None) or (FECfuel[1]is not None) or (FECfuel[2] is not None))
+
+                    PEC =   [benchmark.T_SEC_TARG,\
+                             benchmark.T_SEC_MIN,\
+                             benchmark.T_SEC_MAX]
+
+                    hasPECData = ((PEC[0] is not None) or (PEC[1]is not None) or (PEC[2] is not None))
+
+                    hasData = hasFECelData or hasFECfuelData or hasPECData
+
+                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+                    if hasData:
+                        selected = True
+                
+#..............................................................................
+# common block for all types of benchmarks
+
             if selected == True:
 
                 source = benchmark.Literature

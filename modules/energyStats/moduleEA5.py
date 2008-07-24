@@ -76,14 +76,14 @@ class ModuleEA5(object):
         TotalFEC = self.cgeneraldata.FEC   #FEC in [MWh]
         ElectFEC = self.cgeneraldata.FECel
         FuelsFEC = TotalFEC - ElectFEC
-        PE_FEC = 1.1*FuelsFEC + 3.0*ElectFEC #substitute later the conv. coef. from SetUp #pending put conv. coef. in status.py
+        PE_FEC = self.cgeneraldata.PEC #substitute later the conv. coef. from SetUp #pending put conv. coef. in status.py
             
         Turnover = self.questionnaire.Turnover #in [million euros]
 
         if (Turnover > 0) and not (Turnover==None):    
-            self.cgeneraldata.FUEL_INT = (FuelsFEC)/(Turnover*1000) #converted to [kWh/euro]
-            self.cgeneraldata.EL_INT = (ElectFEC)/(Turnover*1000) #converted to [kWh/euro]
-            self.cgeneraldata.PE_INT = (PE_FEC)/(Turnover*1000) #converted to [kWh/euro]
+            self.cgeneraldata.FUEL_INT = (FuelsFEC)/(Turnover) #converted to [kWh/euro]
+            self.cgeneraldata.EL_INT = (ElectFEC)/(Turnover) #converted to [kWh/euro]
+            self.cgeneraldata.PE_INT = (PE_FEC)/(Turnover) #converted to [kWh/euro]
         else:
             self.cgeneraldata.FUEL_INT = None
             self.cgeneraldata.EL_INT = None
@@ -108,11 +108,11 @@ class ModuleEA5(object):
 
             #calculate SEC for each product
             if (row.QProdYear > 0) and row.QProdYear is not None:    
-                if row.FuelProd is not None: row.FUEL_SEC = (row.FuelProd)*1000/row.QProdYear #converted to [kWh/pu]
+                if row.FuelProd is not None: row.FUEL_SEC = (row.FuelProd)/row.QProdYear #converted to [kWh/pu]
                 else: row.Fuel_SEC = 0
-                if row.ElProd is not None: row.EL_SEC = (row.ElProd)*1000/row.QProdYear #converted to [kWh/pu]
+                if row.ElProd is not None: row.EL_SEC = (row.ElProd)/row.QProdYear #converted to [kWh/pu]
                 else: row.EL_SEC = 0.
-                if row.FuelProd is not None and row.ElProd is not None: row.PE_SEC = (1.1*row.FuelProd + 3.0*row.ElProd)*1000/row.QProdYear #converted to [kWh/pu], fixed energy conv. coef. ->change this later
+                if row.FuelProd is not None and row.ElProd is not None: row.PE_SEC = (1.1*row.FuelProd + 3.0*row.ElProd)/row.QProdYear #converted to [kWh/pu], fixed energy conv. coef. ->change this later
                 else: row.PE_SEC = 0.
 
                 Status.SQL.commit() #SD, check this

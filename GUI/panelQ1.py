@@ -392,7 +392,7 @@ class PanelQ1(wx.Panel):
 
         self.tc31 = ChoiceEntry(self.page3, 
                                values=PRODUCTCODES.values(),
-                               label=_("Product's code"),
+                               label=_("Product code"),
                                tip=_(" "))
 
         self.tc32 = FloatEntry(self.page3,
@@ -544,7 +544,8 @@ class PanelQ1(wx.Panel):
         p = Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Product[str(self.listBoxProducts.GetStringSelection())][0]
         self.tc30.SetValue(str(p.Product))
         print "PanelQ1 (ListBoxClick): tc31 set to %s"%p.ProductCode
-        self.tc31.SetValue(str(p.ProductCode))
+        if str(p.ProductCode) in PRODUCTCODES.keys():
+            self.tc31.SetValue(PRODUCTCODES[str(p.ProductCode)])
         self.tc32.SetValue(str(p.QProdYear))
         self.tc33.SetValue(str(p.ProdUnit))
         self.tc34.SetValue(str(p.TurnoverProd))
@@ -653,7 +654,7 @@ class PanelQ1(wx.Panel):
                     "Questionnaire_id":Status.PId,
                     "AlternativeProposalNo":Status.ANo,
                     "Product":check(self.tc30.GetValue()),
-                    "ProductCode":check(self.tc31.GetValue(text=True)),
+                    "ProductCode":check(findKey(PRODUCTCODES,self.tc31.GetValue(text=True))),
                     "QProdYear":check(self.tc32.GetValue()),
                     "ProdUnit":check(self.tc33.GetValue()),
                     "TurnoverProd":check(self.tc34.GetValue()),
@@ -670,19 +671,9 @@ class PanelQ1(wx.Panel):
                                                                     Questionnaire_id[Status.PId].\
                                                                     AlternativeProposalNo[Status.ANo]) == 1:
                 print "PanelQ1 (OK): saving data for existing product"
-###############################################################################
-###############################################################################
-###############################################################################
-###############################################################################
-###############################################################################
-#   Some problem here with the GetValues
-#   Doesn't arrive to the following print
-#   Doesn't give an error message
-#   => EINSTEIN's magic mysteries ... ????
-#
                 tmp = {
                     "Product":check(self.tc30.GetValue()),
-                    "ProductCode":check(self.tc31.GetValue(text=True)),
+                    "ProductCode":check(findKey(PRODUCTCODES,self.tc31.GetValue(text=True))),
                     "QProdYear":check(self.tc32.GetValue()),
                     "ProdUnit":check(self.tc33.GetValue()),
                     "TurnoverProd":check(self.tc34.GetValue()),
@@ -692,7 +683,7 @@ class PanelQ1(wx.Panel):
                 print "PanelQ1 (OK): temporary dictionary created"
                 print "tmp = ",tmp
 
-                print "PanelQ1: product code = %s saved to SQL"%self.tc31.GetValue(text=True)
+                print "PanelQ1: product code = %s saved to SQL"%findKey(PRODUCTCODES,self.tc31.GetValue(text=True))
 
                 q = Status.DB.qproduct.Product[self.tc30.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
                 q.update(tmp)               

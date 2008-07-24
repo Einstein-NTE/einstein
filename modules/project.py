@@ -1119,7 +1119,7 @@ class Project(object):
         deleteSQLRows(DB.qproduct,sqlQueryQ)
 
 #------------------------------------------------------------------------------
-    def getProducts(self,key,PId = None):
+    def getProducts(self,PId = None):
 #------------------------------------------------------------------------------
 #   returns a table of existing equipment
 #------------------------------------------------------------------------------

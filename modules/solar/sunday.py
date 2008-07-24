@@ -20,6 +20,7 @@
 #
 #	Version No.: 0.01
 #	Created by: 	   Hans Schweiger 	17/06/2008
+#                                               (based on C-Version from 1995)
 #	Last revised by:   
 #            
 #
@@ -98,17 +99,17 @@ class Intensity():
         self.t=0
         self.g=0
         self.d=0
+        self.n=[0.0,0.0,1.0]
 
 gonh = Intensity()
+GT = Intensity()
 #INTENSITY sunbox[3][2];
 sunonh = [0.0,0.0,0.0]
+backshading = 0      
+groundref = 0.2
 
 #* la direccion Z en Sunday corresponde a DIR/OR en el sistema del usuario */
 #int user_coord_dir,user_coord_or;
-
-#double groundref;
-#int backshading;
-
 
 #/* Modelo para el calculo de fraccion difusa a partir de KT */
 COLLARES_PEREIRA_RABL = 1
@@ -316,7 +317,7 @@ def prep_sun(deg_lat,deg_incl,deg_azi,day_of_year,sf,h):
 #endif
 
 #------------------------------------------------------------------------------		
-def sun_hourly(sf,h,t,i,sun):
+def sun_hourly(sf,h,t):
 #------------------------------------------------------------------------------		
 #   SUN_HOURLY  Calculo de datos instantaneos sobre inclinada a partir
 #           de promedios diarios sobre horizontal
@@ -336,12 +337,15 @@ def sun_hourly(sf,h,t,i,sun):
 #   IT  Radiacion total sobre superficie inclinada
 #   IBT Radiacion directa sobre superficie inclinada
 #   IDT Radiacion difusa sobre superficie inclinada
-#   SUN Vector de la direccion del sol
-#                                               */
+#   SUN Vector de la direccion del sol (z^ = normal a superficie)
+#                                               
 #------------------------------------------------------------------------------		
 
 
     global gonh
+    global sunonh
+    global GT
+
     
     sf.hour = (PI2*(1.*((int(t))%86400))/86400) - PI
 
@@ -349,11 +353,11 @@ def sun_hourly(sf,h,t,i,sun):
         gonh.b=0
         gonh.d=0
         gonh.t=0
-        i.b = 0
-        i.d = 0;
-        i.t = 0;
-        sun = [0,0,-1]
-        return gonh
+        GT.b = 0
+        GT.d = 0;
+        GT.t = 0;
+        GT.n = [0.0,0.0,-1.0]
+        return GT
 
     else:
 
@@ -404,19 +408,19 @@ def sun_hourly(sf,h,t,i,sun):
     rot(sunonh,1,sf.cow,sf.siw)
     rot(sunonh,0,sf.coph,-sf.siph)
 
-    sun_proj(sf,sun,i)
+    GT = sun_proj(sf)
 
 #    print "Sunday (sun_hourly): returning gonh = ",gonh.t,gonh.d,gonh.b
-#    print "Sunday (sun_hourly): sun = ",sun
+#    print "Sunday (sun_hourly): sun = ",GT.n
 #    print "Sunday (sun_hourly): sunonh = ",sunonh
-#    print "Sunday (sun_hourly): i = ",i.t,i.d,i.b
+#    print "Sunday (sun_hourly): i = ",GT.t,GT.d,GT.b
 
-    return gonh
+    return GT
 
 
 
 #------------------------------------------------------------------------------		
-def sun_proj(sf,sun,g):
+def sun_proj(sf):
 #------------------------------------------------------------------------------		
 #   SUN_PROJ    Projeccion del sol a una superficie inclinada
 #           (Gb,Gd,s -|SF|-> GbT,GdT,sT)
@@ -440,20 +444,27 @@ def sun_proj(sf,sun,g):
 #double gg,go,fd,fdant,dif;
 #double costheta,costhetaz;
 #int i,k;
-
+    global gonh
+    global sunonh
+    global GT
+    global backshading
+    global groundref
 
 #  SETV(sun,sunonh,3);
     sun = copy.deepcopy(sunonh)
+#    print "Sunday (sun_proj): sun before rotating = ",sun
     costhetaz = sun[2]
 
     if (costhetaz<=0):
-        g.t = 0.
-        g.b = 0.
-        g.d = 0.
+        GT.t = 0.
+        GT.b = 0.
+        GT.d = 0.
         return
 
     rot(sun,2,sf.cog,-sf.sig)
     rot(sun,0,sf.cob,sf.sib)
+
+#    print "Sunday (sun_proj): sun after rotating = ",sun
 
     costheta = sun[2]
 
@@ -462,14 +473,19 @@ def sun_proj(sf,sun,g):
     else:
         Rb = costheta/costhetaz
 
+#    print "Sunday (sun_proj): cosTheta %s cosThetaZ %s Rb %s"%(costheta,costhetaz,Rb)
 # radiation on inclined surface */
 
-    g.b = gonh.b*Rb;
+    GT.b = gonh.b*Rb;
     if (backshading and (costheta<=0)):
-        g.d = gonh.d*(1.+sf.cob)/2. + gonh.d*groundref*(1.-sf.cob)/2.
+        GT.d = gonh.d*(1.+sf.cob)/2. + gonh.d*groundref*(1.-sf.cob)/2.
     else:
-        g.d = gonh.d*(1.+sf.cob)/2. + gonh.t*groundref*(1.-sf.cob)/2.
-    g.t = g.b + g.d
+        GT.d = gonh.d*(1.+sf.cob)/2. + gonh.t*groundref*(1.-sf.cob)/2.
+    GT.t = GT.b + GT.d
+
+    GT.n = sun
+
+    return GT
 
 
 

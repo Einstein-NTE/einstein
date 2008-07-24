@@ -46,7 +46,7 @@ def _(text):
     return text
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 180" #M2_DEMO: deactivates pipes
+VERSION = "R1.00a Revision No. 181" #M2_DEMO: deactivates pipes
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99
@@ -191,9 +191,12 @@ EQUIPMENT = {"HP":                 # equipment class
              "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),EQUIPMENTSUBTYPE[4],_(EQUIPMENTSUBTYPE[4])),
                     (EQUIPTYPE[7],_(EQUIPTYPE[7]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
 
-             "ST": [(EQUIPTYPE[STIndex+0],_(EQUIPTYPE[8]),STTYPES[0],_(EQUIPMENTSUBTYPE[6])),
-                    (EQUIPTYPE[STIndex+1],_(EQUIPTYPE[9]),STTYPES[1],_(EQUIPMENTSUBTYPE[7])),
-                    (EQUIPTYPE[STIndex+2],_(EQUIPTYPE[10]),STTYPES[2],_(EQUIPMENTSUBTYPE[8]))],
+             "ST": [(EQUIPTYPE[STIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+0]],
+                     STTYPES[0],TRANSSTTYPES[STTYPES[0]]),
+                    (EQUIPTYPE[STIndex+1],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+1]],
+                     STTYPES[1],TRANSSTTYPES[STTYPES[1]]),
+                    (EQUIPTYPE[STIndex+2],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+2]],
+                     STTYPES[2],TRANSSTTYPES[STTYPES[2]])],
 
              "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),EQUIPMENTSUBTYPE[11],_(EQUIPMENTSUBTYPE[11])),
                     (EQUIPTYPE[12],_(EQUIPTYPE[12]),EQUIPMENTSUBTYPE[9],_(EQUIPMENTSUBTYPE[9])),
@@ -277,8 +280,18 @@ ROOFTYPES = {"Corrugated metal roof":_("Corrugated metal roof"),
                 "Tiled roof":_("Tiled roof"),
                 "Other":_("Other")}
 
-PRODUCTCODES = {"ProdCode1":_("ProdCode1"), 
-                "ProdCode2":_("ProdCode2")}
+PRODUCTCODES = {"ZZ000":_("ZZ000: other products"),
+                "DA010":_("DA010: milk products"),
+                "DA020":_("DA020: fruits/vegetables/herbs"),
+                "DA030":_("DA030: sugar"),
+                "DA040":_("DA040: beer"),
+                "DA050":_("DA050: fats/oils"),
+                "DA060":_("DA060: chocolate/cacao/coffee"),
+                "DA070":_("DA070: starch/potatoes/grain mill products"),
+                "DA080":_("DA080: wine/beverage"),
+                "DA090":_("DA090: meat"),
+                "DA100":_("DA100: fish"),
+                "DA110":_("DA110: aroma")}
 
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries

@@ -1,0 +1,16 @@
+-- update einstein database: some additional parameters HS 24/07/2008
+USE einstein;
+
+-- add columns to dbbenchmark
+
+ALTER TABLE dbbenchmark ADD COLUMN ProductCode VARCHAR(20) COMMENT 'Classification code for products' AFTER UnitOperation_id;
+ALTER TABLE dbbenchmark ADD COLUMN Product VARCHAR(45) COMMENT 'Name / description of product' AFTER UnitOp;
+
+
+ALTER TABLE dbsolarthermal ADD COLUMN K50L Double COMMENT 'IAM coefficient - longitudinal' AFTER STc2;
+ALTER TABLE dbsolarthermal ADD COLUMN K50T Double COMMENT 'IAM coefficient - transversal' AFTER K50L;
+
+ALTER TABLE qgenerationhc DROP COLUMN ST_IAM;
+ALTER TABLE qgenerationhc ADD COLUMN ST_K50L Double COMMENT 'IAM coefficient - longitudinal' AFTER ST_C2;
+ALTER TABLE qgenerationhc ADD COLUMN ST_K50T Double COMMENT 'IAM coefficient - longitudinal' AFTER ST_K50L;
+

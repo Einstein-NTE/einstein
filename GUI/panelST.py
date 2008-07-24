@@ -19,12 +19,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	    25/06/2008
 #                           (based on PanelHP and PanelBB)
-#	Revised by:         
-#
+#	Revised by:
+#                           Hans Schweiger          23/07/2008
+#                           Enrico Facci            23/07/2008
+#                           Hans Schweiger          24/07/2008
+#       
 #       Changes to previous version:
+#
+#       23/07/2008: HS  convertDoubleToString introduced
+#       24/07/2008: HS  KT and KL introduced in table
+#                       - bug-fix in setSelection of choice of ST Type
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,6 +55,7 @@ from einstein.modules.interfaces import *
 from einstein.modules.modules import *
 from einstein.modules.constants import *
 from numpy import *
+from numCtrl import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 from GUITools import *
 
@@ -79,10 +87,7 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 1
-COLNO = 6
-
-TYPELIST = STTYPES
-
+COLNO = 7
 
 #------------------------------------------------------------------------------		
 #HS2008-03-22: 
@@ -150,7 +155,7 @@ class PanelST(wx.Panel):
         self.grid.EnableGridLines(True)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetDefaultRowSize(24)
-        self.grid.SetDefaultColSize(100)
+        self.grid.SetDefaultColSize(80)
         self.grid.SetRowLabelSize(30)
         self.grid.SetColSize(0,150)
         self.grid.SetColSize(1,150)
@@ -161,7 +166,8 @@ class PanelST(wx.Panel):
         self.grid.SetColLabelValue(2, _("c0"))
         self.grid.SetColLabelValue(3, _("c1"))
         self.grid.SetColLabelValue(4, _("c2"))
-        self.grid.SetColLabelValue(5, _("K(50º)"))
+        self.grid.SetColLabelValue(5, _("K(50º)\n(longitudinal)"))
+        self.grid.SetColLabelValue(6, _("K(50º)\n(tranversal)"))
         #
         # copy values from dictionary to grid
         #
@@ -325,7 +331,7 @@ class PanelST(wx.Panel):
               name='stConfig2', parent=self, pos=wx.Point(40, 390),
               style=0)
 
-        self.choiceConfig2 = wx.Choice(choices=TYPELIST, id=-1, name='choice', parent=self,
+        self.choiceConfig2 = wx.Choice(choices=TRANSSTTYPES.values(), id=-1, name='choice', parent=self,
               pos=wx.Point(300, 390), size=wx.Size(120, 20), style=0)
 
         self.choiceConfig2.Bind(wx.EVT_CHOICE, self.OnChoiceConfig2Choice,
@@ -358,7 +364,7 @@ class PanelST(wx.Panel):
 
         self.stInfo1val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 400), style=0)
+              parent=self, pos=wx.Point(700, 400), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo2 = wx.StaticText(id=-1,
@@ -367,7 +373,7 @@ class PanelST(wx.Panel):
 
         self.stInfo2val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 420), style=0)
+              parent=self, pos=wx.Point(700, 420), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo3 = wx.StaticText(id=-1,
@@ -376,7 +382,7 @@ class PanelST(wx.Panel):
 
         self.stInfo3val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 440), style=0)
+              parent=self, pos=wx.Point(700, 440), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo4 = wx.StaticText(id=-1,
@@ -385,16 +391,16 @@ class PanelST(wx.Panel):
 
         self.stInfo4val = wx.StaticText(id=-1,
               label="", name='stInfo4val',
-              parent=self, pos=wx.Point(700, 470), style=0)
+              parent=self, pos=wx.Point(700, 470), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo5 = wx.StaticText(id=-1,
-              label=_('Annual energy yield [kWh/m2.a]'), name='stInfo5',
+              label=_('Annual energy yield [kWh/kW.a]'), name='stInfo5',
               parent=self, pos=wx.Point(460, 490), style=0)
 
         self.stInfo5val = wx.StaticText(id=-1,
               label="", name='stInfo4val',
-              parent=self, pos=wx.Point(700, 490), style=0)
+              parent=self, pos=wx.Point(700, 490), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo6 = wx.StaticText(id=-1,
@@ -403,7 +409,7 @@ class PanelST(wx.Panel):
 
         self.stInfo6val = wx.StaticText(id=-1,
               label="---", name='stInfo6val',
-              parent=self, pos=wx.Point(700, 510), style=0)
+              parent=self, pos=wx.Point(700, 510), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
 #------------------------------------------------------------------------------		
@@ -459,11 +465,12 @@ class PanelST(wx.Panel):
         except:
             rows = 0
             cols = COLNO
-            
+
         for r in range(rows):
+            print "panelST; display:the value of c0 is ",data[r][2]
             for c in range(cols):
                 try:
-                    self.grid.SetCellValue(r, c, data[r][c])
+                    self.grid.SetCellValue(r, c, convertDoubleToString(data[r][c],3))
                 except:
                     pass
 
@@ -477,27 +484,28 @@ class PanelST(wx.Panel):
         self.config = Status.int.GData["ST Config"]
 
         #config0..2: DA parameters
-        self.tcConfig1.SetValue(str(self.config[0]))
-        self.choiceConfig2.SetStringSelection(self.config[1])
-        self.tcConfig3.SetValue(str(self.config[2]))
+        self.tcConfig1.SetValue(convertDoubleToString(self.config[0]))
+        if self.config[1] in TRANSSTTYPES.keys():
+            self.choiceConfig2.SetStringSelection(TRANSSTTYPES[self.config[1]])
+        self.tcConfig3.SetValue(convertDoubleToString(self.config[2]))
         
         self.sysPars = Status.int.GData["ST SysPars"]
 
-        self.tcSys1.SetValue(str(self.sysPars[0]))
-        self.tcSys2.SetValue(str(self.sysPars[1]))
-        self.tcSys3.SetValue(str(self.sysPars[2]))
+        self.tcSys1.SetValue(convertDoubleToString(self.sysPars[0]))
+        self.tcSys2.SetValue(convertDoubleToString(self.sysPars[1]))
+        self.tcSys3.SetValue(convertDoubleToString(self.sysPars[2]))
         
 #..............................................................................
 # update of info-values
 
         self.info = Status.int.GData["ST Info"]
         
-        self.stInfo1val.SetLabel(str(self.info[0]))
-        self.stInfo2val.SetLabel(str(self.info[1]))
-        self.stInfo3val.SetLabel(str(self.info[2]))
-        self.stInfo4val.SetLabel(str(self.info[3]))
-        self.stInfo5val.SetLabel(str(self.info[4]))
-        self.stInfo6val.SetLabel(str(self.info[5]))
+        self.stInfo1val.SetLabel(convertDoubleToString(self.info[0]))
+        self.stInfo2val.SetLabel(convertDoubleToString(self.info[1]))
+        self.stInfo3val.SetLabel(convertDoubleToString(self.info[2]))
+        self.stInfo4val.SetLabel(convertDoubleToString(self.info[3]))
+        self.stInfo5val.SetLabel(convertDoubleToString(self.info[4]))
+        self.stInfo6val.SetLabel(convertDoubleToString(self.info[5]))
 
 #..............................................................................
 # and finally draw the figure
@@ -520,41 +528,6 @@ class PanelST(wx.Panel):
         self.mod.designAssistant1()
         
         self.display()
-
-#..............................................................................
-# Step 1 design assistant: gets a preselected list of possible heat pumps
-
-#        (mode,STList) = self.mod.designAssistant1()
-        
-#..............................................................................
-# In interactive mode open DB Edidor Heat pump and select manually
-
-#        if (mode == "MANUAL"):
-#            self.dbe = DBEditFrame(self,
-#                            _('Select collector from preselected list'), # title for the dialogs
-#			    _('dbheatpump'),              # database table
-#			    0,                         # column to be returned
-#			    False,
-#                            preselection = STList)      # database table can be edited in DBEditFrame?
-#            if self.dbe.ShowModal() == wx.ID_OK:
-#                STId = self.dbe.theId
-#            else:
-#                STId = -1
-#                print "PanelST: no ST selected after DA1 -> check whether this works"
-
-#        elif (mode == "AUTOMATIC"):
-#            STId = STList[0]    #in automatic mode just take first in the list
-
-#        elif (mode == "CANCEL"):
-#            STId = -1 #make designAssistant2 to understand that
-#        else:
-#            print _("PanelST (DesignAssistant-Button): erroneous panel mode: "),mode
-
-#..............................................................................
-# Step 2 design assistant: add selected equipment to the list and update display
-        
-#        self.mod.designAssistant2(STId)
-#        self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
