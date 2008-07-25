@@ -1,0 +1,178 @@
+100;NACECode;UnitOp;ProductCode;Product;E_EnergyInt_MIN-PC;E_EnergyInt_MAX-PC;E_EnergyInt_TARG-PC;E_EnergyInt_MIN-T;E_EnergyInt_MAX-T;E_EnergyInt_TARG-T;E_SEC min;E_SEC max;E_SEC_TARG;E_Unit;H_EnergyInt_MIN-PC;H_EnergyInt_MAX-PC;H_EnergyInt_TARG-PC;H_EnergyInt_MIN-T;H_EnergyInt_MAX-T;H_EnergyInt_TARG-T;H_SEC min;H_SEC max;H_SEC_TARG;H_Unit;T_EnergyInt_MIN-PC;T_EnergyInt_MAX-PC;T_EnergyInt_TARG-PC;T_EnergyInt_MIN-T;T_EnergyInt_MAX-T;T_EnergyInt_TARG-T;T_SEC min;T_SEC max;T_SEC_TARG;T_Unit;Comments;YearReference;Reference;Literature;DataRelevance;TurnoverMin;TurnoverMax;ProductionMin;ProductionMax;ProductionUnit
+EXAMPLE;DA15.50;0101;DA010;Mozzarella cheese;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+101;NC1;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.2;;kWh/l;;;;;;;;;;
+102;NC2;UO0;;;;;;;;;;;1000;;;;;;;;;;900;;;;;;;;;;2130;kWh/t;;;;;;;;;;
+103;NC3;UO1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1;2;1;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";;;;;;;
+104;NC3;UO2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0,5;1,5;0.5;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";;;;;;;
+105;NC3;UO3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2;4;2;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";;;;;;;
+106;NC3;UO4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;100;120;100;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";;;;;;;
+107;NC3;UO5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;10;5;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";;;;;;;
+108;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+109;NC4;UO6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;65;87;65;kWh/t;canning involves heating, cooling, production of ice, drying, evaporation and oil production ;;;;;;;;;
+110;NC4;UO7;;;;;;;;;;;;;;;;;;;;;;;;;;;;;150;190;150;kWh/t;;;;;;;;;;
+111;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+112;NC5;UO8;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23,89;kWh/hl;;;;;;;;;;
+113;NC5;UO9;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;25,56;kWh/hl;;;;;;;;;;
+114;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+115;NC6;UO1;;;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+116;NC6;UO10;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+117;NC6;UO11;;;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+118;NC6;UO12;;;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+119;NC6;UO13;;;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+120;NC6;UO3;;;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+121;NC6;UO14;;;;;;;;;7;8;7;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+122;NC6;UO4;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+123;NC6;UO15;;;;;;;;;1;2;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+124;NC6;UO16;;;;;;;;;;;;;;;;;;;200;300;200;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+125;NC6;UO11;;;;;;;;;;;;;;;;;;;;;100;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+126;NC6;UO13;;;;;;;;;;;;;;;;;;;;;60;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+127;NC6;UO3;;;;;;;;;;;;;;;;;;;450;500;450;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+128;NC6;UO14;;;;;;;;;;;;;;;;;;;120;200;120;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
+129;NC7;UO1;;;;;;;;;;;0.4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+130;NC7;UO10;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+131;NC7;UO11;;;;;;;;;8;12;8;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+132;NC7;UO17;;;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+133;NC7;UO13;;;;;;;;;15;25;15;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+134;NC7;UO3;;;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+135;NC7;UO14;;;;;;;;;60;80;60;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+136;NC7;UO4;;;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+137;NC7;UO15;;;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+138;NC7;UO13;;;;;;;;;;;;;;;;;;;700;900;700;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+139;NC7;UO3;;;;;;;;;;;;;;;;;;;60;80;60;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+140;NC7;UO14;;;;;;;;;;;;;;;;;;;1500;1800;1500;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+141;NC7;UO4;;;;;;;;;;;;;;;;;;;;;10;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
+142;NC8;UO1;;;;;;;;;20;65;20;;;;;;;;;;;;;;;;;;;;;kWhe/m3;;;
+143;NC8;UO1;;;;;;;;;;;;;;;;;;;;;26389;;;;;;;;;;;kWh/m2;;;
+144;NC8;UO18;;;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
+145;NC8;UO19;;;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
+146;NC8;UO20;;;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
+147;NC8;UO21;;;;;;;;;;;5;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
+148;NC8;UO22;;;;;;;;;;;8;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
+149;NC8;UO23;;;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO."
+150;NC8;UO23;;;;;;;;;;;;;;;;;;;;;0.16;;;;;;;;;;;t/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO."
+151;NC8;UO24;;;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO."
+152;NC8;UO24;;;;;;;;;;;;;;;;;;;;;0.9;;;;;;;;;;;t/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO."
+153;NC8;UO25;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO."
+154;NC8;UO26;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.5;kWhe/t;;;
+155;NC8;UO27;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.5;kWhe/t;;;
+156;NC8;UO28;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;;;
+157;NC8;UO29;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;;;
+158;NC8;UO30;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;kWhe/t;;;
+159;NC8;UO12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4.625;kWhe/t;avarage of different sort;;
+160;NC9;UO31;;;;;;;;;;;;;;;;;;;;;;;;;;;;;40;92;40;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. "
+161;NC9;UO32;;;;;;;;;;;;;;;;;;;;;;;;;;;;;172;792;172;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. "
+162;NC9;UO33;;;;;;;;;;;;;;;;;;;;;;;;;;;;;142;375;142;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF, Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. "
+163;NC9;UO34;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111;278;111;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. "
+164;NC9;UO35;;;;;;;;;;;;;;;;;;;;;;;;;;;;;n.d.;;;kWh/t;;;
+165;NC10;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.45;0.07;kWh/l;;;"[42, Nordic Council of Ministers, et al., 2001]  from BREF, Nordic Council of Ministers; Korsström, E. and Lampi, M. (2001). ""BAT for Nordic
+dairy industry"", TemaNord 2001:586."
+166;NC11;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.12;0.82;0.12;kWh/l;;;"[42, Nordic Council of Ministers, et al., 2001]  from BREF, Nordic Council of Ministers; Korsström, E. and Lampi, M. (2001). ""BAT for Nordic
+dairy industry"", TemaNord 2001:586."
+167;NC12;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.18;0.92;0.18;kWh/l;;;
+168;NC13;UO0;;;;;;;;;140;220;140;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"[117, CIAA-UNAFPA, 2002, 150, Unione Industriali Pastai Italiani, 2002] from BREF, ""Comments to the first draft - pasta""."
+169;NC13;UO0;;;;;;;;;;;;;;;;;;;1.5;1.9;1.5;;;;;;;;;;;MJ/t;;;" CIAA-UNAFPA, 2002, ""Comments to the first draft - pasta""; Unione Industriali Pastai Italiani (2002) ""The efficient use of energy in the Italian pasta
+industry""."
+170;NC14;UO0;;;;;;;;;113.33;260;113.33;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"CIAA-AAC-UFE (2002). ""Comments to the first draft - starch""."
+171;NC14;UO0;;;;;;;;;;;;;;;;;;;350;683.33;350;;;;;;;;;;;kWh/t;;;"CIAA-AAC-UFE (2002). ""Comments to the first draft - starch""."
+172;NC15;UO36;;;;;;;;;;;;;;;;;;;;;;;;;;;;;232;367;232;kWh/t beet ;;;"Nielsen E.H. Lehmann, M. (2002). ""BAT in the Danish sugar industry""."
+173;NC15;UO36;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1554;2379;1554;kWh/t sugar;;;"Nielsen E.H. Lehmann, M. (2002). ""BAT in the Danish sugar industry""."
+174;NC16;UO37;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23.33;31.3;23.33;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+175;NC16;UO38;;;;;;;;;;;;;;;;;;;;;;;;;;;;;6.94;12.78;6.94;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+176;NC16;UO39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;3.61;2.22;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+177;NC16;UO40;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1.11;2.22;1.11;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+178;NC16;UO41;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;4.72;2.22;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+179;NC16;UO42;;;;;;;;;;;;;;;;;;;;;;;;;;;;;9.17;12.78;9.17;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
+180;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+181;NC17;UO0;;;;;;;;;68;176;68;;;;;;;;;;;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);;BREF Production of Iron and Steel
+182;NC17;UO0;;;;;;;;;;;;;;;;;;;1125;1920;1125;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);;
+183;NC18;UO0;;;;;;;;;51;128;51;;;;;;;;;;;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;;
+184;NC18;UO0;;;;;;;;;;;;;;;;;;;;;890.7;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;;
+185;NC19;UO0;;;;;;;;;20;170;20;;;;;;;;;;;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";;
+186;NC19;UO0;;;;;;;;;;;;;;;;;;;3260;4100;3260;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";;
+187;NC20;UO0;;;;;;;;;270;370;270;;;;;;;;;;;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";;
+188;NC20;UO0;;;;;;;;;;;;;;;;;;;1212;3500;1212;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";;
+189;NC21;UO0;;;;;;;;;38;120;38;;;;;;;;;;;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;;
+190;NC21;UO0;;;;;;;;;;;;;;;;;;;50;195;50;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;;
+191;NC22;UO0;;;;;;;;;;;;;;;;;;;;;0.051;;;;;;;;;;;GJ/t LS;"InfoMil, 1997; Information Centre for Environmental Licensing (InfoMil)
+Dutch Notes on BAT for the Production of Primary Iron and Steel
+Final report, prepared for the Ministry of Housing, Spatial Planning and the Environment,
+Directorate for Air and Energy, Department of Industry (1997)";;
+192;NC22;UO0;;;;;;;;;;;0.08;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;;
+193;NC23;UO0;;;;;;;;;;;;;;;;;;;;;0.02;;;;;;;;;;;GJ/t LS;;;
+194;NC23;UO0;;;;;;;;;;;0.04;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;;
+195;NC24;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2300;2700;;MJ/t ;Input/output data for electric arc furnaces for the production of carbon steel compiled
+196;NC24;UO0;;;;;;;;;1250;1800;1250;;;;;;;;;;;;;;;;;;;;;MJ/t ;from various references indicated in the footnotes
+197;NC24;UO0;;;;;;;;;;;;;;;;;;;24;47;24;;;;;;;;;;;m3/t oxigen;
+198;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+199;NC25;UO43;;;;;;;;;;;45;kWh/t;;;;;;;;;200;MJ/t;;;;;;;;;;;
+200;NC25;UO44;;;;;;;;;;;64;kWh/t;;;;;;;;;1700;MJ/t;;;;;;;;;;;
+201;NC25;UO45;;;;;;;;;;;45;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
+202;NC25;UO46;;;;;;;;;;;21;kWh/t;;;;;;;;;4000;MJ/t;;;;;;;;;;;
+203;NC25;UO47;;;;;;;;;;;48;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;
+204;NC25;UO48;;;;;;;;;;;23;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
+205;NC25;UO49;;;;;;;;;;;14;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
+206;NC25;UO50;;;;;;;;;;;7;kWh/t;;;;;;;;;1500;MJ/t;;;;;;;;;;;
+207;NC25;UO51;;;;;;;;;;;133;kWh/t;;;;;;;;;2600;MJ/t;;;;;;;;;;;
+208;NC25;UO52;;;;;;;;;;;200;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
+209;NC25;UO53;;;;;;;;;;;350;kWh/t;;;;;;;;;5800;MJ/t;;;;;;;;;;;
+210;NC26;UO43;;;;;;;;;;;55;kWh/ADt;;;;;;;;;150;MJ/ADt;;;;;;;;;;;
+211;NC26;UO44;;;;;;;;;;;65;kWh/ADt;;;;;;;;;2050;MJ/ADt
+212;NC26;UO45;;;;;;;;;;;55;kWh/ADt;;;;;;;;;0;MJ/ADt
+213;NC26;UO54;;;;;;;;;;;45;kWh/ADt;;;;;;;;;400;MJ/ADt
+214;NC26;UO35;;;;;;;;;;;83;kWh/ADt;;;;;;;;;500;MJ/ADt
+215;NC26;UO55;;;;;;;;;;;6;kWh/ADt;;;;;;;;;70;MJ/ADt
+216;NC26;UO56;;;;;;;;;;;40;kWh/ADt;;;;;;;;;0;MJ/ADt
+217;NC26;UO57;;;;;;;;;;;105;kWh/ADt;;;;;;;;;2850;MJ/ADt
+218;NC26;UO58;;;;;;;;;;;30;kWh/ADt;;;;;;;;;4100;MJ/ADt
+219;NC26;UO59;;;;;;;;;;;60;kWh/ADt;;;;;;;;;610;MJ/ADt
+220;NC26;UO60;;;;;;;;;;;30;kWh/ADt;;;;;;;;;0;MJ/ADt
+221;NC26;UO61;;;;;;;;;;;20;kWh/ADt;;;;;;;;;0;MJ/ADt
+222;NC26;UO62;;;;;;;;;;;10;kWh/ADt;;;;;;;;;1500;MJ/ADt
+223;NC26;UO63;;;;;;;;;;;136;kWh/ADt;;;;;;;;;2170;MJ/ADt
+224;NC27;UO43;;;;;;;;;;;46;kWh/t;;;;;;;;;230;MJ/t
+225;NC27;UO44;;;;;;;;;;;55;kWh/t;;;;;;;;;1800;MJ/t
+226;NC27;UO45;;;;;;;;;;;46;kWh/t;;;;;;;;;0;MJ/t
+227;NC27;UO54;;;;;;;;;;;38;kWh/t;;;;;;;;;400;MJ/t;;;;;;;;;;;;;
+228;NC27;UO35;;;;;;;;;;;70;kWh/t;;;;;;;;;500;MJ/t;;;;;;;;;;;;;
+229;NC27;UO55;;;;;;;;;;;5;kWh/t;;;;;;;;;70;MJ/t;;;;;;;;;;;;;
+230;NC27;UO56;;;;;;;;;;;34;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+231;NC27;UO57;;;;;;;;;;;0;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+232;NC27;UO58;;;;;;;;;;;25;kWh/t;;;;;;;;;3600;MJ/t;;;;;;;;;;;;;
+233;NC27;UO59;;;;;;;;;;;51;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;;;
+234;NC27;UO60;;;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+235;NC27;UO61;;;;;;;;;;;17;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+236;NC27;UO62;;;;;;;;;;;8;kWh/t;;;;;;;;;1300;MJ/t;;;;;;;;;;;;;
+237;NC27;UO63;;;;;;;;;;;115;kWh/t;;;;;;;;;1900;MJ/t;;;;;;;;;;;;;
+238;NC27;UO52;;;;;;;;;;;250;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+239;NC27;UO53;;;;;;;;;;;420;kWh/t;;;;;;;;;7100;MJ/t;;;;;;;;;;;;;
+240;NC28;UO43;;;;;;;;;;;50;kWh/t;;;;;;;;;150;MJ/t;;;;;;;;;;;;;[SEPA-Report 4712-4, 1997]Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997
+241;NC28;UO64;;;;;;;;;;;2110;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+242;NC28;UO45;;;;;;;;;;;50;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
+243;NC28;UO35;;;;;;;;;;;75;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
+244;NC28;UO55;;;;;;;;;;;5;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
+245;NC28;UO56;;;;;;;;;;;35;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
+246;NC28;UO60;;;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
+247;NC28;UO52;;;;;;;;;;;235;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
+248;NC28;UO53;;;;;;;;;;;350;kWh/t;;;;;;;;;5300;MJ/t;;;;;;;;;;
+249;NC29;UO43;;;;;;;;;;;;;;;;;;;;;;;;;;;;;20;30;20;kWh/Adt
+250;NC29;UO65;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1600;1900;1600;kWh/Adt
+251;NC29;UO66;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;500;kWh/Adt

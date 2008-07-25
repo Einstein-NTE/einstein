@@ -1,0 +1,6 @@
+-- update einstein database: add Unitops to DBUnitoperation
+USE einstein;
+
+
+LOAD DATA INFILE 'c:/work/unitops.csv' REPLACE INTO TABLE dbunitoperation 
+	FIELDS TERMINATED BY ';'

@@ -3,9 +3,11 @@ USE einstein;
 
 -- add columns to dbbenchmark
 
-ALTER TABLE dbbenchmark ADD COLUMN ProductCode VARCHAR(20) COMMENT 'Classification code for products' AFTER UnitOperation_id;
-ALTER TABLE dbbenchmark ADD COLUMN Product VARCHAR(45) COMMENT 'Name / description of product' AFTER UnitOp;
+ALTER TABLE dbbenchmark DROP COLUMN NaceCode_id;
+ALTER TABLE dbbenchmark DROP COLUMN UnitOperation_id;
 
+ALTER TABLE dbbenchmark ADD COLUMN ProductCode VARCHAR(20) COMMENT 'Classification code for products' AFTER UnitOp;
+ALTER TABLE dbbenchmark ADD COLUMN Product VARCHAR(45) COMMENT 'Name / description of product' AFTER ProductCode;
 
 ALTER TABLE dbsolarthermal ADD COLUMN K50L Double COMMENT 'IAM coefficient - longitudinal' AFTER STc2;
 ALTER TABLE dbsolarthermal ADD COLUMN K50T Double COMMENT 'IAM coefficient - transversal' AFTER K50L;

@@ -378,16 +378,18 @@ class ModuleEA(object):
 
                 quantity = product.QProdYear
 
+                PEC = generalData.PEC
                 if PEC is not None and quantity > 0:
                     product.PE_SEC = fTurnover*PEC/quantity
                 else:
                     product.PE_SEC = 0.0
-                
+
+                FECel = generalData.FECel
                 if FECel is not None and quantity > 0:
                     product.EL_SEC = fTurnover*FECel/quantity
                 else:
                     product.EL_SEC = 0.0
-                
+
                 if FECFuels is not None and quantity > 0:
                     product.FUEL_SEC = fTurnover*FECFuels/quantity
                 else:
