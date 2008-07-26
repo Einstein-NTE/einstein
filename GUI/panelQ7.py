@@ -563,11 +563,11 @@ class PanelQ7(wx.Panel):
     def clear(self):
 #------------------------------------------------------------------------------
 
-        self.checkBox1.SetValue(False)
-        self.checkBox2.SetValue(False)
-        self.checkBox3.SetValue(False)
-        self.checkBox4.SetValue(False)
-        self.checkBox5.SetValue(False)
+#        self.checkBox1.SetValue(False)
+#        self.checkBox2.SetValue(False)
+#        self.checkBox3.SetValue(False)
+#        self.checkBox4.SetValue(False)
+#        self.checkBox5.SetValue(False)
         self.tc6_0.Clear()
         self.tc6.Clear()
         self.tc7.Clear()
@@ -577,19 +577,19 @@ class PanelQ7(wx.Panel):
         self.tc12.Clear()
 
 
-        self.tc1_21.Clear()
-        self.tc1_22.Clear()
-        self.tc1_23.Clear()
+#        self.tc1_21.Clear()
+#        self.tc1_22.Clear()
+#        self.tc1_23.Clear()
 
-        self.tc14.Clear()
-        self.tc16.Clear()
-        self.tc17.Clear()
-        self.tc18.Clear()
-        self.tc19.Clear()
-        self.tc20.Clear()
-        self.tc21.Clear()
-        self.tc22.Clear()
-        self.tc24.Clear()
+#        self.tc14.Clear()
+#        self.tc16.Clear()
+#        self.tc17.Clear()
+#        self.tc18.Clear()
+#        self.tc19.Clear()
+#        self.tc20.Clear()
+#        self.tc21.Clear()
+#        self.tc22.Clear()
+#        self.tc24.Clear()
 
 
 

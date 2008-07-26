@@ -47,6 +47,32 @@ def prepareDataForReport():
     Status.mod.moduleEA.update()
     print "Control (prepareData): here I should do something more ..."
 
+#### opción 1 llamar a initPanels de los módulos CS y EA
+
+    #mod = ModuleCS(["La Llave que toca"])
+    #mod.initPanel()    #así el módulo te deja en GData exactamente lo mismo
+    #                   #como si manualmente abrirías el panel
+    # para que esto funcione, tienes que poner arriba:
+    #   from einstein.modules.moduleCS import ModuleCS
+
+#### opción 2 llamar a initPanels de módulos que están en Status.mod (modules.py)
+
+    #Status.mod.moduleHP.initPanel() #te hace lo mismo como si manualmente abrirías el PanelHP
+    #Status.mod.moduleHP.updatePanel() 
+
+#### opción 3 escribir algo manualmente a GData:
+
+    mis_datos = [["uno","dos","tres","cuatro","cinco"],
+                 [8,3,2,5,9]]
+
+    Status.int.GData["MyKey"] = mis_datos #(o = copy.deepcopy(mis_datos), si estos se pueden modificar en otro sitio
+    print "Control (prepareDataForReport): GData[%s]:\n%s"%("MyKey",Status.int.GData["MyKey"])
+
+    # equivalente a
+
+    Status.int.setGraphicsData('MyKey',mis_datos)
+
+
 #------------------------------------------------------------------------------		
 def autoRun(parent):
 #------------------------------------------------------------------------------		
@@ -161,6 +187,7 @@ def autoRun(parent):
 
     Status.mod.moduleST.initPanel()
     Status.mod.moduleST.updatePanel()
+#    Status.mod.moduleST.designAssistant1()
     
     equipe = Status.mod.moduleST.addEquipmentDummy()
     equipe.HCGPnom = 500.0
@@ -169,7 +196,8 @@ def autoRun(parent):
     equipe.ST_C0 = 0.80
     equipe.ST_C1 = 3.80
     equipe.ST_C2 = 0.01
-    equipe.ST_IAM = 0.95
+    equipe.ST_K50L = 0.95
+    equipe.ST_K50T = 0.95
     Status.SQL.commit()
 
 #    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})
@@ -260,7 +288,8 @@ def autoRun(parent):
     equipe.ST_C0 = 0.80
     equipe.ST_C1 = 3.80
     equipe.ST_C2 = 0.01
-    equipe.ST_IAM = 0.95
+    equipe.ST_K50L = 0.95
+    equipe.ST_K50T = 0.95
     Status.SQL.commit()
 
 #    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})

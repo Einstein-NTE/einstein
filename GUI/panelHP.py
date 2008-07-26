@@ -111,11 +111,6 @@ from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 #
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
 COLNO = 6
@@ -130,20 +125,22 @@ def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
+    
     self.subplot.plot(Status.int.GData['HP Plot'][0],
                       Status.int.GData['HP Plot'][1],
-                      'go-', label='QD', linewidth=2)
+                      color = DARKGREY, label='QD', linewidth=2)
     self.subplot.plot(Status.int.GData['HP Plot'][0],
                       Status.int.GData['HP Plot'][2],
-                      'rs',  label='QA')
+                      '--', color = DARKGREY, label='QA')
     self.subplot.plot(Status.int.GData['HP Plot'][0],
                       Status.int.GData['HP Plot'][3],
-                      'go-', label='QD_mod', linewidth=2)
+                      color = ORANGE,label='QDres', linewidth=2)
     self.subplot.plot(Status.int.GData['HP Plot'][0],
                       Status.int.GData['HP Plot'][4],
-                      'rs',  label='QA_mod')
+                      '--', color = ORANGE, label='QAres')
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
@@ -193,15 +190,18 @@ class PanelHP(wx.Panel):
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
 
         self.grid.CreateGrid(MAXROWS, COLNO)
 
         self.grid.EnableGridLines(True)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetDefaultRowSize(20)
+        self.grid.SetDefaultColSize(120)
         self.grid.SetRowLabelSize(30)
-        self.grid.SetColSize(0,115)
+        self.grid.SetColSize(0,140)
+        self.grid.SetColSize(2,100)
+        self.grid.SetColSize(5,100)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
         self.grid.SetColLabelValue(0, _("Short name"))
@@ -238,31 +238,35 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # Figure to be plotted
 
-        self.staticBox1 = wx.StaticBox(id=-1,
-              label=_('Heat demand and availability with and without HP'),
-              name='staticBox1', parent=self, pos=wx.Point(440, 40),
-              size=wx.Size(336, 256), style=0)
+        self.boxFig = wx.StaticBox(id=-1,
+              label=_('Heat demand and availability with and w/o HP'),
+              name='boxFig', parent=self, pos=wx.Point(440, 170),
+              size=wx.Size(350, 260), style=0)
+        self.boxFig.SetForegroundColour(TITLE_COLOR)
+        self.boxFig.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelHPFig = wx.Panel(id=wxID_PANELHPFIG, name='panelHPFigure', parent=self,
-              pos=wx.Point(450, 66), size=wx.Size(316, 220),
+              pos=wx.Point(450, 200), size=wx.Size(330, 220),
               style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
 #..............................................................................
 # Grid for display of existing heat pumps
 
+        self.boxTable = wx.StaticBox(id=-1,
+              label=_('Existing heat pumps in the system'),
+              name='boxTable', parent=self, pos=wx.Point(10, 10),
+              size=wx.Size(780, 140), style=0)
+        self.boxTable.SetForegroundColour(TITLE_COLOR)
+        self.boxTable.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.grid = wx.grid.Grid(id=wxID_PANELHPGRIDPAGEHP,
-              name='gridpageHP', parent=self, pos=wx.Point(40, 48),
-              size=wx.Size(376, 168), style=0)
+              name='gridpageHP', parent=self, pos=wx.Point(20, 40),
+              size=wx.Size(760, 100), style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPageHPGridCellLeftDclick, id=wxID_PANELHPGRIDPAGEHP)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridPageHPGridCellRightClick, id=wxID_PANELHPGRIDPAGEHP)
 
-
-        self.st1pageHeatpump = wx.StaticText(id=-1,
-              label=_('Existing Heat pumps in the HC system'),
-              name='st1pageHeatpump', parent=self, pos=wx.Point(40, 32),
-              style=0)
 
 #------------------------------------------------------------------------------		
 #       Action buttons and text entry
@@ -271,7 +275,7 @@ class PanelHP(wx.Panel):
 # Button "run design assistant"
         self.hpCalculate = wx.Button(id=wxID_PANELHPHPCALCULATE,
               label=_('Run design assistant'), name='HP_Calculate', parent=self,
-              pos=wx.Point(232, 224), size=wx.Size(184, 23), style=0)
+              pos=wx.Point(220, 160), size=wx.Size(180, 24), style=0)
 
         self.hpCalculate.Bind(wx.EVT_BUTTON, self.OnHpCalculateButton,
               id=wxID_PANELHPHPCALCULATE)
@@ -279,7 +283,7 @@ class PanelHP(wx.Panel):
 # Button "add heat pump"
         self.buttonpageHeatPumpAdd = wx.Button(id=-1,
               label=_('add heat pump manually'), name='buttonpageHeatPumpAdd',
-              parent=self, pos=wx.Point(40, 224), size=wx.Size(184, 23),
+              parent=self, pos=wx.Point(20, 160), size=wx.Size(180, 24),
               style=0)
         self.buttonpageHeatPumpAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageHPAddButton,
               id=-1)
@@ -288,11 +292,12 @@ class PanelHP(wx.Panel):
 #       Configuration design assistant
 #------------------------------------------------------------------------------		
 
-        self.stConfig = wx.StaticText(id=-1,
-              label=_('Design assistant options:'), name='stConfig',
-              parent=self, pos=wx.Point(40, 272), style=0)
-        self.stConfig.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD,
-              False, 'Tahoma'))
+        self.boxDA = wx.StaticBox(id=-1,
+              label=_('Configuration of design assistant'),
+              name='boxDA', parent=self, pos=wx.Point(10, 250),
+              size=wx.Size(420, 320), style=0)
+        self.boxDA.SetForegroundColour(TITLE_COLOR)
+        self.boxDA.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 #..............................................................................
 # 1. Maintain existing equipment ?
@@ -408,18 +413,18 @@ class PanelHP(wx.Panel):
 
         self.stInfo1 = wx.StaticText(id=-1,
               label=_('Pinch temperature \xb0C'), name='stInfo1',
-              parent=self, pos=wx.Point(440, 424), style=0)
+              parent=self, pos=wx.Point(440, 460), style=0)
 
         self.tcInfo1 = wx.TextCtrl(id=-1, name='tcInfo1',
-              parent=self, pos=wx.Point(640, 416), size=wx.Size(128, 21),
+              parent=self, pos=wx.Point(640, 460), size=wx.Size(128, 21),
               style=0, value="")
 
         self.stInfo2 = wx.StaticText(id=-1,
               label=_('Temperature gap \xb0K'), name='stInfo2',
-              parent=self, pos=wx.Point(440, 464), style=0)
+              parent=self, pos=wx.Point(440, 500), style=0)
 
         self.tcInfo2 = wx.TextCtrl(id=-1, name='tcInfo2',
-              parent=self, pos=wx.Point(640, 456), size=wx.Size(128, 21),
+              parent=self, pos=wx.Point(640, 500), size=wx.Size(128, 21),
               style=0, value="")
 
 
@@ -503,6 +508,7 @@ class PanelHP(wx.Panel):
         self.tcInfo1.SetValue(str(self.info[0]))
         self.tcInfo2.SetValue(str(self.info[1]))
 
+        self.Hide()
         self.panelHPFig.draw()
         self.Show()
         

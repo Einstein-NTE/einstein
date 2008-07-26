@@ -122,7 +122,11 @@ def getConnections():
             if pipes_j[j] is not None:
                 pipesSplit = pipes_j[j].split(';')
                 for i in range(len(pipesSplit)):
-                    pipeIDs_j.append(long(pipesSplit[i]))
+                    try:
+                        pipeIDs_j.append(long(pipesSplit[i]))
+                    except:
+                        logDebug("Connect: erroneous value in pipe-string [%s][%s]"%\
+                                 (pipesSplit[i],pipes_j[j]))
                 print "Connect: pipeIDs_j[%s]"%j,pipeIDs_j
                 
             if pipeID_m[m] in pipeIDs_j:

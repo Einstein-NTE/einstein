@@ -46,7 +46,7 @@ def _(text):
     return text
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 182" #M2_DEMO: deactivates pipes
+VERSION = "R1.00a Revision No. 184" #Number of upload in sourceforge
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99

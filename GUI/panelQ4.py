@@ -705,9 +705,15 @@ class PanelQ4(wx.Panel):
             
         pipes = []
         for i in pipeIDsSQL:
-            pipeID = int(i)
+            try: pipeID = int(i)
+            except:
+                logDebug("PanelQ4 (getPipeNames): erroneous pipeID-string in SQL: [%s|%s]"%\
+                             (i,pipeIDsSQL))
+                pipeID = None
+                
             if pipeID in pipeDict.keys():
                 pipes.append(pipeDict[pipeID])
+                
         print "PanelQ4: Names of pipes stored in SQL :",pipes
         return pipes
             
