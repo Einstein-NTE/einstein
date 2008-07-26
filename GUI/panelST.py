@@ -268,7 +268,7 @@ class PanelST(wx.Panel):
 
 
         self.stSys2 = wx.StaticText(id=-1,
-              label=_('Efficiency of distribution [-]'),
+              label=_('Efficiency of heat storage and distribution [-]'),
               name='stSys2', parent=self, pos=wx.Point(20, 230),
               style=0)
 
@@ -308,7 +308,7 @@ class PanelST(wx.Panel):
 # 1. Solar fraction
 
         self.stConfig1 = wx.StaticText(id=-1,
-              label=_('Desired solar fraction [-]'),
+              label=_('Target solar fraction [%]'),
               name='stConfig1', parent=self, pos=wx.Point(20, 360),
               style=0)
 
@@ -322,7 +322,7 @@ class PanelST(wx.Panel):
 #        self.tc1 = FloatEntry(self,
 #                              ipart=4, decimals=2, minval=0., maxval=1., value=0.5,
 #                              unitdict='FRACTION',
-#                              label=_("Desired solar fraction"),
+#                              label=_("Target solar fraction"),
 #                              tip=_("Reasonable values should be between 0 and 80 %"))
 #..............................................................................
 # 2. Solar collector type 
@@ -359,7 +359,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label=_('Latitude of the site'), name='stInfo1',
+              label=_('Latitude of the site [°]'), name='stInfo1',
               parent=self, pos=wx.Point(460, 400), style=0)
 
         self.stInfo1val = wx.StaticText(id=-1,
@@ -368,7 +368,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label=_('Total available surface area [m2]'), name='stInfo2',
+              label=_('Total gross surface area suitable\n for installation [m2]'), name='stInfo2',
               parent=self, pos=wx.Point(460, 420), style=0)
 
         self.stInfo2val = wx.StaticText(id=-1,
@@ -377,7 +377,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo3 = wx.StaticText(id=-1,
-              label=_('Total gross solar surface area [m2]'), name='stInfo3',
+              label=_('Solar collectors gross area  potential [m2]'), name='stInfo3',
               parent=self, pos=wx.Point(460, 440), style=0)
 
         self.stInfo3val = wx.StaticText(id=-1,
@@ -386,7 +386,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo4 = wx.StaticText(id=-1,
-              label=_('Solar fraction [%]'), name='stInfo4',
+              label=_('Solar fraction (up to 200°C) [%]'), name='stInfo4',
               parent=self, pos=wx.Point(460, 470), style=0)
 
         self.stInfo4val = wx.StaticText(id=-1,

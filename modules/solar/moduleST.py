@@ -243,6 +243,7 @@ class ModuleST(object):
 #   all the calculations should be carried out here that are necessary only
 #   the first time. the rest should be done in "updatePanel"
 #------------------------------------------------------------------------------
+        self.avAreaFactor=1.1
         self.generalData()
         self.screenSurfaces()
         self.calcSurfArea()
@@ -315,7 +316,7 @@ class ModuleST(object):
                 TC =self.TavCollMean
             else:
                 TC = "--"
-        info = [self.latitude,self.TotAvailSurfArea,self.TotNetSurfArea,sf,yi,TC,0]
+        info = [self.latitude,self.usableSurfacesArea,self.grossSurfArea,sf,yi,TC,0]
         Status.int.setGraphicsData('ST Info',info)
 
 #        info = [0,0,0,0,0,0,0]
@@ -486,6 +487,7 @@ class ModuleST(object):
         self.screenEquipments()
         self.guiSysPars = [0,0,0]
         self.updatePanel()
+        self.avAreaFactor=1.1
 
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):
@@ -584,6 +586,8 @@ class ModuleST(object):
         if model.K50L != None: equipe.update({"ST_K50L":model.K50L})
         if model.K50T != None: equipe.update({"ST_K50T":model.K50T})
         if model.DBSolarThermal_ID != None: equipe.update({"EquipIDFromDB":model.DBSolarThermal_ID})
+        if model.STAreaGross != None and model.STAreaAper != None:
+            self.avAreaFactor = model.STAreaGross/model.STAreaAper
         
         Status.SQL.commit()
         logTrack("ModuleST: dummy equipe after commit of everything %s"%str(equipe))
@@ -1181,7 +1185,7 @@ class ModuleST(object):
         NetSurfAreaFactorSloped=1.2
         MINSTATICROOF= 25 
         self.allShaded=1
-        
+        self.usableSurfacesArea=0
         self.usableSurfaces=[]
         self.usableSurfacesData=[]
         self.TotAvailSurfArea=0
@@ -1203,11 +1207,12 @@ class ModuleST(object):
                 f5=1
             self.grossSurfArea += NetSurfAreaPartial*f1*f2*f3*f4*f5
             self.TotAvailSurfArea += self.surfaces[i]["surfArea"]
+            self.usableSurfacesArea += self.surfaces[i]["surfArea"]*f1*f2*f3*f4*f5
             if f1*f2*f3*f4*f5==1:
                 self.allShaded= self.allShaded*fs
                 self.usableSurfaces.append(self.surfaces[i])
                 self.usableSurfacesData.append({"NetSurfAreaFactor":self.NetSurfAreaFactor,"NetSurfAreaPartial":NetSurfAreaPartial})
-        avAreaFactor=1.1
+        avAreaFactor=self.avAreaFactor
         self.TotNetSurfArea=self.grossSurfArea/avAreaFactor
         if self.TotNetSurfArea < self.MINTOTNETSURFAREA:
             showWarning(_("The surface available for the collectors mounting is quite small."))
@@ -1278,6 +1283,7 @@ class ModuleST(object):
                 self.etaSelected=etaCollector
                 self.a=i
         selectedCollector=possibleCollector[self.a]
+        self.avAreaFactor = selectedCollector.STAreaGross/selectedCollector.STAreaAper
         return selectedCollector
         
 #------------------------------------------------------------------------------
@@ -1290,7 +1296,7 @@ class ModuleST(object):
 
         self.solFraDefault=0.5
         self.Tmax=200
-        SolFra=self.solFraDefault  # Later on solarFra will be entered from the GUI
+        SolFra=self.solFraDefault  # Later on solarFra will be entered from the GUI. Right?
         QuSolarUnitary=500
         deltaT_Primary=7
         
@@ -1350,14 +1356,14 @@ class ModuleST(object):
         config=self.getUserDefinedPars()       
 
         if config[0]!= None:
-            self.desiredSolarFraction=config[0]
+            self.desiredSolarFraction=config[0]/100
         else:
             self.desiredSolarFraction= 0.5
         if config[2]!= None:
             self.QuSolarUnitaryMin= config[2]
         else:
             self.QuSolarUnitaryMin=300
-
+#        test=self.QuSolarUnitaryMin*1.02
         if self.STExistance==1:
             showWarning(_("A solar thermal system is in use! in order to design a new one you should delete the existent."))
         else:    
@@ -1407,38 +1413,41 @@ class ModuleST(object):
                     logTrack ("At the averege temperature of:'%s'" % self.TavCollMean)
                     SolFraCalc=USHj/self.QD_Tmax
                     A=equipe.HCGPnom/0.7
-                    logTrack ("The area is:'%s'" % A)
+                    logTrack ("The aperture area is:'%s'" % A)
                     QuSolarUnitary=USHj/A
                     logTrack ("The QuSolarUnitary is:'%s'" % QuSolarUnitary)
                     if QuSolarUnitary < self.QuSolarUnitaryMin:
                         logTrack ("ModuleST designAssistant: reached pointG")
                         A=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
-                        A=max(A,self.MINTOTNETSURFAREA)
-                        logTrack ("The new area is:'%s'" % A)
+                        A=max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
+                        logTrack ("The new aperture area is:'%s'" % A)
                         equipe.HCGPnom = A*0.7
                         equipe.ST_Volume = A*0.05
                         Status.SQL.commit()
                         n +=1
-                        if A==self.MINTOTNETSURFAREA: pass
+                        if A == self.MINTOTNETSURFAREA/self.avAreaFactor : pass
                         continue
                     else:
+#                        test2=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
                         if abs(SolFraCalc-self.desiredSolarFraction) > 0.05:   #  In this way we reduce the solar fraction when it exceed 0.5: even if the QuSolarUnitary is good enough
                             logTrack ("ModuleST designAssistant: reached pointH")
+                            logTrack ("ModuleST designAssistant: SolFraCalc= '%s' self.desiredSolarFraction='%s'" %(SolFraCalc,self.desiredSolarFraction))
                             A1 = A*QuSolarUnitary/self.QuSolarUnitaryMin
                             A2 = A*self.desiredSolarFraction/SolFraCalc
                             k=0.8
                             A3 = k*A2+(1-k)*A
                             A4= min (A3,self.TotNetSurfArea)
-                            if A4/selectedCollector.STAreaGross - int(A4/selectedCollector.STAreaAper) >0.5:
-                                A5 = selectedCollector.STAreaGross*int(A4/selectedCollector.STAreaAper)
-                            else:
-                                A5 = selectedCollector.STAreaGross*(int(A4/selectedCollector.STAreaAper)+1)
+                            A5= selectedCollector.STAreaAper * int((A4/selectedCollector.STAreaAper)+0.5)
+#                            if A4/selectedCollector.STAreaAper - int(A4/selectedCollector.STAreaAper) >0.5:
+#                                A5 = selectedCollector.STAreaGross*int(A4/selectedCollector.STAreaAper)
+#                            else:
+#                                A5 = selectedCollector.STAreaGross*(int(A4/selectedCollector.STAreaAper)+1)
                             A = min(A1,A5)
-#                            A = max(A,self.MINTOTNETSURFAREA)
+                            A = max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
                             equipe.HCGPnom = A*0.7
                             Status.SQL.commit()
                             n +=1
-#                            if A==self.MINTOTNETSURFAREA: pass
+                            if A==self.MINTOTNETSURFAREA/self.avAreaFactor: pass
                             continue
                         else:
                             break
@@ -1447,10 +1456,7 @@ class ModuleST(object):
                 
                 logTrack ("ModuleST designAssistant: reached pointI")
                 A=equipe.HCGPnom/0.7
-                if A/selectedCollector.STAreaGross - int(A/selectedCollector.STAreaAper) >0.5:
-                    NColl = int(A/selectedCollector.STAreaAper)
-                else:
-                    NColl = int(A/selectedCollector.STAreaAper)+1
+                NColl=int((A/selectedCollector.STAreaAper)+0.1)
                 equipe.HCGPnom = NColl*selectedCollector.STAreaAper*0.7
                 Status.SQL.commit()
                 USHj=self.calculateEnergyFlows(equipe,1)
