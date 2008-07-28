@@ -46,7 +46,7 @@ def _(text):
     return text
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 184" #Number of upload in sourceforge
+VERSION = "R1.00a Revision No. 186" #Number of upload in sourceforge
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99

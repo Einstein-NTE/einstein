@@ -48,7 +48,7 @@ from fonts import FontProperties
 CHOOSERBCGCOLOR    = (255,255,255)
 FGCOLOR            = (0,0,0)
 TEXTBKGCOLOR       = (255,255,255)
-EMPTYBKGCOLOR      = (230,230,255)
+EMPTYBKGCOLOR      = (255,255,255)
 INVALIDBKGCOLOR    = (255,255,0)
 LOWERACCEPTEDDATE  = '01/01/1900'
 UPPERACCEPTEDDATE  = '12/31/2050'
@@ -883,8 +883,12 @@ class FloatEntry(wx.Panel):
             # n is the 0-based index to the contents
             self.units.SetSelection(n)
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+ 
 
-
+        
 class IntEntry(wx.Panel):
     def __init__(self, parent=None,
                  minval=None,                                  # min value
@@ -1043,6 +1047,11 @@ class IntEntry(wx.Panel):
             # n is the 0-based index to the contents
             self.units.SetSelection(n)
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+ 
+
 
 class TextEntry(wx.Panel):
     def __init__(self, parent=None,
@@ -1126,6 +1135,10 @@ class TextEntry(wx.Panel):
         # this method is just for compatibility
         pass
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+ 
 
 class DateEntry(wx.Panel):
     def __init__(self, parent=None,
@@ -1189,6 +1202,10 @@ class DateEntry(wx.Panel):
         # this method is just for compatibility
         pass
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+ 
 
 
 class ChoiceEntry(wx.Panel):
@@ -1287,6 +1304,10 @@ class ChoiceEntry(wx.Panel):
         # this method is just for compatibility
         pass
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+ 
 
 
 class MultipleChoiceEntry(wx.Panel):
@@ -1389,9 +1410,17 @@ class MultipleChoiceEntry(wx.Panel):
         # this method is just for compatibility
         pass
 
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        #combo = self.entry.GetCombo()
+        self.cc.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.cc.SetForegroundColour(self.g.makeColour(fgColor))
+ 
 
 
 class Label(wx.lib.stattext.GenStaticText):
+    # ***** deprecated *****
+    # this class is set to disappear soon!
+    #
     # auxiliary class for labels (static text)
     # will show a short descriptive string and
     # generate a longer tooltip.

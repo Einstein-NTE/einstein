@@ -58,6 +58,7 @@ from numpy import *
 from numCtrl import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 from GUITools import *
+import copy
 
 [wxID_PANEL, wxID_PANELBUTTONADD, 
  wxID_PANELBUTTONBACK, wxID_PANELBUTTONCANCEL, 
@@ -196,7 +197,7 @@ class PanelST(wx.Panel):
 # Figure to be plotted
 
         self.staticBox1 = wx.StaticBox(id=-1,
-              label=_('Temperature dependent heat demand with and without solar system'),
+              label=_('Temperature dependent heat demand with and w/o solar system'),
               name='staticBox1', parent=self, pos=wx.Point(450, 130),
               size=wx.Size(340, 260), style=0)
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
@@ -248,19 +249,19 @@ class PanelST(wx.Panel):
 #       System parameters
 #------------------------------------------------------------------------------		
         self.boxSystem = wx.StaticBox(id=-1,
-              label=_('Solar thermal system parameters'),
-              name='boxSystem', parent=self, pos=wx.Point(10, 170),
+              label=_('Lay-out of solar thermal system'),
+              name='boxSystem', parent=self, pos=wx.Point(10, 330),
               size=wx.Size(420, 120), style=0)
         self.boxSystem.SetForegroundColour(TITLE_COLOR)
         self.boxSystem.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stSys1 = wx.StaticText(id=-1,
               label=_('Installed capacity [kW]'),
-              name='stSys1', parent=self, pos=wx.Point(20, 200),
+              name='stSys1', parent=self, pos=wx.Point(20, 360),
               style=0)
 
         self.tcSys1 = wx.TextCtrl(id=-1, name='tcConfig3',
-              parent=self, pos=wx.Point(300, 200), size=wx.Size(120, 20),
+              parent=self, pos=wx.Point(280, 360), size=wx.Size(140, 20),
               style=wx.TE_PROCESS_ENTER, value="")
 
         self.tcSys1.Bind(wx.EVT_KILL_FOCUS, self.OnTcSysTextEnter,
@@ -269,11 +270,11 @@ class PanelST(wx.Panel):
 
         self.stSys2 = wx.StaticText(id=-1,
               label=_('Efficiency of heat storage and distribution [-]'),
-              name='stSys2', parent=self, pos=wx.Point(20, 230),
+              name='stSys2', parent=self, pos=wx.Point(20, 390),
               style=0)
 
         self.tcSys2 = wx.TextCtrl(id=-1, name='tcSys2',
-              parent=self, pos=wx.Point(300, 230), size=wx.Size(120, 20),
+              parent=self, pos=wx.Point(280, 390), size=wx.Size(140, 20),
               style=wx.TE_PROCESS_ENTER, value="")
 
         self.tcSys2.Bind(wx.EVT_KILL_FOCUS, self.OnTcSysTextEnter,
@@ -282,11 +283,11 @@ class PanelST(wx.Panel):
 
         self.stSys3 = wx.StaticText(id=-1,
               label=_('Solar buffer storage volume [m3]'),
-              name='stSys3', parent=self, pos=wx.Point(20, 260),
+              name='stSys3', parent=self, pos=wx.Point(20, 420),
               style=0)
 
         self.tcSys3 = wx.TextCtrl(id=-1, name='tcSys3',
-              parent=self, pos=wx.Point(300, 260), size=wx.Size(120, 20),
+              parent=self, pos=wx.Point(280, 420), size=wx.Size(140, 20),
               style=wx.TE_PROCESS_ENTER, value="")
 
         self.tcSys3.Bind(wx.EVT_KILL_FOCUS, self.OnTcSysTextEnter,
@@ -299,7 +300,7 @@ class PanelST(wx.Panel):
 
         self.boxDA = wx.StaticBox(id=-1,
               label=_('Configuration of design assistant'),
-              name='boxDA', parent=self, pos=wx.Point(10, 330),
+              name='boxDA', parent=self, pos=wx.Point(10, 170),
               size=wx.Size(420, 120), style=0)
         self.boxDA.SetForegroundColour(TITLE_COLOR)
         self.boxDA.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -309,11 +310,11 @@ class PanelST(wx.Panel):
 
         self.stConfig1 = wx.StaticText(id=-1,
               label=_('Target solar fraction [%]'),
-              name='stConfig1', parent=self, pos=wx.Point(20, 360),
+              name='stConfig1', parent=self, pos=wx.Point(20, 200),
               style=0)
 
         self.tcConfig1 = wx.TextCtrl(id=-1, name='tcConfig1',
-              parent=self, pos=wx.Point(300, 360), size=wx.Size(120, 20),
+              parent=self, pos=wx.Point(280, 200), size=wx.Size(140, 20),
               style=wx.TE_PROCESS_ENTER, value="")
 
         self.tcConfig1.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig1TextEnter,
@@ -328,11 +329,11 @@ class PanelST(wx.Panel):
 # 2. Solar collector type 
 
         self.stConfig2 = wx.StaticText(id=-1, label=_('Solar collector type'),
-              name='stConfig2', parent=self, pos=wx.Point(40, 390),
+              name='stConfig2', parent=self, pos=wx.Point(20, 230),
               style=0)
 
         self.choiceConfig2 = wx.Choice(choices=TRANSSTTYPES.values(), id=-1, name='choice', parent=self,
-              pos=wx.Point(300, 390), size=wx.Size(120, 20), style=0)
+              pos=wx.Point(280, 230), size=wx.Size(140, 20), style=0)
 
         self.choiceConfig2.Bind(wx.EVT_CHOICE, self.OnChoiceConfig2Choice,
               id=-1)
@@ -342,11 +343,11 @@ class PanelST(wx.Panel):
 
         self.stConfig3 = wx.StaticText(id=-1,
               label=_('Minimum annual energy yield [kWh/kW.a]'),
-              name='stConfig3', parent=self, pos=wx.Point(40, 420),
+              name='stConfig3', parent=self, pos=wx.Point(20, 260),
               style=0)
 
         self.tcConfig3 = wx.TextCtrl(id=-1, name='tcConfig3',
-              parent=self, pos=wx.Point(300, 420), size=wx.Size(120, 20),
+              parent=self, pos=wx.Point(280, 260), size=wx.Size(140, 20),
               style=wx.TE_PROCESS_ENTER, value="")
 
         self.tcConfig3.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig3TextEnter,
@@ -359,7 +360,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label=_('Latitude of the site [°]'), name='stInfo1',
+              label=_('Gross surface area suitable for installation [m2]'), name='stInfo1',
               parent=self, pos=wx.Point(460, 400), style=0)
 
         self.stInfo1val = wx.StaticText(id=-1,
@@ -368,7 +369,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label=_('Total gross surface area suitable\n for installation [m2]'), name='stInfo2',
+              label=_('Maximum possible solar thermal capacity [kW]'), name='stInfo2',
               parent=self, pos=wx.Point(460, 420), style=0)
 
         self.stInfo2val = wx.StaticText(id=-1,
@@ -377,16 +378,16 @@ class PanelST(wx.Panel):
 
 
         self.stInfo3 = wx.StaticText(id=-1,
-              label=_('Solar collectors gross area  potential [m2]'), name='stInfo3',
-              parent=self, pos=wx.Point(460, 440), style=0)
+              label=_('Solar fraction (up to 200°C) [%]'), name='stInfo3',
+              parent=self, pos=wx.Point(460, 450), style=0)
 
         self.stInfo3val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 440), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+              parent=self, pos=wx.Point(700, 450), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo4 = wx.StaticText(id=-1,
-              label=_('Solar fraction (up to 200°C) [%]'), name='stInfo4',
+              label=_('Annual energy yield [kWh/kW.a]'), name='stInfo4',
               parent=self, pos=wx.Point(460, 470), style=0)
 
         self.stInfo4val = wx.StaticText(id=-1,
@@ -395,7 +396,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo5 = wx.StaticText(id=-1,
-              label=_('Annual energy yield [kWh/kW.a]'), name='stInfo5',
+              label=_('Average system efficiency [%]'), name='stInfo5',
               parent=self, pos=wx.Point(460, 490), style=0)
 
         self.stInfo5val = wx.StaticText(id=-1,
@@ -485,8 +486,17 @@ class PanelST(wx.Panel):
 
         #config0..2: DA parameters
         self.tcConfig1.SetValue(convertDoubleToString(self.config[0]))
-        if self.config[1] in TRANSSTTYPES.keys():
-            self.choiceConfig2.SetStringSelection(TRANSSTTYPES[self.config[1]])
+
+        TRANSCOLLTYPES = copy.deepcopy(TRANSSTTYPES)
+        TRANSCOLLTYPES.update({"any":_("<any>"),"preselected":_("<preselected collector>")})
+        collTypes = TRANSCOLLTYPES.values()
+        collTypes.sort()
+
+        fillChoice(self.choiceConfig2,collTypes,nonePossible=False)
+                              
+        if self.config[1] in TRANSCOLLTYPES.keys():
+            self.choiceConfig2.SetStringSelection(TRANSCOLLTYPES[self.config[1]])
+                              
         self.tcConfig3.SetValue(convertDoubleToString(self.config[2]))
         
         self.sysPars = Status.int.GData["ST SysPars"]
