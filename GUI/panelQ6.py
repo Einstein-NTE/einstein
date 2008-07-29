@@ -319,23 +319,23 @@ class PanelQ6(wx.Panel):
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='TIME',
                                 label=_("Hours of  operation per day"),
-                                tip=_(""))
+                                tip=_(" "))
 
         self.tc111 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 label=_("Number of batches per day"),
-                                tip=_(""))
+                                tip=_(" "))
 
         self.tc112 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='TIME',
                                 label=_("Duration of 1 batch"),
-                                tip=_(""))
+                                tip=_(" "))
 
         self.tc113 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 label=_("Days of operation per year"),
-                                tip=_(""))
+                                tip=_(" "))
 
         #
         # buttons

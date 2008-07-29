@@ -238,7 +238,7 @@ class PanelQ1(wx.Panel):
 
         self.tc11 = TextEntry(self.page0,maxchars=255,value='',
                              label=_("Sub-branch"),
-                             tip=_(""))
+                             tip=_(" "))
 
 
 #        fs = FieldSizes(wData=DATA_ENTRY_WIDTH_LEFT / 3)

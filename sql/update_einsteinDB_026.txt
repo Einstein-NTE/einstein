@@ -1,0 +1,10 @@
+-- update einstein database: some additional parameters HS 28/07/2008
+USE einstein;
+
+-- add columns to qgenerationhc
+
+ALTER TABLE qgenerationhc ADD COLUMN STAreaFactor Double COMMENT 'Ratio gross to net collector area' AFTER ST_K50T;
+ALTER TABLE qgenerationhc ADD COLUMN HTilted Double COMMENT 'Yearly solar radiation on tilted surface' AFTER FETHeat_j;
+ALTER TABLE qgenerationhc ADD COLUMN TAvColl Double COMMENT 'Average operating temperature of the solar thermal colletor' AFTER ST_K50T;
+
+

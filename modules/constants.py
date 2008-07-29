@@ -46,7 +46,7 @@ def _(text):
     return text
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 186" #Number of upload in sourceforge
+VERSION = "R1.00a Revision No. 187" #Number of upload in sourceforge
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99
@@ -82,6 +82,9 @@ INTERACTIONLEVELS = ['interactive','semi-automatic','automatic']
 
 #------------------------------------------------------------------------------		
 #default entries for parameters
+
+#equiptype is the full description of the type containing information on the equipement-class (BB,HP, ...)
+# and on the equipment sub-class (STEAM boiler, CONDENSING boiler, etc.)
 
 EQUIPTYPE = ["compression heat pump",
              "thermal heat pump",
@@ -124,25 +127,34 @@ TRANSEQUIPTYPE = {"compression heat pump":_("compression heat pump"),
              "CHP gas turbine":_("CHP gas turbine"),
              "CHP fuel cell":_("CHP fuel cell")}
 
-BBTYPES = ["condensing boiler",
-           "steam boiler",
+# BBTYPES, STTYPES etc. are the short classifications of the equipment sub-class (usually used within the specific
+# equipment modules
+
+BBTYPES = ["steam boiler",
+           "condensing boiler",
            "hot water boiler",
            "burner (direct heating)",
            "burner (indirect heating)"]
 
+TRANSBBTYPES = {"steam boiler":_("steam boiler"),
+                "condensing boiler":_("condensing boiler"),
+                "hot water boiler":_("hot water boiler"),
+                "burner (direct heating)":_("burner (direct heating)"),
+                "burner (indirect heating)":_("burner (indirect heating)")}
+
 HPTYPES = ["compression",
            "thermal"]
 
-TRANSHPTYPES = {HPTYPES[0]:_(HPTYPES[0]),
-                HPTYPES[1]:_(HPTYPES[1])}
+TRANSHPTYPES = {"compression":_("compression"),
+                "thermal":_("thermal")}
 
 STTYPES = [ "Flat-plate collector",
             "Evacuated tube collector",
             "Concentrating collector"]
 
 TRANSSTTYPES = {"Flat-plate collector":     _("Flat-plate collector"),
-                "Evacuated tube collector":           _("Evacuated tube collector"),
-                "Concentrating collector":_("Concentrating collector")
+                "Evacuated tube collector": _("Evacuated tube collector"),
+                "Concentrating collector":  _("Concentrating collector")
                 }
 
 HXTYPES = [ "plate HX (liquid-liquid)",
@@ -155,13 +167,16 @@ TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
                 "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
                 }
 
-EQUIPMENTSUBTYPE = [BBTYPES[0],
+# EQUIPMENTSUBTYPE collects all the sub-types in ONE list, in the same order as the corresponding
+# EQUIPTYPE
+
+EQUIPMENTSUBTYPE = [HPTYPES[0],
+                    HPTYPES[1],
+                    BBTYPES[0],
                     BBTYPES[1],
                     BBTYPES[2],
                     BBTYPES[3],
                     BBTYPES[4],
-               "compression",
-               "thermal",
                "flat-plate",
                "evacuated tubes",
                "concentrating solar systems",
@@ -174,22 +189,27 @@ EQUIPMENTSUBTYPE = [BBTYPES[0],
                "shell&tube HX (liquid-liquid)",
                "finned tubes (liquid-air)"]
 
+# EQUIPMENT associates equipment class and sub-class
+
 EQUIPMENT = {"HP":                 # equipment class
-             [(EQUIPTYPE[0],       # type of equipment, untranslated
-               _(EQUIPTYPE[0]),    # type of equipment, translated
-               EQUIPMENTSUBTYPE[4],     # type of process, untranslated
-               _(EQUIPMENTSUBTYPE[4])), # type of process, translated
+             [(EQUIPTYPE[0],TRANSEQUIPTYPE[EQUIPTYPE[0]],    # type of equipment, translated
+               HPTYPES[0], TRANSHPTYPES[HPTYPES[0]]), # type of process, translated
+              (EQUIPTYPE[1],TRANSEQUIPTYPE[EQUIPTYPE[1]],
+               HPTYPES[1],TRANSHPTYPES[HPTYPES[1]])],
 
-              (EQUIPTYPE[1],_(EQUIPTYPE[1]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
+             "BB": [(EQUIPTYPE[BBIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+0]],
+                     BBTYPES[0],TRANSBBTYPES[BBTYPES[0]]),
+                    (EQUIPTYPE[BBIndex+1],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+1]],
+                     BBTYPES[1],TRANSBBTYPES[BBTYPES[1]]),
+                    (EQUIPTYPE[BBIndex+2],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+2]],
+                     BBTYPES[2],TRANSBBTYPES[BBTYPES[2]]),
+                    (EQUIPTYPE[BBIndex+3],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+3]],
+                     BBTYPES[3],TRANSBBTYPES[BBTYPES[3]]),
+                    (EQUIPTYPE[BBIndex+4],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+4]],
+                     BBTYPES[4],TRANSBBTYPES[BBTYPES[4]])],
 
-             "BB": [(EQUIPTYPE[BBIndex+0],_(EQUIPTYPE[BBIndex+0]),BBTYPES[0],_(BBTYPES[0])),
-                    (EQUIPTYPE[BBIndex+1],_(EQUIPTYPE[BBIndex+1]),BBTYPES[1],_(BBTYPES[1])),
-                    (EQUIPTYPE[BBIndex+2],_(EQUIPTYPE[BBIndex+2]),BBTYPES[2],_(BBTYPES[2])),
-                    (EQUIPTYPE[BBIndex+3],_(EQUIPTYPE[BBIndex+3]),BBTYPES[3],_(BBTYPES[3])),
-                    (EQUIPTYPE[BBIndex+4],_(EQUIPTYPE[BBIndex+4]),BBTYPES[4],_(BBTYPES[4]))],
-
-             "CH": [(EQUIPTYPE[6],_(EQUIPTYPE[6]),EQUIPMENTSUBTYPE[4],_(EQUIPMENTSUBTYPE[4])),
-                    (EQUIPTYPE[7],_(EQUIPTYPE[7]),EQUIPMENTSUBTYPE[5],_(EQUIPMENTSUBTYPE[5]))],
+             "CH": [(EQUIPTYPE[6],TRANSEQUIPTYPE[EQUIPTYPE[6]],EQUIPMENTSUBTYPE[6],_(EQUIPMENTSUBTYPE[6])),
+                    (EQUIPTYPE[7],TRANSEQUIPTYPE[EQUIPTYPE[7]],EQUIPMENTSUBTYPE[7],_(EQUIPMENTSUBTYPE[7]))],
 
              "ST": [(EQUIPTYPE[STIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+0]],
                      STTYPES[0],TRANSSTTYPES[STTYPES[0]]),
@@ -198,10 +218,10 @@ EQUIPMENT = {"HP":                 # equipment class
                     (EQUIPTYPE[STIndex+2],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+2]],
                      STTYPES[2],TRANSSTTYPES[STTYPES[2]])],
 
-             "CHP": [(EQUIPTYPE[11],_(EQUIPTYPE[11]),EQUIPMENTSUBTYPE[11],_(EQUIPMENTSUBTYPE[11])),
-                    (EQUIPTYPE[12],_(EQUIPTYPE[12]),EQUIPMENTSUBTYPE[9],_(EQUIPMENTSUBTYPE[9])),
-                    (EQUIPTYPE[13],_(EQUIPTYPE[13]),EQUIPMENTSUBTYPE[10],_(EQUIPMENTSUBTYPE[10])),
-                    (EQUIPTYPE[14],_(EQUIPTYPE[14]),EQUIPMENTSUBTYPE[12],_(EQUIPMENTSUBTYPE[12]))]
+             "CHP": [(EQUIPTYPE[11],TRANSEQUIPTYPE[EQUIPTYPE[11]],EQUIPMENTSUBTYPE[11],EQUIPMENTSUBTYPE[11]),
+                    (EQUIPTYPE[12],TRANSEQUIPTYPE[EQUIPTYPE[12]],EQUIPMENTSUBTYPE[9],EQUIPMENTSUBTYPE[9]),
+                    (EQUIPTYPE[13],TRANSEQUIPTYPE[EQUIPTYPE[13]],EQUIPMENTSUBTYPE[10],EQUIPMENTSUBTYPE[10]),
+                    (EQUIPTYPE[14],TRANSEQUIPTYPE[EQUIPTYPE[14]],EQUIPMENTSUBTYPE[12],EQUIPMENTSUBTYPE[12])]
              }
 
 

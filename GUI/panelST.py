@@ -546,21 +546,17 @@ class PanelST(wx.Panel):
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
 
-	self.equipe = self.mod.addEquipmentDummy() 
+        self.dbe = DBEditFrame(self, _("Select solar collector"), "dbsolarthermal", 0, False)
+        if self.dbe.ShowModal() == wx.ID_OK:
+	    self.theId = self.dbe.theId
+            self.equipe = self.mod.addEquipmentDummy() 
+	    try:
+		self.mod.setEquipmentFromDB(self.equipe, self.theId)
+	    except:
+                self.mod.deleteEquipment(None)
+		logDebug('PanelST (choose collector): setEquipmentFromDB from module did not execute')
 
-        pu1 =  AddEquipment(self,                      # pointer to this panel
-                            self.mod,                  # pointer to the associated module
-                            _('Select solar collector'), # title for the dialogs
-                            _('dbsolarthermal'),              # database table
-                            0,                         # column to be returned
-                            False)                     # database table can be edited in DBEditFrame?
-
-        if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelST (Select solar collector): Select collector accepted. Id='+str(pu1.theId)
-        else:
-            self.mod.deleteEquipment(None)
-
-        self.display()
+            self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
