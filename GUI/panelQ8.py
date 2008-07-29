@@ -215,8 +215,7 @@ class PanelQ8(wx.Panel):
         self.tc10 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
                                unitdict=None,
                                label=_("Hours of occupation"),
-                               tip=_("Hours of occupation of the building, during which "+\
-                               "heating and air conditionning is active"))
+                               tip=_("Hours of occupation of the building, during which heating and air conditionning is active"))
 
         self.tc11 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
                                unitdict=None,

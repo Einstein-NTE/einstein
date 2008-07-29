@@ -405,7 +405,7 @@ class PanelBM2(wx.Panel):
         turnover1 = float(self.tcSearchCrit2b.GetValue())
 
         if turnover0 < 0 or turnover1 > 1.0e+6 or turnover0 > turnover1:
-            showWarning(_("revise your search criteria: turnover in between %s and %s M€"%(turnover0,turnover1)))
+            showWarning(_("revise your search criteria: turnover in between %s and %s M€")%(turnover0,turnover1))
             print (turnover0<=0.0),(turnover1 > 1.0e+6),(turnover0 > turnover1)
             return
 
@@ -413,7 +413,7 @@ class PanelBM2(wx.Panel):
         year1 = int(self.tcSearchCrit3b.GetValue())
 
         if (year0 < 1980 or year1 > 2050 or year0 > year1) and year0 > 0:
-            showWarning(_("revise your search criteria: year of data in between %s and %s"%(year0,year1)))
+            showWarning(_("revise your search criteria: year of data in between %s and %s")%(year0,year1))
             return
 
         product = self.comboProduct.GetValue()

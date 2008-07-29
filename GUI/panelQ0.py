@@ -68,7 +68,7 @@ class PanelQ0(wx.Panel):
 # Description of selected industry
 
         self.box1 = wx.StaticBox(id=-1,
-              label=_(_('Projects in the database')),
+              label=_('Projects in the database'),
               name='box1', parent=self, pos=wx.Point(10, 10),
               size=wx.Size(780, 380), style=0)
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -128,7 +128,7 @@ class PanelQ0(wx.Panel):
 # Description of selected industry
 
         self.box2 = wx.StaticBox(id=-1,
-              label=_(_('Selected project')),
+              label=_('Selected project'),
               name='box1', parent=self, pos=wx.Point(10, 410),
               size=wx.Size(780, 160), style=0)
         self.box2.SetForegroundColour(TITLE_COLOR)

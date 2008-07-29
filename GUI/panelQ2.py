@@ -171,8 +171,7 @@ class PanelQ2(wx.Panel):
                               ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='MASSORVOLUME',
                               label=_("Annual consumption (fuel units)"),
-                              tip=_("If possible, provide the monthly data in separate sheet and/or the fuel bills."+ \
-                                    "Specify the energy equivalent in base of LCV (lower calorific value)"))  
+                              tip=_("If possible, provide the monthly data in separate sheet and/or the fuel bills. Specify the energy equivalent in base of LCV (lower calorific value)"))  
         
         self.tc4 = FloatEntry(self.page0,
                               ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,

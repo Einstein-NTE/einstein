@@ -42,11 +42,9 @@
 #	Software Foundation (www.gnu.org).
 #
 #============================================================================== 
-def _(text):
-    return text
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 187" #Number of upload in sourceforge
+VERSION = "R1.00a Revision No. 188" #Number of upload in sourceforge
 
 #------------------------------------------------------------------------------		
 INFINITE = 1.e99
@@ -208,8 +206,8 @@ EQUIPMENT = {"HP":                 # equipment class
                     (EQUIPTYPE[BBIndex+4],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+4]],
                      BBTYPES[4],TRANSBBTYPES[BBTYPES[4]])],
 
-             "CH": [(EQUIPTYPE[6],TRANSEQUIPTYPE[EQUIPTYPE[6]],EQUIPMENTSUBTYPE[6],_(EQUIPMENTSUBTYPE[6])),
-                    (EQUIPTYPE[7],TRANSEQUIPTYPE[EQUIPTYPE[7]],EQUIPMENTSUBTYPE[7],_(EQUIPMENTSUBTYPE[7]))],
+             "CH": [(EQUIPTYPE[6],TRANSEQUIPTYPE[EQUIPTYPE[6]],EQUIPMENTSUBTYPE[6],EQUIPMENTSUBTYPE[6]),
+                    (EQUIPTYPE[7],TRANSEQUIPTYPE[EQUIPTYPE[7]],EQUIPMENTSUBTYPE[7],EQUIPMENTSUBTYPE[7])],
 
              "ST": [(EQUIPTYPE[STIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+0]],
                      STTYPES[0],TRANSSTTYPES[STTYPES[0]]),

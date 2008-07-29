@@ -564,7 +564,6 @@ class EinsteinFrame(wx.Frame):
 
     def OnMenuImportProject(self, event):
         ex = ImportProject()
-        print repr(ex.getDict()) # imprime
         pids = ex.getPid()
         oldPId,newPId = pids
         self.showInfo('Project with pid=%s has been imported. New pid set to %s' % pids)
@@ -1493,7 +1492,7 @@ class EinsteinApp(wx.App):
         # initialize Einstein support
         self.frame.doLog = HelperClass.LogHelper()
         self.frame.conf = HelperClass.ConfigHelper()
-        self.frame.doLog.LogThis('Starting program')
+        self.frame.doLog.LogThis('Starting EINSTEIN Version %s'%VERSION)
 
         # initialize language
         self.frame.setLanguage()
