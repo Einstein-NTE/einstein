@@ -549,14 +549,16 @@ class PanelST(wx.Panel):
         self.dbe = DBEditFrame(self, _("Select solar collector"), "dbsolarthermal", 0, False)
         if self.dbe.ShowModal() == wx.ID_OK:
 	    self.theId = self.dbe.theId
-            self.equipe = self.mod.addEquipmentDummy() 
-	    try:
-		self.mod.setEquipmentFromDB(self.equipe, self.theId)
-	    except:
-                self.mod.deleteEquipment(None)
-		logDebug('PanelST (choose collector): setEquipmentFromDB from module did not execute')
+            self.mod.setManualSelection(self.theId)
+            if self.sysPars[0] > 0:
+                self.equipe = self.mod.addEquipmentDummy()
+                try:
+                    self.mod.setEquipmentFromDB(self.equipe, self.theId)
+                except:
+                    self.mod.deleteEquipment(None)
+                    logDebug('PanelST (choose collector): setEquipmentFromDB from module did not execute')
 
-            self.display()
+                self.display()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
