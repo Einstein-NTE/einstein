@@ -714,7 +714,6 @@ class ModuleCC(object):
 #                    self.ccEq[j].QWHEqRec.update(self.QWHEq[j])
 
                 for m in range(NM):
-                    pass
                     self.ccPipe[m].QHXPipe.update(self.QHXPipe[m])
                     self.ccPipe[m].QWHPipe.update(self.QWHPipe[m]) #to be changed in QWHPipeRec if necessary
 
@@ -730,11 +729,6 @@ class ModuleCC(object):
                 for h in range(NH):
                     self.ccHX[h].QWH.update(self.QWH[h])
                     self.ccHX[h].QHX.update(self.QHX[h])
-
-# here data should be passed to the correspoinding inputs in CheckEq
-#                    self.ccProc[k].QHXProcRec.update(self.QHXProc[k])
-#                    self.ccProc[k].QWHProcRec.update(self.QWHProc[k])
-
 
 #..............................................................................
 # If any matrix conflict appears, break immediately.
