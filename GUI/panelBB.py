@@ -104,10 +104,10 @@ def drawFigure(self):
                       'go-', label='QD [80ºC]', linewidth=2)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][2],
-                      'rs',  label='QD [120ºC]')
+                      'rs',  label='QD [140ºC]')
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][3],
-                      'go-', label='QD [250ºC]', linewidth=2)
+                      'go-', label='QD [Tmax]', linewidth=2)
 #    self.subplot.plot(Interfaces.GData['BB Plot'][0],
 #                      Interfaces.GData['BB Plot'][4],
 #                      'rs',  label='USH (boiler)')
@@ -300,7 +300,7 @@ class PanelBB(wx.Panel):
               label=_('Minimum operating hours (baseload boiler)'),
               name='stConfig5', parent=self, pos=wx.Point(40, 464), style=0)
 
-        self.tcConfig5 = wx.TextCtrl(id=-1, name='tcConfig5', parent=self,
+        self.tcConfig5 = wx.TextCtrl(id=wxID_PANELBBTCCONFIG5, name='tcConfig5', parent=self,
               pos=wx.Point(288, 456), size=wx.Size(128, 24), style=0, value='')
         self.tcConfig5.Bind(wx.EVT_KILL_FOCUS, self.OnTcConfig5TextEnter,
               id=wxID_PANELBBTCCONFIG5)
@@ -340,10 +340,10 @@ class PanelBB(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=wxID_PANELBBSTINFO1,
-              label=_('Safety factor [%]'), name='stInfo1', parent=self,
+              label=_('Maximum demand temperature [°C]'), name='stInfo1', parent=self,
               pos=wx.Point(460, 352), style=0)
         self.stInfo1Value = wx.StaticText(id=wxID_PANELBBSTINFO1VALUE,
-              label=_('10'), name='stInfo1Value', parent=self, pos=wx.Point(544,
+              label=_('-'), name='stInfo1Value', parent=self, pos=wx.Point(660,
               352), style=0)
 
         self.stInfo2 = wx.StaticText(id=wxID_PANELBBSTINFO2,
@@ -356,22 +356,23 @@ class PanelBB(wx.Panel):
         self.stInfo2b = wx.StaticText(id=-1, label=_('Peak demand [kW]'),
               name='stInfo2b', parent=self, pos=wx.Point(616, 416), style=0)
 
-        self.stInfo2_T1 = wx.StaticText(id=wxID_PANELBBSTINFO2_T1, label=_('80'),
+        self.stInfo2_T1 = wx.StaticText(id=wxID_PANELBBSTINFO2_T1, label=_('Up to 80'),
               name='stInfo2_T1', parent=self, pos=wx.Point(504, 440), style=0)
 
-        self.stInfo2_T2 = wx.StaticText(id=wxID_PANELBBSTINFO2_T2, label=_('120'),
+        self.stInfo2_T2 = wx.StaticText(id=wxID_PANELBBSTINFO2_T2, label=_('80<T<140'),
               name='stInfo2_T2', parent=self, pos=wx.Point(504, 464), style=0)
 
-        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label=_('400'),
+        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label=_('T<Tmax'),
+#        self.stInfo2_T3 = wx.StaticText(id=wxID_PANELBBSTINFO2_T3, label=_('140<T<Tmax'),
               name='staticText3', parent=self, pos=wx.Point(504, 488), style=0)
 
-        self.stInfo2_P1 = wx.StaticText(id=wxID_PANELBBSTINFO2_P1, label=_('1100'),
+        self.stInfo2_P1 = wx.StaticText(id=wxID_PANELBBSTINFO2_P1, label=_('0'),
               name='stInfo2_P1', parent=self, pos=wx.Point(616, 440), style=0)
 
-        self.stInfo2_P2 = wx.StaticText(id=wxID_PANELBBSTINFO2_P2, label=_('1380'),
+        self.stInfo2_P2 = wx.StaticText(id=wxID_PANELBBSTINFO2_P2, label=_('0'),
               name='stInfo2_P2', parent=self, pos=wx.Point(616, 464), style=0)
 
-        self.stInfo2_P3 = wx.StaticText(id=wxID_PANELBBSTINFO2_P3, label=_('4270'),
+        self.stInfo2_P3 = wx.StaticText(id=wxID_PANELBBSTINFO2_P3, label=_('0'),
               name='stInfo2_P3', parent=self, pos=wx.Point(616, 488), style=0)
 
 #------------------------------------------------------------------------------		
@@ -436,7 +437,11 @@ class PanelBB(wx.Panel):
 
         self.config = Interfaces.GData["BB Config"]
         
-        try: self.cbConfig1.SetValue(self.config[0])
+        try:
+            if self.config[0] == 1:
+                self.cbConfig1.SetValue(True)
+            elif self.config[0] == 0:
+                self.cbConfig1.SetValue(False)
         except:
             logTrack("PanelBB: problem loading config[0] value %s "%self.config[0])
 
@@ -444,7 +449,11 @@ class PanelBB(wx.Panel):
         except:
             logTrack("PanelBB: problem loading config[1] value %s "%self.config[1])
 
-        try: self.cbConfig3.SetValue(self.config[2])
+        try:
+            if self.config[2] == 1:
+                self.cbConfig3.SetValue(True)
+            elif self.config[2] == 0:
+                self.cbConfig3.SetValue(False)
         except:
             logTrack("PanelBB: problem loading config[2] value %s "%self.config[2])
 
@@ -553,7 +562,14 @@ class PanelBB(wx.Panel):
 #   Event handlers: parameter change in design assistant
 #------------------------------------------------------------------------------		
     def OnCbConfig1Checkbox(self, event):
-        self.config[0] = self.cbConfig1.GetValue()
+        val = self.cbConfig1.GetValue()
+        if val == True:
+            self.config[0] = 1
+        elif val == False:
+            self.config[0] = 0
+        else:
+            self.config[0] = None
+            
         print _("PanelBB: new config[%s] value: ")%0,self.config[0]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
@@ -565,7 +581,13 @@ class PanelBB(wx.Panel):
         self.mod.setUserDefinedPars()
 
     def OnCbConfig3Checkbox(self, event):
-        self.config[2] = self.cbConfig3.GetValue()
+        val = self.cbConfig3.GetValue()
+        if val == True:
+            self.config[2] = 1
+        elif val == False:
+            self.config[2] = 0
+        else:
+            self.config[2] = None
         print _("PanelBB: new config[%s] value: ")%2,self.config[2]
         Interfaces.GData["BB Config"] = self.config
         self.mod.setUserDefinedPars()
