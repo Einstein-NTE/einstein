@@ -214,7 +214,7 @@ class CheckEq():
                 else:
                     self.HCGTEfficiency.valMax = 1.0
             else:
-                logTrack("CheckEq(importData): didn't find table entry in qgenerationhc for EqNo = "%self.EqNo)
+                logTrack("CheckEq(importData): didn't find table entry in qgenerationhc for EqNo = %s"%self.EqNo)
                 
 #        except:
 #            print "CheckEq(importData): error reading data from qgenerationhc PId"

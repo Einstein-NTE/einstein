@@ -113,6 +113,7 @@ class CheckFETfuel():
                 self.FEOFuel.val = 0
                 self.FEOFuel.sqerr = 0.0
         except:
+            self.FuelLCV = 0.0
             print "CheckFETfuel(importData): error reading data from qfuel"
             pass
 

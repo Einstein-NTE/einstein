@@ -37,7 +37,7 @@
 #
 #==============================================================================
 
-DEBUG = "LOGFILE"    #SCREEN: prints debug information on the screen
+DEBUG_TO = "LOGFILE"    #SCREEN: prints debug information on the screen
                     #LOGFILE: writes debug information to the log-File
                     #OFF: no debug information written
 
@@ -50,12 +50,12 @@ def setDebugMode(mode):
 #   function that can be called from somewhere for setting the mode of debugging
 #------------------------------------------------------------------------------		
 
-    global DEBUG
+    global DEBUG_TO
 
     if mode in ["SCREEN","LOGFILE","OFF"]:
-        DEBUG = mode
+        DEBUG_TO = mode
     else:
-        DEBUG = "OFF"
+        DEBUG_TO = "OFF"
         logWARNING("messageLogger (setDebugMode): error in debug mode [%s]"%mode)
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -71,7 +71,7 @@ def logTrack(message):
         Status.doLog = HelperClass.LogHelper()
         Status.doLog.LogThis(message)
 
-    if DEBUG == "SCREEN":
+    if DEBUG_TO == "SCREEN":
         print(message)
 
 #------------------------------------------------------------------------------		
@@ -103,9 +103,9 @@ def logDebug(message):
 #   writes a message to the log-file or to the screen (depending on DEBUG mode)
 #   doesn't do anything if DEBUG = "OFF"
 #------------------------------------------------------------------------------		
-    if DEBUG == "SCREEN":
+    if DEBUG_TO == "SCREEN":
         print message
-    elif DEBUG == "LOGFILE":
+    elif DEBUG_TO == "LOGFILE":
         logTrack("DEBUG: "+message)
     
 #------------------------------------------------------------------------------		
