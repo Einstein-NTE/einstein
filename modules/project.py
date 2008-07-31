@@ -618,7 +618,10 @@ class Project(object):
                              "BBFuelType":"Natural Gas",
                              "BBHOp":100,
                              "BBPmin":500,
-                             "BBEff":0.85}
+                             "BBEff":0.85,
+                             "STSolFra":0.5,
+                             "STCollType":"<any>",
+                             "STMinYield":500.0}
 
 ### fill default values for design assistants ...
             

@@ -358,6 +358,12 @@ class ModuleST(object):
 
         else:
             u = urows[0]
+
+            if u.STSolFra is None: u.STSolFra = 0.5
+            if u.STCollType is None: u.STCollType = "<any>"
+            if u.STMinYield is None: u.STMinYield = 500.0
+            Status.SQL.commit()
+            
             config = noneFilter([u.STSolFra,
                       u.STCollType,
                       u.STMinYield])
@@ -1348,7 +1354,7 @@ class ModuleST(object):
         
 #==============================================================================    
 
-    def designAssistant1(self):
+    def designssistant1(self):
 
         print "ModuleST (designAssistant1): starting"
         index=self.findIndex()   # Index = cascadeIndex-1
