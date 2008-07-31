@@ -1,6 +1,7 @@
 # -*- coding: iso-8859-15 -*-
 import os
 import sys
+import re
 from subprocess import *
 import MySQLdb
 import wx
@@ -22,6 +23,8 @@ class DlgDatabase(wx.Dialog):
         except: self.DBName=''
         try:self.MySQLBin = self.main.conf.get('DB', 'MYSQLBIN')
         except: self.MySQLBin=''
+        try:self.Encoding = self.main.conf.get('GUI', 'ENCODING')
+        except: self.Encoding=''
         
         self.notebook_1 = wx.Notebook(self, -1, style=0)
         self.notebook_1_pane_3 = wx.Panel(self.notebook_1, -1)
@@ -43,6 +46,8 @@ class DlgDatabase(wx.Dialog):
         self.label_6 = wx.StaticText(self.notebook_1_pane_1, -1, _("Folder with MySql executables"))
         self.text_ctrl_6 = wx.TextCtrl(self.notebook_1_pane_1, -1, value=self.MySQLBin)
 
+        self.label_8 = wx.StaticText(self.notebook_1_pane_1, -1, _("Character encoding"))
+        self.chEncoding = wx.Choice(self.notebook_1_pane_1, -1, choices=[])
 
         self.buttonBackupDatabase = wx.Button(self.notebook_1_pane_3, -1,
                                               _("Select a file to save the database backup"))
@@ -62,6 +67,8 @@ class DlgDatabase(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnFinish, self.buttonFinish)
 
 
+        self.ReadValidEncodings()
+        
     def __set_properties(self):
         self.SetTitle(_("Database administration"))
         #self.label_5.SetBackgroundColour(wx.Colour(255, 0, 0))
@@ -92,6 +99,10 @@ class DlgDatabase(wx.Dialog):
         
         grid_sizer_1.Add(self.label_6,  wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer_1.Add(sizer_4, 0, wx.ALIGN_CENTER_VERTICAL, 0)
+
+        grid_sizer_1.Add(self.label_8, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 0)
+        grid_sizer_1.Add(self.chEncoding, 0, wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 0)
+
         grid_sizer_1.AddStretchSpacer()
         grid_sizer_1.Add(self.buttonTestConnection, 0, 0, 0)
         grid_sizer_1.AddStretchSpacer()
@@ -114,6 +125,7 @@ class DlgDatabase(wx.Dialog):
         sizerGlobal.Fit(self)
         self.Layout()
 
+    
     def OnTestConnection(self, event):
         #----- try to connect to the Database
         (rsp,msg) = self.testConnection()
@@ -134,6 +146,9 @@ class DlgDatabase(wx.Dialog):
         username = self.text_username.GetValue().strip()
         passwd = self.text_password.GetValue().strip()
         mysqlbin = self.text_ctrl_6.GetValue().strip()
+        q = self.chEncoding.GetStringSelection().split('(')
+        encoding = q[0].strip()
+
 
         if not hostname or not dbname or not username:
             self.main.showWarning(_('Host name, database name and user name cannot be empty'))
@@ -142,34 +157,64 @@ class DlgDatabase(wx.Dialog):
         if not mysqlbin:
             self.main.showWarning(_('Mysql binary folder is unknown. Database dumps will not be made.'))
 
-        dictWords = {'DBHost':hostname,
-                     'DBUser':username,
-                     'DBPass':passwd,
-                     'DBName':dbname,
-                     'MYSQLBIN':mysqlbin
-                     }
+        groupmarker = re.compile(r'\[(\w+?)\]')
+        itemmarker =  re.compile(r'(\w+?):(.*)')
+
+        newDict = {'GUI':{'TEST'    :'TEST'},
+                   'DB': {'ENCODING':encoding,
+                          'DBHost'  :hostname,
+                          'DBUser'  :username,
+                          'DBPass'  :passwd,
+                          'DBName'  :dbname,
+                          'MYSQLBIN':mysqlbin}
+                   }
+
+        oldDict = {}
+
         inifile = os.path.join(os.getcwd(),'einstein.ini')
         fr = open(inifile, 'r')
         lines = fr.readlines()
         fr.close()
-        fw = open(inifile, 'w')
-        # read the ini file and replace keywords
+
+        # read and store the ini file
         for li in lines:
             s = li.strip()
             if not s:
                 continue
-            datalist = s.split(':')
-            key = datalist[0]
-            if dictWords.has_key(key):
-                fw.write('%s:%s\n' % (key, dictWords[key]))
-                del dictWords[key]
+            # test if line is a group
+            m = groupmarker.match(s)
+            if m:
+                group = m.group(1)
             else:
-                fw.write(s+'\n')
-        # look for keywords in the dictionary that didn't exist
-        # in the file
-        for key in dictWords.keys():
-            fw.write('%s:%s\n' % (key, dictWords[key]))
-            
+                m = itemmarker.match(s)
+                if m:
+                    key = m.group(1).strip()
+                    value = m.group(2).strip()
+                    if not oldDict.has_key(group):
+                        oldDict[group] = {}
+                    oldDict[group][key] = value
+                else:
+                    self.main.showWarning(_('Bad value in einstein.ini file: %s' % s))
+
+        # substitute new values
+        for group in oldDict.keys():        # GUI,DB
+            oldgroup = oldDict[group]
+            newgroup = newDict[group]
+            for key in newgroup.keys():
+                value = newgroup[key]
+                oldgroup[key] = value
+            oldDict[group] = oldgroup
+
+        # rewrite ini file
+
+        fw = open(inifile, 'w')
+        for group in oldDict.keys():
+            fw.write('[%s]\n' % group)
+            oldgroup = oldDict[group]
+            for key in oldgroup.keys():
+                value = oldgroup[key]
+                fw.write('%s:%s\n' % (key,value))
+
         fw.close()
         self.savedchanges=True
         self.main.showInfo(_('The configuration has been updated'))
@@ -256,4 +301,30 @@ class DlgDatabase(wx.Dialog):
     def OnFinish(self,event):
         self.SetReturnCode(wx.CANCEL)
         self.Close()
+        
+
+    def ReadValidEncodings(self):
+        self.chEncoding.Clear()
+        (rsp,msg) = self.testConnection()
+        # if not connected ignore this
+        if not rsp:
+            return
+        
+        try:
+            conn = MySQLdb.connect(host=self.text_host.GetValue(),
+                                   user=self.text_username.GetValue(),
+                                   passwd=self.text_password.GetValue(),
+                                   db=self.text_dbname.GetValue())
+            cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("SHOW CHARACTER SET")
+            result_set = cursor.fetchall()
+            nfields = cursor.rowcount
+            for field in result_set:
+                charset = field['Charset']
+                description = field['Description']
+                self.chEncoding.Append(charset + '(' + description + ')')
+            conn.close()
+        except MySQLdb.Error, e:
+            self.main.showError(str(e))
+
         
