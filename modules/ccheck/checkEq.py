@@ -257,7 +257,7 @@ class CheckEq():
                 qgenerationhc.TExhaustGas = check(self.TExhaustGas.val)#
                 qgenerationhc.ExcessAirRatio = check(self.ExcessAirRatio.val)#
                 qgenerationhc.FlowExhaustGas = check(self.FlowExhaustGas.val)#       
-                qgenerationhc.QExhaustGas = check(self.QExhaustGas)#
+                qgenerationhc.QExhaustGas = check(self.QExhaustGas.val)#
 
 
             # self.USHBoiler not into the qgenerationhc and not exported yet   
