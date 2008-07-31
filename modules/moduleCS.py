@@ -84,7 +84,7 @@ class ModuleCS(object):
         PECPlot = [[10,11],[20,21]]  #dummies en dos primeras filas para test de labels + ignoredrows
                    
 #Panel CS1: Primary energy
-        if self.keys[0] == "CS1 Plot":
+        if self.keys[0] == "CS1_Plot":
             for ANo in range(len(generalData)-1):
                 i = ANo+1
 
@@ -129,12 +129,12 @@ class ModuleCS(object):
 
             data1 = array(PECTable)
                               
-            Status.int.setGraphicsData("CS1 Table", data1)
+            Status.int.setGraphicsData("CS1_Table", data1)
 
             matrix2 = transpose(PECPlot)
             data2 = array(PECPlot)
 
-            Status.int.setGraphicsData("CS1 Plot", data2)
+            Status.int.setGraphicsData("CS1_Plot", data2)
 
             print 'Table: data1\n',data1
             print 'Plot: data2\n',data2
@@ -143,7 +143,7 @@ class ModuleCS(object):
 
 #------------------------------------------------------------------------------
 # Panel CS2: Process & supply heat
-        elif self.keys[0] == "CS2 Plot":
+        elif self.keys[0] == "CS2_Plot":
 
 #............................................................................
 # charge UPH and USH data from SQL
@@ -232,12 +232,12 @@ class ModuleCS(object):
 
             data1 = array(CS2Table)
                               
-            Status.int.setGraphicsData("CS2 Table", data1)
+            Status.int.setGraphicsData("CS2_Table", data1)
 
 ##            matrix2 = transpose(CS2Plot)
             data2 = array(CS2Plot)
 
-            Status.int.setGraphicsData("CS2 Plot", data2)
+            Status.int.setGraphicsData("CS2_Plot", data2)
 ##            print 'CS2 table =', data1
 ##            print 'CS2 plot =', data2
 ##            print 'USH =', USH
@@ -246,7 +246,7 @@ class ModuleCS(object):
 
 #------------------------------------------------------------------------------
 # Panel CS3: Ambiental impact
-        elif self.keys[0] == "CS3 Plot":
+        elif self.keys[0] == "CS3_Plot":
 
 #............................................................................
 # charge UPH and USH data from SQL
@@ -365,19 +365,19 @@ class ModuleCS(object):
 
             data1 = array(CS3Table)
                               
-            Status.int.setGraphicsData("CS3 Table", data1)
+            Status.int.setGraphicsData("CS3_Table", data1)
 
 ##            matrix2 = transpose(CS3Plot)
             data2 = array(CS3Plot)
 
-            Status.int.setGraphicsData("CS3 Plot", data2)
+            Status.int.setGraphicsData("CS3_Plot", data2)
 
 #------------------------------------------------------------------------------
 
 ##########################################################################
 #------------------------------------------------------------------------------
 # Panel CS4: Investment cost
-        elif self.keys[0] == "CS4 Plot":
+        elif self.keys[0] == "CS4_Plot":
 
 #............................................................................
 # charge data from SQL
@@ -462,12 +462,12 @@ class ModuleCS(object):
 
             data1 = array(CS4Table)
                               
-            Status.int.setGraphicsData("CS4 Table", data1)
+            Status.int.setGraphicsData("CS4_Table", data1)
 
             matrix2 = transpose(CS4Plot)
             data2 = array(CS4Plot)
 
-            Status.int.setGraphicsData("CS4 Plot", data2)
+            Status.int.setGraphicsData("CS4_Plot", data2)
 
 
 ##            #dummy data filled here (before creating the necessary fields in SQL)
@@ -491,7 +491,7 @@ class ModuleCS(object):
 
 #------------------------------------------------------------------------------
 # Panel CS5: Annual cost
-        elif self.keys[0] == "CS5 Plot":
+        elif self.keys[0] == "CS5_Plot":
 
 #............................................................................
 # charge data from SQL
@@ -600,11 +600,11 @@ class ModuleCS(object):
 
             data1 = array(CS5Table)
                               
-            Status.int.setGraphicsData("CS5 Table", data1)
+            Status.int.setGraphicsData("CS5_Table", data1)
 
             data2 = array(CS5Plot)
 
-            Status.int.setGraphicsData("CS5 Plot", data2)
+            Status.int.setGraphicsData("CS5_Plot", data2)
 
 
 ##            #dummy data filled here (before creating the necessary fields in SQL)
@@ -626,7 +626,7 @@ class ModuleCS(object):
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # Panel CS6: Annual cost
-        elif self.keys[0] == "CS6 Plot":
+        elif self.keys[0] == "CS6_Plot":
 
 #............................................................................
 # charge data from SQL
@@ -733,11 +733,11 @@ class ModuleCS(object):
 
             data1 = array(CS6Table)
                               
-            Status.int.setGraphicsData("CS6 Table", data1)
+            Status.int.setGraphicsData("CS6_Table", data1)
 
             data2 = array(CS6Plot)
 
-            Status.int.setGraphicsData("CS6 Plot", data2)
+            Status.int.setGraphicsData("CS6_Plot", data2)
 
 
 ##            #dummy data filled here (before creating the necessary fields in SQL)
@@ -761,7 +761,7 @@ class ModuleCS(object):
 
 #------------------------------------------------------------------------------
 # Panel CS7: Annual cost
-        elif self.keys[0] == "CS7 Plot":
+        elif self.keys[0] == "CS7_Plot":
 
 #............................................................................
 # charge data from SQL
@@ -808,11 +808,11 @@ class ModuleCS(object):
 
             data1 = array(CS7Table)
                               
-            Status.int.setGraphicsData("CS7 Table", data1)
+            Status.int.setGraphicsData("CS7_Table", data1)
 
             data2 = array(CS7Plot)
 
-            Status.int.setGraphicsData("CS7 Plot", data2)
+            Status.int.setGraphicsData("CS7_Plot", data2)
 
 
 ##            #dummy data filled here (before creating the necessary fields in SQL)

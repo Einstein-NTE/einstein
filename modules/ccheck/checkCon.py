@@ -67,12 +67,13 @@ class CheckCon():
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def __init__(self,name,colTotals,rowTotals,linkMatrix):     #function that is called at the beginning when object is created
+    def __init__(self,name,colTotals,rowTotals,linkMatrix,ambient=False):     #function that is called at the beginning when object is created
 #------------------------------------------------------------------------------
 #   init function is only called once at the beginning (every time that base
 #   actions that should be carried out in each iteration -> initCheck()
 #------------------------------------------------------------------------------
 
+        self.ambient = ambient #ambient = True: -> dissipation to ambient is allowed
 # assign a variable to all intermediate values needed
         ncol = len(colTotals)
         nrow = len(rowTotals)
@@ -84,6 +85,12 @@ class CheckCon():
         
         self.M = CCMatrix(name+"(M)",ncol,nrow)
         self.FCol = linkMatrix
+
+        self.MAmb = CCRow(name+"(MAmb)",nrow)   #Energy dissipated to ambient
+        self.MAmb1 = CCRow(name+"(MAmb1)",nrow)
+
+        self.MRec = CCRow(name+"(MRec)",nrow)   #Energy used (recovered)
+        self.MRec1 = CCRow(name+"(MRec1)",nrow)
 
 #..............................................................................
 #   Initialises the distribution matrix:
@@ -120,15 +127,30 @@ class CheckCon():
     def checkMRow(self):  #later on should import data from SQL. now simply sets to some value
 #------------------------------------------------------------------------------
 #   calculates energy balances in rows of the distribution matrix
+#   if ambient = True: SUM(M[n]) = rowTotals[n] + MAmb[n]
+#   else:              SUM(M[n]) = rowTotals[n], MAmb[n] = 0
 #------------------------------------------------------------------------------
-        Sum = CCPar("checkMRow")
+        Sum = CCPar("checkMRow-Sum")
         
         diff = 0
         for n in range(self.nrow):
-            Sum = calcRowSum("calcMRow",self.M[n],self.ncol)
+
+            if self.ambient == False:
+                self.MAmb[n].setValue(0.0)
+
+            self.MRec1[n] = calcRowSum("calcMRow",self.M[n],self.ncol)
+            Sum = calcSum("MRowAmb",self.MRec[n],self.MAmb[n])
+
+            ccheck1(self.MRec[n],self.MRec1[n])
             ccheck1(Sum,self.rowTotals[n])
-            if not (Sum.val == None):              
-                diff += adjRowSum("adjMRow",Sum,self.M[n],self.ncol)
+
+            adjustSum(Sum,self.MRec1[n],self.MAmb[n])
+
+            ccheck1(self.MAmb[n],self.MAmb1[n])
+            ccheck1(self.MRec[n],self.MRec1[n])
+                
+            if not (self.MRec[n].val == None):              
+                diff += adjRowSum("adjMRow",self.MRec[n],self.M[n],self.ncol)
         return diff
 
 #------------------------------------------------------------------------------

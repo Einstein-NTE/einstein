@@ -38,39 +38,56 @@ from einstein.GUI.status import *
 from einstein.modules.messageLogger import *
 from einstein.GUI.conflictFrame import *
 
+from einstein.modules.energyStats.moduleEA1 import *
+from einstein.modules.energyStats.moduleEA2 import *
+from einstein.modules.energyStats.moduleEA3 import *
+from einstein.modules.energyStats.moduleEA4 import *
+from einstein.modules.energyStats.moduleEA5 import *
+from einstein.modules.moduleCS import *
+
 #------------------------------------------------------------------------------		
 def prepareDataForReport():
 #------------------------------------------------------------------------------		
 #   calls the functions necessary for writing the report
 #------------------------------------------------------------------------------		
 
+    Status.prj.setActiveAlternative(0)  #select present state
+    
     Status.mod.moduleEA.update()
-    print "Control (prepareData): here I should do something more ..."
 
-#### opción 1 llamar a initPanels de los módulos CS y EA
+    modEA1 = ModuleEA1(['EA1'])
+    modEA1.initModule()
 
-    #mod = ModuleCS(["La Llave que toca"])
-    #mod.initPanel()    #así el módulo te deja en GData exactamente lo mismo
-    #                   #como si manualmente abrirías el panel
-    # para que esto funcione, tienes que poner arriba:
-    #   from einstein.modules.moduleCS import ModuleCS
+    modEA2 = ModuleEA2(['EA2'])
+    modEA2.initPanel()
 
-#### opción 2 llamar a initPanels de módulos que están en Status.mod (modules.py)
+    modEA3 = ModuleEA3(['EA3_FET','EA3_USH'])
+    modEA3.initModule()
 
-    #Status.mod.moduleHP.initPanel() #te hace lo mismo como si manualmente abrirías el PanelHP
-    #Status.mod.moduleHP.updatePanel() 
+    modEA4 = ModuleEA4(['EA4a_Table','EA4a_Plot'])
+    modEA4.updatePanel()   
+    modEA4 = ModuleEA4(['EA4b_Table','EA4b_Plot'])
+    modEA4.updatePanel()   
+    modEA4 = ModuleEA4(['EA4c_Table','EA4c_Plot'])
+    modEA4.updatePanel()   
 
-#### opción 3 escribir algo manualmente a GData:
+    modEA5 = ModuleEA5(['EA5_EI','EA5_SEC'])
+    modEA5.initModule()   
 
-    mis_datos = [["uno","dos","tres","cuatro","cinco"],
-                 [8,3,2,5,9]]
-
-    Status.int.GData["MyKey"] = mis_datos #(o = copy.deepcopy(mis_datos), si estos se pueden modificar en otro sitio
-    print "Control (prepareDataForReport): GData[%s]:\n%s"%("MyKey",Status.int.GData["MyKey"])
-
-    # equivalente a
-
-    Status.int.setGraphicsData('MyKey',mis_datos)
+    modCS = ModuleCS(['CS1_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS2_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS3_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS4_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS5_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS6_Plot'])
+    modCS.updatePanel()
+    modCS = ModuleCS(['CS7_Plot'])
+    modCS.updatePanel()
 
 
 #------------------------------------------------------------------------------		

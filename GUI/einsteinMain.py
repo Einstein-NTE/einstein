@@ -60,6 +60,7 @@
 #                       Stoyan Danov                        02/07/2008
 #                       Tom Sobota                          05/07/2008
 #                       Stoyan Danov                        10/07/2008
+#                       Tom Sobota                          30/07/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -137,7 +138,8 @@
 #       02/07/2008  SD panelEA4 eliminated (now exist only EA4a and EA4b),panelEA6 eliminated
 #       05/07/2008  TS Electricity Mix in main menu and menu dispatch
 #       02/07/2008  SD panels CS4,CS5,CS6,CS7 added
-#
+#       30/07/2008  TS character encoding for MySQL
+
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -281,10 +283,26 @@ class EinsteinFrame(wx.Frame):
         self.DBUser = self.conf.get('DB', 'DBUser')
         self.DBPass = self.conf.get('DB', 'DBPass')
         self.DBName = self.conf.get('DB', 'DBName')
+        #TS20080730 read character encoding
+        try:
+            self.MySQLEncoding = self.conf.get('DB', 'ENCODING')
+        except:
+            # default encoding for MySQL
+            self.MySQLEncoding = 'Latin1'
 
         #----- Connect to the Database
-        return MySQLdb.connect(host=self.DBHost, user=self.DBUser, passwd=self.DBPass, db=self.DBName)
+        conn = MySQLdb.connect(host=self.DBHost, user=self.DBUser, passwd=self.DBPass, db=self.DBName)
+        if conn:
+            # set mysql encoding translation
+            try:
+                cursor = conn.cursor(MySQLdb.cursors.DictCursor)
+                cursor.execute("SET NAMES '%s'" % self.MySQLEncoding)
+                self.doLog.LogThis('Encoding %s' % self.MySQLEncoding)
+            except MySQLdb.Error, e:
+                self.doLog.LogThis('Could not set encoding %s: %s' % (self.MySQLEncoding,str(e)))
 
+        return conn
+                                   
     def setLanguage(self):
         #TS20080528 Took this out of createUI, so it can be called before creating the UI
         LANGUAGE = self.conf.get('GUI', 'LANGUAGE')
@@ -497,7 +515,8 @@ class EinsteinFrame(wx.Frame):
 # grid for displaying alternatives
 
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
-        self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - the tool that never fails ..."),
+       # self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - the tool that never fails ..."),
+        self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - summer special edition ..."),
                                  pos = (10,10),size=(780,580))
         
 #        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
@@ -505,7 +524,7 @@ class EinsteinFrame(wx.Frame):
         self.box1.SetForegroundColour(ORANGE)
         self.box1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','martillo.jpg'),
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','summerTime.jpg'),
                                              wx.BITMAP_TYPE_JPEG),
                                              id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
                                              parent=self.pageTitle,

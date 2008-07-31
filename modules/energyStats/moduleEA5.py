@@ -73,24 +73,24 @@ class ModuleEA5(object):
 
 #Part 1: Energy Intensity
 
-        TotalFEC = self.cgeneraldata.FEC   #FEC in [MWh]
-        ElectFEC = self.cgeneraldata.FECel
-        FuelsFEC = TotalFEC - ElectFEC
-        PE_FEC = self.cgeneraldata.PEC #substitute later the conv. coef. from SetUp #pending put conv. coef. in status.py
+#        TotalFEC = self.cgeneraldata.FEC   #FEC in [MWh]
+#        ElectFEC = self.cgeneraldata.FECel
+#        FuelsFEC = TotalFEC - ElectFEC
+#        PE_FEC = self.cgeneraldata.PEC #substitute later the conv. coef. from SetUp #pending put conv. coef. in status.py
             
-        Turnover = self.questionnaire.Turnover #in [million euros]
+#        Turnover = self.questionnaire.Turnover #in [million euros]
 
-        if (Turnover > 0) and not (Turnover==None):    
-            self.cgeneraldata.FUEL_INT = (FuelsFEC)/(Turnover) #converted to [kWh/euro]
-            self.cgeneraldata.EL_INT = (ElectFEC)/(Turnover) #converted to [kWh/euro]
-            self.cgeneraldata.PE_INT = (PE_FEC)/(Turnover) #converted to [kWh/euro]
-        else:
-            self.cgeneraldata.FUEL_INT = None
-            self.cgeneraldata.EL_INT = None
-            self.cgeneraldata.PE_INT = None
+#        if (Turnover > 0) and not (Turnover==None):    
+#            self.cgeneraldata.FUEL_INT = (FuelsFEC)/(Turnover) #converted to [kWh/euro]
+#            self.cgeneraldata.EL_INT = (ElectFEC)/(Turnover) #converted to [kWh/euro]
+#            self.cgeneraldata.PE_INT = (PE_FEC)/(Turnover) #converted to [kWh/euro]
+#        else:
+#            self.cgeneraldata.FUEL_INT = None
+#            self.cgeneraldata.EL_INT = None
+#            self.cgeneraldata.PE_INT = None
 
 # back-up in SQL                                      
-        Status.SQL.commit() #SD, to be checked
+#        Status.SQL.commit() #SD, to be checked
 
 
         EI_values = []

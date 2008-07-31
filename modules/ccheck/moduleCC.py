@@ -374,10 +374,10 @@ class ModuleCC(object):
 #..............................................................................
 # import data on link of heat exchangers inlet / outlet with equipments, pipes and processes
 
-        self.QWHEqCon = CheckCon("QWHEq Con",self.QWH,self.QWHEq,Status.QWHEqLink)
-        self.QWHPipeCon = CheckCon("QWHPipe Con",self.QWH,self.QWHPipe,Status.QWHPipeLink)
-        self.QWHProcCon = CheckCon("QWHProc Con",self.QWH,self.QWHProc,Status.QWHProcLink)
-        self.QWHEECon = CheckCon("QWHEE Con",self.QWH,self.QWHEE,Status.QWHEELink)
+        self.QWHEqCon = CheckCon("QWHEq Con",self.QWH,self.QWHEq,Status.QWHEqLink,ambient=True)
+        self.QWHPipeCon = CheckCon("QWHPipe Con",self.QWH,self.QWHPipe,Status.QWHPipeLink,ambient=True)
+        self.QWHProcCon = CheckCon("QWHProc Con",self.QWH,self.QWHProc,Status.QWHProcLink,ambient=True)
+        self.QWHEECon = CheckCon("QWHEE Con",self.QWH,self.QWHEE,Status.QWHEELink,ambient=True)
 
         self.QHXEqCon = CheckCon("QWHEq Con",self.QHX,self.QHXEq,Status.QHXEqLink)
         self.QHXPipeCon = CheckCon("QWHPipe Con",self.QHX,self.QHXPipe,Status.QHXPipeLink)

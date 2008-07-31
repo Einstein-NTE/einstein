@@ -152,7 +152,7 @@ class ModuleEA4(object):
 #..............................................................................
 # Data for Panel EA4a: annual values
 
-        if self.keys[0] == "EA4a Table":
+        if self.keys[0] == "EA4a_Table":
 
 # table in EA4a: UPH by process
 
@@ -162,7 +162,7 @@ class ModuleEA4(object):
             print 'moduleEA4: matrix1 =', matrix1
             data1 = array(matrix1)
 
-            Status.int.setGraphicsData("EA4a Table", data1)
+            Status.int.setGraphicsData("EA4a_Table", data1)
 
 # report field PROCESS: process info
 
@@ -199,7 +199,7 @@ class ModuleEA4(object):
 #..............................................................................
 # Data for Panel EA4b: temperature dependent plots
 
-        if self.keys[0] == "EA4b Table":
+        if self.keys[0] == "EA4b_Table":
 
             Status.mod.moduleHR.simulateHR()        #loads UPHProcTotal and USHTotal
 
@@ -304,6 +304,12 @@ class ModuleEA4(object):
             UPH_plot = []
             UPHproc_plot = []
             USH_plot = []
+
+            print 'iTmax =', iTmax
+            print 'Status.int.T[0:iTmax] =', Status.int.T[0:iTmax]
+            print 'UPH_plot =', UPH_plot
+            print 'UPHproc_plot =', UPHproc_plot
+            print 'USH_plot =', USH_plot
             
             for iT in range(iTmax):
                 UPH_plot.append(Status.int.UPHTotal_T[iT]/1000.0)
@@ -314,11 +320,12 @@ class ModuleEA4(object):
                                                      UPH_plot,
                                                      UPHproc_plot,
                                                      USH_plot])
+            print 'moduleEA4b.py: Status.int.GData[EA4b_Table] =', Status.int.GData['EA4b_Table']
 
 #..............................................................................
 # Data for Panel EA4c: cumulative heat demand curve
 
-        if self.keys[0] == "EA4c Table":
+        if self.keys[0] == "EA4c_Table":
 
             Status.mod.moduleHR.simulateHR()        #loads UPHProcTotal and USHTotal
 
