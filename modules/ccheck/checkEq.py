@@ -607,6 +607,7 @@ class CheckEq():
 
             ccheck2(self.HCGTEfficiency,self.HCGTEfficiency1,self.HCGTEfficiency2)
 
+            ccheck1(self.FlowCombAir,self.FlowCombAir1)#
             ccheck1(self.FlowExhaustGas,self.FlowExhaustGas1)#
             ccheck1(self.DTExhaustGas,self.DTExhaustGas1)#
             ccheck1(self.TExhaustGas,self.TExhaustGas1)#
