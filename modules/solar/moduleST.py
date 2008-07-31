@@ -351,7 +351,7 @@ class ModuleST(object):
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
 
-            config = [0.5,STTYPES[0],500.0]            
+            config = [50.0,STTYPES[0],300.0]            
             Status.int.setGraphicsData('ST Config',config)
 
             self.setUserDefinedPars()
@@ -361,12 +361,13 @@ class ModuleST(object):
 
             if u.STSolFra is None: u.STSolFra = 0.5
             if u.STCollType is None: u.STCollType = "<any>"
-            if u.STMinYield is None: u.STMinYield = 500.0
+            if u.STMinYield is None: u.STMinYield = 300.0
             Status.SQL.commit()
             
             config = noneFilter([u.STSolFra,
                       u.STCollType,
                       u.STMinYield])
+            config[0] *= 100.0  #conversion to %
             print "ModuleST (getUserDefinedPars): config = ",config
 
         return config
@@ -387,7 +388,7 @@ class ModuleST(object):
             
         u = urows[0]
 
-        u.STSolFra = config[0]
+        u.STSolFra = config[0] / 100.0 #conversion % to fraction
         u.STCollType = config[1]
         u.STMinYield = config[2]
 
@@ -1354,7 +1355,7 @@ class ModuleST(object):
         
 #==============================================================================    
 
-    def designssistant1(self):
+    def designAssistant1(self):
 
         print "ModuleST (designAssistant1): starting"
         index=self.findIndex()   # Index = cascadeIndex-1
@@ -1363,7 +1364,7 @@ class ModuleST(object):
 
         if config[0]!= None:
             try:    #if the field is empty division may given an error
-                self.desiredSolarFraction=config[0]/100
+                self.desiredSolarFraction=config[0]/100.0
             except:
                 self.desiredSolarFraction = 0.5 
         else:
@@ -1372,7 +1373,7 @@ class ModuleST(object):
             try:
                 self.QuSolarUnitaryMin = float(config[2])
             except:
-                self.QuSolarUnitaryMin=300
+                self.QuSolarUnitaryMin=300.0
           
         else:
             self.QuSolarUnitaryMin=300

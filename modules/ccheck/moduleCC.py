@@ -20,12 +20,14 @@
 #                           Claudia Vannoni     02/05/2008
 #                           Hans Schweiger      13/06/2008
 #                           Hans Schweiger      3/07/2008
+#                                               30/07/2008
 #       Changes to previous version:
 #	v0.02 CV Add CCPipe, Add Matrix and links between matrix
 #       13/06/2008 HS   Connections between sub-systems imported from SQL
 #                       Very basic version of CheckHX added. Not yet coupled
 #                       to the rest.
-#       3/07/2008 HS    Pipe 
+#       3/07/2008 HS    Pipe
+#       30/07/2008      Linked QWH, deleted Rec
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -494,9 +496,9 @@ class ModuleCC(object):
                 self.FETFuel_j[j].update(self.ccEq[j].FETFuel_j)
                 self.FETel_j[j].update(self.ccEq[j].FETel_j)
                 
-# here data should be passed to the correspoinding inputs in CheckEq
-#               self.QHXEq[j].update(self.ccEq[j].QHXEqRec)
-#               self.QWHEq[j].update(self.ccEq[j].QWHEqRec)
+
+                self.QHXEq[j].update(self.ccEq[j].QHXEq)
+                self.QWHEq[j].update(self.ccEq[j].QWHEq)
 
 #..............................................................................
 # check of pipes
@@ -542,9 +544,8 @@ class ModuleCC(object):
                 self.UPHProck[k].update(self.ccProc[k].UPHProc)      #obtain results 
                 self.UPHk[k].update(self.ccProc[k].UPH)      #obtain results 
 
-# here data should be passed to the correspoinding inputs in CheckProc
-#               self.QHXProc[k].update(self.ccProc[k].QHXProcRec)
-#               self.QWHProc[k].update(self.ccProc[k].QWHProcRec)
+                self.QHXProc[k].update(self.ccProc[k].QHXProc)
+                self.QWHProc[k].update(self.ccProc[k].QWHProc)
 
 #..............................................................................
 # check of heat exchangers
@@ -581,7 +582,7 @@ class ModuleCC(object):
 
                 self.ccWHEE[n].check()             # ejecuta la función check para proceso k
 
-                self.QWHEE[n].update(self.ccWHEE[n].QWHEERec)      #obtain results 
+                self.QWHEE[n].update(self.ccWHEE[n].QWHEE)      #obtain results 
 
 #..............................................................................
 # check of totals
@@ -708,23 +709,21 @@ class ModuleCC(object):
                 self.QHXProcCon.check()
 
                 for j in range(NJ):
-                    pass
-# here data should be passed to the correspoinding inputs in CheckEq
-#                    self.ccEq[j].QHXEqRec.update(self.QHXEq[j])
-#                    self.ccEq[j].QWHEqRec.update(self.QWHEq[j])
+                  
+                    self.ccEq[j].QHXEq.update(self.QHXEq[j])
+                    self.ccEq[j].QWHEq.update(self.QWHEq[j])
 
                 for m in range(NM):
                     self.ccPipe[m].QHXPipe.update(self.QHXPipe[m])
                     self.ccPipe[m].QWHPipe.update(self.QWHPipe[m]) #to be changed in QWHPipeRec if necessary
 
                 for k in range(NK):
-                    pass
-# here data should be passed to the correspoinding inputs in CheckEq
-#                    self.ccProc[k].QHXProcRec.update(self.QHXProc[k])
-#                    self.ccProc[k].QWHProcRec.update(self.QWHProc[k])
+                    
+                    self.ccProc[k].QHXProc.update(self.QHXProc[k])
+                    self.ccProc[k].QWHProc.update(self.QWHProc[k])
 
                 for n in range(NN):
-                    self.ccWHEE[n].QWHEERec.update(self.QWHEE[n])
+                    self.ccWHEE[n].QWHEE.update(self.QWHEE[n])
 
                 for h in range(NH):
                     self.ccHX[h].QWH.update(self.QWH[h])

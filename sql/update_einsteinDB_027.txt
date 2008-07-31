@@ -1,0 +1,13 @@
+-- update einstein database: some additional parameters CV 30/07/2008
+USE einstein;
+
+-- add columns to qprocessdata
+
+ALTER TABLE qprocessdata ADD COLUMN QWHProc Double COMMENT 'Waste process heat sum of UPHw and UPHmass' AFTER UPHw;
+ALTER TABLE qprocessdata ADD COLUMN QHXProc Double COMMENT 'Heat recovered' AFTER QHXProcInt;
+
+-- add columns to qgenerationhc
+ALTER TABLE qgenerationhc ADD COLUMN QWHEq Double COMMENT 'Waste heat from boilers' AFTER QHXEq;
+
+
+

@@ -621,7 +621,7 @@ class Project(object):
                              "BBEff":0.85,
                              "STSolFra":0.5,
                              "STCollType":"<any>",
-                             "STMinYield":500.0}
+                             "STMinYield":300.0}
 
 ### fill default values for design assistants ...
             

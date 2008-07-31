@@ -26,9 +26,9 @@
 #                           Claudia Vannoni      25/04/2008
 #                           Claudia Vannoni      27/04/2008
 #              v0.07        Hans Schweiger      07/05/2008
-#                           Claudia Vannoni      3/07/2008
+#                           Claudia Vannoni      03/07/2008
 #                           Hans Schweiger      04/07/2008
-#                    
+#                           Claudia Vannoni      30/07/2008
 #
 #       Changes in last update: 
 #       v004:adjustSum3
@@ -43,6 +43,7 @@
 #                  Partype, constraints val max
 #       04/07/2008: HS  Cross DT added in heat exchangers
 #                       UPHw calculation added
+#       30/07/08: CV QHXProc updated; QWHProc added (it is teh same of UPHw at present state)
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -70,7 +71,7 @@ class CheckProc():
 #------------------------------------------------------------------------------
 #   Carries out consistency checking for process k
 #------------------------------------------------------------------------------
-#UPHw not included yet
+
 #QHXProc: recovered heat as input to the process k (source= matrix of ducts/processes). Not calculated yet
 #UPHtotQ: total UPH from different sources = UPHProc+ QHXProc (the definition as to redefined into the questionnaire).
 # Pay attention: both values used here per process k comes from matrix . At present assigned here.
@@ -148,7 +149,7 @@ class CheckProc():
         self.UPH1 = CCPar("UPH1")
         self.UPH2 = CCPar("UPH2")
         self.UPH = CCPar("UPH")
-        self.UPHw = CCPar("UPHw")
+        self.UPHw = CCPar("UPHw")# It is the waste heat of the outflow. In general it is QWHProc but if we have a vessel it does not
         self.UPHw1 = CCPar("UPHw1")
         self.UPHw_dot = CCPar("UPHw_dot")
         self.UPHw_dot1 = CCPar("UPHw_dot1")
@@ -158,7 +159,8 @@ class CheckProc():
         self.QEvapProc = CCPar("QEvapProc")
         self.UPHcGross = CCPar("UPHcGross")
         self.QHXProcInt = CCPar("QHXProcInt")
-
+        self.QHXProc = CCPar("QHXProc")# It comes from the matrix
+        self.QWHProc = CCPar("QWHProc")# It comes from the matrix. In theory it is the sum UPHw and UPHmass (not existing yet)
 
         if TEST==True:
             self.importTestData(k)
@@ -196,9 +198,7 @@ class CheckProc():
         self.NBatch = CCPar("NBatch")
         self.TEnvProc = CCPar("TEnvProc",parType="T")
         self.QOpProc = CCPar("QOpProc")
-        self.UPHProc = CCPar("UPHProc")
-
-        self.QHXProc = CCPar("QHXProc")# It comes from the matrix (and from calculation from questionnaire??)
+        self.UPHProc = CCPar("UPHProc") 
         
         
 #..............................................................................
@@ -213,8 +213,7 @@ class CheckProc():
                 proc_fluid = Fluid(fluid_number)
                 self.FluidCp = proc_fluid.cp
                 self.FluidDensity = proc_fluid.rho
-                #self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-                #self.FluidDensity = 1000 # Kg/m3 # IMPORT Constant from the FluidDB
+                
 
                 self.PTInFlow.setValue(qprocessdata.PTInFlow)
                 self.PT.setValue(qprocessdata.PT)
@@ -233,7 +232,7 @@ class CheckProc():
                 self.QOpProc.setValue(qprocessdata.QOpProc) 
                 self.UPH.setValue(qprocessdata.UPH) 
 
-                self.QHXProc.setValue(0.0)  
+                 
                
         except:
             print "CheckProc(importData): error reading data from qprocessdata"
@@ -282,7 +281,8 @@ class CheckProc():
                 qprocessdata.UPHc = check(self.UPHc.val)
                 qprocessdata.UPH = check(self.UPH.val)
                 qprocessdata.UPHw = check(self.UPHw.val)
-                                       
+                qprocessdata.QWHProc = check(self.QWHProc.val)
+                qprocessdata.QHXProc = check(self.QHXProc.val)                      
 
                 Status.SQL.commit()
                 
@@ -295,8 +295,8 @@ class CheckProc():
     def importTestData(self,k):  #later on should import data from SQL. now simply sets to some value
 
         if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-            self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+            self.FluidCp = 0.001 # kWh/K*Kg 
+            self.FluidDensity = 1.03 # Kg/m3 
             
 
             self.PTInFlow = CCPar("PTInFlow")
@@ -370,8 +370,8 @@ class CheckProc():
         elif TESTCASE == 3:       #original test case Kla - first version of FECel
 
             if (k==0):
-                self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-                self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+                self.FluidCp = 0.001 # kWh/K*Kg 
+                self.FluidDensity = 1.03 # Kg/m3 
                 
 
                 self.PTInFlow = CCPar("PTInFlow")
@@ -441,8 +441,8 @@ class CheckProc():
                 self.QHXProc.sqerr = 0
 
             elif (k==1):
-                self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-                self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+                self.FluidCp = 0.001 # kWh/K*Kg 
+                self.FluidDensity = 1.03 # Kg/m3 
                 
 
                 self.PTInFlow = CCPar("PTInFlow")
@@ -513,8 +513,8 @@ class CheckProc():
 
                 
             elif (k==2):
-                self.FluidCp = 0.001 # kWh/K*Kg # IMPORT Constant from the FluidDB
-                self.FluidDensity = 1.03 # Kg/m3 # IMPORT Constant from the FluidDB
+                self.FluidCp = 0.001 # kWh/K*Kg 
+                self.FluidDensity = 1.03 # Kg/m3 
                 
 
                 self.PTInFlow = CCPar("PTInFlow")
@@ -599,6 +599,7 @@ class CheckProc():
         self.UPHm.show()
         self.UPHm1.show()
         self.UPHs.show()
+        self.UPHw.show()
         self.UPHs1.show()
         self.UPHsdot.show()
         self.UPHsdot1.show()
@@ -660,6 +661,8 @@ class CheckProc():
         self.DTUPHcNet.show()
         self.DTUPHs1.show()
         self.DTUPHs.show()
+        self.QWHProc.show()
+        self.QHXProc.show()
         
 
         print "====================="
@@ -688,6 +691,7 @@ class CheckProc():
         self.UPHm.screen()
         self.UPHs.screen()
         self.UPHw.screen()
+        # self.QWHProc.screen() Now it coincides with UPHw
 
         self.UPHProc.screen()
         self.QHXProc.screen()
@@ -748,6 +752,7 @@ class CheckProc():
             if self.UAProc.priority < 99: self.UAProc.priority = 2
             if self.QEvapProc.priority < 99: self.QEvapProc.priority = 2
             if self.QHXProc.priority < 99: self.QHXProc.priority = 2
+            #if self.QWHProc.priority < 99: self.QWHProc.priority = 2 Now it coincides with UPHw. Assigned priority 2 coherent with the QHX
             if self.HPerYearProc.priority < 99: self.HPerYearProc.priority = 2
 
             if self.NBatch.priority < 99: self.NBatch.priority = 3
@@ -784,6 +789,7 @@ class CheckProc():
             if self.UAProc.priority < 99: self.UAProc.priority = 3
             if self.QEvapProc.priority < 99: self.QEvapProc.priority = 3
             if self.QHXProc.priority < 99: self.QHXProc.priority = 3
+            #if self.QWHProc.priority < 99: self.QWHProc.priority = 3
             if self.HPerYearProc.priority < 99: self.HPerYearProc.priority = 3
             if self.NBatch.priority < 99: self.NBatch.priority = 3
             if self.NDaysProc.priority < 99: self.NDaysProc.priority = 3
@@ -941,8 +947,8 @@ class CheckProc():
         ccheck1(self.UPHw_dot,self.UPHw_dot1)
         ccheck1(self.DTOutFlow,self.DTOutFlow1)
         ccheck1(self.PTFinal,self.PTFinal1)
-
-
+        ccheck1(self.UPHw,self.QWHProc)#At the moment they are the same. Change it next future when vessel heat recovery will be implemented
+        
 #------------------------------------------------------------------------------
     def estimate(self):  
 #------------------------------------------------------------------------------

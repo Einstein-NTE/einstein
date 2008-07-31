@@ -21,9 +21,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	17/06/2008
 #	Last revised by:    Claudia Vannoni	3/07/2008
+#                           Claudia Vannoni	30/07/2008
 #       Changes in last update:
 #                               
 #	3/07/2008: priority
+#       30/07/2008: deleted QWHEERec and Amb, considered in the matrix
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -55,11 +57,7 @@ class CheckWHEE():
 # assign a variable to all intermediate/calculated values needed
 
         self.QWHEE1 = CCPar("QWHEE1")
-        self.QWHEERec = CCPar("QWHEERec",priority=2)
-        self.QWHEERec1 = CCPar("QWHEERec1")
-        self.QWHEEAmb = CCPar("QWHEEAmb")
-        self.QWHEEAmb1 = CCPar("QWHEEAmb1")
-
+        
         self.importData(n)
 
         if DEBUG in ["ALL","BASIC"]:
@@ -127,8 +125,8 @@ class CheckWHEE():
 #------------------------------------------------------------------------------
 #   screens all variables in the block
 #------------------------------------------------------------------------------
-#        self.QWHEE.screen()
-        self.QWHEERec.screen()  #the most important is the recovered one !!!
+       self.QWHEE.screen()
+
 
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
@@ -150,8 +148,7 @@ class CheckWHEE():
 # Step 1: Call all calculation routines in a given sequence
 
                 print "Step 1: calculating from left to right (CALC)"
-
-            self.QWHEE1 = calcSum("QWHEE1",self.QWHEERec,self.QWHEEAmb)
+            pass     #here calcSum(self.QWHEE,sel.QWHEERec,self.QWHEEAmb)
             
             if DEBUG in ["ALL"]:
                 self.showAll()
@@ -161,8 +158,7 @@ class CheckWHEE():
                 print "Step 2: cross checking"
 
             ccheck1(self.QWHEE,self.QWHEE1)
-            ccheck1(self.QWHEERec,self.QWHEERec1)
-            ccheck1(self.QWHEEAmb,self.QWHEEAmb1)
+            
             
             if DEBUG in ["ALL"]:
                 self.showAll()
@@ -171,8 +167,7 @@ class CheckWHEE():
 
                 print "Step 3: calculating from right to left (ADJUST)"
             
-            adjustSum(self.QWHEE1,self.QWHEERec,self.QWHEEAmb)
-
+            
             if DEBUG in ["ALL"]:
                 self.showAll()
             
@@ -180,9 +175,9 @@ class CheckWHEE():
 
                 print "Step 4: second cross checking"
 
-            ccheck1(self.QWHEE,self.QWHEE1)
-            ccheck1(self.QWHEERec,self.QWHEERec1)
-            ccheck1(self.QWHEEAmb,self.QWHEEAmb1)
+            pass
+        # ccheck1(self.QWHEE,self.QWHEE1)
+           
 
             if DEBUG in ["ALL"]:
                 self.showAll()
