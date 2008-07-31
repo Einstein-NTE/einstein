@@ -3,230 +3,230 @@
 <!-- table auditor ignored -->
 <table name="cgeneraldata">
 <row n="1">
-<element name="PECFuels" type="double" auto="" value="8143851.66901" />
-<element name="NEquipe" type="int(11)" auto="" value="3" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="7517803.83172" />
-<element name="PEC" type="double" auto="" value="11446163.5113" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
-<element name="PETFuels" type="double" auto="" value="8143851.66901" />
 <element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
 <element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="907" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
-<element name="FECel" type="double" auto="" value="1100770.61409" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="8004272.13137" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
 <element name="PET" type="double" auto="" value="9946163.51128" />
-<element name="PECel" type="double" auto="" value="3302311.84227" />
 <element name="NFuels" type="int(11)" auto="" value="1" />
 <element name="ProdCO2el" type="double" auto="" value="550385.307044" />
-<element name="PETel" type="double" auto="" value="1802311.84227" />
+<element name="PE_INT" type="double" auto="" value="2201185.29063" />
+<element name="PETFuels" type="double" auto="" value="8143851.66901" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="907" />
+<element name="PECel" type="double" auto="" value="3302311.84227" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
 <element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="FETel" type="double" auto="" value="600770.614089" />
-<element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 <element name="ProdCO2Fuels" type="double" auto="" value="1850875.37932" />
+<element name="PECFuels" type="double" auto="" value="8143851.66901" />
+<element name="NEquipe" type="int(11)" auto="" value="3" />
+<element name="FECel" type="double" auto="" value="1100770.61409" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="11446163.5113" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="8004272.13137" />
+<element name="FUEL_INT" type="double" auto="" value="1423750.29179" />
+<element name="EL_INT" type="double" auto="" value="211686.656556" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="7517803.83172" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
 <element name="ProdNoNukesEl" type="double" auto="" value="5503853.07044" />
+<element name="PETel" type="double" auto="" value="1802311.84227" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="2">
+<element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
+<element name="ElectricitySales" type="double" auto="" value="0.0" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="PET" type="double" auto="" value="10336980.2686" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="250000.0" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
+<element name="PETFuels" type="double" auto="" value="10336980.2686" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="908" />
+<element name="PECel" type="double" auto="" value="1500000.0" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="NThProc" type="int(11)" auto="" value="3" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="2349313.69741" />
 <element name="PECFuels" type="double" auto="" value="10336980.2686" />
 <element name="NEquipe" type="int(11)" auto="" value="4" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="7517803.83172" />
-<element name="PEC" type="double" auto="" value="11836980.2686" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
-<element name="PETFuels" type="double" auto="" value="10336980.2686" />
-<element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
-<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
-<element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="908" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="FECel" type="double" auto="" value="500000.0" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="11836980.2686" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
 <element name="FET" type="double" auto="" value="9397254.78965" />
-<element name="PET" type="double" auto="" value="10336980.2686" />
-<element name="PECel" type="double" auto="" value="1500000.0" />
-<element name="NFuels" type="int(11)" auto="" value="1" />
-<element name="ProdCO2el" type="double" auto="" value="250000.0" />
-<element name="PETel" type="double" auto="" value="0.0" />
-<element name="NThProc" type="int(11)" auto="" value="3" />
-<element name="FETel" type="double" auto="" value="0.0" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
-<element name="ProdCO2Fuels" type="double" auto="" value="2349313.69741" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="7517803.83172" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
 <element name="ProdNoNukesEl" type="double" auto="" value="2500000.0" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="3">
-<element name="PECFuels" type="double" auto="" value="6920069.54554" />
-<element name="NEquipe" type="int(11)" auto="" value="6" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="7517803.83172" />
-<element name="PEC" type="double" auto="" value="9959287.26517" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
-<element name="PETFuels" type="double" auto="" value="6920069.54554" />
 <element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
 <element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="909" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
-<element name="FECel" type="double" auto="" value="1013072.57321" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="6804044.88734" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
 <element name="PET" type="double" auto="" value="8459287.26517" />
-<element name="PECel" type="double" auto="" value="3039217.71963" />
 <element name="NFuels" type="int(11)" auto="" value="1" />
 <element name="ProdCO2el" type="double" auto="" value="506536.286605" />
-<element name="PETel" type="double" auto="" value="1539217.71963" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
+<element name="PETFuels" type="double" auto="" value="6920069.54554" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="909" />
+<element name="PECel" type="double" auto="" value="3039217.71963" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
 <element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="FETel" type="double" auto="" value="513072.57321" />
-<element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 <element name="ProdCO2Fuels" type="double" auto="" value="1572743.07853" />
+<element name="PECFuels" type="double" auto="" value="6920069.54554" />
+<element name="NEquipe" type="int(11)" auto="" value="6" />
+<element name="FECel" type="double" auto="" value="1013072.57321" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="9959287.26517" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="6804044.88734" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="7517803.83172" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
 <element name="ProdNoNukesEl" type="double" auto="" value="5065362.86605" />
+<element name="PETel" type="double" auto="" value="1539217.71963" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="4">
+<element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
+<element name="ElectricitySales" type="double" auto="" value="0.0" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="PET" type="double" auto="" value="11000000.0004" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="250000.0" />
+<element name="PE_INT" type="double" auto="" value="2403846.15391" />
+<element name="PETFuels" type="double" auto="" value="11000000.0004" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="904" />
+<element name="PECel" type="double" auto="" value="1500000.0" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="NThProc" type="int(11)" auto="" value="3" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="2500000.00007" />
 <element name="PECFuels" type="double" auto="" value="11000000.0003" />
 <element name="NEquipe" type="int(11)" auto="" value="2" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="8000000.00098" />
-<element name="PEC" type="double" auto="" value="12500000.0003" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
-<element name="PETFuels" type="double" auto="" value="11000000.0004" />
-<element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
-<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
-<element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="904" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="FECel" type="double" auto="" value="500000.0" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="12500000.0003" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
 <element name="FET" type="double" auto="" value="10000000.0003" />
-<element name="PET" type="double" auto="" value="11000000.0004" />
-<element name="PECel" type="double" auto="" value="1500000.0" />
-<element name="NFuels" type="int(11)" auto="" value="1" />
-<element name="ProdCO2el" type="double" auto="" value="250000.0" />
-<element name="PETel" type="double" auto="" value="0.0" />
-<element name="NThProc" type="int(11)" auto="" value="3" />
-<element name="FETel" type="double" auto="" value="0.0" />
+<element name="FUEL_INT" type="double" auto="" value="1923076.92313" />
+<element name="EL_INT" type="double" auto="" value="96153.8461538" />
 <element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
-<element name="ProdCO2Fuels" type="double" auto="" value="2500000.00007" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="8000000.00098" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="ProdNoNukesEl" type="double" auto="" value="2500000.0" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="5">
-<element name="PECFuels" type="double" auto="" value="10336980.2686" />
-<element name="NEquipe" type="int(11)" auto="" value="2" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="7517803.83172" />
-<element name="PEC" type="double" auto="" value="11836980.2686" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
-<element name="PETFuels" type="double" auto="" value="10336980.2686" />
 <element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
 <element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="905" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
-<element name="FECel" type="double" auto="" value="500000.0" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="9397254.78965" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
 <element name="PET" type="double" auto="" value="10336980.2686" />
-<element name="PECel" type="double" auto="" value="1500000.0" />
 <element name="NFuels" type="int(11)" auto="" value="1" />
 <element name="ProdCO2el" type="double" auto="" value="250000.0" />
-<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
+<element name="PETFuels" type="double" auto="" value="10336980.2686" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="905" />
+<element name="PECel" type="double" auto="" value="1500000.0" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
 <element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="FETel" type="double" auto="" value="0.0" />
-<element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 <element name="ProdCO2Fuels" type="double" auto="" value="2349313.69741" />
+<element name="PECFuels" type="double" auto="" value="10336980.2686" />
+<element name="NEquipe" type="int(11)" auto="" value="2" />
+<element name="FECel" type="double" auto="" value="500000.0" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="11836980.2686" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="9397254.78965" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="7517803.83172" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
 <element name="ProdNoNukesEl" type="double" auto="" value="2500000.0" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="6">
-<element name="PECFuels" type="double" auto="" value="8641738.65192" />
-<element name="NEquipe" type="int(11)" auto="" value="3" />
-<element name="NPipeDuct" type="int(11)" auto="" value="3" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="USH" type="double" auto="" value="7517803.83172" />
-<element name="PEC" type="double" auto="" value="10215712.8316" />
-<element name="FEOel" type="double" auto="" value="500000.0" />
-<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
-<element name="PETFuels" type="double" auto="" value="8641738.65192" />
 <element name="HDEffAvg" type="double" auto="" value="0.964833164659" />
-<element name="FEC" type="double" auto="" value="10000000.0003" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="UPH" type="double" auto="" value="7718665.31822" />
-<element name="PEConvEl" type="double" auto="" value="3.0" />
-<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
 <element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="906" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
-<element name="FECel" type="double" auto="" value="524658.059879" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="7880784.10708" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
 <element name="PET" type="double" auto="" value="8715712.83156" />
-<element name="PECel" type="double" auto="" value="1573974.17964" />
 <element name="NFuels" type="int(11)" auto="" value="1" />
 <element name="ProdCO2el" type="double" auto="" value="262329.02994" />
-<element name="PETel" type="double" auto="" value="73974.1796376" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
+<element name="PETFuels" type="double" auto="" value="8641738.65192" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="906" />
+<element name="PECel" type="double" auto="" value="1573974.17964" />
+<element name="UPH" type="double" auto="" value="7718665.31822" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
 <element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="FETel" type="double" auto="" value="24658.0598792" />
-<element name="CO2ConvEl" type="double" auto="" value="0.5" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 <element name="ProdCO2Fuels" type="double" auto="" value="1964031.5118" />
+<element name="PECFuels" type="double" auto="" value="8641738.65192" />
+<element name="NEquipe" type="int(11)" auto="" value="3" />
+<element name="FECel" type="double" auto="" value="524658.059879" />
+<element name="FEOel" type="double" auto="" value="500000.0" />
+<element name="PEC" type="double" auto="" value="10215712.8316" />
+<element name="FEC" type="double" auto="" value="10000000.0003" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="7880784.10708" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="NPipeDuct" type="int(11)" auto="" value="3" />
+<element name="USH" type="double" auto="" value="7517803.83172" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
 <element name="ProdNoNukesEl" type="double" auto="" value="2623290.2994" />
+<element name="PETel" type="double" auto="" value="73974.1796376" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
 </row>
 <row n="7">
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
+<element name="ElectricitySales" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="877" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="NEquipe" type="int(11)" auto="" value="2" />
+<element name="FEC" type="double" auto="" value="10000000.0038" />
+<element name="FET" type="double" auto="" value="10000000.0079" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="NPipeDuct" type="int(11)" auto="" value="3" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
-<element name="FEC" type="double" auto="" value="10000000.0038" />
-<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
-<element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="877" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="10000000.0079" />
-<element name="NFuels" type="int(11)" auto="" value="1" />
-<element name="NThProc" type="int(11)" auto="" value="3" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 </row>
 </table>
 <!-- table dbbenchmark ignored -->
@@ -1268,7 +1268,6 @@
 </row>
 <row n="4">
 <element name="ST_C2" type="double" auto="" value="0.01" />
-<element name="ST_IAM" type="double" auto="" value="0.95" />
 <element name="FETj" type="double" auto="" value="24658.0598792" />
 <element name="Equipment" type="varchar(45)" auto="" value="Solar thermal system" />
 <element name="FETel_j" type="double" auto="" value="24658.0598792" />
@@ -1460,7 +1459,6 @@
 </row>
 <row n="12">
 <element name="ST_C2" type="double" auto="" value="0.01" />
-<element name="ST_IAM" type="double" auto="" value="0.95" />
 <element name="FETj" type="double" auto="" value="24658.0598792" />
 <element name="Equipment" type="varchar(45)" auto="" value="Solar thermal system" />
 <element name="FETel_j" type="double" auto="" value="24658.0598792" />
@@ -1791,7 +1789,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1762" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1804,6 +1801,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
@@ -1824,7 +1822,6 @@
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="40.0" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="lange leitung" />
-<element name="UPH" type="double" auto="" value="2000000.0" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1674" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1832,6 +1829,7 @@
 <element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
+<element name="UPH" type="double" auto="" value="2000000.0" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
 <element name="NBatch" type="double" auto="" value="1.0" />
@@ -1839,6 +1837,7 @@
 <element name="ProcNo" type="int(11)" auto="" value="2" />
 </row>
 <row n="3">
+<element name="UPH_SEC" type="double" auto="" value="0.0200000118694" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="continuous" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -1849,13 +1848,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="72.0000232917" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="54.8163073369" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="va por un tubo" />
 <element name="VInFlowDay" type="double" auto="" value="1000000.0" />
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1758" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1868,6 +1868,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
@@ -1895,7 +1896,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1759" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1908,6 +1908,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
@@ -1935,7 +1936,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1760" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1948,6 +1948,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
@@ -1974,7 +1975,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1761" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -1987,6 +1987,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
@@ -2014,7 +2015,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1750" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2027,6 +2027,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
@@ -2037,6 +2038,7 @@
 <element name="UPHw" type="double" auto="" value="5976887.90189" />
 </row>
 <row n="8">
+<element name="UPH_SEC" type="double" auto="" value="0.0218093506597" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="batch" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -2047,13 +2049,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="90.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="79.3605285398" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="da pfeift der dampf" />
 <element name="VInFlowDay" type="double" auto="" value="131801.981125" />
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1748" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2066,6 +2069,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
@@ -2076,6 +2080,7 @@
 <element name="UPHw" type="double" auto="" value="5976887.90189" />
 </row>
 <row n="9">
+<element name="UPH_SEC" type="double" auto="" value="0.00616629225634" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="continuous" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -2087,13 +2092,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="40.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="33.4832499144" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="lange leitung" />
 <element name="VInFlowDay" type="double" auto="" value="1297376.12425" />
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1747" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2106,6 +2112,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
@@ -2116,6 +2123,7 @@
 <element name="UPHw" type="double" auto="" value="13598260.0951" />
 </row>
 <row n="10">
+<element name="UPH_SEC" type="double" auto="" value="0.0200000118694" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="continuous" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -2126,13 +2134,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="72.0000232917" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="54.8163073369" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="va por un tubo" />
 <element name="VInFlowDay" type="double" auto="" value="1000000.0" />
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1749" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2145,6 +2154,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
@@ -2172,7 +2182,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1764" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2185,6 +2194,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
@@ -2225,7 +2235,6 @@
 <element name="PT" type="double" auto="" value="72.0" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="va por un tubo" />
 <element name="VInFlowDay" type="double" auto="" value="1000000.0" />
-<element name="UPH" type="double" auto="" value="5000000.0" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1677" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2234,6 +2243,7 @@
 <element name="PTOutFlow" type="double" auto="" value="40.0" />
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
+<element name="UPH" type="double" auto="" value="5000000.0" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
 <element name="NBatch" type="double" auto="" value="1.0" />
@@ -2259,7 +2269,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1763" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2272,6 +2281,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
@@ -2282,6 +2292,7 @@
 <element name="UPHw" type="double" auto="" value="13598260.0951" />
 </row>
 <row n="15">
+<element name="UPH_SEC" type="double" auto="" value="0.00616629225634" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="continuous" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -2293,13 +2304,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="40.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="33.4832499144" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="lange leitung" />
 <element name="VInFlowDay" type="double" auto="" value="1297376.12425" />
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1757" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2312,6 +2324,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
@@ -2339,7 +2352,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1751" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2352,6 +2364,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
@@ -2378,7 +2391,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1752" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2391,6 +2403,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
@@ -2418,7 +2431,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1753" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2431,6 +2443,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
@@ -2458,7 +2471,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="39.9984" />
 <element name="UPHcGross" type="double" auto="" value="3258976.76227" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1754" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2471,6 +2483,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Heating" />
 <element name="PTInFlow" type="double" auto="" value="30.0" />
 <element name="QHXProcInt" type="double" auto="" value="940427.997777" />
+<element name="UPH" type="double" auto="" value="2000000.08713" />
 <element name="UPHc" type="double" auto="" value="2000000.08708" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
@@ -2497,7 +2510,6 @@
 <element name="PTOutFlowRec" type="double" auto="" value="90.8164838833" />
 <element name="UPHcGross" type="double" auto="" value="19786145.6872" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1755" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2510,6 +2522,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Pasteurisation" />
 <element name="PTInFlow" type="double" auto="" value="4.0" />
 <element name="QHXProcInt" type="double" auto="" value="14786159.9669" />
+<element name="UPH" type="double" auto="" value="5000002.96735" />
 <element name="UPHc" type="double" auto="" value="5000002.80502" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
@@ -2521,6 +2534,7 @@
 <element name="VOutFlow" type="double" auto="" value="1000000.0" />
 </row>
 <row n="21">
+<element name="UPH_SEC" type="double" auto="" value="0.0218093506597" />
 <element name="QEvapProc" type="double" auto="" value="0.0" />
 <element name="ProcType" type="varchar(45)" auto="" value="batch" />
 <element name="VolProcMed" type="double" auto="" value="0.0" />
@@ -2531,13 +2545,14 @@
 <element name="NDaysProc" type="double" auto="" value="250.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="PT" type="double" auto="" value="90.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
 <element name="PTInFlowRec" type="double" auto="" value="79.3605285398" />
 <element name="PipeDuctProc" type="varchar(45)" auto="" value="da pfeift der dampf" />
 <element name="VInFlowDay" type="double" auto="" value="131801.981125" />
 <element name="PTOutFlowRec" type="double" auto="" value="89.9964" />
 <element name="UPHcGross" type="double" auto="" value="2742204.79485" />
 <element name="UAProc" type="double" auto="" value="0.0" />
-<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="1756" />
 <element name="PTFinal" type="double" auto="" value="0.0" />
 <element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
@@ -2550,6 +2565,7 @@
 <element name="Process" type="varchar(45)" auto="" value="Mozzarella production" />
 <element name="PTInFlow" type="double" auto="" value="15.5650831701" />
 <element name="QHXProcInt" type="double" auto="" value="2065702.53849" />
+<element name="UPH" type="double" auto="" value="718628.906" />
 <element name="UPHc" type="double" auto="" value="718916.3792" />
 <element name="TSupply" type="double" auto="" value="180.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
@@ -2603,8 +2619,10 @@
 <element name="FuelProd" type="double" auto="" value="1000000.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="550.385307044" />
 <element name="ProdUnit" type="varchar(45)" auto="" value="t" />
-<element name="FUEL_SEC" type="double" auto="" value="1000000.0" />
+<element name="PE_SEC" type="double" auto="" value="5723.08175564" />
+<element name="FUEL_SEC" type="double" auto="" value="3701.75075864" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
 <element name="QProdYear" type="double" auto="" value="1000.0" />
 <element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="1501" />
@@ -2651,7 +2669,10 @@
 <element name="FuelProd" type="double" auto="" value="1000000.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
 <element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="FUEL_SEC" type="double" auto="" value="500.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="QProdYear" type="double" auto="" value="2000.0" />
 <element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="1496" />
@@ -2660,8 +2681,10 @@
 <element name="FuelProd" type="double" auto="" value="1000000.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
 <element name="ProdUnit" type="varchar(45)" auto="" value="t" />
-<element name="FUEL_SEC" type="double" auto="" value="1000000.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="FUEL_SEC" type="double" auto="" value="1000.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="QProdYear" type="double" auto="" value="1000.0" />
 <element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="1495" />
@@ -2670,7 +2693,10 @@
 <element name="FuelProd" type="double" auto="" value="1000000.0" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="104" />
 <element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="275.192653522" />
 <element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="2861.54087782" />
+<element name="FUEL_SEC" type="double" auto="" value="1850.87537932" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
 <element name="QProdYear" type="double" auto="" value="2000.0" />
 <element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="1502" />
@@ -2719,11 +2745,9 @@
 <table name="questionnaire">
 <row n="1">
 <element name="City" type="varchar(45)" auto="" value="Barcelona" />
-<element name="BaseYear" type="int(11)" auto="" value="2008" />
 <element name="Role" type="varchar(45)" auto="" value="Director" />
-<element name="Branch" type="varchar(100)" auto="" value="food industry" />
+<element name="Branch" type="varchar(100)" auto="" value="Manufacture of fabricated metal products, except machinery and equipment" />
 <element name="Email" type="varchar(45)" auto="" value="info@energyxperts.net" />
-<element name="Independent" type="tinyint(4)" auto="" value="0" />
 <element name="Fax" type="varchar(45)" auto="" value="(+34) 93 788 31 10" />
 <element name="NBuild" type="int(11)" auto="" value="1" />
 <element name="Phone" type="varchar(45)" auto="" value="(+34) 697 267 280" />
@@ -2733,7 +2757,6 @@
 <element name="PSetUpData_id" type="int(10) unsigned" auto="" value="0" />
 <element name="Name" type="varchar(45)" auto="" value="EINSTEIN Milk Products Inc." />
 <element name="NShifts" type="double" auto="" value="2.0" />
-<element name="NEmployees" type="int(11)" auto="" value="100" />
 <element name="Contact" type="varchar(45)" auto="" value="Hans Schweiger" />
 <element name="NDaysInd" type="double" auto="" value="260.0" />
 <element name="Turnover" type="double" auto="" value="5.2" />
@@ -2762,7 +2785,7 @@
 <element name="ShortName" type="varchar(45)" auto="" value="EINSTEIN Super Mix" />
 </row>
 <row n="3">
-<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="StatusEnergy" type="int(11)" auto="" value="0" />
 <element name="Description" type="varchar(100)" auto="" value="complete data set for present state after
  cross-checking and data estimation" />
 <element name="ProjectID" type="int(11)" auto="" value="104" />
@@ -2809,7 +2832,7 @@
 <element name="StatusR" type="int(11)" auto="" value="0" />
 <element name="UnitsReport" type="varchar(45)" auto="" value="SI-kWh" />
 <element name="ProjectID" type="int(11)" auto="" value="104" />
-<element name="ActiveAlternative" type="int(11)" auto="" value="3" />
+<element name="ActiveAlternative" type="int(11)" auto="" value="0" />
 <element name="Auditor_ID" type="int(11)" auto="" value="1" />
 <element name="SProject_ID" type="int(10) unsigned" auto="auto_increment" value="87" />
 <element name="NoOfAlternatives" type="int(11)" auto="" value="5" />

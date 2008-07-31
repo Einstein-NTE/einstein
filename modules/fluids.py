@@ -79,6 +79,11 @@ class Fuel():
             self.PEConv = fuel.PEConvFuel
             self.CO2Conv = fuel.CO2ConvFuel
             self.rho = fuel.FuelDensity
+            self.CombAir = fuel.CombAir
+            self.OffgasHeatCapacity = fuel.OffgasHeatCapacity
+            self.Offgas = fuel.Offgas
+            self.OffgasDensity = fuel.OffgasDensity
+            self.Humidity = fuel.Humidity
             self.name = fuel.FuelName
                                                 #conversion to kWh/kgK
         else:
@@ -87,6 +92,11 @@ class Fuel():
             self.PEConv = 1.1
             self.CO2Conv = 0.20
             self.rho = 10.0
+            self.CombAir = 16.6     #approximate values of natural gas as default
+            self.OffgasHeatCapacity = 1.13
+            self.Offgas = 17.6
+            self.OffgasDensity = 1.23
+            self.Humidity = 0.12
             self.name = "dummy fuel"
             logError(_("Fluid (init): cannot find fuel with ID = %s")%fuelID)
            
