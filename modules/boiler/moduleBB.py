@@ -203,14 +203,16 @@ class ModuleBB(object):
         QD80C = Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval+0.5)]
         QD80C.sort(reverse=True)
 
-        if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
-            QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
-            QD140C.sort(reverse=True)
-        else:
-            QD140C=[]
-            for i in range(len(QD80C)):
-                QD140C.append(0)
-
+#        if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
+#            QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
+#            QD140C.sort(reverse=True)
+#        else:
+#            QD140C=[]
+#            for i in range(len(QD80C)):
+#                QD140C.append(0)
+        QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
+        QD140C.sort(reverse=True)
+        
         iT_maxTemp = int(self.maxTemp/Status.TemperatureInterval)
         QDmaxTemp=Status.int.QD_Tt_mod[index-1][iT_maxTemp]
         QDmaxTemp.sort(reverse=True)
@@ -251,23 +253,29 @@ class ModuleBB(object):
         
 #............................................................................................
 # 4. additional information (Info field right side of panel)
-
+        print"moduleBB;updatePanel: info to be displayed:",self.maxTemp,QResidualMaxTemp[0],QD80C[0],QD140C[0]-QD80C[0],QDmaxTemp[0]
         info = []
         info.append(self.maxTemp)  #first value to be displayed
+        info.append(QResidualMaxTemp[0])
+#        info.append(max(0,QResidualMaxTemp[0]))
+        info.append(max(0,QD80C[0]))
+        info.append(max(0,(QD140C[0]-QD80C[0])))
+        info.append(max(0,QDmaxTemp[0]))
+
         
-        info.append(max(0,(QD80C[0]-PowerSum80)))  #power for T-level
-        
-        if self.maxTemp>160:
-            info.append(max(0,(QD140C[0]-QD80C[0]-PowerSum140)))  #power for T-level
-            info.append(max(0,QResidualMaxTemp[0]))
-#            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSumTmax)))  #power for T-level
-        else:
-            info.append(0)
-            if self.maxTemp>80:
-                info.append(max(0,QResidualMaxTemp[0]))
-#                info.append(max(0,(QDmaxTemp[0]-QD80C[0]-PowerSumTmax)))  #power for T-level
-            else:
-                info.append(0)
+#        info.append(max(0,(QD80C[0]-PowerSum80)))  #power for T-level
+#        
+#        if self.maxTemp>160:
+#            info.append(max(0,(QD140C[0]-QD80C[0]-PowerSum140)))  #power for T-level
+#            info.append(max(0,QResidualMaxTemp[0]))
+##            info.append(max(0,(QDmaxTemp[0]-QD140C[0]-PowerSumTmax)))  #power for T-level
+#        else:
+#            info.append(0)
+#            if self.maxTemp>80:
+#                info.append(max(0,QResidualMaxTemp[0]))
+##                info.append(max(0,(QDmaxTemp[0]-QD80C[0]-PowerSumTmax)))  #power for T-level
+#            else:
+#                info.append(0)
 
 
         Status.int.setGraphicsData('BB Info',info)

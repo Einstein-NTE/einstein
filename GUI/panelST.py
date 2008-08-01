@@ -97,8 +97,9 @@ def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
 
     gdata = Status.int.GData['ST Plot']
     
@@ -520,6 +521,7 @@ class PanelST(wx.Panel):
 #..............................................................................
 # and finally draw the figure
 
+        self.Hide()
         self.panelFig.draw()
         self.Show()
         

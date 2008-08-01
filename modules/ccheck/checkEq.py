@@ -108,9 +108,10 @@ class CheckEq():
         self.DTExhaustGas = CCPar("DTExhaustGas",parType="DT")#
         self.DTExhaustGas1 = CCPar("DTExhaustGas1",parType="DT")#
         self.QExhaustGasdot = CCPar("QExhaustGasdot")#
+        self.QExhaustGasdot1 = CCPar("QExhaustGasdot1")#
         self.QExhaustGas = CCPar("QExhaustGas")#
         self.QExhaustGas1 = CCPar("QExhaustGas1")#
-
+        self.ExcessAirRatio1 = CCPar("ExcessAirRatio1")#
 
         self.QWHEq1 = CCPar("QHXEq1")#
         self.QLossEq = CCPar("QLossEq")#
@@ -151,7 +152,9 @@ class CheckEq():
         self.HCGTEfficiency = CCPar("HCGTEfficiency")
 
         self.TExhaustGas = CCPar("TExhaustGas", parType="T")#
-        self.ExcessAirRatio = CCPar("ExcessAirRatio",parType="X")#
+        self.ExcessAirRatio = CCPar("ExcessAirRatio")#
+        self.ExcessAirRatio.valMin = 1.0
+        self.ExcessAirRatio.valMax = 2.0
 
         self.FETj = CCPar("FETj",priority=2)   # from/to the FET matrix
         self.FETel_j = CCPar("FETel_j") 
@@ -392,7 +395,7 @@ class CheckEq():
         self.FuelConsum.show()
         self.FuelConsum1.show()#
         self.FuelConsum2.show()#
-        self.FuelConsum3 .show()#
+        self.FuelConsum3.show()#
         self.ElectriConsum.show()
         self.HPerYearEqNom.show()
         self.HPerYearEqNom1.show()#
@@ -608,26 +611,26 @@ class CheckEq():
             ccheck2(self.HCGTEfficiency,self.HCGTEfficiency1,self.HCGTEfficiency2)
 
             ccheck1(self.FlowCombAir,self.FlowCombAir1)#
+            ccheck1(self.ExcessAirRatio,ExcessAirRatio1)#
             ccheck1(self.FlowExhaustGas,self.FlowExhaustGas1)#
             ccheck1(self.DTExhaustGas,self.DTExhaustGas1)#
+            ccheck1(self.QExhaustGasdot,self.QExhaustGasdot1)#
             ccheck1(self.TExhaustGas,self.TExhaustGas1)#
             ccheck1(self.HPerYearEq,self.HPerYearEq1)
-            ccheck2(self.HPerYearEqNom,self.HPerYearEqNom1,self.HPerYearEqNom2)
+            ccheck3(self.HPerYearEqNom,self.HPerYearEqNom1,self.HPerYearEqNom2,self.HPerYearEqNom3)
             ccheck1(self.HCGPnom,self.HCGPnom1)
             ccheck2(self.FETj,self.FETj1,self.FETj2)#
             ccheck2(self.FETFuel_j,self.FETFuel_j1,self.FETFuel_j2)
             ccheck2(self.FETel_j,self.FETel_j1,self.FETel_j2)
-            ccheck1(self.QExhaustGas,self.QExhaustGas1)#
             ccheck3(self.FuelConsum,self.FuelConsum1,self.FuelConsum2,self.FuelConsum3)#
             ccheck2(self.ElectriConsum,self.ElectriConsum1,self.ElectriConsum2)
             ccheck2(self.USHBoiler,self.USHBoiler1,self.USHBoiler2)
             ccheck2(self.QHXEq,self.QHXEq1,self.QHXEq2)#
             ccheck3(self.USHj,self.USHj1,self.USHj2,self.USHj3)#
             ccheck1(self.QLossEq,self.QLossEq1)#
+            ccheck1(self.QInputEq,self.QInputEq1)#
             ccheck1(self.QOutEq,self.QOutEq1)#
-            ccheck1(self.QWHEq,self.QWHEq1)#
-
-            ccheck1(self.QWHEq,self.QExhaustGas) #It is done provisioanlly. It is supposed the 2parameters to be same.To be modified      
+            ccheck3(self.QWHEq,self.QWHEq1,self.QExhaustGas,self.QExhaustGas1)#It is done provisional. It is supposed the 2parameters to be same.To be modified
 
 #==============================================================================
 if __name__ == "__main__":

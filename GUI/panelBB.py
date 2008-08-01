@@ -75,11 +75,11 @@ from numCtrl import *
  wxID_PANELBBST4PAGEBB, wxID_PANELBBSTATICTEXT1, wxID_PANELBBSTINFO2_T3, 
  wxID_PANELBBSTCONFIG3, wxID_PANELBBSTCONFIG4, wxID_PANELBBSTCONFIG5, 
  wxID_PANELBBSTCONFIG6, wxID_PANELBBSTCONFIG7, wxID_PANELBBSTINFO1, 
- wxID_PANELBBSTINFO1VALUE, wxID_PANELBBSTINFO2, wxID_PANELBBSTINFO2_P1, 
+ wxID_PANELBBSTINFO1VALUE, wxID_PANELBBSTINFO2, wxID_PANELBBSTINFO2VALUE, wxID_PANELBBSTINFO2_P1,   ####E.F. 01/08
  wxID_PANELBBSTINFO2_P2, wxID_PANELBBSTINFO2_P3, wxID_PANELBBSTINFO2_T1, 
  wxID_PANELBBSTINFO2_T2, wxID_PANELBBSTINFO2A, wxID_PANELBBTCCONFIG2, 
  wxID_PANELBBTCCONFIG5, wxID_PANELBBTCCONFIG6, wxID_PANELBBTCCONFIG7, 
-] = [wx.NewId() for _init_ctrls in range(37)]
+] = [wx.NewId() for _init_ctrls in range(38)]
 
 # constants
 #
@@ -97,8 +97,9 @@ def drawFigure(self):
 #------------------------------------------------------------------------------
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][1],
                       'go-', label='QD [80ºC]', linewidth=2)
@@ -343,12 +344,19 @@ class PanelBB(wx.Panel):
               label=_('Maximum demand temperature [°C]'), name='stInfo1', parent=self,
               pos=wx.Point(460, 352), style=0)
         self.stInfo1Value = wx.StaticText(id=wxID_PANELBBSTINFO1VALUE,
-              label=_('-'), name='stInfo1Value', parent=self, pos=wx.Point(660,
+              label='-', name='stInfo1Value', parent=self, pos=wx.Point(660,
               352), style=0)
 
         self.stInfo2 = wx.StaticText(id=wxID_PANELBBSTINFO2,
-              label=_('Residual power to be supplied:'), name='stInfo2',
-              parent=self, pos=wx.Point(460, 392), style=0)
+              label=_('Residual power to be supplied [kWh]'), name='stInfo2',
+              parent=self, pos=wx.Point(460, 372), style=0)
+
+        self.stInfo2Value = wx.StaticText(id=wxID_PANELBBSTINFO2VALUE,                    #### E.F. 01/08
+              label='0', name='stInfo2Value', parent=self, pos=wx.Point(660,
+              372), style=0)
+
+
+
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELBBSTINFO2A,
               label=_('Temperature [\xbaC]'), name='stInfo3', parent=self,
@@ -474,10 +482,12 @@ class PanelBB(wx.Panel):
         self.info = Interfaces.GData["BB Info"]
         
         self.stInfo1Value.SetLabel(convertDoubleToString(self.info[0]))
-        self.stInfo2_P1.SetLabel(convertDoubleToString(self.info[1]))
-        self.stInfo2_P2.SetLabel(convertDoubleToString(self.info[2]))
-        self.stInfo2_P3.SetLabel(convertDoubleToString(self.info[3]))
+        self.stInfo2Value.SetLabel(convertDoubleToString(self.info[1]))
+        self.stInfo2_P1.SetLabel(convertDoubleToString(self.info[2]))
+        self.stInfo2_P2.SetLabel(convertDoubleToString(self.info[3]))
+        self.stInfo2_P3.SetLabel(convertDoubleToString(self.info[4]))
 
+        self.Hide()
         try: self.panelFig.draw()
         except: pass
         
