@@ -1,0 +1,8 @@
+-- update einstein database: add BB_ST parameters to dbsolarthermal 
+USE einstein;
+
+ALTER TABLE dbsolarthermal DROP COLUMN ProjectID;
+ALTER TABLE dbsolarthermal DROP COLUMN STIAM;
+
+LOAD DATA INFILE 'c:/workEI/dbsolarthermal.csv' REPLACE INTO TABLE dbsolarthermal 
+	FIELDS TERMINATED BY ';'

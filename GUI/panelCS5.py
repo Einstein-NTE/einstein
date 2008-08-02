@@ -55,7 +55,7 @@ class PanelCS5(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS5 Plot','CS5 Table'] 
+        keys = ['CS5_Plot','CS5_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -68,7 +68,7 @@ class PanelCS5(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS5 Plot",                      # key for Interface
+                   'key'         : "CS5_Plot",                      # key for Interface
                    'title'       :_('Annual cost'), # title of the graph
                    'ylabel'      :_('Total annual cost [EUR]'),                   # y axis label
                    'legend'      :[_('Amortization [EUR]'),_('Energy cost [EUR]'),_('O&M cost [EUR]')],  # legend
@@ -195,7 +195,7 @@ class PanelCS5(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS5 Table"]
+        data = Status.int.GData["CS5_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

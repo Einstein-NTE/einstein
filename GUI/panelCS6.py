@@ -55,7 +55,7 @@ class PanelCS6(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS6 Plot','CS6 Table'] 
+        keys = ['CS6_Plot','CS6_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -68,7 +68,7 @@ class PanelCS6(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS6 Plot",                      # key for Interface
+                   'key'         : "CS6_Plot",                      # key for Interface
                    'title'       :_('Additional cost per saved primary energy'), # title of the graph
                    'ylabel'      :_('[EUR/MWh saved]'),                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
@@ -197,7 +197,7 @@ class PanelCS6(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS6 Table"]
+        data = Status.int.GData["CS6_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

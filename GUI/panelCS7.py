@@ -55,7 +55,7 @@ class PanelCS7(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS7 Plot','CS Table'] 
+        keys = ['CS7_Plot','CS7_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -68,7 +68,7 @@ class PanelCS7(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS7 Plot",                      # key for Interface
+                   'key'         : "CS7_Plot",                      # key for Interface
                    'title'       :_('Internal rate of return'), # title of the graph
                    'ylabel'      :_('[%]'),                   # y axis label
                    'legend'      :[_('IRR')],                   # legend
@@ -196,7 +196,7 @@ class PanelCS7(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS7 Table"]
+        data = Status.int.GData["CS7_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

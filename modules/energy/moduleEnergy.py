@@ -31,6 +31,7 @@
 #                           Hans Schweiger      28/06/2008
 #                           Hans Schweiger      03/07/2008
 #                           Hans Schweiger      10/07/2008
+#                           Hans Schweiger      02/08/2008
 #
 #       Changes to previous version:
 #       16/03/2008 Graphics implementation
@@ -51,6 +52,7 @@
 #                   in run simulation
 #       03/07/2008: check and update of cascadeUpdateLevel incorporated
 #       10/07/2008: adaptation to new panel and solar system simulation
+#       02/08/2008: clean-up of prints in runSimulation and cEF
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -208,13 +210,15 @@ class ModuleEnergy(object):
 #   dummy function for calculation of energy flows in any equipment
 #------------------------------------------------------------------------------
 
-        print "ModuleEnergy(calculateEnergyFlows): dummy function"
-
         PNom = equipe.HCGPnom
-        if PNom is None: PNom = 0
+        if PNom is None:
+            logTrack("ModuleEnergy (cEF-dummy): no equipment capacity specified")
+            PNom = 0
 
         COPh_nom = equipe.HCGTEfficiency
-        if COPh_nom is None: COPh_nom = 0.90
+        if COPh_nom is None:
+            logTrack("ModuleEnergy (cEF-dummy): no equipment COP specified")
+            COPh_nom = 0.90
         
         EqName = equipe.Equipment
         EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
@@ -224,8 +228,6 @@ class ModuleEnergy(object):
         Nt = Status.Nt
         Dt = Status.TimeStep
         
-        print EqName, ": PNom = ",PNom, " kW"
-
 #..............................................................................
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
@@ -344,42 +346,30 @@ class ModuleEnergy(object):
 # call the calculation modules for each equipment
 
         for cascadeIndex in range(first,last+1):
+            
             equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
 
-            equipe = Status.DB.qgenerationhc.QGenerationHC_ID[equipeID][0]
-            logTrack("ModuleEnergy (runSimulation) [%s]: %s equipeType = : %s"%\
-                     (cascadeIndex,equipe.Equipment,equipe.EquipType))
-            
+            equipe = Status.DB.qgenerationhc.QGenerationHC_ID[equipeID][0]            
             equipeClass = getEquipmentClass(equipe.EquipType)
-            logTrack("ModuleEnergy (runSimulation): equipe type/class = %s/%s"%\
-                     (equipe.EquipType,equipeClass))
+
+            logTrack("=================================\nModuleEnergy (runSimulation): %s - %s [%s: %s]"%\
+                     (cascadeIndex,equipe.Equipment,equipeClass,equipe.EquipType))
             
             if equipeClass == "HP":
-                print "======================================"
-                print "heat pump"
-                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
                 Status.mod.moduleHP.calculateEnergyFlows(equipe,cascadeIndex)
-                print "end heat pump"
-                print "======================================"
+                
             elif equipeClass == "BB":
-                print "boiler"
-                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
                 Status.mod.moduleBB.calculateEnergyFlows(equipe,cascadeIndex)
-                print "boiler"
-                print "end boiler"
-                print "======================================"
+                
             elif equipeClass == "ST":
-                print "solar thermal"
-                print "ModuleEnergy (runSimulation): equipe =", equipe, "cascadeIndex", cascadeIndex
                 Status.mod.moduleST.calculateEnergyFlows(equipe,cascadeIndex)
-                print "end solar thermal"
-                print "======================================"
+                
             else:
-                print "equipment type not yet forseen in system simulation module"
-                print "running calculateEnergyFlows-dummy"
+                logTrack("WARNING: equipment type not yet forseen in system simulation module")
+                logTrack("running calculateEnergyFlows-dummy")
                 self.calculateEnergyFlows(equipe,cascadeIndex)
 
-            logTrack("ModuleEnergy (runSimulation): end simulation")
+            logTrack("ModuleEnergy (runSimulation): end simulation=====================================")
 
 #..............................................................................
 # update the pointer to the last calculated cascade

@@ -76,7 +76,7 @@ TITLE_COLOR = ORANGE
 class PanelEM1(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
-        keys = ['EM1 Table','EM Plot'] 
+        keys = ['EM1_Table','EM1_Plot'] 
         self.mod = ModuleEM1(keys)
 
         labels_column = 0

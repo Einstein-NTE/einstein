@@ -93,14 +93,6 @@ def setCheckMode(mode):
     global CHECKMODE
     CHECKMODE = mode
     
-DEBUG = "OFF" #Set to:
-                #"ALL": highest level,
-                #"CALC": only debug in CALC Functions
-                #"ADJUST": only debug in ADJUST Functions
-                #"MAIN": plots the show-alls in each block
-                #"BASIC": basic debugging (not yet implemented)
-                #"OFF" or any other value ...: doesn't print anything
-
 TEST = False
 TESTCASE = 3
 

@@ -179,8 +179,11 @@ class CheckEq():
                 if fuel_number <= 0 or fuel_number is None:
                     self.mainSource = "Electricity"
                     self.FuelLCV = 0.0
+                    self.OffgasHeatCapacity.setValue(0) #
+                    self.CombAir = 0.0 #
                     self.FuelConsum.setValue(0)
                     self.ElectriConsum.setValue(qgenerationhc.ElectriConsum)
+                    self.ExcessAirRatio.val = 1.0
                 else:
                     self.mainSource = "Fuel"
                     eq_fuel = Fuel(fuel_number)
@@ -518,7 +521,6 @@ class CheckEq():
 
             self.FlowCombAir1 = calcProdC("FlowCombAir1",self.CombAir,self.FuelConsum,self.ExcessAirRatio) # 
             self.FlowExhaustGas1 = calcSum("FlowExhaustGas1",self.FlowCombAir,self.FuelConsum1)#
-            self.DTExhaustGas1 = calcDiff("DTExhaustGas1",self.TExhaustGas,self.TEnvEq)#
             self.QExhaustGasdot1 = calcFlow("QExhaustGasdot1",self.OffgasHeatCapacity,self.FlowExhaustGas,self.TExhaustGas1,
                                             self.TEnvEq,self.DTExhaustGas,self.DTExhaustGas1)#
                         
@@ -584,7 +586,6 @@ class CheckEq():
 
             adjustFlow(self.QExhaustGasdot1,self.OffgasHeatCapacity,self.FlowExhaustGas,self.TExhaustGas1,
                                             self.TEnvEq,self.DTExhaustGas,self.DTExhaustGas1)#
-            adjustDiff(self.DTExhaustGas1,self.TExhaustGas,self.TEnvEq)#
             adjustSum(self.FlowExhaustGas1,self.FlowCombAir,self.FuelConsum1)#
             adjustProdC(self.FlowCombAir1,self.CombAir,self.FuelConsum,self.ExcessAirRatio) # 
             
@@ -611,7 +612,7 @@ class CheckEq():
             ccheck2(self.HCGTEfficiency,self.HCGTEfficiency1,self.HCGTEfficiency2)
 
             ccheck1(self.FlowCombAir,self.FlowCombAir1)#
-            ccheck1(self.ExcessAirRatio,ExcessAirRatio1)#
+            ccheck1(self.ExcessAirRatio,self.ExcessAirRatio1)#
             ccheck1(self.FlowExhaustGas,self.FlowExhaustGas1)#
             ccheck1(self.DTExhaustGas,self.DTExhaustGas1)#
             ccheck1(self.QExhaustGasdot,self.QExhaustGasdot1)#

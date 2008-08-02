@@ -1511,7 +1511,9 @@ class EinsteinApp(wx.App):
         # initialize Einstein support
         self.frame.doLog = HelperClass.LogHelper()
         self.frame.conf = HelperClass.ConfigHelper()
-        self.frame.doLog.LogThis('Starting EINSTEIN Version %s'%VERSION)
+        self.frame.doLog.LogThis("\n==================================\n"+\
+                                 ("Starting EINSTEIN Version %s"%VERSION)+\
+                                 "\n==================================\n")
 
         # initialize language
         self.frame.setLanguage()

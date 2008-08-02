@@ -83,7 +83,7 @@ class PanelEA4a(wx.Panel):
 #..............................................................................
 # starting module
 
-        keys = ['EA4a Table','EA4a Plot']
+        keys = ['EA4a_Table','EA4a_Plot']
         self.mod = ModuleEA4(keys)
         self.mod.updatePanel()
 

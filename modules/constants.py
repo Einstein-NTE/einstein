@@ -18,19 +18,21 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.06
 #	Created by: 	    Hans Schweiger	    22/03/2008
 #
 #       Last modified by:   Stoyan Danov            04/06/2008
 #                           Hans Schweiger          10/06/2008
 #                           Claudia Vannoni         02/07/2008
 #                           Hans Schweiger          03/07/2008
+#                           Hans Schweiger          02/08/2008
 #
 #       Changes to previous version:
 #       04/06/2008  SD: traduceable lists creation
 #       10/06/2008  HS: function findKey added
 #       02/07/2008  CV: ST parameters
 #       03/07/2008: HS  subtypes for boilers adapted to DB Boiler
+#       02/08/2008: HS  constant "DEBUG" incorporated
 #
 #
 #------------------------------------------------------------------------------		
@@ -44,9 +46,23 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00a Revision No. 194" #Number of upload in sourceforge
+VERSION = "R1.00a Revision No. 201" #Number of upload in sourceforge
+#------------------------------------------------------------------------------		
+DEBUG = "OFF"   #Set to:
+
+                #"OFF" (default): no debug
+
+                #"BASIC": basic debugging
+                #"ALL": highest level of debugging,
+                #"CALC": only ccheck debug in CALC Functions
+                #"ADJUST": only ccheck debug in ADJUST Functions
+                #"MAIN": ccheck plots the show-alls in each block
+#------------------------------------------------------------------------------		
 
 #------------------------------------------------------------------------------		
+# constants of general use in EINSTEIN
+#------------------------------------------------------------------------------		
+
 INFINITE = 1.e99
 KELVIN = 273.15
 MAXTEMP = 999.9 #maximum allowed temperature in analysis 

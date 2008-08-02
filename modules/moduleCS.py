@@ -81,8 +81,8 @@ class ModuleCS(object):
         PEC = []
 
         PECTable = []
-        PECPlot = [[10,11],[20,21]]  #dummies en dos primeras filas para test de labels + ignoredrows
-                   
+        PECPlot = []
+        
 #Panel CS1: Primary energy
         if self.keys[0] == "CS1_Plot":
             for ANo in range(len(generalData)-1):

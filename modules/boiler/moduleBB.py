@@ -224,7 +224,7 @@ class ModuleBB(object):
 # 2. XY Plot
         TimeIntervals=[]
         for it in range(Status.Nt+1):
-            TimeIntervals.append(1.0*(it+1))
+            TimeIntervals.append(Status.TimeStep*(it+1)*Status.EXTRAPOLATE_TO_YEAR)
 
         try:
 
@@ -458,8 +458,10 @@ class ModuleBB(object):
         equipe.update({"NumEquipUnits":1})
         if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
+        equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
         Status.SQL.commit()
-        print "moduleBB;setEquipmentFromDB: boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%(model.BoilerManufacturer,model.BoilerType,model.BBPnom,model.BoilerTemp)
+        logTrack("moduleBB (setEquipmentFromDB): boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%\
+                 (model.BoilerManufacturer,model.BoilerType,model.BBPnom,model.BoilerTemp))
         self.calculateEnergyFlows(equipe,self.cascadeIndex)
 
 #------------------------------------------------------------------------------

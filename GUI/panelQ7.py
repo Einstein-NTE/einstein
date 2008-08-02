@@ -453,6 +453,7 @@ class PanelQ7(wx.Panel):
     def OnButtonDeleteEnergy(self,event):
 #------------------------------------------------------------------------------
         Status.prj.deleteSurface(self.selectedSurfaceID)
+        Status.mod.moduleST.resetST()   #surface calculation no longer up to date
         self.display()
         event.Skip()
 
@@ -539,6 +540,9 @@ class PanelQ7(wx.Panel):
 
             surface.update(tmp)
             Status.SQL.commit()
+
+            Status.mod.moduleST.resetST()   #surface calculation no longer up to date
+        
 
             logDebug("PanelQ7 (OK button): now filling page again")
 

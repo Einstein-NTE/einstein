@@ -72,21 +72,58 @@ def drawFigure(self):
 #   defines the figures to be plotted
 #------------------------------------------------------------------------------		
 
-    if not hasattr(self, 'subplot'):
-        self.subplot = self.figure.add_subplot(1,1,1)
+    AXIS_FONT = {'fontsize'  : 6}
 
-    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
-                      Status.int.GData['EA4b Plot'][1],
+    if hasattr(self, 'subplot'):
+        del self.subplot
+    self.subplot = self.figure.add_subplot(1,1,1)
+
+    self.subplot.plot(Status.int.GData['EA4b_Plot'][0],
+                      Status.int.GData['EA4b_Plot'][1],
                       '-', color = DARKGREY,label='UPH', linewidth=1)
-    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
-                      Status.int.GData['EA4b Plot'][2],
+    self.subplot.plot(Status.int.GData['EA4b_Plot'][0],
+                      Status.int.GData['EA4b_Plot'][2],
                       color = ORANGE, label='UPH proc', linewidth=3)
-    self.subplot.plot(Status.int.GData['EA4b Plot'][0],
-                      Status.int.GData['EA4b Plot'][3],
+    self.subplot.plot(Status.int.GData['EA4b_Plot'][0],
+                      Status.int.GData['EA4b_Plot'][3],
                       'r:',  label='USH', linewidth=3)
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend(loc = 2)
+    self.subplot.axes.set_ylabel(_('Yearly energy [MWh]'))
+    self.subplot.axes.set_xlabel(_('Temperature [ºC]'))
+    
+    for label in self.subplot.axes.get_yticklabels():
+#        label.set_color(self.params['ytickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['yticksangle'])
+    #
+    # properties of labels on the x axis
+    #
+    for label in self.subplot.axes.get_xticklabels():
+#        label.set_color(self.params['xtickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['xticksangle'])
+
+    try:
+        lg = self.subplot.get_legend()
+        ltext  = lg.get_texts()             # all the text.Text instance in the legend
+        for txt in ltext:
+            txt.set_fontsize(10)  # the legend text fontsize
+        # legend line thickness
+        llines = lg.get_lines()             # all the lines.Line2D instance in the legend
+        for lli in llines:
+            lli.set_linewidth(1.5)          # the legend linewidth
+        # color of the legend frame
+        # this only works when the frame is painted (see below draw_frame)
+        frame  = lg.get_frame()             # the patch.Rectangle instance surrounding the legend
+        frame.set_facecolor('#F0F0F0')      # set the frame face color to light gray
+        # should the legend frame be painted
+        lg.draw_frame(False)
+    except:
+        # no legend
+        pass
+    
 
 #------------------------------------------------------------------------------
 class PanelEA4b(wx.Panel):
@@ -96,7 +133,7 @@ class PanelEA4b(wx.Panel):
 #------------------------------------------------------------------------------
 
         self._init_ctrls(parent)
-        keys = ['EA4b Table','EA4b Plot']
+        keys = ['EA4b_Table','EA4b_Plot']
         self.mod = ModuleEA4(keys)
         self.mod.updatePanel()
 
@@ -106,7 +143,7 @@ class PanelEA4b(wx.Panel):
         labels_column = 0
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : 'EA4b Plot',                # key for Interface
+                   'key'         : 'EA4b_Plot',                # key for Interface
                    'title'       : _('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
@@ -160,10 +197,10 @@ class PanelEA4b(wx.Panel):
 # bring data to table
 
         try:
-            data = Status.int.GData['EA4b Table']
+            data = Status.int.GData['EA4b_Table']
             (rows,cols) = data.shape
         except:
-            logDebug("PanelEA4b: received corrupt data in key: EA4b Table")
+            logDebug("PanelEA4b: received corrupt data in key: EA4b_Table")
             (rows,cols) = (0,COLNO)
 
         decimals = [-1,2,2,2,2,2,2]   #number of decimal digits for each colum
@@ -197,19 +234,19 @@ class PanelEA4b(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) and supply (USH) by temperature'),
+        self.box1 = wx.StaticBox(self, -1, _('Heat demand (UPH) and supply (USH) by temperature'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.staticText2 = wx.StaticText(id=-1,
-              label=_(u'Heat demand (UPH) by process temperature (PT)'),
+              label=_('Heat demand (UPH) by process temperature (PT)'),
               name='staticText2', parent=self, pos=wx.Point(200, 24),
               size=wx.Size(50, 17), style=0)
 
         self.staticText3 = wx.StaticText(id=-1,
-              label=_(u'Heat supply (USH) by central supply temperature (CST)'),
+              label=_('Heat supply (USH) by central supply temperature (CST)'),
               name='staticText3', parent=self, pos=wx.Point(470, 24),
               size=wx.Size(50, 17), style=0)
 
@@ -218,7 +255,7 @@ class PanelEA4b(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of heat demand (UPH) by process temperatures'),
+        self.box2 = wx.StaticBox(self, -1, _('Distribution of heat demand (UPH) and supply (USH) by process temperatures'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -272,6 +309,7 @@ class PanelEA4b(wx.Panel):
     def display(self):
 #------------------------------------------------------------------------------		
 
+        self.Hide()
         try:
             self.panelEA4bFig.draw()
         except: pass

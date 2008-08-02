@@ -95,18 +95,21 @@ class ModuleHC(object):
             idx = 0
             pipes = "o=="
             for i in pipeIDsSQL:
-                pipeID = int(i)
-                if pipeID in pipeDict.keys():
-                    if idx == 0:
-                        pipes = str(pipeDict[pipeID])
-                    else:
-                        newPipes = pipes+"==]\n[=="+str(pipeDict[pipeID])
-                        pipes = newPipes
-                    idx += 1
+                try:
+                    pipeID = int(i)
+                    if pipeID in pipeDict.keys():
+                        if idx == 0:
+                            newPipes = pipes + str(pipeDict[pipeID])
+                            pipes = newPipes
+                        else:
+                            newPipes = pipes+"==]\n[=="+str(pipeDict[pipeID])
+                            pipes = newPipes
+                        idx += 1
+                except:
+                    pass
             newPipes = pipes+"==o"
             pipes = newPipes
 
-            print "ModuleHC: %s pipes found >>>%s"%(idx,pipes)
 #..............................................................................
 # getting pipe names of equipes
 

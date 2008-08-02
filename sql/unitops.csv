@@ -1,51 +1,99 @@
-101;Cleaning of bottles and cases;101
-102;Washing products;102
-103;Cleaning of production halls and equipment;103
-104;Electropolishing;104
-105;Solvent degreasing;105
-106;Aqueous cleaning;106
-107;Pickling;107
-108;Etching and descalling;108
-109;Electrolitically assisted pickling, activation and degreasing;109
-110;Metal stripping;110
-111;Rinsing;111
-201;Drying;201
-301;Evaporation;301
-302;Distillation;302
-303;Deodorization;303
-401;Blanching;401
-501;Pasteurization;501
-601;Sterilization;601
-701;Cooking and boiling;701
-801;Pre-heating;801
-802;Soaking;802
-803;Thawing;803
-901;Boiler feed-water preheating;901
-1001;Heating of production halls;1001
-1101;Cooling of production halls;1101
-1201;Cooling, chilling and cold stabilization;1201
-1202;Ageing;1202
-1203;Plating copper and copper alloy;1203
-1204;Electroplating nickel;1204
-1205;Plating chromium;1205
-1206;Plating zinc and zinc alloy;1206
-1207;Plating cadmium;1207
-1208;Plating tin and alloy;1208
-1209;Plating precious metal;1209
-1210;Autocatalytic plating;1210
-1211;Immersion coatings;1211
-1212;Oiling;1212
-1213;Anodizing;1213
-1214;Sealing following anodizing;1214
-1215;Conversion coatings (phosphate layer);1215
-1216;Conversion coatings (chromium);1216
-1217;Coating oxide (chemical blacking);1217
-1218;Brightening;1218
-1219;Chemical milling;1219
-1301;Melting;1301
-1401;Extraction ;1401
-1501;Bleaching;1501
-1601;Electropainting;1601
-1602;Lacquering;1602
-1603;Colour anodizing on aluminium;1603
-1604;Metal colouring;1604
+0101;Cleaning of bottles and cases;0101;Cleaning of bottles and cases
+0102;Washing products;0102;Washing products
+0103;Cleaning of production halls and equipment;0103;Cleaning of production halls and equipment
+0104;Electropolishing;0104;Electropolishing
+0105;Solvent degreasing;0105;Solvent degreasing
+0106;Aqueous cleaning;0106;Aqueous cleaning
+0107;Pickling;0107;Pickling
+0108;Etching and descalling;0108;Etching and descalling
+0109;Electrolitically assisted pickling, activation and degreasing;0109;Electrolitically assisted pickling, activation and degreasing
+0110;Metal stripping;0110;Metal stripping
+0111;Rinsing;0111;Rinsing
+0112;Materials handling and storage;0112;Materials handling and storage
+0201;Drying;0201;Drying
+0301;Evaporation;0301;Evaporation
+0302;Distillation;0302;Distillation
+0303;Deodorization;0303;Deodorization
+0304;Vacuum generation;0304;Vacuum generation
+0401;Blanching;0401;Blanching
+0501;Pasteurization;0501;Pasteurization
+0601;Sterilization;0601;Sterilization
+0701;Cooking and boiling;0701;Cooking and boiling
+0801;Pre-heating;0801;Pre-heating
+0802;Soaking;0802;Soaking
+0803;Thawing;0803;Thawing
+;Peeling;;Peeling
+0804;Lime kiln;0804;Lime kiln
+0901;Boiler feed-water preheating;0901;Boiler feed-water preheating
+1001;Heating of production halls;1001;Heating of production halls
+1101;Cooling of production halls;1101;Cooling of production halls
+1201;Cooling, chilling and cold stabilization;1201;Cooling, chilling and cold stabilization
+1202;Ageing;1202;Ageing
+1203;Plating copper and copper alloy;1203;Plating copper and copper alloy
+1204;Electroplating nickel;1204;Electroplating nickel
+1205;Plating chromium;1205;Plating chromium
+1206;Plating zinc and zinc alloy;1206;Plating zinc and zinc alloy
+1207;Plating cadmium;1207;Plating cadmium
+1208;Plating tin and alloy;1208;Plating tin and alloy
+1209;Plating precious metal;1209;Plating precious metal
+1210;Autocatalytic plating;1210;Autocatalytic plating
+1211;Immersion coatings;1211;Immersion coatings
+1212;Oiling;1212;Oiling
+1213;Anodizing;1213;Anodizing
+1214;Sealing following anodizing;1214;Sealing following anodizing
+1215;Conversion coatings (phosphate layer);1215;Conversion coatings (phosphate layer)
+1216;Conversion coatings (chromium);1216;Conversion coatings (chromium)
+1217;Coating oxide (chemical blacking);1217;Coating oxide (chemical blacking)
+1218;Brightening;1218;Brightening
+1219;Chemical milling;1219;Chemical milling
+1301;Melting;1301;Melting
+1401;Extraction ;1401;Extraction 
+1501;Bleaching;1501;Bleaching
+1601;Electropainting;1601;Electropainting
+1602;Lacquering;1602;Lacquering
+1603;Colour anodizing on aluminium;1603;Colour anodizing on aluminium
+1604;Metal colouring;1604;Metal colouring
+1605;Deinking ;1605;Deinking 
+1701;Packaging and filling;1701;Packaging and filling
+1702;filleting;1702;filleting
+1703;Canning and bottling;1703;Canning and bottling
+1704;Kegging;1704;Kegging
+1801;Sorting/screening, grading, dehulling, destemming/destalking and trimming;1801;Sorting/screening, grading, dehulling, destemming/destalking and trimming
+1802;Peeling (refining);1802;Peeling (refining)
+1803;Cutting, slicing, chopping, mincing, pulping and pressing;1803;Cutting, slicing, chopping, mincing, pulping and pressing
+1804;Caustic Peeling;1804;Caustic Peeling
+1805;Steam Peeling;1805;Steam Peeling
+1806;Neutralisation;1806;Neutralisation
+1807;Soap splitting;1807;Soap splitting
+1808;Hardening;1808;Hardening
+1809;Stock preparation;1809;Stock preparation
+1810;Paper machine ;1810;Paper machine 
+1811;delignification;1811;delignification
+1812;causticizing;1812;causticizing
+1813;refining;1813;refining
+1814;Dispersion;1814;Dispersion
+1901;Beet sugar production;1901;Beet sugar production
+1902;Brewhouse;1902;Brewhouse
+2001;Process water;2001;Process water
+2002;Service water;2002;Service water
+2101;Flotation;2101;Flotation
+2102;Filtering;2102;Filtering
+2201;Turbine generator;2201;Turbine generator
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;
+;;;

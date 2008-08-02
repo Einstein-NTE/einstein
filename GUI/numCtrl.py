@@ -17,7 +17,7 @@ def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
         xfloat = float(x)
         x = xfloat
     except:
-        print "numCtrl: seems to be a string"
+#        print "numCtrl: seems to be a string"
         return str(x)
     
 #x is ok, now check the number of decimals ...

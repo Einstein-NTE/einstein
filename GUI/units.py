@@ -39,6 +39,8 @@
 #==============================================================================
 
 from einstein.modules.fluids import Fluid
+from einstein.modules.messageLogger import *
+
 CURRENCY = 'EUR'
 
 UNITSFLUIDDENSITY = 1000.0

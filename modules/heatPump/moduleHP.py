@@ -43,6 +43,7 @@
 #                           Stoyan Danov            06/05/2008
 #                           Stoyan Danov            16/05/2008
 #                           Hans Schweiger          28/06/2008
+#                           Hans Schweiger          02/08/2008
 #   
 #
 #       Changes to previous version:
@@ -89,6 +90,7 @@
 #                       getTminD, getTmaxA: corrected +-1 to assume linear change in the last sector of the curve
 #       16/05/2008 SD:  some prints added in designAssistant1, calculateEnergyFlows; runSimulation activated in DA2 ->problems here, see prints
 #       28/06/2008: HS  new modality of runSimulation(first=xy,last=xy) implemented. Some clean-up.
+#       02/08/2008: HS  conversion kWh - MWh in panel
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -188,12 +190,23 @@ class ModuleHP():
 # 2. XY Plot
 
         try:
+            iTmax = Status.NT/2
+            QD_plot = []
+            QDres_plot = []
+            QA_plot = []
+            QAres_plot = []
+            for i in range(iTmax):
+                QD_plot.append(Status.int.QD_T_mod[self.cascadeIndex-1][i]/1000.0)
+                QA_plot.append(Status.int.QA_T_mod[self.cascadeIndex-1][i]/1000.0)
+                QDres_plot.append(Status.int.QD_T_mod[self.cascadeIndex][i]/1000.0)
+                QAres_plot.append(Status.int.QA_T_mod[self.cascadeIndex][i]/1000.0)
+
             Status.int.setGraphicsData('HP Plot',
                                        [Status.int.T[0:(Status.NT/2)],
-                                        Status.int.QD_T_mod[self.cascadeIndex-1][0:(Status.NT/2)],
-                                        Status.int.QA_T_mod[self.cascadeIndex-1][0:(Status.NT/2)],
-                                        Status.int.QD_T_mod[self.cascadeIndex][0:(Status.NT/2)],
-                                        Status.int.QA_T_mod[self.cascadeIndex][0:(Status.NT/2)]])
+                                        QD_plot,
+                                        QA_plot,
+                                        QDres_plot,
+                                        QAres_plot])
         except:
             logDebug("ModuleHP (updatePanel): error trying to send graphics data")
 
@@ -226,7 +239,7 @@ class ModuleHP():
             print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
             print 'Error: confusion in PId and ANo'
             maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, 'compression',1000.0,60.0,100.0,-10.0,100.0])            
+            Status.int.setGraphicsData('HP Config',[maintainExisting, 'compression',1500.0,60.0,100.0,-10.0,100.0])            
 
         else:
             uHP = uHProws[0]

@@ -36,7 +36,7 @@ import wx
 from status import Status
 from einstein.modules.moduleCS import *
 import einstein.modules.matPanel as Mp
-from einstein.GUI.graphics import drawStackedBarPlot
+from einstein.GUI.graphics import drawSimpleBarPlot
 from GUITools import *
 from numCtrl import *
 
@@ -57,7 +57,7 @@ class PanelCS1(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS1 Plot','CS1 Table'] 
+        keys = ['CS1_Plot','CS1_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -70,15 +70,22 @@ class PanelCS1(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS1 Plot",                      # key for Interface
+                   'key'         : "CS1_Plot",                      # key for Interface
                    'title'       :_('Primary energy consumption'), # title of the graph
                    'ylabel'      :_('PEC [MWh]'),                   # y axis label
                    'legend'      :[_('PEC [MWh]')],                   # legend (list)
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
-                   'ignoredrows' :[0,1]}                        # rows that should not be plotted
+                   'ignoredrows' :[]}                        # rows that should not be plotted
         
-        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawStackedBarPlot,
+
+        try:
+            data = Status.int.GData["CS1_Plot"]
+            print data
+        except:
+            pass
+        
+        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawSimpleBarPlot,
                             paramList)
 
         #
@@ -197,7 +204,7 @@ class PanelCS1(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS1 Table"]
+        data = Status.int.GData["CS1_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

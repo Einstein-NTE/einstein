@@ -24,6 +24,8 @@
 #                           Hans Schweiger      23/07/2008
 #                           Enrico Facci        23/07/2008
 #                           Hans Schweiger      24/07/2008
+#                           Enrico Facci        (...)
+#                           Hans Schweiger      01/08/2008
 #
 #       Changes to previous version:
 #
@@ -36,7 +38,10 @@
 #                               no longer necessary)
 #       23/07/2008: HS  update adapting to corrections in "sunday"
 #       24/07/2008: HS  biaxial incidence angle modifier
-#
+#       01/08/2008: HS  qrenewables only function of PId, not of ANo
+#                       conversion kWh -> MWh in plot
+#                       clean-up of the following functions:
+#                       - calculateEnergyFlows (cEF)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -60,6 +65,8 @@ import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 from sunday import *
 from einstein.modules.messageLogger import *
+
+PARASITIC_ELECTRICITY = 0.01
 
 sunOnH = Intensity()
 sunOnT = Intensity()
@@ -121,8 +128,8 @@ def collectorEfficiencyBiaxial(GbT,GdT,tanThetaL,tanThetaT,dT,STc0,STc1,STc2,K50
         return 0.0
     else:
         
-        bT = - log(K50T)/pow(tan(2*pi*50.0/360.),2) 
-        bL = - log(K50L)/pow(tan(2*pi*50.0/360.),2)
+        bT = max(- log(K50T)/pow(tan(50.0*pi/180.0),2),0) 
+        bL = max(- log(K50L)/pow(tan(50.0*pi/180.0),2),0)
         
         KT = exp(-bT*pow(tanThetaT,2)) #transversal IAM
         KL = exp(-bL*pow(tanThetaL,2)) #longitudinal IAM
@@ -261,9 +268,7 @@ class ModuleST(object):
 #   This function will be called from the GUI every time some information to
 #   be displayed might have changed
 #------------------------------------------------------------------------------
-        print "Updating Solar Thermal window"
         (STList,collectorList) = self.screenEquipments()
-        print "---moduleST;updatePanel: the STList is----",STList
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
             Status.mod.moduleEnergy.runSimulation(last=self.cascadeIndex)
 
@@ -283,16 +288,24 @@ class ModuleST(object):
         Tmax = 200.0
         iTmax = int(Tmax/Status.TemperatureInterval + 0.5)
         index=self.findIndex()
-        print "ModuleST: index =",index,"cascadeIndex=",self.cascadeIndex
-        
+#        print "ModuleST: index =",index,"cascadeIndex=",self.cascadeIndex
+
+        QD_plot = []
+        USH_plot = []
+                           
         if len(STList)>0:
+            for i in range(iTmax):
+                QD_plot.append(Status.int.QD_T_mod[index][i]/1000.0)
+                USH_plot.append(Status.int.USHj_T[index][i]/1000.0)
             Status.int.setGraphicsData('ST Plot',[Status.int.T[0:iTmax],
-                                                  Status.int.QD_T_mod[index][0:iTmax],
-                                                  Status.int.USHj_T[index][0:iTmax]])
+                                                  QD_plot,
+                                                  USH_plot])
         else:
+            for i in range(iTmax):
+                QD_plot.append(Status.int.QD_T_mod[index][i]/1000.0)
+
             Status.int.setGraphicsData('ST Plot',[Status.int.T[0:iTmax],
-                                                  Status.int.QD_T[0:iTmax]])
-            #HS2008-07-10: security feature if no ST existing. -> send global demand
+                                                  QD_plot])
 #............................................................................................
 # 3. Configuration design assistant
 
@@ -306,18 +319,18 @@ class ModuleST(object):
         if len(STList)>0:
             yi= Status.int.USHj_T[index][iTmax]/(STList[0][0])
             sf=Status.int.USHj_T[index][iTmax]*100/Status.int.QD_T_mod[index][iTmax]
-            print "ModuleST; updatePanel: the heat supplyed in a year by the solar system is:",Status.int.USHj_T[index][iTmax]
-            if collectorList[0][7] != None:    ####E.F. 28/07
+#            print "ModuleST; updatePanel: the heat supplyed in a year by the solar system is:",Status.int.USHj_T[index][iTmax]
+            if collectorList[0][7] != None:                                 ####E.F. 28/07
                 try:
                     maxCapacity=(self.grossSurfArea/collectorList[0][7])*0.7     ####E.F. 28/07
-                except:     ####E.F. 28/07
-                    maxCapacity=(self.grossSurfArea/1.1)*0.7     ####E.F. 28/07
-            else:     ####E.F. 28/07
-                maxCapacity=(self.grossSurfArea/1.1)*0.7     ####E.F. 28/07
-            try:     ####E.F. 28/07
+                except:                                                     ####E.F. 28/07
+                    maxCapacity=(self.grossSurfArea/1.1)*0.7                ####E.F. 28/07
+            else:                                                           ####E.F. 28/07
+                maxCapacity=(self.grossSurfArea/1.1)*0.7                    ####E.F. 28/07
+            try:                                                            ####E.F. 28/07
                 SEff = Status.int.USHj_T[index][iTmax]*100/(collectorList[0][8]*STList[0][0]/0.7)    ####E.F. 28/07
             except:
-                SEff= "--"     ####E.F. 28/07
+                SEff= "--"                                                  ####E.F. 28/07
 #            print "ModuleST; updatePanel: collectorList[0][8] is:",collectorList[0][8]
         else:
             yi=0
@@ -333,11 +346,7 @@ class ModuleST(object):
                 TC = "--"
         
         info= [self.usableSurfacesArea,maxCapacity,sf,yi,SEff,TC,0]
-#        info = [self.latitude,self.usableSurfacesArea,self.grossSurfArea,sf,yi,TC,0]
         Status.int.setGraphicsData('ST Info',info)
-
-#        info = [0,0,0,0,0,0,0]
-#        Status.int.setGraphicsData('ST Info',info)
 
 #............................................................................................
 # 5. System parameters to GUI
@@ -347,9 +356,8 @@ class ModuleST(object):
             sysPars = noneFilter(STList[0])
         else:
             sysPars = self.guiSysPars
+            
         Status.int.setGraphicsData('ST SysPars',sysPars)
-
-        print "ST window updated"    
 
 #------------------------------------------------------------------------------
 
@@ -362,8 +370,7 @@ class ModuleST(object):
         urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         if len(urows) == 0:
-            print 'getUserDefinedParamST: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
-            print 'Error: confusion in PId and ANo'
+            logTrack('ModuleST (getUserDefinedPars): PId %s ANo %s not defined'%(Status.PId,Status.ANo))
 
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
@@ -384,8 +391,7 @@ class ModuleST(object):
             config = noneFilter([u.STSolFra,        #H.S. 01/08
                       u.STCollType,        #H.S. 01/08
                       u.STMinYield])        #H.S. 01/08
-            config[0] *= 100.0  #conversion to %        #H.S. 01/08
-            print "ModuleST (getUserDefinedPars): config = ",config
+            config[0] *= 100.0          #conversion to %        #H.S. 01/08
 
         return config
 
@@ -398,7 +404,8 @@ class ModuleST(object):
         urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
         
         if len(urows)==0:
-            print "ModuleST(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
+            logTrack("ModuleST(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo")
+            
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
             urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
@@ -445,12 +452,10 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
 
         equipments = Status.prj.getEquipments(cascade=True)
-        print "ModuleST; screenEquipments: all the equipments in this project are:",equipments
         self.NEquipe=len(equipments)
         STList=[]
         collectorList=[]
-#        e=equipments[0]
-#        print "ModuleST; screenEquipments: the first equipment is a:", getEquipmentClass(e.EquipType)
+
         self.equipeIDs=[]
         self.cascadeIndex = 0
         for equipe in equipments:
@@ -491,11 +496,9 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
     def deleteEquipment(self,rowNo,automatic=False):
 #------------------------------------------------------------------------------
-        """
-        deletes the selected boiler in the current alternative
-        """
+# deletes the selected boiler in the current alternative
 #------------------------------------------------------------------------------
-#HS2008-07-09: CHANGES FOR DEMO !!!!
+
         if automatic == False:
             if rowNo == None:   #indicates to delete last added equipment dummy
                 if self.dummyEqId is None:
@@ -504,16 +507,17 @@ class ModuleST(object):
                     STid = self.dummyEqId
             else:
                 STid = self.getEqId(rowNo)
-                print "Module ST (delete): id to be deleted = ",STid
+                logTrack("Module ST (delete): id to be deleted = %s"%STid)
         else:
             STid= rowNo
-            print "Module ST (delete automaticly): id to be deleted = ",STid
+            logTrack("Module ST (delete automaticly): id to be deleted = %s"%STid)
         
         Status.prj.deleteEquipment(STid)
         self.screenEquipments()
         self.guiSysPars = [0,0,0]
         self.updatePanel()
         self.avAreaFactor=1.1
+        
         self.manualChoosenColl = None   ####E.F. 28/07
 
 #------------------------------------------------------------------------------
@@ -524,18 +528,20 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
 
         (STList,collectorList) = self.screenEquipments()
-        if len(STList)>0:
+        if len(STList)> 0:
             self.dummyEqId = None
             equipments = Status.DB.qgenerationhc.\
                       Questionnaire_id[Status.PId].\
                       AlternativeProposalNo[Status.ANo].\
                       CascadeIndex[self.cascadeIndex]
+            
             if len(equipments)>0:
                 self.equipe=equipments[0]
                 showWarning(_("You are changing the current solar system."))
                 return self.equipe
 
-            else: print " module ST: addEquipmentDummy error!!!!!"
+            else:
+                logDebug("ModuleST (addEquipmentDummy): fatal error in STList!!!!!")
 
         self.equipe = Status.prj.addEquipmentDummy()
         self.dummyEqId = self.equipe.QGenerationHC_ID
@@ -625,6 +631,11 @@ class ModuleST(object):
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
+    def setManualSelection(self,theId):   ##### E.F. 28/07
+#        self.manualChoosenColl = theId
+        self.manualChoosenColl = Status.DB.dbsolarthermal.DBSolarThermal_ID[theId][0]
+
+#------------------------------------------------------------------------------
     def calculateEnergyFlows(self,equipe,cascadeIndex):
 #------------------------------------------------------------------------------
 #   calculates the energy flows in the equipment identified by "cascadeIndex"
@@ -639,29 +650,20 @@ class ModuleST(object):
 #..............................................................................
 # get equipment data from equipment list in SQL
 
+        self.screenEquipments()
+
         STModel = equipe.Model
-        print equipe.Model
         STType = equipe.EquipType
         PNom = equipe.HCGPnom
 
-####HS2008-07-09: SECURITY FEATURE ADDED
-        if PNom is None or PNom == 0:
+        if PNom is None or PNom == 0:   #security feature
             logDebug("ModuleST (calcEn.Flows): equipe with PNom = None or PNom = 0 detected\nCan't do anything with this !!!")
             return
             
         COPh_nom = equipe.HCGTEfficiency
 
 #XXX TOpMax or something similar should be defined in SQL        TMax = equipe.TOpMax
-# for the moment set equal to TExhaustGas
-#        TMax = equipe.TExhaustGas
         Tmax=200
-
-#XXX ENRICO: here other equipment parameters should be imported from SQL database
-        self.screenEquipments()
-#        print "ModuleST,calcEnergyFlows. The cascadeIndex-1 is:", cascadeIndex-1
-#        EquipmentNo = Status.int.cascade[cascadeIndex-1]["equipeNo"]
-
-#        print 'ModuleST (calculateEnergyFlows): Model = ', STModel, ' Type = ', STType, 'PNom = ', PNom
 
 #..............................................................................
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
@@ -678,21 +680,11 @@ class ModuleST(object):
         QHXj_T = Status.int.createQ_T()
 
 #..............................................................................
+#..............................................................................
+#..............................................................................
 # Start hourly loop
 
-#       ***GETTING_STARTED***:
-#   This are the required input data for the calculation of the radiation
-#   on tilted surface. are used as input values in the function prep_sun
-
-
-###Claudia: I changed another time to lower-case letters, as usually we use the convention of lower case
-### letters for local python variables. first letter uppercase is usually used for classes.
-
-#        (inclination,azimuth,shLoss)=self.defineCalcParams()
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
+# update surface calculations if necessary
 
         if self.atmosfericFlag != 1:
             self.generalData()
@@ -700,104 +692,56 @@ class ModuleST(object):
             self.screenSurfaces()
             self.calcSurfArea()
             (self.inclination,self.azimuth,self.shLoss)=self.defineCalcParams()
-#HS 2008-07-09: geographic data not found. here re-activated as a dummy
-#        self.latitude = 41.4
-#        self.inclination = 30
-#        self.azimuth = 15.0
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
 
-#        I=Status.DB.qrenewables.Questionnaire_id[Status.PId][0].ST_I
-#        if I== None or I <100 or I >3000:
-#            if self.Lat=None:
-#                I=1300
-#            else:
-#                    I=1300   # Here a function from Claudia to calculate I(Lat)
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-#HS 2008-07-09: self.ST_IDefault seems not yet to be working. for the moment a fix number
-#        I = 1500
-# now self.ST_IDefault should be Found
         I = self.ST_IDefault
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
 
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-#HS 2008-07-09: self.TAmb was not found below. for the moment a fixed number
-#        self.TAmb = 20
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-########################################################################################################3
-
-#       ***GETTING_STARTED***:
-#   The area should be imported from the QGenerationHC equipment parameters
-#   A solar system should be entered like any other heat supply equipment
-#   into the QGenerationHC - Table. We should think about how to match the
-#   parameters there with characteristic solar parameters
-#   e.g. PNom for solar systems = the nominal solar system power
-#   -> SurfaceAreaSol = PNom / 0.7
-
-#        SurfAreaSol = 100.0       #E.F. this is self.totNetSurfArea
-
-
-###HS2008-07-09: Changede equipe.HCGPnom to PNom. => once imported to a local variable, better
-# use the local variable from this on. also necessary for the new security feature !!!!!
+#   Solar system parameters
 
         SurfAreaSol = PNom/0.7
         if equipe.ST_SysEff != None and 0< equipe.ST_SysEff <1:
             systemEfficiency = equipe.ST_SysEff
         else:
+            logTrack("ModuleST (cEF): invalid specification of system efficiency. eta = 0.9 assumed")
             systemEfficiency = 0.90
-#   N.B. In questo caso sarebbe bene mettere uno showWorning fuori dal calculateEnergyFlows che avvisa che l'efficienza del sistema è stata assunta 0.9
-#        systemEfficiency = 0.90         #accounting for all the thermal losses in the solar system
-                                    #including pipe and tank losses
+
+#   Solar collector parameters
 
         ST_C0=equipe.ST_C0
         ST_C1=equipe.ST_C1
         ST_C2=equipe.ST_C2
         
         if equipe.ST_K50T > 0 and equipe.ST_K50T is not None: ST_K50T = equipe.ST_K50T
-        else: ST_K50T = 0.95
+        else:
+            logTrack("ModuleST (cEF): invalid specification of KT. KT = 0.95 assumed")
+            ST_K50T = 0.95
         
         if equipe.ST_K50L > 0 and equipe.ST_K50L is not None: ST_K50L = equipe.ST_K50L
-        else: ST_K50L = 0.95
+        else:
+            logTrack("ModuleST (cEF): invalid specification of KT. KT = 0.95 assumed")
+            ST_K50L = 0.95
     
-#       ***GETTING_STARTED***:
-#   These are the parameters for storage modelling:
+#   Parameters for storage modelling
 
-        TStorage = 20.0                 #initial temperature of the storage at 1st of January 0:00
+        TStorage = 60.0                 #initial temperature of the storage at 1st of January 0:00
+                                        #HS2008-08-02. initial temperature changed to 60 ºC
         TStorageMax = 250.0             #maximum allowed temperature in the storage
+        
         if equipe.ST_Volume != None:
             if equipe.ST_Volume < 0.01* equipe.HCGPnom:
                 storageVolume = 0.01* equipe.HCGPnom
-                showWarning(_("The heat storage volume is very small. For internal calculation it has been setted to 0.01 m^3/kW"))
+                showWarning(_("The heat storage volume is very small. For internal calculation it has been set to 0.01 m^3/kW"))
             else:
                 storageVolume = equipe.ST_Volume
         else:
+            logTrack("ModuleST (cEF): no storage Volume specified. Specific storage size of 0.05 m3/m2 assumed")
             storageVolume = 0.05*SurfAreaSol       #in m3. for the moment fixed to 50 l/m2. can be an equipment parameter
             equipe.ST_Volume = storageVolume
             Status.SQL.commit()
-#        storageVolume = 0.05*SurfAreaSol       #in m3. for the moment fixed to 50 l/m2. can be an equipment parameter
+
         CStorage = 1.16*storageVolume   #heat capacity of the storage in kW/K
         QStorage = CStorage*TStorage    #total heat stored in the tank (reference temperature = 0ºC)
         QStorageMax = CStorage*TStorageMax #maximum amount of heat that can be stored in the tank (ref. = 0ºC)
                  
-
-        QavColl = 0    #these two values only for calculating the weighted mean of the average collector
-        QTavColl = 0    #temperature during the year
-
-        oldDay = 0
-
 #.............................................................................
 #.............................................................................
 #.............................................................................
@@ -811,17 +755,25 @@ class ModuleST(object):
 #.............................................................................
 #.............................................................................
 
-        USHj = 0
-        QHXj = 0
-
         TIMESTEP = Status.TimeStep
         NT = Status.NT
-        annualGbT =0
-        annualGdT =0
+
+# setting counters and initial value of integrals (sums) to zero
+
+        oldDay = 0
+
+        QavColl = 0     #these two values only for calculating the weighted mean of the average collector
+        QTavColl = 0    #temperature during the year
+
+        USHj = 0
+        QHXj = 0
         HPerYear = 0
         annualDemand=0
-        HTilted =0
-#        print "moduleST;calculateEnergyFlows: number of time intervals evaluated: ",Status.Nt
+
+        annualGbT =0
+        annualGdT =0
+        HTilted = 0
+        
         for it in range(Status.Nt):
 
         
@@ -835,18 +787,16 @@ class ModuleST(object):
 #.............................................................................
 # recalculate solar data for a new day
 
-#       ***GETTING_STARTED***:
 #   The function PREP_SUN prepares the radiation calculations for a given day
 #   in the year
 
             if nday > oldDay:
                 oldDay = nday
+                
 #HS2008-07-10: Multiplication with EXTRAPOLATE_TO_YEAR added. so a full solar year will be
 #               simulated also if calculation time is less than 8760 !!!
                 nday_solar = int(nday*Status.EXTRAPOLATE_TO_YEAR + 0.1)
-#                print "ModuleST (calculateEnergyFlows): new day %s, I = %s"%(nday,I)
                 sunOnH.t = getDailyRadiation(I,nday_solar)
-#                print "ModuleST (calculateEnergyFlows): sunOnH = ",sunOnH
 
                 prep_sun(self.latitude,
                          self.inclination,
@@ -855,12 +805,14 @@ class ModuleST(object):
                          sunAnglesOnSurface,
                          sunOnH)
 
+                if DEBUG in ["ALL","BASIC"]:
+                    print "NEW DAY: %s H = %s"%(nday_solar,sunOnH.t)
+                    print "lat %s inc %s azi %s"%(self.latitude,self.inclination,self.azimuth)
+
 #.............................................................................
 # now get instantaneous radiation (in W/m2)
-#HS 2008-07-23 RADIATION CALCULATION CORRECTED !!!!
 
-            GT_W = sun_hourly(sunAnglesOnSurface,sunOnH,time_in_s)
-
+            GT_W = sun_hourly(sunAnglesOnSurface,sunOnH,time_in_s)  #GT_W: radiation in [W] vs. GT in [kW]!!!
             
             GbT = GT_W.b / 1000.    #conversion to kW/m2
             GdT = GT_W.d / 1000.
@@ -868,14 +820,15 @@ class ModuleST(object):
 
 # calculation of tan(incidence_angle). needed later on for efficiency calculation.
 
-#            print "ModuleST (cEF): dirSunOnT = ",GT_W.n
             if GT_W.n[2] <= 0:
                 tanThetaT = INFINITE
                 tanThetaL = INFINITE
             else:
                 tanThetaT = fabs(GT_W.n[0]/GT_W.n[2])
                 tanThetaL = fabs(GT_W.n[1]/GT_W.n[2])
-#            print "ModuleST (cEF): tanThetaT %s tanThetaL %s"%(tanThetaT,tanThetaL)
+
+            if DEBUG in ["ALL"]:
+                print "ModuleST (cEF): dirSunOnT = %s"%GT_W.n
                 
             annualGbT += GbT * TIMESTEP
             annualGdT += GdT * TIMESTEP
@@ -892,37 +845,21 @@ class ModuleST(object):
             
             DeltaT = TavCollector - self.TAmb
 
-# Moved this out from here: assignment of constant parameters has to be done only once, not every timestep
-#            ST_C0=equipe.ST_C0
-#            ST_C1=equipe.ST_C1
-#            ST_C2=equipe.ST_C2
-#            ST_K50T = equipe.ST_K50T
-#            ST_K50L = equipe.ST_K50L
-
-            eff = collectorEfficiencyBiaxial(GT_W.b,GT_W.b,tanThetaL,tanThetaT,DeltaT,ST_C0,ST_C1,ST_C2,ST_K50L,ST_K50T)
+            eff = collectorEfficiencyBiaxial(GT_W.b,GT_W.d,tanThetaL,tanThetaT,DeltaT,ST_C0,ST_C1,ST_C2,ST_K50L,ST_K50T)
+            
+            if DEBUG in ["ALL"]:
+                print"tanThetaL %s tanThetaT %s eff %s"%(tanThetaL,tanThetaT,eff)
 
             dotQuSolarMax = eff*systemEfficiency*SurfAreaSol*GT*self.shLoss
                                                     #*shadingFactor!!!  if shaded then add shading factor.ADD an IF!
-            dotQuSolarMax = max(dotQuSolarMax,0)    #HS2008-07-10: Security feature for negative efficiency
-                                #maximum instantaneous power the solar system may deliver
-            print"ModuleST; calculateEnergyFlows: the istant. eff. is'%s', the deltaT is'%s' and GH.t is'%s'"%\
-                            (eff,DeltaT,GT)
-#            print"ModuleST; calculateEnergyFlows: the istantaneous deltaT is",DeltaT
+            dotQuSolarMax = max(dotQuSolarMax,0)    #solar system regulation controls that there's no negative Qu !!!
 
-
-#       ***GETTING_STARTED***:
-#   general Note: I used the "dot" to distinguish between power and energy.
-#   we could adapt the calculations using the energy-fraction in time interval: dQ = dotQ*TIMESTEP
-#   as is used in the EINSTEIN - arrays ...
-#   dotQDemand should be set to the heat demand below TStorage (dotQDemand * TIMESTEP = QD_Tt[TStorage])
-
-            iTmax = (int(floor(Tmax/Status.TemperatureInterval+0.5)))
-            dotQDemand = QD_Tt[iTmax][it]/Status.TimeStep
-
-#       ***GETTING_STARTED***:
+#   determination of minimum and maximum demand and corresponding temperature levels
 #   the minimum temperature of demand indicates to what temperature the storage can be cooled down.
 #   if we have heat demand only above e.g. 60ºC, we cannot cool down the storage lower than this,
 #   as heat can not be transferred from cold to hot (at least not yet, maybe EINSTEIN succeeds to do it)
+            iTmax = (int(floor(Tmax/Status.TemperatureInterval+0.5)))
+            dotQDemand = QD_Tt[iTmax][it]/Status.TimeStep
 
             iTmin = NT+1
             for i in range(NT+1):
@@ -932,13 +869,24 @@ class ModuleST(object):
 
             TMinDemand = iTmin*Status.TemperatureInterval
 
+            
+# calculate actual solar system production
+
             QStorageCapacity = max(QStorageMax - QStorage,0.0)   #maximum amount of heat that still can be fed into the storage
             dotQuSolar = min(dotQDemand+QStorageCapacity/TIMESTEP,dotQuSolarMax)
                                                         #solar production constrained by demand + remaining storage capacity
 
+# calculate actual heat delivery to demand
+
             QStorageMin = CStorage*TMinDemand           #minimum heat that has to remain within the storage, as it can't be cooled down further
             dotQuSupply = min(dotQDemand,dotQuSolar + max((QStorage - QStorageMin)/TIMESTEP,0))
                                                         #supply constrained by solar production + available heat stored at T > TMinDemand
+            if DEBUG in ["ALL","BASIC"]:
+                print"ModuleST (calculateEnergyFlows): time: %s eff: %s DT: %s GT: %s dotQu: %s dotQuSolar: %s Tamb: %s"%\
+                                (time_in_h,eff,DeltaT,GT, dotQuSupply, dotQuSolar,self.TAmb)
+
+# now update heat stored in tank
+            QStorage += (dotQuSolar - dotQuSupply)*TIMESTEP
 
             if dotQuSolar > 0:
                 HPerYear += Status.TimeStep
@@ -946,31 +894,20 @@ class ModuleST(object):
             USHj_t = dotQuSupply*TIMESTEP
             annualDemand += dotQDemand * TIMESTEP    
 
-#       ***GETTING_STARTED***:
-#   note: the remaining problem is to decide at WHAT temperature the solar system does supply heat (from USHj_t to USHj_Tt)
-#   -> let's use the simplest possible solution (although it's not the most efficient one ...):
-#   fill up the demand from below (-> see heat pump example, I think there the same strategy
-#   is applied. you can copy ...
-
-            for iT in range(NT+2):
-                USHj_Tt[iT][it] = min(USHj_t,QD_Tt[iT][it])
-                QD_Tt[iT][it] -= USHj_Tt[iT][it]
-
-# now update heat stored in tank
-            QStorage += (dotQuSolar - dotQuSupply)*TIMESTEP
-
-#            print "ModuleST (energyFlows): it=%s QsolMax=%s QD =%s USH=%s QStorage=%s"%\
-#                  (it,dotQuSolarMax,dotQDemand,dotQuSupply,QStorage)
-
             QavColl += dotQuSolar
             QTavColl += dotQuSolar*TavCollector
 
             USHj += USHj_t
             HTilted += GT*TIMESTEP
-#.............................................................................
-#.............................................................................
-#.............................................................................
-#.............................................................................
+
+#   now the remaining problem is to decide at WHAT temperature the solar system does supply heat (from USHj_t to USHj_Tt)
+#   -> let's use the simplest possible solution (although it's not the most efficient one ...):
+#   fill up the demand from below
+
+            for iT in range(NT+2):
+                USHj_Tt[iT][it] = min(USHj_t,QD_Tt[iT][it])
+                QD_Tt[iT][it] -= USHj_Tt[iT][it]
+
 #.............................................................................
 #.............................................................................
 #.............................................................................
@@ -981,7 +918,7 @@ class ModuleST(object):
         self.TavCollMean = QTavColl/max(QavColl,0.000000001)
 
 #........................................................................
-# End of year reached. Store results in interfaces
+#  Store results in interfaces
 
 # remaining heat demand and availability for next equipment in cascade
         Status.int.QD_Tt_mod[cascadeIndex] = QD_Tt
@@ -1001,65 +938,122 @@ class ModuleST(object):
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
         Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
-#        equipeC.USHj = USHj
-#        equipeC.QHXj = QHXj    #XXX to be defined in data base
-#        print "Total energy demand ",annualDemand, " kWh"
-        print "ModuleST; calulateEnegyFlows. Total energy supplied by equipment: ",USHj, " kWh"
-        print "ModuleST; calulateEnegyFlows. Total energy supplied by the sun: ",HTilted*Status.EXTRAPOLATE_TO_YEAR, " kWh/m^2year"
-#        print "Total waste heat input  ",QHXj, " kWh"
-        print "ModuleST; calulateEnegyFlows. Radiation annualGbT is '%s' and annualGdT is'%s'" % (annualGbT*Status.EXTRAPOLATE_TO_YEAR,annualGdT*Status.EXTRAPOLATE_TO_YEAR)
+
+#........................................................................
+# Indicate that present level of cascade has been updated
+
         Status.int.cascadeUpdateLevel = cascadeIndex
 
 #........................................................................
 # Global results (annual energy flows)
-        equipe.update({"HTilted":HTilted*Status.EXTRAPOLATE_TO_YEAR})    #### E.F. 28/07
-        Status.SQL.commit()    #### E.F. 28/07
 
-        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
+        equipe.update({"HTilted":HTilted*Status.EXTRAPOLATE_TO_YEAR})       #### E.F. 28/07
+        Status.SQL.commit()                                                 #### E.F. 28/07
 
         FETFuel_j = 0.0
-
+        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
         Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j*Status.EXTRAPOLATE_TO_YEAR
-        Status.int.FETel_j[cascadeIndex-1] = 0.02*USHj*Status.EXTRAPOLATE_TO_YEAR
-        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
+        Status.int.FETel_j[cascadeIndex-1] = PARASITIC_ELECTRICITY*USHj*Status.EXTRAPOLATE_TO_YEAR   
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+
+        if DEBUG in ["ALL","BASIC"]:
+            print "ModuleST (cEF): USH: %s HT: %s HbT: %s HdT: %s"%\
+                  (USHj*Status.EXTRAPOLATE_TO_YEAR,
+                   HTilted*Status.EXTRAPOLATE_TO_YEAR,
+                   annualGbT*Status.EXTRAPOLATE_TO_YEAR,
+                   annualGdT*Status.EXTRAPOLATE_TO_YEAR)
 
         return USHj*Status.EXTRAPOLATE_TO_YEAR    
 
 #==============================================================================
 #==============================================================================
 #==============================================================================
+#   FUNCTIONS FOR SURFACE CALCULATIONS AND WEATHER DATA 
+#============================================================================== 
+#============================================================================== 
+#============================================================================== 
+#------------------------------------------------------------------------------ 
     def resetST(self):
+#------------------------------------------------------------------------------ 
+#   resets the surface and weather flag. for calls outside from moduleST
+#   at present reset is called in:
+#   - setActiveProject: -> always when a new project is selected
+#   - PanelQ7 - OK and DELETE buttons: -> always when the user changes some-
+#       thing manually in the surface or weather data
+#------------------------------------------------------------------------------ 
         self.atmosfericFlag = 0
         self.surfaceFlag = 0
-#==============================================================================
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    def set_IDefault(self):
+#------------------------------------------------------------------------------ 
+# Function from Claudia to calculate the radiation (estimates yearly radiation from latitude)
+#------------------------------------------------------------------------------ 
+        self.ST_IDefault = -0.0002*pow(self.latitude,4.0)+\
+                           0.2547*pow(self.latitude,3.0)-\
+                           31.055*pow(self.latitude,2.0)+\
+                           1245.4*self.latitude-\
+                           14419
+        logWarning(_("The yearly incident solar radiation has not been defined. \nValue calculated from default correlation: H [kWh/m2] = %s")%\
+                   self.ST_IDefault)
+        
+#------------------------------------------------------------------------------ 
     def generalData(self):
+#------------------------------------------------------------------------------ 
+#   Sets general data for module calculations (H, TAmb, latitude, etc.)
+#------------------------------------------------------------------------------ 
         
         renTable = Status.DB.qrenewables.Questionnaire_id[Status.PId]
+            
+#........................................................................
+# read in latitude (set to default if no reasonable value)
+
         if len (renTable)>0 and renTable[0].Latitude!=None:
             self.latitude=renTable[0].Latitude
         else:
-            self.latitude=45
-#........................................................................
-# Function from Claudia to calculate the radiatin
-        if len (renTable)>0 and renTable[0].ST_I != None:
-            if 100 < renTable[0].ST_I <3000:
-                self.ST_IDefault = renTable[0].ST_I
-            else:
-                self.ST_IDefault = -0.0002*pow(self.latitude,4.0)+0.2547*pow(self.latitude,3.0)-31.055*pow(self.latitude,2.0)+1245.4*self.latitude-14419
-        else:
-            self.ST_IDefault = -0.0002*pow(self.latitude,4.0)+0.2547*pow(self.latitude,3.0)-31.055*pow(self.latitude,2.0)+1245.4*self.latitude-14419
+            logWarning(_("The geographic latitude has not been defined. \n45º North (Central Europe) assumed as default"))
+            self.latitude=45.0
 
 #........................................................................
+# read in yearly solar radiation on horizontal (set to default if no reasonable value)
+
+        if len (renTable)> 0 and renTable[0].ST_I != None:
+            if 100.0 < renTable[0].ST_I < 3000.0:
+                self.ST_IDefault = renTable[0].ST_I
+            else:
+                self.set_IDefault()
+        else:
+            self.set_IDefault()
+
+        if DEBUG in ["ALL","BASIC"]:
+            print "ModuleST (generalData): H = ", self.ST_IDefault
+
+#........................................................................
+# read in ambient temperature (set to default if no reasonable value)
 
         if  len (renTable)>0 and renTable[0].TAmb!=None:
             self.TAmb = renTable[0].TAmb
         else:
-            self.TAmb = -0.0143*pow(self.latitude,2.0) + 0.4668*self.latitude+20.5
-        self.surfAreaFactorDef=0.0042*pow(self.latitude,2.0)-0.3044*self.latitude+8
-        print "ModuleST;generalData. The radiation is:", self.ST_IDefault
+            self.TAmb = -0.0143*pow(self.latitude,2.0) + 0.4668*self.latitude + 20.5
+            logWarning(_("The yearly mean ambient temperature has not been defined. \nValue calculated from default correlation: TAmb [ºC] = %s")%\
+                   self.TAmb)
+            
+#..............................................................................
+# surface area factor (-> based on default inclination and collector row separation)
+
+        self.surfAreaFactorDef = 0.0042*pow(self.latitude,2.0)-0.3044*self.latitude+8
+        
+#..............................................................................
+# finally set Flag
+
         self.atmosfericFlag=1
-#==============================================================================
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
     def defineCalcParams(self):
+#------------------------------------------------------------------------------ 
+#   ???
+#------------------------------------------------------------------------------
+
         MININCLINATION=20
         
         
@@ -1085,24 +1079,25 @@ class ModuleST(object):
         self.surfaceFlag = 1
         return (inclinationOpt,azimuthOpt,shLoss)
             
-
 #------------------------------------------------------------------------------
-
+#------------------------------------------------------------------------------
     def screenSurfaces(self):
 #------------------------------------------------------------------------------
+#   screens the available surfaces for their aptitude for solar energy use
+#------------------------------------------------------------------------------
 
+        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
+        self.renewablesTable = Status.DB.qrenewables.sql_select(sqlQuery)  
 
-        sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' "%(Status.PId,Status.ANo)
-        self.renewablesTable = Status.DB.qrenewables.sql_select(sqlQuery)  # This DB doesn't exist jet!!
-        self.surfaces=[0]
-        if len(self.renewablesTable) > 0:
+        if len(self.renewablesTable) > 0:               #XXXENRICO -> isn't this in conflict/redundancy with "generalData" ???
             self.renewables = self.renewablesTable[0]
             self.latitude = self.renewables.Latitude
             self.radiation = self.renewables.ST_I
             
         else:
-            #xxxx here some security feature, if no table entry exists for latitude and radiation ... -
-            pass
+            logDebug("ModuleST (screenSurfaces): no entry in qrenewables")
+
+# screen existing surfaces and add to self.surfaces
 
         sqlQuery = "ProjectId = '%s'"%(Status.PId)
         self.qsurfareas= Status.DB.qsurfarea.sql_select(sqlQuery)  # This DB doesn't exist jet!!
@@ -1127,23 +1122,32 @@ class ModuleST(object):
         for i in range(len(self.surfaces)):
             if self.surfaces[i]["inclination"] == None:
                 self.surfaces[i]["inclination"] = 0
+                logWarning(_("Surface %s: no inclination specified. 0º assumed")%(i+1))
             if self.surfaces[i]["azimuth"] == None:
                 self.surfaces[i]["azimuth"] =0
+#                logWarning(_("Surface %s: no azimuth specified. 0º assumed")%(i+1))
             if self.surfaces[i]["azimuthClass"] == None:
                 self.surfaces[i]["azimuthClass"] = "S"
+                logWarning(_("Surface %s: no azimuth specified. South orientation assumed")%(i+1))
                                   
         self.NSurfaces= len(self.surfaces)
         
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def calcNetSurfAreaFactor (self,i,MININCLINATION):
+#------------------------------------------------------------------------------
+#   ???
+#------------------------------------------------------------------------------
         NetSurfAreaFactorSloped=1.2
         if self.surfaces[i]["azimuthClass"]=="S" and  self.surfaces[i]["inclination"]>MININCLINATION:
             self.NetSurfAreaFactor=NetSurfAreaFactorSloped
         else:
             self.NetSurfAreaFactor=0.0042*pow(self.latitude,2.0)-0.3044*self.latitude+8
-        print "moduleST; calcNetSurfAreaFactor: the surfAreaFactor is:",self.NetSurfAreaFactor
+#        print "moduleST; calcNetSurfAreaFactor: the surfAreaFactor is:",self.NetSurfAreaFactor
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------        
     def checkNetSurfArea(self,i):
+#------------------------------------------------------------------------------
         MINSURFACE = 20
         NetSurfAreaPartial=self.surfaces[i]["surfArea"]/self.NetSurfAreaFactor
         if NetSurfAreaPartial>=MINSURFACE:
@@ -1153,7 +1157,10 @@ class ModuleST(object):
             logMessage(_("In '%s' the surface available for the collectors mounting is too small.")%(self.surfaces[i]["surfAreaName"]))
         return (f1,NetSurfAreaPartial)
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def checkDistance(self,i):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
         DISTANCECONSTRAINT= 1500
         DistanceFactor=(-2*0.0000001*pow(self.surfaces[i]["surfArea"],2))+(0.0022*self.surfaces[i]["surfArea"])+0.3938
         MaxDistance=self.surfaces[i]["surfArea"]/(DistanceFactor*self.NetSurfAreaFactor)
@@ -1165,7 +1172,9 @@ class ModuleST(object):
             f2=1
         return (f2)
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def checkOrientation(self,i):
+#------------------------------------------------------------------------------
         MININCLINATION = 20
         if self.surfaces[i]["azimuthClass"]==("N" or "NE" or "NW"):
             if self.surfaces[i]["inclination"]<MININCLINATION:
@@ -1178,7 +1187,10 @@ class ModuleST(object):
             f3=1
         return (f3)       
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def checkShading(self,i):
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
         if self.surfaces[i]["shading"] == "Yes,fully shaded": #==SHADINGTYPES.keys()[2]
             f4=0
             fs=1
@@ -1191,12 +1203,17 @@ class ModuleST(object):
                 fs=0
         return (f4,fs)          
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def checkLoad(self,i):
+#------------------------------------------------------------------------------
+#   checks static load capacity of the roof
+#------------------------------------------------------------------------------
         if self.surfaces[i]["roofStaticLoadCap"] ==None:
             f5=1
             if self.surfaces[i]["roofType"] in ["Corrugated metal roof","Composite sandwich panels","Other"]:
-                logMessage(_("Check the static load capacity of the roof '%s'and the collectors mounting feasibility.")%(self.surfaces[i]["surfAreaName"]))
-        elif self.surfaces[i]["roofStaticLoadCap"]>=MINSTATICROOF:
+                logMessage(_("Check the static load capacity of the roof '%s'and the collectors mounting feasibility.")%\
+                           (self.surfaces[i]["surfAreaName"]))
+        elif self.surfaces[i]["roofStaticLoadCap"] >= MINSTATICROOF:
             f5=1
         else:
             f5=0
@@ -1204,12 +1221,10 @@ class ModuleST(object):
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-    def setManualSelection(self,theId):   ##### E.F. 28/07
-#        self.manualChoosenColl = theId
-        self.manualChoosenColl = Status.DB.dbsolarthermal.DBSolarThermal_ID[theId][0]
-
-#------------------------------------------------------------------------------
     def calcSurfArea(self):
+#------------------------------------------------------------------------------
+#   ???
+#------------------------------------------------------------------------------
 
         MINSURFACE=20  # The minimum area considered is 20 m^2
         DISTANCECONSTRAINT=1500
@@ -1253,8 +1268,8 @@ class ModuleST(object):
             enoughSurface= "No"
         else:
             enoughSurface= "Yes"
-        logTrack ("The list of aveilable surfaces is:'%s'"% self.surfaces)
-        logTrack ("The list of usable surfaces is:'%s'"% self.usableSurfaces)
+        logDebug ("The list of aveilable surfaces is:'%s'"% self.surfaces)
+        logDebug ("The list of usable surfaces is:'%s'"% self.usableSurfaces)
         logMessage(_("The surfaces have a total area of '%s' and a usable (net) area of '%s'"% (self.TotAvailSurfArea,self.TotNetSurfArea)))
         return enoughSurface
 
@@ -1270,7 +1285,7 @@ class ModuleST(object):
             if getEquipmentClass(row["equipeType"]) == "ST" and index==0:
                 self.existingSTSystem = row
                 index= i
-                print ("A solar sistem exist and its position in cascade is:", index+1)
+#                print ("A solar sistem exist and its position in cascade is:", index+1)
                 self.STExistance=1
             i += 1
         return (index)
@@ -1282,7 +1297,7 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
     def selectST(self,GT,dT):
 
-        print(" ModuleST: selectST is starting")
+#        print(" ModuleST: selectST is starting")
 
 #------------------------------------------------------------------------------
 #       here a selection among all the collectors based on efficiency.
@@ -1328,13 +1343,20 @@ class ModuleST(object):
            self.avAreaFactor = 1.1 
         return selectedCollector
         
+#==============================================================================
+#==============================================================================
+#==============================================================================
+#   PREDIMENSIONING AND DESIGN ASSISTANT 
+#============================================================================== 
+#============================================================================== 
+#============================================================================== 
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-
     def preDimensioning(self):
+#------------------------------------------------------------------------------
+#   ???
+#------------------------------------------------------------------------------
 
-        print (" ModuleST: preDimensioning is starting") 
+        logTrack(" ModuleST: preDimensioning is starting") 
 
         self.solFraDefault=0.5
         self.Tmax=200
@@ -1345,12 +1367,12 @@ class ModuleST(object):
         index=self.findIndex()
         self.QD_Tmax=Status.int.QD_T_mod[index][int(self.Tmax/Status.TemperatureInterval+0.5)]
         QDTav=self.QD_Tmax*SolFra
-        print ("the cumulative heat demand QD_T for the ST system is:", Status.int.QD_T_mod[index])
+#        print ("the cumulative heat demand QD_T for the ST system is:", Status.int.QD_T_mod[index])
         i=0
         while Status.int.QD_T_mod[index][i]< QDTav:
             i+=1
         self.Tav= i*Status.TemperatureInterval
-        print ("The temperature corresponding to half of the demand at 200°C is:",self.Tav)
+#        print ("The temperature corresponding to half of the demand at 200°C is:",self.Tav)
         USHSolTot= QDTav
         self.SurfAreaSol=USHSolTot /QuSolarUnitary
         if self.TotNetSurfArea/self.SurfAreaSol<1:
@@ -1367,33 +1389,23 @@ class ModuleST(object):
         self.TavCollector= self.Tav + deltaT_Primary
 
 # NB       if da userDefinedPars arriva una potenza più picola ridurre direttamente qui la superficie...
-        print ("The solar area is:",self.SurfAreaSol)
-        print ("corresponding to '%s' kWh" % self.QDT)
-        print ("The temperature corresponding to half of the demand is:",self.Tav)
-# Data now calculated in self.generalData
-#        renTable = Status.DB.qrenewables.Questionnaire_id[Status.PId]
-#        if len(renTable) > 0:
-#            self.Lat = renTable[0].Latitude
-#            self.TAmb = renTable[0].TAmb
-                       
-#        else:
-#            self.Lat = 45
-#            self.TAmb = 20
-#            print "ERROR: No line in sql for this project!"
+#        print ("The solar area is:",self.SurfAreaSol)
+#        print ("corresponding to '%s' kWh" % self.QDT)
+#        print ("The temperature corresponding to half of the demand is:",self.Tav)
         
-#        if self.TAmb == None or self.TAmb < -20 or self.TAmb >40:
-#            self.TAmb=20
-#        if self.Lat == None or  self.Lat <20 or self.Lat>75:
-#            self.Lat=45
-        
- 
-        
-#==============================================================================    
-
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
     def designAssistant1(self):
+#------------------------------------------------------------------------------
+#   assisted design of a solar thermal system
+#------------------------------------------------------------------------------
 
-        print "ModuleST (designAssistant1): starting"
+        logTrack("ModuleST (designAssistant1): starting")
+        
         index=self.findIndex()   # Index = cascadeIndex-1
+
+#........................................................................
+# read in and check the design assistant configuration parameters
 
         config=self.getUserDefinedPars()       
 
@@ -1408,17 +1420,26 @@ class ModuleST(object):
             try:
                 self.QuSolarUnitaryMin = float(config[2])
             except:
-                self.QuSolarUnitaryMin=300
+                self.QuSolarUnitaryMin=300.0
         else:
-            self.QuSolarUnitaryMin=300
-#        test=self.QuSolarUnitaryMin*1.02
+            self.QuSolarUnitaryMin=300.0
+
+            
+#........................................................................
+# do previous checks
+
         if self.STExistance==1 and self.manualChoosenColl == None: #E.F. 28/07
             showWarning(_("A solar thermal system is in use! in order to design a new one you should delete the existent."))
         else:
             enoughSurface=self.calcSurfArea()
-            logTrack ("ModuleST designAssistant: reached pointA")
+            logDebug ("ModuleST designAssistant: reached pointA")
             if enoughSurface=="Yes":
-                logTrack ("ModuleST designAssistant: reached pointB")
+
+
+#........................................................................
+# if everything's ok, start assisted design
+
+                logDebug ("ModuleST designAssistant: reached pointB")
                 self.preDimensioning()
 
                 GT=800
@@ -1440,7 +1461,7 @@ class ModuleST(object):
 
 
                 SolFraCalc=USHj/self.QD_Tmax
-                logTrack ("ModuleST designAssistant: reached pointC")
+                logDebug ("ModuleST designAssistant: reached pointC")
                 if self.manualChoosenColl == None:                    ########## E.F. 28/07
                     while abs (self.TavCollMean -self.Tav)>10 :
                         logTrack ("ModuleST designAssistant: reached pointD")
@@ -1454,22 +1475,22 @@ class ModuleST(object):
                         USHj=self.calculateEnergyFlows(equipe,1)
                 
                     SolFraCalc=USHj/self.QD_Tmax
-                logTrack ("ModuleST designAssistant: reached pointE")
+                logDebug ("ModuleST designAssistant: reached pointE")
 
                 nMaxiter=3
                 n=1
                 while n< nMaxiter:
-                    logTrack ("ModuleST designAssistant: reached pointF")
+                    logDebug ("ModuleST designAssistant: reached pointF")
                     USHj=self.calculateEnergyFlows(equipe,1)
-                    logTrack ("The total energy supplyed by the solar system is:'%s'" % USHj)
-                    logTrack ("At the averege temperature of:'%s'" % self.TavCollMean)
+                    logDebug ("The total energy supplyed by the solar system is:'%s'" % USHj)
+                    logDebug ("At the averege temperature of:'%s'" % self.TavCollMean)
                     SolFraCalc=USHj/self.QD_Tmax
                     A=equipe.HCGPnom/0.7
                     logTrack ("The aperture area is:'%s'" % A)
                     QuSolarUnitary=USHj/A
                     logTrack ("The QuSolarUnitary is:'%s'" % QuSolarUnitary)
                     if QuSolarUnitary < self.QuSolarUnitaryMin:
-                        logTrack ("ModuleST designAssistant: reached pointG")
+                        logDebug ("ModuleST designAssistant: reached pointG")
                         A=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
                         A=max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
                         logTrack ("The new aperture area is:'%s'" % A)
@@ -1482,7 +1503,7 @@ class ModuleST(object):
                     else:
 #                        test2=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
                         if abs(SolFraCalc-self.desiredSolarFraction) > 0.05:   #  In this way we reduce the solar fraction when it exceed 0.5: even if the QuSolarUnitary is good enough
-                            logTrack ("ModuleST designAssistant: reached pointH")
+                            logDebug("ModuleST designAssistant: reached pointH")
                             logTrack ("ModuleST designAssistant: SolFraCalc= '%s' self.desiredSolarFraction='%s'" %(SolFraCalc,self.desiredSolarFraction))
                             A1 = A*QuSolarUnitary/self.QuSolarUnitaryMin
                             A2 = A*self.desiredSolarFraction/SolFraCalc
@@ -1506,13 +1527,13 @@ class ModuleST(object):
 
                     n +=1
                 
-                logTrack ("ModuleST designAssistant: reached pointI")
+                logDebug("ModuleST designAssistant: reached pointI")
                 A=equipe.HCGPnom/0.7
                 NColl=int((A/selectedCollector.STAreaAper)+0.1)
                 equipe.HCGPnom = NColl*selectedCollector.STAreaAper*0.7
                 Status.SQL.commit()
                 USHj=self.calculateEnergyFlows(equipe,1)
-                logTrack ("ModuleST designAssistant: reached pointL")
+                logDebug ("ModuleST designAssistant: reached pointL")
 #------------------------------------------------------------------------------
 #   Here all the data to be displayed or registered are calculated.
 
@@ -1528,23 +1549,23 @@ class ModuleST(object):
                 Status.SQL.commit()
                 logTrack ("ModuleST designAssistant: reached pointM")
 
-                print ("The total heat supplied by the solar system in a year is:'%s'kWh"% USHj)
+#                print ("The total heat supplied by the solar system in a year is:'%s'kWh"% USHj)
                 SF=USHj/self.QD_Tmax
-                print "It corresponds to a solar fraction of:",SF
-                print ("The nominal power of the solar system is:'%s'kW" % equipe.HCGPnom)
+#                print "It corresponds to a solar fraction of:",SF
+#                print ("The nominal power of the solar system is:'%s'kW" % equipe.HCGPnom)
                 QuSolarUnitary=USHj/equipe.HCGPnom
-                print ("The yield of the solar system is:'%s'kWh/kw" %QuSolarUnitary)
-                print ("The averege working temperature of the system is'%s'°C" %self.TavCollMean)
-                print ("The collector is a '%s' of the '%s' "%(equipe.EquipTypeFromDB,equipe.Manufact))
+#                print ("The yield of the solar system is:'%s'kWh/kw" %QuSolarUnitary)
+#                print ("The averege working temperature of the system is'%s'°C" %self.TavCollMean)
+#                print ("The collector is a '%s' of the '%s' "%(equipe.EquipTypeFromDB,equipe.Manufact))
                 GT=800
                 dT=self.TavCollMean- self.TAmb
                 STc0 = selectedCollector.STc0
                 STc1 = selectedCollector.STc1
                 STc2 = selectedCollector.STc2
                 eta = collectorEfficiency(GT,dT,STc0,STc1,STc2)
-                print "Its efficiency is:", eta
+#                print "Its efficiency is:", eta
                 storVol = equipe.ST_Volume
-                print "The volume of the solar storage is:", storVol
+#                print "The volume of the solar storage is:", storVol
                 logTrack ("ModuleST designAssistant: reached pointN")
             else:
                 showWarning(_("The suitable surfaces are quite small. Einstein suggests not to install a solar system"))

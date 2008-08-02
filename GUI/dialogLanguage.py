@@ -103,7 +103,14 @@ class DialogLanguage(wx.Dialog):
         self.listBoxLang.Clear()
 
     def fillPage(self):
-	self.SetLangList([_('en-English'),_('de-Deutsch'),_('it-Italiano'),_('es-Castellano')])
+	self.SetLangList([_('en-English'),
+                          _('cat-Catalan'),
+                          _('cz-Czech'),
+                          _('de-Deutsch'),
+                          _('it-Italiano'),
+                          _('pl-Polish'),
+                          _('si-Slovenian'),
+                          _('es-Spanish')])
 
     def GetLanguage(self):
         return self.language

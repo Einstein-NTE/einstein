@@ -36,6 +36,7 @@ from math import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import Status
 from einstein.modules.constants import *
+from einstein.modules.messageLogger import *
 
 DEFAULTSCHEDULES = ["continuous","batch","batchCharge","batchDischarge"]
 DEFAULTCHARGETIME = 0.2 #20% of batch duration
@@ -162,8 +163,8 @@ class Schedule():
             self.fav[it] /= fsum
 
         if fabs(self.hop-self.HPerYear) > 1.0:
-            print "Schedule (normalize): WARNING - normalized operating hours (%s) different from specified in HPerYear (%s)"\
-                     %(self.hop,self.HPerYear)
+            logDebug("Schedule (normalize): WARNING - normalized operating hours (%s) different from specified in HPerYear (%s)"\
+                     %(self.hop,self.HPerYear))
 
         return fsum
 
@@ -205,7 +206,7 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                print "Schedule (setDefault): ERROR in schedule parameters"
+                logDebug("Schedule (setDefault): ERROR in schedule parameters")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
@@ -224,7 +225,7 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                print "Schedule (setDefault): ERROR in schedule parameters"
+                logDebug("Schedule (setDefault): ERROR in schedule parameters")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
@@ -243,7 +244,7 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                print "Schedule (setDefault): ERROR in schedule parameters"
+                logDebug("Schedule (setDefault): ERROR in schedule parameters")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
@@ -280,7 +281,7 @@ class Schedule():
                 else:
                     break
 
-        print "Schedule (setDefault): weekly profile created: %s"%self.weekly
+        logTrack("Schedule (setDefault): weekly profile created: %s"%self.weekly)
         
 #------------------------------------------------------------------------------		
 class Schedules(object):
@@ -314,11 +315,9 @@ class Schedules(object):
 #   calulates the Schedules of the processes
 #------------------------------------------------------------------------------		
 
-        print "Schedules (calcProcS): running"
+        logTrack("Schedules (calcProcS): running")
         
         processes = Status.prj.getProcesses()
-
-        print "-> %s processes found"%len(processes)
 
         self.procOpSchedules = []
         self.procStartUpSchedules = []
@@ -327,14 +326,12 @@ class Schedules(object):
         
         for process in processes:
 
-            print ("Schedules (calcProcS): process no. %s: ")%process.ProcNo,process.Process
-
 #..............................................................................
 # check if data are correct
 
             if process.ProcType == "continuous":
                 if process.NBatch != 1 or process.HBatch != process.HPerDayProc:
-                    print "Schedules (calculate): error in process schedule"
+                    logDebug("Schedules (calculate): error in process schedule")
                     process.HBatch = process.HPerDayProc
                     process.NBatch = 1
                     Status.SQL.commit()
@@ -408,15 +405,13 @@ class Schedules(object):
 #   calulates the Schedules of the processes
 #------------------------------------------------------------------------------		
 
-        print ("Schedules (calcEquipeSchedules): running")
+        logTrack("Schedules (calcEquipeSchedules): running")
         
         equipments = Status.prj.getEquipments()
 
         self.equipmentSchedules = []
         
         for equipe in equipments:
-
-            print ("Schedules (calcEquipeSchedules): eq. no. %s: ")%equipe.EqNo,equipe.Equipment
 
 #..............................................................................
 # schedule for equipment operation
@@ -437,15 +432,13 @@ class Schedules(object):
 #   calulates the Schedules of the electrical equipment w. waste heat
 #------------------------------------------------------------------------------		
 
-        print ("Schedules (calcWHEESchedules): running")
+        logTrack("Schedules (calcWHEESchedules): running")
         
         whees = Status.prj.getWHEEs()
 
         self.WHEESchedules = []
         
         for whee in whees:
-
-            print ("Schedules (calcEquipeSchedules): eq. no. %s: ")%whee.WHEENo,whee.WHEEName
 
 #..............................................................................
 # schedule for equipment operation

@@ -57,7 +57,7 @@ class PanelCS2(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS2 Plot','CS2 Table'] 
+        keys = ['CS2_Plot','CS2_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -70,7 +70,7 @@ class PanelCS2(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS2 Plot",                      # key for Interface
+                   'key'         : "CS2_Plot",                      # key for Interface
                    'title'       :_('Relative comparison of prosess & supply heat'), # title of the graph
                    'ylabel'      :_('[%]'),                   # y axis label
                    'legend'      :[_('UPH [% of present state]'),_('USH [% of present state]')],                   # y axis label
@@ -198,7 +198,7 @@ class PanelCS2(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS2 Table"]
+        data = Status.int.GData["CS2_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

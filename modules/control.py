@@ -204,25 +204,28 @@ def autoRun(parent):
 
     Status.mod.moduleST.initPanel()
     Status.mod.moduleST.updatePanel()
-#    Status.mod.moduleST.designAssistant1()
+    Status.int.GData.update({'ST Config':[50.,"<any>",300.0]})
+    Status.mod.moduleST.setUserDefinedPars()
+    Status.mod.moduleST.designAssistant1()
     
-    equipe = Status.mod.moduleST.addEquipmentDummy()
-    equipe.HCGPnom = 500.0
-    equipe.ST_SysEff = 0.9
-    equipe.ST_Volume = 25.0
-    equipe.ST_C0 = 0.80
-    equipe.ST_C1 = 3.80
-    equipe.ST_C2 = 0.01
-    equipe.ST_K50L = 0.95
-    equipe.ST_K50T = 0.95
-    Status.SQL.commit()
-
-#    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})
-#    Status.mod.moduleST.setSolarSystemPars()
+#    equipe = Status.mod.moduleST.addEquipmentDummy()
+#    equipe.HCGPnom = 500.0
+#    equipe.ST_SysEff = 0.9
+#    equipe.ST_Volume = 25.0
+#    equipe.ST_C0 = 0.80
+#    equipe.ST_C1 = 3.80
+#    equipe.ST_C2 = 0.01
+#    equipe.ST_K50L = 0.95
+#    equipe.ST_K50T = 0.95
+#    Status.SQL.commit()
 
     Status.mod.moduleST.updatePanel()
 
-#    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
+    Status.mod.moduleBB.updatePanel()
+
+    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.updatePanel()
 
     Status.mod.moduleEA.update()
     Status.main.tree.SelectItem(Status.main.qST, select=True)
@@ -255,7 +258,11 @@ def autoRun(parent):
 
 # Finally check the boiler dimensioning for the remaining heat demand
 
-#    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
+    Status.mod.moduleBB.updatePanel()
+
+    Status.mod.moduleBB.designAssistant()
+    Status.mod.moduleBB.updatePanel()
 
     Status.mod.moduleEA.update()
     Status.main.tree.SelectItem(Status.main.qHP, select=True)
@@ -297,22 +304,23 @@ def autoRun(parent):
 
     Status.mod.moduleST.initPanel()
     Status.mod.moduleST.updatePanel()
+    Status.int.GData.update({'ST Config':[50.,"<any>",300.0]})
+    Status.mod.moduleST.setUserDefinedPars()
+    Status.mod.moduleST.designAssistant1()
     
-    equipe = Status.mod.moduleST.addEquipmentDummy()
-    equipe.HCGPnom = 500.0
-    equipe.ST_SysEff = 0.9
-    equipe.ST_Volume = 25.0
-    equipe.ST_C0 = 0.80
-    equipe.ST_C1 = 3.80
-    equipe.ST_C2 = 0.01
-    equipe.ST_K50L = 0.95
-    equipe.ST_K50T = 0.95
-    Status.SQL.commit()
-
-#    Status.int.GData.update({'ST SysPars':[500.,0.9,25.0]})
-#    Status.mod.moduleST.setSolarSystemPars()
+#    equipe = Status.mod.moduleST.addEquipmentDummy()
+#    equipe.HCGPnom = 500.0
+#    equipe.ST_SysEff = 0.9
+#    equipe.ST_Volume = 25.0
+#    equipe.ST_C0 = 0.80
+#    equipe.ST_C1 = 3.80
+#    equipe.ST_C2 = 0.01
+#    equipe.ST_K50L = 0.95
+#    equipe.ST_K50T = 0.95
+#    Status.SQL.commit()
 
     Status.mod.moduleST.updatePanel()
+
     Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
     Status.mod.moduleBB.updatePanel()
 

@@ -55,7 +55,7 @@ class PanelCS4(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS4 Plot','CS4 Table'] 
+        keys = ['CS4_Plot','CS4_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -68,7 +68,7 @@ class PanelCS4(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS4 Plot",                      # key for Interface
+                   'key'         : "CS4_Plot",                      # key for Interface
                    'title'       :_('Investment cost'), # title of the graph
                    'ylabel'      :_('Total cost (Own+Subsidies)[EUR]'),  # y axis label
                    'legend'      :[_('Own cost [EUR]'),_('Subsidies [EUR]')],  # legend
@@ -195,7 +195,7 @@ class PanelCS4(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS4 Table"]
+        data = Status.int.GData["CS4_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

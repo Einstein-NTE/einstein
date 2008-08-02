@@ -60,7 +60,7 @@ def drawFigure(self):
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
 
-    data = Status.int.GData['EA4c Plot']
+    data = Status.int.GData['EA4c_Plot']
     for i in range(1,len(data)):
         if i == 0:
             linewidth = 3
@@ -84,7 +84,7 @@ class PanelEA4c(wx.Panel):
 #------------------------------------------------------------------------------
 
         self._init_ctrls(parent)
-        keys = ['EA4c Table','EA4c Plot']
+        keys = ['EA4c_Table','EA4c_Plot']
         self.mod = ModuleEA4(keys)
         self.mod.updatePanel()
 
@@ -94,7 +94,7 @@ class PanelEA4c(wx.Panel):
         labels_column = 0
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
-                   'key'         : 'EA4c Plot',                # key for Interface
+                   'key'         : 'EA4c_Plot',                # key for Interface
                    'title'       : _('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
@@ -144,10 +144,10 @@ class PanelEA4c(wx.Panel):
 # bring data to table
 
         try:
-            data = Status.int.GData['EA4c Table']
+            data = Status.int.GData['EA4c_Table']
             (rows,cols) = data.shape
         except:
-            logDebug("PanelEA4c: received corrupt data in key: EA4c Table")
+            logDebug("PanelEA4c: received corrupt data in key: EA4c_Table")
             (rows,cols) = (0,COLNO)
 
         print "PanelEA4c: data arriving"

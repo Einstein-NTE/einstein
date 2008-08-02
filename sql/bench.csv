@@ -1,178 +1,395 @@
-100;NACECode;UnitOp;ProductCode;Product;E_EnergyInt_MIN-PC;E_EnergyInt_MAX-PC;E_EnergyInt_TARG-PC;E_EnergyInt_MIN-T;E_EnergyInt_MAX-T;E_EnergyInt_TARG-T;E_SEC min;E_SEC max;E_SEC_TARG;E_Unit;H_EnergyInt_MIN-PC;H_EnergyInt_MAX-PC;H_EnergyInt_TARG-PC;H_EnergyInt_MIN-T;H_EnergyInt_MAX-T;H_EnergyInt_TARG-T;H_SEC min;H_SEC max;H_SEC_TARG;H_Unit;T_EnergyInt_MIN-PC;T_EnergyInt_MAX-PC;T_EnergyInt_TARG-PC;T_EnergyInt_MIN-T;T_EnergyInt_MAX-T;T_EnergyInt_TARG-T;T_SEC min;T_SEC max;T_SEC_TARG;T_Unit;Comments;YearReference;Reference;Literature;DataRelevance;TurnoverMin;TurnoverMax;ProductionMin;ProductionMax;ProductionUnit
-EXAMPLE;DA15.50;0101;DA010;Mozzarella cheese;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-101;NC1;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.2;;kWh/l;;;;;;;;;;
-102;NC2;UO0;;;;;;;;;;;1000;;;;;;;;;;900;;;;;;;;;;2130;kWh/t;;;;;;;;;;
-103;NC3;UO1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1;2;1;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+0;NACECode;UnitOp;ProductCode;Product;E_EnergyInt_MIN-PC;E_EnergyInt_MAX-PC;E_EnergyInt_TARG-PC;E_EnergyInt_MIN-T;E_EnergyInt_MAX-T;E_EnergyInt_TARG-T;E_SEC min;E_SEC max;E_SEC_TARG;E_Unit;H_EnergyInt_MIN-PC;H_EnergyInt_MAX-PC;H_EnergyInt_TARG-PC;H_EnergyInt_MIN-T;H_EnergyInt_MAX-T;H_EnergyInt_TARG-T;H_SEC min;H_SEC max;H_SEC_TARG;H_Unit;T_EnergyInt_MIN-PC;T_EnergyInt_MAX-PC;T_EnergyInt_TARG-PC;T_EnergyInt_MIN-T;T_EnergyInt_MAX-T;T_EnergyInt_TARG-T;T_SEC min;T_SEC max;T_SEC_TARG;T_Unit;Comments;YearReference;References;Literature;DataRelevance;TurnoverMin;TurnoverMax;ProductionMin;ProductionMax;ProductionUnit
+1;DA15.5;0000;DA010;Milk;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.2;;kWh/l;;2001;EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
 Italian contribution (2001). ""Consumption & emission data for meat and fruit and
-vegetables sectors"", personal communication.";;;;;;;
-104;NC3;UO2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0,5;1,5;0.5;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+vegetables sectors"", personal communication.";;;;;;
+2;DA15.1;0000;DA090;Canned meat and sousages;;;;;;;;;1000;;;;;;;;;;900;;;;;;;;;;2130;kWh/t;;2001;EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
 Italian contribution (2001). ""Consumption & emission data for meat and fruit and
-vegetables sectors"", personal communication.";;;;;;;
-105;NC3;UO3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2;4;2;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+vegetables sectors"", personal communication.";data for Denmark;;;;;
+3;DA15.1;112;DA090;Canned meat and sousages;;;;;;;;;;;;;;;;;;;;;;;;;;;1;2;1;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
 Italian contribution (2001). ""Consumption & emission data for meat and fruit and
-vegetables sectors"", personal communication.";;;;;;;
-106;NC3;UO4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;100;120;100;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+vegetables sectors"", personal communication.";data for Italy;;;;;
+4;DA15.1;112;DA090;Canned meat and sousages;;;;;;;;;;;;;;;;;;;;;;;;;;;0,5;1,5;0.5;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
 Italian contribution (2001). ""Consumption & emission data for meat and fruit and
-vegetables sectors"", personal communication.";;;;;;;
-107;NC3;UO5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;10;5;kWh/t;;;"data for Italy, BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+vegetables sectors"", personal communication.";data for Italy;;;;;
+5;DA15.1;501;DA090;Canned meat and sousages;;;;;;;;;;;;;;;;;;;;;;;;;;;2;4;2;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
 Italian contribution (2001). ""Consumption & emission data for meat and fruit and
-vegetables sectors"", personal communication.";;;;;;;
-108;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-109;NC4;UO6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;65;87;65;kWh/t;canning involves heating, cooling, production of ice, drying, evaporation and oil production ;;;;;;;;;
-110;NC4;UO7;;;;;;;;;;;;;;;;;;;;;;;;;;;;;150;190;150;kWh/t;;;;;;;;;;
-111;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-112;NC5;UO8;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23,89;kWh/hl;;;;;;;;;;
-113;NC5;UO9;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;25,56;kWh/hl;;;;;;;;;;
-114;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-115;NC6;UO1;;;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-116;NC6;UO10;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-117;NC6;UO11;;;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-118;NC6;UO12;;;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-119;NC6;UO13;;;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-120;NC6;UO3;;;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-121;NC6;UO14;;;;;;;;;7;8;7;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-122;NC6;UO4;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-123;NC6;UO15;;;;;;;;;1;2;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-124;NC6;UO16;;;;;;;;;;;;;;;;;;;200;300;200;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-125;NC6;UO11;;;;;;;;;;;;;;;;;;;;;100;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-126;NC6;UO13;;;;;;;;;;;;;;;;;;;;;60;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-127;NC6;UO3;;;;;;;;;;;;;;;;;;;450;500;450;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-128;NC6;UO14;;;;;;;;;;;;;;;;;;;120;200;120;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for canning tomatoes [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)] Italian contribution (2001). ""Consumption & emission data for meat and fruit and vegetables sectors"", personal communication. Italy (2003). ""Comments on the second draft""."
-129;NC7;UO1;;;;;;;;;;;0.4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-130;NC7;UO10;;;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-131;NC7;UO11;;;;;;;;;8;12;8;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-132;NC7;UO17;;;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-133;NC7;UO13;;;;;;;;;15;25;15;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-134;NC7;UO3;;;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-135;NC7;UO14;;;;;;;;;60;80;60;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-136;NC7;UO4;;;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-137;NC7;UO15;;;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-138;NC7;UO13;;;;;;;;;;;;;;;;;;;700;900;700;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-139;NC7;UO3;;;;;;;;;;;;;;;;;;;60;80;60;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-140;NC7;UO14;;;;;;;;;;;;;;;;;;;1500;1800;1500;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-141;NC7;UO4;;;;;;;;;;;;;;;;;;;;;10;;;;;;;;;;;kg steam/t;;;"Consumption and emission levels for manufacturing of tomatoe juice, puree and pasta [89, Italian contribution, 2001, 184, Italy, 2003 (Reference from BREF)]   All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3"
-142;NC8;UO1;;;;;;;;;20;65;20;;;;;;;;;;;;;;;;;;;;;kWhe/m3;;;
-143;NC8;UO1;;;;;;;;;;;;;;;;;;;;;26389;;;;;;;;;;;kWh/m2;;;
-144;NC8;UO18;;;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
-145;NC8;UO19;;;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
-146;NC8;UO20;;;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
-147;NC8;UO21;;;;;;;;;;;5;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
-148;NC8;UO22;;;;;;;;;;;8;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;
-149;NC8;UO23;;;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
-Vegetable Sector"", VITO."
-150;NC8;UO23;;;;;;;;;;;;;;;;;;;;;0.16;;;;;;;;;;;t/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
-Vegetable Sector"", VITO."
-151;NC8;UO24;;;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
-Vegetable Sector"", VITO."
-152;NC8;UO24;;;;;;;;;;;;;;;;;;;;;0.9;;;;;;;;;;;t/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
-Vegetable Sector"", VITO."
-153;NC8;UO25;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0;kWhe/t;;;"[32, Van Bael J., 1998] BREF Van Bael J. (1998). ""Memorandum on Energy Consumption in the Flemish Frozen
-Vegetable Sector"", VITO."
-154;NC8;UO26;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.5;kWhe/t;;;
-155;NC8;UO27;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.5;kWhe/t;;;
-156;NC8;UO28;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;;;
-157;NC8;UO29;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;;;
-158;NC8;UO30;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;kWhe/t;;;
-159;NC8;UO12;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4.625;kWhe/t;avarage of different sort;;
-160;NC9;UO31;;;;;;;;;;;;;;;;;;;;;;;;;;;;;40;92;40;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
-Milk Industry"", BMU, Hannover University, fdm/tm/65. "
-161;NC9;UO32;;;;;;;;;;;;;;;;;;;;;;;;;;;;;172;792;172;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
-Milk Industry"", BMU, Hannover University, fdm/tm/65. "
-162;NC9;UO33;;;;;;;;;;;;;;;;;;;;;;;;;;;;;142;375;142;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF, Germany (2002). ""Best Available Techniques Reference Document on the Food and
-Milk Industry"", BMU, Hannover University, fdm/tm/65. "
-163;NC9;UO34;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111;278;111;kWh/t;;;"[65, Germany, 2002, 109, CIAA-FEDIOL, 2002] from BREF Germany (2002). ""Best Available Techniques Reference Document on the Food and
-Milk Industry"", BMU, Hannover University, fdm/tm/65. "
-164;NC9;UO35;;;;;;;;;;;;;;;;;;;;;;;;;;;;;n.d.;;;kWh/t;;;
-165;NC10;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.45;0.07;kWh/l;;;"[42, Nordic Council of Ministers, et al., 2001]  from BREF, Nordic Council of Ministers; Korsström, E. and Lampi, M. (2001). ""BAT for Nordic
-dairy industry"", TemaNord 2001:586."
-166;NC11;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.12;0.82;0.12;kWh/l;;;"[42, Nordic Council of Ministers, et al., 2001]  from BREF, Nordic Council of Ministers; Korsström, E. and Lampi, M. (2001). ""BAT for Nordic
-dairy industry"", TemaNord 2001:586."
-167;NC12;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.18;0.92;0.18;kWh/l;;;
-168;NC13;UO0;;;;;;;;;140;220;140;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"[117, CIAA-UNAFPA, 2002, 150, Unione Industriali Pastai Italiani, 2002] from BREF, ""Comments to the first draft - pasta""."
-169;NC13;UO0;;;;;;;;;;;;;;;;;;;1.5;1.9;1.5;;;;;;;;;;;MJ/t;;;" CIAA-UNAFPA, 2002, ""Comments to the first draft - pasta""; Unione Industriali Pastai Italiani (2002) ""The efficient use of energy in the Italian pasta
-industry""."
-170;NC14;UO0;;;;;;;;;113.33;260;113.33;;;;;;;;;;;;;;;;;;;;;kWh/t;;;"CIAA-AAC-UFE (2002). ""Comments to the first draft - starch""."
-171;NC14;UO0;;;;;;;;;;;;;;;;;;;350;683.33;350;;;;;;;;;;;kWh/t;;;"CIAA-AAC-UFE (2002). ""Comments to the first draft - starch""."
-172;NC15;UO36;;;;;;;;;;;;;;;;;;;;;;;;;;;;;232;367;232;kWh/t beet ;;;"Nielsen E.H. Lehmann, M. (2002). ""BAT in the Danish sugar industry""."
-173;NC15;UO36;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1554;2379;1554;kWh/t sugar;;;"Nielsen E.H. Lehmann, M. (2002). ""BAT in the Danish sugar industry""."
-174;NC16;UO37;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23.33;31.3;23.33;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-175;NC16;UO38;;;;;;;;;;;;;;;;;;;;;;;;;;;;;6.94;12.78;6.94;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-176;NC16;UO39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;3.61;2.22;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-177;NC16;UO40;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1.11;2.22;1.11;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-178;NC16;UO41;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;4.72;2.22;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-179;NC16;UO42;;;;;;;;;;;;;;;;;;;;;;;;;;;;;9.17;12.78;9.17;kWh/hl beer;;;"Germany (2002). ""Best Available Techniques Reference Document on the Food and Milk Industry"", BMU, Hannover University, fdm/tm/65."
-180;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-181;NC17;UO0;;;;;;;;;68;176;68;;;;;;;;;;;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);;BREF Production of Iron and Steel
-182;NC17;UO0;;;;;;;;;;;;;;;;;;;1125;1920;1125;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);;
-183;NC18;UO0;;;;;;;;;51;128;51;;;;;;;;;;;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;;
-184;NC18;UO0;;;;;;;;;;;;;;;;;;;;;890.7;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;;
-185;NC19;UO0;;;;;;;;;20;170;20;;;;;;;;;;;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";;
-186;NC19;UO0;;;;;;;;;;;;;;;;;;;3260;4100;3260;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";;
-187;NC20;UO0;;;;;;;;;270;370;270;;;;;;;;;;;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";;
-188;NC20;UO0;;;;;;;;;;;;;;;;;;;1212;3500;1212;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";;
-189;NC21;UO0;;;;;;;;;38;120;38;;;;;;;;;;;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;;
-190;NC21;UO0;;;;;;;;;;;;;;;;;;;50;195;50;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;;
-191;NC22;UO0;;;;;;;;;;;;;;;;;;;;;0.051;;;;;;;;;;;GJ/t LS;"InfoMil, 1997; Information Centre for Environmental Licensing (InfoMil)
+vegetables sectors"", personal communication.";data for Italy;;;;;
+6;DA15.1;1701;DA090;Canned meat and sousages;;;;;;;;;;;;;;;;;;;;;;;;;;;100;120;100;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";data for Italy;;;;;
+7;DA15.1;106;DA090;Canned meat and sousages;;;;;;;;;;;;;;;;;;;;;;;;;;;5;10;5;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [89, Italian contribution, 2001] 
+Italian contribution (2001). ""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication.";data for Italy;;;;;
+8;DA15.2;1702;DA100;Fish and shellfish;;;;;;;;;;;;;;;;;;;;;;;;;;;65;87;65;kWh/t;The consumption of energy depends on the installation, the equipment and the fish manufacturing processes that take place. ;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [134, AWARENET, 2002] 
+AWARENET (2002). ""Tools for prevention and minimisation of agro-food wastes
+generation in European industry (This working draft is no longer available)"", GRD1-
+CT-2000-28033.";average;;;;;
+9;DA15.2;1703;DA100;Fish and shellfish;;;;;;;;;;;;;;;;;;;;;;;;;;;150;190;150;kWh/t;canning involves heating, cooling, production of ice, drying, evaporation and oil production ;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [134, AWARENET, 2002] 
+AWARENET (2002). ""Tools for prevention and minimisation of agro-food wastes
+generation in European industry (This working draft is no longer available)"", GRD1-
+CT-2000-28033.";average;;;;;
+10;DA15.96;101;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23,89;kWh/hl;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002]
+Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";German breweries with more than 20 employees;;;;;
+11;DA15.96;501;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;;;25,56;kWh/hl;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002]
+Germany (2002). ""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";German breweries with more than 20 employees;;;;;
+12;DA15.3;112;DA020;Tomatoes;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy;;;;;
+13;DA15.3;1801;DA020;Tomatoes;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy;;;;;
+14;DA15.3;1802;DA020;Tomatoes;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy;;;;;
+15;DA15.3;102;DA020;Tomatoes;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy;;;;;
+16;DA15.3;401;DA020;Tomatoes;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+17;DA15.3;501;DA020;Tomatoes;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+18;DA15.3;301;DA020;Tomatoes;;;;;;;7;8;7;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+19;DA15.3;1701;DA020;Tomatoes;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+20;DA15.3;304;DA020;Tomatoes;;;;;;;1;2;1;;;;;;;;;;;;;;;;;;;;;kWh/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+21;DA15.3;1703;DA020;Tomatoes;;;;;;;;;;;;;;;;;200;300;200;;;;;;;;;;;kg steam/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+22;DA15.3;1802;DA020;Tomatoes;;;;;;;;;;;;;;;;;;;100;;;;;;;;;;;kg steam/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+23;DA15.3;401;DA020;Tomatoes;;;;;;;;;;;;;;;;;;;60;;;;;;;;;;;kg steam/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+24;DA15.3;501;DA020;Tomatoes;;;;;;;;;;;;;;;;;450;500;450;;;;;;;;;;;kg steam/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+25;DA15.3;301;DA020;Tomatoes;;;;;;;;;;;;;;;;;120;200;120;;;;;;;;;;;kg steam/t;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+26;DA15.3;112;DA020;Tomatoe Juice, puree and paste;;;;;;;;;0.4;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+27;DA15.3;1801;DA020;Tomatoe Juice, puree and paste;;;;;;;;;1.5;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+28;DA15.3;1802;DA020;Tomatoe Juice, puree and paste;;;;;;;8;12;8;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+29;DA15.3;1803;DA020;Tomatoe Juice, puree and paste;;;;;;;;;2.5;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+30;DA15.3;401;DA020;Tomatoe Juice, puree and paste;;;;;;;15;25;15;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+31;DA15.3;501;DA020;Tomatoe Juice, puree and paste;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+32;DA15.3;301;DA020;Tomatoe Juice, puree and paste;;;;;;;60;80;60;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+33;DA15.3;1701;DA020;Tomatoe Juice, puree and paste;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+34;DA15.3;304;DA020;Tomatoe Juice, puree and paste;;;;;;;4;5;4;;;;;;;;;;;;;;;;;;;;;kWh/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+35;DA15.3;401;DA020;Tomatoe Juice, puree and paste;;;;;;;;;;;;;;;;;700;900;700;;;;;;;;;;;kg steam/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+36;DA15.3;501;DA020;Tomatoe Juice, puree and paste;;;;;;;;;;;;;;;;;60;80;60;;;;;;;;;;;kg steam/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+37;DA15.3;301;DA020;Tomatoe Juice, puree and paste;;;;;;;;;;;;;;;;;1500;1800;1500;;;;;;;;;;;kg steam/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+38;DA15.3;1701;DA020;Tomatoe Juice, puree and paste;;;;;;;;;;;;;;;;;;;10;;;;;;;;;;;kg steam/t;"All figures are referred to 1 t of 28 – 30 Brix tomato puree. Conversion coefficients for other final products: 7 – 12 Brix puree – multiply by 0.3; 20 – 22 Brix puree – multiply by 0.7, 36 – 40 Brix puree – multiply by 1.3";2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[89, Italian contribution, 2001; 184, Italy, 2003
+""Consumption & emission data for meat and fruit and
+vegetables sectors"", personal communication; ""Comments on the second draft"".";data for Italy
+39;DA15.3;112;DA020;Frozen vegetables;;;;;;;20;65;20;;;;;;;;;;;;;;;;;;;;;kWhe/m3 storage/year;;;;;
+40;DA15.3;112;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;26389;;;;;;;;;;;kWh/m2 storage/year;;;;;
+41;DA15.3;1801;DA020;Frozen vegetables;;;;;;;;;1;;;;;;;;;;;;;;;;;;;;;kWhe/t;Electricity consumption during the sorting of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+42;DA15.3;1801;DA020;Frozen vegetables;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;Electricity consumption during the sorting of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+43;DA15.3;1801;DA020;Frozen vegetables;;;;;;;;;4;;;;;;;;;;;;;;;;;;;;;kWhe/t;Electricity consumption during the sorting of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+44;DA15.3;1801;DA020;Frozen vegetables;;;;;;;;;5;;;;;;;;;;;;;;;;;;;;;kWhe/t;Electricity consumption during the sorting of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+45;DA15.3;1801;DA020;Frozen vegetables;;;;;;;;;8;;;;;;;;;;;;;;;;;;;;;kWhe/t;Electricity consumption during the sorting of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+46;DA15.3;1804;DA020;Frozen vegetables;;;;;;;;;2;;;;;;;;;;;;;;;;;;;;;kWhe/t;;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+47;DA15.3;1804;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;0.16;;;;;;;;;;;t/t;;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+48;DA15.3;1805;DA020;Frozen vegetables;;;;;;;;;3.5;;;;;;;;;;;;;;;;;;;;;kWhe/t;;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+49;DA15.3;1805;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;0.9;;;;;;;;;;;t/t;;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+50;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+51;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.5;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+52;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2.5;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+53;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+54;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+55;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;kWhe/t;Electricity consumption for the washing of vegetables;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+56;DA15.3;102;DA020;Frozen vegetables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4.625;kWhe/t;Electricity consumption of mechanical processing of vegetables before freezing;1998; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries[32, Van Bael J., 1998]
+""Memorandum on Energy Consumption in the Flemish Frozen
+Vegetable Sector"", VITO";
+57;DA15.41;1806;DA020;Crude vegetable oil refining;;;;;;;;;;;;;;;;;;;;;;;;;;;40;92;40;kWh/t;Energy consumption in crude vegetable oil refining;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002, 109, CIAA-FEDIOL, 2002]
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";data for Germany
+58;DA15.41;1807;DA020;Crude vegetable oil refining;;;;;;;;;;;;;;;;;;;;;;;;;;;172;792;172;kWh/t;Energy consumption in crude vegetable oil refining;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002, 109, CIAA-FEDIOL, 2002]
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";data for Germany
+59;DA15.41;303;DA020;Crude vegetable oil refining;;;;;;;;;;;;;;;;;;;;;;;;;;;142;375;142;kWh/t;Energy consumption in crude vegetable oil refining;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002, 109, CIAA-FEDIOL, 2002]
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";data for Germany
+60;DA15.41;1808;DA020;Crude vegetable oil refining;;;;;;;;;;;;;;;;;;;;;;;;;;;111;278;111;kWh/t;Energy consumption in crude vegetable oil refining;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002, 109, CIAA-FEDIOL, 2002]
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65.";data for Germany
+61;DA15.5;0000;DA010;Market milk and joughurt;;;;;;;;;;;;;;;;;;;;;;;;;;;0.07;0.45;0.07;kWh/l;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [42, Nordic Council of Ministers, et al., 2001] 
+""BAT for Nordic dairy industry"", TemaNord 2001:586.";Sweden, Denmark, Finland, Norway avarage
+62;DA15.51;0000;DA010;Cheese and whey;;;;;;;;;;;;;;;;;;;;;;;;;;;0.12;0.82;0.12;kWh/l;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [42, Nordic Council of Ministers, et al., 2001] 
+""BAT for Nordic dairy industry"", TemaNord 2001:586.";Sweden, Denmark, Finland, Norway avarage
+63;DA15.8;0000;DA010;Milk and whey powder;;;;;;;;;;;;;;;;;;;;;;;;;;;0.18;0.92;0.18;kWh/l;;2001; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [42, Nordic Council of Ministers, et al., 2001] 
+""BAT for Nordic dairy industry"", TemaNord 2001:586.";Sweden, Denmark, Finland, Norway avarage
+64;DA15.82;0000;DA070;Dry pasta;;;;;;;140;220;140;;;;;;;;;;;;;;;;;;;;;kWh/t;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [117, CIAA-UNAFPA, 2002, 150, Unione Industriali Pastai Italiani, 2002] 
+""Comments to the first draft - pasta""; Unione Industriali Pastai Italiani (2002). ""The efficient use of energy in the Italian pasta
+industry"".";data for Italy
+65;DA15.82;0000;DA070;Dry pasta;;;;;;;;;;;;;;;;;1.5;1.9;1.5;;;;;;;;;;;MJ/t;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [117, CIAA-UNAFPA, 2002, 150, Unione Industriali Pastai Italiani, 2002] 
+""Comments to the first draft - pasta""; Unione Industriali Pastai Italiani (2002). ""The efficient use of energy in the Italian pasta
+industry"".";data for Italy
+66;DA15.62;0000;DA070;Starch;;;;;;;113.33;260;113.33;;;;;;;;;;;;;;;;;;;;;kWh/t;Energy consumption in the starch industry;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries CIAA-AAC-UFE (2002).
+""Comments to the first draft - starch"".";general
+67;DA15.62;0000;DA070;Starch;;;;;;;;;;;;;;;;;350;683.33;350;;;;;;;;;;;kWh/t;Energy consumption in the starch industry;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries CIAA-AAC-UFE (2002).
+""Comments to the first draft - starch"".";general
+68;DA15.83;1901;DA070;Sugar;;;;;;;;;;;;;;;;;;;;;;;;;;;232;367;232;kWh/t beet ;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [139, Nielsen E.H. Lehmann, 2002]
+""BAT in the Danish sugar industry"".";Danish sugar industry
+69;DA15.83;1901;DA070;Sugar;;;;;;;;;;;;;;;;;;;;;;;;;;;1554;2379;1554;kWh/t sugar;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [139, Nielsen E.H. Lehmann, 2002]
+""BAT in the Danish sugar industry"".";Danish sugar industry
+70;DA15.96;1902;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;23.33;31.3;23.33;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+71;DA15.96;1703;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;6.94;12.78;6.94;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+72;DA15.96;1704;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;3.61;2.22;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+73;DA15.96;2001;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;1.11;2.22;1.11;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+74;DA15.96;2002;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;2.22;4.72;2.22;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+75;DA15.96;0000;DA040;Beer;;;;;;;;;;;;;;;;;;;;;;;;;;;9.17;12.78;9.17;kWh/hl beer;;2002; EU-IPPC BREFS Food, Drink and Milk Industries;"BREF Food, Drink and Milk Industries [65, Germany, 2002] from BREF p. 206
+""Best Available Techniques Reference Document on the Food and
+Milk Industry"", BMU, Hannover University, fdm/tm/65. ";German breweries with more than 20 employees
+76;DJ27.1;0000;DJ;sinter plants;;;;;;;68;176;68;;;;;;;;;;;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;The European Blast Furnace Committee survey of the operational data for sinter plants (1996)
+77;DJ27.1;0000;DJ;sinter plants;;;;;;;;;;;;;;;;;1125;1920;1125;;;;;;;;;;;MJ/t sinter;operational data for sinter plants (1996);2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;The European Blast Furnace Committee survey of the operational data for sinter plants (1996)
+78;DJ27.1;0000;DJ;Pelletisation plant;;;;;;;51;128;51;;;;;;;;;;;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;data from1996 to 1998
+79;DJ27.1;0000;DJ;Pelletisation plant;;;;;;;;;;;;;;;;;;;890.7;;;;;;;;;;;MJ/t Pel;Input/output-data from the five pelletisation plant in the EU 15;2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;data from1996 to 1998
+80;DJ27.1;0000;DJ;coke oven plants;;;;;;;20;170;20;;;;;;;;;;;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;"data from 1996;";;;;;;
+81;DJ27.1;0000;DJ;coke oven plants;;;;;;;;;;;;;;;;;3260;4100;3260;;;;;;;;;;;MJ/t coke;"Input/output-data from eleven coke oven plants in four different EU Member States;";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;"data from 1996;";;;;;;
+82;DJ27.1;0000;DJ;blast furnances;;;;;;;270;370;270;;;;;;;;;;;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;Data from 1996;;;;;;
+83;DJ27.1;0000;DJ;blast furnances;;;;;;;;;;;;;;;;;1212;3500;1212;;;;;;;;;;;MJ/t pig iron;"Input/output data from four existing blast furnaces in four different EU Member States;";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;Data from 1996;;;;;;
+84;DJ27.1;0000;DJ;basic oxigen steelmaking and casting;;;;;;;38;120;38;;;;;;;;;;;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;Data refer to 1996;;;;;;
+85;DJ27.1;0000;DJ;basic oxigen steelmaking and casting;;;;;;;;;;;;;;;;;50;195;50;;;;;;;;;;;MJ/t LS;Input/output-data from four existing basic oxygen steelmaking plants in four different;2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;Data refer to 1996;;;;;;
+86;DJ27.1;0000;DJ;basic iron and steel and of ferro-alloys;;;;;;;;;;;;;;;;;;;0.051;;;;;;;;;;;GJ/t LS;"InfoMil, 1997; Information Centre for Environmental Licensing (InfoMil)
 Dutch Notes on BAT for the Production of Primary Iron and Steel
 Final report, prepared for the Ministry of Housing, Spatial Planning and the Environment,
-Directorate for Air and Energy, Department of Industry (1997)";;
-192;NC22;UO0;;;;;;;;;;;0.08;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;;
-193;NC23;UO0;;;;;;;;;;;;;;;;;;;;;0.02;;;;;;;;;;;GJ/t LS;;;
-194;NC23;UO0;;;;;;;;;;;0.04;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;;
-195;NC24;UO0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2300;2700;;MJ/t ;Input/output data for electric arc furnaces for the production of carbon steel compiled
-196;NC24;UO0;;;;;;;;;1250;1800;1250;;;;;;;;;;;;;;;;;;;;;MJ/t ;from various references indicated in the footnotes
-197;NC24;UO0;;;;;;;;;;;;;;;;;;;24;47;24;;;;;;;;;;;m3/t oxigen;
-198;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-199;NC25;UO43;;;;;;;;;;;45;kWh/t;;;;;;;;;200;MJ/t;;;;;;;;;;;
-200;NC25;UO44;;;;;;;;;;;64;kWh/t;;;;;;;;;1700;MJ/t;;;;;;;;;;;
-201;NC25;UO45;;;;;;;;;;;45;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
-202;NC25;UO46;;;;;;;;;;;21;kWh/t;;;;;;;;;4000;MJ/t;;;;;;;;;;;
-203;NC25;UO47;;;;;;;;;;;48;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;
-204;NC25;UO48;;;;;;;;;;;23;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
-205;NC25;UO49;;;;;;;;;;;14;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
-206;NC25;UO50;;;;;;;;;;;7;kWh/t;;;;;;;;;1500;MJ/t;;;;;;;;;;;
-207;NC25;UO51;;;;;;;;;;;133;kWh/t;;;;;;;;;2600;MJ/t;;;;;;;;;;;
-208;NC25;UO52;;;;;;;;;;;200;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;
-209;NC25;UO53;;;;;;;;;;;350;kWh/t;;;;;;;;;5800;MJ/t;;;;;;;;;;;
-210;NC26;UO43;;;;;;;;;;;55;kWh/ADt;;;;;;;;;150;MJ/ADt;;;;;;;;;;;
-211;NC26;UO44;;;;;;;;;;;65;kWh/ADt;;;;;;;;;2050;MJ/ADt
-212;NC26;UO45;;;;;;;;;;;55;kWh/ADt;;;;;;;;;0;MJ/ADt
-213;NC26;UO54;;;;;;;;;;;45;kWh/ADt;;;;;;;;;400;MJ/ADt
-214;NC26;UO35;;;;;;;;;;;83;kWh/ADt;;;;;;;;;500;MJ/ADt
-215;NC26;UO55;;;;;;;;;;;6;kWh/ADt;;;;;;;;;70;MJ/ADt
-216;NC26;UO56;;;;;;;;;;;40;kWh/ADt;;;;;;;;;0;MJ/ADt
-217;NC26;UO57;;;;;;;;;;;105;kWh/ADt;;;;;;;;;2850;MJ/ADt
-218;NC26;UO58;;;;;;;;;;;30;kWh/ADt;;;;;;;;;4100;MJ/ADt
-219;NC26;UO59;;;;;;;;;;;60;kWh/ADt;;;;;;;;;610;MJ/ADt
-220;NC26;UO60;;;;;;;;;;;30;kWh/ADt;;;;;;;;;0;MJ/ADt
-221;NC26;UO61;;;;;;;;;;;20;kWh/ADt;;;;;;;;;0;MJ/ADt
-222;NC26;UO62;;;;;;;;;;;10;kWh/ADt;;;;;;;;;1500;MJ/ADt
-223;NC26;UO63;;;;;;;;;;;136;kWh/ADt;;;;;;;;;2170;MJ/ADt
-224;NC27;UO43;;;;;;;;;;;46;kWh/t;;;;;;;;;230;MJ/t
-225;NC27;UO44;;;;;;;;;;;55;kWh/t;;;;;;;;;1800;MJ/t
-226;NC27;UO45;;;;;;;;;;;46;kWh/t;;;;;;;;;0;MJ/t
-227;NC27;UO54;;;;;;;;;;;38;kWh/t;;;;;;;;;400;MJ/t;;;;;;;;;;;;;
-228;NC27;UO35;;;;;;;;;;;70;kWh/t;;;;;;;;;500;MJ/t;;;;;;;;;;;;;
-229;NC27;UO55;;;;;;;;;;;5;kWh/t;;;;;;;;;70;MJ/t;;;;;;;;;;;;;
-230;NC27;UO56;;;;;;;;;;;34;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-231;NC27;UO57;;;;;;;;;;;0;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-232;NC27;UO58;;;;;;;;;;;25;kWh/t;;;;;;;;;3600;MJ/t;;;;;;;;;;;;;
-233;NC27;UO59;;;;;;;;;;;51;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;;;
-234;NC27;UO60;;;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-235;NC27;UO61;;;;;;;;;;;17;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-236;NC27;UO62;;;;;;;;;;;8;kWh/t;;;;;;;;;1300;MJ/t;;;;;;;;;;;;;
-237;NC27;UO63;;;;;;;;;;;115;kWh/t;;;;;;;;;1900;MJ/t;;;;;;;;;;;;;
-238;NC27;UO52;;;;;;;;;;;250;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-239;NC27;UO53;;;;;;;;;;;420;kWh/t;;;;;;;;;7100;MJ/t;;;;;;;;;;;;;
-240;NC28;UO43;;;;;;;;;;;50;kWh/t;;;;;;;;;150;MJ/t;;;;;;;;;;;;;[SEPA-Report 4712-4, 1997]Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997
-241;NC28;UO64;;;;;;;;;;;2110;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-242;NC28;UO45;;;;;;;;;;;50;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;;;
-243;NC28;UO35;;;;;;;;;;;75;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
-244;NC28;UO55;;;;;;;;;;;5;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
-245;NC28;UO56;;;;;;;;;;;35;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
-246;NC28;UO60;;;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
-247;NC28;UO52;;;;;;;;;;;235;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;
-248;NC28;UO53;;;;;;;;;;;350;kWh/t;;;;;;;;;5300;MJ/t;;;;;;;;;;
-249;NC29;UO43;;;;;;;;;;;;;;;;;;;;;;;;;;;;;20;30;20;kWh/Adt
-250;NC29;UO65;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1600;1900;1600;kWh/Adt
-251;NC29;UO66;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;500;kWh/Adt
+Directorate for Air and Energy, Department of Industry (1997)";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;;;;;;;
+87;DJ27.1;0000;DJ;basic iron and steel and of ferro-alloys;;;;;;;;;0.08;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;;;;;;;
+88;DJ27.52;0000;DJ;casting;;;;;;;;;;;;;;;;;;;0.02;;;;;;;;;;;GJ/t LS;;2001;EU-IPPC BREFS Iron and Steel;"BREF Iron and Steel [InfoMil, 1997]
+Information Centre for Environmental Licensing (InfoMil)
+Dutch Notes on BAT for the Production of Primary Iron and Steel
+Final report, prepared for the Ministry of Housing, Spatial Planning and the Environment,
+Directorate for Air and Energy, Department of Industry (1997)";;;;;;;
+89;DJ27.52;0000;DJ;casting;;;;;;;;;0.04;;;;;;;;;;;;;;;;;;;;;GJ/t LS;;2001;EU-IPPC BREFS Iron and Steel;"BREF Iron and Steel [InfoMil, 1997]
+Information Centre for Environmental Licensing (InfoMil)
+Dutch Notes on BAT for the Production of Primary Iron and Steel
+Final report, prepared for the Ministry of Housing, Spatial Planning and the Environment,
+Directorate for Air and Energy, Department of Industry (1997)";;;;;;;
+90;DJ27.1;0000;DJ;electric ARC furnace;;;;;;;;;;;;;;;;;;;;;;;;;;;2300;2700;;MJ/t ;"Input/output data for electric arc furnaces for the production of carbon steel compiled 
+from various references indicated in the footnotes";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;;;;;;;
+91;DJ27.1;0000;DJ;electric ARC furnace;;;;;;;1250;1800;1250;;;;;;;;;;;;;;;;;;;;;MJ/t ;"Input/output data for electric arc furnaces for the production of carbon steel compiled 
+from various references indicated in the footnotes";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;;;;;;;
+92;DJ27.1;0000;DJ;electric ARC furnace;;;;;;;;;;;;;;;;;24;47;24;;;;;;;;;;;m3/t oxigen;"Input/output data for electric arc furnaces for the production of carbon steel compiled 
+from various references indicated in the footnotes";2001;EU-IPPC BREFS Iron and Steel;BREF Iron and Steel;;;;;;;
+93;DE21.11;112;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;45;kWh/t;;;;;;;;;200;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;;;
+94;DE21.11;701;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;64;kWh/t;;;;;;;;;1700;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;;;
+95;DE21.11;102;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;45;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;;;
+96;DE21.11;301;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;21;kWh/t;;;;;;;;;4000;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+97;DE21.11;901;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;48;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+98;DE21.11;901;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;23;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+99;DE21.11;1804;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;14;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+100;DE21.11;804;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;7;kWh/t;;;;;;;;;1500;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+101;DE21.11;0000;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;133;kWh/t;;;;;;;;;2600;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+102;DE21.11;1809;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;200;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+103;DE21.11;1810;DE010;Kraft (sulphate) pulping process: Unbleached kraft pulp production with integrated production of paperboard;;;;;;;;;350;kWh/t;;;;;;;;;5800;MJ/t;;;;;;;;;;;"Average energy consumption for the production of 243000 ADt/a unbleached Kraft
+pulp, and integrated production of 250000 t/a paperboard";;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+104;DE21.11;112;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;55;kWh/ADt;;;;;;;;;150;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+105;DE21.11;701;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;65;kWh/ADt;;;;;;;;;2050;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+106;DE21.11;102;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;55;kWh/ADt;;;;;;;;;0;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+107;DE21.11;1811;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;45;kWh/ADt;;;;;;;;;400;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+108;DE21.11;1501;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;83;kWh/ADt;;;;;;;;;500;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+109;DE21.11;1501;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;6;kWh/ADt;;;;;;;;;70;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+110;DE21.11;1501;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;40;kWh/ADt;;;;;;;;;0;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+111;DE21.11;201;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;105;kWh/ADt;;;;;;;;;2850;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+112;DE21.11;301;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;30;kWh/ADt;;;;;;;;;4100;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+113;DE21.11;901;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;60;kWh/ADt;;;;;;;;;610;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+114;DE21.11;901;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;30;kWh/ADt;;;;;;;;;0;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+115;DE21.11;1812;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;20;kWh/ADt;;;;;;;;;0;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+116;DE21.11;804;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;10;kWh/ADt;;;;;;;;;1500;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+117;DE21.11;0000;DE020;Kraft (sulphate) pulping process: Non-integrated production of bleached kraft pulp;;;;;;;;;136;kWh/ADt;;;;;;;;;2170;MJ/ADt;;;;;;;;;;;Energy consumption for non-integrated 250000 ADt/a bleached Kraft pulp;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+118;DE21.11;112;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;46;kWh/t;;;;;;;;;230;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+119;DE21.11;701;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;55;kWh/t;;;;;;;;;1800;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+120;DE21.11;102;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;46;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+121;DE21.11;1811;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;38;kWh/t;;;;;;;;;400;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+122;DE21.11;1501;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;70;kWh/t;;;;;;;;;500;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+123;DE21.11;1501;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;5;kWh/t;;;;;;;;;70;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+124;DE21.11;1501;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;34;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+125;DE21.11;201;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;0;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+126;DE21.11;301;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;25;kWh/t;;;;;;;;;3600;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+127;DE21.11;901;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;51;kWh/t;;;;;;;;;600;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills;;;;
+128;DE21.11;901;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+129;DE21.11;1812;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;17;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+130;DE21.11;804;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;8;kWh/t;;;;;;;;;1300;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+131;DE21.11;0000;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;115;kWh/t;;;;;;;;;1900;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+132;DE21.11;1809;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;250;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+133;DE21.11;1810;DE030;Kraft (sulphate) pulping process: Bleached kraft pulp with integrated production of uncoated fine paper;;;;;;;;;420;kWh/t;;;;;;;;;7100;MJ/t;;;;;;;;;;;Energy consumption for an integrated bleached Kraft mill with 250000 t/a of surfacesized uncoated fine paper.;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper;data for Swedish mills
+134;DE21.11;112;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;50;kWh/t;;;;;;;;;150;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+135;DE21.11;1813;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;2110;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+136;DE21.11;102;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;50;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+137;DE21.11;1501;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;75;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+138;DE21.11;1501;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;5;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+139;DE21.11;1501;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;35;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+140;DE21.11;901;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;25;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+141;DE21.11;1809;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;235;kWh/t;;;;;;;;;0;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+142;DE21.11;1810;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;350;kWh/t;;;;;;;;;5300;MJ/t;;;;;;;;;;;Energy consumption in an integrated mill with a production capacity of 500000 t/a newsprint from TMP;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA-Report 4712-4, 1997]
+Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997";1997
+143;DE21.11;112;DE040;A modern Finnish integrated CTMP mill;;;;;;;;;;;;;;;;;;;;;;;;;;;20;30;20;kWh/Adt;A modern Finnish integrated CTMP mill;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper ;A modern Finnish integrated CTMP mill
+144;DE21.11;1813;DE040;A modern Finnish integrated CTMP mill;;;;;;;;;;;;;;;;;;;;;;;;;;;1600;1900;1600;kWh/Adt;A modern Finnish integrated CTMP mill;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper ;A modern Finnish integrated CTMP mill
+145;DE21.11;1501;DE040;A modern Finnish integrated CTMP mill;;;;;;;;;;;;;;;;;;;;;;;;;;;;;500;kWh/Adt;A modern Finnish integrated CTMP mill;2001;EU-IPPC BREFS Pulp and Paper;BREF Pulp and paper ;A modern Finnish integrated CTMP mill
+146;DE21.11;1803;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1100;2200;1100;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+147;DE21.11;1803;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1100;2200;1100;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+148;DE21.11;0000;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1100;2300;1100;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+149;DE21.11;0000;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1600;3000;1600;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+150;DE21.11;1803;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1800;3600;1800;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+151;DE21.11;1803;DE040;Mechanical pulping and chemi-mechanical pupling ml CSF;;;;;;;;;;;;;;;;;;;;;;;;;;;1000;4300;1000;kWh/t of pulp;Energy consumption in mechanical pulping;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [TEKES, 1997]
+";These figures are only average numbers, which may deviate ±10%, due to local mill circumstances and also due to measuring inaccuracies
+152;DE21.11;0000;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;1;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+153;DE21.11;1803;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;39;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+154;DE21.11;1801;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+155;DE21.11;1801;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;17;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+156;DE21.11;2101;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;18;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+157;DE21.11;102;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;8;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+158;DE21.11;2102;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;not required;;;;;;
+159;DE21.11;1814;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;55;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+160;DE21.11;2101;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;5;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+161;DE21.11;102;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;10;kWh/t of DIP pulp;Modern equipment is applied. Note that the energy consumption depends on the raw materials used, the stock preration lay out, the installed equipment, and the product properties to be achieved The figures include the stock praparation only and not the paper machine. ;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of tissue  from recovered paper 
+162;DE21.11;0000;DE050;Recovered Paper Processing (RCF based paper mills) - Tissue DIP-line (200 t/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;not included;;;;;;
+163;DE21.11;0000;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;0.4;kWh/t (drum pulper);;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+164;DE21.11;1803;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;16;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+165;DE21.11;1801;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;18.5;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+166;DE21.11;1801;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;22;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+167;DE21.11;2101;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;33;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+168;DE21.11;102;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;No washing;;;;;;
+169;DE21.11;2102;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;1;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+170;DE21.11;1814;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;67;kWh/t2;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+171;DE21.11;2101;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;19;kWh/t;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+172;DE21.11;102;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;No washing;;;;;;
+173;DE21.11;0000;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;;;;;;;;;;;;;;;;;;;;;;;91;kWh/t 4);;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [data from Valmet]
+";production of newsprint from recovered paper 
+174;DE21.11;1605;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;175;;;kWh/Adt;;;;;;;200;;;MJ/Adt;;;;;;;;;;;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";Base year: 1995 Swedish mill
+175;DE21.11;102;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;50;;;kWh/Adt;;;;;;;0;;;MJ/Adt;;;;;;;;;;;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";Base year: 1995 Swedish mill
+176;DE21.11;1501;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;75;;;kWh/Adt;;;;;;;0;;;MJ/Adt;;;;;;;;;;;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";Base year: 1995 Swedish mill
+177;DE21.11;1809;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;235;;;kWh/Adt;;;;;;;0;;;MJ/Adt;;;;;;;;;;;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";Base year: 1995 Swedish mill
+178;DE21.11;1810;DE050;Recovered Paper Processing (RCF based paper mills) - Newsprint DIP-line (1000/d);;;;;;;350;;;kWh/Adt;;;;;;;5300;;;MJ/Adt;;;;;;;;;;;;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";Base year: 1995 Swedish mill
+179;DE21.11;0000;DE060;Papermaking and relates processes (non-integrated paper mill);;;;;;;674;;;kWh/t;;;;;;;2222;;;kWh/t;;;;;;;;;;;"This figure does not yet take into account the losses when transferring the energy of fossil fuels into electricity. When
+converting purchased electricity into primary energy consumption an energy yield of the electricity generating companies of
+36.75%, can be assumed. In this case an electricity consumption of 674 kWh/t corresponds to 1852 kWh/t primary energy (e.g.coal).";2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";The total demand for energy (consumption) in the form of heat (steam) and electric power
+180;DE21.11;1809;DE060;Papermaking and relates processes (non-integrated paper mill);;;;;;;202;;;kWh/t;;;;;;;0;;;MJ/t;;;;;;;;;;;Energy consumption in a non-integrated coated paper mill with a production capacity of 125000t/a;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";nonintegrated fine paper mill
+181;DE21.11;1810;DE060;Papermaking and relates processes (non-integrated paper mill);;;;;;;350;;;kWh/t;;;;;;;8000;;;MJ/t;;;;;;;;;;;Energy consumption in a non-integrated coated paper mill with a production capacity of 125000t/a;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";nonintegrated fine paper mill
+182;DE21.11;1217;DE060;Papermaking and relates processes (non-integrated paper mill);;;;;;;118;;;kWh/t;;;;;;;0;;;MJ/t;;;;;;;;;;;Energy consumption in a non-integrated coated paper mill with a production capacity of 125000t/a;2001;EU-IPPC BREFS Pulp and Paper;"BREF Pulp and paper [SEPA Report 4712-4, 1997]
+""Energy conservation in the pulp and paper industry, Jaakko Pöyry Consulting AB. 1997""";nonintegrated fine paper mill
+183;DE21.11;2201;DE060;Papermaking and relates processes (non-integrated paper mill);;;;;;;0;;;kWh/t;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

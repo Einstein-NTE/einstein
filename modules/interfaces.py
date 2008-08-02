@@ -237,7 +237,7 @@ class Interfaces(object):
 
         logTrack("Interfaces (initCascadeArrays): creating cascade of size %s"%cascadeSize)
         if self.cascadeUpdateLevel < 0:
-            print "Interfaces (initCascadeArrays): demand profile not yet created"
+            logDebug("Interfaces (initCascadeArrays): demand profile not yet created")
             Status.processData.createAggregateDemand()
 
         self.QD_Tt_mod = []      

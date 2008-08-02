@@ -56,7 +56,7 @@ class PanelCS3(wx.Panel):
     def __init__(self, parent):
 #------------------------------------------------------------------------------		
         self._init_ctrls(parent)
-        keys = ['CS3 Plot','CS3 Table'] 
+        keys = ['CS3_Plot','CS3_Table'] 
         self.mod = ModuleCS(keys)
         self.mod.updatePanel()
 
@@ -69,7 +69,7 @@ class PanelCS3(wx.Panel):
         #
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
-                   'key'         : "CS3 Plot",                      # key for Interface
+                   'key'         : "CS3_Plot",                      # key for Interface
                    'title'       :_('Relative comparison'), # title of the graph
                    'ylabel'      :_('[%]'),                   # y axis label
                    'legend'      :[_('CO2'),_('Nuclear waste'),_('Water consumption')],                   # legend (list)
@@ -196,7 +196,7 @@ class PanelCS3(wx.Panel):
         attr2.SetBackgroundColour(GRID_BACKGROUND_COLOR_HIGHLIGHT)
         attr2.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        data = Status.int.GData["CS3 Table"]
+        data = Status.int.GData["CS3_Table"]
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         

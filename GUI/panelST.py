@@ -113,6 +113,40 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
+    self.subplot.axes.set_ylabel(_('Yearly energy [MWh]'))
+    self.subplot.axes.set_xlabel(_('Temperature [ºC]'))
+    
+    for label in self.subplot.axes.get_yticklabels():
+#        label.set_color(self.params['ytickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['yticksangle'])
+    #
+    # properties of labels on the x axis
+    #
+    for label in self.subplot.axes.get_xticklabels():
+#        label.set_color(self.params['xtickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['xticksangle'])
+
+    try:
+        lg = self.subplot.get_legend()
+        ltext  = lg.get_texts()             # all the text.Text instance in the legend
+        for txt in ltext:
+            txt.set_fontsize(10)  # the legend text fontsize
+        # legend line thickness
+        llines = lg.get_lines()             # all the lines.Line2D instance in the legend
+        for lli in llines:
+            lli.set_linewidth(1.5)          # the legend linewidth
+        # color of the legend frame
+        # this only works when the frame is painted (see below draw_frame)
+        frame  = lg.get_frame()             # the patch.Rectangle instance surrounding the legend
+        frame.set_facecolor('#F0F0F0')      # set the frame face color to light gray
+        # should the legend frame be painted
+        lg.draw_frame(False)
+    except:
+        # no legend
+        pass
+
 
 #------------------------------------------------------------------------------		
 class PanelST(wx.Panel):
@@ -123,7 +157,6 @@ class PanelST(wx.Panel):
 #    def __init__(self, parent, main, id, pos, size, style, name):
     def __init__(self, parent, main, id, name):
 
-        print "PanelST (__init__)"
         self.prnt = parent
         self.main = main
           
@@ -469,7 +502,6 @@ class PanelST(wx.Panel):
             cols = COLNO
 
         for r in range(rows):
-            print "panelST; display:the value of c0 is ",data[r][2]
             for c in range(cols):
                 try:
                     self.grid.SetCellValue(r, c, convertDoubleToString(data[r][c],3))
@@ -536,7 +568,7 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 
 
-        print "PanelBB (run design assistant): calling function DA"
+        logTrack("PanelBB (run design assistant): calling function DA")
         self.mod.designAssistant1()
         
         self.display()
@@ -574,7 +606,7 @@ class PanelST(wx.Panel):
 	dialog = ManualAddDialog(self, EqId)
 
         if (dialog.ShowModal() ==wx.ID_OK):
-            print _("PanelST (OnGridLeftDclick) - OK")
+            logTrack(_("PanelST (OnGridLeftDclick) - OK"))
 
         self.display()
 
@@ -607,18 +639,15 @@ class PanelST(wx.Panel):
 
     def OnTcConfig1TextEnter(self, event):
         self.config[0] = self.tcConfig1.GetValue()
-        print _("new config[%s] value: ")%0,self.config[0]
         Status.int.GData["ST Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnChoiceConfig2Choice(self, event):
         self.config[1] = self.choiceConfig2.GetStringSelection()
-        print _("new config[%s] value: ")%1,self.config[1]
         Status.int.GData["ST Config"] = self.config
         self.mod.setUserDefinedPars()
 
     def OnTcConfig3TextEnter(self, event):
-        print _("new config[%s] value: ")%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
         Status.int.GData["ST Config"] = self.config
         self.mod.setUserDefinedPars()
@@ -651,7 +680,7 @@ class PanelST(wx.Panel):
         event.Skip()
 
     def OnButtonCancelButton(self, event):
-        print _("Button exitModuleCancel: CANCEL Option not yet foreseen")
+        logTrack("Button exitModuleCancel: CANCEL Option not yet foreseen")
 
 #============================================================================== 				
 

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.13
+#	Version No.: 0.14
 #
 #       Created by:     Hans Schweiger      02/04/2008
 #       Revised by:     Hans Schweiger      15/04/2008
@@ -31,6 +31,7 @@
 #                       Hans Schweiger      08/07/2008
 #                       Hans Schweiger      16/07/2008
 #                       Hans Schweiger      18/07/2008
+#                       Hans Schweiger      01/08/2008
 #
 #       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
 #       18/04/08: HS    Functions Add-, Copy-, Delete-Project
@@ -51,6 +52,7 @@
 #                           BBMaintain: -> BBMaintain
 #       18/07/08: HS    several bug-fixes. change in addEquipmentDummy
 #                       -> no longer creates cascade !!! (gives problems in PanelQ4)
+#       01/08/08: HS    qrenewables: only function of PId, not of ANo
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -246,7 +248,7 @@ class Project(object):
         copySQLRows(DB.qheatexchanger,sqlQuery,"QHeatExchanger_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.qprocessdata,sqlQueryQ,"QProcessData_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.qproduct,sqlQueryQ,"QProduct_ID","AlternativeProposalNo",ANo)
-        copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","AlternativeProposalNo",ANo)
+#        copySQLRows(DB.qrenewables,sqlQueryQ,"QRenewables_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.qwasteheatelequip,sqlQuery,"QWasteHeatElEquip_ID","AlternativeProposalNo",ANo)
         copySQLRows(DB.uheatpump,sqlQueryQ,"UHeatPump_ID","AlternativeProposalNo",ANo)
 
@@ -305,7 +307,7 @@ class Project(object):
         deleteSQLRows(DB.qheatexchanger,sqlQuery)
         deleteSQLRows(DB.qprocessdata,sqlQueryQ)
         deleteSQLRows(DB.qproduct,sqlQueryQ)
-        deleteSQLRows(DB.qrenewables,sqlQueryQ)
+#        deleteSQLRows(DB.qrenewables,sqlQueryQ)
         deleteSQLRows(DB.qwasteheatelequip,sqlQuery)
         deleteSQLRows(DB.uheatpump,sqlQueryQ)
 
@@ -330,7 +332,7 @@ class Project(object):
             shiftANoInSQLRows(DB.qheatexchanger,sqlQuery,-1)
             shiftANoInSQLRows(DB.qprocessdata,sqlQueryQ,-1)
             shiftANoInSQLRows(DB.qproduct,sqlQueryQ,-1)
-            shiftANoInSQLRows(DB.qrenewables,sqlQueryQ,-1)
+#            shiftANoInSQLRows(DB.qrenewables,sqlQueryQ,-1)
             shiftANoInSQLRows(DB.qwasteheatelequip,sqlQuery,-1)
             shiftANoInSQLRows(DB.uheatpump,sqlQueryQ,-1)
 
@@ -552,8 +554,12 @@ class Project(object):
 
             self.setActiveAlternative(Status.ANo)
 
-        Status.SQL.commit()            
-            
+        Status.SQL.commit()
+
+        try:                                #try, because at start-up there's not yet a moduleST
+            Status.mod.moduleST.resetST()   #resets the calculator of surface areas
+        except:
+            pass
 
 #------------------------------------------------------------------------------
     def createNewProject(self,originalPId,shortName,description,originalName=None):
@@ -731,7 +737,7 @@ class Project(object):
             cleanUpSQLRows(DB.qheatexchanger,sqlQuery,maxANo)
             cleanUpSQLRows(DB.qprocessdata,sqlQueryQ,maxANo)
             cleanUpSQLRows(DB.qproduct,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qrenewables,sqlQueryQ,maxANo)
+#            cleanUpSQLRows(DB.qrenewables,sqlQueryQ,maxANo)
             cleanUpSQLRows(DB.qwasteheatelequip,sqlQuery,maxANo)
             cleanUpSQLRows(DB.uheatpump,sqlQueryQ,maxANo)
 
@@ -803,6 +809,7 @@ class Project(object):
         deleteSQLRows(DB.qprocessdata,sqlQueryQ)
         deleteSQLRows(DB.qproduct,sqlQueryQ)
         deleteSQLRows(DB.qrenewables,sqlQueryQ)
+        deleteSQLRows(DB.qsurfarea,sqlQuery)
         deleteSQLRows(DB.qwasteheatelequip,sqlQuery)
         deleteSQLRows(DB.uheatpump,sqlQueryQ)
 
@@ -946,10 +953,9 @@ class Project(object):
 
 # 1. manipulation of questionnaire
 
-        print "SetTreePermissions: StatusQ = ",Status.StatusQ
         if (Status.StatusQ > 0):
             if (Status.ANo <= 0 and Status.StatusCC > 0):
-                permit = (False,0,_("Data have already been confirmed as consistent. First unblock before modifying"))
+                permit = (False,0,_("Data have already been confirmed as consistent. First unblock before modifying data of present state"))
             else:
                 permit = allow           
         else:
@@ -1053,11 +1059,7 @@ class Project(object):
         else:
             permit = (False,0,_("Cannot access this function. First check the data for consistency"))
             
-        tmp.update({_("Comparative analysis"):permit})
-        tmp.update({_("nanu"):(False,0,"no se")})
-        tmp.update({_("Comparative study - Detail Info 1"):permit})
-        tmp.update({_("Comparative study - Detail Info 2"):permit})
-        tmp.update({_("Comparative study - Detail Info 3"):permit})
+        tmp.update({_("Comparative study"):permit})
 
         tmp.update({_("Report"):permit})
         tmp.update({_("Report generation"):permit})
