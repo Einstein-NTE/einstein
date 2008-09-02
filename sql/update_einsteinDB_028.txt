@@ -1,0 +1,8 @@
+-- update einstein database: parameter types in q heatexchanger
+USE einstein;
+
+
+ALTER TABLE qheatexchanger ADD COLUMN StreamStatusSource VARCHAR(200) AFTER StreamType;
+ALTER TABLE qheatexchanger ADD COLUMN StreamTypeSource VARCHAR(200) AFTER StreamStatusSource;
+ALTER TABLE qheatexchanger ADD COLUMN StreamStatusSink VARCHAR(200) AFTER StreamTypeSource;
+ALTER TABLE qheatexchanger ADD COLUMN StreamTypeSink VARCHAR(200) AFTER StreamStatusSink;

@@ -16,11 +16,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	07/05/2008
-#	Revised by:         ---
+#	Revised by:         Hans Schweiger      02/09/2008
 #
 #       Changes in last update:
+#
+#       02/09/08: HS    Security feature added -> avoid zero division in function
+#                       normalize
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -159,8 +162,11 @@ class Schedule():
         fsum *= YEAR/ftot
         self.hop = fsum
 
-        for it in range(Status.Nt):
-            self.fav[it] /= fsum
+        if fsum > 0:
+            for it in range(Status.Nt):
+                self.fav[it] /= fsum
+        else:
+            logDebug("Schedule (normalize): WARNING - schedule is 0 in all time steps")
 
         if fabs(self.hop-self.HPerYear) > 1.0:
             logDebug("Schedule (normalize): WARNING - normalized operating hours (%s) different from specified in HPerYear (%s)"\

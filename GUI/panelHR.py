@@ -40,21 +40,30 @@
 
 import wx
 import wx.grid
+
+from status import Status
+
+from GUITools import *
+from numCtrl import *
+
 from einstein.GUI.graphics import drawPiePlot
+import einstein.modules.matPanel as Mp
+
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
 #from einstein.GUI.panelHR_PopUp1 import HRPopUp1
 
-import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
 
 
-[wxID_PANELHR, wxID_PANELHRAUTODESIGN, wxID_PANELHRBUTTONPAGEHRBACK, 
- wxID_PANELHRBUTTONPAGEHRCANCEL, wxID_PANELHRBUTTONPAGEHRFWD, 
- wxID_PANELHRBUTTONPAGEHROK, wxID_PANELHRGRID, wxID_PANELHRHRADD, 
- wxID_PANELHRMOVEDOWNWARDS, wxID_PANELHRMOVETOBOTTOM, wxID_PANELHRMOVETOTOP, 
- wxID_PANELHRMOVEUPWARDS, wxID_PANELHRST1PAGEHR, wxID_PANELHRSTATICTEXT1, 
-] = [wx.NewId() for _init_ctrls in range(14)]
+[wxID_PANELHR, wxID_PANELHRBTNCALCULATE, wxID_PANELHRBTNCHANGEHX, 
+ wxID_PANELHRBTNDELETEHX, wxID_PANELHRBTNSHOWSTDVALUES, 
+ wxID_PANELHRBUTTONPAGEHRBACK, wxID_PANELHRBUTTONPAGEHRCANCEL, 
+ wxID_PANELHRBUTTONPAGEHRFWD, wxID_PANELHRBUTTONPAGEHROK, 
+ wxID_PANELHRCBCURVEDISPLAY, wxID_PANELHRCBEXHX, wxID_PANELHRGRID, 
+ wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, 
+ wxID_PANELHRSTATICTEXT1, wxID_PANELHRSTATICTEXT2, wxID_PANELHRSTATICTEXT3, 
+] = [wx.NewId() for _init_ctrls in range(18)]
 
 # constants
 #
@@ -65,14 +74,76 @@ GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
 GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-COLNO = 6
+COLNO = 11
+
+
+def drawFigureHCG(self):   
+    try:           
+        #data = Interfaces.GData['Curves HR']
+        data = Status.int.hcg
+        self.subplot = self.figure.add_subplot(121)
+        curve = data[0]
+        self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
+        self.subplot.legend(loc = 0)
+        self.subplot.set_title(curve.Name)
+        self.subplot.set_xlabel('Power [kW]')
+        self.subplot.set_ylabel('Temperature [°C]')
+        
+        mmx = [ max(curve.X), min(curve.X) ]
+        mmy = [ max(curve.Y), min(curve.Y) ]
+        
+        curve = data[1]
+        self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
+        self.subplot.legend(loc = 0)
+        self.subplot.set_title(curve.Name)
+        self.subplot.set_xlabel('Power [kW]')
+        self.subplot.set_ylabel('Temperature [°C]')
+        
+        mmx.append(max(curve.X))
+        mmx.append(min(curve.X))
+        mmy.append(max(curve.Y))
+        mmy.append(min(curve.Y))            
+        
+        self.subplot.axis([min(mmx),max(mmx),min(mmy),max(mmy)])
+        
+        self.subplot = self.figure.add_subplot(122)
+        curve = data[2]
+        self.subplot.plot(curve.X,curve.Y,'g',label =curve.Name)
+        self.subplot.axis([min(curve.X),max(curve.X),min(curve.Y),max(curve.Y)])
+        self.subplot.legend(loc = 0)
+        self.subplot.set_title(curve.Name)
+        self.subplot.set_xlabel('Power [kW]')
+        self.subplot.set_ylabel('Temperature [C]')
+
+        self.setSize((608, 280))
+    except e:
+        print "cant draw figure"+e
+
+def drawFigureYED(self):    
+    try:
+        #data = Interfaces.GData['Curves HR']
+        data = Status.int.yed              
+        min_ = 100000
+        max_ = 0
+        
+        X = xrange(0, 406, 5)      
+        Y = data       
+        self.subplot = self.figure.add_subplot(111)
+        self.subplot.plot(X,Y,'b',label ="YED")    
+        self.subplot.legend(loc = 0)                             
+        self.subplot.axis([min(X),max(X),min(Y),max(Y)])   
+        self.subplot.set_xlabel('Power [kW]')
+        self.subplot.set_ylabel('Temperature [C]')  
+        self.setSize((608, 280))
+    except e:
+        print "cant draw figure"+e
 
 class PanelHR(wx.Panel):
 
     def __init__(self, parent, main, id, pos, size, style, name):
         self.main = main
         self._init_ctrls(parent)
-	self.keys = ['HR Table']
+        self.keys = ['HR Table','HR Curves']
         self.mod = Status.mod.moduleHR
         self.selectedRow = 0
         labels_column = 0
@@ -95,32 +166,39 @@ class PanelHR(wx.Panel):
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
-        self.grid.SetDefaultColSize(60)
-        self.grid.SetColSize(2,160)
-        self.grid.SetColSize(3,160)
+        self.grid.SetDefaultColSize(90)
+        self.grid.SetColSize(1,60)
+        #self.grid.SetColSize(3,160)
+        
+        self.btnDeleteHX.Enabled = False
+        self.btnChangeHX.Enabled = False
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Cascade index"))
-        self.grid.SetColLabelValue(1, _("Equipment No."))
-        self.grid.SetColLabelValue(2, _("Equipment"))
-        self.grid.SetColLabelValue(3, _("Type"))
-        self.grid.SetColLabelValue(4, _("Nominal power [kW]"))
-        self.grid.SetColLabelValue(5, _("Heat Supplied to pipe/duct no."))
+        self.grid.SetColLabelValue(0, _("Power\n[kW]"))
+        self.grid.SetColLabelValue(1, _("Size storage tank\n[m³]"))
+        self.grid.SetColLabelValue(2, _("Hot Medium"))
+        self.grid.SetColLabelValue(3, _("T1 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(4, _("T2 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(5, _("Cold medium"))
+        self.grid.SetColLabelValue(6, _("T3 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(7, _("T4 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(8, _("surface area\n[m²]"))
+        self.grid.SetColLabelValue(9, _("inv. cost\n[EUR]"))
+        self.grid.SetColLabelValue(10, _("oper. cost\n[EUR]"))
         #
         # copy values from dictionary to grid
         #
         for r in range(MAXROWS):
             self.grid.SetRowAttr(r, attr)
-            for c in range(COLNO):
-                if c == labels_column:
-                    self.grid.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
-                else:
-                    self.grid.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.grid.SetGridCursor(0, 0)
-
         self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
+        self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)
+        self.Show()
+        
+        
+       
     
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -128,9 +206,9 @@ class PanelHR(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
-        self.grid = wx.grid.Grid(id=wxID_PANELHRGRID,
-              name='gridpageHR', parent=self, pos=wx.Point(40, 96),
-              size=wx.Size(616, 328), style=0)
+        self.grid = wx.grid.Grid(id=wxID_PANELHRGRID, name='gridpageHR',
+              parent=self, pos=wx.Point(16, 352), size=wx.Size(752, 176),
+              style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridGridCellLeftDclick, id=wxID_PANELHRGRID)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
@@ -138,76 +216,102 @@ class PanelHR(wx.Panel):
         self.grid.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
               self.OnGridGridCellRightClick, id=wxID_PANELHRGRID)
 
-        self.st1pageHR = wx.StaticText(id=-1, label=_('Order equipment cascade'),
-              name='st1pageHR', parent=self, pos=wx.Point(664, 128), style=0)
+        self.panel_drawcurve = wx.Panel(id=wxID_PANELHRPANEL_DRAWCURVE,
+              name='panel_drawcurve', parent=self, pos=wx.Point(160, 40),
+              size=wx.Size(608, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
         self.buttonpageHROk = wx.Button(id=wxID_PANELHRBUTTONPAGEHROK,
-              label=_('ok'), name='buttonpageHROk', parent=self, pos=wx.Point(528,
-              544), size=wx.Size(75, 23), style=0)
+              label=_('ok'), name='buttonpageHROk', parent=self,
+              pos=wx.Point(520, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHROk.Bind(wx.EVT_BUTTON, self.OnButtonpageHROkButton,
               id=wxID_PANELHRBUTTONPAGEHROK)
 
         self.buttonpageHRCancel = wx.Button(id=wxID_PANELHRBUTTONPAGEHRCANCEL,
               label=_('cancel'), name='buttonpageHRCancel', parent=self,
-              pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
+              pos=wx.Point(608, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHRCancel.Bind(wx.EVT_BUTTON,
               self.OnButtonpageHRCancelButton,
               id=wxID_PANELHRBUTTONPAGEHRCANCEL)
 
         self.buttonpageHRFwd = wx.Button(id=wxID_PANELHRBUTTONPAGEHRFWD,
               label='>>>', name='buttonpageHRFwd', parent=self,
-              pos=wx.Point(704, 544), size=wx.Size(75, 23), style=0)
+              pos=wx.Point(696, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHRFwd.Bind(wx.EVT_BUTTON, self.OnButtonpageHRFwdButton,
               id=wxID_PANELHRBUTTONPAGEHRFWD)
 
         self.buttonpageHRBack = wx.Button(id=wxID_PANELHRBUTTONPAGEHRBACK,
               label='<<<', name='buttonpageHRBack', parent=self,
-              pos=wx.Point(440, 544), size=wx.Size(75, 23), style=0)
+              pos=wx.Point(432, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHRBack.Bind(wx.EVT_BUTTON, self.OnButtonpageHRBackButton,
               id=wxID_PANELHRBUTTONPAGEHRBACK)
 
-        self.MoveToBottom = wx.Button(id=wxID_PANELHRMOVETOBOTTOM,
-              label=_('to bottom'), name='MoveToBottom', parent=self,
-              pos=wx.Point(680, 344), size=wx.Size(96, 24), style=0)
-        self.MoveToBottom.Bind(wx.EVT_BUTTON, self.OnMoveToBottomButton,
-              id=wxID_PANELHRMOVETOBOTTOM)
-
-        self.MoveDownwards = wx.Button(id=wxID_PANELHRMOVEDOWNWARDS,
-              label=_('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
-              304), size=wx.Size(96, 24), style=0)
-        self.MoveDownwards.Bind(wx.EVT_BUTTON, self.OnMoveDownwardsButton,
-              id=wxID_PANELHRMOVEDOWNWARDS)
-
-        self.MoveUpwards = wx.Button(id=wxID_PANELHRMOVEUPWARDS, label=_('up'),
-              name='MoveUpwards', parent=self, pos=wx.Point(680, 240),
-              size=wx.Size(96, 24), style=0)
-        self.MoveUpwards.Bind(wx.EVT_BUTTON, self.OnMoveUpwardsButton,
-              id=wxID_PANELHRMOVEUPWARDS)
-
-        self.MoveToTop = wx.Button(id=wxID_PANELHRMOVETOTOP, label=_('to top'),
-              name='MoveToTop', parent=self, pos=wx.Point(680, 200),
-              size=wx.Size(96, 24), style=0)
-        self.MoveToTop.Bind(wx.EVT_BUTTON, self.OnMoveToTopButton,
-              id=wxID_PANELHRMOVETOTOP)
-
-        self.AutoDesign = wx.Button(id=wxID_PANELHRAUTODESIGN,
-              label=_('calculate HX network'),
-              name='AutoDesign', parent=self, pos=wx.Point(40, 32),
-              size=wx.Size(616, 24), style=0)
-        self.AutoDesign.Bind(wx.EVT_BUTTON, self.OnAutoDesignButton,
-              id=wxID_PANELHRAUTODESIGN)
+        self.btnCalculate = wx.Button(id=wxID_PANELHRBTNCALCULATE,
+              label=_('recalculate'), name='btnCalculate', parent=self,
+              pos=wx.Point(24, 72), size=wx.Size(104, 24), style=0)
+        self.btnCalculate.Bind(wx.EVT_BUTTON, self.OnBtnCalculateButton,
+              id=wxID_PANELHRBTNCALCULATE)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELHRSTATICTEXT1,
               label=_('Existing heat exchangers in the system'),
-              name='staticText1', parent=self, pos=wx.Point(40, 72), style=0)
+              name='staticText1', parent=self, pos=wx.Point(16, 328), style=0)
 
-#------------------------------------------------------------------------------		
+        self.staticText3 = wx.StaticText(id=wxID_PANELHRSTATICTEXT3,
+              label='Performance Curves', name='staticText3', parent=self,
+              pos=wx.Point(160, 16), size=wx.Size(98, 13), style=0)
+
+        self.cbCurveDisplay = wx.Choice(choices=['HCC/CCC/GCC', 'YED'],
+              id=wxID_PANELHRCBCURVEDISPLAY, name='cbCurveDisplay', parent=self,
+              pos=wx.Point(16, 272), size=wx.Size(120, 21),
+              style=wx.FULL_REPAINT_ON_RESIZE)
+        self.cbCurveDisplay.SetSelection(0)
+        self.cbCurveDisplay.Bind(wx.EVT_CHOICE, self.OnCbCurveDisplayChoice,
+              id=wxID_PANELHRCBCURVEDISPLAY)
+
+        self.cbExHX = wx.CheckBox(id=wxID_PANELHRCBEXHX,
+              label=_('  Consider existing'), name='cbExHX', parent=self,
+              pos=wx.Point(24, 104), size=wx.Size(112, 16), style=0)
+        self.cbExHX.SetValue(True)
+        self.cbExHX.Bind(wx.EVT_CHECKBOX, self.OnCbExHXCheckbox,
+              id=wxID_PANELHRCBEXHX)
+
+        self.btnDeleteHX = wx.Button(id=wxID_PANELHRBTNDELETEHX,
+              label='Delete HX', name='btnDeleteHX', parent=self,
+              pos=wx.Point(16, 544), size=wx.Size(75, 23), style=0)
+        self.btnDeleteHX.Bind(wx.EVT_BUTTON, self.OnBtnDeleteHXButton,
+              id=wxID_PANELHRBTNDELETEHX)
+
+        self.btnChangeHX = wx.Button(id=wxID_PANELHRBTNCHANGEHX,
+              label='Change HX', name='btnChangeHX', parent=self,
+              pos=wx.Point(104, 544), size=wx.Size(75, 23), style=0)
+        self.btnChangeHX.Bind(wx.EVT_BUTTON, self.OnBtnChangeHXButton,
+              id=wxID_PANELHRBTNCHANGEHX)
+
+        self.staticBox1 = wx.StaticBox(id=wxID_PANELHRSTATICBOX1,
+              label='HX Network', name='staticBox1', parent=self,
+              pos=wx.Point(8, 40), size=wx.Size(136, 192), style=0)
+
+        self.btnShowStdValues = wx.Button(id=wxID_PANELHRBTNSHOWSTDVALUES,
+              label='Standard values for HX', name='btnShowStdValues',
+              parent=self, pos=wx.Point(192, 544), size=wx.Size(128, 23),
+              style=0)
+        self.btnShowStdValues.Bind(wx.EVT_BUTTON, self.OnBtnShowStdValuesButton,
+              id=wxID_PANELHRBTNSHOWSTDVALUES)
+
+        self.staticBox2 = wx.StaticBox(id=wxID_PANELHRSTATICBOX2,
+              label='Display Options', name='staticBox2', parent=self,
+              pos=wx.Point(8, 248), size=wx.Size(136, 64), style=0)
+
+        self.staticText2 = wx.StaticText(id=wxID_PANELHRSTATICTEXT2,
+              label=_('HXs in network \ncalculation'), name='staticText2',
+              parent=self, pos=wx.Point(48, 120), size=wx.Size(74, 26),
+              style=0)
+
     def display(self):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
         self.mod.initPanel()        # prepares data for plotting
-
+        #self.mod.updatePanel()
         data = Interfaces.GData[self.keys[0]]
 
 #..............................................................................
@@ -231,6 +335,16 @@ class PanelHR(wx.Panel):
 
         self.Show()
 
+
+    def updateButtons(self,index):
+        if (self.mod.indexExists(index)):
+            self.enableButtons(True)
+        else:
+            self.enableButtons(False)
+            
+    def enableButtons(self,bool):
+        self.btnDeleteHX.Enabled = bool
+        self.btnChangeHX.Enabled = bool
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
@@ -241,12 +355,14 @@ class PanelHR(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftClick(self, event):
 #------------------------------------------------------------------------------		
-	self.selectedRow = event.GetRow()
+        self.selectedRow = event.GetRow()
+        self.updateButtons(self.selectedRow)
         print _("PanelHR (GridLeftClick): selected row = "),self.selectedRow
         event.Skip()
 
     def OnGridGridCellRightClick(self, event):
-	self.selectedRow = event.GetRow()
+        self.updateButtons(self.selectedRow)
+        self.selectedRow = event.GetRow()
         print _("PanelHR (GridRightClick): selected row = "),self.selectedRow
         event.Skip()
         
@@ -273,38 +389,41 @@ class PanelHR(wx.Panel):
         self.main.tree.SelectItem(self.main.qHP, select=True)
         print "Button exitModuleFwd: now I should show another window"
 
-#==============================================================================
-#   Bottom Down Up Top
-#==============================================================================
-    def OnMoveToBottomButton(self, event):
-        ci = self.selectedRow + 1
-        print _("PanelHR (move to bottom)"),ci
-        self.mod.cascadeMoveToBottom(ci)
-        self.display()
 
-    def OnMoveDownwardsButton(self, event):
-        ci = self.selectedRow + 1
-        print _("PanelHR (move down)"),ci
-        self.mod.cascadeMoveDown(ci)
-        self.display()
-
-    def OnMoveUpwardsButton(self, event):
-        ci = self.selectedRow + 1
-        print _("PanelHR (move up)"),ci
-        self.mod.cascadeMoveUp(ci)
-        self.display()
-
-    def OnMoveToTopButton(self, event):
-        ci = self.selectedRow + 1
-        print _("PanelHR (move to top)"),ci
-        self.mod.cascadeMoveToTop(ci)   
-        self.display()
 #==============================================================================
 
-    def OnAutoDesignButton(self, event):
-        print _("PanelHR (OnAutoDesignButton)")
-        self.mod.runHRModule()
-        self.display()
+    def OnCbCurveDisplayChoice(self, event):
+        del self.chart
+        if (self.cbCurveDisplay.GetCurrentSelection() == 0):
+            self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)          
+        else:
+            self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureYED)
+            
+        #self.panel_drawcurve.draw()
         event.Skip()
 
-#==============================================================================
+    def OnBtnCalculateButton(self, event):
+        print _("PanelHR (OnBtnCalculateButton)")
+        self.mod.runHRModule()
+        self.enableButtons(False)
+        self.display()        
+        event.Skip()
+
+    def OnBtnDeleteHXButton(self, event):        
+        self.mod.deleteHX(self.selectedRow)
+        self.enableButtons(False)
+        self.OnCbCurveDisplayChoice(event)
+        self.display()
+        #event.Skip()
+
+    def OnBtnChangeHXButton(self, event):
+        #TODO change dlg
+        self.mod.changeHX(self.selectedRow)
+        event.Skip()
+
+    def OnBtnShowStdValuesButton(self, event):
+        event.Skip()
+
+    def OnCbExHXCheckbox(self, event):
+        self.mod.ExHX = self.cbExHX.GetValue()
+        event.Skip()

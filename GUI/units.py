@@ -19,6 +19,7 @@
 #                           Stoyan Danov    11/06/2008
 #                           Hans Schweiger  11/06/2008
 #                           Stoyan Danov    12/06/2008
+#                           Hans Schweiger  01/09/2008
 #
 #       Changes to previous version:
 #       SD: 10/06/2008: added FUELPRICELCV, PRICE
@@ -27,6 +28,7 @@
 #                       new structure of dictionaries
 #       SD: 12/06/2008: completing the new structure: MASSFLOW,PRESSURE,SPECIFICENTHALPY,
 #                       VOLUMEFLOW,TIME,
+#       HS: 01/09/2008: bug-fix in SPECIFICENTHALPY and SPECIFICHEAT
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -193,7 +195,7 @@ UNITS = {
 # conversion to internal unit: [kWh/kg]
     'SPECIFICENTHALPY' : {
         'kWh/kg' : (1.0,0.0),
-        'kJ/kg' : (3600.0e-1,0.0),
+        'kJ/kg' : (1.0/3600,0.0),
         'kcal/kg' : (1.163e-3,0.0),
         'btu/lb' : (0.0002930711/0.45359,0.0)
         },
@@ -201,7 +203,7 @@ UNITS = {
 # conversion to internal unit: [kWh/kgK]
     'SPECIFICHEAT' : {
         'kWh/kgK' : (1.0,0.0),
-        'kJ/kgK' : (3600.0e-1,0.0),
+        'kJ/kgK' : (1.0/3600.0,0.0),
         'kcal/kgK' : (1.163e-3,0.0),
         'btu/lbºF' : (((0.0002930711*9)/(0.45359*5)),0.0)
         },

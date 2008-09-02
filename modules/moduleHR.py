@@ -7,24 +7,26 @@
 #
 #------------------------------------------------------------------------------
 #
-#   ModuleHC (Heat and Cold Supply)
+#   ModuleHR (Heat Recovery)
 #           
 #------------------------------------------------------------------------------
 #           
-#   Module for design of HC Supply cascade
+#   Module for design of heat recovery system (HX network)
 #
 #==============================================================================
 #
-#   Version No.: 0.03
+#   Version No.: 0.04
 #   Created by:         Hans Schweiger  10/06/2008
 #   Last revised by:
 #                       Hans Schweiger  23/06/2008
 #                       Hans Schweiger  02/07/2008
+#                       Florian Joebstl 02/09/2008
 #
 #   Changes to previous version:
 #
 #   23/06/2008: HS  Query of fluids and fuels used in export XML
 #   02/07/2008: HS  Function getHXData added -> obtains Fluid ID's in HX
+#   02/09/2008: FJ  Call to PE2 external module
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -40,159 +42,224 @@ from sys import *
 from math import *
 from numpy import *
 
-
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
-from einstein.modules.exportdata import *
-
 from einstein.modules.messageLogger import *
+from subprocess import *
+
+from einstein.modules.exportHR import *
+from einstein.modules.importHR import *
+from einstein.modules.dataHR import *
+
+from einstein.GUI.dialog_changeHX import *
 
 class ModuleHR(object):
 
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
+        self.ExHX = True
+        self.data = None
 
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self):
 #------------------------------------------------------------------------------
 #       screens existing equipment, whether there are already heat pumps
 #       XXX to be implemented
 #------------------------------------------------------------------------------
-
-        self.DB = Status.DB
-        self.sql = Status.SQL
-        
-        sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,Status.ANo)
-        self.hx = Status.DB.qheatexchanger.sql_select(sqlQuery)
-        self.NHX = len(self.hx)
-
-        Status.int.getEquipmentCascade()
-        self.cascadeIndex = 0
-
+        Status.int.getEquipmentCascade() ##old code, dont know what its for...
+        self.cascadeIndex = 0                  
         self.updatePanel()
             
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def updatePanel(self):
 #------------------------------------------------------------------------------
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
+        if (self.data!=None):
+            self.updateGridData()
+            self.updateCurveData()
 
-        dataList = []
-        for i in range(self.NHX):
-            row = {"equipeNo":1,"equipeType":"hx","equipePnom":1000}
-            dataList.append(noneFilter([i+1,row["equipeNo"],"myname",row["equipeType"],row["equipePnom"],"???"]))
+#------------------------------------------------------------------------------
+    def updateGridData(self):
+#------------------------------------------------------------------------------
+# generates rows for the grid 
+#------------------------------------------------------------------------------      
+        dataList = []  
+        for hx in self.data.hexers:
+            opcost = float(hx["OMVar"])+float(hx["OMFix"])
+            row = [hx["QdotHX"],hx["StorageSize"],hx["HXSource"],hx["HXTSourceInlet"],hx["HXTSourceOutlet"],hx["HXSink"],hx["HXTSinkInlet"],hx["HXTSinkOutlet"],hx["Area"],hx["TurnKeyPrice"],opcost]
+            dataList.append(noneFilter(row))
         data = array(dataList)
-
-        Status.int.setGraphicsData(self.keys[0], data)
-
+        Status.int.setGraphicsData(self.keys[0], data)        
+        
+#------------------------------------------------------------------------------
+    def updateCurveData(self):                 
+#------------------------------------------------------------------------------
+# stores data for mathplot in panelHR
+#------------------------------------------------------------------------------  
+        #Status.int.setGraphicsData(self.keys[1], self.data.curves)
+        Status.int.hcg = self.data.curves
+        #Status.int.yed = ...     
+ 
+#------------------------------------------------------------------------------
+    def deleteHX(self,index):   
+#------------------------------------------------------------------------------
+#called when "Delete HX"-Button pressed
+#1) generates and adds 2 new streams
+#2) deletes selected hx
+#3) updates panel
+#------------------------------------------------------------------------------    
         try:
-            Status.int.setGraphicsData('HR Info',{"noseque":55})
+            self.data.deleteHexAndGenStreams(index)           
+            self.calcQdaList()
+            self.updatePanel()
         except:
+            print "deleting failed."
+
+#------------------------------------------------------------------------------
+    def changeHX(self,index):
+#------------------------------------------------------------------------------
+#
+#todo...
+#------------------------------------------------------------------------------
+        try:
+            dlg = DlgChangeHX(None)
+            dlg.ShowModal()
+        
+            if (dlg.recalc):
+                print "Recalc hx:"
+                hx = self.data.hexers[index]
+                
+                WallThickness = 0.001
+                Lambda        = 15.0
+                AlphaL        = dlg.AlphaLiquid()
+                AlphaG        = dlg.AlphaGas()
+                AlphaC        = dlg.AlphaPC()
+                
+                if (dlg.MaterialType == HXConsts.MAT_TYPE_CS):
+                    Lamda = 50.0                
+                if (dlg.MaterialType == HXConsts.MAT_TYPE_CU):
+                    Lamda = 80.0
+                
+                hot = Stream()
+                hot.generateHotStreamFromHEX(hx)
+                cold = Stream()
+                cold.generateColdStreamFromHEX(hx)
+
+                types = ['sst_liquid','sst_gaseous','sst_condensation']
+                deltas = [ [10, 15, 7.5 ],[15,20,12.5],[7.5,12.5,5]]
+                        
+                hoti = types.index(hx["StreamStatusSource"])
+                coldi= types.index(hx["StreamStatusSink"])
+                delta_t_min = deltas[hoti][coldi]
+                
+                delta_T_in  = abs(hot.StartTemp - cold.EndTemp)   #?????
+                delta_T_out = abs(hot.EndTemp   - cold.StartTemp) #?????                
+                delta_T_max = max(delta_T_in,delta_T_out)
+                delta_T_min = min(delta_T_in,delta_T_out)
+                
+                delta_T_logaritmic = (delta_T_max - delta_T_min)/log(delta_T_max / delta_T_min)
+                
+                #TODO....                
+                
+                #save db
+                #load from db
+                #update panel
+        except e:
+            print e
             pass
+        
 
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-    def getHXData(self):
-#------------------------------------------------------------------------------
-#       obtains the data of the HX fluids
-#------------------------------------------------------------------------------
-
-        hxes = Status.prj.getHXes()
-        equipments = Status.prj.getEquipments()
-        pipes = Status.prj.getPipes()
-        processes = Status.prj.getProcesses()
-        whees = Status.prj.getWHEEs()
-
-        for hx in hxes:
-            source = hx.HXSource
-            sink = hx.HXSink
-            sourceOK = False
-            sinkOK = False
-
-            print "----------------------------------------------"
-            print "ModuleHR (getHXData): checking HX %s with Source= %s and Sink= %s"%\
-                  (hx.HXName,hx.HXSource,hx.HXSink)
-
-            for eq in equipments:
-                if (sourceOK==True and sinkOK==True): break
-
-                print "Equipment %s: "%eq.Equipment
-                if source == eq.Equipment:
-                    hx.FluidIDSource = None
-                    sourceOK = True
-                    
-                if sink == eq.Equipment:
-                    hx.FluidIDSink = None
-                    sinkOK = True
-
-                print "sourceID/sinkID: %s,%s"%(hx.FluidIDSource,hx.FluidIDSink)
-            
-            for pipe in pipes:
-                if (sourceOK==True and sinkOK==True): break
-                print "Pipe %s: "%pipe.Pipeduct
-                if source == pipe.Pipeduct:
-                    hx.FluidIDSource = pipe.HeatDistMedium
-                    sourceOK = True
-
-                if sink == pipe.Pipeduct:
-                    hx.FluidIDSink = pipe.HeatDistMedium
-                    sinkOK = True
-
-                print "sourceID/sinkID: %s,%s"%(hx.FluidIDSource,hx.FluidIDSink)
-            
-            for process in processes:
-                if (sourceOK==True and sinkOK==True): break
-                print "process %s: "%process.Process
-                if source == process.Process:
-                    hx.FluidIDSource = process.ProcMedOut
-                    sourceOK = True
-                    
-                if sink == process.Process:
-                    hx.FluidIDSink = process.ProcMedDBFluid_id
-                    sinkOK = True
-
-                print "sourceID/sinkID: %s,%s"%(hx.FluidIDSource,hx.FluidIDSink)
-                    
-            for whee in whees:                         #WHEE can only be source, not sink !!!
-                if (sourceOK==True and sinkOK==True): break
-                print "whee %s: "%whee.WHEEName
-                if source == whee.WHEEName:
-                    hx.FluidIDSource = whee.WHEEMedium
-                    sourceOK = True
-
-                print "sourceID/sinkID: %s,%s"%(hx.FluidIDSource,hx.FluidIDSink)
-
-            if sinkOK == False:
-                logWarning("ModuleHR (getHXData): couldn't find a sink ID for HX %s"%hx.HXName)
-                
-            if sourceOK == False:
-                logWarning("ModuleHR (getHXData): couldn't find a source ID for HX %s"%hx.HXName)
-                
+    def indexExists(self,index):
+        if (len(self.data.hexers)>index):
+            return True
+        else:
+            return False
+                                    
 #------------------------------------------------------------------------------
     def runHRModule(self):
 #------------------------------------------------------------------------------
-#       runs the calculations on the external HR module
+#   runs the calculations on the external HR module
+#   1) create schedules (?OldCode?)
+#   2) getHXData        (?OldCode?)
+#   3) exports data into xml
+#   4) calls external calculation
+#   5) imports results from xml
+#   6) store hxs in database
+#   7) runSimulateHR
+#   8) updatePanel 
 #------------------------------------------------------------------------------
-
         if Status.schedules.outOfDate == True:
             Status.schedules.create()   #creates the process and equipment schedules
 
-        self.getHXData()
-
-        (fluidIDs,fuelIDs) = Status.prj.getFluidAndFuelList()                         
-        ex = ExportDataHR(pid=Status.PId, ano=Status.ANo,fuels=fuelIDs, fluids=fluidIDs)
-
-#        self.runHR()
-#        self.importDataFromHR()
-
+        #self.getHXData()
+        #(fluidIDs,fuelIDs) = Status.prj.getFluidAndFuelList()     
+                         
+        XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
+        # TODO call external calc
+        try:
+            retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml"], shell=True)
+            print "External program returned: "+str(retcode)
+            if (retcode!=0):
+                raise
+        except:
+            print "Error in external program. EXIT "
+                
+        doc = XMLImportHRModule.importXML("export.xml")
+                      
+        self.data = HRData(Status.PId,Status.ANo)
+        self.data.loadFromDocument(doc)
+        
+        self.calcQdaList()
+        self.calcQaaList()
+        
         self.simulateHR()
+    
+        self.updatePanel()
+    
+    
+    
+    def calcQdaList(self):        
+        list_qda_ = []
+        temperature_step = 5;
+        for temperature in xrange(0, 406, temperature_step):
+            list_qda_.append(0)
+    
+        print len(self.data.streams)
+        temperature_step = 5;
+        for temperature in xrange(0, 406, temperature_step):
+            for stream in self.data.streams:                
+                if (stream.HotColdType == "cold"):
+                    if  ((temperature - stream.StartTemp) > 0) and ((temperature - stream.EndTemp) <= 0) and (stream.HeatType == "sensible"):                                                                                                                                    
+                        list_qda_[temperature / temperature_step] += stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours
+                    else:
+                        if (stream.HeatType == "latent")  and ((temperature - stream.EndTemp) <= 5) and ((temperature - stream.StartTemp) >= 0):
+                            list_qda_[temperature / temperature_step] += stream.HeatLoad * stream.OperatingHours
+                        
+        Status.int.yed = list_qda_
+        #print list_qda_
+        
+    def calcQaaList(self):        
+        list_qaa_ = []
+    
+    #    temperature_step = 5;
+     #   for temperature in xrange(0, 406, temperature_step):
+    #        list_qaa_.append([])
+    #        for stream in self.data.streams:
+    #            if (stream.HotColdType == "cold"):
+    #                if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):                                                                                                            
+    #                    list_qda_[temperature / temperature_step].append(stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours)  
+    #                else:
+    #                    if (stream.HeatType == "latent")  and ((temperature - stream.StartTemp) >= 0):
+    #                        list_qda_[temperature / temperature_step].append( stream.HeatLoad * stream.OperatingHours)
+                        
+       # Status.int.yed.list_qaa_ = list_qaa_
 
-        pass
+   
+    
 #------------------------------------------------------------------------------
     def simulateHR(self):
 #------------------------------------------------------------------------------
@@ -203,9 +270,10 @@ class ModuleHR(object):
 #
 #       QHX = min(fHR*USHw_Tt,QHXmax)
 #------------------------------------------------------------------------------
-
+        print("SIMULATE HR!!!")
         if Status.processData.outOfDate == True:
             Status.processData.createAggregateDemand()
+            return ###????
             
         QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
         UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes
@@ -276,24 +344,4 @@ class ModuleHR(object):
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
             
         
-#------------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    print "Testing ModuleHR"
-    import einstein.GUI.pSQL as pSQL, MySQLdb
-    from einstein.modules.interfaces import *
-    from einstein.modules.energy.moduleEnergy import *
-    stat = Status("testModuleHC")
-
-    Status.SQL = MySQLdb.connect(user="root", db="einstein")
-    Status.DB = pSQL.pSQL(Status.SQL, "einstein")
-    
-    Status.PId = 99
-    Status.ANo = 0
-    Status.SetUpId = 1 #this is PSetUpData_ID
-    
-    Status.int = Interfaces()
-    keys = ["HP Table","HP Plot","HP UserDef"]
-
-    mod = ModuleHC(keys)
     
