@@ -298,7 +298,7 @@ class PanelQ3(wx.Panel):
 
         self.tc17 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict='MASS',
+                              unitdict='VOLUME',
                               label=_("Daily outflow of process medium"),
                               tip=_("Can be different from the incoming flow if e.g. there is evaporation or some chemical reaction."))
 

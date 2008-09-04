@@ -32,6 +32,7 @@
 #                           Hans Schweiger      07/05/2008
 #                           Hans Schweiger      19/06/2008
 #                           Hans Schweiger      21/06/2008ff
+#                           Hans Schweiger      18/08/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -63,6 +64,7 @@
 #                   sqerr(x) >= 1 !!! (division by something very close to zero)
 #       22/06/08 HS bugfix01 in constrain, calcDev, calcErr -> separate treat-
 #                   ment of INFINITE
+#       18/08/2008 checkBalance in ccheck2-5
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -80,7 +82,7 @@ from einstein.GUI.GUITools import *     #needed for function check
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 MINIMUM_VALUE = 1.e-10
-DEFAULT_SQERR = 1.e-10 # default value for sqerr assigned to questionnaire values
+DEFAULT_SQERR = 1.e-6 # default value for sqerr assigned to questionnaire values
 NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
 MAX_SQERR = 0.1     # critical square error for screening
 
@@ -511,6 +513,8 @@ class Cycle():
         self.balanceSum += balance
         self.balanceMax = max(balance,self.balanceMax)
         self.nBalanceChecks += 1
+        return balance
+    
 #------------------------------------------------------------------------------
     def initCheckBalance(self):
 #------------------------------------------------------------------------------
@@ -1807,6 +1811,8 @@ def ccheck2(y0,y1,y2):
 #------------------------------------------------------------------------------
 #..............................................................................
 
+    bal = cycle.checkBalance([y0.val,y1.val,y2.val])
+    
     if DEBUG in ["ALL","CHECK"]:
         print "CCheck1_(before...)________________________________"
         y0.show()
@@ -1986,6 +1992,8 @@ def ccheck3(y0,y1,y2,y3):
 #------------------------------------------------------------------------------
 #..............................................................................
 
+    cycle.checkBalance([y0.val,y1.val,y2.val,y3.val])
+    
     row = CCRow("ccheck3-row",4)
     y = CCPar("ccheck3-y")
     
@@ -2013,6 +2021,8 @@ def ccheck4(y0,y1,y2,y3,y4):
 #   calculated inputs.
 #------------------------------------------------------------------------------
 #..............................................................................
+
+    cycle.checkBalance([y0.val,y1.val,y2.val,y3.val,y4.val])
 
     row = CCRow("ccheck4-row",5)
     y = CCPar("ccheck4-y")
@@ -2043,6 +2053,8 @@ def ccheck5(y0,y1,y2,y3,y4,y5):
 #   calculated inputs.
 #------------------------------------------------------------------------------
 #..............................................................................
+
+    cycle.checkBalance([y0.val,y1.val,y2.val,y3.val,y4.val,y5.val])
 
     row = CCRow("ccheck4-row",6)
     y = CCPar("ccheck4-y")

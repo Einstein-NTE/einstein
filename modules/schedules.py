@@ -212,7 +212,8 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                logDebug("Schedule (setDefault): ERROR in schedule parameters")
+                TPeriod = self.HBatch*self.NBatch
+                logWarning("WARNING: batch duration larger than industry operating time")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
@@ -231,7 +232,8 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                logDebug("Schedule (setDefault): ERROR in schedule parameters")
+                TPeriod = self.HBatch*self.NBatch
+                logWarning("WARNING: batch duration larger than industry operating time")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 
@@ -250,7 +252,8 @@ class Schedule():
             if self.NBatch > 0 and self.HBatch*self.NBatch <= self.HPerDay:
                 TPeriod = Status.HPerDayInd / self.NBatch
             else:
-                logDebug("Schedule (setDefault): ERROR in schedule parameters")
+                TPeriod = self.HBatch*self.NBatch
+                logWarning("WARNING: batch duration larger than industry operating time")
 
             tStartDay = 12.0 - 0.5 * Status.HPerDayInd
 

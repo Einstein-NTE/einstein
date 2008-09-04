@@ -43,7 +43,11 @@ class Fluid():
         if len(fluids) > 0:
             self.rho = fluids[0].FluidDensity
             self.cp = fluids[0].FluidCp
+            self.hL = fluids[0].LatentHeat
+            self.TCond = fluids[0].TCond
+            
             if self.cp is not None: self.cp = self.cp/3600.0
+            if self.hL is not None: self.hL = self.hL/3600.0
                                                 #data in DB are in kJ/kgK ->
                                                 #conversion to kWh/kgK
 
@@ -57,10 +61,14 @@ class Fluid():
                 logError(_("Severe error in your fluid data for fluid %s: cp %s")%\
                            (fluids[0].FluidName,self.cp))
                 self.cp = 1.16/1000.0
+
             self.name = fluids[0].FluidName
+
         else:
             self.rho = 1000.0                   #kg/m3
             self.cp  = 1.16/1000.0              #water properties in kWh/kgK
+            self.hL  = 0.7
+            self.TCond = 999 #
             self.name = "dummy fluid"
             logError(_("Fluid (init): cannot find fluid with ID = %s")%fluidID)
            

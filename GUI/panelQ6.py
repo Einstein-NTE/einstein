@@ -214,7 +214,7 @@ class PanelQ6(wx.Panel):
                               tip=_("Inlet temperature of the hot fluid"))
 
         self.tc8 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=4, minval=0., maxval=99999., value=0.,
                               unitdict='SPECIFICENTHALPY',
                               label=_("Inlet specific enthalpy (source)"),
                               tip=_("Inlet enthalpy of the hot fluid"))
@@ -226,7 +226,7 @@ class PanelQ6(wx.Panel):
                               tip=_("Outlet temperature of hot fluid"))
 
         self.tc10 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=4, minval=0., maxval=99999., value=0.,
                               unitdict='SPECIFICENTHALPY',
                               label=_("Outlet specific enthalpy (source)"),
                               tip=_("Outlet enthalpy of the hot fluid"))

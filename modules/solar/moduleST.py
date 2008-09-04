@@ -384,7 +384,7 @@ class ModuleST(object):
             u = urows[0]
 
             if u.STSolFra is None: u.STSolFra = 0.5
-            if u.STCollType is None: u.STCollType = "<any>"
+            if u.STCollType is None: u.STCollType = "any"
             if u.STMinYield is None: u.STMinYield = 300.0
             Status.SQL.commit()
             
@@ -1306,7 +1306,7 @@ class ModuleST(object):
         config = noneFilter(self.getUserDefinedPars())
         if self.manualChoosenColl != None:   #E.F. 28/07
             selectedCollector = self.manualChoosenColl    #E.F. 28/07
-            if config[1] != "<preselected>":   #E.F. 28/07
+            if config[1] != "preselected":   #E.F. 28/07
                 showWarning (_("When a particular collector has been selected in the database the collector type should be setted as 'preselected'"))  #E.F. 28/07
         else:
             if config[1] in ("Flat-plate collector", "Evacuated tube collector", "Concentrating collector"):

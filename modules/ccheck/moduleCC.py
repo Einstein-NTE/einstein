@@ -21,6 +21,7 @@
 #                           Hans Schweiger      13/06/2008
 #                           Hans Schweiger      3/07/2008
 #                                               30/07/2008
+#                           HS                  18/08/08
 #       Changes to previous version:
 #	v0.02 CV Add CCPipe, Add Matrix and links between matrix
 #       13/06/2008 HS   Connections between sub-systems imported from SQL
@@ -28,6 +29,7 @@
 #                       to the rest.
 #       3/07/2008 HS    Pipe
 #       30/07/2008      Linked QWH, deleted Rec
+#         18/08/08      null
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -213,11 +215,11 @@ class ModuleCC(object):
 
                 if entry[4] is not None:
                     row1 = ["%12.2f"%entry[4],
-                            "+/- "+"%5.3f"%entry[5]+"%",
+                            "+/- "+"%5.2f"%(entry[5]*100.0)+"%",
                             origin1]
                 else:
                     row1 = ["---",
-                            "+/- "+"%5.3f"%entry[5]+"%",
+                            "+/- "+"%5.2f"%(entry[5]*100.0)+"%",
                             origin1]
                     
 
@@ -227,11 +229,11 @@ class ModuleCC(object):
 
                 if entry[8] is not None:
                     row2 = ["%12.2f"%entry[8],
-                            "+/- "+"%5.3f"%entry[9]+"%",
+                            "+/- "+"%5.2f"%(entry[9]*100.0)+"%",
                             origin2]
                 else:
                     row2 = ["---",
-                            "+/- "+"%5.3f"%entry[9]+"%",
+                            "+/- "+"%5.2f"%(entry[9]*100.0)+"%",
                             origin2]
                     
                        

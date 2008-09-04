@@ -521,7 +521,7 @@ class PanelST(wx.Panel):
         self.tcConfig1.SetValue(convertDoubleToString(self.config[0]))
 
         TRANSCOLLTYPES = copy.deepcopy(TRANSSTTYPES)
-        TRANSCOLLTYPES.update({"any":_("<any>"),"preselected":_("<preselected collector>")})
+        TRANSCOLLTYPES.update({"any":_("--any--"),"preselected":_("--preselected collector--")})
         collTypes = TRANSCOLLTYPES.values()
         collTypes.sort()
 
