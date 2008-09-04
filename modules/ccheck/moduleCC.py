@@ -421,7 +421,7 @@ class ModuleCC(object):
         
 #..............................................................................
         
-        NCycles = 50        #maximum number of cycles
+        NCycles = 100        #maximum number of cycles
         NBestCycles = 8     #run the first cycles in CHECKMODE = "BEST", the
                             #remaining ones in "MEAN"
 
@@ -744,12 +744,15 @@ class ModuleCC(object):
                   (cycle.getMeanTotalBalance(),balanceCtrl,\
                    cycle.getMaxTotalBalance())
 
-            if ncycle%1 == 0 or balanceCtrl <= 1.e-3:
+            if ncycle%1 == 0 or balanceCtrl <= 5.e-4:
                 logMessage("Consistency check: maximum remaining balance error %6.2f percent"%(balanceCtrl*100))
 
-            if balanceCtrl <= 1.e-3:
+            if balanceCtrl <= 5.e-4:
                 print "ModuleCC (basic check): convergence reached at %s cycles"%(ncycle+1)
                 break
+
+            if ncycle == NCycles-1:
+                showWarning("Consistency check calculations did not converge. Data may not be fully balanced")
 
             
 #..............................................................................

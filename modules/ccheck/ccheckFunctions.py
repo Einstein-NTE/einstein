@@ -33,6 +33,7 @@
 #                           Hans Schweiger      19/06/2008
 #                           Hans Schweiger      21/06/2008ff
 #                           Hans Schweiger      18/08/2008
+#                           Hans Schweiger      02/09/2008 ff
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -65,6 +66,8 @@
 #       22/06/08 HS bugfix01 in constrain, calcDev, calcErr -> separate treat-
 #                   ment of INFINITE
 #       18/08/2008 checkBalance in ccheck2-5
+#       02/09/2008  skip very bad estimates in meanValueOf - functions
+#                   latent heat added in calcH
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -82,7 +85,7 @@ from einstein.GUI.GUITools import *     #needed for function check
 EPSILON = 1.e-10     # required accuracy for function "isequal"
 INFINITE = 1.e99    # numerical value assigned to "infinite"
 MINIMUM_VALUE = 1.e-10
-DEFAULT_SQERR = 1.e-6 # default value for sqerr assigned to questionnaire values
+DEFAULT_SQERR = 1.e-4 # default value for sqerr assigned to questionnaire values
 NUMERIC_ERR = 1.e-10 # accuracy of numeric calculations
 MAX_SQERR = 0.1     # critical square error for screening
 
@@ -179,6 +182,7 @@ class CCPar():
     def update(self,new):
 #------------------------------------------------------------------------------
         self.val = new.val
+            
         self.sqerr = new.sqerr
         self.sqdev = new.sqdev
         self.valMin = new.valMin
@@ -225,6 +229,9 @@ class CCPar():
         elif self.parType == "X" and self.val > 1.0 - NUMERIC_ERR:
             self.val = 1.0
             self.sqerr = 0
+        elif self.parType == "T" and err==DEFAULT_SQERR:
+            self.sqdev = 0.1
+            self.calcErr()
         else:
             self.sqerr = err
 
@@ -298,7 +305,9 @@ class CCPar():
             if self.val > 0:
                 
                 try:    #helps to avoid crash for very large errors
-                    self.sqerr = min(self.sqerr,pow((self.valMax-self.valMin)/self.val,2.0))
+                    newErr = max(pow((self.valMax-self.val)/self.val,2.0),\
+                                 pow((self.val-self.valMin)/self.val,2.0))
+                    self.sqerr = min(self.sqerr,newErr)
                 except:
                     pass
 
@@ -900,26 +909,91 @@ def calcFlow(Qdotname,cp,m,T1,T0,DT,DT1):
     return Qdot
 
 #------------------------------------------------------------------------------
-def calcH(yname,a,x1,x2):
+def enthalpy(cL,cV,h,T0,T,x):
+#------------------------------------------------------------------------------
+#   enthalpy calculation
+#------------------------------------------------------------------------------
+
+    if (T ==None):
+        return(None)
+    
+    elif h is None or T0 is None:
+        return (cL * T)
+    
+    elif isequal(T,T0):
+        if x is None:
+            return (cL * T0 + 0.5*h)
+        else:
+            return(cL * T0 + x*h)
+    
+    elif T < T0:
+        return(cL * T)
+    
+    elif T > T0:
+        return(cL * T0 + h + cV * (T - T0))
+
+#------------------------------------------------------------------------------
+def invEnthalpy(cL,cV,h,T0,y):
+#------------------------------------------------------------------------------
+#   enthalpy calculation
+#------------------------------------------------------------------------------
+
+    h0 = cL*T0
+    h1 = h0 + h
+    
+    if (y ==None):
+        return(None,None)
+    
+    elif y < h0:     #liquid phase
+        return (y/cL,0.0)
+    
+    elif y <= h1:
+        x = (y - h0)/h
+        return(T0,x)
+    
+    elif y > h1:
+        return(T0 + (y - h1)/cV,1.0)
+    
+#------------------------------------------------------------------------------
+def calcH(yname,cL,cV,h,T0,x1,x2):
 #------------------------------------------------------------------------------
 #   Default function for calculating the entalpy h
 #------------------------------------------------------------------------------
     y = CCPar(yname)
 
-    if (x1.val ==None):
-        y.val = None
+    y.val = enthalpy(cL,cV,h,T0,x1.val,x2.val)
+    y.valMin = enthalpy(cL,cV,h,T0,x1.valMin,x2.valMin)
+    y.valMax = enthalpy(cL,cV,h,T0,x1.valMax,x2.valMax)
+
+    if x1.val is None:
         y.sqerr = INFINITE
     else:
-        y.val = a * x1.val
-        y.sqerr = x1.sqerr
+        devT = pow(x1.calcDev(),0.5)
+        devh = pow(x2.calcDev(),0.5)
+        TL = max(0.0,x1.val - devT)
 
-    y.valMin = a*x1.valMin
-    y.valMax = min(INFINITE,a*x1.valMax)
+        if x2.val is None:
+            xL = 0
+        else:
+            xL = max(0.0,x2.val - devh)
+        hL = enthalpy(cL,cV,h,T0,TL,xL)
+        
+        TH = x1.val + devT
+        if x2.val is None:
+            xH = 1
+        else:
+            xH = x2.val + devh
+        hH = enthalpy(cL,cV,h,T0,TH,xH)
+
+        y.sqdev = pow(max(hH - y.val,y.val-hL),2.0)
+        y.calcErr()
+        
     y.constrain()
 
     if y.val is not None:
         y.track = []
         y.track.extend(x1.track)
+        y.track.extend(x2.track)
         y.cleanUp()
 
     if DEBUG in ["ALL","CALC"]:
@@ -1527,7 +1601,8 @@ def adjRowSum(name,y,row,m):
         diff = nNones
 
     else:
-        
+
+# first adjustment
         for i in range(m):
             if SumErr <> 0:
                 
@@ -1541,31 +1616,32 @@ def adjRowSum(name,y,row,m):
                 newValMin = max(newValMin,row[i].valMin)
                 newValMax = min(newValMax,row[i].valMax)
 
+                row[i].valMax = newValMax
+                row[i].valMin = newValMin
+
                 if y.val is not None:
+                    newval = row[i].val + ((row[i].sqdev/SumSqDev)*(y.val-Sum))
+                    newval = max(newval,row[i].valMin)
+                    newval = min(newval,row[i].valMax)
+                    newval = min(newval,y.val)  #no value can be bigger than the sum.
+                    if DEBUG in ["ALL","ADJUST"]:
+                        print "In adjRowSum newval = ",newval," substitutes "
+                        row[i].show()
+                        
+                    shift = newval - row[i].val
+                    row[i].val = newval
+
                     maxSqDev = y.sqdev
                     for j in range(m):
                         if not j==i:
                             maxSqDev += row[j].sqdev
 
-                    newval = row[i].val + ((row[i].sqdev/SumSqDev)*(y.val-Sum))
-                    newval = max(newval,row[i].valMin)
-                    newval = min(newval,row[i].valMax)
-                    if DEBUG in ["ALL","ADJUST"]:
-                        print "In adjRowSum newval = ",newval," substitutes "
-                        row[i].show()  
-
-                    row[i].val = newval
+                    row[i].sqdev = min(row[i].sqdev + 4.*pow(shift,2.),maxSqDev)
+                    row[i].calcErr()
 
                     if DEBUG in ["ALL","ADJUST"]:
                         print "... to new value:"
-                        row[i].show()  
-
-                    row[i].sqdev = min(row[i].sqdev,maxSqDev)
-                    row[i].calcErr()
-
-
-                row[i].valMax = newValMax
-                row[i].valMin = newValMin
+                        row[i].show()
 
             elif not isequal(Sum,y.val):
 
@@ -1582,6 +1658,30 @@ def adjRowSum(name,y,row,m):
             diff = abs(Sum - y.val)
         else:
             diff = 1.0
+
+# second pass -> try to adjust the balance
+
+        Sum=0.0
+        for i in range(m):
+            if row[i].val is None:
+                nNones += 1
+            else:
+                Sum += row[i].val
+
+#        dummy = None                
+#        if dummy is not None:
+        if y.val is not None:
+            newdiff = Sum - y.val
+            if newdiff <> 0:
+                for i in range(m):
+                    newval = row[i].val - newdiff
+                    newval = max(newval,row[i].valMin)
+                    newval = min(newval,row[i].valMax)
+                    shift = row[i].val - newval
+                    newdiff -= shift
+                    row[i].val = newval
+                    row[i].sqdev += 4.*pow(shift,2.)
+                    row[i].calcErr()
 
     for i in range(m):        
         row[i].constrain()
@@ -1713,7 +1813,7 @@ def adjustFlow(Qdot,cp,m,T1,T0,DT,DT1):
 
 
 #------------------------------------------------------------------------------
-def adjustH(y,a,x1,x2):
+def adjustH(y,cL,cV,h,T0,x1,x2):
 #------------------------------------------------------------------------------
 #   Default function for adjusting the entalpy h
 #------------------------------------------------------------------------------
@@ -1726,15 +1826,42 @@ def adjustH(y,a,x1,x2):
         x1.show()
         x2.show()
 
+    h0 = enthalpy(cL,cV,h,T0,T0,0.0)
+    h1 = enthalpy(cL,cV,h,T0,T0,1.0)
+    
     if not (y.val == None):
-        
-        x1.val = y.val /a
-        x1.sqerr = y.sqerr
 
-    x1.valMin = min(y.valMin/a,INFINITE)
-    x1.valMax = min(y.valMax/a,INFINITE)
+        dev = pow(y.calcDev(),0.5)
+        yL = max(y.val - dev,0.0)
+        yH = y.val + dev
+        
+        (T,x) = invEnthalpy(cL,cV,h,T0,y.val)            
+        (TL,xL) = invEnthalpy(cL,cV,h,T0,yL)            
+        (TH,xH) = invEnthalpy(cL,cV,h,T0,yH)
+
+        devT = max(T-TL,TH-T)
+        devx = max(x-xL,xH-x)
+
+        x1.val = T
+        x1.sqdev = pow(devT,2.0)
+        x1.calcErr()
+
+        x2.val = x
+        x2.sqdev = pow(devx,2.0)
+        x2.calcErr()
+
+    (Tmin,xmin) = invEnthalpy(cL,cV,h,T0,y.valMin)
+    (Tmax,xmax) = invEnthalpy(cL,cV,h,T0,y.valMax)
+
+    x1.valMin = max(min(Tmin,INFINITE),0.0)
+    x1.valMax = min(Tmax,INFINITE)
 
     x1.constrain()
+
+    x2.valMin = max(min(xmin,INFINITE),0.0)
+    x2.valMax = min(xmax,1.0)
+
+    x2.constrain()
 
     if y.val is not None:
         x1.track = []
@@ -2228,9 +2355,8 @@ def meanValueOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
-    checkIfConflict(y1,y2)
-
     mean = CCPar("meanValueOf")
+    mean.update(bestOf(y1,y2))
 
 #    mean.track = trackBestOf(y1,y2)
 # adding too much tracks gave problems ... -> back to the roots
@@ -2243,16 +2369,6 @@ def meanValueOf(y1,y2):
 #    sumSqErr = pow(y1.sqerr,2) + pow(y2.sqerr,2)
     sumSqDev = y1.calcDev() + y2.calcDev()
     
-#    if sumSqErr > 0:
-#        mean.val = (pow(y1.sqerr,2)*y2.val + pow(y2.sqerr,2)*y1.val)/sumSqErr
-
-    if sumSqDev > 0:
-        mean.val = (y1.sqdev*y2.val + y2.sqdev*y1.val)/sumSqDev
-        
-    else:
-        mean.val=0.5*(y1.val+y2.val)
-
-    
     dif=abs(y1.val-y2.val)
     maxDif = pow(sumSqDev,0.5)*CONFIDENCE
     
@@ -2264,7 +2380,15 @@ def meanValueOf(y1,y2):
         y2.show()
         print "======================================================"
 
-
+    if y1.sqdev > 10.0*y2.sqdev or y2.sqdev > 10.0*y1.sqdev:
+        pass
+    
+    elif sumSqDev > 0:
+        mean.val = (y1.sqdev*y2.val + y2.sqdev*y1.val)/sumSqDev
+        
+    else:
+        mean.val=0.5*(y1.val+y2.val)
+        
     mean.sqdev = min(y1.sqdev,y2.sqdev)
     
     mean.valMin = max(y1.valMin,y2.valMin)
@@ -2376,15 +2500,27 @@ def meanOfRow(row,m):
         print "___________________________________________________"
 
     
+    minDev = INFINITE
+    for i in range(m):
+        minDev = min(minDev,row[i].calcDev())
+        
+    if minDev == 0:
+        minWeight = INFINITE
+    else:
+        minWeight = 0.1/minDev
+    
     sumVal = 0
     sumWeight = 0
 
     for i in range(m):
         if not (row[i].val == None):
-            if row[i].calcDev() == 0:
+            if row[i].sqdev == 0:
                 weight = INFINITE
             else:
                 weight = 1./row[i].sqdev
+
+            if weight < minWeight:
+                weight = 0            # skip very bad estimates
                 
             sumWeight += weight
             sumVal += row[i].val*weight

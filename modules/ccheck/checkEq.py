@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
+#	Version No.: 0.08
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    Claudia Vannoni     7/04/2008
 #                           Claudia Vannoni     16/04/2008
@@ -26,6 +26,7 @@
 #                           Claudia Vannoni     27/04/2008
 #                           Claudia Vannoi      3/07/2008
 #                           Claudia Vannoi      30/07/2008
+#                           Hans Schweiger      03/09/2008
 #
 #               Changes in last update:
 #                               sqerr NONE eliminated
@@ -33,6 +34,7 @@
 #       26/04/2008: SQL import and export, ccheck, labels
 #	3/07/2008: parameters in screen list, priorities, import from DBFuel,constraints val max
 #       30/07/2008: Added calculations on ExhaustGas,QWHEq, all parameters with # updated
+#       03/09/2008: HS  0 error for some of the input variables
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -197,8 +199,8 @@ class CheckEq():
                     else:
                         self.ElectriConsum.setValue(qgenerationhc.ElectriConsum)
 
-                self.HCGPnom.setValue(qgenerationhc.HCGPnom)
-                self.NDaysEq.setValue(qgenerationhc.NDaysEq)
+                self.HCGPnom.setValue(qgenerationhc.HCGPnom,err = 0.0)  #if specified, take as fixed
+                self.NDaysEq.setValue(qgenerationhc.NDaysEq, err=0.0) #integer -> 0 error
                 self.HPerDayEq.setValue(qgenerationhc.HPerDayEq)
                 self.PartLoad.setValue(qgenerationhc.PartLoad)
                 self.HCGTEfficiency.setValue(qgenerationhc.HCGTEfficiency)

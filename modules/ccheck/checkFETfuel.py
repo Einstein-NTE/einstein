@@ -23,9 +23,11 @@
 #	Last revised by:    Claudia Vannoni      17/04/2008
 #                           Claudia Vannoni      27/04/2008
 #                           Claudia Vannoni      3/07/2008
+#                           Hans Schweiger      03/09/2008
 #       Changes in last update:
 #                   v003: import from SQL, ccheck,labels
 #               3/07/2008: import from FluidDB
+#       03/09/08: HS    0 error for MFuel specified
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -87,7 +89,7 @@ class CheckFETfuel():
 # assign empty CCPar to all questionnaire parameters
 
         
-        self.MFuelYear = CCPar("MFuelYear")
+        self.MFuelYear = CCPar("MFuelYear") 
         self.FECFuel = CCPar("FECFuel")
         self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
         
@@ -107,11 +109,12 @@ class CheckFETfuel():
                 self.FuelLCV = fet_fuel.LCV
                 #self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
 
-                self.MFuelYear.setValue(qfuel.MFuelYear)
+                self.MFuelYear.setValue(qfuel.MFuelYear,err=0.0) #if specified, take as exact
                 self.FECFuel.setValue(qfuel.FECFuel)
                 
                 self.FEOFuel.val = 0
                 self.FEOFuel.sqerr = 0.0
+                logDebug("checkFuel (importData): FEO = 0.0 assumed")
         except:
             self.FuelLCV = 0.0
             print "CheckFETfuel(importData): error reading data from qfuel"

@@ -33,6 +33,7 @@
 #                           Claudia Vannoni      14/08/2008
 #                           Hans Schweiger      16/08/2008
 #                           Hans Schweiger      18/08/2008
+#                           Hans Schweiger      03/09/2008
 #
 #       Changes in last update: 
 #       v004:adjustSum3
@@ -54,6 +55,7 @@
 #                    bug-fix in calculation of UPHm -> HPerYear instead HPerDay
 #                    special case for QHXint = 0
 #       18/08/08: NDaysProc added ccheck 1,2,3; NBatchPerYear2
+#       03/09/08: Default error for integers (number of days, ...) = 0
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -173,6 +175,7 @@ class CheckProc():
         self.QHXProc1 = CCPar("QHXProc1")
         self.UAProc = CCPar("UAProc")
         self.QEvapProc = CCPar("QEvapProc")
+        self.QEvapProc1 = CCPar("QEvapProc1")
         self.UPHcGross = CCPar("UPHcGross")
         self.QHXProcInt = CCPar("QHXProcInt")
         self.QHXProc = CCPar("QHXProc")# It comes from the matrix
@@ -230,7 +233,7 @@ class CheckProc():
             self.FluidRhoCp = self.FluidCp* self.FluidDensity
 
             self.PTInFlow.setValue(qprocessdata.PTInFlow)
-            self.PT.setValue(qprocessdata.PT)
+            self.PT.setValue(qprocessdata.PT,err=0.0)   #if specified, take as fixed
             self.PTOutFlow.setValue(qprocessdata.PTOutFlow)
             self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
             self.PTStartUp.setValue(qprocessdata.PTStartUp)
@@ -238,15 +241,16 @@ class CheckProc():
             self.VInFlowDay.setValue(qprocessdata.VInFlowDay) 
             self.VOutFlow.setValue(qprocessdata.VOutFlow) 
             self.VolProcMed.setValue(qprocessdata.VolProcMed) 
-            self.NDaysProc.setValue(qprocessdata.NDaysProc)
+            self.NDaysProc.setValue(qprocessdata.NDaysProc,err=0.0) #number -> exact value
             self.HPerDayProc.setValue(qprocessdata.HPerDayProc) 
-            self.NBatch.setValue(qprocessdata.NBatch) 
+            self.NBatch.setValue(qprocessdata.NBatch,err=0.0) #number -> exact value
+            
             if qprocessdata.TEnvProc is None:
                 self.TEnvProc.setValue(18.0)
             else:
                 self.TEnvProc.setValue(qprocessdata.TEnvProc)
             self.QOpProc.setValue(qprocessdata.QOpProc) 
-            self.UPH.setValue(qprocessdata.UPH) 
+            self.UPH.setValue(qprocessdata.UPH,err=0.0) #if specified, take exact value 
 
             if isequal(self.PTInFlow.val,self.PTInFlowRec.val) or self.PTInFlowRec.val is None:
                 self.internalHR = False
@@ -992,6 +996,7 @@ class CheckProc():
         ccheck1(self.DTLoss,self.DTLoss1)
         ccheck1(self.QLoss,self.QLoss1)
         ccheck1(self.QOpProc,self.QOpProc1)
+        ccheck1(self.QEvapProc,self.QEvapProc1)
         ccheck1(self.UPHm,self.UPHm1)
         ccheck1(self.UPHcdotGross,self.UPHcdotGross1)
         ccheck2(self.QHXdotProcInt,self.QHXdotProcInt1,self.QHXdotProcInt2)

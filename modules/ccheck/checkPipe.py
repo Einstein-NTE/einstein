@@ -299,6 +299,8 @@ class CheckPipe():
 
             fluid = Fluid(qdistributionhc.HeatDistMedium)
             self.FluidCp = fluid.cp
+            self.Fluid_hL = fluid.hL
+            self.FluidTCond = fluid.TCond
 
             self.DistribCircFlow.setValue(qdistributionhc.DistribCircFlow)
             self.ToutDistrib.setValue(qdistributionhc.ToutDistrib)
@@ -309,9 +311,8 @@ class CheckPipe():
             self.DDistPipe.setValue(qdistributionhc.DDistPipe)
             self.DeltaDistPipe.setValue(qdistributionhc.DeltaDistPipe)
 
-            self.TenvPipe.setValue(18)  #°C
-            self.TrefPipe.setValue(0)   #°C, NOT USED
-            self.QHXPipe.setValue(0.0)
+            self.TenvPipe.setValue(18,err=0.0)  #°C
+            self.TrefPipe.setValue(0,err=0.0)   #°C, NOT USED
         else:
             self.FluidCp = 0.00116
             logTrack("CheckPipe(importData): error reading data from qdistributionhc in PipeNo: %s"%self.PipeDuctNo)
@@ -323,7 +324,8 @@ class CheckPipe():
 #            print "CheckPipe(importData): error reading data from qdistributionhc"
 
 #####TESTING ONLY: unknown HPerYearPipe gives problems !!!!
-        self.HPerYearPipe.setValue(4000.0)
+        self.HPerYearPipe.setValue(4000.0,err=0.0)
+        logDebug("CheckPipe (importData): pipe operating hours fixed to 4000 h")
 
         if self.DDistPipe.val is not None and self.DeltaDistPipe.val is not None:
             self.DoPipe.setValue (self.DDistPipe.val + (2*self.DeltaDistPipe.val))
@@ -608,12 +610,37 @@ class CheckPipe():
 #..............................................................................
 # writing data into table " qdistributionhc"
 
-            self.hForwIn1 = calcH("hForwIn1",self.FluidCp,self.ToutDistrib1,self.xForwIn) #ToutDistrib1
-            self.hForwOut1 = calcH("hForwOut1",self.FluidCp,self.TForwOut1,self.xForwOut)#TForwOut1
-            self.hRetIn1 = calcH("hRetIn1",self.FluidCp,self.TRetIn,self.xRetIn)
-            self.hRetRec1 = calcH("hRetRec1",self.FluidCp,self.TreturnDistrib1,self.xRetIn)#TreturnDistrib1
-            self.hRetOut1 = calcH("hRetOut1",self.FluidCp,self.TRetOut,self.xRetOut)
-            self.hFeedUp1 = calcH("hFeedUp1",self.FluidCp,self.Tfeedup,self.xFeedup)
+            self.hForwIn1 = calcH("hForwIn1",
+                                  self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                  self.ToutDistrib1,self.xForwIn) #ToutDistrib1
+            self.hForwOut1 = calcH("hForwOut1",self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                   self.TForwOut1,self.xForwOut)#TForwOut1
+            self.hRetIn1 = calcH("hRetIn1",self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                 self.TRetIn,self.xRetIn)
+            self.hRetRec1 = calcH("hRetRec1",self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                  self.TreturnDistrib1,self.xRetIn)#TreturnDistrib1
+            self.hRetOut1 = calcH("hRetOut1",self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                  self.TRetOut,self.xRetOut)
+            self.hFeedUp1 = calcH("hFeedUp1",self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                                  self.Tfeedup,self.xFeedup)
 
 
             self.PercentFeedUp1 = calcDiff("PercentFeedUp1",self.ONE,self.PercentRecirc)#hFeedUp,hRetRec
@@ -723,12 +750,41 @@ class CheckPipe():
             adjustDiff(self.DhRetRecFeedup1,self.hRetRec,self.hFeedUp)
             adjustDiff(self.PercentFeedUp1,self.ONE,self.PercentRecirc)#hFeedUp,hRetRec
 
-            adjustH(self.hFeedUp1,self.FluidCp,self.Tfeedup,self.xFeedup)
-            adjustH(self.hRetOut1,self.FluidCp,self.TRetOut1,self.xForwOut)
-            adjustH(self.hRetRec1,self.FluidCp,self.TreturnDistrib1,self.xRetIn)
-            adjustH(self.hRetIn1,self.FluidCp,self.TRetIn,self.xRetIn)
-            adjustH(self.hForwOut1,self.FluidCp,self.TForwOut1,self.xForwOut)
-            adjustH(self.hForwIn1,self.FluidCp,self.ToutDistrib1,self.xForwIn) 
+            adjustH(self.hFeedUp1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.Tfeedup,self.xFeedup)
+            
+            adjustH(self.hRetOut1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.TRetOut1,self.xForwOut)
+            
+            adjustH(self.hRetRec1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.TreturnDistrib1,self.xRetIn)
+            
+            adjustH(self.hRetIn1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.TRetIn,self.xRetIn)
+            
+            adjustH(self.hForwOut1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.TForwOut1,self.xForwOut)
+            
+            adjustH(self.hForwIn1,self.FluidCp,
+                                  self.FluidCp,
+                                  self.Fluid_hL,
+                                  self.FluidTCond,
+                    self.ToutDistrib1,self.xForwIn) 
             
             
             if DEBUG in ["ALL","MAIN"]:
