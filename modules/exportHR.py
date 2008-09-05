@@ -1,13 +1,39 @@
+#==============================================================================#
+#   E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
 #------------------------------------------------------------------------------
 #
-#    HRExport
-#            
+#    XMLExportHRModule
+#           
 #------------------------------------------------------------------------------
-#            
+#
 #    Module to create customized export XML for the HRModule
-#
-#
+#           
 #==============================================================================
+#
+#   Version No.: 0.03
+#   Created by:         Florian Joebstl  20/08/2008
+#   Last revised by:
+#                       Florian Joebstl  04/09/2008                       
+#
+#   Changes to previous version:
+#   01/09/2008: (FJ) Set all NULL values to 0 like expected by the external tool 
+#   04/09/2008: (FJ) Fixed the QOpProc value problem
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
+#
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
+#
+#============================================================================== 
+#  INFORMATION:
+#
 #  Usage:
 #    XMLExportHRModule.export(path,qid,ano,export_exheatex = False)
 #    e.g. XMLExportHRModule.export("hr.xml",74,1,False)
@@ -35,9 +61,10 @@
 #==============================================================================
 
 import xml.dom
-
+from einstein.modules.messageLogger import *
+#Try to import the PYXML library to generate human readable (well formated) xml
+#else the default print is used
 TRY_PYXML = True
-
 if (TRY_PYXML):
     try:
         import xml.dom.ext
@@ -51,8 +78,6 @@ import string
 import wx
 
 from xml.dom.minidom import getDOMImplementation
-
-##CHANGE to Einstein location of status.py
 from einstein.GUI.status import Status
 
 
@@ -335,32 +360,37 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
         db = DBConnection();
         db.connect()
         sql = self.procdatabatch[self.SQL]
-        tags= self.procdatabatch[self.INNERTAGS]                
+        tags= self.procdatabatch[self.INNERTAGS]   
+                             
         r = db.sql( sql % (pid,self.qid,self.ano) )
-        count = 0
+        valuecount = 0
+        
         hbatch = 0        
-        for value in r[0]:
-            override = 0
-            if (tags[count]=="HBatch"): #not needed anymore
-                hbatch = value
-                
-            innerentry = self.document.createElement(tags[count])
+        for tag in tags:                        
+            value = r[0][valuecount]
+                    
+            override = 0                       
+            innerentry = self.document.createElement(tag)
             innerentryvalue = None
-            convertedvalue = self.handleSpecialCases(value,tags[count])
+            convertedvalue = self.handleSpecialCases(value,tag)
             
-            if (tags[count]=="MinStartBatch"):
-                override = 1  
-                #val = (hbatch * 0.1)
-                innerentryvalue = self.document.createTextNode(str(30.0))                          
-            if (tags[count]=="MinStartCont"):
-                override = 1                
-                innerentryvalue = self.document.createTextNode(str(30.0))
-            if (override == 0):                                         
-                innerentryvalue = self.document.createTextNode(convertedvalue) ##XX
+            if (tag=="MinStartBatch"):
+                override = 1      
+                valuecount-=1          
+                convertedvalue = str(30.0)
+                                          
+            if (tag=="MinStartCont"):
+                override = 1     
+                valuecount-=1             
+                convertedvalue = str(30.0)
+                
+            innerentryvalue = self.document.createTextNode(convertedvalue) 
+                
             if (convertedvalue!=None):
                 innerentry.appendChild(innerentryvalue)
+                
             parent.appendChild(innerentry)
-            count+=1                     
+            valuecount+=1                     
         db.close()                        
         return None   
 
@@ -488,7 +518,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     insupplymedtags = ["SupplyMed","TSupply","SupplyMedFlow","FluidId","FluidDensity","FluidCp"]
     insupplymed     = [None,"InputSupplyMedium1",insupplymedtags,SQLViews.SQL_InputSupplyMed1,None,None]      
     
-    #InputXMLQProcessDataBatch structure
+    #InputXMLQProcessDataBatch structure                              
     procdatabatchtags = ["NBatch","HBatch","NDaysProc","MinStartBatch","MinStartCont","QOpProc","HPerDayProc","QEvapProc"]
     procdatabatch     = [None,None,procdatabatchtags,SQLViews.SQL_ProcessData2, None, HandleBatchData]       
     

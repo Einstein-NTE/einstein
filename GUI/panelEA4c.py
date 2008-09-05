@@ -182,7 +182,7 @@ class PanelEA4c(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _(u'Heat demand (UPH) and supply (USH) by temperature'),
+        self.box1 = wx.StaticBox(self, -1, _('Useful supply heat demand (USH) - peak and base load'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -193,7 +193,7 @@ class PanelEA4c(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of heat demand (UPH) by process temperatures'),
+        self.box2 = wx.StaticBox(self, -1, _('Cumulative heat demand (USH)'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)

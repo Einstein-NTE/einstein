@@ -1,6 +1,42 @@
 #Boa:Dialog:dlgChangeHX
+#==============================================================================#
+#   E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#    DlgChangeHX
+#           
+#------------------------------------------------------------------------------
+#
+#    Dialog for changing a heatexchanger in the HRModule
+#           
+#==============================================================================
+#
+#   Version No.: 0.02
+#   Created by:         Florian Joebstl  01/09/2008
+#   Last revised by:
+#                       Florian Joebstl  03/09/2008                       
+#
+#   Changes to previous version:
+#   03/09/2008: (FJ) Disable all not used fields based on hot and cold type index 
+#   
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
+#
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
+#
+#============================================================================== 
+
 
 from wx import *
+from einstein.modules.messageLogger import *
 
 def create(parent):
     return dlgChangeHX(parent)
@@ -15,7 +51,7 @@ def create(parent):
  wxID_DLGCHANGEHXSTATICTEXT10, wxID_DLGCHANGEHXSTATICTEXT11, 
  wxID_DLGCHANGEHXSTATICTEXT12, wxID_DLGCHANGEHXSTATICTEXT13, 
  wxID_DLGCHANGEHXSTATICTEXT14, wxID_DLGCHANGEHXSTATICTEXT15, 
- wxID_DLGCHANGEHXSTATICTEXT16, wxID_DLGCHANGEHXSTATICTEXT17, 
+ wxID_DLGCHANGEHXSTATICTEXT16, wxID_PANEL1TBADDITIONAL, 
  wxID_DLGCHANGEHXSTATICTEXT18, wxID_DLGCHANGEHXSTATICTEXT19, 
  wxID_DLGCHANGEHXSTATICTEXT2, wxID_DLGCHANGEHXSTATICTEXT20, 
  wxID_DLGCHANGEHXSTATICTEXT21, wxID_DLGCHANGEHXSTATICTEXT22, 
@@ -35,6 +71,9 @@ class HXConsts:
     MAT_TYPE_CS = 'CS'
     MAT_TYPE_CU = 'Cu'
     MAT_TYPE_NI = 'NI'
+        
+    HX_TYPE_P = 'plate (PHE)'
+    HX_TYPE_S = 'shell and tube (STHE)' #XXX
     
     
 class DlgChangeHX(wx.Dialog):
@@ -44,7 +83,7 @@ class DlgChangeHX(wx.Dialog):
         wx.Dialog.__init__(self, id=wxID_DLGCHANGEHX, name='dlgChangeHX',
               parent=prnt, pos=wx.Point(373, 250), size=wx.Size(493, 409),
               style=wx.DIALOG_MODAL | wx.DIALOG_NO_PARENT | wx.DEFAULT_DIALOG_STYLE,
-              title='Change Heatexchanger - Parameters for calculation of HEX')
+              title=_('Change Heatexchanger - Parameters for calculation of HEX'))
         self.SetClientSize(wx.Size(485, 382))
 
         self.staticBox1 = wx.StaticBox(id=wxID_DLGCHANGEHXSTATICBOX1,
@@ -57,14 +96,14 @@ class DlgChangeHX(wx.Dialog):
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,
               id=wxID_DLGCHANGEHXBTNOK)
 
-        self.btnCancel = wx.Button(id=wxID_DLGCHANGEHXBTNCANCEL, label='Cancel',
+        self.btnCancel = wx.Button(id=wxID_DLGCHANGEHXBTNCANCEL, label=_('Cancel'),
               name='btnCancel', parent=self, pos=wx.Point(392, 352),
               size=wx.Size(75, 23), style=0)
         self.btnCancel.Bind(wx.EVT_BUTTON, self.OnBtnCancelButton,
               id=wxID_DLGCHANGEHXBTNCANCEL)
 
         self.staticText1 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT1,
-              label='liquid-liquid', name='staticText1', parent=self,
+              label=_('liquid-liquid'), name='staticText1', parent=self,
               pos=wx.Point(16, 264), size=wx.Size(52, 13), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_DLGCHANGEHXSTATICBOX2,
@@ -137,7 +176,7 @@ class DlgChangeHX(wx.Dialog):
               label='1', name='staticText11', parent=self, pos=wx.Point(152,
               200), size=wx.Size(32, 13), style=0)
 
-        self.chLL = wx.Choice(choices=['plate','shell&tube'], id=wxID_DLGCHANGEHXCHLL, name='chLL',
+        self.chLL = wx.Choice(choices=[HXConsts.HX_TYPE_P, HXConsts.HX_TYPE_S], id=wxID_DLGCHANGEHXCHLL, name='chLL',
               parent=self, pos=wx.Point(96, 264), size=wx.Size(104, 21),
               style=0)
         self.chLL.SetSelection(0)
@@ -146,23 +185,23 @@ class DlgChangeHX(wx.Dialog):
               label=_('gaseous-gaseus'), name='staticText12', parent=self,
               pos=wx.Point(16, 312), size=wx.Size(78, 13), style=0)
 
-        self.chLG = wx.Choice(choices=['plate','shell&tube'], id=wxID_DLGCHANGEHXCHLG, name='chLG',
+        self.chLG = wx.Choice(choices=[HXConsts.HX_TYPE_P, HXConsts.HX_TYPE_S], id=wxID_DLGCHANGEHXCHLG, name='chLG',
               parent=self, pos=wx.Point(96, 288), size=wx.Size(104, 21),
               style=0)
-        self.chLG.SetSelection(0)
+        self.chLG.SetSelection(1)
 
-        self.chGG = wx.Choice(choices=['plate','shell&tube'], id=wxID_DLGCHANGEHXCHGG, name='chGG',
+        self.chGG = wx.Choice(choices=[HXConsts.HX_TYPE_P, HXConsts.HX_TYPE_S], id=wxID_DLGCHANGEHXCHGG, name='chGG',
               parent=self, pos=wx.Point(96, 312), size=wx.Size(104, 21),
               style=0)
-        self.chGG.SetSelection(0)
+        self.chGG.SetSelection(1)
 
-        self.chMatType = wx.Choice(choices=[HXConsts.MAT_TYPE_CU,HXConsts.MAT_TYPE_CS,HXConsts.MAT_TYPE_NI,HXConsts.MAT_TYPE_NI], id=wxID_DLGCHANGEHXCHMATTYPE,
+        self.chMatType = wx.Choice(choices=[HXConsts.MAT_TYPE_SS,HXConsts.MAT_TYPE_CS,HXConsts.MAT_TYPE_NI,HXConsts.MAT_TYPE_CU], id=wxID_DLGCHANGEHXCHMATTYPE,
               name='chMatType', parent=self, pos=wx.Point(96, 136),
               size=wx.Size(104, 21), style=0)
         self.chMatType.SetSelection(0)
 
         self.staticText13 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT13,
-              label='liquides [W/m\xb2K]', name='staticText13', parent=self,
+              label=_('liquides [W/m\xb2K]'), name='staticText13', parent=self,
               pos=wx.Point(232, 40), size=wx.Size(79, 13), style=0)
 
         self.staticText14 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT14,
@@ -190,10 +229,10 @@ class DlgChangeHX(wx.Dialog):
               label=_('additional % based on \ntotal equipment costs'),
               name='staticText16', parent=self, pos=wx.Point(232, 144),
               size=wx.Size(110, 26), style=0)
-
-        self.staticText17 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT17,
-              label='5', name='staticText17', parent=self, pos=wx.Point(424,
-              152), size=wx.Size(24, 13), style=0)
+        
+        self.tbAdditional = wx.TextCtrl(id=wxID_PANEL1TBADDITIONAL,
+              name='tbAdditional', parent=self, pos=wx.Point(352,
+              152),size=wx.Size(100, 21), style=0, value='0')
 
         self.staticText18 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT18,
               label=_('pressure [bar]'), name='staticText18', parent=self,
@@ -226,6 +265,7 @@ class DlgChangeHX(wx.Dialog):
         self.staticText24 = wx.StaticText(id=wxID_DLGCHANGEHXSTATICTEXT24,
               label='4', name='staticText24', parent=self, pos=wx.Point(424,
               312), size=wx.Size(16, 13), style=0)
+                
 
     def __init__(self, parent):
         self._init_ctrls(parent)
@@ -241,7 +281,7 @@ class DlgChangeHX(wx.Dialog):
         event.Skip()
         
     def MaterialType(self):
-        return  self.chMatType.GetStringSelection()
+        return self.chMatType.GetStringSelection()
     
     def AlphaLiquid(self):
         return float(self.tbAlphaL.GetValue())
@@ -251,3 +291,66 @@ class DlgChangeHX(wx.Dialog):
     
     def AlphaPC(self):
         return float(self.tbAlphaPC.GetValue())
+    
+    def PressureValue(self):
+        return float(self.tbPressure.GetValue())
+    
+    def AdditionalCostPercent(self):
+        return float(self.tbAdditional.GetValue())
+    
+    def HXType(self,hoti,coldi):
+        # 0=liquid 1=gas 2=condensation
+        if (hoti==2): #condensation --> gas            
+            hoti=1
+        if (coldi==2):#condensation --> liquid
+            coldi=0
+        
+        if (hoti==0) and (coldi==0):
+            return self.chLL.GetStringSelection()
+        if (hoti==1) and (coldi==1):
+            return self.chGG.GetStringSelection()
+                           
+        return self.chLG.GetStringSelection()
+    
+    def LockChoices(self,hoti,coldi):
+        self.tbAlphaPC.Enabled = False
+        self.tbAlphaL.Enabled  = False
+        self.tbAlphaG.Enabled  = False
+        
+        if (hoti==2): #condensation --> gas
+            self.tbAlphaPC.Enabled = True
+            hoti=1
+        if (coldi==2):#condensation --> liquid
+            self.tbAlphaPC.Enabled = True
+            coldi=0
+            
+        #enable AlphaGas and AlphaLiquid if one of both is Gas/Liquid
+        if (hoti==1) or (coldi==1):
+             self.tbAlphaG.Enabled = True            
+        if (hoti==0) and (coldi==0):
+            self.tbAlphaL.Enabled = True
+        
+        #enable plate / shell&tube choice
+        if (hoti==0) and (coldi==0):
+            self.chGG.Enabled = False
+            self.chLG.Enabled = False
+            return
+        if (hoti==1) and (coldi==1):
+            self.chLL.Enabled = False
+            self.chLG.Enabled = False
+            return        
+                        
+        self.chGG.Enabled = False
+        self.chLL.Enabled = False               
+    
+    def LockInput(self):        
+        self.btnOK.Enabled =False
+        self.chGG.Enabled = False
+        self.chLG.Enabled = False
+        self.chLL.Enabled = False
+        self.chMatType.Enabled =False
+        self.tbAlphaG.Enabled =False
+        self.tbAlphaL.Enabled = False
+        self.tbAlphaPC.Enabled = False
+        self.tbPressure.Enabled = False
+        self.tbAdditional.Enabled = False

@@ -1,7 +1,44 @@
+#==============================================================================#
+#   E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#    XMLImportHRModule
+#           
+#------------------------------------------------------------------------------
+#
+#    Module to load XML from the external PE tool
+#    Part of the HRModule
+#           
+#==============================================================================
+#
+#   Version No.: 0.01
+#   Created by:         Florian Joebstl  01/09/2008
+#   Last revised by:
+#                       Florian Joebstl  01/09/2008                       
+#
+#   Changes to previous version:
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
+#
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
+#
+#============================================================================== 
+
 import xml.dom
 import xml.dom.minidom
 import MySQLdb
 import string
+from einstein.modules.messageLogger import *
+
+import sys
 
 class DataBaseClass:   
     IsValid = False 
@@ -49,15 +86,16 @@ class DataBaseClass:
 
 
 class HexData(DataBaseClass):
-    nodes  = ['HXNo','HXType','QdotHX','HXLMTD','QHX','HXSource','HXTSourceInlet','HXTSourceOutlet','HXhSourceInlet','HXhSourceOutlet',
+    nodes  = ['HXNo','HxName','HXType','QdotHX','HXLMTD','QHX','HXSource','HXTSourceInlet','HXTSourceOutlet','HXhSourceInlet','HXhSourceOutlet',
               'HXSink','HXTSinkInlet','HXTSinkOutlet','HXSource_FluidID','HXSink_FluidID','storage_size','HEX_area','HEX_turnkeyprice',
-              'HX_OandMfix','HX_OandMvar','HperYear','streamstatusSource','streamstatusSink','streamtypeSink']
+              'HX_OandMfix','HX_OandMvar','HperYear','streamstatusSource','streamstatusSink','streamtypeSink','streamtypeSource']
     
     def __getValuesInDBOrder(self):        
     ## hopefully the external C# program get this right soon so so this is not nessecary...
         values = []
         values.append(self.getValue("HXNo"))
-        values.append("TMP_NAME")                   #HXname
+        values.append(self.getValue("HxName"))     #HXname
+        #values.append("NULL")  
         values.append(self.getValue("HXType"))
         values.append(self.getValue("QdotHX"))
         values.append(self.getValue("HXLMTD"))
@@ -84,7 +122,7 @@ class HexData(DataBaseClass):
         values.append(self.getValue("streamstatusSource")) 
         values.append(self.getValue("streamstatusSink")) 
         values.append(self.getValue("streamtypeSink"))
-        values.append("NULL")                        #StreamTypeSource
+        values.append(self.getValue("streamtypeSource"))                        #StreamTypeSource
         return values
     
     def getInsertSQL(self,pid,ano):                
@@ -113,7 +151,7 @@ class CurveData:
             self.Name = name
             self.__points = []
             self.__parse(curveentry)
-            self.IsValid = True
+            self.IsValid = True                                                
         except:
             self.IsValid = False
     
@@ -169,7 +207,7 @@ class XMLDocHRModuleImport:
             if (hexdata.IsValid):
                 self.hexdatabase.append(hexdata)
             else:
-                print "Invalid HX data."
+                logDebug("Invalid HX data.")
                 
     def __HandleCurves(self,doc):
         coldcurve  = doc.getElementsByTagName('ColdCompositeCurveValues')[0]
@@ -182,7 +220,7 @@ class XMLDocHRModuleImport:
             if (curve.IsValid):
                 self.curvedatabase.append(curve)
             else:
-                print "Invalid curve data ("+curve.Name+")"
+                logDebug("Invalid curve data ("+curve.Name+")")
         
     def __HandleStreams(self,doc):
         streams = doc.getElementsByTagName('ExportStreamInformation')
@@ -191,7 +229,7 @@ class XMLDocHRModuleImport:
             if (streamdata.IsValid):
                 self.streamdatabase.append(streamdata)
             else:
-                print "Invalid stream data."
+                logDebug("Invalid stream data.")
             
     def debug(self): #debug            
         for hexdata in self.hexdatabase:
@@ -206,7 +244,7 @@ class XMLDocHRModuleImport:
 
 class XMLImportHRModule:
     def importXML(path):
-        print "Importing data from "+str(path)
+        logDebug("Importing data from "+str(path))
         try:
             dom = xml.dom.minidom.parse(path)
             document = XMLDocHRModuleImport(dom);            
@@ -214,7 +252,7 @@ class XMLImportHRModule:
             dom.unlink()
             return document
         except:
-            print "Importing failed."
+            logError(_("Importing failed."))
             return None
 
     importXML = staticmethod(importXML)

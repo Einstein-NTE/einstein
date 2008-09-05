@@ -22,11 +22,14 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	    10/06/2008
 #	Last revised by:
-#                           Stoyan Danov            18/06/2008
+#                       Stoyan Danov        18/06/2008
+#                       Florian Joebstl     02/09/2008
 #                           
 #
-#       Changes to previous version:
-#       18/06/2008 SD: change to translatable text _(...)
+#   Changes to previous version:
+#   
+#   18/06/2008 SD: change to translatable text _(...)
+#   02/09/2008 FJ: redone the entire GUI (grid,plot,controls...)
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,13 +51,17 @@ from numCtrl import *
 
 from einstein.GUI.graphics import drawPiePlot
 import einstein.modules.matPanel as Mp
+from matplotlib.ticker import MaxNLocator
+
+#from einstein.GUI.matplotPanel import MatplotPanel
+from einstein.GUI.dialog_changeHX import *
 
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
 #from einstein.GUI.panelHR_PopUp1 import HRPopUp1
 
 from einstein.modules.interfaces import *
-
+from einstein.modules.messageLogger import *
 
 [wxID_PANELHR, wxID_PANELHRBTNCALCULATE, wxID_PANELHRBTNCHANGEHX, 
  wxID_PANELHRBTNDELETEHX, wxID_PANELHRBTNSHOWSTDVALUES, 
@@ -62,81 +69,132 @@ from einstein.modules.interfaces import *
  wxID_PANELHRBUTTONPAGEHRFWD, wxID_PANELHRBUTTONPAGEHROK, 
  wxID_PANELHRCBCURVEDISPLAY, wxID_PANELHRCBEXHX, wxID_PANELHRGRID, 
  wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, 
- wxID_PANELHRSTATICTEXT1, wxID_PANELHRSTATICTEXT2, wxID_PANELHRSTATICTEXT3, 
+ wxID_PANELHRSTATICBOX3, wxID_PANELHRSTATICBOX4, wxID_PANELHRSTATICTEXT2, 
 ] = [wx.NewId() for _init_ctrls in range(18)]
 
 # constants
 #
-GRID_LETTER_SIZE = 8 #points
-GRID_LABEL_SIZE = 9  # points
-GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGHR
-GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
-GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
+#GRID_LETTER_SIZE = 8 #points
+#GRID_LABEL_SIZE = 9  # points
+#GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGHR
+#GRID_BACKGROUND_COLOR = '#F0FFFF' # idem
+#GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 
 MAXROWS = 50
-COLNO = 11
+COLNO = 12
+
 
 
 def drawFigureHCG(self):   
-    try:           
+    try:    
+        
+        if hasattr(self, 'subplot'):
+            del self.subplot             
         #data = Interfaces.GData['Curves HR']
-        data = Status.int.hcg
+        data = Status.int.hrdata.curves
+        
+        if (len(data)==0):
+            return
+               
         self.subplot = self.figure.add_subplot(121)
         curve = data[0]
         self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
         self.subplot.legend(loc = 0)
         self.subplot.set_title(curve.Name)
-        self.subplot.set_xlabel('Power [kW]')
-        self.subplot.set_ylabel('Temperature [°C]')
+        self.subplot.set_xlabel(_('Power [kW]'))
+        self.subplot.set_ylabel(_('Temperature [C]'))
         
         mmx = [ max(curve.X), min(curve.X) ]
         mmy = [ max(curve.Y), min(curve.Y) ]
         
+                          
         curve = data[1]
         self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
         self.subplot.legend(loc = 0)
         self.subplot.set_title(curve.Name)
-        self.subplot.set_xlabel('Power [kW]')
-        self.subplot.set_ylabel('Temperature [°C]')
+        #self.subplot.set_xlabel(_('Power [kW]'))
+        #self.subplot.set_ylabel(_('Temperature [C]'))
         
         mmx.append(max(curve.X))
         mmx.append(min(curve.X))
         mmy.append(max(curve.Y))
         mmy.append(min(curve.Y))            
         
-        self.subplot.axis([min(mmx),max(mmx),min(mmy),max(mmy)])
+        m = (max(mmy) - min(mmy))*0.2
+        m2 = (max(mmx) - min(mmx))*0.2
         
-        self.subplot = self.figure.add_subplot(122)
+        self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
+        
+        if hasattr(self, 'subplot2'):
+            del self.subplot2
+        
+        self.subplot2 = self.figure.add_subplot(122)
         curve = data[2]
-        self.subplot.plot(curve.X,curve.Y,'g',label =curve.Name)
-        self.subplot.axis([min(curve.X),max(curve.X),min(curve.Y),max(curve.Y)])
-        self.subplot.legend(loc = 0)
-        self.subplot.set_title(curve.Name)
-        self.subplot.set_xlabel('Power [kW]')
-        self.subplot.set_ylabel('Temperature [C]')
+        self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
+        
+        m = (max(curve.Y) - min(curve.Y))*0.2
+        m2 = (max(curve.X) - min(curve.X))*0.2
+        
+        self.subplot2.axis([min(curve.X),max(curve.X)+m2,min(curve.Y),max(curve.Y)+m])
+        self.subplot2.legend(loc = 0)
+        self.subplot2.set_title(curve.Name)
+        self.subplot2.set_xlabel(_('Power [kW]'))
+        self.subplot2.set_ylabel(_('Temperature [C]'))
 
-        self.setSize((608, 280))
-    except e:
-        print "cant draw figure"+e
+        #change axis
+        self.subplot.xaxis.set_major_locator(MaxNLocator(4))
+        self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
+        
+        #self.show()
+        self.setSize((576, 280))    
+    except:
+        #print "cant draw figure"
+        drawFigureDefault(self)
 
 def drawFigureYED(self):    
     try:
         #data = Interfaces.GData['Curves HR']
-        data = Status.int.yed              
+        if hasattr(self, 'subplot'):
+            del self.subplot
+                   
+        data = Status.int.hrdata.QD_T              
         min_ = 100000
         max_ = 0
         
         X = xrange(0, 406, 5)      
         Y = data       
-        self.subplot = self.figure.add_subplot(111)
-        self.subplot.plot(X,Y,'b',label ="YED")    
+        self.subplot = self.figure.add_subplot(121)
+        self.subplot.plot(X,Y,'b',label ="QD_T")    
         self.subplot.legend(loc = 0)                             
-        self.subplot.axis([min(X),max(X),min(Y),max(Y)])   
-        self.subplot.set_xlabel('Power [kW]')
-        self.subplot.set_ylabel('Temperature [C]')  
-        self.setSize((608, 280))
-    except e:
-        print "cant draw figure"+e
+        self.subplot.axis([min(X),max(X),min(Y),max(Y)*1.1])   
+        self.subplot.set_ylabel(_('Power [kW]'))
+        self.subplot.set_xlabel(_('Temperature [C]'))
+        
+        if hasattr(self, 'subplot2'):
+            del self.subplot2
+        
+        data = Status.int.hrdata.QA_T              
+        min_ = 100000
+        max_ = 0
+                        
+        X = xrange(0, 406, 5)      
+        Y = data       
+        self.subplot2 = self.figure.add_subplot(122)
+        self.subplot2.plot(X,Y,'r',label ="QA_T")    
+        self.subplot2.legend(loc = 0)                             
+        self.subplot2.axis([min(X),max(X),min(Y),max(Y)*1.1])   
+        self.subplot2.set_ylabel(_('Power [kW]'))
+        self.subplot2.set_xlabel(_('Temperature [C]'))  
+        
+        #self.show()
+        self.setSize((576, 280))                                  
+    except:
+        #print "cant draw figure"
+        drawFigureDefault(self)
+        
+def drawFigureDefault(obj):
+    #TODO: maybe plot a text
+    pass
 
 class PanelHR(wx.Panel):
 
@@ -170,22 +228,22 @@ class PanelHR(wx.Panel):
         self.grid.SetColSize(1,60)
         #self.grid.SetColSize(3,160)
         
-        self.btnDeleteHX.Enabled = False
-        self.btnChangeHX.Enabled = False
+        self.enableButtons(False)
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Power\n[kW]"))
-        self.grid.SetColLabelValue(1, _("Size storage tank\n[m³]"))
-        self.grid.SetColLabelValue(2, _("Hot Medium"))
-        self.grid.SetColLabelValue(3, _("T1 hot med.\n[°C]"))
-        self.grid.SetColLabelValue(4, _("T2 hot med.\n[°C]"))
-        self.grid.SetColLabelValue(5, _("Cold medium"))
-        self.grid.SetColLabelValue(6, _("T3 cold med.\n[°C]"))
-        self.grid.SetColLabelValue(7, _("T4 cold med.\n[°C]"))
-        self.grid.SetColLabelValue(8, _("surface area\n[m²]"))
-        self.grid.SetColLabelValue(9, _("inv. cost\n[EUR]"))
-        self.grid.SetColLabelValue(10, _("oper. cost\n[EUR]"))
+        self.grid.SetColLabelValue(0, _("Name"))
+        self.grid.SetColLabelValue(1, _("Power\n[kW]"))
+        self.grid.SetColLabelValue(2, _("Size storage tank\n[m³]"))
+        self.grid.SetColLabelValue(3, _("Hot Medium"))
+        self.grid.SetColLabelValue(4, _("T1 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(5, _("T2 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(6, _("Cold medium"))
+        self.grid.SetColLabelValue(7, _("T3 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(8, _("T4 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(9, _("surface area\n[m²]"))
+        self.grid.SetColLabelValue(10, _("inv. cost\n[EUR]"))
+        self.grid.SetColLabelValue(11, _("oper. cost\n[EUR]"))
         #
         # copy values from dictionary to grid
         #
@@ -193,8 +251,9 @@ class PanelHR(wx.Panel):
             self.grid.SetRowAttr(r, attr)
 
         self.grid.SetGridCursor(0, 0)
-        self.staticText1.SetFont(wx.Font(12, wx.ROMAN, wx.NORMAL, wx.BOLD))
         self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)
+        del self.chart
+        
         self.Show()
         
         
@@ -207,7 +266,7 @@ class PanelHR(wx.Panel):
         self.SetClientSize(wx.Size(800, 600))
 
         self.grid = wx.grid.Grid(id=wxID_PANELHRGRID, name='gridpageHR',
-              parent=self, pos=wx.Point(16, 352), size=wx.Size(752, 176),
+              parent=self, pos=wx.Point(32, 360), size=wx.Size(720, 160),
               style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridGridCellLeftDclick, id=wxID_PANELHRGRID)
@@ -217,8 +276,8 @@ class PanelHR(wx.Panel):
               self.OnGridGridCellRightClick, id=wxID_PANELHRGRID)
 
         self.panel_drawcurve = wx.Panel(id=wxID_PANELHRPANEL_DRAWCURVE,
-              name='panel_drawcurve', parent=self, pos=wx.Point(160, 40),
-              size=wx.Size(608, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+              name='panel_drawcurve', parent=self, pos=wx.Point(32, 32),
+              size=wx.Size(576, 280), style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
         self.buttonpageHROk = wx.Button(id=wxID_PANELHRBUTTONPAGEHROK,
               label=_('ok'), name='buttonpageHROk', parent=self,
@@ -246,22 +305,14 @@ class PanelHR(wx.Panel):
               id=wxID_PANELHRBUTTONPAGEHRBACK)
 
         self.btnCalculate = wx.Button(id=wxID_PANELHRBTNCALCULATE,
-              label=_('recalculate'), name='btnCalculate', parent=self,
-              pos=wx.Point(24, 72), size=wx.Size(104, 24), style=0)
+              label=_('calculate'), name='btnCalculate', parent=self,
+              pos=wx.Point(648, 32), size=wx.Size(104, 24), style=0)
         self.btnCalculate.Bind(wx.EVT_BUTTON, self.OnBtnCalculateButton,
               id=wxID_PANELHRBTNCALCULATE)
 
-        self.staticText1 = wx.StaticText(id=wxID_PANELHRSTATICTEXT1,
-              label=_('Existing heat exchangers in the system'),
-              name='staticText1', parent=self, pos=wx.Point(16, 328), style=0)
-
-        self.staticText3 = wx.StaticText(id=wxID_PANELHRSTATICTEXT3,
-              label='Performance Curves', name='staticText3', parent=self,
-              pos=wx.Point(160, 16), size=wx.Size(98, 13), style=0)
-
         self.cbCurveDisplay = wx.Choice(choices=['HCC/CCC/GCC', 'YED'],
               id=wxID_PANELHRCBCURVEDISPLAY, name='cbCurveDisplay', parent=self,
-              pos=wx.Point(16, 272), size=wx.Size(120, 21),
+              pos=wx.Point(640, 152), size=wx.Size(120, 21),
               style=wx.FULL_REPAINT_ON_RESIZE)
         self.cbCurveDisplay.SetSelection(0)
         self.cbCurveDisplay.Bind(wx.EVT_CHOICE, self.OnCbCurveDisplayChoice,
@@ -269,54 +320,74 @@ class PanelHR(wx.Panel):
 
         self.cbExHX = wx.CheckBox(id=wxID_PANELHRCBEXHX,
               label=_('  Consider existing'), name='cbExHX', parent=self,
-              pos=wx.Point(24, 104), size=wx.Size(112, 16), style=0)
-        self.cbExHX.SetValue(True)
+              pos=wx.Point(648, 64), size=wx.Size(112, 16), style=0)
+        self.cbExHX.SetValue(False)
         self.cbExHX.Bind(wx.EVT_CHECKBOX, self.OnCbExHXCheckbox,
               id=wxID_PANELHRCBEXHX)
 
         self.btnDeleteHX = wx.Button(id=wxID_PANELHRBTNDELETEHX,
-              label='Delete HX', name='btnDeleteHX', parent=self,
+              label=_('Delete HX'), name='btnDeleteHX', parent=self,
               pos=wx.Point(16, 544), size=wx.Size(75, 23), style=0)
         self.btnDeleteHX.Bind(wx.EVT_BUTTON, self.OnBtnDeleteHXButton,
               id=wxID_PANELHRBTNDELETEHX)
 
         self.btnChangeHX = wx.Button(id=wxID_PANELHRBTNCHANGEHX,
-              label='Change HX', name='btnChangeHX', parent=self,
+              label=_('Change HX'), name='btnChangeHX', parent=self,
               pos=wx.Point(104, 544), size=wx.Size(75, 23), style=0)
         self.btnChangeHX.Bind(wx.EVT_BUTTON, self.OnBtnChangeHXButton,
               id=wxID_PANELHRBTNCHANGEHX)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELHRSTATICBOX1,
-              label='HX Network', name='staticBox1', parent=self,
-              pos=wx.Point(8, 40), size=wx.Size(136, 192), style=0)
+              label=_('HX Network'), name='staticBox1', parent=self,
+              pos=wx.Point(632, 8), size=wx.Size(136, 112), style=0)
+        self.staticBox1.SetForegroundColour(TITLE_COLOR)
+        self.staticBox1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.btnShowStdValues = wx.Button(id=wxID_PANELHRBTNSHOWSTDVALUES,
-              label='Standard values for HX', name='btnShowStdValues',
+              label=_('Standard values for HX'), name='btnShowStdValues',
               parent=self, pos=wx.Point(192, 544), size=wx.Size(128, 23),
               style=0)
         self.btnShowStdValues.Bind(wx.EVT_BUTTON, self.OnBtnShowStdValuesButton,
               id=wxID_PANELHRBTNSHOWSTDVALUES)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELHRSTATICBOX2,
-              label='Display Options', name='staticBox2', parent=self,
-              pos=wx.Point(8, 248), size=wx.Size(136, 64), style=0)
+              label=_('Display Options'), name='staticBox2', parent=self,
+              pos=wx.Point(632, 128), size=wx.Size(136, 64), style=0)
+        self.staticBox2.SetForegroundColour(TITLE_COLOR)
+        self.staticBox2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.staticText2 = wx.StaticText(id=wxID_PANELHRSTATICTEXT2,
               label=_('HXs in network \ncalculation'), name='staticText2',
-              parent=self, pos=wx.Point(48, 120), size=wx.Size(74, 26),
+              parent=self, pos=wx.Point(672, 80), size=wx.Size(74, 26),
               style=0)
+
+        self.staticBox3 = wx.StaticBox(id=wxID_PANELHRSTATICBOX3,
+              label=_('Performance Curves'), name='staticBox3', parent=self,
+              pos=wx.Point(16, 8), size=wx.Size(608, 320), style=0)
+        self.staticBox3.SetForegroundColour(TITLE_COLOR)
+        self.staticBox3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.staticBox4 = wx.StaticBox(id=wxID_PANELHRSTATICBOX4,
+              label=_('Existing heat exchangers in the system'),
+              name='staticBox4', parent=self, pos=wx.Point(16, 336),
+              size=wx.Size(752, 192), style=0)
+        self.staticBox4.SetForegroundColour(TITLE_COLOR)
+        self.staticBox4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
     def display(self):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
+        print "display"
         self.mod.initPanel()        # prepares data for plotting
-        #self.mod.updatePanel()
-        data = Interfaces.GData[self.keys[0]]
 
-#..............................................................................
-# update of equipment table
+        self.UpdateGrid()           
+        self.UpdatePlot()    
+        self.Show()
 
+    def UpdateGrid(self):
+        #..............................................................................
+        # update of equipment table
         try:
             data = Interfaces.GData[self.keys[0]]
             (rows,cols) = data.shape
@@ -332,9 +403,6 @@ class PanelHR(wx.Panel):
         for r in range(rows,MAXROWS):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
-
-        self.Show()
-
 
     def updateButtons(self,index):
         if (self.mod.indexExists(index)):
@@ -392,14 +460,15 @@ class PanelHR(wx.Panel):
 
 #==============================================================================
 
-    def OnCbCurveDisplayChoice(self, event):
-        del self.chart
+    def UpdatePlot(self):       
         if (self.cbCurveDisplay.GetCurrentSelection() == 0):
             self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)          
         else:
             self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureYED)
-            
-        #self.panel_drawcurve.draw()
+        del self.chart
+        
+    def OnCbCurveDisplayChoice(self, event):            
+        self.UpdatePlot()
         event.Skip()
 
     def OnBtnCalculateButton(self, event):
@@ -417,11 +486,14 @@ class PanelHR(wx.Panel):
         #event.Skip()
 
     def OnBtnChangeHXButton(self, event):
-        #TODO change dlg
         self.mod.changeHX(self.selectedRow)
+        self.UpdateGrid()
         event.Skip()
 
     def OnBtnShowStdValuesButton(self, event):
+        dlg = DlgChangeHX(None)
+        dlg.LockInput()
+        dlg.ShowModal()        
         event.Skip()
 
     def OnCbExHXCheckbox(self, event):

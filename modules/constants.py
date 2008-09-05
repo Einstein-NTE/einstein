@@ -46,7 +46,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 203" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 204" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 
@@ -180,6 +180,18 @@ TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
                 "shell&tube HX (liquid-liquid)":_("shell&tube HX (liquid-liquid)"),
                 "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
                 }
+
+CHPTYPES = [ "CHP engine",
+             "CHP steam turbine",
+             "CHP gas turbine",
+             "CHP fuel cell"]
+
+TRANSCHPTYPES = {
+             "CHP engine":_("CHP engine"),
+             "CHP steam turbine":_("CHP steam turbine"),
+             "CHP gas turbine":_("CHP gas turbine"),
+             "CHP fuel cell":_("CHP fuel cell")}
+
 
 # EQUIPMENTSUBTYPE collects all the sub-types in ONE list, in the same order as the corresponding
 # EQUIPTYPE

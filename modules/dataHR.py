@@ -1,7 +1,45 @@
-from einstein.GUI.status import *
-
-#--------------------------------------------------------------------------------------------
+#==============================================================================#
+#   E I N S T E I N
 #
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (www.iee-einstein.org)
+#
+#------------------------------------------------------------------------------
+#
+#    HRData
+#           
+#------------------------------------------------------------------------------
+#
+#    Part of the HRModule. Provides classes to store/load needed data
+#           
+#==============================================================================
+#
+#   Version No.: 0.01
+#   Created by:         Florian Joebstl  02/09/2008
+#   Last revised by:
+#                       Florian Joebstl  02/09/2008                       
+#
+#   Changes to previous version:
+#
+#
+#   
+#------------------------------------------------------------------------------     
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
+#
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
+#
+#============================================================================== 
+
+
+from einstein.GUI.status import *
+from einstein.modules.messageLogger import *
+#--------------------------------------------------------------------------------------------
+# stores all data needed in the HRModule
+# default state is loaded from db
+# expects a XMLDocHRModuleImport to load data from XML
 #--------------------------------------------------------------------------------------------
 class HRData:
     pid     = None
@@ -13,14 +51,23 @@ class HRData:
     def __init__(self,pid,ano):
         self.pid = pid
         self.ano = ano
-    
+        
+    def loadDatabaseData(self):
+        self.__loadHEX()
+          
     def loadFromDocument(self,doc):
-        self.__storeNewHX(doc)
+    # doc is a XMLDocHRModuleImport Document (importHR.py)
+        
+        #stores HEXers from document to database
+        self.__storeNewHX(doc.hexdatabase)
+        #loads Streams, Curves from document to HRData
         self.__loadStreams(doc.streamdatabase)
         self.__loadCurves(doc.curvedatabase)
+        #loads HEXers from database to HRData
         self.__loadHEX()
     
     def __loadHEX(self):  
+    #loads HEX from Database
         try:      
             sqlQuery = "ProjectID = '%s' AND AlternativeProposalNo = '%s'"%(self.pid,self.ano)
             self.hexers = Status.DB.qheatexchanger.sql_select(sqlQuery)
@@ -28,17 +75,20 @@ class HRData:
             self.hexers = []
     
                    
-    def __storeNewHX(self,doc):                
+    def __storeNewHX(self,listofhexdata):   
+    #stores HEXers found in XML document
+    #deletes old HEX             
         try:
-            delquery = "DELETE FROM qheatexchanger  WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (Status.PId,Status.ANo)
+            delquery = "DELETE FROM qheatexchanger  WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (self.pid,self.ano)
             Status.DB.sql_query(delquery)
-            for hx in doc.hexdatabase:                
-                query = hx.getInsertSQL(Status.PId,Status.ANo)
+            for hx in listofhexdata:                
+                query = hx.getInsertSQL(self.pid,self.ano)
                 Status.DB.sql_query(query)
-        except:        
-            print "error writing new HX"
+        except:            
+            logError(_("Error writing new HX into database.")) 
     
     def __loadStreams(self,listofstreamdata):
+    #loads streams from document
         self.streams = []
         for streamdata in listofstreamdata:
             if (streamdata.IsValid):
@@ -47,6 +97,7 @@ class HRData:
                 self.streams.append(newstream)
     
     def __loadCurves(self,listofcurvedata):
+    #loads curves from document
         self.curves = []
         for curvedata in listofcurvedata:
             if (curvedata.IsValid):
@@ -54,22 +105,24 @@ class HRData:
                 newcurve.loadFromData(curvedata)
                 self.curves.append(newcurve)
     
-    def deleteHex(self,index):             
+    def deleteHex(self,index):   
+    #deletes a specific HEX in db and reloads          
          try:
              hx = self.hexers[index]
              print "deleting hx "+ str(hx["QHeatExchanger_ID"])
              sqlQuery = "DELETE FROM qheatexchanger  WHERE ProjectID=%s AND AlternativeProposalNo=%s AND QHeatExchanger_ID=%s" % (self.pid,self.ano,hx["QHeatExchanger_ID"])
              Status.DB.sql_query(sqlQuery)
              self.__loadHEX()
-         except w:
-             print "deleting of hex failed."+w
+         except:
+             logError(_("Deleting HX from database failed")) 
     
     def deleteHexAndGenStreams(self,index):
+    #delets a HEX and add a hot and cold stream into the stream list
         try:
             if (index < 0)or(index >= len(self.hexers)):
                 return
             hx = self.hexers[index]
-            print "generating new hot and cold stream from HEX"
+            
             hot = Stream()
             hot.generateHotStreamFromHEX(hx)
             cold = Stream()
@@ -80,10 +133,10 @@ class HRData:
             
             self.deleteHex(index)            
         except:
-            print "generating new streams failed."
+            logError(_("Generating new streams failed."))
             
 #--------------------------------------------------------------------------------------------
-#
+# class representing a Stream
 #--------------------------------------------------------------------------------------------
 class Stream:
     OperatingHours = None
@@ -130,13 +183,19 @@ class Stream:
             self.StartTemp = float(hx["HXTSourceInlet"])
             self.EndTemp   = float(hx["HXTSourceOutlet"])
             self.HotColdType = "hot"
-            self.HeatType    = hx["StreamTypeSource"]
+            self.HeatType    = hx["StreamTypeSource"] 
             return True
         except:
-            return False        
+            return False  
         
+    def printStream(self):      
+        print "Stream: " + str(self.HotColdType) + " / " + str(self.HeatType)
+        print "  Load: " + str(self.HeatLoad)
+        print "  Temp: " + str(self.StartTemp) + " - " + str(self.EndTemp)
+        print " OpHrs: " + str(self.OperatingHours)
+            
 #--------------------------------------------------------------------------------------------
-#
+# class representing a curve
 #--------------------------------------------------------------------------------------------
 class Curve:
     X = []

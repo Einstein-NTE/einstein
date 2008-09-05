@@ -1,0 +1,8 @@
+-- update einstein database: parameter types in q heatexchanger
+USE einstein;
+
+ALTER TABLE uheatpump ADD COLUMN CHPEff DOUBLE AFTER AlternativeProposalNo;
+ALTER TABLE uheatpump ADD COLUMN CHPHOp DOUBLE AFTER AlternativeProposalNo;
+ALTER TABLE uheatpump ADD COLUMN CHPFuelType VARCHAR(45) AFTER AlternativeProposalNo;
+ALTER TABLE uheatpump ADD COLUMN CHPType VARCHAR(45) AFTER AlternativeProposalNo;
+ALTER TABLE uheatpump ADD COLUMN CHPMaintain TINYINT AFTER AlternativeProposalNo;

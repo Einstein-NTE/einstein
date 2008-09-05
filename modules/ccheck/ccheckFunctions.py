@@ -947,11 +947,14 @@ def invEnthalpy(cL,cV,h,T0,y):
     elif y < h0:     #liquid phase
         return (y/cL,0.0)
     
-    elif y <= h1:
-        x = (y - h0)/h
+    elif y < h1:
+        if h > 0:   #avoid zero division
+            x = (y - h0)/h
+        else:
+            x = 1.0
         return(T0,x)
     
-    elif y > h1:
+    elif y >= h1:
         return(T0 + (y - h1)/cV,1.0)
     
 #------------------------------------------------------------------------------

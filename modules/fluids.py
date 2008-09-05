@@ -50,7 +50,11 @@ class Fluid():
             if self.hL is not None: self.hL = self.hL/3600.0
                                                 #data in DB are in kJ/kgK ->
                                                 #conversion to kWh/kgK
+            else: self.hL = 0.0 #if nothing is specified, 0 latent heat supposed
 
+            if self.TCond is None:
+                self.TCond = 1e+99 #if no condensing temperature is given, no phase change
+                
             if self.rho is None or self.rho < 0 or self.rho > 1e+5:
                 logError(_("Severe error in your fluid data for fluid %s: density %s")%\
                            (fluids[0].FluidName,self.rho))
@@ -68,7 +72,7 @@ class Fluid():
             self.rho = 1000.0                   #kg/m3
             self.cp  = 1.16/1000.0              #water properties in kWh/kgK
             self.hL  = 0.7
-            self.TCond = 999 #
+            self.TCond = 115.0 #
             self.name = "dummy fluid"
             logError(_("Fluid (init): cannot find fluid with ID = %s")%fluidID)
            
