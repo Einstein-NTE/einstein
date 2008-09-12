@@ -67,13 +67,13 @@ class PreferencesFrame(wx.Frame):
         # generated method, don't edit
         wx.Frame.__init__(self, id=wxID_FRAME1, name='', parent=prnt,
               pos=wx.Point(300, 140), size=wx.Size(600, 400),
-              style=wx.DEFAULT_FRAME_STYLE, title='Frame1')
+              style=wx.DEFAULT_FRAME_STYLE, title='EINSTEINs preferences')
         self.SetClientSize(wx.Size(600, 400))
 
         # access to font properties object
         fp = FontProperties()
 
-        self.notebook = wx.Notebook(id=wxID_FRAME1NOTEBOOK1, name='notebook1',
+        self.notebook = wx.Notebook(id=wxID_FRAME1NOTEBOOK1, name='notebook',
               parent=self, pos=wx.Point(0, 0), size=wx.Size(600, 340), style=0)
         self.notebook.SetFont(fp.getFont())
 
@@ -92,9 +92,9 @@ class PreferencesFrame(wx.Frame):
                        wData=DATA_ENTRY_WIDTH,wUnits=UNITS_WIDTH)
 
         self.par1_1 = ChoiceEntry(self.page1,
-                               values=["OFF","BASIC","MAIN","ALL"],
-                               label=_("Debug mode"),
-                               tip=_("This will create different volume of output for debugging:\n"))        
+                               values=DEBUGMODES,
+                               label=_("Debug mode for consistency check:"),
+                               tip=_("This will create different volume of output for debugging:"))        
 
         self.par2_1 = ChoiceEntry(self.page2,
                                values=["estimate","PE2"],

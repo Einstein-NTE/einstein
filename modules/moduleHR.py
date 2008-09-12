@@ -583,12 +583,10 @@ class ModuleHR(object):
             QWHAmb_Tt[1][it] = UPHw_Tt[1][it]
             for iT in range(2,Status.NT+2):
                 QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - (QHXProc_max-QHXProc_Tt[iT-2][it])
-                print "UPHw: %s QHXProc %s"%(UPHw_Tt[iT][it],QHXProc_Tt[iT][it])
 
 #substract recovered heat from demand -> UPHProc
             for iT in range(Status.NT+2):
                 UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it] 
-                print "UPH: %s QHXProc %s"%(UPH_Tt[iT][it],QHXProc_Tt[iT][it])
                            
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency

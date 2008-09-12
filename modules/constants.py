@@ -46,10 +46,10 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 207" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 208" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
-
+DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
                 #"OFF" (default): no debug
 
                 #"BASIC": basic debugging
@@ -402,8 +402,14 @@ def findKey(dictionary,value):
     return None
             
 #------------------------------------------------------------------------------
-            
-
+def setDebugMode(value):
+#------------------------------------------------------------------------------
+#   sets the DEBUG variable
+#------------------------------------------------------------------------------
+    global DEBUG
+    if value in DEBUGMODES:
+        DEBUG = value
+#------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
