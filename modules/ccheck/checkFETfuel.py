@@ -130,14 +130,11 @@ class CheckFETfuel():
         
 #..............................................................................
 # writing data into table " qfuel"
-#        try:
         if ANo == 0:
             qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[self.FuelNo]
             if len(qfuelTable) > 0:
-                print "exporting data to qfuel"
                 qfuel = qfuelTable[0]
 
-        
                 qfuel.MFuelYear = check(self.MFuelYear.val)
                 qfuel.FEOFuel = check(self.FEOFuel.val)
                 qfuel.FECFuel = check(self.FECFuel.val)
@@ -145,10 +142,6 @@ class CheckFETfuel():
                 
                 Status.SQL.commit()
                 
-#        except:
-            print "CheckFETfuel (exportData): error writing data to qfuel"
-            pass
-                              
 
     def importTestData(self,i):  #later on should import data from SQL. now simply sets to some value
 

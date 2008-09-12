@@ -166,7 +166,10 @@ class ModuleCC(object):
                 nMissingVarsOfPriority+=1
 
         if nMissingVarsOfPriority==0:
-            CCList.append(["","","","",""])
+            if CCScreen.nScreened == 0:
+                CCList.append(["","","","",""])
+            else:
+                CCList.append(["",_("CONGRATULATION: data set is sufficiently complete !!!"),"","",""])
             
         data = array(CCList)
         Status.int.setGraphicsData(self.keys[0], data)  #sends the data to the GUI
@@ -378,14 +381,14 @@ class ModuleCC(object):
 #..............................................................................
 # import data on link of heat exchangers inlet / outlet with equipments, pipes and processes
 
-        self.QWHEqCon = CheckCon("QWHEq Con",self.QWH,self.QWHEq,Status.QWHEqLink,ambient=True)
-        self.QWHPipeCon = CheckCon("QWHPipe Con",self.QWH,self.QWHPipe,Status.QWHPipeLink,ambient=True)
-        self.QWHProcCon = CheckCon("QWHProc Con",self.QWH,self.QWHProc,Status.QWHProcLink,ambient=True)
-        self.QWHEECon = CheckCon("QWHEE Con",self.QWH,self.QWHEE,Status.QWHEELink,ambient=True)
+        self.QWHEqCon = CheckCon("QWHEq-Con",self.QWH,self.QWHEq,Status.QWHEqLink,ambient=True)
+        self.QWHPipeCon = CheckCon("QWHPipe-Con",self.QWH,self.QWHPipe,Status.QWHPipeLink,ambient=True)
+        self.QWHProcCon = CheckCon("QWHProc-Con",self.QWH,self.QWHProc,Status.QWHProcLink,ambient=True)
+        self.QWHEECon = CheckCon("QWHEE-Con",self.QWH,self.QWHEE,Status.QWHEELink,ambient=True)
 
-        self.QHXEqCon = CheckCon("QWHEq Con",self.QHX,self.QHXEq,Status.QHXEqLink)
-        self.QHXPipeCon = CheckCon("QWHPipe Con",self.QHX,self.QHXPipe,Status.QHXPipeLink)
-        self.QHXProcCon = CheckCon("QWHProc Con",self.QHX,self.QHXProc,Status.QHXProcLink)
+        self.QHXEqCon = CheckCon("QHXEq-Con",self.QHX,self.QHXEq,Status.QHXEqLink)
+        self.QHXPipeCon = CheckCon("QHXPipe-Con",self.QHX,self.QHXPipe,Status.QHXPipeLink)
+        self.QHXProcCon = CheckCon("QHXProc-Con",self.QHX,self.QHXProc,Status.QHXProcLink)
 
 #..............................................................................
 # import data on existing totals
@@ -406,6 +409,11 @@ class ModuleCC(object):
 
         global CHECKMODE
 
+        logTrack("ModuleCC (basicCheck): estimate = %s;continue = %s"%\
+                 (estimate,continueCheck))
+        print "ModuleCC (basicCheck): estimate = %s;continue = %s"%\
+                 (estimate,continueCheck)
+        
         if DEBUG in ["ALL","BASIC"]:
             logDebug("====================================================")
             logDebug("ModuleCC: getting Test data")
@@ -422,10 +430,10 @@ class ModuleCC(object):
 #..............................................................................
         
         NCycles = 100        #maximum number of cycles
-        NBestCycles = 8     #run the first cycles in CHECKMODE = "BEST", the
+        NBestCycles = 10     #run the first cycles in CHECKMODE = "BEST", the
                             #remaining ones in "MEAN"
 
-        balanceCtrl = 1.0   #initial setting: lagged value of (rel.) imbalance
+        balanceCtrl = 0.1   #initial setting: lagged value of (rel.) imbalance
             
         for ncycle in range(NCycles):
 
@@ -505,7 +513,7 @@ class ModuleCC(object):
 #..............................................................................
 # check of pipes
 
-            if DEBUG in ["ALL","BASIC"]:
+            if DEBUG in ["ALL","MAIN","BASIC"]:
                 print "===================================================="
                 print "ModuleCC: checking Pipes (Pipe)"
                 print "===================================================="
@@ -538,7 +546,9 @@ class ModuleCC(object):
             NK = self.NThProc
 
             for k in range(self.NThProc):
-                print "checking process no. %s"%k
+                if DEBUG in ["ALL"]:
+                    print "checking process no. %s"%k
+                    
                 conflict.setDataGroup("Process",k+1)
 
                 self.ccProc[k].check()             # ejecuta la función check para proceso k
@@ -744,14 +754,14 @@ class ModuleCC(object):
                   (cycle.getMeanTotalBalance(),balanceCtrl,\
                    cycle.getMaxTotalBalance())
 
-            if ncycle%1 == 0 or balanceCtrl <= 5.e-4:
+            if ncycle%1 == 0 or balanceCtrl <= 1.e-3:
                 logMessage("Consistency check: maximum remaining balance error %6.2f percent"%(balanceCtrl*100))
 
-            if balanceCtrl <= 5.e-4:
+            if balanceCtrl <= 1.e-3:
                 print "ModuleCC (basic check): convergence reached at %s cycles"%(ncycle+1)
                 break
 
-            if ncycle == NCycles-1:
+            if ncycle == NCycles-1 and balanceCtrl > 5.e-3:
                 showWarning("Consistency check calculations did not converge. Data may not be fully balanced")
 
             
@@ -791,13 +801,17 @@ class ModuleCC(object):
 #..............................................................................
 # And finally export all the data
 
+        logTrack("ModuleCC (basicCheck): exporting results to SQL")
+        print NI,NJ,NK,NM,NH,NN
+        
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
             self.ccFET[i].exportData()
         for j in range(NJ):       
             self.ccEq[j].exportData()
         for k in range(NK):       
             self.ccProc[k].exportData()
-        for m in range(0,NM):      
+        for m in range(NM):
+            print "ModuleCC (basicCheck): exporting pipe %s data"%(m+1)
             self.ccPipe[m].exportData()
         for h in range(NH):       
             self.ccHX[h].exportData()
@@ -825,8 +839,7 @@ class ModuleCC(object):
         
         NJ = self.NEquipe
         for j in range(NJ):       
-#            self.ccEq[j].estimate()
-            pass
+            self.ccEq[j].estimate()
         
         NK = self.NThProc
         for k in range(NK):       

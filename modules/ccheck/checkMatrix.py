@@ -18,13 +18,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.05
 #	Created by: 	    Hans Schweiger	08/03/2008
 #	Last revised by:    claudia Vannoni      9/04/2008
 #                           claudia Vannoni      16/04/2008
+#                           Hans Schweiger      11/09/2008
 #
 #       Changes in last update:
 #                           moved functions to ccheckfunctions
+#       11/09/08: HS    check of matrix totals added in CheckM3 for better
+#                       convergence
 #
 #	
 #------------------------------------------------------------------------------		
@@ -44,6 +47,7 @@ INFINITE = 1.e99    # numerical value assigned to "infinite"
 from math import *
 from ccheckFunctions import *
 from numpy import *
+import copy
 
 #------------------------------------------------------------------------------
 def CCMatrix(name,ncol,nrow):
@@ -255,6 +259,24 @@ class CheckMatrix():
                 col[n]=MColTotals[n][m]
             Mean = meanOfRow(col,self.nrow)
             ccheck1(self.colTotals[m],Mean)
+        
+# finally calculate the total of totals ...
+
+        TotTot1 = calcRowSum(self.name,self.rowTotals,self.nrow)
+        TotTot2 = calcRowSum(self.name,self.colTotals,self.ncol)
+        
+        ccheck1(TotTot1,TotTot2)
+        rT = copy.deepcopy(self.rowTotals)
+        cT = copy.deepcopy(self.colTotals)
+        
+        adjRowSum(self.name,TotTot1,rT,self.nrow)
+        adjRowSum(self.name,TotTot2,cT,self.ncol)
+
+        for n in range(self.nrow):
+            ccheck1(self.rowTotals[n],rT[n])
+
+        for m in range(self.ncol):
+            ccheck1(self.colTotals[m],cT[m])
         
 
 #------------------------------------------------------------------------------

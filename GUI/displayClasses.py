@@ -446,23 +446,18 @@ class CFloat(wx.TextCtrl):
         if s.strip() == '':
             # don't touch null value
             return
-        s1 = self.__clean_tsep(s)
-        s2 = self.__clean_dot(s1)
-        # if negative, save sign
+        f = self.toFloat(s)
         sign = ''
-        if s2.startswith('-'):
-            sign = '-'
-            s2 = s2[1:]
-        # split
-        (integ,dot,frac) = s2.partition('.')
-        # adjust integer part
-        if integ == '':
-            integ = '0'
-        # adjust fraction part, with rounding
-        f = float('0.'+frac) * (10**self.decimals)
-        f1 = math.floor(f+0.5)
-        frac = str(int(f1)) + ('0' * self.decimals)
-        frac = frac[:self.decimals]
+        if f<0.0:
+            sign='-'
+            f = abs(f)
+        snum = "%.*f" % (self.decimals,f)
+        try:
+            (integ,frac) = snum.split(".")
+        except ValueError:
+            print 'snum=',snum
+            integ = snum
+            frac = ''
         # set thousands separator
         sn = ''
         r0 = integ[::-1] # reverse

@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.100
+#   Version No.: 0.101
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -61,6 +61,8 @@
 #                       Tom Sobota                          05/07/2008
 #                       Stoyan Danov                        10/07/2008
 #                       Tom Sobota                          30/07/2008
+#                       Hans Schweiger                      05/09/2008
+#                       Hans Schweiger                      12/09/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -139,7 +141,8 @@
 #       05/07/2008  TS Electricity Mix in main menu and menu dispatch
 #       02/07/2008  SD panels CS4,CS5,CS6,CS7 added
 #       30/07/2008  TS character encoding for MySQL
-
+#       05/09/2008  HS PanelCHP activated
+#       12/09/2008  HS Preferences frame added
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -181,7 +184,7 @@ from einstein.modules.project import Project #functions for handling of PId/ANo
 
 #--- popup frames
 import DBEditFrame
-import PreferencesFrame
+from PreferencesFrame import *
 
 #--- Module Panels
 from panelCC import *
@@ -191,6 +194,7 @@ from panelHC import *
 from panelST import *
 from panelHP import *
 from panelBB import *
+from panelCHP import *
 from panelEnergy import *
 #TS20080406 the new panels Q*
 from einstein.GUI.panelQ0 import PanelQ0
@@ -516,7 +520,8 @@ class EinsteinFrame(wx.Frame):
 
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - the tool that never fails ..."),
-        self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - summer special edition ..."),
+       # self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - summer special edition ..."),
+        self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to ..."),
                                  pos = (10,10),size=(780,580))
         
 #        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
@@ -524,12 +529,12 @@ class EinsteinFrame(wx.Frame):
         self.box1.SetForegroundColour(ORANGE)
         self.box1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','summerTime.jpg'),
+        self.staticBitmap1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','brochureTitlePage.jpg'),
                                              wx.BITMAP_TYPE_JPEG),
                                              id=-1,#TS 2008-3-26 changed from id=wxID_PANELCCPIC1,
                                              parent=self.pageTitle,
-                                             pos=wx.Point(140, 100),
-                                             size=wx.Size(400, 480),
+                                             pos=wx.Point(60, 100),
+                                             size=wx.Size(700, 480),
                                              style=wx.SUNKEN_BORDER)
         self.staticBitmap2 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','einstein_logo_small.jpg'),
                                              wx.BITMAP_TYPE_JPEG),
@@ -571,11 +576,13 @@ class EinsteinFrame(wx.Frame):
             wx.Exit()
 
     def OnMenuExportData(self, event):
-        print 'PId='+repr(Status.PId)
-        ex = ExportDataXML(pid=Status.PId,ano=Status.ANo, fuels=[1,2,3], fluids=[1,2,3,4])
+        showMessage(_("sorry: this option is not yet available"))
+#        print 'PId='+repr(Status.PId)
+#        ex = ExportDataXML(pid=Status.PId,ano=Status.ANo, fuels=[1,2,3], fluids=[1,2,3,4])
 
     def OnMenuImportData(self, event):
-        ex = ImportDataXML()
+        showMessage(_("sorry: this option is not yet available"))
+#        ex = ImportDataXML()
 
     def OnMenuExportProject(self, event):
         print 'PId='+repr(Status.PId)
@@ -657,10 +664,9 @@ class EinsteinFrame(wx.Frame):
 
 
 
-    def OnMenuPreferences(self, event):
-        framePreferences = PreferencesFrame.wxFrame(None)
+    def OnMenuSettingsPreferences(self, event):
+        framePreferences = PreferencesFrame(None)
         framePreferences.Show()
-        #event.Skip()
 
     def OnMenuSettingsLanguage(self,event):
         dialogLang = DialogLanguage(self)
@@ -841,17 +847,17 @@ class EinsteinFrame(wx.Frame):
             self.panelEA3 = PanelEA3(parent=self.leftpanel2)
             self.panelEA3.display()
         #qEA4a 'Process heat 1 - Yearly'   #SD2008-07-01
-        elif select == _("Process heat 1"):
+        elif select == _("Heat demand (proc.)"):
             self.hidePages()
             self.panelEA4a = PanelEA4a(parent=self.leftpanel2)
             self.panelEA4a.display()
         #qEA4b 'Process heat 2 - Yearly'   #SD2008-07-01
-        elif select == _("Process heat 2"):
+        elif select == _("Heat demand (temp.)"):
             self.hidePages()
             self.panelEA4b = PanelEA4b(parent=self.leftpanel2)
             self.panelEA4b.display()
         #qEA4c 'Process heat 3 - Yearly'   #SD2008-07-01
-        elif select == _("Process heat 3"):
+        elif select == _("Heat demand (time)"):
             self.hidePages()
             self.panelEA4c = PanelEA4c(parent=self.leftpanel2)
             self.panelEA4c.display()
@@ -914,7 +920,14 @@ class EinsteinFrame(wx.Frame):
             self.panelA = PanelA(parent=self.leftpanel2,main=self)
             self.panelA.display()
 
-        #pageBoilers
+        #panelCHP
+        elif select == "CHP":
+            self.hidePages()
+            self.panelCHP = PanelCHP(id=-1, name='panelCHP', parent=self.leftpanel2,
+                                   main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),
+                                   style=wx.TAB_TRAVERSAL)
+            self.panelCHP.display()
+        #panelST
         elif select == "Solar Thermal":
             self.hidePages()
             self.panelST = PanelST(id=-1, name='panelST', parent=self.leftpanel2,main=self)
@@ -1154,6 +1167,8 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.panelHC.Destroy()
         except:pass
+        try:self.panelCHP.Destroy()
+        except:pass
         try:self.panelST.Destroy()
         except:pass
         try:self.panelHP.Destroy()
@@ -1343,9 +1358,9 @@ class EinsteinFrame(wx.Frame):
         self.qEA1 = self.tree.AppendItem (self.qEA, _("Primary energy"))
         self.qEA2 = self.tree.AppendItem (self.qEA, _("Final energy by fuels"))
         self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
-        self.qEA4a = self.tree.AppendItem (self.qEA, _("Process heat 1"))
-        self.qEA4b = self.tree.AppendItem (self.qEA, _("Process heat 2"))
-        self.qEA4c = self.tree.AppendItem (self.qEA, _("Process heat 3"))
+        self.qEA4a = self.tree.AppendItem (self.qEA, _("Heat demand (proc.)"))
+        self.qEA4b = self.tree.AppendItem (self.qEA, _("Heat demand (temp.)"))
+        self.qEA4c = self.tree.AppendItem (self.qEA, _("Heat demand (time)"))
         self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
         # monthly statistics subtree
         self.qEM1 = self.tree.AppendItem (self.qEM, _("Monthly demand"))
@@ -1481,6 +1496,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel3, self.UserSelectLevel3)
 
+        self.Bind(wx.EVT_MENU, self.OnMenuSettingsPreferences, self.Preferences)
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsLanguage, self.Language)
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsViewMessages, self.ViewMessages)
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsManageFonts, self.ManageFonts)

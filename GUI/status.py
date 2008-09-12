@@ -90,6 +90,8 @@ class Status(object):
   SIMULATED_YEAR = Nt*TimeStep
   EXTRAPOLATE_TO_YEAR = 8760.0 / SIMULATED_YEAR
 
+  HRTool = "estimate" #default tool for heat recovery calculations
+
   #------------------------------------------------------------------------------		
   # Instance variables
 

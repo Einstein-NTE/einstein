@@ -174,6 +174,7 @@ class CheckProc():
         self.UPHProc1 = CCPar("UPHProc1")
         self.QHXProc1 = CCPar("QHXProc1")
         self.UAProc = CCPar("UAProc")
+        self.UAProc1 = CCPar("UAProc1")
         self.QEvapProc = CCPar("QEvapProc")
         self.QEvapProc1 = CCPar("QEvapProc1")
         self.UPHcGross = CCPar("UPHcGross")
@@ -252,7 +253,9 @@ class CheckProc():
             self.QOpProc.setValue(qprocessdata.QOpProc) 
             self.UPH.setValue(qprocessdata.UPH,err=0.0) #if specified, take exact value 
 
-            if isequal(self.PTInFlow.val,self.PTInFlowRec.val) or self.PTInFlowRec.val is None:
+            if isequal(self.PTInFlow.val,self.PTInFlowRec.val) or \
+               (self.PTInFlowRec.val is None) or \
+               (self.PT.val < self.PTInFlow.val + 5.0):
                 self.internalHR = False
             else:
                 self.internalHR = True
@@ -1015,6 +1018,7 @@ class CheckProc():
         ccheck1(self.DTOutFlow,self.DTOutFlow1)
         ccheck1(self.PTFinal,self.PTFinal1)
         ccheck1(self.UPHw,self.QWHProc)#At the moment they are the same. Change it next future when vessel heat recovery will be implemented
+        ccheck1(self.UAProc,self.UAProc1)
         
 #------------------------------------------------------------------------------
     def estimate(self):  
@@ -1024,11 +1028,39 @@ class CheckProc():
 #   (not necessarily ALL data have to be estimated)
 #------------------------------------------------------------------------------
 
-        self.PTOutFlowRec.setEstimate(self.PT,limits=(self.PT.valMin,self.PT.valMax))
-        self.VOutFlow.setEstimate(self.VInFlowDay,limits=(self.VInFlowDay.valMin,self.VInFlowDay.valMax))
+        self.PTOutFlowRec.setEstimate(self.PT.val,limits=(self.PT.valMin,self.PT.valMax))        
+        self.VOutFlow.setEstimate(self.VInFlowDay.val,limits=(self.VInFlowDay.valMin,self.VInFlowDay.valMax))
         self.PTInFlow.setEstimate(15.0,limits = (5.0,35.0))
-        self.DTCrossHXHT.setEstimate(10.0,limits = (5.0,20.0))
-        self.DTCrossHXLT.setEstimate(10.0,limits = (5.0,20.0))
+
+        if (self.PT.val - self.PTInFlow.val > 5.0):
+            self.DTCrossHXHT.setEstimate(10.0,limits = (5.0,999.0))
+            self.DTCrossHXLT.setEstimate(10.0,limits = (5.0,999.0))
+        else:
+            self.PTInFlowRec.update(self.PTInFlow)
+            self.internalHR = False
+
+# estimate of Evaporation losses
+        self.QEvapProc.setEstimate(0.0,limits = (0.0,0.0))
+
+        if self.NBatch.val > 0 and (self.NBatch.val is not None):
+            vol1 = self.VInFlowDay.val / self.NBatch.val
+        else:
+            vol1 = 0.0
+            
+        if self.VolProcMed.val is not None:
+            vol2 = self.VolProcMed.val
+        else:
+            vol2 = 0.0
+            
+        vol = max(vol1,vol2)
+
+        if vol < INFINITE:
+        
+            surface = 10.0 * pow(vol,2.0/3)
+            UAmin = 0.0004 * surface * 0.1  #0.4 W/m2K well insulated vessel
+            UA = 0.008 * surface
+            UAmax = 0.002 * surface * 1.0   #2.0 W/m2K badly insulated equipment
+            self.UAProc.setEstimate(UA,limits=(UAmin,UAmax))
         
 # limits: optional and fix absolute minimum and maximum values
 # sqerr: optional input that fixes the (stochastic) relative square error

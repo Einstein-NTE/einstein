@@ -1,0 +1,79 @@
+-- update einstein database: 10.09.2008, Do Thi Thu Huyen
+USE einstein;
+
+ALTER TABLE questionnaire ADD COLUMN OMGenUtilities DOUBLE COMMENT 'General maintenance - Utilities and operating materials costs' AFTER OMGenTot;
+ALTER TABLE questionnaire ADD COLUMN OMGenLabour DOUBLE COMMENT 'General maintenance - Labour costs' AFTER OMGenUtilities;
+ALTER TABLE questionnaire ADD COLUMN OMGenExtenal DOUBLE COMMENT 'General maintenance - External costs' AFTER OMGenLabour;
+ALTER TABLE questionnaire ADD COLUMN OMGenRegulatory DOUBLE COMMENT 'General maintenance - Regulatory compliance, insurance and future liability costs' AFTER OMGenExtenal;
+ALTER TABLE questionnaire ADD COLUMN OMBuildUtilities DOUBLE COMMENT 'Buildings - Utilities and operating materials costs' AFTER OMBuildTot;
+ALTER TABLE questionnaire ADD COLUMN OMBuildLabour DOUBLE COMMENT 'Buildings - Labour costs' AFTER OMBuildUtilities;
+ALTER TABLE questionnaire ADD COLUMN OMBuildExtenal DOUBLE COMMENT 'Buildings - External costs' AFTER OMBuildLabour;
+ALTER TABLE questionnaire ADD COLUMN OMBuildRegulatory DOUBLE COMMENT 'Buildings - Regulatory compliance, insurance and future liability costs' AFTER OMBuildExtenal;
+ALTER TABLE questionnaire ADD COLUMN OMMachEquipUtilities DOUBLE COMMENT 'Machines and equipment - Utilities and operating materials costs' AFTER OMMachEquipTot;
+ALTER TABLE questionnaire ADD COLUMN OMMachEquipLabour DOUBLE COMMENT 'Machines and equipment - Labour costs' AFTER OMMachEquipTot;
+ALTER TABLE questionnaire ADD COLUMN OMMachEquipExtenal DOUBLE COMMENT 'Machines and equipment  - External costs' AFTER OMMachEquipLabour;
+ALTER TABLE questionnaire ADD COLUMN OMMachEquipRegulatory DOUBLE COMMENT 'Machines and equipment  - Regulatory compliance, insurance and future liability costs' AFTER OMMachEquipExtenal;
+ALTER TABLE questionnaire ADD COLUMN OMHCGenDistUtilities DOUBLE COMMENT 'Generation and distribution of heat and cold - Utilities and operating materials costs' AFTER OMHCGenDistTot;
+ALTER TABLE questionnaire ADD COLUMN OMHCGenDistLabour DOUBLE COMMENT 'Generation and distribution of heat and cold - Labour costs' AFTER OMHCGenDistUtilities;
+ALTER TABLE questionnaire ADD COLUMN OMHCGenDistExtenal DOUBLE COMMENT 'Generation and distribution of heat and cold  - External costs' AFTER OMHCGenDistUtilities;
+ALTER TABLE questionnaire ADD COLUMN OMHCGenDistRegulatory DOUBLE COMMENT 'Generation and Distribution of heat and cold  - Regulatory compliance, insurance and future liability costs' AFTER OMHCGenDistExtenal;
+ALTER TABLE questionnaire ADD COLUMN OMTotalUtilities DOUBLE COMMENT 'Total - Utilities and operating materials costs' AFTER OMTotalTot;
+ALTER TABLE questionnaire ADD COLUMN OMTotalLabour DOUBLE COMMENT 'Total - Labour costs' AFTER OMTotalTot;
+ALTER TABLE questionnaire ADD COLUMN OMTotalExtenal DOUBLE COMMENT 'Total - External costs' AFTER OMTotalLabour;
+ALTER TABLE questionnaire ADD COLUMN OMTotalRegulatory DOUBLE COMMENT 'Total - Regulatory compliance, insurance and future liability costs' AFTER OMTotalExtenal;
+
+
+ALTER TABLE questionnaire ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount Rate' AFTER InterestExtFinancing;
+
+
+ALTER TABLE questionnaire DROP COLUMN OMGenOP;
+ALTER TABLE questionnaire DROP COLUMN OMGenEP;
+ALTER TABLE questionnaire DROP COLUMN OMGenFung;
+ALTER TABLE questionnaire DROP COLUMN OMBuildOP;
+ALTER TABLE questionnaire DROP COLUMN OMBuildEP;
+ALTER TABLE questionnaire DROP COLUMN OMBuildFung;
+ALTER TABLE questionnaire DROP COLUMN OMMachEquipOP;
+ALTER TABLE questionnaire DROP COLUMN OMMachEquipEP;
+ALTER TABLE questionnaire DROP COLUMN OMMachEquipFung;
+ALTER TABLE questionnaire DROP COLUMN OMHCGenDistOP;
+ALTER TABLE questionnaire DROP COLUMN OMHCGenDistEP;
+ALTER TABLE questionnaire DROP COLUMN OMHCGenDistFung;
+ALTER TABLE questionnaire DROP COLUMN OMTotalOP;
+ALTER TABLE questionnaire DROP COLUMN OMTotalEP;
+ALTER TABLE questionnaire DROP COLUMN OMTotalFung;
+
+
+
+
+--==================================================================================================================
+
+
+ALTER TABLE cgeneraldata ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount Rate' AFTER InterestExtFinancing;
+
+ALTER TABLE cgeneraldata ADD COLUMN InvestmentEffective DOUBLE COMMENT 'investment capital without subsidies and revenue from replaced equipments' AFTER TotalInvCost;
+ALTER TABLE cgeneraldata ADD COLUMN RevenueReplaceEquipment DOUBLE COMMENT 'Possible Revenue from replaced equipments' AFTER InvestmentEffective;
+ALTER TABLE cgeneraldata ADD COLUMN BCR DOUBLE COMMENT 'Benefit Cost Ratio' AFTER IRR;
+
+
+
+
+ALTER TABLE cgeneraldata DROP COLUMN OMGenTot;
+ALTER TABLE cgeneraldata DROP COLUMN OMGenOP;
+ALTER TABLE cgeneraldata DROP COLUMN OMGenEP;
+ALTER TABLE cgeneraldata DROP COLUMN OMGenFung;
+ALTER TABLE cgeneraldata DROP COLUMN OMBuildTot;
+ALTER TABLE cgeneraldata DROP COLUMN OMBuildOP;
+ALTER TABLE cgeneraldata DROP COLUMN OMBuildEP;
+ALTER TABLE cgeneraldata DROP COLUMN OMBuildFung;
+ALTER TABLE cgeneraldata DROP COLUMN OMMachEquipTot;
+ALTER TABLE cgeneraldata DROP COLUMN OMMachEquipOP;
+ALTER TABLE cgeneraldata DROP COLUMN OMMachEquipEP;
+ALTER TABLE cgeneraldata DROP COLUMN OMMachEquipFung;
+ALTER TABLE cgeneraldata DROP COLUMN OMHCGenDistTot;
+ALTER TABLE cgeneraldata DROP COLUMN OMHCGenDistOP;
+ALTER TABLE cgeneraldata DROP COLUMN OMHCGenDistEP;
+ALTER TABLE cgeneraldata DROP COLUMN OMHCGenDistFung;
+ALTER TABLE cgeneraldata DROP COLUMN OMTotalTot;
+ALTER TABLE cgeneraldata DROP COLUMN OMTotalOP;
+ALTER TABLE cgeneraldata DROP COLUMN OMTotalEP;
+ALTER TABLE cgeneraldata DROP COLUMN OMTotalFung;

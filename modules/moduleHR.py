@@ -15,11 +15,12 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.05
+#   Version No.: 0.06
 #   Created by:         Hans Schweiger  10/06/2008
 #   Last revised by:
 #                       Florian Joebstl 04/09/2008
 #                       Hans Schweiger  05/09/2008
+#                       Hans Schweiger  12/09/2008
 #
 #
 #   Changes to previous version:
@@ -28,8 +29,10 @@
 #   02/07/2008: HS  Function getHXData added -> obtains Fluid ID's in HX
 #   04/09/2008: FJ  Redone the entire module, still not completely functional
 #   05/09/2008: HS  Adaptation of simulateHRnew to general program
-#                   (Flo: changes marked with "#HS..." !!!)
-#   
+#   12/09/2008: HS  bug-fix in function simulateHR() -> completely rewritten
+#                   selection of calculation mode by Status.HRTool in function
+#                   runHRModule (is set in preferences).
+#                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #   www.energyxperts.net / info@energyxperts.net
@@ -147,28 +150,32 @@ class ModuleHR(object):
 #   7) updatePanel 
 #------------------------------------------------------------------------------
 
-        logWarning(_("Recalculating HX network. This may take some time."))
-        
-        if Status.schedules.outOfDate == True:
-            Status.schedules.create()   #creates the process and equipment schedules
-                         
-        XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
-        
-        try:
-            retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml"], shell=True)
-            logDebug(_("External program returned: ")+str(retcode))
-            if (retcode!=0):
-                raise
-        except:
-            logError(_("Error in external program (ProcessEngineering.exe) Run default simulation.."))            
+        if Status.HRTool == "estimate":
             self.simulateHR()
-        else:    
-            doc = XMLImportHRModule.importXML("export.xml")
-                      
-            self.data = HRData(Status.PId,Status.ANo)
-            self.data.loadFromDocument(doc)
-                    
-            self.simulateHRnew()
+            
+        else:
+            logWarning(_("Recalculating HX network. This may take some time."))
+            
+            if Status.schedules.outOfDate == True:
+                Status.schedules.create()   #creates the process and equipment schedules
+                             
+            XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
+            
+            try:
+                retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml"], shell=True)
+                logDebug(_("External program returned: ")+str(retcode))
+                if (retcode!=0):
+                    raise
+            except:
+                logError(_("Error in external program (ProcessEngineering.exe) Run default simulation.."))            
+                self.simulateHR()
+            else:    
+                doc = XMLImportHRModule.importXML("export.xml")
+                          
+                self.data = HRData(Status.PId,Status.ANo)
+                self.data.loadFromDocument(doc)
+                        
+                self.simulateHRnew()
 
 
         print "ModuleHR (runHRModule): QWHAmb = %s"%Status.int.QWHAmb_T[Status.NT+1]
@@ -552,18 +559,36 @@ class ModuleHR(object):
         for it in range(Status.Nt):
 
 #..............................................................................
-        
-            QHXmax = 0
-            for iT in range(Status.NT+1,-1,-1):
-                QHXmax = max(QHXmax,min(fHR*UPHw_Tt[iT][it],UPH_Tt[iT][it]))
-                QHXProc_Tt[iT][it] = min(QHXmax,fHR*UPHw_Tt[iT][it])
-                QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - QHXProc_Tt[iT][it]
 
-            QHXProc_it = QHXProc_Tt[0][it]
+#first invert UPHw curve and shift 2 temperature intervals (DTmin)
+
+            UPHw_max = UPHw_Tt[2][it]   
             
+            for iT in range(Status.NT):
+                QHXProc_Tt[iT][it] = fHR*(UPHw_max - UPHw_Tt[iT+2][it])  #maximum available energy
+            QHXProc_Tt[Status.NT][it]   = QHXProc_Tt[Status.NT-1][it]         #includes shift by DTmin
+            QHXProc_Tt[Status.NT+1][it] = QHXProc_Tt[Status.NT-1][it]
+
+#then shift so that QHXProc always < UPH -> = Hot Composite Curve
+            shift = 0.0
             for iT in range(Status.NT+2):
-                QHXProc_Tt[iT][it] = QHXProc_it - QHXProc_Tt[iT][it]    #from descending to ascending cumulative
+                shift = max(shift,QHXProc_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
+
+            for iT in range(Status.NT+2):
+                QHXProc_Tt[iT][it] = max(0.0,QHXProc_Tt[iT][it]-shift)                                        # = shift of HCC in Q
+            
+#substract recovered heat from total available waste heat -> QHWAmb
+            QHXProc_max = QHXProc_Tt[Status.NT+1][it]
+            QWHAmb_Tt[0][it] = UPHw_Tt[0][it]
+            QWHAmb_Tt[1][it] = UPHw_Tt[1][it]
+            for iT in range(2,Status.NT+2):
+                QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - (QHXProc_max-QHXProc_Tt[iT-2][it])
+                print "UPHw: %s QHXProc %s"%(UPHw_Tt[iT][it],QHXProc_Tt[iT][it])
+
+#substract recovered heat from demand -> UPHProc
+            for iT in range(Status.NT+2):
                 UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it] 
+                print "UPH: %s QHXProc %s"%(UPH_Tt[iT][it],QHXProc_Tt[iT][it])
                            
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
