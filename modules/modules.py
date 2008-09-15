@@ -48,6 +48,7 @@ from einstein.modules.solar.moduleST import ModuleST
 from einstein.modules.heatPump.moduleHP import ModuleHP
 from einstein.modules.boiler.moduleBB import ModuleBB
 from einstein.modules.energyStats.moduleEA import ModuleEA
+from einstein.modules.moduleTCA import ModuleTCA
 from einstein.modules.messageLogger import *
 
 class Modules(object):
@@ -89,4 +90,6 @@ class Modules(object):
 
         self.moduleEA = ModuleEA()
        
+        keys = []
+        self.moduleTCA = ModuleTCA(keys)
 #------------------------------------------------------------------------------		

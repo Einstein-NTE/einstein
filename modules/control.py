@@ -191,8 +191,7 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 2: Heat recovery + solar system
 
-    showMessage("Now let's try to install a solar system (Alternative 2)\n"+\
-                "In the present Version, a fixed size of 500 kW will be the first try")
+    showMessage("Now let's try to install a solar system (Alternative 2)\n")
     
     shortName = "Solar thermal"
     description = "EINSTEIN default design of a solar thermal system"
@@ -208,17 +207,6 @@ def autoRun(parent):
     Status.mod.moduleST.setUserDefinedPars()
     Status.mod.moduleST.designAssistant1()
     
-#    equipe = Status.mod.moduleST.addEquipmentDummy()
-#    equipe.HCGPnom = 500.0
-#    equipe.ST_SysEff = 0.9
-#    equipe.ST_Volume = 25.0
-#    equipe.ST_C0 = 0.80
-#    equipe.ST_C1 = 3.80
-#    equipe.ST_C2 = 0.01
-#    equipe.ST_K50L = 0.95
-#    equipe.ST_K50T = 0.95
-#    Status.SQL.commit()
-
     Status.mod.moduleST.updatePanel()
 
     Status.mod.moduleBB.initPanel() #preparation sequence of HP Module
@@ -308,17 +296,6 @@ def autoRun(parent):
     Status.mod.moduleST.setUserDefinedPars()
     Status.mod.moduleST.designAssistant1()
     
-#    equipe = Status.mod.moduleST.addEquipmentDummy()
-#    equipe.HCGPnom = 500.0
-#    equipe.ST_SysEff = 0.9
-#    equipe.ST_Volume = 25.0
-#    equipe.ST_C0 = 0.80
-#    equipe.ST_C1 = 3.80
-#    equipe.ST_C2 = 0.01
-#    equipe.ST_K50L = 0.95
-#    equipe.ST_K50T = 0.95
-#    Status.SQL.commit()
-
     Status.mod.moduleST.updatePanel()
 
     Status.mod.moduleBB.initPanel() #preparation sequence of HP Module

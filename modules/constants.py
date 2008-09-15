@@ -46,7 +46,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 208" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 209" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
@@ -119,7 +119,7 @@ EQUIPTYPE = ["compression heat pump",
 
 HPIndex = 0
 BBIndex = 2
-CHIndex = 8
+CHIndex = 7
 STIndex = 9
 CHPIndex = 12
 
@@ -155,6 +155,13 @@ TRANSBBTYPES = {"steam boiler":_("steam boiler"),
                 "hot water boiler":_("hot water boiler"),
                 "burner (direct heating)":_("burner (direct heating)"),
                 "burner (indirect heating)":_("burner (indirect heating)")}
+
+CHTYPES = [ "compression chiller",
+            "thermal chiller"]
+
+TRANSCHTYPES = { "compression chiller":_("compression chiller"),
+                 "thermal chiller":_("thermal chiller")}
+
 
 HPTYPES = ["compression",
            "thermal"]
@@ -218,9 +225,9 @@ EQUIPMENTSUBTYPE = [HPTYPES[0],
 # EQUIPMENT associates equipment class and sub-class
 
 EQUIPMENT = {"HP":                 # equipment class
-             [(EQUIPTYPE[0],TRANSEQUIPTYPE[EQUIPTYPE[0]],    # type of equipment, translated
+             [(EQUIPTYPE[HPIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[HPIndex+0]],    # type of equipment, translated
                HPTYPES[0], TRANSHPTYPES[HPTYPES[0]]), # type of process, translated
-              (EQUIPTYPE[1],TRANSEQUIPTYPE[EQUIPTYPE[1]],
+              (EQUIPTYPE[HPIndex+1],TRANSEQUIPTYPE[EQUIPTYPE[HPIndex+1]],
                HPTYPES[1],TRANSHPTYPES[HPTYPES[1]])],
 
              "BB": [(EQUIPTYPE[BBIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+0]],
@@ -234,8 +241,10 @@ EQUIPMENT = {"HP":                 # equipment class
                     (EQUIPTYPE[BBIndex+4],TRANSEQUIPTYPE[EQUIPTYPE[BBIndex+4]],
                      BBTYPES[4],TRANSBBTYPES[BBTYPES[4]])],
 
-             "CH": [(EQUIPTYPE[6],TRANSEQUIPTYPE[EQUIPTYPE[6]],EQUIPMENTSUBTYPE[6],EQUIPMENTSUBTYPE[6]),
-                    (EQUIPTYPE[7],TRANSEQUIPTYPE[EQUIPTYPE[7]],EQUIPMENTSUBTYPE[7],EQUIPMENTSUBTYPE[7])],
+             "CH": [(EQUIPTYPE[CHIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[CHIndex+0]],
+                     CHTYPES[0],TRANSCHTYPES[CHTYPES[0]]),
+                    (EQUIPTYPE[CHIndex+1],TRANSEQUIPTYPE[EQUIPTYPE[CHIndex+1]],
+                     CHTYPES[1],TRANSCHTYPES[CHTYPES[1]])],
 
              "ST": [(EQUIPTYPE[STIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+0]],
                      STTYPES[0],TRANSSTTYPES[STTYPES[0]]),
@@ -244,10 +253,14 @@ EQUIPMENT = {"HP":                 # equipment class
                     (EQUIPTYPE[STIndex+2],TRANSEQUIPTYPE[EQUIPTYPE[STIndex+2]],
                      STTYPES[2],TRANSSTTYPES[STTYPES[2]])],
 
-             "CHP": [(EQUIPTYPE[11],TRANSEQUIPTYPE[EQUIPTYPE[11]],EQUIPMENTSUBTYPE[11],EQUIPMENTSUBTYPE[11]),
-                    (EQUIPTYPE[12],TRANSEQUIPTYPE[EQUIPTYPE[12]],EQUIPMENTSUBTYPE[9],EQUIPMENTSUBTYPE[9]),
-                    (EQUIPTYPE[13],TRANSEQUIPTYPE[EQUIPTYPE[13]],EQUIPMENTSUBTYPE[10],EQUIPMENTSUBTYPE[10]),
-                    (EQUIPTYPE[14],TRANSEQUIPTYPE[EQUIPTYPE[14]],EQUIPMENTSUBTYPE[12],EQUIPMENTSUBTYPE[12])]
+             "CHP": [(EQUIPTYPE[CHPIndex+0],TRANSEQUIPTYPE[EQUIPTYPE[CHPIndex+0]],
+                      CHPTYPES[0],TRANSCHPTYPES[CHPTYPES[0]]),
+                    (EQUIPTYPE[CHPIndex+1],TRANSEQUIPTYPE[EQUIPTYPE[CHPIndex+1]],
+                      CHPTYPES[1],TRANSCHPTYPES[CHPTYPES[1]]),
+                    (EQUIPTYPE[CHPIndex+2],TRANSEQUIPTYPE[EQUIPTYPE[CHPIndex+2]],
+                      CHPTYPES[2],TRANSCHPTYPES[CHPTYPES[2]]),
+                    (EQUIPTYPE[CHPIndex+3],TRANSEQUIPTYPE[EQUIPTYPE[CHPIndex+3]],
+                      CHPTYPES[3],TRANSCHPTYPES[CHPTYPES[3]])]
              }
 
 

@@ -15,7 +15,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
+#	Version No.: 0.12
 #	Created by: 	    Hans Schweiger	25/06/2008
 #                           (based on ModuleST from Enrico Facci)
 #	Last revised by:    Enrico Facci &      05/07/2008
@@ -26,6 +26,7 @@
 #                           Hans Schweiger      24/07/2008
 #                           Enrico Facci        (...)
 #                           Hans Schweiger      01/08/2008
+#                           Hans Schweiger      13/09/2008
 #
 #       Changes to previous version:
 #
@@ -42,6 +43,8 @@
 #                       conversion kWh -> MWh in plot
 #                       clean-up of the following functions:
 #                       - calculateEnergyFlows (cEF)
+#       13/09/2008: HS  bug-fix in display of desired solar fraction
+#                       temporary change in selectST: factor 0.8 for concentrating collectors
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -280,6 +283,7 @@ class ModuleST(object):
 #        data = array(collectors)
 
         Status.int.setGraphicsData('ST Table',data)
+        print "ST Table data:\n",data
 #............................................................................................
 # 2. Preparing data
 
@@ -412,7 +416,10 @@ class ModuleST(object):
             
         u = urows[0]
 
-        u.STSolFra = config[0]
+        try:
+            u.STSolFra = config[0]/100.0
+        except:
+            u.STSolFra = 0.5
         u.STCollType = config[1]
         u.STMinYield = config[2]
 
@@ -459,6 +466,7 @@ class ModuleST(object):
         self.equipeIDs=[]
         self.cascadeIndex = 0
         for equipe in equipments:
+            print "Equipment: ",equipe.EquipType,getEquipmentClass(equipe.EquipType)
             if getEquipmentClass(equipe.EquipType) == "ST":
                 collectorTable = [equipe.Model,
                                   equipe.EquipType,
@@ -1333,6 +1341,9 @@ class ModuleST(object):
                 STc1=possibleCollector[i].STc1
                 STc2=possibleCollector[i].STc2
                 etaCollector=collectorEfficiency(GT,dT,STc0,STc1,STc2)
+                if possibleCollector[i].STType == "Concentrating collector":
+                    etaCollector *= 0.8         #HS2008-09-13. some temporary solution for a more realistic comparison
+                                                #of concentrating and non-concentrating collectors.
                 if etaCollector>self.etaSelected:
                     self.etaSelected=etaCollector
                     self.a=i

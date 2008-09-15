@@ -385,7 +385,8 @@ class ModuleEnergy(object):
         if last == self.NEquipe:
 
             uncoveredDemand = Status.int.QD_T_mod[last][Status.NT+1]
-            if uncoveredDemand > 0:
+            totalDemand = Status.int.QD_T_mod[0][Status.NT+1]
+            if uncoveredDemand > 0.005*totalDemand:
                 showWarning("Revise your design.\nCurrent equipment capacity is not sufficient for covering the demand\n"+\
                             "Remaining heat demand: %s [MWh]"%(uncoveredDemand/1000.0))
                 

@@ -63,6 +63,7 @@
 #                       Tom Sobota                          30/07/2008
 #                       Hans Schweiger                      05/09/2008
 #                       Hans Schweiger                      12/09/2008
+#                       Florian Joebstl                     15/09/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -143,6 +144,7 @@
 #       30/07/2008  TS character encoding for MySQL
 #       05/09/2008  HS PanelCHP activated
 #       12/09/2008  HS Preferences frame added
+#       15/09/2008  FJ TCA GUI added
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -230,6 +232,13 @@ from panelCS7 import *
 from panelBM1 import *
 from panelBM2 import *
 from panelBM3 import *
+
+from panelTCA import *
+from panelTCAInvestment import *
+from panelTCAEnergy import *
+from panelTCACont import *
+from panelTCANon import *
+
 #TS2008-04-15 panelInfo added
 from panelInfo import *
 
@@ -637,9 +646,9 @@ class EinsteinFrame(wx.Frame):
     def OnMenuEditDBBoiler(self, event):
         frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
         frameEditDBBoiler.ShowModal()
-    def OnMenuEditDBSolarEquip(self, event):
-        frameEditDBSolarEquip = DBEditFrame(None, "Edit DBSolarEquip", 'dbsolarequip', 0, True)
-        frameEditDBSolarEquip.ShowModal()
+    def OnMenuEditDBSolarThermal(self, event):
+        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)
+        frameEditDBSolarThermal.ShowModal()
     def OnMenuEditDBChiller(self, event):
         frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
         frameEditDBChiller.ShowModal()
@@ -974,6 +983,37 @@ class EinsteinFrame(wx.Frame):
             self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelHC.display()
+
+
+  	elif select ==  _("Total Cost Assessment"):
+            self.hidePages()
+            self.panelTCA = PanelTCA(id=-1, name='panelTCA', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelTCA.display()
+        
+        elif select ==  _("Investment"):
+            self.hidePages()
+            self.panelTCAInvestment = PanelTCAInvestment(id=-1, name='panelTCAInvestment', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelTCAInvestment.display()
+            
+        elif select ==  _("Energy and operating costs"):
+            self.hidePages()
+            self.panelTCAEnergy = PanelTCAEnergy(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelTCAEnergy.display()
+        
+        elif select ==  _("Contingencies"):
+            self.hidePages()
+            self.panelTCACont = PanelTCAContingencies(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelTCACont.display()
+        
+        elif select ==  _("Non reocurring costs"):
+            self.hidePages()
+            self.panelTCANon = PanelTCANon(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelTCANon.display()
         #qCS1 'Primary energy - Yearly'   #SD2008-07-01
         elif select == _("Comp.study: Primary energy"):
             self.hidePages()
@@ -1178,6 +1218,16 @@ class EinsteinFrame(wx.Frame):
         try:self.panelEnergy.Destroy()
         except:pass
 
+	try:self.panelTCA.Destroy()        
+        except:pass
+        try:self.panelTCAInvestment.Destroy()
+        except:pass
+        try:self.panelTCAEnergy.Destroy()
+        except:pass
+        try:self.panelTCACont.Destroy()
+        except:pass
+        try:self.panelTCANon.Destroy()
+        except:pass   
 
         try:self.panelCS1.Destroy()
         except:pass
@@ -1210,7 +1260,7 @@ class EinsteinFrame(wx.Frame):
         self.submenuPrint = wx.Menu()
         self.submenuEditDB = wx.Menu()
 
-        self.subnenuEquipments = wx.Menu()
+        self.submenuEquipments = wx.Menu()
         self.submenuUserLevel = wx.Menu()
         self.submenuClassification = wx.Menu()
 
@@ -1232,14 +1282,14 @@ class EinsteinFrame(wx.Frame):
         self.menuFile.AppendSeparator()
         self.ExitApp = self.menuFile.Append(-1, _("E&xit"))
 
-        self.EditDBCHP = self.subnenuEquipments.Append(-1, _("&CHP"))
-        self.EditDBHeatPump = self.subnenuEquipments.Append(-1, _("&Heat pumps"))
-        self.EditDBChiller = self.subnenuEquipments.Append(-1, _("&Chillers"))
-        self.EditDBBoiler = self.subnenuEquipments.Append(-1, _("B&oilers"))
-        self.EditDBStorage = self.subnenuEquipments.Append(-1, _("Stora&ge"))
-        self.EditDBSolarEquip = self.subnenuEquipments.Append(-1, _("&Solar equipment"))
+        self.EditDBCHP = self.submenuEquipments.Append(-1, _("&CHP"))
+        self.EditDBHeatPump = self.submenuEquipments.Append(-1, _("&Heat pumps"))
+        self.EditDBChiller = self.submenuEquipments.Append(-1, _("&Chillers"))
+        self.EditDBBoiler = self.submenuEquipments.Append(-1, _("B&oilers"))
+        self.EditDBStorage = self.submenuEquipments.Append(-1, _("Stora&ge"))
+        self.EditDBSolarThermal = self.submenuEquipments.Append(-1, _("&Solar Collectors"))
 
-        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.subnenuEquipments)
+        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.submenuEquipments)
         self.EditDBFuel = self.menuDatabase.Append(-1, _("Fue&ls"))
         self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
         self.EditDBElectricityMix = self.menuDatabase.Append(-1, _("Electricity mix"))
@@ -1427,18 +1477,13 @@ class EinsteinFrame(wx.Frame):
 
         #Energy performance
         self.qEnergy = self.tree.AppendItem (self.qA, _("Energy performance"))
-            #Detailed energy flows 1
-#HS2008-03-12: subdivision energy cancelled out
-#        self.qEnergy1 = self.tree.AppendItem (self.qEnergy, "Detailed energy flows 1")
-            #Detailed energy flows 2
-#        self.qEnergy2 = self.tree.AppendItem (self.qEnergy, "Detailed energy flows 2")
 
-        #Economic analysis
-        self.qOptiProEconomic = self.tree.AppendItem (self.qA, _("Economic analysis"))
-            #Economics 1
-        self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, _("Economics 1"))
-            #Economics 2
-        self.qOptiProEconomic2 = self.tree.AppendItem (self.qOptiProEconomic, _("Economics 2"))
+        #Total Cost Assessment
+        self.qOptiProEconomic  = self.tree.AppendItem (self.qA, _("Total Cost Assessment"))  
+        self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, _("Investment"))
+        self.qOptiProEconomic2 = self.tree.AppendItem (self.qOptiProEconomic, _("Energy and operating costs"))
+        self.qOptiProEconomic3 = self.tree.AppendItem (self.qOptiProEconomic, _("Contingencies"))
+        self.qOptiProEconomic4 = self.tree.AppendItem (self.qOptiProEconomic, _("Non reocurring costs"))    
 
 
         #Comparative analysis
@@ -1489,7 +1534,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBFuel, self.EditDBFuel)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBElectricityMix, self.EditDBElectricityMix)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarEquip, self.EditDBSolarEquip)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarThermal, self.EditDBSolarThermal)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
 
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
