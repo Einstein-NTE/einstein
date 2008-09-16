@@ -12,7 +12,7 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.07
 #	Created by: 	    Hans Schweiger	05/07/2008
 #                           Stoyan Danov        10/07/2008
 #                           Stoyan Danov        12/07/2008
@@ -186,7 +186,10 @@ class ModuleCS(object):
                     USHSaving = USH0 - dUSH #SD: inverted-changed sign
                     if USH0 > 0:
                         RelSavingUSH = USHSaving/USH0
-                        RatioUSH = dUSH*100.0/USH0 #SD in %
+                        if dUSH_Table == "---":
+                            RatioUSH = 0.0
+                        else:
+                            RatioUSH = dUSH*100.0/USH0 #SD in %
                     else:
                         RelSavingUSH = 0.0
                         RatioUSH = 0.0 #SD in %
@@ -194,7 +197,10 @@ class ModuleCS(object):
                     UPHSaving = UPH0 - dUPH #SD: inverted-changed sign
                     if UPH0 > 0:
                         RelSavingUPH = UPHSaving/UPH0
-                        RatioUPH = dUPH*100.0/UPH0 #SD in %
+                        if dUPH_Table == "---":
+                            RatioUPH = 0.0
+                        else:
+                            RatioUPH = dUPH*100.0/UPH0 #SD in %
                     else:
                         RelSavingUPH = 0.0
                         RatioUPH = 0.0 #SD in %

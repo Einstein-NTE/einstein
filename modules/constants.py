@@ -46,7 +46,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 209" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 210" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
@@ -274,7 +274,7 @@ TRANSPROCTYPES = {"continuous":_("continuous"),
 
 YESNO = ["yes","no"]
 #translatable dictionary
-TRANSYESNO = {"Yes":_("yes"),"No":_("no")}
+TRANSYESNO = {"yes":_("yes"),"no":_("no")}
 
 STORAGETYPES = ["sensible",
                 "latent"]

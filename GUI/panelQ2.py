@@ -8,11 +8,11 @@
 #
 #------------------------------------------------------------------------------
 #
-#	PanelQ0: Tool main page (page 0) -> project selection
+#	PanelQ2: Questionnaire on energy consumption
 #
 #==============================================================================
 #
-#	Version No.: 0.16
+#	Version No.: 0.17
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -29,6 +29,7 @@
 #                           Hans Schweiger  23/06/2008
 #                           Hans Schweiger  03/07/2008
 #                           Hans Schweiger  07/07/2008
+#                           Hans Schweiger  16/09/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
@@ -50,6 +51,7 @@
 #       03/07/2008: HS  adjustment of column with in table electricity; 
 #       07/07/2008: HS  bug-fix: self.check substituted by GUITools->check
 #                       the old one didn't work with Tom's new FloatEntry
+#       16/09/2008: HS  bug-fix: introduced ANo in electricity table
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -86,6 +88,13 @@ ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
 
 #------------------------------------------------------------------------------
+def scale(val,fscale):
+    try:
+        x = float(val)*fscale
+    except:
+        x = val
+    return x
+
 #------------------------------------------------------------------------------
 class PanelQ2(wx.Panel):
 #------------------------------------------------------------------------------
@@ -413,75 +422,46 @@ class PanelQ2(wx.Panel):
 
     def storeElectricityData(self):
         if Status.PId <> 0:
-            if len(Status.DB.qelectricity.\
+
+            elTable = Status.DB.qelectricity.\
                    Questionnaire_id[Status.PId].\
-                   AlternativeProposalNo[Status.ANo]) == 0:
+                   AlternativeProposalNo[Status.ANo]
+            
+            if len(elTable) == 0:
+
+                logDebug("PanelQ2: no electricity table available in project")
                 
                 tmp = {
                     "Questionnaire_id":Status.PId,
-                    "AlternativeProposalNo":Status.ANo,
-                    "PowerContrTot":check(self.grid.GetCellValue(1, 3)),
-                    "PowerContrStd":check(self.grid.GetCellValue(1, 1)),
-                    "PowerContrPeak":check(self.grid.GetCellValue(1, 0)),
-                    "PowerContrVall":check(self.grid.GetCellValue(1, 2)),
-                    "ElectricityTotYear":check(self.grid.GetCellValue(0, 3)),
-                    "ElectricityPeakYear":check(self.grid.GetCellValue(0, 0)),
-                    "ElectricityStandYear":check(self.grid.GetCellValue(0, 1)),
-                    "ElectricityValleyYear":check(self.grid.GetCellValue(0, 2)),
-                    "ElGenera":check(self.grid.GetCellValue(0, 4)),
-                    "ElSales":check(self.grid.GetCellValue(0, 5)),
-                    "ElectricityRef":check(self.grid.GetCellValue(8, 0)),
-                    "ElectricityAC":check(self.grid.GetCellValue(8, 1)),
-                    "ElectricityThOther":check(self.grid.GetCellValue(8, 2)),
-                    "ElectricityMotors":check(self.grid.GetCellValue(8, 3)),
-                    "ElectricityChem":check(self.grid.GetCellValue(8, 4)),
-                    "ElectricityLight":check(self.grid.GetCellValue(8, 5)),
-                    "ElTariffClassTot":check(self.grid.GetCellValue(2, 3)),
-                    "ElTariffClassStd":check(self.grid.GetCellValue(2, 1)),
-                    "ElTariffClassPeak":check(self.grid.GetCellValue(2, 0)),
-                    "ElTariffClassTotVall":check(self.grid.GetCellValue(2, 2)),
-                    "ElTariffClassCHP":check(self.grid.GetCellValue(2, 5)),
-                    "ElTariffPowTot":check(self.grid.GetCellValue(3, 3)),
-                    "ElTariffPowStd":check(self.grid.GetCellValue(3, 1)),
-                    "ElTariffPowPeak":check(self.grid.GetCellValue(3, 0)),
-                    "ElTariffPowVall":check(self.grid.GetCellValue(3, 2)),
-                    "ElTariffPowCHP":check(self.grid.GetCellValue(3, 5)),
-                    "ElTariffCTot":check(self.grid.GetCellValue(4, 3)),
-                    "ElTariffCStd":check(self.grid.GetCellValue(4, 1)),
-                    "ElTariffCPeak":check(self.grid.GetCellValue(4, 0)),
-                    "ElTariffCVall":check(self.grid.GetCellValue(4, 2)),
-                    "ETariffCHP":check(self.grid.GetCellValue(4, 5)),
-                    "ElCostYearTot":check(self.grid.GetCellValue(5, 3)),
-                    "ElCostYearStd":check(self.grid.GetCellValue(5, 1)),
-                    "ElCostYearPeak":check(self.grid.GetCellValue(5, 0)),
-                    "ElCostYearVall":check(self.grid.GetCellValue(5, 2)),
-                    "ElSalesYearCHP":check(self.grid.GetCellValue(5, 5))
-                    }
+                    "AlternativeProposalNo":Status.ANo}
                 
                 Status.DB.qelectricity.insert(tmp)
                 Status.SQL.commit()                      
 
-            elif len(Status.DB.qelectricity.\
-                     Questionnaire_id[Status.PId].\
-                     AlternativeProposalNo[Status.ANo]) >= 1:
-                q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
+            elTable = Status.DB.qelectricity.\
+                   Questionnaire_id[Status.PId].\
+                   AlternativeProposalNo[Status.ANo]
+            
+            if len(elTable) >= 1:
+
+                q = elTable[0]
                 tmp = {                    
                     "PowerContrTot":check(self.grid.GetCellValue(1, 3)),
                     "PowerContrStd":check(self.grid.GetCellValue(1, 1)),
                     "PowerContrPeak":check(self.grid.GetCellValue(1, 0)),
                     "PowerContrVall":check(self.grid.GetCellValue(1, 2)),
-                    "ElectricityTotYear":check(self.grid.GetCellValue(0, 3)),
-                    "ElectricityPeakYear":check(self.grid.GetCellValue(0, 0)),
-                    "ElectricityStandYear":check(self.grid.GetCellValue(0, 1)),
-                    "ElectricityValleyYear":check(self.grid.GetCellValue(0, 2)),
-                    "ElGenera":check(self.grid.GetCellValue(0, 4)),
-                    "ElSales":check(self.grid.GetCellValue(0, 5)),
-                    "ElectricityRef":check(self.grid.GetCellValue(8, 0)),
-                    "ElectricityAC":check(self.grid.GetCellValue(8, 1)),
-                    "ElectricityThOther":check(self.grid.GetCellValue(8, 2)),
-                    "ElectricityMotors":check(self.grid.GetCellValue(8, 3)),
-                    "ElectricityChem":check(self.grid.GetCellValue(8, 4)),
-                    "ElectricityLight":check(self.grid.GetCellValue(8, 5)),
+                    "ElectricityTotYear":check(scale(self.grid.GetCellValue(0, 3),1000.0)),
+                    "ElectricityPeakYear":check(scale(self.grid.GetCellValue(0, 0),1000.0)),
+                    "ElectricityStandYear":check(scale(self.grid.GetCellValue(0, 1),1000.0)),
+                    "ElectricityValleyYear":check(scale(self.grid.GetCellValue(0, 2),1000.0)),
+                    "ElGenera":check(scale(self.grid.GetCellValue(0, 4),1000.0)),
+                    "ElSales":check(scale(self.grid.GetCellValue(0, 5),1000.0)),
+                    "ElectricityRef":check(scale(self.grid.GetCellValue(8, 0),1000.0)),
+                    "ElectricityAC":check(scale(self.grid.GetCellValue(8, 1),1000.0)),
+                    "ElectricityThOther":check(scale(self.grid.GetCellValue(8, 2),1000.0)),
+                    "ElectricityMotors":check(scale(self.grid.GetCellValue(8, 3),1000.0)),
+                    "ElectricityChem":check(scale(self.grid.GetCellValue(8, 4),1000.0)),
+                    "ElectricityLight":check(scale(self.grid.GetCellValue(8, 5),1000.0)),
                     "ElTariffClassTot":check(self.grid.GetCellValue(2, 3)),
                     "ElTariffClassStd":check(self.grid.GetCellValue(2, 1)),
                     "ElTariffClassPeak":check(self.grid.GetCellValue(2, 0)),
@@ -528,7 +508,6 @@ class PanelQ2(wx.Panel):
             self.clear()
         event.Skip()
 
-
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------		
@@ -536,6 +515,7 @@ class PanelQ2(wx.Panel):
     def display(self):
         self.fillChoiceOfDBFuelType()
         self.clear()
+        self.Hide()
         self.fillPage()
         self.Show()
 
@@ -552,25 +532,29 @@ class PanelQ2(wx.Panel):
 	if Status.PId == 0:
 	    return
 
-	if len(Status.DB.qelectricity.Questionnaire_id[Status.PId]) > 0:
+        elTable = Status.DB.qelectricity.\
+               Questionnaire_id[Status.PId].\
+               AlternativeProposalNo[Status.ANo]
+
+	if len(elTable) > 0:
 	    
-            q = Status.DB.qelectricity.Questionnaire_id[Status.PId][0]
+            q = elTable[0]
             self.grid.SetCellValue(1, 3, str(q.PowerContrTot))
             self.grid.SetCellValue(1, 1, str(q.PowerContrStd))
             self.grid.SetCellValue(1, 0, str(q.PowerContrPeak))
             self.grid.SetCellValue(1, 2, str(q.PowerContrVall))
-            self.grid.SetCellValue(0, 3, str(q.ElectricityTotYear))
-            self.grid.SetCellValue(0, 0, str(q.ElectricityPeakYear))
-            self.grid.SetCellValue(0, 1, str(q.ElectricityStandYear))
-            self.grid.SetCellValue(0, 2, str(q.ElectricityValleyYear))
-            self.grid.SetCellValue(0, 4, str(q.ElGenera))
-            self.grid.SetCellValue(0, 5, str(q.ElSales))
-            self.grid.SetCellValue(8, 0, str(q.ElectricityRef))
-            self.grid.SetCellValue(8, 1, str(q.ElectricityAC))
-            self.grid.SetCellValue(8, 2, str(q.ElectricityThOther))
-            self.grid.SetCellValue(8, 3, str(q.ElectricityMotors))
-            self.grid.SetCellValue(8, 4, str(q.ElectricityChem))
-            self.grid.SetCellValue(8, 5, str(q.ElectricityLight))
+            self.grid.SetCellValue(0, 3, str(scale(q.ElectricityTotYear,0.001)))
+            self.grid.SetCellValue(0, 0, str(scale(q.ElectricityPeakYear,0.001)))
+            self.grid.SetCellValue(0, 1, str(scale(q.ElectricityStandYear,0.001)))
+            self.grid.SetCellValue(0, 2, str(scale(q.ElectricityValleyYear,0.001)))
+            self.grid.SetCellValue(0, 4, str(scale(q.ElGenera,0.001)))
+            self.grid.SetCellValue(0, 5, str(scale(q.ElSales,0.001)))
+            self.grid.SetCellValue(8, 0, str(scale(q.ElectricityRef,0.001)))
+            self.grid.SetCellValue(8, 1, str(scale(q.ElectricityAC,0.001)))
+            self.grid.SetCellValue(8, 2, str(scale(q.ElectricityThOther,0.001)))
+            self.grid.SetCellValue(8, 3, str(scale(q.ElectricityMotors,0.001)))
+            self.grid.SetCellValue(8, 4, str(scale(q.ElectricityChem,0.001)))
+            self.grid.SetCellValue(8, 5, str(scale(q.ElectricityLight,0.001)))
             self.grid.SetCellValue(2, 3, str(q.ElTariffClassTot))
             self.grid.SetCellValue(2, 1, str(q.ElTariffClassStd))
             self.grid.SetCellValue(2, 0, str(q.ElTariffClassPeak))
@@ -591,6 +575,9 @@ class PanelQ2(wx.Panel):
             self.grid.SetCellValue(5, 0, str(q.ElCostYearPeak))
             self.grid.SetCellValue(5, 2, str(q.ElCostYearVall))
             self.grid.SetCellValue(5, 5, str(q.ElSalesYearCHP))
+
+        else:
+            logDebug("PanelQ2 (fillPage): electricity table not found")
 
 	self.fillFuelList()
 

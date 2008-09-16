@@ -310,6 +310,8 @@ class Schedules(object):
 
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
+        if Status.HPerDayInd is None:
+            Status.HPerDayInd = 12.0
 
         self.calculateProcessSchedules()
         self.calculateEquipmentSchedules()

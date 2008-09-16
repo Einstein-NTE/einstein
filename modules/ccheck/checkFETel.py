@@ -18,14 +18,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Claudia Vannoni 	17/04/2008
-#                           Claudia Vannoni 	25/04/2008
+#       Revised by:         Claudia Vannoni 	25/04/2008
 #                           Claudia Vannoni 	27/04/2008
+#                           Hans Schweiger      16/09/2008
+#
 #       Changes in last update:
 #                           complete export data, arrange parameters and labels
-#       
-#
+#       16/09/2008: HS  Some adaptations to new ccheck structure
+#                       Control of Nones for FEO and components
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -59,19 +61,27 @@ class CheckFETel():
         
         self.ElectricityNet = CCPar("ElectricityNet") 
         self.ElectricityNet1 = CCPar("ElectricityNet1")
+        
+        self.ElectricityGen1 = CCPar("ElectricityGen1")
+        self.ElectricitySales1 = CCPar("ElectricitySales1")
+        self.ElectricityTotYear1 = CCPar("ElectricityTotYear1")
+
+        self.ElectricityMotors1 = CCPar("ElectricityMotors1")
+        self.ElectricityChem1 = CCPar("ElectricityChem1")
+        self.ElectricityLight1 = CCPar("ElectricityLight1")
+        self.ElectricityRef1 = CCPar("ElectricityRef1")
+        self.ElectricityAC1 = CCPar("ElectricityAC1")
+        self.ElectricityThOther1 = CCPar("ElectricityThOther1")
+
         self.FECel1 = CCPar("FECel1")
-        self.FECel2 = CCPar("FECel2")
-        self.FECel = CCPar("FECel")
+        self.FECel = CCPar("FECel",priority=1)
         self.FEOel1 = CCPar("FEOel1")
         self.FEOel = CCPar("FEOel")
         self.FETel1 = CCPar("FETel1")
         self.FETel2 = CCPar("FETel2")
-        self.FETel = CCPar("FETel",priority=2)
+        self.FETel = CCPar("FETel",priority=1)
         
-        if TEST==True:
-            self.importTestData()
-        else:
-            self.importData(0)
+        self.importData(0)
 
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllFETel()
@@ -91,7 +101,7 @@ class CheckFETel():
         self.ElectricityGen = CCPar("ElectricityGen")
         self.ElectricitySales = CCPar("ElectricitySales")
         self.ElectricityTotYear = CCPar("ElectricityTotYear")
-        #self.ElProd electricty required per product, has to be defined as vector
+
         self.ElectricityMotors = CCPar("ElectricityMotors")
         self.ElectricityChem = CCPar("ElectricityChem")
         self.ElectricityLight = CCPar("ElectricityLight")
@@ -101,42 +111,43 @@ class CheckFETel():
 
 #..............................................................................
 # reading data from table "cgeneraldata"
-        try:
-            cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
-            if len(cgeneraldataTable) > 0:
-                cgeneraldata = cgeneraldataTable[0]
+        cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+        if len(cgeneraldataTable) > 0:
+            cgeneraldata = cgeneraldataTable[0]
 
-                self.ElectricityGen.setValue(cgeneraldata.ElectricityGen)
-                self.ElectricitySales.setValue(cgeneraldata.ElectricitySales)
+            self.ElectricityGen.setValue(cgeneraldata.ElectricityGen)
+            self.ElectricitySales.setValue(cgeneraldata.ElectricitySales)
                 
-        except:
-            print "CheckFETel (importData): error reading data from cgeneraldata"
-            pass
 
 #..............................................................................
 # reading data from table "qelectricity"
 
-        try:
-            qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
-            if len(qelectricityTable) > 0:
-                qelectricity = qelectricityTable[0]
+        qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+        if len(qelectricityTable) > 0:
+            qelectricity = qelectricityTable[0]
 
-                self.ElectricityTotYear.setValue(qelectricity.ElectricityTotYear)
-                self.ElectricityMotors.setValue(qelectricity.ElectricityMotors)
-                self.ElectricityChem.setValue(qelectricity.ElectricityChem)
-                self.ElectricityLight.setValue(qelectricity.ElectricityLight)
-                self.ElectricityRef.setValue(qelectricity.ElectricityRef)
-                self.ElectricityAC.setValue(qelectricity.ElectricityAC)
-                self.ElectricityThOther.setValue(qelectricity.ElectricityThOther)
+            self.ElectricityTotYear.setValue(qelectricity.ElectricityTotYear)
+            self.ElectricityMotors.setValue(qelectricity.ElectricityMotors)
+            self.ElectricityChem.setValue(qelectricity.ElectricityChem)
+            self.ElectricityLight.setValue(qelectricity.ElectricityLight)
+            self.ElectricityRef.setValue(qelectricity.ElectricityRef)
+            self.ElectricityAC.setValue(qelectricity.ElectricityAC)
+            self.ElectricityThOther.setValue(qelectricity.ElectricityThOther)
                 
-        except:
-            print "CheckFETel (importData): error reading data from qelectricity"
-            pass
-
 #..............................................................................
-# xxx something missing -> later to be added ...
+# check if calculation of FECel is principally possible
 
-        #self.ElProd electricty required per product, has to be defined as vector
+        if (self.ElectricityTotYear.val is None) or \
+           (self.ElectricityGen.val is None) or \
+           (self.ElectricitySales.val is None):
+            if (self.ElectricityMotors.val is None) or \
+               (self.ElectricityLight.val is None) or \
+               (self.ElectricityChem.val is None):
+                logWarning(_("WARNING: No data available for electricity consumption for non-thermal uses. Set to 0 !!!"))
+                self.ElectricityMotors.setValue(0.0)
+                self.ElectricityLight.setValue(0.0)
+                self.ElectricityChem.setValue(0.0)
+                self.FEOel.setValue(0.0)
 
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -157,27 +168,22 @@ class CheckFETel():
 
                 cgeneraldata.ElectricityGen = check(self.ElectricityGen.val)
                 cgeneraldata.ElectricitySales = check(self.ElectricitySales.val)
-#                cgeneraldata.ElectricityNet = self.ElectricityNet.val
+
                 cgeneraldata.FECel = check(self.FECel.val)
                 cgeneraldata.FEOel = check(self.FEOel.val)
                 cgeneraldata.FETel = check(self.FETel.val)
                 
                 Status.SQL.commit()
 
-#        except:
-#            print "CheckFETel (exportData): error writing data to cgeneraldata"
-            pass
-
 #..............................................................................
 # writing data to table "qelectricity"
 
-#        try:
         qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
         if len(qelectricityTable) > 0:
-            print "exporting data to qelectricity"
             qelectricity = qelectricityTable[0]
 
             qelectricity.ElectricityTotYear = check(self.ElectricityTotYear.val)
+            
             qelectricity.ElectricityMotors = check(self.ElectricityMotors.val)
             qelectricity.ElectricityChem = check(self.ElectricityChem.val)
             qelectricity.ElectricityLight = check(self.ElectricityLight.val)
@@ -188,112 +194,21 @@ class CheckFETel():
 
             Status.SQL.commit()
                 
-#        except:
-#            print "CheckFETel (exportData): error writing data to qelectricity"
-            pass
-
-        #self.ElProd electricty required per product, has to be defined as vector
 
         
 #------------------------------------------------------------------------------
-    def importTestData(self):  #later on should import data from SQL. now simply sets to some value
-#------------------------------------------------------------------------------
-#   manual assignment of data. for testing purposes only ...
-#   dummy for function importData
-#------------------------------------------------------------------------------
-
-        if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.ElectricityGen = CCPar("ElectricityGen")
-            self.ElectricityGen.val = 50
-            self.ElectricityGen.sqerr = 0.01
-
-            self.ElectricitySales = CCPar("ElectricitySales")
-            self.ElectricitySales.val = 15
-            self.ElectricitySales.sqerr = 0.01
-            
-            self.ElectricityTotYear = CCPar("ElectricityTotYear")
-            self.ElectricityTotYear.val = 400
-            self.ElectricityTotYear.sqerr = 0.01
-
-            #self.ElProd electricty required per product, has to be defined as vector
-
-            self.ElectricityMotors = CCPar("ElectricityMotors")
-            self.ElectricityMotors.val = 2
-            self.ElectricityMotors.sqerr = 0.02
-
-            self.ElectricityChem = CCPar("ElectricityChem")
-            self.ElectricityChem.val = 0.5
-            self.ElectricityChem.sqerr = 0.02
-
-            self.ElectricityLight = CCPar("ElectricityLight")
-            self.ElectricityLight.val = 2.5
-            self.ElectricityLight.sqerr = 0.0201
-
-            self.ElectricityRef = CCPar("ElectricityRef")
-            self.ElectricityRef.val = 100
-            self.ElectricityRef.sqerr = 0.015
-
-            self.ElectricityAC = CCPar("ElectricityAC")
-            self.ElectricityAC.val = 130
-            self.ElectricityAC.sqerr = 0.001
-
-            self.ElectricityThOther = CCPar("ElectricityThOther")
-            self.ElectricityThOther.val = 200
-            self.ElectricityThOther.sqerr = 0.05
-
-        elif TESTCASE == 3:       #Test case for overall algoritm
-            self.ElectricityGen = CCPar("ElectricityGen")
-            self.ElectricityGen.val = 0.0
-            self.ElectricityGen.sqerr = 0.0
-
-            self.ElectricitySales = CCPar("ElectricitySales")
-            self.ElectricitySales.val = 0.0
-            self.ElectricitySales.sqerr = 0.0
-            
-            self.ElectricityTotYear = CCPar("ElectricityTotYear")
-            self.ElectricityTotYear.val = 5000
-            self.ElectricityTotYear.sqerr = 0.001
-
-            #self.ElProd electricty required per product, has to be defined as vector
-
-            self.ElectricityMotors = CCPar("ElectricityMotors")
-            self.ElectricityMotors.val = None
-            self.ElectricityMotors.sqerr = INFINITE
-
-            self.ElectricityChem = CCPar("ElectricityChem")
-            self.ElectricityChem.val = 0.0
-            self.ElectricityChem.sqerr = 0.0
-
-            self.ElectricityLight = CCPar("ElectricityLight")
-            self.ElectricityLight.val = None
-            self.ElectricityLight.sqerr = INFINITE
-
-            self.ElectricityRef = CCPar("ElectricityRef")
-            self.ElectricityRef.val = 0.0
-            self.ElectricityRef.sqerr = 0.0
-
-            self.ElectricityAC = CCPar("ElectricityAC")
-            self.ElectricityAC.val = None
-            self.ElectricityAC.sqerr = INFINITE
-
-            self.ElectricityThOther = CCPar("ElectricityThOther")
-            self.ElectricityThOther.val = None
-            self.ElectricityThOther.sqerr = INFINITE
-
-        else:
-            print "CheckFETel: WARNING - don't have input data for this test case no. ",TESTCASE
-
-
     def showAllFETel(self):
+#------------------------------------------------------------------------------
+#   function for debug-plotting
+#------------------------------------------------------------------------------
+
         print "====================="
         self.ElectricityNet.show()
         self.ElectricityNet1.show()
         self.ElectricityGen.show()
         self.ElectricitySales.show()
         self.ElectricityTotYear.show()
-        #self.ElProd.show()
         self.FECel1.show()
-        self.FECel2.show()
         self.FECel.show()
         self.ElectricityMotors.show()
         self.ElectricityChem.show()
@@ -307,7 +222,6 @@ class CheckFETel():
         self.FETel2.show()
         self.FETel.show()
                   
-                
         print "====================="
     
 #------------------------------------------------------------------------------
@@ -320,16 +234,17 @@ class CheckFETel():
         self.ElectricityGen.screen()
         self.ElectricitySales.screen()
         self.ElectricityTotYear.screen()
-        #self.ElProd.show()
-        self.FECel.screen()
+
         self.ElectricityMotors.screen()
         self.ElectricityChem.screen()
         self.ElectricityLight.screen()
         self.ElectricityRef.screen()
         self.ElectricityAC.screen()
         self.ElectricityThOther.screen()
+        
         self.FEOel.screen()
         self.FETel.screen()
+        self.FECel.screen()
 
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
@@ -355,7 +270,7 @@ class CheckFETel():
             
             self.ElectricityNet1 = calcDiff("ElectricityNet1",self.ElectricityGen,self.ElectricitySales)
             self.FECel1 = calcSum("FECel1",self.ElectricityNet,self.ElectricityTotYear)
-            #self.FECel2 = calcRowSum(name,row,m)self.ElProd
+
             self.FEOel1 = calcSum3("FEOel1",self.ElectricityMotors,self.ElectricityChem,self.ElectricityLight)
             self.FETel1 = calcDiff("FETel1",self.FECel,self.FEOel)
             self.FETel2 = calcSum3("FETel2",self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
@@ -368,12 +283,7 @@ class CheckFETel():
 
                 print "Step 2: cross checking"
 
-            ccheck1(self.ElectricityNet,self.ElectricityNet1)
-#            ccheck2(self.FECel,self.FECel1,self.FECel2)
-            ccheck1(self.FECel,self.FECel1)
-            ccheck1(self.FEOel,self.FEOel1)
-            ccheck2(self.FETel,self.FETel1,self.FETel2)
-                          
+            self.ccheckAll()
 
             if DEBUG in ["ALL"]:
                 self.showAllFETel()
@@ -385,7 +295,7 @@ class CheckFETel():
             adjustSum3(self.FETel2,self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
             adjustDiff(self.FETel1,self.FECel,self.FEOel)
             adjustSum3(self.FEOel1,self.ElectricityMotors,self.ElectricityChem,self.ElectricityLight)
-            #adjRowSum(name,y,row,m) self.FECel2
+            
             adjustSum(self.FECel1,self.ElectricityNet,self.ElectricityTotYear)
             adjustDiff(self.ElectricityNet1,self.ElectricityGen,self.ElectricitySales)
 
@@ -397,12 +307,8 @@ class CheckFETel():
 
                 print "Step 4: second cross checking"
                
-            ccheck1(self.ElectricityNet,self.ElectricityNet1)
-    #            ccheck2(self.FECel,self.FECel1,self.FECel2)
-            ccheck1(self.FECel,self.FECel1)
-            ccheck1(self.FEOel,self.FEOel1)
-            ccheck2(self.FETel,self.FETel1,self.FETel2)
-                          
+            self.ccheckAll()
+            
             if DEBUG in ["ALL"]:
                 self.showAllFETel()
         
@@ -413,6 +319,27 @@ class CheckFETel():
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllFETel()
 
+#------------------------------------------------------------------------------
+    def ccheckAll(self):     
+#------------------------------------------------------------------------------
+#   ccheck block
+#------------------------------------------------------------------------------
+        ccheck1(self.ElectricityNet,self.ElectricityNet1)
+        ccheck1(self.ElectricityTotYear,self.ElectricityTotYear1)
+        ccheck1(self.ElectricityGen,self.ElectricityGen1)
+        ccheck1(self.ElectricitySales,self.ElectricitySales1)
+
+        ccheck1(self.ElectricityMotors,self.ElectricityMotors1)
+        ccheck1(self.ElectricityChem,self.ElectricityChem1)
+        ccheck1(self.ElectricityLight,self.ElectricityLight1)
+        ccheck1(self.ElectricityRef,self.ElectricityRef1)
+        ccheck1(self.ElectricityAC,self.ElectricityAC1)
+        ccheck1(self.ElectricityThOther,self.ElectricityThOther1)
+
+        ccheck1(self.FECel,self.FECel1)
+        ccheck1(self.FEOel,self.FEOel1)
+        ccheck2(self.FETel,self.FETel1,self.FETel2)
+                          
 #------------------------------------------------------------------------------
     def estimate(self):  
 #------------------------------------------------------------------------------

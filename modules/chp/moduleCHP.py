@@ -174,7 +174,7 @@ class ModuleCHP(object):
             Status.DB.uheatpump.insert(dummy)
 
             maintainExisting = True
-            config = [1,"CHP Engine","Natural Gas",1000.0,55.0]            
+            config = [1,"CHP Engine","Natural Gas",2000.0,0.55]            
             Status.int.setGraphicsData('CHP Config',config)
 
             self.setUserDefinedPars()

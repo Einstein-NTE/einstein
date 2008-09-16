@@ -11,14 +11,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
+#	Version No.: 0.08
 #	Created by: 	    Tom Sobota	April 2008
-#       Revised by:         Hans Schweiger 12/04/2008
-#                           Hans Schweiger 17/04/2008
-#                           Tom Sobota 21/04/2008
-#                           Tom Sobota 6/05/2008
-#                           Stoyan Danov            18/06/2008
+#       Revised by:         Hans Schweiger  12/04/2008
+#                           Hans Schweiger  17/04/2008
+#                           Tom Sobota      21/04/2008
+#                           Tom Sobota      06/05/2008
+#                           Stoyan Danov    18/06/2008
 #                           Hans Schweiger  01/07/2008
+#                           Hans Schweiger  16/09/2008
 #
 #       Changes to previous version:
 #       12/04/08:       Link to functions in Project (open project)
@@ -31,6 +32,8 @@
 #       18/06/2008 SD: change to translatable text _(...)
 #       01/07/2008: HS  Change of lay-out; introduction of auto-run button and field
 #                       for industry description
+#       16/09/2008: HS  Call to panelinfo.update/showMainMenuAlternatives added in
+#                       Delete and Copy 
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -199,6 +202,8 @@ class PanelQ0(wx.Panel):
             print "PanelP (GenerateNew-Button): calling function createNewProject"
 
             Status.prj.createNewProject(-1,self.shortName,self.description,originalName=projectName)
+            self.main.panelinfo.update()
+            self.main.showMainMenuAlternatives()
             self.display()
 
 #------------------------------------------------------------------------------		
@@ -229,6 +234,8 @@ class PanelQ0(wx.Panel):
         if self.main.askConfirmation(_('Delete project %s ?') % (projectName,)) == wx.ID_YES:
             print _("PanelQ0 (ButtonDelete): deleting "),projectName
             Status.prj.deleteProject(-1,name=projectName)
+            self.main.panelinfo.update()
+            self.main.showMainMenuAlternatives()
             self.display()
 #------------------------------------------------------------------------------		
 

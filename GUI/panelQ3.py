@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.17
+#	Version No.: 0.18
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger  02/05/2008
@@ -31,6 +31,7 @@
 #                           Tom Sobota      21/06/2008
 #                           Hans Schweiger  23/06/2008
 #                           Hans Schweiger  18/07/2008
+#                           Hans Schweiger  15/09/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -54,6 +55,8 @@
 #       23/06/2008: HS  bug-fix in function display: clear() shifted to the beginning
 #       18/07/2008: HS  possibility to modify processes in checked state is blocked
 #                       fillPage substituted by display in the button-event handlers
+#       15/09/2008: HS  function fillPage moved from __init__ to display()
+#                       call to display added in OK button event handler
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -91,7 +94,7 @@ class PanelQ3(wx.Panel):
 	self.main = main
         self._init_ctrls(parent)
         self.__do_layout()
-        self.fillPage()
+        self.selectedProcessName = None
 
     def _init_ctrls(self, parent):
 
@@ -357,7 +360,7 @@ class PanelQ3(wx.Panel):
         self.tc26 = FloatEntry(self.page1,
                                ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
                                unitdict='ENERGY',
-                               label=_("Annual consumption of UPH"),
+                               label=_("Total yearly process heat consumption"),
                                tip=_("Only for the process"))
 
         fp.popFont()
@@ -481,6 +484,7 @@ class PanelQ3(wx.Panel):
 
     def OnButtonAddProcess(self, event):
         self.clear()
+        self.selectedProcessName = None
 
     def OnButtonDeleteProcess(self, event):
         
@@ -489,13 +493,23 @@ class PanelQ3(wx.Panel):
         
         Status.prj.deleteProcess(self.selectedProcessID)
         self.clear()
+        self.selectedProcessName = None
         self.display()
 
     def OnListBoxProcessesClick(self, event):
         self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
-        processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        self.showProcess()
 
-        q = processes.Process[self.selectedProcessName][0]
+    def showProcess(self):
+        processes = Status.DB.qprocessdata.\
+                    Questionnaire_id[Status.PId].\
+                    AlternativeProposalNo[Status.ANo].\
+                    Process[self.selectedProcessName]
+        if len(processes) == 0:
+            return
+        else:
+            q = processes[0]
+        
         self.selectedProcessID = q.QProcessData_ID
 
         fluidDict = Status.prj.getFluidDict()
@@ -633,12 +647,16 @@ class PanelQ3(wx.Panel):
 
         Status.processData.changeInProcess()
 
+        self.selectedProcessName = processName
+        self.display()
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------		
 
     def display(self):
-        
+        self.fillPage()
+        self.showProcess()
         self.Show()
 
     def fillChoiceOfDBUnitOperation(self): # tc3

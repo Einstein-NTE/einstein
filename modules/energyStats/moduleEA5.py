@@ -109,7 +109,7 @@ class ModuleEA5(object):
             #calculate SEC for each product
             if (row.QProdYear > 0) and row.QProdYear is not None:    
                 if row.FuelProd is not None: row.FUEL_SEC = (row.FuelProd)/row.QProdYear #converted to [kWh/pu]
-                else: row.Fuel_SEC = 0
+                else: row.FUEL_SEC = 0
                 if row.ElProd is not None: row.EL_SEC = (row.ElProd)/row.QProdYear #converted to [kWh/pu]
                 else: row.EL_SEC = 0.
                 if row.FuelProd is not None and row.ElProd is not None: row.PE_SEC = (1.1*row.FuelProd + 3.0*row.ElProd)/row.QProdYear #converted to [kWh/pu], fixed energy conv. coef. ->change this later

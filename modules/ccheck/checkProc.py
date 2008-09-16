@@ -245,7 +245,16 @@ class CheckProc():
             self.NDaysProc.setValue(qprocessdata.NDaysProc,err=0.0) #number -> exact value
             self.HPerDayProc.setValue(qprocessdata.HPerDayProc) 
             self.NBatch.setValue(qprocessdata.NBatch,err=0.0) #number -> exact value
-            
+
+            if (qprocessdata.HeatRecOK == "yes"):
+                self.HeatRecOK = True
+            elif(qprocessdata.HeatRecOK == "no"):
+                self.HeatRecOK = False
+            else:
+                logWarning(_("Possibility of heat recovery for process no. %s (%s)is not specified.\nYES is assumed.")%\
+                            (self.ProcNo,qprocessdata.Process))
+                self.HeatRecOK = True
+                
             if qprocessdata.TEnvProc is None:
                 self.TEnvProc.setValue(18.0)
             else:
@@ -304,7 +313,12 @@ class CheckProc():
                 qprocessdata.UPH = check(self.UPH.val)
                 qprocessdata.UPHw = check(self.UPHw.val)
                 qprocessdata.QWHProc = check(self.QWHProc.val)
-                qprocessdata.QHXProc = check(self.QHXProc.val)                      
+                qprocessdata.QHXProc = check(self.QHXProc.val)
+
+                if self.HeatRecOK == True:
+                    qprocessdata.HeatRecOK = "yes"
+                else:
+                    qprocessdata.HeatRecOK = "no"
 
                 Status.SQL.commit()
                 
@@ -689,6 +703,7 @@ class CheckProc():
         self.DTUPHs.show()
         self.QWHProc.show()
         self.QHXProc.show()
+        print "HeatRecOK: ",self.HeatRecOK
         
 
         print "====================="
@@ -703,7 +718,7 @@ class CheckProc():
         if iszero(self.VInFlowDay):
             self.PTInFlow.priority = 99
             self.PTInFlowrec.priority = 99
-        if iszero(self.VOutFlow):
+        if iszero(self.VOutFlow) or (self.HeatRecOK == False):
             self.PTOutFlow.priority = 99
             self.PTOutFlowRec.priority = 99
         if iszero(self.VolProcMed):
@@ -894,9 +909,13 @@ class CheckProc():
                 self.DTCrossHXLT1 = calcDiff("DTCrossHXLT",self.PTOutFlow,self.PTInFlow)
                 self.DTCrossHXHT1 = calcDiff("DTCrossHXHT",self.PTOutFlowRec,self.PTInFlowRec)
 
-            self.UPHw_dot1 = calcFlow("UPHw_dot1",self.FluidRhoCp,self.VOutFlow,
-                                      self.PTOutFlow,self.PTFinal,
-                                      self.DTOutFlow,self.DTOutFlow1)
+            if self.HeatRecOK == True:
+                self.UPHw_dot1 = calcFlow("UPHw_dot1",self.FluidRhoCp,self.VOutFlow,
+                                          self.PTOutFlow,self.PTFinal,
+                                          self.DTOutFlow,self.DTOutFlow1)
+            else:
+                self.UPHw_dot1.setValue(0.0)
+                
             self.UPHw1 = calcProd("UPHw1",self.UPHw_dot,self.NBatchPerYear)
                         
             if DEBUG in ["ALL","MAIN"]:
@@ -918,8 +937,12 @@ class CheckProc():
                 print "Step 3: calculating from right to left (ADJUST)"
                 print "-------------------------------------------------"
                 
-            adjustFlow(self.UPHw_dot1,self.FluidRhoCp,self.VOutFlow2,
-                       self.PTOutFlow3,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
+            if self.HeatRecOK == True:
+                adjustFlow(self.UPHw_dot1,self.FluidRhoCp,self.VOutFlow2,
+                           self.PTOutFlow3,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
+            else:
+                self.PTFinal.update(self.PTOutFlow) #for security (link with HR module): -> zero UPHw !!!
+                
             adjustProd(self.UPHw1,self.UPHw_dot,self.NBatchPerYear)
 
             if self.internalHR == True:

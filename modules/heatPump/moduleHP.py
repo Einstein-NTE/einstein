@@ -112,6 +112,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.GUITools import *
 
 
 #from einstein.modules.modules import Modules
@@ -238,14 +239,16 @@ class ModuleHP():
         if len(uHProws) == 0:
             print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
             print 'Error: confusion in PId and ANo'
-            maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, 'compression',1500.0,60.0,100.0,-10.0,100.0])            
+            Status.int.setGraphicsData('HP Config',[True, 'compression',1500.0,60.0,100.0,-10.0,100.0])            
 
         else:
             uHP = uHProws[0]
             #returns to the GUI the default user-defined data to be shown in HP panel
-            maintainExisting = True
-            Status.int.setGraphicsData('HP Config',[maintainExisting, uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
+            if uHP.UHPMaintain == 1:
+                maintainExisting = True
+            else:
+                maintainExisting = False
+            Status.int.setGraphicsData('HP Config',[maintainExisting,uHP.UHPType,uHP.UHPMinHop,uHP.UHPDTMax,
                                                      uHP.UHPmaxT,uHP.UHPminT,uHP.UHPTgenIn])
 
 #------------------------------------------------------------------------------
@@ -264,13 +267,17 @@ class ModuleHP():
             
         row = uhp[0]
 
-#        row.MaintainExisting = UDList[0] # to add in UHeatPump
-        row.UHPType = UDList[1]
-        row.UHPMinHop = UDList[2]
-        row.UHPDTMax = UDList[3]
-        row.UHPmaxT = UDList[4]
-        row.UHPminT = UDList[5]
-        row.UHPTgenIn = UDList[6]
+        if UDList[0] == True:
+            maintainExisting = 1
+        else:
+            maintainExisting = 0
+        row.UHPMaintain = check(maintainExisting) # to add in UHeatPump
+        row.UHPType = check(UDList[1])
+        row.UHPMinHop = check(UDList[2])
+        row.UHPDTMax = check(UDList[3])
+        row.UHPmaxT = check(UDList[4])
+        row.UHPminT = check(UDList[5])
+        row.UHPTgenIn = check(UDList[6])
 
         Status.SQL.commit()
 
@@ -624,6 +631,10 @@ class ModuleHP():
             
             #Start temperature for calculation Th0 = to the user-defined temperature
             Th0 = min(DA.UHPmaxT,TCondMaxInList)
+
+            if Th0 is None:
+                logDebug("ModuleHP (designAssistant1): WARNING -> Th0 = None was obtained")
+                Th0 = 100.0
             
 #............................................................................................
 # Initial selection: maximum reasonable power for a heat pump

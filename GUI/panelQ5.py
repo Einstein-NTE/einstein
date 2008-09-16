@@ -184,10 +184,10 @@ class PanelQ5(wx.Panel):
                               tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vapour system)"))
 
         self.tc7 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=3, minval=0., maxval=1., value=0.,
                               unitdict=None,
-                              label=_("Percentage of recirculation"),
-                              tip=_("Specify the percentage of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
+                              label=_("Rate of recirculation"),
+                              tip=_("Specify the rate of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
 
 
         self.tc8 = FloatEntry(self.page0,

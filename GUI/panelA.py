@@ -19,14 +19,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
+#	Version No.: 0.06
 #	Created by: 	    Hans Schweiger	    03/04/2008
 #	Revised by:    
 #                           Tom Sobota              05/04/2008
 #                           Hans Schweiger          15/04/2008
+#                           Tom Sobota              28/04/2008
 #                           Stoyan Danov            18/06/2008
-#
-#       Revised by:         Tom Sobota  28/04/2008
+#                           Hans Schweiger          16/09/2008
 #
 #       Changes to previous version:
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
@@ -34,6 +34,7 @@
 #       15/04/08 HS copy and delete buttons added. event handler "Generate New" linked
 #       28/04/2008  added 'draw' to method display
 #       18/06/2008 SD: change to translatable text _(...)
+#       16/09/2008  HS  call to showMainMenuAlternatives added in display
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -354,9 +355,13 @@ class PanelA(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
 
+        self.grid.SelectRow(Status.ANo+1)
+
+        self.Hide()
         self.panelAFig.draw()
         self.Show()
         self.main.panelinfo.update()
+        self.main.showMainMenuAlternatives()
        
 #------------------------------------------------------------------------------		
 

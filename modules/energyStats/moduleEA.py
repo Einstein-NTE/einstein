@@ -170,7 +170,19 @@ class ModuleEA(object):
             for equipe in equipments:
                 jc = equipe.CascadeIndex -  1
                 dFETFuel = Status.int.FETFuel_j[jc]
+
+                if dFETFuel is None:
+                    logDebug("ModuleEA (cEEB): FETFuel of equipment %s (cascadeIndex = %s) is None"%\
+                             (equipe.EqNo,equipe.CascadeIndex))
+                    dFETFuel = 0.0
+                    
                 dFETel = Status.int.FETel_j[jc]
+
+                if dFETel is None:
+                    logDebug("ModuleEA (cEEB): FETel of equipment %s (cascadeIndex = %s) is None"%\
+                             (equipe.EqNo,equipe.CascadeIndex))
+                    dFETel = 0.0
+                    
                 dFETHeat = 0.0  #to be added once needed
                 dUSH = Status.int.USHj[jc]
                 dQHX = Status.int.QHXj[jc]
@@ -181,8 +193,6 @@ class ModuleEA(object):
                 equipe.FETHeat_j = dFETHeat
                 equipe.FETj = dFETel + dFETFuel + dFETHeat #simple sum of fuel + electricity. doesn't make very much sense, but ... 
 
-                print "CalcEqEnBal: equipe = %s ci = %s FET = %s "%\
-                      (equipe.Equipment,equipe.CascadeIndex,equipe.FETj)
                 equipe.USHj = dUSH
                 equipe.QHXj = dQHX       
                 equipe.QWHj = dQWH
@@ -295,7 +305,13 @@ class ModuleEA(object):
             generalData.PEConvEl = 3.0
             showWarning(_("No conversion factor electricity - primary energy was specified.\default value 3.0 assumed"))
 
-        generalData.PETel = generalData.FETel * generalData.PEConvEl        
+        generalData.PETel = generalData.FETel * generalData.PEConvEl
+
+        if generalData.FECel is None and generalData.FEOel is None:
+            logWarning(_("WARNING: No data available for electricity consumption for non-thermal uses. Set to 0 !!!"))
+            generalData.FECel = generalData.FETel
+            generalData.FEOel = 0.0
+            
         generalData.PECel = generalData.FECel * generalData.PEConvEl
 
         if generalData.CO2ConvEl is None:

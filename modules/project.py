@@ -437,6 +437,12 @@ class Project(object):
                 Status.schedules.outOfDate=True
                 Status.processData.outOfDate=True
                 Status.int.changeInCascade(0)
+
+                try:
+                    Status.main.panelinfo.update()
+                    Status.main.showMainMenuAlternatives()
+                except:
+                    print "problems updating main menu and panelinfo"
             else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
 
@@ -618,15 +624,27 @@ class Project(object):
 
             newUHeatPump =  {"Questionnaire_id":newID,
                              "AlternativeProposalNo":-1,
+                             "CHPMaintain":1,
+                             "CHPType":"CHP Engine",
+                             "CHPFuelType":"Natural Gas",
+                             "CHPHOp":2000.0,
+                             "CHPEff":0.55,
+                             "UHPMaintain":1,
+                             "UHPType":"compression",
+                             "UHPMinHop":1500.0,
+                             "UHPDTMax":60.0,
+                             "UHPTgenIn":100.0,
+                             "UHPmaxT":100.0,
+                             "UHPminT":-10.0,
                              "BBMaintain":0,
                              "BBSafety":10.0,
                              "BBRedundancy":1,
                              "BBFuelType":"Natural Gas",
-                             "BBHOp":100,
+                             "BBHOp":1000.0,
                              "BBPmin":500,
                              "BBEff":0.85,
                              "STSolFra":0.5,
-                             "STCollType":"<any>",
+                             "STCollType":"any",
                              "STMinYield":300.0}
 
 ### fill default values for design assistants ...
