@@ -22,6 +22,7 @@
 #                           Tom Sobota      03/07/2008
 #                           Hans Schweiger  03/07/2008
 #                           Hans Schweiger  07/07/2008
+#                           Hans Schweiger  17/09/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -33,6 +34,7 @@
 #                 : HS  some minor retouch in text and colour
 #       07/07/2008: HS  bug-fix: self.check -> GUITools-check
 #                       (compatibility with Tom's new FloatEntry)
+#       17/09/2008: HS  adaptation to new nomenclature of TCA
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -129,9 +131,10 @@ class PanelQ9(wx.Panel):
 
         self.labelSpc0= wx.StaticText(self.page1, -1,'')
         self.label_14 = wx.StaticText(self.page1, -1, _("Total costs\n[EUR]"))
-        self.label_15 = wx.StaticText(self.page1, -1, _("Own personnel\n[EUR]"))
-        self.label_16 = wx.StaticText(self.page1, -1, _("External personnel \n[EUR]"))
-        self.label_17 = wx.StaticText(self.page1, -1, _("Spare parts and\n fungible assets\n[EUR]"))
+        self.label_15 = wx.StaticText(self.page1, -1, _("Utilities and\noperating materials\n[EUR]"))
+        self.label_16 = wx.StaticText(self.page1, -1, _("Labour costs\n[EUR]"))
+        self.label_17 = wx.StaticText(self.page1, -1, _("External costs\n[EUR]"))
+        self.label_18 = wx.StaticText(self.page1, -1, _("Regulatory compliance,\ninsurance and\nfuture liability costs\n[EUR]"))
 
         # set font for frames
         # 1. save actual font parameters on the stack
@@ -142,13 +145,14 @@ class PanelQ9(wx.Panel):
         self.frame_parameters.SetFont(fp.getFont())
         self.frame_management.SetFont(fp.getFont())
         # set font for labels
-        fp.changeFont(size=TYPE_SIZE_NORMAL)
+        fp.changeFont(size=8, weight = wx.NORMAL)
         self.label_funding.SetFont(fp.getFont())
         self.label_credit.SetFont(fp.getFont())
         self.label_14.SetFont(fp.getFont())
         self.label_15.SetFont(fp.getFont())
         self.label_16.SetFont(fp.getFont())
         self.label_17.SetFont(fp.getFont())
+        self.label_18.SetFont(fp.getFont())
         # restore font
         fp.popFont()
         #
@@ -181,6 +185,10 @@ class PanelQ9(wx.Panel):
                               label=_("Percentage of external financing for installations"),
                               tip=_("Percentage of the external financing for the inversions"))
 
+        self.tc4b = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+                              unitdict='GROWTHRATE',
+                              label=_("Company specific discount rate"),
+                              tip=_(" "))
         self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='LONGTIME',
                               label=_("Time for economic amortization of installations"),
@@ -224,31 +232,49 @@ class PanelQ9(wx.Panel):
         self.tc10_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_4 = wx.TextCtrl(self.page1,-1, '')
+        self.tc10_5 = wx.TextCtrl(self.page1,-1, '')
         
         self.label_10 = wx.StaticText(self.page1, -1, _("Buildings"))
         self.tc11_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_4 = wx.TextCtrl(self.page1,-1, '')
+        self.tc11_5 = wx.TextCtrl(self.page1,-1, '')
         
         self.label_11 = wx.StaticText(self.page1, -1, _("Machines and equipment for processes"))
         self.tc12_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_4 = wx.TextCtrl(self.page1,-1, '')
+        self.tc12_5 = wx.TextCtrl(self.page1,-1, '')
         
         self.label_12 = wx.StaticText(self.page1, -1, _("Generation and distribution of heat and cold"))
         self.tc13_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_4 = wx.TextCtrl(self.page1,-1, '')
+        self.tc13_5 = wx.TextCtrl(self.page1,-1, '')
         
         self.label_13 = wx.StaticText(self.page1, -1, _("Total"))
         self.tc14_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc14_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc14_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc14_4 = wx.TextCtrl(self.page1,-1, '')
+        self.tc14_5 = wx.TextCtrl(self.page1,-1, '')
 
+        # restore font
+        fp.pushFont()
+        #
+        fp.changeFont(size=8,weight=wx.NORMAL)
+        self.label_9.SetFont(fp.getFont())
+        self.label_10.SetFont(fp.getFont())
+        self.label_11.SetFont(fp.getFont())
+        self.label_12.SetFont(fp.getFont())
+        self.label_13.SetFont(fp.getFont())
+
+        # restore font
+        fp.popFont()
+        #
         #
         # buttons
         #
@@ -279,6 +305,7 @@ class PanelQ9(wx.Panel):
         sizerP0PartTop.Add(self.tc2, 0, flagText, VSEP_LEFT)
         sizerP0PartTop.Add(self.tc3, 0, flagText, VSEP_LEFT)
         sizerP0PartTop.Add(self.tc4, 0, flagText, VSEP_LEFT)
+        sizerP0PartTop.Add(self.tc4b, 0, flagText, VSEP_LEFT)
         sizerP0PartTop.Add(self.tc5, 0, flagText, VSEP_LEFT)
         sizerP0Parts.Add(sizerP0PartTop,2,0,0)
 
@@ -308,37 +335,43 @@ class PanelQ9(wx.Panel):
         # sizer for right tab
         # tab 1, operation and maintenance costs
         sizerPage1 = wx.StaticBoxSizer(self.frame_costs, wx.VERTICAL)
-        sizerP1 = wx.FlexGridSizer(6, 5, 1, 2) #r,c,vsep,hsep
+        sizerP1 = wx.FlexGridSizer(6, 6, 1, 2) #r,c,vsep,hsep
         sizerP1.Add(self.labelSpc0,0,0,0)
         sizerP1.Add(self.label_14,0,flagText,0)
         sizerP1.Add(self.label_15,0,flagText,0)
         sizerP1.Add(self.label_16,0,flagText,0)
         sizerP1.Add(self.label_17,0,flagText,0)
+        sizerP1.Add(self.label_18,0,flagText,0)
         sizerP1.Add(self.label_9,0,flagLabel,0)
         sizerP1.Add(self.tc10_1,0,0,0)
         sizerP1.Add(self.tc10_2,0,0,0)
         sizerP1.Add(self.tc10_3,0,0,0)
         sizerP1.Add(self.tc10_4,0,0,0)
+        sizerP1.Add(self.tc10_5,0,0,0)
         sizerP1.Add(self.label_10,0,flagLabel,0)
         sizerP1.Add(self.tc11_1,0,0,0)
         sizerP1.Add(self.tc11_2,0,0,0)
         sizerP1.Add(self.tc11_3,0,0,0)
         sizerP1.Add(self.tc11_4,0,0,0)
+        sizerP1.Add(self.tc11_5,0,0,0)
         sizerP1.Add(self.label_11,0,flagLabel,0)
         sizerP1.Add(self.tc12_1,0,0,0)
         sizerP1.Add(self.tc12_2,0,0,0)
         sizerP1.Add(self.tc12_3,0,0,0)
         sizerP1.Add(self.tc12_4,0,0,0)
+        sizerP1.Add(self.tc12_5,0,0,0)
         sizerP1.Add(self.label_12,0,flagLabel,0)
         sizerP1.Add(self.tc13_1,0,0,0)
         sizerP1.Add(self.tc13_2,0,0,0)
         sizerP1.Add(self.tc13_3,0,0,0)
         sizerP1.Add(self.tc13_4,0,0,0)
+        sizerP1.Add(self.tc13_5,0,0,0)
         sizerP1.Add(self.label_13,0,flagLabel,0)
         sizerP1.Add(self.tc14_1,0,0,0)
         sizerP1.Add(self.tc14_2,0,0,0)
         sizerP1.Add(self.tc14_3,0,0,0)
         sizerP1.Add(self.tc14_4,0,0,0)
+        sizerP1.Add(self.tc14_5,0,0,0)
         sizerPage1.Add(sizerP1,2,wx.EXPAND|wx.TOP,10)
 
         self.page1.SetSizer(sizerPage1)
@@ -367,27 +400,33 @@ class PanelQ9(wx.Panel):
                 "FuelPriceRate":check(self.tc2.GetValue()),
                 "InterestExtFinancing":check(self.tc3.GetValue()),
                 "PercentExtFinancing":check(self.tc4.GetValue()),
+                "CompSpecificDiscountRate":check(self.tc4b.GetValue()),
                 "AmortisationTime":check(self.tc5.GetValue()),
                 "OMGenTot":check(self.tc10_1.GetValue()),
-                "OMGenOP":check(self.tc10_2.GetValue()),
-                "OMGenEP":check(self.tc10_3.GetValue()),
-                "OMGenFung":check(self.tc10_4.GetValue()),
+                "OMGenUtilities":check(self.tc10_2.GetValue()),
+                "OMGenLabour":check(self.tc10_3.GetValue()),
+                "OMGenExternal":check(self.tc10_4.GetValue()),
+                "OMGenRegulatory":check(self.tc10_5.GetValue()),
                 "OMBuildTot":check(self.tc11_1.GetValue()),
-                "OMBuildOP":check(self.tc11_2.GetValue()),
-                "OMBuildEP":check(self.tc11_3.GetValue()),
-                "OMBiuildFung":check(self.tc11_4.GetValue()),
+                "OMBuildUtilities":check(self.tc11_2.GetValue()),
+                "OMBuildLabour":check(self.tc11_3.GetValue()),
+                "OMBuildExternal":check(self.tc11_4.GetValue()),
+                "OMBuildRegulatory":check(self.tc11_5.GetValue()),
                 "OMMachEquipTot":check(self.tc12_1.GetValue()),
-                "OMMachEquipOP":check(self.tc12_2.GetValue()),
-                "OMMachEquipEP":check(self.tc12_3.GetValue()),
-                "OMMachEquipFung":check(self.tc12_4.GetValue()),
+                "OMMachEquipUtilities":check(self.tc12_2.GetValue()),
+                "OMMachEquipLabour":check(self.tc12_3.GetValue()),
+                "OMMachEquipExternal":check(self.tc12_4.GetValue()),
+                "OMMachEquipRegulatory":check(self.tc12_5.GetValue()),
                 "OMHCGenDistTot":check(self.tc13_1.GetValue()),
-                "OMHCGenDistOP":check(self.tc13_2.GetValue()),
-                "OMHCGenDistEP":check(self.tc13_3.GetValue()),
-                "OMHCGenDistFung":check(self.tc13_4.GetValue()),
+                "OMHCGenDistUtilities":check(self.tc13_2.GetValue()),
+                "OMHCGenDistLabour":check(self.tc13_3.GetValue()),
+                "OMHCGenDistExternal":check(self.tc13_4.GetValue()),
+                "OMHCGenDistRegulatory":check(self.tc13_5.GetValue()),
                 "OMTotalTot":check(self.tc14_1.GetValue()),
                 "OMTotalOP":check(self.tc14_2.GetValue()),
                 "OMTotalEP":check(self.tc14_3.GetValue()),
-                "OMTotalFung":check(self.tc14_4.GetValue())
+                "OMTotalExternal":check(self.tc14_4.GetValue()),
+                "OMTotalRegulatory":check(self.tc14_5.GetValue())
                   }
 
             q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
@@ -411,27 +450,33 @@ class PanelQ9(wx.Panel):
         self.tc2.entry.Clear()
         self.tc3.entry.Clear()
         self.tc4.entry.Clear()
+        self.tc4b.entry.Clear()
         self.tc5.entry.Clear()
         self.tc10_1.Clear()
         self.tc10_2.Clear()
         self.tc10_3.Clear()
         self.tc10_4.Clear()
+        self.tc10_5.Clear()
         self.tc11_1.Clear()
         self.tc11_2.Clear()
         self.tc11_3.Clear()
         self.tc11_4.Clear()
+        self.tc11_5.Clear()
         self.tc12_1.Clear()
         self.tc12_2.Clear()
         self.tc12_3.Clear()
         self.tc12_4.Clear()
+        self.tc12_5.Clear()
         self.tc13_1.Clear()
         self.tc13_2.Clear()
         self.tc13_3.Clear()
         self.tc13_4.Clear()
+        self.tc13_5.Clear()
         self.tc14_1.Clear()
         self.tc14_2.Clear()
         self.tc14_3.Clear()
         self.tc14_4.Clear()
+        self.tc14_5.Clear()
 
 
     def fillPage(self):
@@ -443,27 +488,33 @@ class PanelQ9(wx.Panel):
 	self.tc2.SetValue(str(q.FuelPriceRate))
 	self.tc3.SetValue(str(q.InterestExtFinancing))
 	self.tc4.SetValue(str(q.PercentExtFinancing))
+	self.tc4b.SetValue(str(q.CompSpecificDiscountRate))
 	self.tc5.SetValue(str(q.AmortisationTime))
 	self.tc10_1.SetValue(str(q.OMGenTot))
-	self.tc10_2.SetValue(str(q.OMGenOP))
-	self.tc10_3.SetValue(str(q.OMGenEP))
-	self.tc10_4.SetValue(str(q.OMGenFung))
+	self.tc10_2.SetValue(str(q.OMGenUtilities))
+	self.tc10_3.SetValue(str(q.OMGenLabour))
+	self.tc10_4.SetValue(str(q.OMGenExternal))
+	self.tc10_5.SetValue(str(q.OMGenRegulatory))
 	self.tc11_1.SetValue(str(q.OMBuildTot))
-	self.tc11_2.SetValue(str(q.OMBuildOP))
-	self.tc11_3.SetValue(str(q.OMBuildEP))
-	self.tc11_4.SetValue(str(q.OMBiuildFung))
+	self.tc11_2.SetValue(str(q.OMBuildUtilities))
+	self.tc11_3.SetValue(str(q.OMBuildLabour))
+	self.tc11_4.SetValue(str(q.OMBuildExternal))
+	self.tc11_5.SetValue(str(q.OMBuildRegulatory))
 	self.tc12_1.SetValue(str(q.OMMachEquipTot))
-	self.tc12_2.SetValue(str(q.OMMachEquipOP))
-	self.tc12_3.SetValue(str(q.OMMachEquipEP))
-	self.tc12_4.SetValue(str(q.OMMachEquipFung))
+	self.tc12_2.SetValue(str(q.OMMachEquipUtilities))
+	self.tc12_3.SetValue(str(q.OMMachEquipLabour))
+	self.tc12_4.SetValue(str(q.OMMachEquipExternal))
+	self.tc12_5.SetValue(str(q.OMMachEquipRegulatory))
 	self.tc13_1.SetValue(str(q.OMHCGenDistTot))
-	self.tc13_2.SetValue(str(q.OMHCGenDistOP))
-	self.tc13_3.SetValue(str(q.OMHCGenDistEP))
-	self.tc13_4.SetValue(str(q.OMHCGenDistFung))
+	self.tc13_2.SetValue(str(q.OMHCGenDistUtilities))
+	self.tc13_3.SetValue(str(q.OMHCGenDistLabour))
+	self.tc13_4.SetValue(str(q.OMHCGenDistExternal))
+	self.tc13_5.SetValue(str(q.OMHCGenDistRegulatory))
 	self.tc14_1.SetValue(str(q.OMTotalTot))
-	self.tc14_2.SetValue(str(q.OMTotalOP))
-	self.tc14_3.SetValue(str(q.OMTotalEP))
-	self.tc14_4.SetValue(str(q.OMTotalFung))
+	self.tc14_2.SetValue(str(q.OMTotalUtilities))
+	self.tc14_3.SetValue(str(q.OMTotalLabour))
+	self.tc14_4.SetValue(str(q.OMTotalExternal))
+	self.tc14_5.SetValue(str(q.OMTotalRegulatory))
 
 	if q.EnergyManagExisting is None:
 	    self.checkBox6.SetValue(False)

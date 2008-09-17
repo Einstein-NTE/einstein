@@ -475,24 +475,6 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS4_Plot", data2)
 
-
-##            #dummy data filled here (before creating the necessary fields in SQL)
-##
-##            data1 = array([['Present State (checked)', 0.0, 0.0, 0.0],
-##                           ['Design 1', 100000, 60000, 40000],
-##                           ['Design 2', 200000, 100000, 100000],
-##                           ['Design 3', 300000, 120000, 180000]])
-##                              
-##            Status.int.setGraphicsData("CS4 Table", data1)
-##
-##            data2 = array([['Present State (checked)', 0.0, 0.0],
-##                           ['Design 1', 60000, 40000],
-##                           ['Design 2', 100000, 100000],
-##                           ['Design 3', 120000, 180000]])
-##
-##            Status.int.setGraphicsData("CS4 Plot", data2)
-            
-
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -508,7 +490,8 @@ class ModuleCS(object):
             FuelCost = [] # holds the fuels EnergyCost from ANo=0 to the ANo=last (all fuels)
             for i in range(1,len(generalData)):
                 sumcost = 0.0
-                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%(Status.PId,generalData[i].AlternativeProposalNo)
+                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%\
+                           (Status.PId,generalData[i].AlternativeProposalNo)
                 fuelsByANo = Status.DB.qfuel.sql_select(sqlQuery)
                 for fuel in fuelsByANo:
                     fuelcost = fuel['FuelCostYear']
@@ -540,10 +523,10 @@ class ModuleCS(object):
                 else:
                     Amortization.append(generalData[i].Amortization)
 
-                if generalData[i].OMHCGenDistTot is None: #here O&M costs for heat/cold generation and dist. considered
+                if generalData[i].OMThermal is None: #here O&M costs for heat/cold generation and dist. considered
                     OMCost.append(0.0)
                 else:
-                    OMCost.append(generalData[i].OMHCGenDistTot)
+                    OMCost.append(generalData[i].OMThermal)
 
                 if qelectricity[i].ElCostYearTot is None:
                     ElCost.append(0.0)
@@ -566,7 +549,7 @@ class ModuleCS(object):
                     else:
                         dAmortization_Table = dAmortization
 
-                    dOMCost = generalData[i].OMHCGenDistTot
+                    dOMCost = generalData[i].OMThermal
                     if dOMCost is None:
                         dOMCost = 0.0
                         dOMCost_Table = "---"
@@ -611,23 +594,6 @@ class ModuleCS(object):
             data2 = array(CS5Plot)
 
             Status.int.setGraphicsData("CS5_Plot", data2)
-
-
-##            #dummy data filled here (before creating the necessary fields in SQL)
-##
-##            data1 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
-##                           ['Design 1', 50000, 60000, 20000],
-##                           ['Design 2', 70000, 40000, 10000],
-##                           ['Design 3', 100000, 30000, 15000]])
-##                              
-##            Status.int.setGraphicsData("CS5 Table", data1)
-##
-##            data2 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
-##                           ['Design 1', 50000, 60000, 20000],
-##                           ['Design 2', 70000, 40000, 10000],
-##                           ['Design 3', 100000, 30000, 15000]])
-##
-##            Status.int.setGraphicsData("CS5 Plot", data2)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -745,24 +711,6 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS6_Plot", data2)
 
-
-##            #dummy data filled here (before creating the necessary fields in SQL)
-##
-##            data1 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
-##                           ['Design 1', 50000, 60000, 20000],
-##                           ['Design 2', 70000, 40000, 10000],
-##                           ['Design 3', 100000, 30000, 15000]])
-##                              
-##            Status.int.setGraphicsData("CS6 Table", data1)
-##
-##            data2 = array([['Present State (checked)', 0.0, 150000.0, 30000.0],
-##                           ['Design 1', 50000, 60000, 20000],
-##                           ['Design 2', 70000, 40000, 10000],
-##                           ['Design 3', 100000, 30000, 15000]])
-##
-##            Status.int.setGraphicsData("CS6 Plot", data2)
-            
-
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -821,19 +769,4 @@ class ModuleCS(object):
             Status.int.setGraphicsData("CS7_Plot", data2)
 
 
-##            #dummy data filled here (before creating the necessary fields in SQL)
-##
-##            data1 = array([['Present State (checked)', 0.0],
-##                           ['Design 1', 15.0],
-##                           ['Design 2', 18.0],
-##                           ['Design 3', 21.0]])
-##                              
-##            Status.int.setGraphicsData("CS7 Table", data1)
-##
-##            data2 = array([['Present State (checked)', 0.0],
-##                           ['Design 1', 15.0],
-##                           ['Design 2', 18.0],
-##                           ['Design 3', 21.0]])
-##
-##            Status.int.setGraphicsData("CS7 Plot", data2)
             

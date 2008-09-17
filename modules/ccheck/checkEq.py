@@ -90,6 +90,7 @@ class CheckEq():
         self.HCGTEfficiency3 = CCPar("HCGTEfficiency3")
         self.ConvLoss = CCPar("ConvLoss")
         self.ConvLoss1 = CCPar("ConvLoss1")
+        self.LossFactEq1 = CCPar("LossFactEq1")
         self.QConvLoss = CCPar("QConvLoss")
         self.QConvLoss1 = CCPar("QConvLoss1")
         self.One = CCOne()
@@ -430,6 +431,7 @@ class CheckEq():
         self.PartLoad.show()
         self.HCGTEfficiency.show()
         self.ConvLoss.show()
+        self.LossFactEq.show()
         self.USHj.show()
         self.USHj1.show()#
         self.USHj2.show()#
@@ -564,15 +566,13 @@ class CheckEq():
             self.USHj1 = calcSum("USH1",self.USHBoiler,self.QHXEq)
             self.FETj1 = calcSum("FETj1",self.FETFuel_j,self.FETel_j)
 
-            if self.EquipeClass in ["BB"]:
-                self.QConvLoss1 = calcProd("QConvLoss1",self.ConvLoss,self.FETj3)
-                
             self.QLossEq1= calcProd("QLossEq1",self.LossFactEq,self.USHj2)#
             self.QOutEq1 = calcSum("QOutEq1",self.QLossEq,self.USHj3)#
             self.QInputEq1 = calcSum("QInputEq1",self.FETj2,self.QHXEq1)#
             self.QWHEq1 = calcDiff("QWHEq1",self.QInputEq,self.QOutEq)
 
             if self.EquipeClass in ["BB"]:
+                print "checkEq in mode BB"
                 self.QConvLoss1 = calcProd("QConvLoss1",self.ConvLoss,self.FETj3)
                 self.QWHEq2 = calcDiff("QWHEq2",self.QConvLoss,self.QLossEq2)#
                    
@@ -666,6 +666,7 @@ class CheckEq():
             ccheck2(self.QHXEq,self.QHXEq1,self.QHXEq2)#
             ccheck3(self.USHj,self.USHj1,self.USHj2,self.USHj3)#
             ccheck1(self.QConvLoss,self.QConvLoss1)#
+            ccheck1(self.LossFactEq,self.LossFactEq1)#
             ccheck2(self.QLossEq,self.QLossEq1,self.QLossEq2)#
             ccheck1(self.QInputEq,self.QInputEq1)#
             ccheck1(self.QOutEq,self.QOutEq1)#
