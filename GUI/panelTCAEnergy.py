@@ -203,11 +203,11 @@ class PanelTCAEnergy(wx.Panel):
         #opcost
         self.tbTotalOpCost.SetValue(str(self.mod.totalopcost))
         #Helptext & DetailedButton
-        #self.btnDetailedOpCost.Enabled = False
-        #if (Status.ANo > 0):
-        #    self.tEnergyHelp.SetLabel(_("The values come from the audit questionnaire and Einstein database.\nIf you would like to make any change on them, please edit the values."))
-        #    self.tOpcostHep.SetLabel(_("If you would like to calculate the operating costs in details, please choose \"Detailed operating cost calculation\""))
-        #    self.btnDetailedOpCost.Enabled = True
+        self.btnDetailedOpCost.Enabled = False
+        if (Status.ANo > 0):
+            self.tEnergyHelp.SetLabel(_("The values come from the audit questionnaire and Einstein database.\nIf you would like to make any change on them, please edit the values."))
+            self.tOpcostHep.SetLabel(_("If you would like to calculate the operating costs in details, please choose \"Detailed operating cost calculation\""))
+            self.btnDetailedOpCost.Enabled = True
 
     def __init__(self, parent, main, id, pos, size, style, name):
         #print "Init Energy"      
@@ -244,7 +244,16 @@ class PanelTCAEnergy(wx.Panel):
         self.tbTotalOpCost.SetValue(str(self.mod.totalopcost))
     
     def OnGrid1GridCellLeftClick(self, event):
-        self.selectedRow = event.GetRow()        
+        self.selectedRow = event.GetRow()  
+        if (self.selectedRow < len(self.mod.energycost)):
+            entry = self.mod.energycost[self.selectedRow]
+            self.comboBox1.SetValue(str(entry[0]))
+            self.tbDemand.SetValue(str(entry[1]))
+            self.tbPrice.SetValue(str(entry[2]))
+            self.tbDevelopment.SetValue(str(entry[3]))
+            self.btnAdd.SetLabel("Change")
+        else:
+            self.btnAdd.SetLabel("Add")
         event.Skip()  
                 
     def OnBtnDeleteButton(self, event):
@@ -264,9 +273,14 @@ class PanelTCAEnergy(wx.Panel):
             dev    = float(self.tbDevelopment.GetValue())
            
             if (demand<0)or(price<0):
-                raise            
-                        
-            self.mod.energycost.append([name,demand,price,dev])                
+                raise           
+            try:                    
+                if (self.selectedRow < len(self.mod.energycost)):
+                    self.mod.energycost[self.selectedRow] = [name,demand,price,dev]
+                else:           
+                    self.mod.energycost.append([name,demand,price,dev])                
+            except:
+                self.mod.energycost.append([name,demand,price,dev])
         except:
             wx.MessageBox(_("Reconsider values."))
                 

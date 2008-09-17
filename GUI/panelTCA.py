@@ -15,9 +15,12 @@
 #
 #    Version No.: 0.01
 #       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
+#       Revised by:          Florian Joebstl 16/09/2008  
 #
 #       Changes to previous version:
+#            16/09/08 FJ Removed "Loan Interest Rate"
+#                        Added "Nominal Interest Rate of external financing"
+#                        Added "Inflation Rate"                         
 #
 #
 #------------------------------------------------------------------------------
@@ -36,47 +39,47 @@ from einstein.GUI.panelTCAResultTabpage2 import panelResult2
 
 from GUITools import *
 
-[wxID_PANELTCA, wxID_PANELTCABTNNEXT, wxID_PANELTCABTNRESETDATA, 
+[wxID_PANELTCA, wxID_PANELTCABTNNEXT, wxID_PANELTCABTNNEXTMODULE, 
+ wxID_PANELTCABTNPREVMODULE, wxID_PANELTCABTNRESETDATA, 
  wxID_PANELTCANOTEBOOK1, wxID_PANELTCASTATICBOX1, wxID_PANELTCASTATICBOX2, 
- wxID_PANELTCASTATICTEXT1, wxID_PANELTCASTATICTEXT2, wxID_PANELTCASTATICTEXT3, 
- wxID_PANELTCASTATICTEXT4, wxID_PANELTCASTATICTEXT5, wxID_PANELTCASTATICTEXT6, 
- wxID_PANELTCASTATICTEXT7, wxID_PANELTCASTATICTEXT8, wxID_PANELTCASTATICTEXT9, 
- wxID_PANELTCATBCSDRATE, wxID_PANELTCATBENERGYPRICES, 
- wxID_PANELTCATBLOANINTERRESTRATE, wxID_PANELTCATBTIMEFAME, 
-] = [wx.NewId() for _init_ctrls in range(19)]
+ wxID_PANELTCASTATICTEXT1, wxID_PANELTCASTATICTEXT10, 
+ wxID_PANELTCASTATICTEXT2, wxID_PANELTCASTATICTEXT3, wxID_PANELTCASTATICTEXT4, 
+ wxID_PANELTCASTATICTEXT5, wxID_PANELTCASTATICTEXT6, wxID_PANELTCASTATICTEXT7, 
+ wxID_PANELTCASTATICTEXT8, wxID_PANELTCASTATICTEXT9, wxID_PANELTCATBCSDRATE, 
+ wxID_PANELTCATBENERGYPRICES, wxID_PANELTCATBINFLATION, wxID_PANELTCATBNIR, 
+ wxID_PANELTCATBTIMEFAME, 
+] = [wx.NewId() for _init_ctrls in range(23)]
 
 class PanelTCA(wx.Panel):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELTCA, name='PanelTCA', parent=prnt,
-              pos=wx.Point(0, 0), size=wx.Size(808, 619), style=0)
-        self.SetClientSize(wx.Size(800, 592))
+              pos=wx.Point(0, 0), size=wx.Size(808, 617), style=0)
+        self.SetClientSize(wx.Size(800, 590))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCASTATICBOX1,
               label=_('General Economic Data'), name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(760, 152), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELTCASTATICTEXT1,
-              label=_('Loan interest rate'), name='staticText1', parent=self,
-              pos=wx.Point(40, 40), size=wx.Size(86, 13), style=0)
+              label=_(u'Nominal interest rate of external financing'),
+              name='staticText1', parent=self, pos=wx.Point(40, 60),
+              size=wx.Size(202, 13), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELTCASTATICTEXT2,
-              label=_('Company specific descount rate'), name='staticText2',
-              parent=self, pos=wx.Point(40, 67), size=wx.Size(153, 13),
+              label=_(u'Company specific discount rate'), name='staticText2',
+              parent=self, pos=wx.Point(40, 84), size=wx.Size(149, 13),
               style=0)
 
-        self.tbLoanInterrestRate = wx.TextCtrl(id=wxID_PANELTCATBLOANINTERRESTRATE,
-              name='tbLoanInterrestRate', parent=self, pos=wx.Point(232, 40),
-              size=wx.Size(100, 20), style=0, value='0')
-        self.tbLoanInterrestRate.SetAutoLayout(False)
-        self.tbLoanInterrestRate.Bind(wx.EVT_KILL_FOCUS,
-              self.OnTbLoanInterrestRateKillFocus)
-        self.tbLoanInterrestRate.Bind(wx.EVT_TEXT,
-              self.OnTbLoanInterrestRateText,
-              id=wxID_PANELTCATBLOANINTERRESTRATE)
+        self.tbNIR = wx.TextCtrl(id=wxID_PANELTCATBNIR, name=u'tbNIR',
+              parent=self, pos=wx.Point(256, 56), size=wx.Size(100, 20),
+              style=0, value='0')
+        self.tbNIR.SetAutoLayout(False)
+        self.tbNIR.Bind(wx.EVT_KILL_FOCUS, self.OnTbNIRKillFocus)
+        self.tbNIR.Bind(wx.EVT_TEXT, self.OnTbNIRText, id=wxID_PANELTCATBNIR)
 
         self.tbCSDRate = wx.TextCtrl(id=wxID_PANELTCATBCSDRATE,
-              name='tbCSDRate', parent=self, pos=wx.Point(232, 64),
+              name='tbCSDRate', parent=self, pos=wx.Point(256, 80),
               size=wx.Size(100, 21), style=0, value='0')
         self.tbCSDRate.Bind(wx.EVT_KILL_FOCUS, self.OnTbCSDRateKillFocus)
         self.tbCSDRate.Bind(wx.EVT_TEXT, self.OnTbCSDRateText,
@@ -84,28 +87,30 @@ class PanelTCA(wx.Panel):
 
         self.staticText3 = wx.StaticText(id=wxID_PANELTCASTATICTEXT3,
               label=_('This timeframe will be applied to each equipment of all proposals\nIf you think there would be some maintainance or re-investment\ncaused by this time frame, please fill in the Contingencies'),
-              name='staticText3', parent=self, pos=wx.Point(368, 112),
-              size=wx.Size(307, 39), style=0)
+              name='staticText3', parent=self, pos=wx.Point(400, 122),
+              size=wx.Size(267, 33), style=0)
+        self.staticText3.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL,
+              False, u'Tahoma'))
 
         self.staticText4 = wx.StaticText(id=wxID_PANELTCASTATICTEXT4,
               label=_('Development of energy prices'), name='staticText4',
-              parent=self, pos=wx.Point(40, 94), size=wx.Size(144, 13),
+              parent=self, pos=wx.Point(40, 108), size=wx.Size(144, 13),
               style=0)
 
         self.staticText5 = wx.StaticText(id=wxID_PANELTCASTATICTEXT5,
-              label=_('Choose time frame for economic'), name='staticText5',
-              parent=self, pos=wx.Point(40, 120), size=wx.Size(154, 13),
+              label=_(u'Time frame for economic analysis'), name='staticText5',
+              parent=self, pos=wx.Point(40, 132), size=wx.Size(158, 13),
               style=0)
 
         self.tbTimeFame = wx.TextCtrl(id=wxID_PANELTCATBTIMEFAME,
-              name='tbTimeFame', parent=self, pos=wx.Point(232, 112),
+              name='tbTimeFame', parent=self, pos=wx.Point(256, 128),
               size=wx.Size(100, 21), style=0, value=u'1')
         self.tbTimeFame.Bind(wx.EVT_KILL_FOCUS, self.OnTbTimeFameKillFocus)
         self.tbTimeFame.Bind(wx.EVT_TEXT, self.OnTbTimeFameText,
               id=wxID_PANELTCATBTIMEFAME)
 
         self.tbEnergyPrices = wx.TextCtrl(id=wxID_PANELTCATBENERGYPRICES,
-              name='tbEnergyPrices', parent=self, pos=wx.Point(232, 88),
+              name='tbEnergyPrices', parent=self, pos=wx.Point(256, 104),
               size=wx.Size(100, 21), style=0, value='0')
         self.tbEnergyPrices.Bind(wx.EVT_KILL_FOCUS,
               self.OnTbEnergyPricesKillFocus)
@@ -113,25 +118,25 @@ class PanelTCA(wx.Panel):
               id=wxID_PANELTCATBENERGYPRICES)
 
         self.staticText6 = wx.StaticText(id=wxID_PANELTCASTATICTEXT6, label='%',
-              name='staticText6', parent=self, pos=wx.Point(336, 64),
+              name='staticText6', parent=self, pos=wx.Point(360, 64),
               size=wx.Size(32, 13), style=0)
 
         self.staticText7 = wx.StaticText(id=wxID_PANELTCASTATICTEXT7, label='%',
-              name='staticText7', parent=self, pos=wx.Point(336, 40),
+              name='staticText7', parent=self, pos=wx.Point(360, 40),
               size=wx.Size(11, 13), style=0)
 
         self.staticText8 = wx.StaticText(id=wxID_PANELTCASTATICTEXT8,
               label=_('% of the current energy price (including Grid fee, excluding VAT)'),
-              name='staticText8', parent=self, pos=wx.Point(336, 88),
+              name='staticText8', parent=self, pos=wx.Point(360, 88),
               size=wx.Size(311, 13), style=0)
 
         self.staticText9 = wx.StaticText(id=wxID_PANELTCASTATICTEXT9,
-              label=_('year'), name='staticText9', parent=self,
-              pos=wx.Point(336, 112), size=wx.Size(22, 13), style=0)
+              label=_(u'years'), name='staticText9', parent=self,
+              pos=wx.Point(360, 128), size=wx.Size(27, 13), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCASTATICBOX2,
-              label=_('Results'), name='staticBox2', parent=self, pos=wx.Point(8,
-              168), size=wx.Size(760, 384), style=0)
+              label=_('Results'), name='staticBox2', parent=self,
+              pos=wx.Point(8, 168), size=wx.Size(760, 384), style=0)
 
         self.btnResetData = wx.Button(id=wxID_PANELTCABTNRESETDATA,
               label=_('Reset TCA data'), name=u'btnResetData', parent=self,
@@ -140,14 +145,39 @@ class PanelTCA(wx.Panel):
               id=wxID_PANELTCABTNRESETDATA)
 
         self.btnNext = wx.Button(id=wxID_PANELTCABTNNEXT,
-              label=_('Go through TCA data >>>'), name='btnNext', parent=self,
-              pos=wx.Point(576, 560), size=wx.Size(192, 23), style=0)
+              label=_(u'Go through TCA data'), name='btnNext', parent=self,
+              pos=wx.Point(520, 560), size=wx.Size(192, 23), style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
               id=wxID_PANELTCABTNNEXT)
 
         self.notebook1 = wx.Notebook(id=wxID_PANELTCANOTEBOOK1,
               name='notebook1', parent=self, pos=wx.Point(16, 192),
               size=wx.Size(744, 352), style=0)
+
+        self.btnPrevModule = wx.Button(id=wxID_PANELTCABTNPREVMODULE,
+              label=u'<<<', name=u'btnPrevModule', parent=self,
+              pos=wx.Point(464, 560), size=wx.Size(48, 23), style=0)
+        self.btnPrevModule.SetToolTipString(u'Back to H&C Supply')
+        self.btnPrevModule.Bind(wx.EVT_BUTTON, self.OnBtnPrevModuleButton,
+              id=wxID_PANELTCABTNPREVMODULE)
+
+        self.btnNextModule = wx.Button(id=wxID_PANELTCABTNNEXTMODULE,
+              label=u'>>>', name=u'btnNextModule', parent=self,
+              pos=wx.Point(720, 560), size=wx.Size(48, 23), style=0)
+        self.btnNextModule.SetToolTipString(u'forward to Comperativ Study')
+        self.btnNextModule.Bind(wx.EVT_BUTTON, self.OnBtnNextModuleButton,
+              id=wxID_PANELTCABTNNEXTMODULE)
+
+        self.tbInflation = wx.TextCtrl(id=wxID_PANELTCATBINFLATION,
+              name=u'tbInflation', parent=self, pos=wx.Point(256, 32),
+              size=wx.Size(100, 21), style=0, value=u'0')
+        self.tbInflation.Bind(wx.EVT_TEXT, self.OnTbInflationText,
+              id=wxID_PANELTCATBINFLATION)
+        self.tbInflation.Bind(wx.EVT_KILL_FOCUS, self.OnTbInflationKillFocus)
+
+        self.staticText10 = wx.StaticText(id=wxID_PANELTCASTATICTEXT10,
+              label=u'Inflation Rate', name='staticText10', parent=self,
+              pos=wx.Point(40, 36), size=wx.Size(66, 13), style=0)
 
     def __init_custom_ctrls(self, prnt):
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
@@ -174,20 +204,21 @@ class PanelTCA(wx.Panel):
     
     def display(self):
         self.mod.updatePanel()  
-        self.tbLoanInterrestRate.SetValue(str(self.mod.LIR))
+        self.tbInflation.SetValue(str(self.mod.Inflation))
+        self.tbNIR.SetValue(str(self.mod.NIR))
         self.tbCSDRate.SetValue(str(self.mod.CSDR))
         self.tbEnergyPrices.SetValue(str(self.mod.DEP))
         self.tbTimeFame.SetValue(str(self.mod.TimeFrame))      
 
 #Focus events------------------------------------------------------------------------------------------------
-    def OnTbLoanInterrestRateKillFocus(self, event):
+    def OnTbNIRKillFocus(self, event):
         try:
-            self.mod.LIR = float(self.tbLoanInterrestRate.GetValue())
-            if (self.mod.LIR<0)or(self.mod.LIR>100.0):
+            self.mod.NIR = float(self.tbNIR.GetValue())
+            if (self.mod.NIR<0)or(self.mod.NIR>100.0):
                 raise
         except:
-            wx.MessageBox(_("Load interest rate: value between 0 and 100 expected."))
-            self.tbLoanInterrestRate.SetFocus()
+            wx.MessageBox(_("Nominal Interest rate: value between 0 and 100 expected."))
+            self.tbNIR.SetFocus()
         event.Skip()
 
     def OnTbCSDRateKillFocus(self, event):
@@ -220,14 +251,26 @@ class PanelTCA(wx.Panel):
             self.tbEnergyPrices.SetFocus()
         event.Skip()
 
-#TEXT EVENTS---------------------------------------------------------------------------------
-    def OnTbLoanInterrestRateText(self, event):
+    
+    def OnTbInflationKillFocus(self, event):
         try:
-            self.mod.LIR = float(self.tbLoanInterrestRate.GetValue())
-            if (self.mod.LIR<0)or(self.mod.LIR>100.0):
+            self.mod.Inflation = float(self.tbInflation.GetValue())
+            if (self.mod.Inflation<0)or(self.mod.Inflation>100.0):
                 raise
         except:
-            self.mod.LIR = 0
+            wx.MessageBox(_("Inflation rate: value between 0 and 100 expected."))
+            self.tbInflation.SetFocus()
+        
+        event.Skip()
+
+#TEXT EVENTS---------------------------------------------------------------------------------
+    def OnTbNIRText(self, event):
+        try:
+            self.mod.NIR = float(self.tbNIR.GetValue())
+            if (self.mod.NIR<0)or(self.mod.NIR>100.0):
+                raise
+        except:
+            self.mod.NIR = 0
         event.Skip()
 
     def OnTbCSDRateText(self, event):
@@ -256,7 +299,17 @@ class PanelTCA(wx.Panel):
         except:
             self.mod.DEP = 0
         event.Skip()
-
+        
+    def OnTbInflationText(self, event):
+        try:
+            self.mod.Inflation = float(self.tbInflation.GetValue())
+            if (self.mod.Inflation<0)or(self.mod.Inflation>100.0):
+                raise
+        except:
+            self.mod.Inflation = 0        
+        event.Skip()
+        
+#-Nav----------------------------------------------------------------------------------------
     def OnBtnResetDataButton(self, event):
         event.Skip()
 
@@ -264,4 +317,15 @@ class PanelTCA(wx.Panel):
         self.Hide()
         self.main.tree.SelectItem(self.main.qOptiProEconomic1, select=True)
         event.Skip()
+
+    def OnBtnPrevModuleButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHC, select=True)
+        event.Skip()
+
+    def OnBtnNextModuleButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qCS, select=True)
+        event.Skip()
+   
 

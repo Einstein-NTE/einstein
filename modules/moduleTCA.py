@@ -29,6 +29,7 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+from einstein.modules.dataTCA import TCAData
 
 
 class ModuleTCA(object):
@@ -47,7 +48,8 @@ class ModuleTCA(object):
   
     def setDefaultValues(self):
         #Main Page-------------------------------------------------
-        self.LIR = 0       #Loan interest rate
+        self.Inflation = 0
+        self.NIR = 0       #Loan interest rate
         self.CSDR = 0      #Company specific discount rate
         self.DEP  = 0      #development of energy price
         self.TimeFrame = 1 #timeframe

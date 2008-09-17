@@ -1,35 +1,5 @@
 #Boa:FramePanel:panelResult1
-#==============================================================================
-#
-#    E I N S T E I N
-#
-#       Expert System for an Intelligent Supply of Thermal Energy in Industry
-#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
-#
-#------------------------------------------------------------------------------
-#
-#    panelResult1: TCA Resultpage - Values (Tabpage of panelTCA)
-#                  (part of the TCA module)
-#
-#
-#==============================================================================
-#
-#    Version No.: 0.01
-#       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
-#
-#       Changes to previous version:
-#
-#
-#------------------------------------------------------------------------------
-#    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
-#    http://www.energyxperts.net/
-#
-#    This program is free software: you can redistribute it or modify it under
-#    the terms of the GNU general public license as published by the Free
-#    Software Foundation (www.gnu.org).
-#
-#==============================================================================
+
 import wx
 import wx.grid
 from GUITools import *
@@ -49,7 +19,7 @@ class panelResult1(wx.Panel):
 
         self.grid = wx.grid.Grid(id=wxID_PANELRESULT1GRID, name=u'grid',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(704, 170), style=0)
-        self.grid.EnableEditing(False)
+        self.grid.EnableEditing(False)        
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
               self.OnGridGridCellLeftClick)
 
@@ -58,18 +28,18 @@ class panelResult1(wx.Panel):
               pos=wx.Point(24, 264), size=wx.Size(160, 21), style=0)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELRESULT1STATICBOX1,
-              label=_(u'Choose the proposal(s) to be additionaly displayed:'),
+              label=u'Choose the proposal(s) to be additionaly displayed:',
               name='staticBox1', parent=self, pos=wx.Point(8, 240),
               size=wx.Size(704, 64), style=0)
 
         self.btnAddProposal = wx.Button(id=wxID_PANELRESULT1BTNADDPROPOSAL,
-              label=_('Add'), name=u'btnAddProposal', parent=self,
+              label=u'Add', name=u'btnAddProposal', parent=self,
               pos=wx.Point(192, 264), size=wx.Size(75, 23), style=0)
         self.btnAddProposal.Bind(wx.EVT_BUTTON, self.OnBtnAddProposalButton,
               id=wxID_PANELRESULT1BTNADDPROPOSAL)
 
         self.btnRemoveProposal = wx.Button(id=wxID_PANELRESULT1BTNREMOVEPROPOSAL,
-              label=_('Remove'), name=u'btnRemoveProposal', parent=self,
+              label=u'Remove', name=u'btnRemoveProposal', parent=self,
               pos=wx.Point(272, 264), size=wx.Size(75, 23), style=0)
         self.btnRemoveProposal.Bind(wx.EVT_BUTTON,
               self.OnBtnRemoveProposalButton,
@@ -106,6 +76,8 @@ class panelResult1(wx.Panel):
         self.grid.SetRowLabelValue(2, _("Benefit cost ratio"))
         self.grid.SetRowLabelValue(3, _("Payback period (years)"))
         self.grid.SetRowLabelValue(4, _("Internal rate of return at payback (%)"))
+        
+        self.grid.SetBackgroundColour(wx.Colour(255, 0, 0))
         #choices--------------------------------------------------------------------------------
 
 

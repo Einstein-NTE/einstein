@@ -96,7 +96,7 @@ class PanelTCAInvestment(wx.Panel):
               value=_('<enter custom description or choose from list>'))
 
         self.staticText3 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT3,
-              label=_(u'The values of investment are suggested by the program.\nIf they do not apply to your process, please indicate your own values'),
+              label=_(u'The values of investment are suggested by the program.(The default funding for equipment is 30%) \nIf this do not apply to your process, please indicate your own values'),
               name='staticText3', parent=self, pos=wx.Point(40, 384),
               size=wx.Size(335, 26), style=0)
         self.staticText3.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
@@ -208,10 +208,10 @@ class PanelTCAInvestment(wx.Panel):
         self.grid.SetColLabelValue(0, _("Description"))
         self.grid.SetColLabelValue(1, _("Investment\nEUR"))
         self.grid.SetColLabelValue(2, _("Funding\n%"))
-        self.grid.SetColLabelValue(3, _("Funding\nfixed sum"))
-
-        self.updateGridAttributes()
+        self.grid.SetColLabelValue(3, _("Additional\nfixed sum"))
         
+        self.updateGridAttributes()
+        #self.grid.SetBackgroundColor("black")
         #Revenue----------------------------------------------------------
         self.tbRevenueValue.SetValue(str(self.mod.revenue))
         
