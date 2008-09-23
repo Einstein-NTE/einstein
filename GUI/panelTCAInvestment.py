@@ -76,7 +76,7 @@ class PanelTCAInvestment(wx.Panel):
 
         self.tbFundingPerc = wx.TextCtrl(id=wxID_PANELTCAINVESTMENTTBFUNDINGPERC,
               name=u'tbFundingPerc', parent=self, pos=wx.Point(456, 328),
-              size=wx.Size(56, 21), style=0, value='0')
+              size=wx.Size(56, 21), style=0, value='30')
 
         self.btnAdd = wx.Button(id=wxID_PANELTCAINVESTMENTBTNADD, label=_('Add'),
               name='btnAdd', parent=self, pos=wx.Point(680, 328),
@@ -213,7 +213,7 @@ class PanelTCAInvestment(wx.Panel):
         self.updateGridAttributes()
         #self.grid.SetBackgroundColor("black")
         #Revenue----------------------------------------------------------
-        self.tbRevenueValue.SetValue(str(self.mod.revenue))
+        
         
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()
@@ -234,19 +234,27 @@ class PanelTCAInvestment(wx.Panel):
         self.__init_custom_ctrls(parent)       
         self.display()              
         
-    def display(self):          
-        #Update grid------------------------------------------------
-        div = len(self.mod.investment) - self.rows
-        if (div>0):
-            self.rows=len(self.mod.investment)
-            self.grid.AppendRows(div) 
-            self.updateGridAttributes()  
-        for r in range(0,self.rows):
-            for c in range(self.cols):
-                self.grid.SetCellValue(r, c, "")
-        for r in range(len(self.mod.investment)):
-            for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.investment[r][c]))
+    def display(self):
+        if (Status.ANo == 0):
+            wx.MessageBox("There are no investments to enter for the current process. \n Please proceed with Energy and Operating costs")
+            self.Hide()
+            self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)
+        else:          
+            self.mod.updatePanel()  
+            #Revenue-----------------------------------------------------
+            self.tbRevenueValue.SetValue(str(self.mod.data.revenue))                    
+            #Update grid------------------------------------------------
+            div = len(self.mod.data.investment) - self.rows
+            if (div>0):
+                self.rows=len(self.mod.data.investment)
+                self.grid.AppendRows(div) 
+                self.updateGridAttributes()  
+            for r in range(0,self.rows):
+                for c in range(self.cols):
+                    self.grid.SetCellValue(r, c, "")
+            for r in range(len(self.mod.data.investment)):
+                for c in range(self.cols):
+                    self.grid.SetCellValue(r, c, str(self.mod.data.investment[r][c]))
  
     def OnBtnAddButton(self, event):
         try:
@@ -257,8 +265,15 @@ class PanelTCAInvestment(wx.Panel):
            
             if (investment<0)or(fundingperc<0)or(fundingperc>100)or(fundingfix<0):
                 raise            
-                                
-            self.mod.investment.append([name,investment,fundingperc,fundingfix])                
+                          
+            try:                    
+                if (self.selectedRow < len(self.mod.data.investment)):
+                    self.mod.data.investment[self.selectedRow] = [name,investment,fundingperc,fundingfix]
+                else:           
+                    self.mod.data.investment.append([name,investment,fundingperc,fundingfix])                 
+            except:
+                 self.mod.data.investment.append([name,investment,fundingperc,fundingfix])          
+                                    
         except:
             wx.MessageBox(_("Reconsider values."))
             
@@ -266,14 +281,24 @@ class PanelTCAInvestment(wx.Panel):
         self.display()  
 
     def OnBtnDeleteButton(self, event):
-        if (self.selectedRow < len(self.mod.investment)):
-            self.mod.investment.pop(self.selectedRow)  
+        if (self.selectedRow < len(self.mod.data.investment)):
+            self.mod.data.investment.pop(self.selectedRow)  
         event.Skip()
         self.display()    
 
     def OnGridGridCellLeftClick(self, event):
-        self.selectedRow = event.GetRow() 
-        event.Skip()
+        self.selectedRow = event.GetRow()  
+        if (self.selectedRow < len(self.mod.data.investment)):
+            entry = self.mod.data.investment[self.selectedRow]
+            
+            self.cbName.SetValue(str(entry[0]))
+            self.tbInvestment.SetValue(str(entry[1]))
+            self.tbFundingPerc.SetValue(str(entry[2]))
+            self.tbFundingFix.SetValue(str(entry[3]))            
+            self.btnAdd.SetLabel("Change")
+        else:
+            self.btnAdd.SetLabel("Add")
+        event.Skip()          
 
     def OnPanelTCAInvestmentKillFocus(self, event):
         #print "leave focus"
@@ -284,7 +309,7 @@ class PanelTCAInvestment(wx.Panel):
             value = float(self.tbRevenueValue.GetValue())
             if (value<0):
                 raise
-            self.mod.revenue = value                                      
+            self.mod.data.revenue = value                                      
         except:
             wx.MessageBox(_("Numeric value greater or equal zero expected."))
                                      
@@ -296,7 +321,7 @@ class PanelTCAInvestment(wx.Panel):
             dlg.ShowModal()
             if (dlg.apply):
                 self.tbRevenueValue.SetValue("%.0f" % dlg.value)
-                self.mod.revenue = dlg.value
+                self.mod.data.revenue = dlg.value
         except:
             pass
         event.Skip()
@@ -306,9 +331,9 @@ class PanelTCAInvestment(wx.Panel):
             value = float(self.tbRevenueValue.GetValue())
             if (value<0):
                 raise
-            self.mod.revenue = value                                      
+            self.mod.data.revenue = value                                      
         except:
-            self.mod.revenue = 0                                     
+            self.mod.data.revenue = 0                                     
         event.Skip()
 
     def OnBtnGoMainButton(self, event):
@@ -318,5 +343,6 @@ class PanelTCAInvestment(wx.Panel):
 
     def OnBtnNextButton(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)
         event.Skip()

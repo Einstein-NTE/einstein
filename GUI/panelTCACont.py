@@ -173,22 +173,34 @@ class PanelTCAContingencies(wx.Panel):
             self.grid.SetRowAttr(r, attr)
              
     def display(self):          
+        self.mod.updatePanel() 
         #Update grid------------------------------------------------  
-        div = len(self.mod.contingencies) - self.rows
+        div = len(self.mod.data.contingencies) - self.rows
         if (div>0):
-            self.rows=len(self.mod.contingencies)
+            self.rows=len(self.mod.data.contingencies)
             self.grid.AppendRows(div) 
             self.updateGridAttributes()  
         for r in range(0,self.rows):
             for c in range(self.cols):
                 self.grid.SetCellValue(r, c, "")
-        for r in range(len(self.mod.contingencies)):
+        for r in range(len(self.mod.data.contingencies)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.contingencies[r][c]))
+                self.grid.SetCellValue(r, c, str(self.mod.data.contingencies[r][c]))
  
 
     def OnGrid1GridCellLeftClick(self, event):
-        self.selectedRow = event.GetRow()        
+        self.selectedRow = event.GetRow()  
+        
+        if (self.selectedRow < len(self.mod.data.contingencies)):
+            entry = self.mod.data.contingencies[self.selectedRow]
+            
+            self.cbName.SetValue(str(entry[0]))
+            self.textCtrl1.SetValue(str(entry[1]))
+            self.textCtrl2.SetValue(str(entry[2]))                        
+            self.btnAdd.SetLabel("Change")
+        else:
+            self.btnAdd.SetLabel("Add")
+      
         event.Skip()
 
     def OnChoice1Choice(self, event):
@@ -201,26 +213,34 @@ class PanelTCAContingencies(wx.Panel):
             timeframe = int(self.textCtrl2.GetValue())
            
             if (timeframe<0)or(eur_year<0):
-                raise            
-            
-            self.mod.contingencies.append([name,eur_year,timeframe])                
+                raise   
+                     
+            try:                    
+                if (self.selectedRow < len(self.mod.data.contingencies)):
+                    self.mod.data.contingencies[self.selectedRow] = [name,eur_year,timeframe]
+                else:           
+                    self.mod.data.contingencies.append([name,eur_year,timeframe])                
+            except:
+                 self.mod.data.contingencies.append([name,eur_year,timeframe])                
         except:
             wx.MessageBox(_("Reconsider values."))
         event.Skip()
         self.display()  
 
     def OnBtnDeleteButton(self, event):
-        if (self.selectedRow < len(self.mod.contingencies)):
-            self.mod.contingencies.pop(self.selectedRow)  
+        if (self.selectedRow < len(self.mod.data.contingencies)):
+            self.mod.data.contingencies.pop(self.selectedRow)  
         event.Skip()
         self.display()    
 
     def OnBtnGoMainButton(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
         event.Skip()        
 
     def OnButton1Button(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qOptiProEconomic4, select=True)
         event.Skip()        

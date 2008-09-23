@@ -1,0 +1,118 @@
+-- phpMyAdmin SQL Dump
+-- version 2.11.4
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Erstellungszeit: 19. September 2008 um 13:18
+-- Server Version: 5.0.51
+-- PHP-Version: 5.2.5
+
+use einstein;
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+--
+-- Datenbank: `einstein`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcacontingencies`
+--
+
+CREATE TABLE IF NOT EXISTS `tcacontingencies` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `Value` float NOT NULL,
+  `TimeFrame` int(11) NOT NULL
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcadetailedopcost`
+--
+
+CREATE TABLE IF NOT EXISTS `tcadetailedopcost` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `Value` float NOT NULL,
+  `Category` int(11) NOT NULL COMMENT '0-6 for the 7 subcategories'
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcadetailedrevenue`
+--
+
+CREATE TABLE IF NOT EXISTS `tcadetailedrevenue` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `InitialInvestment` float NOT NULL,
+  `DeprecationPeriod` int(11) NOT NULL,
+  `RemainingPeriod` int(11) NOT NULL
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcaenergy`
+--
+
+CREATE TABLE IF NOT EXISTS `tcaenergy` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `EnergyDemand` float NOT NULL,
+  `EnergyPrice` float NOT NULL,
+  `DevelopmentOfEnergyPrice` float NOT NULL
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcageneraldata`
+--
+
+CREATE TABLE IF NOT EXISTS `tcageneraldata` (
+  `IDTca` int(11) NOT NULL auto_increment,
+  `ProjectID` int(11) NOT NULL,
+  `AlternativeProposalNo` int(11) NOT NULL,
+  `InflationRate` float NOT NULL,
+  `NominalInterestRate` float NOT NULL COMMENT 'Nominal interrest rate of external financing',
+  `CompSpecificDiscountRate` float NOT NULL,
+  `FulePriceRate` float NOT NULL,
+  `AmotisationTime` int(11) NOT NULL,
+  `TotalOperatingCost` float NOT NULL,
+  `TotalRevenue` float NOT NULL,
+  PRIMARY KEY  (`IDTca`)
+) TYPE=MyISAM AUTO_INCREMENT=32 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcainvestments`
+--
+
+CREATE TABLE IF NOT EXISTS `tcainvestments` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `Investment` float NOT NULL,
+  `FundingPerc` float NOT NULL,
+  `FundingFix` float NOT NULL
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tcanonreoccuringcosts`
+--
+
+CREATE TABLE IF NOT EXISTS `tcanonreoccuringcosts` (
+  `TcaID` int(11) NOT NULL,
+  `Description` varchar(200) NOT NULL,
+  `Value` float NOT NULL,
+  `Year` int(11) NOT NULL,
+  `Type` varchar(200) NOT NULL COMMENT 'Cost or Revenue'
+) TYPE=MyISAM;

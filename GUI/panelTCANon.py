@@ -172,22 +172,35 @@ class PanelTCANon(wx.Panel):
             self.grid.SetRowAttr(r, attr)
              
     def display(self):          
+        self.mod.updatePanel() 
         #Update grid------------------------------------------------  
-        div = len(self.mod.nonreoccuringcosts) - self.rows
+        div = len(self.mod.data.nonreoccuringcosts) - self.rows
         if (div>0):
-            self.rows=len(self.mod.nonreoccuringcosts)
+            self.rows=len(self.mod.data.nonreoccuringcosts)
             self.grid.AppendRows(div) 
             self.updateGridAttributes()  
         for r in range(0,self.rows):
             for c in range(self.cols):
                 self.grid.SetCellValue(r, c, "")
-        for r in range(len(self.mod.nonreoccuringcosts)):
+        for r in range(len(self.mod.data.nonreoccuringcosts)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.nonreoccuringcosts[r][c]))
+                self.grid.SetCellValue(r, c, str(self.mod.data.nonreoccuringcosts[r][c]))
  
 
     def OnGrid1GridCellLeftClick(self, event):
-        self.selectedRow = event.GetRow()        
+        self.selectedRow = event.GetRow() 
+        
+        if (self.selectedRow < len(self.mod.data.nonreoccuringcosts)):
+            entry = self.mod.data.nonreoccuringcosts[self.selectedRow]
+                        
+            self.cbName.SetValue(str(entry[0]))            
+            self.textCtrl1.SetValue(str(entry[1]))
+            self.textCtrl2.SetValue(str(entry[2]))
+            self.cbCostRev.SetStringSelection(str(entry[3]))                        
+            self.btnAdd.SetLabel("Change")
+        else:
+            self.btnAdd.SetLabel("Add")  
+                 
         event.Skip()
 
     def OnChoice1Choice(self, event):
@@ -202,8 +215,14 @@ class PanelTCANon(wx.Panel):
            
             if (euro<0)or(year<0):
                 raise            
-                        
-            self.mod.nonreoccuringcosts.append([name,euro,year,type])                
+            try:                    
+                if (self.selectedRow < len(self.mod.data.nonreoccuringcosts)):
+                    self.mod.data.nonreoccuringcosts[self.selectedRow] = [name,euro,year,type]
+                else:           
+                    self.mod.data.nonreoccuringcosts.append([name,euro,year,type])               
+            except:
+                 self.mod.data.nonreoccuringcosts.append([name,euro,year,type])                   
+                            
         except:
             wx.MessageBox(_("Reconsider values."))
             
@@ -212,8 +231,8 @@ class PanelTCANon(wx.Panel):
 
     def OnBtnDeleteButton(self, event):
         try:
-            if (self.selectedRow < len(self.mod.nonreoccuringcosts)):
-                self.mod.nonreoccuringcosts.pop(self.selectedRow)
+            if (self.selectedRow < len(self.mod.data.nonreoccuringcosts)):
+                self.mod.data.nonreoccuringcosts.pop(self.selectedRow)
         except:
             pass  
         event.Skip()
@@ -221,5 +240,7 @@ class PanelTCANon(wx.Panel):
 
     def OnBtnNextButton(self, event):
         self.Hide()
+        self.mod.storeData()
+        self.mod.calculate()
         self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
         event.Skip()        

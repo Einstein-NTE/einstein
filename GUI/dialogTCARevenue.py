@@ -241,18 +241,18 @@ class dlgRevenue(wx.Dialog):
 
     def display(self):          
         #Update grid------------------------------------------------
-        div = len(self.mod.revenues) - self.rows
+        div = len(self.mod.data.revenues) - self.rows
         if (div>0):
-            self.rows=len(self.mod.revenues)
+            self.rows=len(self.mod.data.revenues)
             self.grid.AppendRows(div) 
             self.updateGridAttributes()
         
         for r in range(0,self.rows):
             for c in range(self.cols):
                 self.grid.SetCellValue(r, c, "")
-        for r in range(len(self.mod.revenues)):
+        for r in range(len(self.mod.data.revenues)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.revenues[r][c]))
+                self.grid.SetCellValue(r, c, str(self.mod.data.revenues[r][c]))
 
 
     def updateSubcategory(self):
@@ -299,7 +299,7 @@ class dlgRevenue(wx.Dialog):
             revenue = 0
             perc    = float(self.tbPerc.GetValue())/100.0
                     
-            for p in self.mod.revenues:
+            for p in self.mod.data.revenues:
                 factor = 1
                 if (self.rbBookValue.GetValue() == True):                    
                     factor = float(p[3])/float(p[2])             
@@ -342,7 +342,7 @@ class dlgRevenue(wx.Dialog):
             if (initinvestment<0)or(depperiod<1)or(remperiod<1):
                 raise            
                         
-            self.mod.revenues.append([name,initinvestment,depperiod,remperiod])                
+            self.mod.data.revenues.append([name,initinvestment,depperiod,remperiod])                
         except:
             wx.MessageBox("Reconsider values.")
         event.Skip()
@@ -352,8 +352,8 @@ class dlgRevenue(wx.Dialog):
 
     def OnBtnRemoveButton(self, event):
         try:
-            if (self.selectedRow < len(self.mod.revenues)):
-                self.mod.revenues.pop(self.selectedRow)
+            if (self.selectedRow < len(self.mod.data.revenues)):
+                self.mod.data.revenues.pop(self.selectedRow)
         except:
             pass  
         event.Skip()

@@ -111,29 +111,29 @@ class dlgOpcost(wx.Dialog):
         self.tcNotebook.AddPage(imageId=-1, page=self.liability, select=False, text='Future liability')
         
     def __init_data(self):
-        self.utilities.items    = Status.mod.moduleTCA.detailedopcost[0][:]
+        self.utilities.items    = Status.mod.moduleTCA.data.detailedopcost[0][:]
         self.utilities.display()
-        self.opmaterials.items  = Status.mod.moduleTCA.detailedopcost[1][:]
+        self.opmaterials.items  = Status.mod.moduleTCA.data.detailedopcost[1][:]
         self.opmaterials.display()
-        self.labour.items       = Status.mod.moduleTCA.detailedopcost[2][:]
+        self.labour.items       = Status.mod.moduleTCA.data.detailedopcost[2][:]
         self.labour.display()
-        self.extcost.items      = Status.mod.moduleTCA.detailedopcost[3][:]
+        self.extcost.items      = Status.mod.moduleTCA.data.detailedopcost[3][:]
         self.extcost.display()
-        self.compliance.items   = Status.mod.moduleTCA.detailedopcost[4][:]
+        self.compliance.items   = Status.mod.moduleTCA.data.detailedopcost[4][:]
         self.compliance.display()
-        self.insurance.items    = Status.mod.moduleTCA.detailedopcost[5][:]
+        self.insurance.items    = Status.mod.moduleTCA.data.detailedopcost[5][:]
         self.insurance.display()
-        self.liability.items    = Status.mod.moduleTCA.detailedopcost[6][:]
+        self.liability.items    = Status.mod.moduleTCA.data.detailedopcost[6][:]
         self.liability.display()
     
     def store_data(self):
-        Status.mod.moduleTCA.detailedopcost[0] = self.utilities.items
-        Status.mod.moduleTCA.detailedopcost[1] = self.opmaterials.items
-        Status.mod.moduleTCA.detailedopcost[2] = self.labour.items     
-        Status.mod.moduleTCA.detailedopcost[3] = self.extcost.items  
-        Status.mod.moduleTCA.detailedopcost[4] = self.compliance.items
-        Status.mod.moduleTCA.detailedopcost[5] = self.insurance.items
-        Status.mod.moduleTCA.detailedopcost[6] = self.liability.items
+        Status.mod.moduleTCA.data.detailedopcost[0] = self.utilities.items
+        Status.mod.moduleTCA.data.detailedopcost[1] = self.opmaterials.items
+        Status.mod.moduleTCA.data.detailedopcost[2] = self.labour.items     
+        Status.mod.moduleTCA.data.detailedopcost[3] = self.extcost.items  
+        Status.mod.moduleTCA.data.detailedopcost[4] = self.compliance.items
+        Status.mod.moduleTCA.data.detailedopcost[5] = self.insurance.items
+        Status.mod.moduleTCA.data.detailedopcost[6] = self.liability.items
         
 
     def __init__(self, parent):

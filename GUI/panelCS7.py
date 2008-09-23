@@ -69,7 +69,7 @@ class PanelCS7(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS7_Plot",                      # key for Interface
-                   'title'       :_('Internal rate of return'), # title of the graph
+                   'title'       :_('Modified nternal rate of return'), # title of the graph
                    'ylabel'      :_('[%]'),                   # y axis label
                    'legend'      :[_('IRR')],                   # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
@@ -103,9 +103,9 @@ class PanelCS7(wx.Panel):
         self.grid1.SetDefaultColSize(155)
         self.grid1.SetColSize(0,240)
         self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Internal rate of return\n[%]"))
-        self.grid1.SetColLabelValue(2, _(" "))
-        self.grid1.SetColLabelValue(3, _(" "))
+        self.grid1.SetColLabelValue(1, _("Modified internal\nrate of return [%]"))
+        self.grid1.SetColLabelValue(2, _("Pay-back period\n[years]"))
+        self.grid1.SetColLabelValue(3, _("Cost benefit ratio\n[-]"))
 
         self.display()
 
@@ -117,7 +117,7 @@ class PanelCS7(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Internal rate of return (IRR)'),
+        self.box1 = wx.StaticBox(self, -1, _(u'Modified internal rate of return (IRR)'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)

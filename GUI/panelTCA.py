@@ -204,17 +204,17 @@ class PanelTCA(wx.Panel):
     
     def display(self):
         self.mod.updatePanel()  
-        self.tbInflation.SetValue(str(self.mod.Inflation))
-        self.tbNIR.SetValue(str(self.mod.NIR))
-        self.tbCSDRate.SetValue(str(self.mod.CSDR))
-        self.tbEnergyPrices.SetValue(str(self.mod.DEP))
-        self.tbTimeFame.SetValue(str(self.mod.TimeFrame))      
+        self.tbInflation.SetValue(str(self.mod.data.Inflation))
+        self.tbNIR.SetValue(str(self.mod.data.NIR))
+        self.tbCSDRate.SetValue(str(self.mod.data.CSDR))
+        self.tbEnergyPrices.SetValue(str(self.mod.data.DEP))
+        self.tbTimeFame.SetValue(str(self.mod.data.TimeFrame))      
 
 #Focus events------------------------------------------------------------------------------------------------
     def OnTbNIRKillFocus(self, event):
         try:
-            self.mod.NIR = float(self.tbNIR.GetValue())
-            if (self.mod.NIR<0)or(self.mod.NIR>100.0):
+            self.mod.data.NIR = float(self.tbNIR.GetValue())
+            if (self.mod.data.NIR<0)or(self.mod.data.NIR>100.0):
                 raise
         except:
             wx.MessageBox(_("Nominal Interest rate: value between 0 and 100 expected."))
@@ -223,8 +223,8 @@ class PanelTCA(wx.Panel):
 
     def OnTbCSDRateKillFocus(self, event):
         try:
-            self.mod.CSDR = float(self.tbCSDRate.GetValue())
-            if (self.mod.CSDR<0)or(self.mod.CSDR>100.0):
+            self.mod.data.CSDR = float(self.tbCSDRate.GetValue())
+            if (self.mod.data.CSDR<0)or(self.mod.data.CSDR>100.0):
                 raise
         except:
             wx.MessageBox(_("Company specific discount rate: value between 0 and 100 expected."))
@@ -233,8 +233,8 @@ class PanelTCA(wx.Panel):
 
     def OnTbTimeFameKillFocus(self, event):
         try:
-            self.mod.TimeFrame = int(self.tbTimeFame.GetValue())
-            if (self.mod.TimeFrame<1)or(self.mod.TimeFrame>1000.0):
+            self.mod.data.TimeFrame = int(self.tbTimeFame.GetValue())
+            if (self.mod.data.TimeFrame<1)or(self.mod.data.TimeFrame>1000.0):
                 raise
         except:
             wx.MessageBox(_("Time frame: value between 1 and 1000 expected."))
@@ -243,8 +243,8 @@ class PanelTCA(wx.Panel):
 
     def OnTbEnergyPricesKillFocus(self, event):
         try:
-            self.mod.DEP = float(self.tbEnergyPrices.GetValue())
-            if (self.mod.DEP<0)or(self.mod.DEP>100.0):
+            self.mod.data.DEP = float(self.tbEnergyPrices.GetValue())
+            if (self.mod.data.DEP<0)or(self.mod.data.DEP>100.0):
                 raise
         except:
             wx.MessageBox(_("Development of energy prices: value between 0 and 100 expected."))
@@ -254,8 +254,8 @@ class PanelTCA(wx.Panel):
     
     def OnTbInflationKillFocus(self, event):
         try:
-            self.mod.Inflation = float(self.tbInflation.GetValue())
-            if (self.mod.Inflation<0)or(self.mod.Inflation>100.0):
+            self.mod.data.Inflation = float(self.tbInflation.GetValue())
+            if (self.mod.data.Inflation<0)or(self.mod.data.Inflation>100.0):
                 raise
         except:
             wx.MessageBox(_("Inflation rate: value between 0 and 100 expected."))
@@ -266,8 +266,8 @@ class PanelTCA(wx.Panel):
 #TEXT EVENTS---------------------------------------------------------------------------------
     def OnTbNIRText(self, event):
         try:
-            self.mod.NIR = float(self.tbNIR.GetValue())
-            if (self.mod.NIR<0)or(self.mod.NIR>100.0):
+            self.mod.data.NIR = float(self.tbNIR.GetValue())
+            if (self.mod.data.NIR<0)or(self.mod.data.NIR>100.0):
                 raise
         except:
             self.mod.NIR = 0
@@ -275,38 +275,38 @@ class PanelTCA(wx.Panel):
 
     def OnTbCSDRateText(self, event):
         try:
-            self.mod.CSDR = float(self.tbCSDRate.GetValue())
-            if (self.mod.CSDR<0)or(self.mod.CSDR>100.0):
+            self.mod.data.CSDR = float(self.tbCSDRate.GetValue())
+            if (self.mod.data.CSDR<0)or(self.mod.data.CSDR>100.0):
                 raise
         except:
-            self.mod.CSDR = 0
+            self.mod.data.CSDR = 0
         event.Skip()
 
     def OnTbTimeFameText(self, event):
         try:
-            self.mod.TimeFrame = int(self.tbTimeFame.GetValue())
-            if (self.mod.TimeFrame<1)or(self.mod.TimeFrame>1000.0):
+            self.mod.data.TimeFrame = int(self.tbTimeFame.GetValue())
+            if (self.mod.data.TimeFrame<1)or(self.mod.data.TimeFrame>1000.0):
                 raise
         except:
-            self.mod.TimeFrame = 1
+            self.mod.data.TimeFrame = 1
         event.Skip()
 
     def OnTbEnergyPricesText(self, event):
         try:
-            self.mod.DEP = float(self.tbEnergyPrices.GetValue())
-            if (self.mod.DEP<0)or(self.mod.DEP>100.0):
+            self.mod.data.DEP = float(self.tbEnergyPrices.GetValue())
+            if (self.mod.data.DEP<0)or(self.mod.data.DEP>100.0):
                 raise
         except:
-            self.mod.DEP = 0
+            self.mod.data.DEP = 0
         event.Skip()
         
     def OnTbInflationText(self, event):
         try:
-            self.mod.Inflation = float(self.tbInflation.GetValue())
-            if (self.mod.Inflation<0)or(self.mod.Inflation>100.0):
+            self.mod.data.Inflation = float(self.tbInflation.GetValue())
+            if (self.mod.data.Inflation<0)or(self.mod.data.Inflation>100.0):
                 raise
         except:
-            self.mod.Inflation = 0        
+            self.mod.data.Inflation = 0        
         event.Skip()
         
 #-Nav----------------------------------------------------------------------------------------
@@ -315,6 +315,7 @@ class PanelTCA(wx.Panel):
 
     def OnBtnNextButton(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qOptiProEconomic1, select=True)
         event.Skip()
 

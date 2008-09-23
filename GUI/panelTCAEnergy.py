@@ -200,8 +200,6 @@ class PanelTCAEnergy(wx.Panel):
 
         self.updateGridAttributes()
             
-        #opcost
-        self.tbTotalOpCost.SetValue(str(self.mod.totalopcost))
         #Helptext & DetailedButton
         self.btnDetailedOpCost.Enabled = False
         if (Status.ANo > 0):
@@ -227,26 +225,27 @@ class PanelTCAEnergy(wx.Panel):
             self.grid.SetRowSize(r,20)
             self.grid.SetRowAttr(r, attr)
         
-    def display(self):          
+    def display(self):  
+        self.mod.updatePanel()         
         #Update grid------------------------------------------------
-        div = len(self.mod.energycost) - self.rows
+        div = len(self.mod.data.energycosts) - self.rows
         if (div>0):
-            self.rows=len(self.mod.energycost)
+            self.rows=len(self.mod.data.energycosts)
             self.grid.AppendRows(div) 
             self.updateGridAttributes()  
         for r in range(0,self.rows):
             for c in range(self.cols):
                 self.grid.SetCellValue(r, c, "")
-        for r in range(len(self.mod.energycost)):
+        for r in range(len(self.mod.data.energycosts)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.energycost[r][c]))
+                self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
         #Update opcost
-        self.tbTotalOpCost.SetValue(str(self.mod.totalopcost))
+        self.tbTotalOpCost.SetValue(str(self.mod.data.totalopcost))
     
     def OnGrid1GridCellLeftClick(self, event):
         self.selectedRow = event.GetRow()  
-        if (self.selectedRow < len(self.mod.energycost)):
-            entry = self.mod.energycost[self.selectedRow]
+        if (self.selectedRow < len(self.mod.data.energycosts)):
+            entry = self.mod.data.energycosts[self.selectedRow]
             self.comboBox1.SetValue(str(entry[0]))
             self.tbDemand.SetValue(str(entry[1]))
             self.tbPrice.SetValue(str(entry[2]))
@@ -258,8 +257,8 @@ class PanelTCAEnergy(wx.Panel):
                 
     def OnBtnDeleteButton(self, event):
         try:
-            if (self.selectedRow < len(self.mod.energycost)):
-                self.mod.energycost.pop(self.selectedRow)
+            if (self.selectedRow < len(self.mod.data.energycosts)):
+                self.mod.data.energycosts.pop(self.selectedRow)
         except:
             pass  
         event.Skip()
@@ -275,12 +274,12 @@ class PanelTCAEnergy(wx.Panel):
             if (demand<0)or(price<0):
                 raise           
             try:                    
-                if (self.selectedRow < len(self.mod.energycost)):
-                    self.mod.energycost[self.selectedRow] = [name,demand,price,dev]
+                if (self.selectedRow < len(self.mod.data.energycosts)):
+                    self.mod.data.energycosts[self.selectedRow] = [name,demand,price,dev]
                 else:           
-                    self.mod.energycost.append([name,demand,price,dev])                
+                    self.mod.data.energycosts.append([name,demand,price,dev])                
             except:
-                self.mod.energycost.append([name,demand,price,dev])
+                self.mod.data.energycosts.append([name,demand,price,dev])
         except:
             wx.MessageBox(_("Reconsider values."))
                 
@@ -291,11 +290,10 @@ class PanelTCAEnergy(wx.Panel):
         try:
             dlg = dlgOpcost(None)
             dlg.ShowModal()
-            if (dlg.save):
+            if (dlg.save == True):
                 dlg.store_data()
                 self.mod.calculateTotalOpCostFromDetailedOpcost()
-                self.display()
-                # do some calc            
+                self.display()              
         except:
             pass
         
@@ -304,9 +302,9 @@ class PanelTCAEnergy(wx.Panel):
     def OnTbTotalOpCostText(self, event):
         try:
             opcost = float(self.tbTotalOpCost.GetValue())
-            self.mod.totalopcost = opcost
+            self.mod.data.totalopcost = opcost
         except:
-            self.mod.totalopcost = 0
+            self.mod.data.totalopcost = 0
         event.Skip()
 
     def OnTbTotalOpCostKillFocus(self, event):
@@ -314,6 +312,7 @@ class PanelTCAEnergy(wx.Panel):
 
     def OnBtnNextButton(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qOptiProEconomic3, select=True)
         event.Skip()        
 
