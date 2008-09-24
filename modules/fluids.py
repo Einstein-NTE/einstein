@@ -87,16 +87,28 @@ class Fuel():
         if len(fuels) > 0:
             fuel = fuels[0]
             self.LCV = fuel.FuelLCV
-            self.HCV = fuel.FuelHCV  #data in DB are in kJ/kgK ->
+            self.HCV = fuel.FuelHCV
             self.PEConv = fuel.PEConvFuel
             self.CO2Conv = fuel.CO2ConvFuel
             self.rho = fuel.FuelDensity
             self.CombAir = fuel.CombAir
-            self.OffgasHeatCapacity = fuel.OffgasHeatCapacity
+            self.OffgasHeatCapacity = fuel.OffgasHeatCapacity/3600.0
             self.Offgas = fuel.Offgas
             self.OffgasDensity = fuel.OffgasDensity
             self.Humidity = fuel.Humidity
             self.name = fuel.FuelName
+            if self.LCV is None or \
+               self.HCV is None or \
+               self.PEConv is None or \
+               self.CO2Conv is None or \
+               self.rho is None or \
+               self.CombAir is None or \
+               self.OffgasHeatCapacity is None:
+#               self.Offgas is None or \
+#               self.OffgasDensity is None or \
+#               self.Humidity is None:
+                logError(_("Severe error in your fuel data for fuel %s: some parameters are missing")%\
+                           (fuels[0].FuelName))
                                                 #conversion to kWh/kgK
         else:
             self.LCV = 10.0
@@ -105,7 +117,7 @@ class Fuel():
             self.CO2Conv = 0.20
             self.rho = 10.0
             self.CombAir = 16.6     #approximate values of natural gas as default
-            self.OffgasHeatCapacity = 1.13
+            self.OffgasHeatCapacity = 1.13/3600.0
             self.Offgas = 17.6
             self.OffgasDensity = 1.23
             self.Humidity = 0.12

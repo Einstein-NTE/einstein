@@ -307,6 +307,7 @@ class CheckPipe():
             self.PercentRecirc.setValue(qdistributionhc.PercentRecirc)
             self.Tfeedup.setValue(qdistributionhc.Tfeedup)
             self.TotLengthDistPipe.setValue(qdistributionhc.TotLengthDistPipe)
+            self.UAPipe.setValue(qdistributionhc.UAPipe)
             self.DDistPipe.setValue(qdistributionhc.DDistPipe)
             self.DeltaDistPipe.setValue(qdistributionhc.DeltaDistPipe)
 
@@ -324,15 +325,17 @@ class CheckPipe():
         self.HPerYearPipe.setValue(4000.0,err=0.0)
         logDebug("CheckPipe (importData): pipe operating hours fixed to 4000 h")
 
-        if self.DDistPipe.val is not None and self.DeltaDistPipe.val is not None:
-            self.DoPipe.setValue (self.DDistPipe.val + (2*self.DeltaDistPipe.val))
-            try: self.dUAPipe.setValue(0.000314 /(log(self.DoPipe.val) - log(self.DDistPipe.val)))
-            except: pass
-        else:   ####### for testing. IMPORTANT THAT THERE's A VALUE
-            self.dUAPipe.setValue(0.0005)   # in kW/mK !!!!
-            self.dUAPipe.sqerr = 0.25
-            self.dUAPipe.valMin = 0.00025
-            self.dUAPipe.valMax = 0.00075
+#calculate dUAPipe from DDistPipe and DoPipe only if it cannot be calculated by dUA = UA/LPipe
+        if (self.UAPipe.val is None) or (self.TotLengthDistPipe is None):
+            if self.DDistPipe.val is not None and self.DeltaDistPipe.val is not None:
+                self.DoPipe.setValue (self.DDistPipe.val + (2*self.DeltaDistPipe.val))
+                try: self.dUAPipe.setValue(0.000314 /(log(self.DoPipe.val) - log(self.DDistPipe.val)))
+                except: pass
+            else:   ####### for testing. IMPORTANT THAT THERE's A VALUE
+                self.dUAPipe.setValue(0.0005)   # in kW/mK !!!!
+                self.dUAPipe.sqerr = 0.25
+                self.dUAPipe.valMin = 0.00025
+                self.dUAPipe.valMax = 0.00075
 
                 
 #------------------------------------------------------------------------------
@@ -367,7 +370,7 @@ class CheckPipe():
                 qdistributionhc.HDEffAvg = check(self.HDEffAvg.val)
                 qdistributionhc.QHXPipe = check(self.QHXPipe.val)
                 qdistributionhc.QWHPipe = check(self.QWHPipe.val)
-                qdistributionhc.UDistPipe = check(self.UAPipe.val)
+                qdistributionhc.UAPipe = check(self.UAPipe.val)
                 qdistributionhc.UPHProcm = check(self.UPHProcm.val)
                 qdistributionhc.USHm = check(self.USHm.val)
                 qdistributionhc.USHPipe = check(self.USHPipe.val)
@@ -511,8 +514,8 @@ class CheckPipe():
         self.DoPipe.show()
                
         self.UAPipe.show()
-#        self.UAPipe1.show()
-#        self.UAPipe2.show()
+        self.UAPipe1.show()
+        self.UAPipe2.show()
         self.dUAPipe.show()
        
 

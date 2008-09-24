@@ -141,7 +141,8 @@ class PanelQ0(wx.Panel):
               parent=self, pos=wx.Point(20, 440), size=wx.Size(400, 20), value="")
 
         self.tc2 = wx.TextCtrl(id=-1, name='tc2',
-              parent=self, pos=wx.Point(20, 480), size=wx.Size(400, 80), value="")
+              parent=self, pos=wx.Point(20, 480), size=wx.Size(400, 80),
+                               style=wx.TE_MULTILINE | wx.TE_LINEWRAP, value="")
 
         self.buttonAutoRun = wx.Button(id=-1,
 						 label=_('run EINSTEIN audit procedure'),
@@ -220,8 +221,10 @@ class PanelQ0(wx.Panel):
         # so the next line would bomb because self doesn't exist any more)
         self.main.panelinfo.update()
         self.main.showMainMenuAlternatives()
+        self.fillPage()
         if Status.StatusCC <=0:
-            self.main.tree.SelectItem(self.main.qPage1, select=True)
+            pass
+#            self.main.tree.SelectItem(self.main.qPage1, select=True)
         elif Status.ANo > 0:
             self.main.tree.SelectItem(self.main.qA,select=True)
 

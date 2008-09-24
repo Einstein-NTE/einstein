@@ -386,7 +386,7 @@ class PanelQ5(wx.Panel):
         self.tc9.SetValue(str(p.PressDistMedium))
 ##        self.tc10.SetValue(str(p.PercentCondRecovery))
         self.tc11.SetValue(str(p.TotLengthDistPipe))
-        self.tc12.SetValue(str(p.UDistPipe))
+        self.tc12.SetValue(str(p.UAPipe))
         self.tc13.SetValue(str(p.DDistPipe))
         self.tc14.SetValue(str(p.DeltaDistPipe))		
         self.tc15.SetValue(str(p.NumStorageUnits)) 
@@ -435,7 +435,7 @@ class PanelQ5(wx.Panel):
 		"PressDistMedium":check(self.tc9.GetValue()),
                 
 		"TotLengthDistPipe":check(self.tc11.GetValue()), 
-		"UDistPipe":check(self.tc12.GetValue()), 
+		"UAPipe":check(self.tc12.GetValue()), 
 		"DDistPipe":check(self.tc13.GetValue()), 
 		"DeltaDistPipe":check(self.tc14.GetValue()), 		
 		"NumStorageUnits":check(self.tc15.GetValue()),  

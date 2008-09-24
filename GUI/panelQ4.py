@@ -196,8 +196,8 @@ class PanelQ4(wx.Panel):
                              label=_("Manufacturer"),
                              tip=_("Attach the technical data if available"))
         
-        self.tc3 = IntEntry(self.page0,
-                            minval=2000, maxval=2050, value=0,
+        self.tc3 = FloatEntry(self.page0,
+                            decimals=0, minval=1950, maxval=2050, value=2000,
                             label=_("Year of  manufacturing\nor/and installation?"),
                             tip=_("Year of manufacturing or installation"))
 
@@ -212,8 +212,8 @@ class PanelQ4(wx.Panel):
                                label=_("Type of equipment"),
                                tip=_("e.g. boiler / burner / chiller / compressor / CHP motor"))
 
-        self.tc6 = IntEntry(self.page0,
-                            minval=0, maxval=100, value=0,
+        self.tc6 = FloatEntry(self.page0,
+                            decimals=0,minval=0, maxval=100, value=0,
                             label=_("Number of units of the same type"),
                             tip=_("Specify how many units of this type exist"))
         #
@@ -248,12 +248,14 @@ class PanelQ4(wx.Panel):
                               tip=_("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
 
         self.tc13 = FloatEntry(self.page1,
-                              ipart=1, decimals=3, minval=0., maxval=1., value=0.,
+                              ipart=1, decimals=3, minval=0., maxval=2000., value=0.,
+                              unitdict='FRACTION',
                               label=_("Mean overall thermal conversion efficiency"),
                               tip=_("Specify the efficiency of boiler or EER(COP) for cold generation"))
 
         self.tc17 = FloatEntry(self.page1,
-                              ipart=1, decimals=3, minval=0., maxval=1., value=0.,
+                              ipart=1, decimals=3, minval=0., maxval=100., value=0.,
+                              unitdict='FRACTION',
                               label=_("Mean utilisation factor (full capacity = 100%)"),
                               tip=_("Specify the mean supplied power of the boiler/cooler/etc. with respect to its nominal power"))
 
