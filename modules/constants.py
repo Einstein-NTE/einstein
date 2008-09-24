@@ -46,9 +46,9 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 210" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 215" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
-DEBUG = "OFF"   #Set to:
+DEBUG = "BASIC"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
                 #"OFF" (default): no debug
 

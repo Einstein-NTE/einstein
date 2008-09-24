@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinProject pid="162">
+<!-- table auditor ignored -->
+<table name="cgeneraldata">
+<row n="1">
+<element name="NEquipe" type="int(11)" auto="" value="1" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1621" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+</row>
+<row n="2">
+<element name="PECFuels" type="double" auto="" value="783753.910277" />
+<element name="NEquipe" type="int(11)" auto="" value="2" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="USH" type="double" auto="" value="920176.190475" />
+<element name="FEOel" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PETel" type="double" auto="" value="271806.469079" />
+<element name="PEC" type="double" auto="" value="1055560.37936" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="PET" type="double" auto="" value="1055560.37936" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="PETFuels" type="double" auto="" value="783753.910277" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="FUEL_INT" type="double" auto="" value="0.712503554797" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1650" />
+<element name="EL_INT" type="double" auto="" value="0.0906021563597" />
+<element name="FET" type="double" auto="" value="803105.711157" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="FEC" type="double" auto="" value="2683847.22222" />
+<element name="FECel" type="double" auto="" value="90602.1563597" />
+<element name="PECel" type="double" auto="" value="271806.469079" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="45301.0781798" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+<element name="FETel" type="double" auto="" value="90602.1563597" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="PE_INT" type="double" auto="" value="1.05556037936" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="178125.888699" />
+<element name="ProdNoNukesEl" type="double" auto="" value="453010.781798" />
+</row>
+<row n="3">
+<element name="PECFuels" type="double" auto="" value="891520.07294" />
+<element name="NEquipe" type="int(11)" auto="" value="2" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="USH" type="double" auto="" value="920176.190475" />
+<element name="FEOel" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PETel" type="double" auto="" value="271806.469079" />
+<element name="PEC" type="double" auto="" value="1163326.54202" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="PET" type="double" auto="" value="1163326.54202" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="PETFuels" type="double" auto="" value="891520.07294" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="FUEL_INT" type="double" auto="" value="0.810472793582" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1648" />
+<element name="EL_INT" type="double" auto="" value="0.0906021563597" />
+<element name="FET" type="double" auto="" value="901074.949941" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="FEC" type="double" auto="" value="2683847.22222" />
+<element name="FECel" type="double" auto="" value="90602.1563597" />
+<element name="PECel" type="double" auto="" value="271806.469079" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="45301.0781798" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+<element name="FETel" type="double" auto="" value="90602.1563597" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="PE_INT" type="double" auto="" value="1.16332654202" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="202618.198395" />
+<element name="ProdNoNukesEl" type="double" auto="" value="453010.781798" />
+</row>
+<row n="4">
+<element name="PECFuels" type="double" auto="" value="1112300.88959" />
+<element name="NEquipe" type="int(11)" auto="" value="1" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="USH" type="double" auto="" value="920176.190475" />
+<element name="FEOel" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEC" type="double" auto="" value="1112300.88959" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="PET" type="double" auto="" value="1112300.88959" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="PETFuels" type="double" auto="" value="1112300.88959" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="FUEL_INT" type="double" auto="" value="1.0111826269" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1649" />
+<element name="EL_INT" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="1011182.6269" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="FEC" type="double" auto="" value="2683847.22222" />
+<element name="FECel" type="double" auto="" value="0.0" />
+<element name="PECel" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="0.0" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="PE_INT" type="double" auto="" value="1.11230088959" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="252795.656724" />
+<element name="ProdNoNukesEl" type="double" auto="" value="0.0" />
+</row>
+<row n="5">
+<element name="PECFuels" type="double" auto="" value="1265242.2619" />
+<element name="NEquipe" type="int(11)" auto="" value="1" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="USH" type="double" auto="" value="920176.190475" />
+<element name="FEOel" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEC" type="double" auto="" value="1265242.2619" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="PET" type="double" auto="" value="1265242.2619" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="PETFuels" type="double" auto="" value="1265242.2619" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="FUEL_INT" type="double" auto="" value="1.15022023809" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1645" />
+<element name="EL_INT" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="1150220.23809" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="FEC" type="double" auto="" value="2683847.22222" />
+<element name="FECel" type="double" auto="" value="0.0" />
+<element name="PECel" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="0.0" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="PE_INT" type="double" auto="" value="1.2652422619" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="287555.059523" />
+<element name="ProdNoNukesEl" type="double" auto="" value="0.0" />
+</row>
+<row n="6">
+<element name="PECFuels" type="double" auto="" value="2952231.94444" />
+<element name="NEquipe" type="int(11)" auto="" value="1" />
+<element name="NPipeDuct" type="int(11)" auto="" value="1" />
+<element name="USH" type="double" auto="" value="2147077.77778" />
+<element name="FEOel" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PETel" type="double" auto="" value="0.0" />
+<element name="PEC" type="double" auto="" value="2952231.94444" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="PET" type="double" auto="" value="2952231.94444" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="PETFuels" type="double" auto="" value="2952231.94444" />
+<element name="NoNukesConvEl" type="double" auto="" value="5.0" />
+<element name="NProducts" type="int(11)" auto="" value="0" />
+<element name="FUEL_INT" type="double" auto="" value="2.68384722222" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1644" />
+<element name="EL_INT" type="double" auto="" value="0.0" />
+<element name="FET" type="double" auto="" value="2683847.22222" />
+<element name="NHX" type="int(10) unsigned" auto="" value="0" />
+<element name="FEC" type="double" auto="" value="2683847.22222" />
+<element name="FECel" type="double" auto="" value="0.0" />
+<element name="PECel" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="ProdCO2el" type="double" auto="" value="0.0" />
+<element name="NWHEE" type="int(10) unsigned" auto="" value="0" />
+<element name="NThProc" type="int(11)" auto="" value="1" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="CO2ConvEl" type="double" auto="" value="0.5" />
+<element name="PE_INT" type="double" auto="" value="2.95223194444" />
+<element name="PEConvEl" type="double" auto="" value="3.0" />
+<element name="ProdCO2Fuels" type="double" auto="" value="670961.805555" />
+<element name="ProdNoNukesEl" type="double" auto="" value="0.0" />
+</row>
+</table>
+<!-- table dbbenchmark ignored -->
+<!-- table dbboiler ignored -->
+<!-- table dbchp ignored -->
+<!-- table dbelectricitymix ignored -->
+<!-- table dbfluid ignored -->
+<!-- table dbfuel ignored -->
+<!-- table dbheatpump ignored -->
+<!-- table dbnacecode ignored -->
+<!-- table dbsolarthermal ignored -->
+<!-- table dbunitoperation ignored -->
+<!-- table ebenchmarkgeneraldata has no values for id=162 -->
+<!-- table ebenchmarkprocessdata has no values for id=162 -->
+<!-- table ebenchmarkproductdata has no values for id=162 -->
+<!-- table lproductcode ignored -->
+<!-- table preferences ignored -->
+<!-- table projectinfo has no values for id=162 -->
+<!-- table psetupdata ignored -->
+<!-- table qbuildings has no values for id=162 -->
+<table name="qdistributionhc">
+<row n="1">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3053" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="Hot water piping" />
+<element name="ToutDistrib" type="double" auto="" value="90.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+</row>
+<row n="2">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.986586419785" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3076" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="162" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2147077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="Hot water piping" />
+<element name="TreturnDistrib" type="double" auto="" value="87.5547569304" />
+<element name="ToutDistrib" type="double" auto="" value="90.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2147077.77778" />
+<element name="QLossPipe" type="double" auto="" value="28800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="Tfeedup" type="double" auto="" value="88.9180947516" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="10082.3987146" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
