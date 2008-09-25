@@ -1,4 +1,4 @@
-use energyxperts;
+use einstein;
 
 ALTER TABLE qprocessdata DROP COLUMN UPHtotQ;
 ALTER TABLE cgeneraldata DROP COLUMN OMBiuildFung;
