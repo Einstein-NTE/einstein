@@ -770,21 +770,22 @@ class ExportDB(object):
         if dbname == "all":
             self.dumpTable(cursor, fd, "dbfluid", "")
             self.dumpTable(cursor, fd, "dbfuel", "")
-#            self.dumpTable(cursor, fd, "dbboiler", "")
-#            self.dumpTable(cursor, fd, "dbchp", "")
-#            self.dumpTable(cursor, fd, "dbheatpump", "")
-#            self.dumpTable(cursor, fd, "dbsolarthermal", "")
-#            self.dumpTable(cursor, fd, "dbbenchmark", "")
-#            self.dumpTable(cursor, fd, "dbunitoperation", "")
-#            self.dumpTable(cursor, fd, "dbnacecode", "")
             
-        if dbname == "all equipments":
+            self.dumpTable(cursor, fd, "dbboiler", "")
+            self.dumpTable(cursor, fd, "dbchp", "")
+            self.dumpTable(cursor, fd, "dbheatpump", "")
+            self.dumpTable(cursor, fd, "dbsolarthermal", "")
+            
+#            self.dumpTable(cursor, fd, "dbbenchmark", "")
+            
+        elif dbname == "all equipments":
             self.dumpTable(cursor, fd, "dbboiler", "")
             self.dumpTable(cursor, fd, "dbchp", "")
             self.dumpTable(cursor, fd, "dbheatpump", "")
             self.dumpTable(cursor, fd, "dbsolarthermal", "")
             
         else:
+            print "exportDB: ",dbname
             self.dumpTable(cursor, fd, dbname, "")
 
         fd.write('</EinsteinDataBase>\n')

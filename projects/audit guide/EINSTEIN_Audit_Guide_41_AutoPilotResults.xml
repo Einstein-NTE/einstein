@@ -408,3 +408,1487 @@
 <element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
 <element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
 <element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+<row n="2">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.970317136357" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3156" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2183077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="TreturnDistrib" type="double" auto="" value="109.810389071" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2183077.77778" />
+<element name="QLossPipe" type="double" auto="" value="64800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+<row n="3">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.970317136357" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3157" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2183077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="TreturnDistrib" type="double" auto="" value="109.810389071" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2183077.77778" />
+<element name="QLossPipe" type="double" auto="" value="64800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+<row n="4">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.970317136357" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3158" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2183077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="TreturnDistrib" type="double" auto="" value="109.810389071" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2183077.77778" />
+<element name="QLossPipe" type="double" auto="" value="64800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+<row n="5">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3159" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+</row>
+<row n="6">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.970317136357" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3160" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2183077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="TreturnDistrib" type="double" auto="" value="109.810389071" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2183077.77778" />
+<element name="QLossPipe" type="double" auto="" value="64800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+<row n="7">
+<element name="PipeDuctNo" type="int(11)" auto="" value="1" />
+<element name="HDEffAvg" type="double" auto="" value="0.970317136357" />
+<element name="PercentRecirc" type="double" auto="" value="1.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="PressDistMedium" type="double" auto="" value="0.0" />
+<element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="3161" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UPHProcm" type="double" auto="" value="2118277.77778" />
+<element name="USHPipe" type="double" auto="" value="2183077.77778" />
+<element name="QWHPipe" type="double" auto="" value="0.0" />
+<element name="Pipeduct" type="varchar(45)" auto="" value="hot water piping" />
+<element name="PmaxStorage" type="double" auto="" value="0.0" />
+<element name="TreturnDistrib" type="double" auto="" value="109.810389071" />
+<element name="ToutDistrib" type="double" auto="" value="180.0" />
+<element name="TotLengthDistPipe" type="double" auto="" value="100.0" />
+<element name="USHm" type="double" auto="" value="2183077.77778" />
+<element name="QLossPipe" type="double" auto="" value="64800.0" />
+<element name="HeatDistMedium" type="varchar(45)" auto="" value="1" />
+<element name="TypeStorage" type="varchar(45)" auto="" value="Sensible" />
+<element name="TmaxStorage" type="double" auto="" value="0.0" />
+<element name="Tfeedup" type="double" auto="" value="20.0" />
+<element name="VUnitStorage" type="double" auto="" value="0.0" />
+<element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
+<element name="DistribCircFlow" type="double" auto="" value="4585.90300821" />
+<element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.05" />
+</row>
+</table>
+<table name="qelectricity">
+<row n="1">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="ElectricityTotYear" type="double" auto="" value="275738.073023" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2551" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="2">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="ElectricityTotYear" type="double" auto="" value="200000.0" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2552" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="3">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="ElectricityTotYear" type="double" auto="" value="200000.0" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2553" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="4">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="ElectricityTotYear" type="double" auto="" value="200000.0" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2554" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="5">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="ElectricityTotYear" type="double" auto="" value="206659.423968" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2555" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="6">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="ElectricityTotYear" type="double" auto="" value="269514.952438" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2556" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+<row n="7">
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="ElectricityTotYear" type="double" auto="" value="200000.0" />
+<element name="QElectricity_ID" type="int(10) unsigned" auto="auto_increment" value="2557" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectricityMotors" type="double" auto="" value="100000.0" />
+<element name="ElectricityRef" type="double" auto="" value="0.0" />
+<element name="ElectricityChem" type="double" auto="" value="0.0" />
+<element name="ElSales" type="double" auto="" value="0.0" />
+<element name="ElectricityThOther" type="double" auto="" value="0.0" />
+<element name="ElectricityAC" type="double" auto="" value="0.0" />
+<element name="ElectricityLight" type="double" auto="" value="100000.0" />
+<element name="ElGenera" type="double" auto="" value="0.0" />
+</row>
+</table>
+<table name="qfuel">
+<row n="1">
+<element name="PECFuel" type="double" auto="" value="1349442.13818" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="1349442.13818" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="1226765.58016" />
+<element name="ProdCO2Fuel" type="double" auto="" value="306691.395041" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="1226765.58016" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1553" />
+</row>
+<row n="2">
+<element name="PECFuel" type="double" auto="" value="929139.262189" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="929139.262189" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="844672.056535" />
+<element name="ProdCO2Fuel" type="double" auto="" value="211168.014134" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="844672.056535" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1552" />
+</row>
+<row n="3">
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1550" />
+</row>
+<row n="4">
+<element name="PECFuel" type="double" auto="" value="1972566.70635" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="1972566.70635" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="1793242.46032" />
+<element name="ProdCO2Fuel" type="double" auto="" value="448310.61508" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="1793242.46032" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1551" />
+</row>
+<row n="5">
+<element name="PECFuel" type="double" auto="" value="1734124.57701" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="1734124.57701" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="1576476.88819" />
+<element name="ProdCO2Fuel" type="double" auto="" value="394119.222048" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="1576476.88819" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1554" />
+</row>
+<row n="6">
+<element name="PECFuel" type="double" auto="" value="687208.501898" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="687208.501898" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="624735.001725" />
+<element name="ProdCO2Fuel" type="double" auto="" value="156183.750431" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="624735.001725" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1555" />
+</row>
+<row n="7">
+<element name="PECFuel" type="double" auto="" value="3001731.94444" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PETFuel" type="double" auto="" value="3001731.94444" />
+<element name="FEOFuel" type="double" auto="" value="0.0" />
+<element name="FuelNo" type="int(11)" auto="" value="1" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FECFuel" type="double" auto="" value="2728847.22222" />
+<element name="ProdCO2Fuel" type="double" auto="" value="682211.805555" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="FuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="MFuelYear" type="double" auto="" value="274531.913704" />
+<element name="FETFuel" type="double" auto="" value="2728847.22222" />
+<element name="QFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1556" />
+</row>
+</table>
+<table name="qgenerationhc">
+<row n="1">
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="ST_C2" type="double" auto="" value="0.008" />
+<element name="FETj" type="double" auto="" value="6659.42396808" />
+<element name="Equipment" type="varchar(45)" auto="" value="Solar thermal system" />
+<element name="FETel_j" type="double" auto="" value="6659.42396808" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="ST_C0" type="double" auto="" value="0.76" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="2" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="0.0" />
+<element name="Price" type="double" auto="" value="97295.4612277" />
+<element name="ST_K50L" type="double" auto="" value="0.94" />
+<element name="HCGTEffReal" type="double" auto="" value="100.0" />
+<element name="ST_K50T" type="double" auto="" value="1.1" />
+<element name="OandMfix" type="double" auto="" value="1749.3" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="Evacuated tube collector" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7354" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="TurnKeyPrice" type="double" auto="" value="291886.383683" />
+<element name="USHj" type="double" auto="" value="665942.396808" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="ST_Volume" type="double" auto="" value="35.0" />
+<element name="Model" type="varchar(45)" auto="" value="ETCEinstein" />
+<element name="EquipType" type="varchar(45)" auto="" value="solar thermal (evacuated tubes)" />
+<element name="HCGPnom" type="double" auto="" value="490.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="HTilted" type="double" auto="" value="1635.6066789" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="ST_SysEff" type="double" auto="" value="0.9" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="1359.06611594" />
+<element name="ST_C1" type="double" auto="" value="1.2" />
+</row>
+<row n="2">
+<element name="YearManufact" type="int(11)" auto="" value="2008" />
+<element name="FETj" type="double" auto="" value="69514.9524376" />
+<element name="DatabaseNameSelection" type="varchar(45)" auto="" value="DBHeatPump" />
+<element name="Equipment" type="varchar(45)" auto="" value="New heat pump 1" />
+<element name="FETel_j" type="double" auto="" value="69514.9524376" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="15" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="0.0" />
+<element name="HCGTEffReal" type="double" auto="" value="4.57796889945" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.482" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="compression" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7353" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="1" />
+<element name="USHj" type="double" auto="" value="318237.290306" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="EquipType" type="varchar(45)" auto="" value="compression heat pump" />
+<element name="HCGPnom" type="double" auto="" value="2000.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="HCGTEfficiency" type="double" auto="" value="3.28" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="159.118645153" />
+</row>
+<row n="3">
+<element name="TMaxSupply" type="double" auto="" value="140.0" />
+<element name="FETj" type="double" auto="" value="1226765.58016" />
+<element name="Equipment" type="varchar(45)" auto="" value="New boiler 2" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="64" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="1226765.58016" />
+<element name="HCGTEffReal" type="double" auto="" value="0.91" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="steam boiler" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7352" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="1116356.67795" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="Try6" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="800.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="2" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.91" />
+<element name="EqNo" type="int(11)" auto="" value="2" />
+<element name="PartLoad" type="double" auto="" value="1395.44584744" />
+</row>
+<row n="4">
+<element name="TMaxSupply" type="double" auto="" value="140.0" />
+<element name="FETj" type="double" auto="" value="1576476.88819" />
+<element name="Equipment" type="varchar(45)" auto="" value="New boiler 3" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="64" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="1576476.88819" />
+<element name="HCGTEffReal" type="double" auto="" value="0.91" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="steam boiler" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7351" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="1434593.96826" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="Try6" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="800.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.91" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="1793.24246032" />
+</row>
+<row n="5">
+<element name="NDaysEq" type="double" auto="" value="260.0" />
+<element name="Equipment" type="varchar(45)" auto="" value="Boiler 1" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="ElectriConsum" type="double" auto="" value="0.0" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7355" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="3200.0" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="      3159" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="HPerDayEq" type="double" auto="" value="10.0" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.8" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+</row>
+<row n="6">
+<element name="NDaysEq" type="double" auto="" value="260.0" />
+<element name="FETj" type="double" auto="" value="2728847.22222" />
+<element name="Equipment" type="varchar(45)" auto="" value="Boiler 1" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="ExcessAirRatio" type="double" auto="" value="1.05" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="2728847.22222" />
+<element name="ElectriConsum" type="double" auto="" value="0.0" />
+<element name="HPerYearEq" type="double" auto="" value="2600.0" />
+<element name="FlowExhaustGas" type="double" auto="" value="7458.75251509" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7356" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="2183077.77778" />
+<element name="QHXEq" type="double" auto="" value="0.0" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FuelConsum" type="double" auto="" value="402.414486922" />
+<element name="QExhaustGas" type="double" auto="" value="651640.06614" />
+<element name="TExhaustGas" type="double" auto="" value="412.979286259" />
+<element name="Model" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="3200.0" />
+<element name="QWHEq" type="double" auto="" value="651640.06614" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="      3157" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="HPerDayEq" type="double" auto="" value="10.0" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.8" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="0.262389155983" />
+</row>
+<row n="7">
+<element name="TMaxSupply" type="double" auto="" value="140.0" />
+<element name="FETj" type="double" auto="" value="624735.001725" />
+<element name="Equipment" type="varchar(45)" auto="" value="New boiler 4" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="64" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="624735.001725" />
+<element name="HCGTEffReal" type="double" auto="" value="0.91" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="steam boiler" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7357" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="568508.85157" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="Try6" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="800.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="3" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.91" />
+<element name="EqNo" type="int(11)" auto="" value="3" />
+<element name="PartLoad" type="double" auto="" value="710.636064463" />
+</row>
+<row n="8">
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="ST_C2" type="double" auto="" value="0.008" />
+<element name="FETj" type="double" auto="" value="6659.22554509" />
+<element name="Equipment" type="varchar(45)" auto="" value="Solar thermal system" />
+<element name="FETel_j" type="double" auto="" value="6659.22554509" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="ST_C0" type="double" auto="" value="0.76" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="2" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="0.0" />
+<element name="Price" type="double" auto="" value="97295.4612277" />
+<element name="ST_K50L" type="double" auto="" value="0.94" />
+<element name="HCGTEffReal" type="double" auto="" value="100.0" />
+<element name="ST_K50T" type="double" auto="" value="1.1" />
+<element name="OandMfix" type="double" auto="" value="1749.3" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="Evacuated tube collector" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7358" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="TurnKeyPrice" type="double" auto="" value="291886.383683" />
+<element name="USHj" type="double" auto="" value="665922.554509" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="ST_Volume" type="double" auto="" value="35.0" />
+<element name="Model" type="varchar(45)" auto="" value="ETCEinstein" />
+<element name="EquipType" type="varchar(45)" auto="" value="solar thermal (evacuated tubes)" />
+<element name="HCGPnom" type="double" auto="" value="490.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="HTilted" type="double" auto="" value="1635.6066789" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="ST_SysEff" type="double" auto="" value="0.9" />
+<element name="EqNo" type="int(11)" auto="" value="2" />
+<element name="PartLoad" type="double" auto="" value="1359.02562145" />
+<element name="ST_C1" type="double" auto="" value="1.2" />
+</row>
+<row n="9">
+<element name="YearManufact" type="int(11)" auto="" value="2008" />
+<element name="FETj" type="double" auto="" value="69078.847478" />
+<element name="DatabaseNameSelection" type="varchar(45)" auto="" value="DBHeatPump" />
+<element name="Equipment" type="varchar(45)" auto="" value="New heat pump 1" />
+<element name="FETel_j" type="double" auto="" value="69078.847478" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="15" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="0.0" />
+<element name="HCGTEffReal" type="double" auto="" value="2.89759556628" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.482" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="compression" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7359" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="1" />
+<element name="USHj" type="double" auto="" value="200162.562176" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="EquipType" type="varchar(45)" auto="" value="compression heat pump" />
+<element name="HCGPnom" type="double" auto="" value="2000.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="2" />
+<element name="HCGTEfficiency" type="double" auto="" value="3.28" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="100.081281088" />
+</row>
+<row n="10">
+<element name="TMaxSupply" type="double" auto="" value="140.0" />
+<element name="FETj" type="double" auto="" value="844672.056535" />
+<element name="Equipment" type="varchar(45)" auto="" value="New boiler 1" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="EquipIDFromDB" type="int(10) unsigned" auto="" value="64" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="844672.056535" />
+<element name="HCGTEffReal" type="double" auto="" value="0.91" />
+<element name="EquipTypeFromDB" type="varchar(45)" auto="" value="steam boiler" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7360" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="768651.571447" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="NumEquipUnits" type="int(11)" auto="" value="1" />
+<element name="Model" type="varchar(45)" auto="" value="Try6" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="800.0" />
+<element name="Manufact" type="varchar(45)" auto="" value="Einstein" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="" />
+<element name="CascadeIndex" type="int(11)" auto="" value="2" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.91" />
+<element name="EqNo" type="int(11)" auto="" value="2" />
+<element name="PartLoad" type="double" auto="" value="960.814464309" />
+</row>
+<row n="11">
+<element name="NDaysEq" type="double" auto="" value="260.0" />
+<element name="FETj" type="double" auto="" value="1793242.46032" />
+<element name="Equipment" type="varchar(45)" auto="" value="Boiler 1" />
+<element name="FETel_j" type="double" auto="" value="0.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="QHXj" type="double" auto="" value="0.0" />
+<element name="ExcessAirRatio" type="double" auto="" value="1.05" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="FETFuel_j" type="double" auto="" value="1793242.46032" />
+<element name="HCGTEffReal" type="double" auto="" value="0.8" />
+<element name="ElectriConsum" type="double" auto="" value="0.0" />
+<element name="HPerYearEq" type="double" auto="" value="2600.0" />
+<element name="FlowExhaustGas" type="double" auto="" value="7458.75251509" />
+<element name="QGenerationHC_ID" type="int(10) unsigned" auto="auto_increment" value="7361" />
+<element name="FETHeat_j" type="double" auto="" value="0.0" />
+<element name="QWHj" type="double" auto="" value="0.0" />
+<element name="IsSelectedFromDB" type="tinyint(4)" auto="" value="0" />
+<element name="USHj" type="double" auto="" value="1434593.96826" />
+<element name="QHXEq" type="double" auto="" value="0.0" />
+<element name="DBFuel_id" type="int(10) unsigned" auto="" value="1" />
+<element name="FuelConsum" type="double" auto="" value="402.414486922" />
+<element name="QExhaustGas" type="double" auto="" value="651640.06614" />
+<element name="TExhaustGas" type="double" auto="" value="412.979286259" />
+<element name="Model" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="EquipType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="HCGPnom" type="double" auto="" value="3200.0" />
+<element name="QWHEq" type="double" auto="" value="651640.06614" />
+<element name="PipeDuctEquip" type="varchar(45)" auto="" value="      3158" />
+<element name="CascadeIndex" type="int(11)" auto="" value="1" />
+<element name="HPerDayEq" type="double" auto="" value="10.0" />
+<element name="HCGTEfficiency" type="double" auto="" value="0.8" />
+<element name="EqNo" type="int(11)" auto="" value="1" />
+<element name="PartLoad" type="double" auto="" value="448.31061508" />
+</row>
+</table>
+<!-- table qheatexchanger has no values for id=164 -->
+<table name="qprocessdata">
+<row n="1">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3436" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="2">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3437" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="3">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3438" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="4">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3439" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="5">
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3440" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="6">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3441" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+<row n="7">
+<element name="UPH_SEC" type="double" auto="" value="81.4722222223" />
+<element name="QEvapProc" type="double" auto="" value="0.0" />
+<element name="ProcType" type="varchar(45)" auto="" value="continuous" />
+<element name="VolProcMed" type="double" auto="" value="0.0" />
+<element name="UPHProc" type="double" auto="" value="2118277.77778" />
+<element name="DBUnitOperation_id" type="int(10) unsigned" auto="" value="2002" />
+<element name="TEnvProc" type="double" auto="" value="18.0" />
+<element name="QOpProc" type="double" auto="" value="0.0" />
+<element name="HPerDayProc" type="double" auto="" value="10.0" />
+<element name="NDaysProc" type="double" auto="" value="260.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="PT" type="double" auto="" value="80.0" />
+<element name="EL_SEC" type="double" auto="" value="0.0" />
+<element name="PE_SEC" type="double" auto="" value="0.0" />
+<element name="HeatRecOK" type="varchar(4)" auto="" value="Yes" />
+<element name="PTInFlowRec" type="double" auto="" value="10.0" />
+<element name="PipeDuctProc" type="varchar(45)" auto="" value="hot water piping" />
+<element name="VInFlowDay" type="double" auto="" value="100.0" />
+<element name="PTOutFlowRec" type="double" auto="" value="50.0" />
+<element name="UPHcGross" type="double" auto="" value="2118277.77778" />
+<element name="UAProc" type="double" auto="" value="0.0" />
+<element name="QHXProc" type="double" auto="" value="0.0" />
+<element name="QProcessData_ID" type="int(10) unsigned" auto="auto_increment" value="3442" />
+<element name="PTFinal" type="double" auto="" value="0.0" />
+<element name="QWHProc" type="double" auto="" value="1513055.55556" />
+<element name="SupplyMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="ProcMedOut" type="int(11)" auto="" value="1" />
+<element name="ProcMedDBFluid_id" type="int(10) unsigned" auto="" value="1" />
+<element name="HPerYearProc" type="double" auto="" value="2600.0" />
+<element name="PTOutFlow" type="double" auto="" value="50.0" />
+<element name="UPHm" type="double" auto="" value="0.0" />
+<element name="PTStartUp" type="double" auto="" value="0.0" />
+<element name="Process" type="varchar(45)" auto="" value="Hot water" />
+<element name="PTInFlow" type="double" auto="" value="10.0" />
+<element name="QHXProcInt" type="double" auto="" value="0.0" />
+<element name="UPH" type="double" auto="" value="2118277.77778" />
+<element name="UPHc" type="double" auto="" value="2118277.77778" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="NBatch" type="double" auto="" value="1.0" />
+<element name="HBatch" type="double" auto="" value="10.0" />
+<element name="UPHs" type="double" auto="" value="0.0" />
+<element name="ProcNo" type="int(11)" auto="" value="1" />
+<element name="UPHw" type="double" auto="" value="1513055.55556" />
+<element name="VOutFlow" type="double" auto="" value="100.0" />
+</row>
+</table>
+<table name="qproduct">
+<row n="1">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="68.9345182558" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="378.605680242" />
+<element name="FUEL_SEC" type="double" auto="" value="156.183750431" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2939" />
+</row>
+<row n="2">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2940" />
+</row>
+<row n="3">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="FUEL_SEC" type="double" auto="" value="1000000.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2941" />
+</row>
+<row n="4">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="FUEL_SEC" type="double" auto="" value="1000000.0" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2942" />
+</row>
+<row n="5">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2943" />
+</row>
+<row n="6">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="100.0" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="1286.28335318" />
+<element name="FUEL_SEC" type="double" auto="" value="896.62123016" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2944" />
+</row>
+<row n="7">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="103.329711984" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="774.558767046" />
+<element name="FUEL_SEC" type="double" auto="" value="422.336028268" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2945" />
+</row>
+<row n="8">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="51.664855992" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="387.279383523" />
+<element name="FUEL_SEC" type="double" auto="" value="211.168014134" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2946" />
+</row>
+<row n="9">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="134.757476219" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="1078.99349775" />
+<element name="FUEL_SEC" type="double" auto="" value="613.382790082" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2947" />
+</row>
+<row n="10">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="67.3787381094" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="539.496748873" />
+<element name="FUEL_SEC" type="double" auto="" value="306.691395041" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2948" />
+</row>
+<row n="11">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="100.0" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="1167.06228851" />
+<element name="FUEL_SEC" type="double" auto="" value="788.238444096" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2949" />
+</row>
+<row n="12">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="50.0" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="583.531144253" />
+<element name="FUEL_SEC" type="double" auto="" value="394.119222048" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2950" />
+</row>
+<row n="13">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Milk" />
+<element name="EL_SEC" type="double" auto="" value="137.869036512" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="757.211360484" />
+<element name="FUEL_SEC" type="double" auto="" value="312.367500863" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="QProdYear" type="double" auto="" value="1000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2951" />
+</row>
+<row n="14">
+<element name="FuelProd" type="double" auto="" value="1000000.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="Product" type="varchar(45)" auto="" value="Cheese" />
+<element name="EL_SEC" type="double" auto="" value="50.0" />
+<element name="ProdUnit" type="varchar(45)" auto="" value="t" />
+<element name="PE_SEC" type="double" auto="" value="643.141676588" />
+<element name="FUEL_SEC" type="double" auto="" value="448.31061508" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="QProdYear" type="double" auto="" value="2000.0" />
+<element name="QProduct_ID" type="int(10) unsigned" auto="auto_increment" value="2952" />
+</row>
+</table>
+<table name="qrenewables">
+<row n="1">
+<element name="PriceBiomassRegion" type="double" auto="" value="0.0" />
+<element name="LCVBiomassProc" type="double" auto="" value="0.0" />
+<element name="Latitude" type="double" auto="" value="41.4" />
+<element name="ST_I" type="double" auto="" value="1470.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="TAmb" type="double" auto="" value="18.0" />
+<element name="NDaysBiomassProc" type="double" auto="" value="0.0" />
+<element name="HumidBiomassProc" type="double" auto="" value="0.0" />
+<element name="QBiomassProcDay" type="double" auto="" value="0.0" />
+<element name="SpaceBiomassProc" type="double" auto="" value="0.0" />
+<element name="NDaysBiomassRegion" type="double" auto="" value="0.0" />
+<element name="QRenewables_ID" type="int(10) unsigned" auto="auto_increment" value="25" />
+</row>
+</table>
+<table name="qsurfarea">
+<row n="1">
+<element name="SurfArea" type="double" auto="" value="2000.0" />
+<element name="ProjectID" type="int(10) unsigned" auto="" value="164" />
+<element name="SurfAreaNo" type="int(11)" auto="" value="1" />
+<element name="SurfAreaName" type="varchar(45)" auto="" value="Roof Hall 1" />
+<element name="id" type="int(10) unsigned" auto="auto_increment" value="89" />
+</row>
+</table>
+<table name="questionnaire">
+<row n="1">
+<element name="City" type="varchar(45)" auto="" value="Barcelona" />
+<element name="BaseYear" type="int(11)" auto="" value="2008" />
+<element name="Role" type="varchar(45)" auto="" value="Director" />
+<element name="Branch" type="varchar(100)" auto="" value="food industry" />
+<element name="Email" type="varchar(45)" auto="" value="info@energyxperts.net" />
+<element name="Independent" type="tinyint(4)" auto="" value="0" />
+<element name="Fax" type="varchar(45)" auto="" value="(+34) 93 788 31 10" />
+<element name="NBuild" type="int(11)" auto="" value="1" />
+<element name="Phone" type="varchar(45)" auto="" value="(+34) 697 267 280" />
+<element name="Address" type="varchar(200)" auto="" value="Creu dels Molers 15, 2-1
+08003 Barcelona (Spa" />
+<element name="ProdCost" type="double" auto="" value="4.6" />
+<element name="PSetUpData_id" type="int(10) unsigned" auto="" value="0" />
+<element name="Name" type="varchar(45)" auto="" value="EINSTEIN Guide 41 Auto-Pilot Results" />
+<element name="NShifts" type="double" auto="" value="2.0" />
+<element name="NEmployees" type="int(11)" auto="" value="100" />
+<element name="Contact" type="varchar(45)" auto="" value="Hans Schweiger" />
+<element name="NDaysInd" type="double" auto="" value="260.0" />
+<element name="Turnover" type="double" auto="" value="5.2" />
+<element name="Questionnaire_ID" type="int(10) unsigned" auto="auto_increment" value="164" />
+<element name="Growth" type="double" auto="" value="5.0" />
+<element name="HPerDayInd" type="double" auto="" value="10.0" />
+<element name="DescripIndustry" type="varchar(200)" auto="" value="EINSTEIN Audit Guide Chapter 4.1: EINSTEIN Container Washing. Results of Auto-Pilot." />
+</row>
+</table>
+<!-- table qwasteheatelequip has no values for id=164 -->
+<table name="salternatives">
+<row n="1">
+<element name="StatusEnergy" type="int(11)" auto="" value="0" />
+<element name="Description" type="varchar(100)" auto="" value="original data as submitted by industry" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1724" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="ShortName" type="varchar(45)" auto="" value="present state (original)" />
+</row>
+<row n="2">
+<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="Description" type="varchar(100)" auto="" value="complete data set for present state after
+ cross-checking and data estimation" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1725" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="ShortName" type="varchar(45)" auto="" value="Present State (checked)" />
+</row>
+<row n="3">
+<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="Description" type="varchar(100)" auto="" value="EINSTEIN default design of heat recovery system" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1726" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="ShortName" type="varchar(45)" auto="" value="Heat recovery (HR)" />
+</row>
+<row n="4">
+<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="Description" type="varchar(100)" auto="" value="EINSTEIN default design of a solar thermal system" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1727" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="ShortName" type="varchar(45)" auto="" value="Solar thermal" />
+</row>
+<row n="5">
+<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="Description" type="varchar(100)" auto="" value="EINSTEIN default design of a heat pump based system" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1728" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="ShortName" type="varchar(45)" auto="" value="Heat pump" />
+</row>
+<row n="6">
+<element name="StatusEnergy" type="int(11)" auto="" value="1" />
+<element name="Description" type="varchar(100)" auto="" value="EINSTEIN default design of a new boiler cascade" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1729" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="ShortName" type="varchar(45)" auto="" value="Boiler cascade" />
+</row>
+<row n="7">
+<element name="StatusEnergy" type="int(11)" auto="" value="0" />
+<element name="Description" type="varchar(100)" auto="" value="EINSTEIN default design of a new boiler cascade" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="SAlternative_ID" type="int(10) unsigned" auto="auto_increment" value="1730" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="ShortName" type="varchar(45)" auto="" value="EINSTEIN Super Mix" />
+</row>
+</table>
+<table name="sproject">
+<row n="1">
+<element name="StatusQ" type="int(11)" auto="" value="1" />
+<element name="StatusR" type="int(11)" auto="" value="0" />
+<element name="UnitsReport" type="varchar(45)" auto="" value="SI-kWh" />
+<element name="ProjectID" type="int(11)" auto="" value="164" />
+<element name="ActiveAlternative" type="int(11)" auto="" value="5" />
+<element name="Auditor_ID" type="int(11)" auto="" value="1" />
+<element name="SProject_ID" type="int(10) unsigned" auto="auto_increment" value="147" />
+<element name="NoOfAlternatives" type="int(11)" auto="" value="5" />
+<element name="StatusCC" type="int(11)" auto="" value="1" />
+<element name="StatusCA" type="int(11)" auto="" value="0" />
+<element name="WriteProtected" type="int(11)" auto="" value="0" />
+<element name="LanguageReport" type="varchar(45)" auto="" value="english" />
+</row>
+</table>
+<!-- table stool ignored -->
+<!-- table tcacontingencies ignored -->
+<!-- table tcadetailedopcost ignored -->
+<!-- table tcadetailedrevenue ignored -->
+<!-- table tcaenergy ignored -->
+<!-- table tcageneraldata has no values for id=164 -->
+<!-- table tcainvestments ignored -->
+<!-- table tcanonreoccuringcosts ignored -->
+<table name="uheatpump">
+<row n="1">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="992" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+</row>
+<row n="2">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="993" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+</row>
+<row n="3">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="1" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="994" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+</row>
+<row n="4">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="2" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="STCollType" type="varchar(45)" auto="" value="any" />
+<element name="STSolFra" type="double" auto="" value="0.5" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="995" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+<element name="STMinYield" type="double" auto="" value="300.0" />
+</row>
+<row n="5">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="3" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="996" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+</row>
+<row n="6">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="4" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="997" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+</row>
+<row n="7">
+<element name="UHPDTMax" type="double" auto="" value="60.0" />
+<element name="UHPType" type="varchar(45)" auto="" value="compression" />
+<element name="BBFuelType" type="varchar(45)" auto="" value="Natural Gas" />
+<element name="AlternativeProposalNo" type="int(11)" auto="" value="5" />
+<element name="BBSafety" type="double" auto="" value="10.0" />
+<element name="UHPMaintain" type="tinyint(4)" auto="" value="0" />
+<element name="UHPTgenIn" type="double" auto="" value="90.0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="164" />
+<element name="UHPminT" type="double" auto="" value="-10.0" />
+<element name="BBPmin" type="double" auto="" value="500.0" />
+<element name="BBHOp" type="double" auto="" value="100.0" />
+<element name="UHPmaxT" type="double" auto="" value="80.0" />
+<element name="STCollType" type="varchar(45)" auto="" value="any" />
+<element name="STSolFra" type="double" auto="" value="0.5" />
+<element name="BBEff" type="double" auto="" value="85.0" />
+<element name="BBRedundancy" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="BBMaintain" type="tinyint(3) unsigned" auto="" value="0" />
+<element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="998" />
+<element name="UHPMinHop" type="double" auto="" value="100.0" />
+<element name="STMinYield" type="double" auto="" value="300.0" />
+</row>
+</table>
+<table name="dbfuel">
+<row n="1">
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="NG" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Natural gas" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="FuelLCV" type="double" auto="" value="9.94" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool; rough estimates for other data -> to be updated" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="FuelDensity" type="double" auto="" value="999.999" />
+</row>
+</table>
+<table name="dbfluid">
+<row n="1">
+<element name="FluidName" type="varchar(45)" auto="" value="Water" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="4.19" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="TCond" type="double" auto="" value="999.0" />
+<element name="LatentHeat" type="double" auto="" value="0.0" />
+</row>
+</table>
+<table name="auditor">
+<row n="1">
+<element name="City" type="varchar(45)" auto="" value="Barcelona" />
+<element name="Fax" type="varchar(45)" auto="" value="(+34) 93 788 31 10" />
+<element name="Name" type="varchar(45)" auto="" value="Hans Schweiger" />
+<element name="Web" type="varchar(45)" auto="" value="www.energyxperts.net" />
+<element name="Country" type="varchar(45)" auto="" value="Spain" />
+<element name="Company" type="varchar(45)" auto="" value="energyXperts.BCN" />
+<element name="Phone" type="varchar(45)" auto="" value="(+34) 697 267 280" />
+<element name="Auditor_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="Adress" type="varchar(100)" auto="" value="Creu dels Molers 15, 2-1, 08004 Barcelona" />
+<element name="EMail" type="varchar(45)" auto="" value="info@energyxperts.net" />
+<element name="CompanyType" type="varchar(45)" auto="" value="EINSTEIN Developer" />
+</row>
+</table>
+</EinsteinProject>

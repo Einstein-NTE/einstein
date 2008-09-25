@@ -3,42 +3,42 @@
 <!-- table auditor ignored -->
 <table name="cgeneraldata">
 <row n="1">
-<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
-<element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="NFuels" type="int(11)" auto="" value="1" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1442" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="NThProc" type="int(11)" auto="" value="3" />
 <element name="NEquipe" type="int(11)" auto="" value="2" />
-<element name="FEC" type="double" auto="" value="10000000.0038" />
-<element name="FET" type="double" auto="" value="10000000.0079" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="NPipeDuct" type="int(11)" auto="" value="3" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="-1" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="ElectricitySales" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1442" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
+<element name="FET" type="double" auto="" value="10000000.0079" />
+<element name="FEC" type="double" auto="" value="10000000.0038" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="NThProc" type="int(11)" auto="" value="3" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 </row>
 <row n="2">
-<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
-<element name="ElectricitySales" type="double" auto="" value="0.0" />
-<element name="NFuels" type="int(11)" auto="" value="1" />
-<element name="PE_INT" type="double" auto="" value="3.44496153846" />
-<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1576" />
-<element name="UPH" type="double" auto="" value="6009014.24964" />
-<element name="ElectricityGen" type="double" auto="" value="0.0" />
-<element name="NThProc" type="int(11)" auto="" value="3" />
-<element name="FETel" type="double" auto="" value="0.0" />
 <element name="NEquipe" type="int(11)" auto="" value="2" />
-<element name="FECel" type="double" auto="" value="400000.0" />
-<element name="FEOel" type="double" auto="" value="400000.0" />
-<element name="FEC" type="double" auto="" value="7999342.09799" />
-<element name="FEO" type="double" auto="" value="0.0" />
-<element name="FET" type="double" auto="" value="7999342.09799" />
-<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
-<element name="EL_INT" type="double" auto="" value="0.192307692308" />
 <element name="NPipeDuct" type="int(11)" auto="" value="3" />
 <element name="USH" type="double" auto="" value="6627518.89855" />
+<element name="FEOel" type="double" auto="" value="400000.0" />
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
+<element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
+<element name="UPH" type="double" auto="" value="6009014.24964" />
+<element name="FUEL_INT" type="double" auto="" value="2.60730769231" />
+<element name="ElectricitySales" type="double" auto="" value="0.0" />
+<element name="FEO" type="double" auto="" value="0.0" />
+<element name="CGeneralData_ID" type="int(10) unsigned" auto="auto_increment" value="1576" />
+<element name="EL_INT" type="double" auto="" value="0.192307692308" />
+<element name="FET" type="double" auto="" value="7999342.09799" />
+<element name="FEC" type="double" auto="" value="7999342.09799" />
+<element name="FECel" type="double" auto="" value="400000.0" />
+<element name="ElectricityGen" type="double" auto="" value="0.0" />
+<element name="NFuels" type="int(11)" auto="" value="1" />
+<element name="NThProc" type="int(11)" auto="" value="3" />
+<element name="FETel" type="double" auto="" value="0.0" />
+<element name="PE_INT" type="double" auto="" value="3.44496153846" />
 </row>
 </table>
 <!-- table dbbenchmark ignored -->
@@ -103,7 +103,6 @@
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="2978" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
-<element name="UDistPipe" type="double" auto="" value="0.151490510056" />
 <element name="UPHProcm" type="double" auto="" value="1303704.84686" />
 <element name="USHPipe" type="double" auto="" value="1507922.07878" />
 <element name="QWHPipe" type="double" auto="" value="0.0" />
@@ -120,6 +119,7 @@
 <element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
 <element name="DistribCircFlow" type="double" auto="" value="1800.0" />
 <element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.151490510056" />
 </row>
 <row n="2">
 <element name="PipeDuctNo" type="int(11)" auto="" value="3" />
@@ -180,7 +180,6 @@
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="2979" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
-<element name="UDistPipe" type="double" auto="" value="0.100546950317" />
 <element name="UPHProcm" type="double" auto="" value="4309573.79152" />
 <element name="USHPipe" type="double" auto="" value="4444763.96085" />
 <element name="QWHPipe" type="double" auto="" value="0.0" />
@@ -197,6 +196,7 @@
 <element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
 <element name="DistribCircFlow" type="double" auto="" value="10000.0" />
 <element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.100546950317" />
 </row>
 <row n="6">
 <element name="PipeDuctNo" type="int(11)" auto="" value="2" />
@@ -206,7 +206,6 @@
 <element name="AlternativeProposalNo" type="int(11)" auto="" value="0" />
 <element name="QDistributionHC_ID" type="int(10) unsigned" auto="auto_increment" value="2980" />
 <element name="Questionnaire_id" type="int(10) unsigned" auto="" value="150" />
-<element name="UDistPipe" type="double" auto="" value="0.151312932075" />
 <element name="UPHProcm" type="double" auto="" value="398125.043102" />
 <element name="USHPipe" type="double" auto="" value="604331.86637" />
 <element name="QWHPipe" type="double" auto="" value="0.0" />
@@ -223,6 +222,7 @@
 <element name="IsAlternative" type="tinyint(4)" auto="" value="0" />
 <element name="DistribCircFlow" type="double" auto="" value="1200.0" />
 <element name="QHXPipe" type="double" auto="" value="0.0" />
+<element name="UAPipe" type="double" auto="" value="0.151312932075" />
 </row>
 </table>
 <table name="qelectricity">
@@ -685,7 +685,7 @@
 <element name="Fax" type="varchar(45)" auto="" value="(+34) 93 788 31 10" />
 <element name="NBuild" type="int(11)" auto="" value="1" />
 <element name="Phone" type="varchar(45)" auto="" value="(+34) 697 267 280" />
-<element name="Address" type="varchar(45)" auto="" value="Creu dels Molers 15, 2-1 08003 Barcelona (Spa" />
+<element name="Address" type="varchar(200)" auto="" value="Creu dels Molers 15, 2-1 08003 Barcelona (Spa" />
 <element name="ProdCost" type="double" auto="" value="4.6" />
 <element name="PSetUpData_id" type="int(10) unsigned" auto="" value="0" />
 <element name="Name" type="varchar(45)" auto="" value="EINSTEIN Guide 42 BaseCase" />
@@ -736,6 +736,13 @@
 </row>
 </table>
 <!-- table stool ignored -->
+<!-- table tcacontingencies ignored -->
+<!-- table tcadetailedopcost ignored -->
+<!-- table tcadetailedrevenue ignored -->
+<!-- table tcaenergy ignored -->
+<!-- table tcageneraldata has no values for id=150 -->
+<!-- table tcainvestments ignored -->
+<!-- table tcanonreoccuringcosts ignored -->
 <table name="uheatpump">
 <row n="1">
 <element name="UHPDTMax" type="double" auto="" value="60.0" />
@@ -780,6 +787,75 @@
 <element name="UHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="712" />
 <element name="UHPMinHop" type="double" auto="" value="500.0" />
 <element name="STMinYield" type="double" auto="" value="500.0" />
+</row>
+</table>
+<table name="dbfuel">
+<row n="1">
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="NG" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Natural gas" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="m3" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="FuelLCV" type="double" auto="" value="9.94" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool; rough estimates for other data -> to be updated" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="FuelDensity" type="double" auto="" value="999.999" />
+</row>
+</table>
+<table name="dbfluid">
+<row n="1">
+<element name="FluidName" type="varchar(45)" auto="" value="Water" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="4.19" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="TCond" type="double" auto="" value="999.0" />
+<element name="LatentHeat" type="double" auto="" value="0.0" />
+</row>
+<row n="2">
+<element name="FluidName" type="varchar(45)" auto="" value="Steam_7bar" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="20.05" />
+<element name="SensibleHeat" type="double" auto="" value="700.0" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="TCond" type="double" auto="" value="999.0" />
+<element name="LatentHeat" type="double" auto="" value="2067.0" />
+</row>
+<row n="3">
+<element name="FluidName" type="varchar(45)" auto="" value="R134a" />
+<element name="FluidCp" type="double" auto="" value="1.136" />
+<element name="SensibleHeat" type="double" auto="" value="26.94" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="SpecificMassFlow" type="double" auto="" value="0.0071" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: JR 2008/07" />
+<element name="THighP" type="double" auto="" value="68.7" />
+<element name="TCond" type="double" auto="" value="45.0" />
+<element name="RefrigerantCode" type="varchar(6)" auto="" value="R134a" />
+<element name="LatentHeat" type="double" auto="" value="157.52" />
+</row>
+<row n="4">
+<element name="FluidName" type="varchar(45)" auto="" value="Milk" />
+<element name="FluidDensity" type="double" auto="" value="1035.0" />
+<element name="FluidCp" type="double" auto="" value="3.935" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="9" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: Uni Roma August 2008" />
+</row>
+</table>
+<table name="auditor">
+<row n="1">
+<element name="City" type="varchar(45)" auto="" value="Barcelona" />
+<element name="Fax" type="varchar(45)" auto="" value="(+34) 93 788 31 10" />
+<element name="Name" type="varchar(45)" auto="" value="Hans Schweiger" />
+<element name="Web" type="varchar(45)" auto="" value="www.energyxperts.net" />
+<element name="Country" type="varchar(45)" auto="" value="Spain" />
+<element name="Company" type="varchar(45)" auto="" value="energyXperts.BCN" />
+<element name="Phone" type="varchar(45)" auto="" value="(+34) 697 267 280" />
+<element name="Auditor_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="Adress" type="varchar(100)" auto="" value="Creu dels Molers 15, 2-1, 08004 Barcelona" />
+<element name="EMail" type="varchar(45)" auto="" value="info@energyxperts.net" />
+<element name="CompanyType" type="varchar(45)" auto="" value="EINSTEIN Developer" />
 </row>
 </table>
 </EinsteinProject>
