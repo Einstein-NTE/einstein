@@ -232,13 +232,13 @@ class PanelTCAInvestment(wx.Panel):
         self.description = _("")
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)       
-        self.display()              
+        #self.display()              
         
     def display(self):
-        if (Status.ANo == 0):
-            wx.MessageBox("There are no investments to enter for the current process. \n Please proceed with Energy and Operating costs")
+        if (Status.ANo == 0):            
+            wx.MessageBox("There are no investments to enter for the current process. \n Please proceed with Energy and Operating costs")                        
             self.Hide()
-            self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)
+            self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)            
         else:          
             self.mod.updatePanel()  
             #Revenue-----------------------------------------------------

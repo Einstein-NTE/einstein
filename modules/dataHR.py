@@ -17,9 +17,10 @@
 #   Version No.: 0.01
 #   Created by:         Florian Joebstl  02/09/2008
 #   Last revised by:
-#                       Florian Joebstl  02/09/2008                       
+#                       Florian Joebstl  25/09/2008                       
 #
 #   Changes to previous version:
+#       25/09/08   FJ   getStreamsFromHiddenHX added
 #
 #
 #   
@@ -55,11 +56,12 @@ class HRData:
     def loadDatabaseData(self):
         self.__loadHEX()
           
-    def loadFromDocument(self,doc):
+    def loadFromDocument(self,doc,overrideHX = False):
     # doc is a XMLDocHRModuleImport Document (importHR.py)
         
         #stores HEXers from document to database
-        self.__storeNewHX(doc.hexdatabase)
+        if (overrideHX):
+            self.__storeNewHX(doc.hexdatabase)
         #loads Streams, Curves from document to HRData
         self.__loadStreams(doc.streamdatabase)
         self.__loadCurves(doc.curvedatabase)
@@ -106,7 +108,7 @@ class HRData:
                 self.curves.append(newcurve)
     
     def deleteHex(self,index):   
-    #deletes a specific HEX in db and reloads          
+    #deletes a specific HEX in db and reloads list of hx          
          try:
              hx = self.hexers[index]
              print "deleting hx "+ str(hx["QHeatExchanger_ID"])
@@ -118,6 +120,10 @@ class HRData:
     
     def deleteHexAndGenStreams(self,index):
     #delets a HEX and add a hot and cold stream into the stream list
+    #
+    # NOT USED ANYMORE - hx should not be deleted but temporarily hidden
+    # see: getStreamsFromHiddenHX(hidden)
+    #
         try:
             if (index < 0)or(index >= len(self.hexers)):
                 return
@@ -135,6 +141,23 @@ class HRData:
         except:
             logError(_("Generating new streams failed."))
             
+    def getStreamsFromHiddenHX(self,indizesOfHiddenHX):
+        try:
+            streamsFromHiddenHX = [ ]
+            for index in indizesOfHiddenHX:
+                if not((index < 0)or(index >= len(self.hexers))):
+                    hx = self.hexers[index]
+                    hot = Stream()
+                    hot.generateHotStreamFromHEX(hx)
+                    cold = Stream()
+                    cold.generateColdStreamFromHEX(hx)
+            
+                    streamsFromHiddenHX.append(hot)
+                    streamsFromHiddenHX.append(cold)   
+            return streamsFromHiddenHX
+        except:
+            logError(_("Generating streams for hidden HX failed"))
+            return []
 #--------------------------------------------------------------------------------------------
 # class representing a Stream
 #--------------------------------------------------------------------------------------------

@@ -31,63 +31,101 @@
 #
 #==============================================================================
 
-from einstein.GUI.graphics import drawPiePlot
-import einstein.modules.matPanel as Mp
-from matplotlib.ticker import MaxNLocator
-from einstein.modules.calculationTCA import *
+#from einstein.GUI.graphics import drawPiePlot
+#import einstein.modules.matPanel as Mp
 
-def drawFigure(self):
-    if (Status.mod.moduleTCA.displayPlot == 0):
-        if (Status.mod.moduleTCA.result != None):
-            if hasattr(self, 'subplot'):
-                del self.subplot                     
-            self.subplot = self.figure.add_subplot(111)   
-            for result in Status.mod.moduleTCA.result:    
-                if (result.display == 1):  
-                    npv = [0.0] * len(result.npv)
-                    for i in xrange(0,len(result.npv)):
-                        if (result.npv[i]>0):
-                            npv[i] = result.npv[i]      
-                    self.subplot.plot(npv, label = "NPV - "+str(result.name))  
-                              
-            self.subplot.legend(loc = 0)
-            self.subplot.set_xlabel(_('time / Y'))
-            self.subplot.set_ylabel(_('NPV / EUR'))  
-    else:
-        if (Status.mod.moduleTCA.result != None):
-            if hasattr(self, 'subplot'):
-                del self.subplot
-                   
-            self.subplot = self.figure.add_subplot(111)   
-            for result in Status.mod.moduleTCA.result: 
-                if (result.display == 1):   
-                    mirr = [0.0] * len(result.mirr) 
-                    for i in xrange(0, len(result.mirr)):
-                        if result.mirr[i]>0:
-                            mirr[i] = result.mirr[i]
-                                
-                    self.subplot.plot(mirr, label = "MIRR - "+str(result.name))  
-                         
-            self.subplot.legend(loc = 0)
-            self.subplot.set_xlabel(_('time / Y'))
-            self.subplot.set_ylabel(_('MIRR / EUR'))      
+from einstein.modules.calculationTCA import *
+from einstein.modules.plotPanel import PlotPanel
+from pylab import *
+import wx
+#from matplotlib.ticker import MaxNLocator
+
+class TCAPlotPanel (PlotPanel):
+    """Plots several lines in distinct colors."""
+    def __init__( self, parent, **kwargs ):
+        self.parent = parent
+        # initiate plotter
+        PlotPanel.__init__( self, parent, **kwargs )
+        self.SetColor( (255,255,255) )
+
+    def draw( self ):
+        """Draw data."""
+        if not hasattr( self, 'subplot' ):
+            self.subplot = self.figure.add_subplot( 111 )
             
-            #yaxis = self.subplot.axes.yaxis
-            #self.subplot.axis()
-            #print [0,len(result.mirr),0,max(result.mirr)]
-            #self.subplot.axes.yaxis = yaxis
-                                        
-    
-    #self.subplot.legend()   
-    self.setSize(wx.Size(544, 312))
+        if (Status.mod.moduleTCA.result != None): 
+            if (Status.mod.moduleTCA.displayPlot == 0):  
+                self.plot("npv")
+            else:            
+                self.plot("mirr")   
+                                                                       
+    def plot(self,mode):                                  
+        results = Status.mod.moduleTCA.result
+                                                            
+        results_to_display = 0
+        for result in results: 
+            if (result.display == 1)and(result.ResultPresent):
+                results_to_display +=1  
+                if (mode == "mirr"):
+                    timeFrame = len(result.mirr)-1
+                else:
+                    timeFrame = len(result.npv)-1
+        
+        if (results_to_display == 0):
+            return
+            
+        timeStep = 5.0
+        size = int(timeFrame/timeStep)
+        
+        add_last_year = False
+        if (timeFrame % timeStep)!=0: 
+            add_last_year = True
+            size = size+1
+                         
+        ind = arange(size)  
+        width = 1.0/(results_to_display+1)
+        count = 0
+        colorcount = 0
+        ticklabls = []
+        color = ['b','g','r','y']
+        
+        for result in results:                       
+            if (result.display == 1)and(result.ResultPresent):
+                if (mode=="mirr"):
+                    original_data = result.mirr
+                    self.subplot.set_ylabel(_('MIRR / EUR')) 
+                else:
+                    original_data = result.npv
+                    self.subplot.set_ylabel(_('NPV / EUR'))                                              
+                data = [0.0] * (size)                      
+                index = 0
+                for i in xrange(0, timeFrame+1):                                                       
+                    if (i % timeStep == 0)and(i!=0):                                
+                        if original_data[i]>0:
+                            data[index] = original_data[i]
+                        ticklabls.append(_("Year ")+str(i))                                                                
+                        index = index+1                        
+                if (add_last_year):
+                    ticklabls.append(_("Year ")+str(timeFrame))
+                    data[len(data)-1] = (original_data[timeFrame-1])
+                self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = "MIRR - "+str(result.name))                        
+                count+=1  
+            colorcount+=1
+        
+        self.subplot.xaxis.set_ticklabels(ticklabls)
+        self.subplot.xaxis.set_ticks(ind+(width*count)/2)
+        if (Status.mod.moduleTCA.showlegend):
+            self.subplot.legend(loc = 4)       
+
      
 import wx
 from GUITools import *
 [wxID_PANELRESULT2, wxID_PANELRESULT2BTNADD, wxID_PANELRESULT2BTNREMOVE, 
- wxID_PANELRESULT2CHOICE1, wxID_PANELRESULT2PANEL1, wxID_PANELRESULT2RBMIRR, 
- wxID_PANELRESULT2RBNPV, wxID_PANELRESULT2STATICBOX1, 
- wxID_PANELRESULT2STATICBOX2, 
-] = [wx.NewId() for _init_ctrls in range(9)]
+ wxID_PANELRESULT2CBSHOWLEGEND, wxID_PANELRESULT2CHOICE1, 
+ wxID_PANELRESULT2PANEL1, wxID_PANELRESULT2RBMIRR, wxID_PANELRESULT2RBNPV, 
+ wxID_PANELRESULT2STATICBOX1, wxID_PANELRESULT2STATICBOX2, 
+ wxID_PANELRESULT2STATICBOX3, 
+] = [wx.NewId() for _init_ctrls in range(11)]
 
 class panelResult2(wx.Panel):
     def _init_ctrls(self, prnt):
@@ -99,31 +137,30 @@ class panelResult2(wx.Panel):
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX1,
               label=_(u'Choose the proposal(s)'), name='staticBox1',
-              parent=self, pos=wx.Point(560, 80), size=wx.Size(160, 240),
+              parent=self, pos=wx.Point(560, 136), size=wx.Size(160, 184),
               style=0)
 
         self.choice1 = wx.Choice(choices=[], id=wxID_PANELRESULT2CHOICE1,
-              name='choice1', parent=self, pos=wx.Point(568, 104),
+              name='choice1', parent=self, pos=wx.Point(568, 160),
               size=wx.Size(144, 21), style=0)
         self.choice1.Bind(wx.EVT_CHOICE, self.OnChoice1Choice,
               id=wxID_PANELRESULT2CHOICE1)
 
         self.btnAdd = wx.Button(id=wxID_PANELRESULT2BTNADD, label=_('Add'),
-              name=u'btnAdd', parent=self, pos=wx.Point(568, 136),
+              name=u'btnAdd', parent=self, pos=wx.Point(568, 192),
               size=wx.Size(144, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELRESULT2BTNADD)
 
         self.btnRemove = wx.Button(id=wxID_PANELRESULT2BTNREMOVE,
               label=_('Remove'), name=u'btnRemove', parent=self,
-              pos=wx.Point(568, 168), size=wx.Size(144, 23), style=0)
+              pos=wx.Point(568, 224), size=wx.Size(144, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_PANELRESULT2BTNREMOVE)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX2,
-              label=_(u'Please choose the parameters'), name='staticBox2',
-              parent=self, pos=wx.Point(560, 0), size=wx.Size(160, 80),
-              style=0)
+              label=_(u'Choose Figure'), name='staticBox2', parent=self,
+              pos=wx.Point(560, 0), size=wx.Size(160, 80), style=0)
 
         self.panel1 = wx.Panel(id=wxID_PANELRESULT2PANEL1, name='panel1',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(544, 312),
@@ -143,6 +180,17 @@ class panelResult2(wx.Panel):
         self.rbMIRR.Bind(wx.EVT_RADIOBUTTON, self.OnRbMIRRRadiobutton,
               id=wxID_PANELRESULT2RBMIRR)
 
+        self.cbShowLegend = wx.CheckBox(id=wxID_PANELRESULT2CBSHOWLEGEND,
+              label=_(u'Show/Hide'), name=u'cbShowLegend', parent=self,
+              pos=wx.Point(584, 104), size=wx.Size(112, 13), style=0)
+        self.cbShowLegend.SetValue(True)
+        self.cbShowLegend.Bind(wx.EVT_CHECKBOX, self.OnCbShowLegendCheckbox,
+              id=wxID_PANELRESULT2CBSHOWLEGEND)
+
+        self.staticBox3 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX3,
+              label=u'Legend', name='staticBox3', parent=self, pos=wx.Point(560,
+              80), size=wx.Size(160, 56), style=0)
+
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
@@ -150,12 +198,12 @@ class panelResult2(wx.Panel):
         self.display()
         
     def __init_custom_ctrls(self, prnt):
-          Status.mod.moduleTCA.displayPlot = 0   
-          self.chart = Mp.MatPanel(self.panel1, wx.Panel, drawFigure)
-          del self.chart
+          Status.mod.moduleTCA.displayPlot = 0 
+          Status.mod.moduleTCA.showlegend = self.cbShowLegend.GetValue()     
+          self.plotpanel = TCAPlotPanel(self.panel1)
+                 
     
     def display(self):
-        self.panel1.draw()       
         self.choice1.Clear()
         if (Status.mod.moduleTCA.result!=None):
             for result in Status.mod.moduleTCA.result:            
@@ -166,20 +214,22 @@ class panelResult2(wx.Panel):
     def OnRbNPVRadiobutton(self, event):        
         if (self.rbNPV.GetValue()==True):
             Status.mod.moduleTCA.displayPlot = 0            
-            self.chart = Mp.MatPanel(self.panel1, wx.Panel, drawFigure)
-            del self.chart
-            self.display()
-            
+            self.updatePanel()        
         event.Skip()
 
     def OnRbMIRRRadiobutton(self, event):
         if (self.rbMIRR.GetValue()==True):
             Status.mod.moduleTCA.displayPlot = 1            
-            self.chart = Mp.MatPanel(self.panel1, wx.Panel, drawFigure)
-            del self.chart  
-            self.display()          
+            self.updatePanel()   
         event.Skip()
 
+    def updatePanel(self):
+        self.plotpanel.Hide() 
+        self.plotpanel.Destroy()
+        Status.mod.moduleTCA.showlegend = self.cbShowLegend.GetValue()     
+        self.plotpanel = TCAPlotPanel(self.panel1)          
+        self.plotpanel.Show()   
+        
     def OnChoice1Choice(self, event):
         self.updateButtons()
         event.Skip()
@@ -199,7 +249,13 @@ class panelResult2(wx.Panel):
     def OnBtnAddButton(self, event):
         try:
             index = self.choice1.GetSelection()
-            Status.mod.moduleTCA.result[index].display = 1
+            
+            if (Status.mod.moduleTCA.result[index].ResultPresent):
+                Status.mod.moduleTCA.result[index].display = 1
+            else:
+                name = Status.mod.moduleTCA.result[index].name
+                wx.MessageBox(_("No result to display for proposal: ")+name)                
+            self.updatePanel()
         except:
             pass
         self.display()
@@ -209,7 +265,13 @@ class panelResult2(wx.Panel):
         try:
             index = self.choice1.GetSelection()
             Status.mod.moduleTCA.result[index].display = 0
+            self.updatePanel()
         except:
             pass
         self.display()
         event.Skip()
+
+    def OnCbShowLegendCheckbox(self, event):
+        self.updatePanel()
+        event.Skip()
+        

@@ -17,7 +17,7 @@ class panelResult1(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(730, 350),
               style=wx.TAB_TRAVERSAL)
         self.SetClientSize(wx.Size(722, 323))
-
+        
         self.grid = wx.grid.Grid(id=wxID_PANELRESULT1GRID, name=u'grid',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(704, 170), style=0)
         self.grid.EnableEditing(False)
@@ -112,17 +112,35 @@ class panelResult1(wx.Panel):
             
             count = 0
             for result in Status.mod.moduleTCA.result:
-                if (result.display == 1):
-                    self.grid.SetColLabelValue(count,  str(result.name))
-                    str_pp = "%f" % payback_period(result.npv)
-                    str_mirr = "%f" % (result.mirr[len(result.mirr)-1]*100)
-                               
-                    self.grid.SetCellValue(0, count, str(result.TIC))
-                    self.grid.SetCellValue(1, count, str(result.EIC))
-                    self.grid.SetCellValue(3, count, str_pp)
-                    self.grid.SetCellValue(4, count, str_mirr)
-                    
-                    print result.bcr  
+                if (result.display == 1):    
+                    try:                
+                        if (result.ResultPresent == True):
+                            self.grid.SetColLabelValue(count,  str(result.name))
+                            str_pp = "%.2f" % result.PP
+                            str_mirr = "%.2f" % (result.mirr[len(result.mirr)-1]*100)
+                            str_TIC = "%.0f" % result.TIC
+                            str_EIC = "%.0f" % result.EIC
+                            str_BCR = "%.2f" % (result.bcr[len(result.bcr)-1])
+                                       
+                            self.grid.SetCellValue(0, count, str_TIC)
+                            self.grid.SetCellValue(1, count, str_EIC)
+                            self.grid.SetCellValue(2, count, str_BCR)
+                            self.grid.SetCellValue(3, count, str_pp)
+                            self.grid.SetCellValue(4, count, str_mirr)
+                        else:
+                            self.grid.SetColLabelValue(count,  str(result.name))
+                            self.grid.SetCellValue(0, count, _("No Result"))
+                            self.grid.SetCellValue(1, count, _("No Result"))
+                            self.grid.SetCellValue(2, count, _("No Result"))
+                            self.grid.SetCellValue(3, count, _("No Result"))
+                            self.grid.SetCellValue(4, count, _("No Result"))
+                    except:
+                            self.grid.SetColLabelValue(count,  "Invalid Proposal")
+                            self.grid.SetCellValue(0, count, _("ERROR"))
+                            self.grid.SetCellValue(1, count, _("ERROR"))
+                            self.grid.SetCellValue(2, count, _("ERROR"))
+                            self.grid.SetCellValue(3, count, _("ERROR"))
+                            self.grid.SetCellValue(4, count, _("ERROR"))
                     count +=1  
                        
         
@@ -174,3 +192,5 @@ class panelResult1(wx.Panel):
     def OnCbProposalsChoice(self, event):       
         self.updateButtons()
         event.Skip()
+        
+

@@ -238,9 +238,9 @@ class PanelTCANon(wx.Panel):
         event.Skip()
         self.display()    
 
-    def OnBtnNextButton(self, event):
+    def OnBtnNextButton(self, event):        
         self.Hide()
         self.mod.storeData()
-        self.mod.calculate()
         self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
-        event.Skip()        
+        event.Skip()  
+              

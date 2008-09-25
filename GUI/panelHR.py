@@ -44,22 +44,14 @@
 import wx
 import wx.grid
 
-from status import Status
-
 from GUITools import *
 from numCtrl import *
-
-from einstein.GUI.graphics import drawPiePlot
-import einstein.modules.matPanel as Mp
+from einstein.modules.plotPanel import PlotPanel
+from pylab import *
 from matplotlib.ticker import MaxNLocator
-
-#from einstein.GUI.matplotPanel import MatplotPanel
 from einstein.GUI.dialog_changeHX import *
-
 from einstein.modules.modules import Modules
 from einstein.GUI.status import Status
-#from einstein.GUI.panelHR_PopUp1 import HRPopUp1
-
 from einstein.modules.interfaces import *
 from einstein.modules.messageLogger import *
 
@@ -68,9 +60,10 @@ from einstein.modules.messageLogger import *
  wxID_PANELHRBUTTONPAGEHRBACK, wxID_PANELHRBUTTONPAGEHRCANCEL, 
  wxID_PANELHRBUTTONPAGEHRFWD, wxID_PANELHRBUTTONPAGEHROK, 
  wxID_PANELHRCBCURVEDISPLAY, wxID_PANELHRCBEXHX, wxID_PANELHRGRID, 
- wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, 
- wxID_PANELHRSTATICBOX3, wxID_PANELHRSTATICBOX4, wxID_PANELHRSTATICTEXT2, 
-] = [wx.NewId() for _init_ctrls in range(18)]
+ wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRRBCALC, wxID_PANELHRRBREDESIGN, 
+ wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, wxID_PANELHRSTATICBOX3, 
+ wxID_PANELHRSTATICBOX4, wxID_PANELHRSTATICTEXT2, 
+] = [wx.NewId() for _init_ctrls in range(20)]
 
 # constants
 #
@@ -84,15 +77,26 @@ MAXROWS = 50
 COLNO = 12
 
 
+#from matplotlib.ticker import MaxNLocator
 
-def drawFigureHCG(self):   
-    try:    
-        
-        if hasattr(self, 'subplot'):
-            del self.subplot             
-        #data = Interfaces.GData['Curves HR']
-        data = Status.int.hrdata.curves
-        
+class HRPlotPanelHCG (PlotPanel):
+    """Plots several lines in distinct colors."""
+    def __init__( self, parent, **kwargs ):
+        self.parent = parent
+        # initiate plotter
+        PlotPanel.__init__( self, parent, **kwargs )
+        self.SetColor( (255,255,255) )
+
+    def draw( self ):
+        """Draw data."""
+        if not hasattr( self, 'subplot' ):
+            self.subplot = self.figure.add_subplot( 121 )
+        if not hasattr(self, 'subplot2'):
+            self.subplot2 = self.figure.add_subplot(122)
+       
+        if not hasattr(Status.int, 'hrdata'):
+            return
+        data = Status.int.hrdata.curves            
         if (len(data)==0):
             return
                
@@ -124,11 +128,7 @@ def drawFigureHCG(self):
         m2 = (max(mmx) - min(mmx))*0.2
         
         self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
-        
-        if hasattr(self, 'subplot2'):
-            del self.subplot2
-        
-        self.subplot2 = self.figure.add_subplot(122)
+                            
         curve = data[2]
         self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
         
@@ -144,20 +144,33 @@ def drawFigureHCG(self):
         #change axis
         self.subplot.xaxis.set_major_locator(MaxNLocator(4))
         self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
-        
-        #self.show()
-        self.setSize((576, 280))    
-    except:
-        #print "cant draw figure"
-        drawFigureDefault(self)
 
-def drawFigureYED(self):    
-    try:
-        #data = Interfaces.GData['Curves HR']
-        if hasattr(self, 'subplot'):
-            del self.subplot
-                   
-        data = Status.int.hrdata.QD_T              
+
+class HRPlotPanelYED (PlotPanel):
+    """Plots several lines in distinct colors."""
+    def __init__( self, parent, **kwargs ):
+        self.parent = parent
+        # initiate plotter
+        PlotPanel.__init__( self, parent, **kwargs )
+        self.SetColor( (255,255,255) )
+        Status.HRTool = "estimate"
+
+    def draw( self ):
+        """Draw data."""
+        if not hasattr( self, 'subplot' ):
+            self.subplot = self.figure.add_subplot( 121 )
+        if not hasattr(self, 'subplot2'):
+            self.subplot2 = self.figure.add_subplot(122)
+       
+        if not hasattr(Status.int, 'hrdata'):
+            return
+        
+        if not hasattr(Status.int.hrdata, 'QD_T'):
+            return        
+        data = Status.int.hrdata.QD_T             
+        if (len(data)==0):
+            return    
+                     
         min_ = 100000
         max_ = 0
         
@@ -170,99 +183,35 @@ def drawFigureYED(self):
         self.subplot.set_ylabel(_('Power [kW]'))
         self.subplot.set_xlabel(_('Temperature [C]'))
         
-        if hasattr(self, 'subplot2'):
-            del self.subplot2
-        
+        if not hasattr(Status.int.hrdata, 'QA_T'):
+            return    
         data = Status.int.hrdata.QA_T              
         min_ = 100000
         max_ = 0
                         
         X = xrange(0, 406, 5)      
         Y = data       
-        self.subplot2 = self.figure.add_subplot(122)
+
         self.subplot2.plot(X,Y,'r',label ="QA_T")    
         self.subplot2.legend(loc = 0)                             
         self.subplot2.axis([min(X),max(X),min(Y),max(Y)*1.1])   
         self.subplot2.set_ylabel(_('Power [kW]'))
         self.subplot2.set_xlabel(_('Temperature [C]'))  
         
-        #self.show()
-        self.setSize((576, 280))                                  
-    except:
-        #print "cant draw figure"
-        drawFigureDefault(self)
-        
-def drawFigureDefault(obj):
-    #TODO: maybe plot a text
-    pass
 
 class PanelHR(wx.Panel):
 
     def __init__(self, parent, main, id, pos, size, style, name):
         self.main = main
-        self._init_ctrls(parent)
         self.keys = ['HR Table','HR Curves']
         self.mod = Status.mod.moduleHR
-        self.selectedRow = 0
-        labels_column = 0
-        
-        #
-        # additional widgets setup
-        # here, we modify some widgets attributes that cannot be changed
-        # directly by Boa. This cannot be done in _init_ctrls, since that
-        # method is rewritten by Boa each time.
-        #
-        # data cell attributes
-        attr = wx.grid.GridCellAttr()
-        attr.SetTextColour(GRID_LETTER_COLOR)
-        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
-        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
-
-        self.grid.CreateGrid(MAXROWS, COLNO)
-
-        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
-        self.grid.EnableGridLines(True)
-        self.grid.SetDefaultRowSize(20)
-        self.grid.SetRowLabelSize(30)
-        self.grid.SetDefaultColSize(90)
-        self.grid.SetColSize(1,60)
-        #self.grid.SetColSize(3,160)
-        
-        self.enableButtons(False)
-
-        self.grid.EnableEditing(False)
-        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Name"))
-        self.grid.SetColLabelValue(1, _("Power\n[kW]"))
-        self.grid.SetColLabelValue(2, _("Size storage tank\n[m³]"))
-        self.grid.SetColLabelValue(3, _("Hot Medium"))
-        self.grid.SetColLabelValue(4, _("T1 hot med.\n[°C]"))
-        self.grid.SetColLabelValue(5, _("T2 hot med.\n[°C]"))
-        self.grid.SetColLabelValue(6, _("Cold medium"))
-        self.grid.SetColLabelValue(7, _("T3 cold med.\n[°C]"))
-        self.grid.SetColLabelValue(8, _("T4 cold med.\n[°C]"))
-        self.grid.SetColLabelValue(9, _("surface area\n[m²]"))
-        self.grid.SetColLabelValue(10, _("inv. cost\n[EUR]"))
-        self.grid.SetColLabelValue(11, _("oper. cost\n[EUR]"))
-        #
-        # copy values from dictionary to grid
-        #
-        for r in range(MAXROWS):
-            self.grid.SetRowAttr(r, attr)
-
-        self.grid.SetGridCursor(0, 0)
-        self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)
-        del self.chart
-        
-        self.Show()
-        
-        
-       
-    
+        self._init_ctrls(parent)
+        self.__init_custom_ctrls(parent)
+      
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHR, name='PanelHR', parent=prnt,
-              pos=wx.Point(0, 0), size=wx.Size(800, 600), style=0)
+              pos=wx.Point(0, 0), size=wx.Size(808, 627), style=0)
         self.SetClientSize(wx.Size(800, 600))
 
         self.grid = wx.grid.Grid(id=wxID_PANELHRGRID, name='gridpageHR',
@@ -312,7 +261,7 @@ class PanelHR(wx.Panel):
 
         self.cbCurveDisplay = wx.Choice(choices=['HCC/CCC/GCC', 'YED'],
               id=wxID_PANELHRCBCURVEDISPLAY, name='cbCurveDisplay', parent=self,
-              pos=wx.Point(640, 152), size=wx.Size(120, 21),
+              pos=wx.Point(640, 224), size=wx.Size(120, 21),
               style=wx.FULL_REPAINT_ON_RESIZE)
         self.cbCurveDisplay.SetSelection(0)
         self.cbCurveDisplay.Bind(wx.EVT_CHOICE, self.OnCbCurveDisplayChoice,
@@ -320,7 +269,7 @@ class PanelHR(wx.Panel):
 
         self.cbExHX = wx.CheckBox(id=wxID_PANELHRCBEXHX,
               label=_('  Consider existing'), name='cbExHX', parent=self,
-              pos=wx.Point(648, 64), size=wx.Size(112, 16), style=0)
+              pos=wx.Point(648, 112), size=wx.Size(112, 16), style=0)
         self.cbExHX.SetValue(False)
         self.cbExHX.Bind(wx.EVT_CHECKBOX, self.OnCbExHXCheckbox,
               id=wxID_PANELHRCBEXHX)
@@ -339,9 +288,7 @@ class PanelHR(wx.Panel):
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELHRSTATICBOX1,
               label=_('HX Network'), name='staticBox1', parent=self,
-              pos=wx.Point(632, 8), size=wx.Size(136, 112), style=0)
-        self.staticBox1.SetForegroundColour(TITLE_COLOR)
-        self.staticBox1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+              pos=wx.Point(632, 8), size=wx.Size(136, 184), style=0)
 
         self.btnShowStdValues = wx.Button(id=wxID_PANELHRBTNSHOWSTDVALUES,
               label=_('Standard values for HX'), name='btnShowStdValues',
@@ -352,42 +299,114 @@ class PanelHR(wx.Panel):
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELHRSTATICBOX2,
               label=_('Display Options'), name='staticBox2', parent=self,
-              pos=wx.Point(632, 128), size=wx.Size(136, 64), style=0)
-        self.staticBox2.SetForegroundColour(TITLE_COLOR)
-        self.staticBox2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+              pos=wx.Point(632, 200), size=wx.Size(136, 64), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELHRSTATICTEXT2,
               label=_('HXs in network \ncalculation'), name='staticText2',
-              parent=self, pos=wx.Point(672, 80), size=wx.Size(74, 26),
+              parent=self, pos=wx.Point(672, 128), size=wx.Size(74, 26),
               style=0)
 
         self.staticBox3 = wx.StaticBox(id=wxID_PANELHRSTATICBOX3,
               label=_('Performance Curves'), name='staticBox3', parent=self,
               pos=wx.Point(16, 8), size=wx.Size(608, 320), style=0)
-        self.staticBox3.SetForegroundColour(TITLE_COLOR)
-        self.staticBox3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.staticBox4 = wx.StaticBox(id=wxID_PANELHRSTATICBOX4,
               label=_('Existing heat exchangers in the system'),
               name='staticBox4', parent=self, pos=wx.Point(16, 336),
               size=wx.Size(752, 192), style=0)
+
+        self.rbCalc = wx.RadioButton(id=wxID_PANELHRRBCALC,
+              label=_(u'Calculate only'), name=u'rbCalc', parent=self,
+              pos=wx.Point(648, 64), size=wx.Size(96, 13), style=0)
+        self.rbCalc.SetValue(True)
+        self.rbCalc.Bind(wx.EVT_RADIOBUTTON, self.OnRbCalcRadiobutton,
+              id=wxID_PANELHRRBCALC)
+
+        self.rbRedesign = wx.RadioButton(id=wxID_PANELHRRBREDESIGN,
+              label=_(u'Redesign network'), name=u'rbRedesign', parent=self,
+              pos=wx.Point(648, 88), size=wx.Size(104, 13), style=0)
+        self.rbRedesign.SetValue(True)
+        self.rbRedesign.Bind(wx.EVT_RADIOBUTTON, self.OnRbRedesignRadiobutton,
+              id=wxID_PANELHRRBREDESIGN)
+
+    def __init_custom_ctrls(self, prnt):
+        self.staticBox1.SetForegroundColour(TITLE_COLOR)
+        self.staticBox1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.staticBox2.SetForegroundColour(TITLE_COLOR)
+        self.staticBox2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.staticBox3.SetForegroundColour(TITLE_COLOR)
+        self.staticBox3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.staticBox4.SetForegroundColour(TITLE_COLOR)
-        self.staticBox4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.staticBox4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))                
+        #----Grid-------------------------------------------------------------------------
+        self.selectedRow = 0
+        labels_column = 0
+        
+        # data cell attributes
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.BOLD))
+
+        self.grid.CreateGrid(MAXROWS, COLNO)
+
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetDefaultColSize(90)
+        self.grid.SetColSize(1,60)
+        #self.grid.SetColSize(3,160)
+        
+        self.enableButtons(False)
+
+        self.grid.EnableEditing(False)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.grid.SetColLabelValue(0, _("Name"))
+        self.grid.SetColLabelValue(1, _("Power\n[kW]"))
+        self.grid.SetColLabelValue(2, _("Size storage tank\n[m³]"))
+        self.grid.SetColLabelValue(3, _("Hot Medium"))
+        self.grid.SetColLabelValue(4, _("T1 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(5, _("T2 hot med.\n[°C]"))
+        self.grid.SetColLabelValue(6, _("Cold medium"))
+        self.grid.SetColLabelValue(7, _("T3 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(8, _("T4 cold med.\n[°C]"))
+        self.grid.SetColLabelValue(9, _("surface area\n[m²]"))
+        self.grid.SetColLabelValue(10, _("inv. cost\n[EUR]"))
+        self.grid.SetColLabelValue(11, _("oper. cost\n[EUR]"))
+        #
+        # copy values from dictionary to grid
+        #
+        for r in range(MAXROWS):
+            self.grid.SetRowAttr(r, attr)
+
+        self.grid.SetGridCursor(0, 0)         
+        self.plotpanel = HRPlotPanelHCG(self.panel_drawcurve)
+        self.Show()  
+        
+       
 
     def display(self):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
-        print "display"
+        #print "display"
         self.mod.initPanel()        # prepares data for plotting
 
         self.UpdateGrid()           
-        self.UpdatePlot()    
+        self.UpdatePlot()   
+        self.UpdateRadio() 
         self.Show()
+    
+    def UpdateRadio(self):
+        if (Status.HRTool == "estimate"):
+            self.rbRedesign.SetValue(False)
+            self.rbCalc.SetValue(True)
+        else:
+            self.rbRedesign.SetValue(True)
+            self.rbCalc.SetValue(False)
 
     def UpdateGrid(self):
-        #..............................................................................
-        # update of equipment table
         try:
             data = Interfaces.GData[self.keys[0]]
             (rows,cols) = data.shape
@@ -399,20 +418,42 @@ class PanelHR(wx.Panel):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, data[r][c])
 
-#XXX Here better would be updating the grid and showing less rows ... ????
         for r in range(rows,MAXROWS):
             for c in range(cols):
                 self.grid.SetCellValue(r, c, "")
 
+    def UpdatePlot(self):      
+        if (self.cbCurveDisplay.GetCurrentSelection() == 0):
+            try:
+                self.plotpanel.Hide() 
+                self.plotpanel.Destroy()
+            except:
+                pass
+            self.plotpanel = HRPlotPanelHCG(self.panel_drawcurve)   
+            self.plotpanel.Show()          
+        else:
+            self.plotpanel.Hide() 
+            self.plotpanel.Destroy()
+            self.plotpanel = HRPlotPanelYED(self.panel_drawcurve)   
+            self.plotpanel.Show()
+            
     def updateButtons(self,index):
         if (self.mod.indexExists(index)):
             self.enableButtons(True)
         else:
             self.enableButtons(False)
+        
+        if self.selectedRow in self.mod.HiddenHX:
+            self.btnDeleteHX.Label = _("Show HX")
+        else:
+            self.btnDeleteHX.Label = _("Hide HX")
             
-    def enableButtons(self,bool):
+        
+            
+    def enableButtons(self,bool):        
         self.btnDeleteHX.Enabled = bool
         self.btnChangeHX.Enabled = bool
+        
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
@@ -459,20 +500,13 @@ class PanelHR(wx.Panel):
 
 
 #==============================================================================
-
-    def UpdatePlot(self):       
-        if (self.cbCurveDisplay.GetCurrentSelection() == 0):
-            self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureHCG)          
-        else:
-            self.chart = Mp.MatPanel(self.panel_drawcurve, wx.Panel, drawFigureYED)
-        del self.chart
-        
+      
     def OnCbCurveDisplayChoice(self, event):            
         self.UpdatePlot()
         event.Skip()
 
     def OnBtnCalculateButton(self, event):
-        print _("PanelHR (OnBtnCalculateButton)")
+        print _("PanelHR (OnBtnCalculateButton)")        
         self.mod.runHRModule()
         self.enableButtons(False)
         self.display()        
@@ -483,7 +517,7 @@ class PanelHR(wx.Panel):
         self.enableButtons(False)
         self.OnCbCurveDisplayChoice(event)
         self.display()
-        #event.Skip()
+        event.Skip()
 
     def OnBtnChangeHXButton(self, event):
         self.mod.changeHX(self.selectedRow)
@@ -498,4 +532,12 @@ class PanelHR(wx.Panel):
 
     def OnCbExHXCheckbox(self, event):
         self.mod.ExHX = self.cbExHX.GetValue()
+        event.Skip()
+
+    def OnRbRedesignRadiobutton(self, event):
+        Status.HRTool == "redesign"
+        event.Skip()
+
+    def OnRbCalcRadiobutton(self, event):
+        Status.HRTool = "estimate"
         event.Skip()

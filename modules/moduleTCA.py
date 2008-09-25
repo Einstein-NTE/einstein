@@ -33,7 +33,7 @@ from einstein.modules.dataTCA import TCAData
 from einstein.modules.calculationTCA import *
 import sys
 from pylab import *
-
+import wx
 
 class ModuleTCA(object):
 
@@ -42,99 +42,85 @@ class ModuleTCA(object):
         self.data = None    
         self.result = None
                        
-#------------------------------------------------------------------------------
-    def initPanel(self):
-#------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#------------------------------------------------------------------------------           
-        self.updatePanel()
-  
 
-    def calculateTotalOpCostFromDetailedOpcost(self):
-        cost = 0
-        for category in self.data.detailedopcost:
-            for entry in category:
-                cost+=entry[1]
-               
-        self.data.totalopcost = cost
-       
-    def storeData(self):
-        self.data.storeTCAData() 
-            
+    def initPanel(self):         
+        self.updatePanel()
+              
 #------------------------------------------------------------------------------
     def updatePanel(self):
+        #TCA should no run with present state(original)
         if (Status.ANo == -1):
             wx.MessageBox("Could not display TCA for unchecked state!")
             self.Hide()
             self.main.tree.SelectItem(self.main.qA, select=True)
-            
+        
+        #Create or Update data according to PID and ANo in Status    
         if (self.data == None):
             self.data = TCAData(Status.PId,Status.ANo)
             self.data.loadTCAData()        
         if (Status.PId != self.data.pid)or(Status.ANo != self.data.ano):
             self.data = TCAData(Status.PId,Status.ANo)
             self.data.loadTCAData()
-        else:
-            print "ok"
-     
-    
-    def calculate(self):
+       
+    def runTCAModule(self):
+        #reset result       
+        self.result = []
+        
+        #set parameters
         InterestRate = self.data.NIR - self.data.Inflation
         DiscountRate = self.data.CSDR - self.data.Inflation
-        self.result = []    
+        ProjectLifetime = self.data.TimeFrame
+            
+        #get cashflow for the current process
+        data = TCAData(Status.PId,0)                
+        data.loadTCAData() 
+        data = self.calculateCashFlow(data)
+        old = data.cashflow
         
-        old     = self.getCashFlow(0)
+        #get all proposal numbers and names
         query = """SELECT AlternativeProposalNo,ShortName FROM salternatives WHERE ProjectID = %s"""
-        query = query % (self.data.pid)
-    
+        query = query % (self.data.pid)    
         results = Status.DB.sql_query(query)
-        self.anos = []        
-        
+        self.anos = []                
         for result in results:
             if (result[0]>0):
                 self.anos.append([result[0],result[1]])              
         
-        for ano in self.anos:
-            current = self.getCashFlow(ano[0])
-            display = 0
-            if (Status.ANo == ano[0]):
-                display = 1
-            npv = NPV(current.CF(), old.CF(), InterestRate)
-            mirr = MIRR(current.CF(), old.CF(), InterestRate, DiscountRate)
-            bcr = BCR(current.CF(), old.CF(), InterestRate)        
+        #calculate result for each proposal in project
+        for ano in self.anos: # ano = [ Number, Name ] !!!
+            try:
+                #load data for alternative
+                data = TCAData(Status.PId,ano[0])                
+                data.loadTCAData() 
+                #calculate cashflow for alternative
+                data = self.calculateCashFlow(data)
+                current = data.cashflow
+                
+                #set display option to 1 only for the current proposal
+                display = 0
+                
+                #The currently selected proposal
+                if (Status.ANo == ano[0]):
+                    display = 1
+                
+                #calculate the results  
+                name = ano[1]  
+                npv = NPV(current.CF(), old.CF(), InterestRate)
+                mirr = MIRR(current.CF(), old.CF(), InterestRate, DiscountRate)
+                bcr = BCR(current.CF(), old.CF(), InterestRate)                    
+                annuity = ANNUITY(current.TotalInvestmentCapital,InterestRate,ProjectLifetime)              
+                pp = payback_period(npv)
+                #set the results in data, store data in result list
+                data.setResult(name,npv,mirr,bcr,annuity,pp,display)                                
+                self.result.append(data)
+                data.storeResultToCGeneralData()
+            except:
+                data.setResultInvalid(name,display)
+                self.result.append(data)
+                logWarning((_("TCA: No result for %s") % ano[1]))        
             
-            result = CalculationResult(ano[0],ano[1],npv,mirr,bcr,current.TotalInvestmentCapital,current.EffectiveInvstmentCapital,display)                           
-            self.result.append(result)
-            
-              
-
         
-        
-        
-        
-        #current = self.getCashFlow(1)       
-        #print NPV(current.CF(), old.CF(), InterestRate)
-    
-        
-        #bcr = BCR(current.CF(), old.CF(), InterestRate) # call with <InterestRate>?
-        #print
-        #print "BCR: ", bcr
-        #figure(3)
-        #plot(bcr)
-        #xlabel('time / Y')
-        #ylabel('BCR')
-        #title('benefit cost ratio')
-        #grid(True)
-        #show()
-    
-        #print
-        #raw_input('Press any key to continue.')
-        #close('all')              
-        
-    def getCashFlow(self,ano):
-        data = TCAData(Status.PId,ano)                
-        data.loadTCAData()   
-                            
+    def calculateCashFlow(self,data):                                     
         AmotisationTime        = data.TimeFrame + 1 #to fix calculation
         InterestRate           = data.NIR - data.Inflation
         EnergyPriceDevelopment = data.DEP  
@@ -143,15 +129,22 @@ class ModuleTCA(object):
         
         a.TotalInvestmentCapital = 0
         a.EffectiveInvstmentCapital = 0
-        for investment in data.investment:   
+        a.TotalFundings = 0
+        for investment in data.investment: 
+            #Investment ------------------------------  
             value = investment[1]
             fp    = investment[2]
             ff    = investment[3]    
             a.TotalInvestmentCapital+= value   
             a.EffectiveInvstmentCapital+= value
             a.EffectiveInvstmentCapital-= value*(fp/100)+ff         
-            a.Investment(0,-value)              #Investment
-            a.Investment(0,value*(fp/100)+ff)   #Funding
+            a.Investment(0,-value)              
+            #Funding ---------------------------------
+            funding = value*(fp/100)+ff         
+            a.TotalFundings+= funding
+            a.Investment(0,funding)
+             
+        a.EffectiveInvstmentCapital-= data.revenue 
         a.Investment(0,data.revenue)       #Revenue
             
         for energy in data.energycosts:    #Energy
@@ -175,5 +168,16 @@ class ModuleTCA(object):
             else:
                 a.Investment(Year,Value)
         
-        del data                
-        return a 
+        data.cashflow = a    
+        return data 
+    
+    def calculateTotalOpCostFromDetailedOpcost(self):
+        cost = 0
+        for category in self.data.detailedopcost:
+            for entry in category:
+                cost+=entry[1]
+               
+        self.data.totalopcost = cost
+       
+    def storeData(self):
+        self.data.storeTCAData() 

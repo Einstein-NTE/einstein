@@ -202,6 +202,23 @@ def BCR(cf_new, cf_old, interest):
     return bcr
         
 
+def ANNUITY(I0,r,N):
+    #Total Investment Capital
+    #real interest rate of external financing
+    #ProjectLifetime
+    if (I0==0)or(N==0):
+        return 0.0
+    
+    r = r / 100.0
+    #print "ANNUITY I0=%s r=%s N=%s" %(I0,r,N)
+    sum = 0
+    for i in xrange(1,N+1):
+        sum+=1.0/pow(1+r,i)
+    a = 1.0 / sum
+    A = a * I0
+    #print "a=%s" % (a)
+    #print "A=%s" % (A)
+    return A
 
 
 #################
@@ -278,14 +295,4 @@ if __name__ == "__main__":
     raw_input('Press any key to continue.')
     close('all')
     
-class CalculationResult():
-    def __init__(self,ano,name,npv,mirr,bcr,TIC,EIC,display):
-        self.ano = ano
-        self.name = name
-        self.npv = npv
-        self.mirr = mirr
-        self.bcr = bcr
-        self.display = display
-        self.TIC = TIC
-        self.EIC = EIC
         

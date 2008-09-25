@@ -36,6 +36,7 @@ import wx
 from einstein.GUI.status import Status
 from einstein.GUI.panelTCAResultTabpage1 import panelResult1
 from einstein.GUI.panelTCAResultTabpage2 import panelResult2
+from einstein.modules.messageLogger import *
 
 from GUITools import *
 
@@ -43,12 +44,13 @@ from GUITools import *
  wxID_PANELTCABTNPREVMODULE, wxID_PANELTCABTNRESETDATA, 
  wxID_PANELTCANOTEBOOK1, wxID_PANELTCASTATICBOX1, wxID_PANELTCASTATICBOX2, 
  wxID_PANELTCASTATICTEXT1, wxID_PANELTCASTATICTEXT10, 
- wxID_PANELTCASTATICTEXT2, wxID_PANELTCASTATICTEXT3, wxID_PANELTCASTATICTEXT4, 
- wxID_PANELTCASTATICTEXT5, wxID_PANELTCASTATICTEXT6, wxID_PANELTCASTATICTEXT7, 
- wxID_PANELTCASTATICTEXT8, wxID_PANELTCASTATICTEXT9, wxID_PANELTCATBCSDRATE, 
+ wxID_PANELTCASTATICTEXT11, wxID_PANELTCASTATICTEXT2, 
+ wxID_PANELTCASTATICTEXT3, wxID_PANELTCASTATICTEXT4, wxID_PANELTCASTATICTEXT5, 
+ wxID_PANELTCASTATICTEXT6, wxID_PANELTCASTATICTEXT7, wxID_PANELTCASTATICTEXT8, 
+ wxID_PANELTCASTATICTEXT9, wxID_PANELTCATBCSDRATE, 
  wxID_PANELTCATBENERGYPRICES, wxID_PANELTCATBINFLATION, wxID_PANELTCATBNIR, 
  wxID_PANELTCATBTIMEFAME, 
-] = [wx.NewId() for _init_ctrls in range(23)]
+] = [wx.NewId() for _init_ctrls in range(24)]
 
 class PanelTCA(wx.Panel):
     def _init_ctrls(self, prnt):
@@ -68,7 +70,7 @@ class PanelTCA(wx.Panel):
 
         self.staticText2 = wx.StaticText(id=wxID_PANELTCASTATICTEXT2,
               label=_(u'Company specific discount rate'), name='staticText2',
-              parent=self, pos=wx.Point(40, 84), size=wx.Size(149, 13),
+              parent=self, pos=wx.Point(40, 108), size=wx.Size(149, 13),
               style=0)
 
         self.tbNIR = wx.TextCtrl(id=wxID_PANELTCATBNIR, name=u'tbNIR',
@@ -79,7 +81,7 @@ class PanelTCA(wx.Panel):
         self.tbNIR.Bind(wx.EVT_TEXT, self.OnTbNIRText, id=wxID_PANELTCATBNIR)
 
         self.tbCSDRate = wx.TextCtrl(id=wxID_PANELTCATBCSDRATE,
-              name='tbCSDRate', parent=self, pos=wx.Point(256, 80),
+              name='tbCSDRate', parent=self, pos=wx.Point(256, 104),
               size=wx.Size(100, 21), style=0, value='0')
         self.tbCSDRate.Bind(wx.EVT_KILL_FOCUS, self.OnTbCSDRateKillFocus)
         self.tbCSDRate.Bind(wx.EVT_TEXT, self.OnTbCSDRateText,
@@ -87,14 +89,14 @@ class PanelTCA(wx.Panel):
 
         self.staticText3 = wx.StaticText(id=wxID_PANELTCASTATICTEXT3,
               label=_('This timeframe will be applied to each equipment of all proposals\nIf you think there would be some maintainance or re-investment\ncaused by this time frame, please fill in the Contingencies'),
-              name='staticText3', parent=self, pos=wx.Point(400, 122),
+              name='staticText3', parent=self, pos=wx.Point(400, 120),
               size=wx.Size(267, 33), style=0)
         self.staticText3.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'Tahoma'))
 
         self.staticText4 = wx.StaticText(id=wxID_PANELTCASTATICTEXT4,
               label=_('Development of energy prices'), name='staticText4',
-              parent=self, pos=wx.Point(40, 108), size=wx.Size(144, 13),
+              parent=self, pos=wx.Point(40, 84), size=wx.Size(144, 13),
               style=0)
 
         self.staticText5 = wx.StaticText(id=wxID_PANELTCASTATICTEXT5,
@@ -110,7 +112,7 @@ class PanelTCA(wx.Panel):
               id=wxID_PANELTCATBTIMEFAME)
 
         self.tbEnergyPrices = wx.TextCtrl(id=wxID_PANELTCATBENERGYPRICES,
-              name='tbEnergyPrices', parent=self, pos=wx.Point(256, 104),
+              name='tbEnergyPrices', parent=self, pos=wx.Point(256, 80),
               size=wx.Size(100, 21), style=0, value='0')
         self.tbEnergyPrices.Bind(wx.EVT_KILL_FOCUS,
               self.OnTbEnergyPricesKillFocus)
@@ -153,7 +155,9 @@ class PanelTCA(wx.Panel):
         self.notebook1 = wx.Notebook(id=wxID_PANELTCANOTEBOOK1,
               name='notebook1', parent=self, pos=wx.Point(16, 192),
               size=wx.Size(744, 352), style=0)
-
+        self.notebook1.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,
+              self.OnNotebook1NotebookPageChanged, id=wxID_PANELTCANOTEBOOK1)
+        
         self.btnPrevModule = wx.Button(id=wxID_PANELTCABTNPREVMODULE,
               label=u'<<<', name=u'btnPrevModule', parent=self,
               pos=wx.Point(464, 560), size=wx.Size(48, 23), style=0)
@@ -179,6 +183,10 @@ class PanelTCA(wx.Panel):
               label=u'Inflation Rate', name='staticText10', parent=self,
               pos=wx.Point(40, 36), size=wx.Size(66, 13), style=0)
 
+        self.staticText11 = wx.StaticText(id=wxID_PANELTCASTATICTEXT11,
+              label=u'%', name='staticText11', parent=self, pos=wx.Point(360,
+              108), size=wx.Size(11, 13), style=0)
+
     def __init_custom_ctrls(self, prnt):
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
         self.staticBox1.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False,'Tahoma'))
@@ -198,12 +206,15 @@ class PanelTCA(wx.Panel):
         self.main = main
         self.mod = Status.mod.moduleTCA
         self.shortName = _("TCA")
-        self.description = _("")
+        self.description = _("")        
+        self.mod.updatePanel()
+        self.mod.runTCAModule() 
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
+                
     
     def display(self):
-        self.mod.updatePanel()  
+        self.mod.updatePanel()
         self.tbInflation.SetValue(str(self.mod.data.Inflation))
         self.tbNIR.SetValue(str(self.mod.data.NIR))
         self.tbCSDRate.SetValue(str(self.mod.data.CSDR))
@@ -315,9 +326,10 @@ class PanelTCA(wx.Panel):
 
     def OnBtnNextButton(self, event):
         self.Hide()
-        self.mod.storeData()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic1, select=True)
-        event.Skip()
+        self.mod.storeData()       
+        self.main.tree.SelectItem(self.main.qOptiProEconomic1, select=False)
+        #event.Skip()
+         
 
     def OnBtnPrevModuleButton(self, event):
         self.Hide()
@@ -329,4 +341,12 @@ class PanelTCA(wx.Panel):
         self.main.tree.SelectItem(self.main.qCS, select=True)
         event.Skip()
    
-
+    def OnNotebook1NotebookPageChanged(self, event):
+        #To make sure add/remove proposal is corectly shon in both tab pages
+        try:
+            self.resultpage1.display()
+            self.resultpage2.updatePanel()
+            self.resultpage2.display()
+        except:
+            pass
+        event.Skip()

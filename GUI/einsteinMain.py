@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.102
+#   Version No.: 0.103
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -147,6 +147,7 @@
 #       12/09/2008  HS Preferences frame added
 #       15/09/2008  FJ TCA GUI added
 #       25/09/2008  HS Activation of import / export data from databases
+#                      Link to process optimisation and some clean-up in tree
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -193,6 +194,7 @@ from PreferencesFrame import *
 #--- Module Panels
 from panelCC import *
 from panelA import *
+from panelPO import *
 from panelHR import *
 from panelHC import *
 from panelST import *
@@ -966,6 +968,13 @@ class EinsteinFrame(wx.Frame):
             self.panelA = PanelA(parent=self.leftpanel2,main=self)
             self.panelA.display()
 
+        #panelPO
+        elif select == _("Process optimization"):
+            self.hidePages()
+            self.panelPO = PanelPO(id=-1, name='panelPO', parent=self.leftpanel2, main = self,
+                                   pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
+            self.panelPO.display()
+
         #panelCHP
         elif select == "CHP":
             self.hidePages()
@@ -1493,27 +1502,15 @@ class EinsteinFrame(wx.Frame):
         self.qA = self.tree.AppendItem (self.qRoot, _("Alternative proposals"))
 
         #Design
-        self.qOptiProDesign = self.tree.AppendItem (self.qA, _("Design"))
-
+        self.qDesign = self.tree.AppendItem (self.qA, _("Design"))
         #Process optimisation
-        self.qOptiProProcess = self.tree.AppendItem (self.qOptiProDesign, _("Process optimisation"))
+        self.qPO = self.tree.AppendItem (self.qDesign, _("Process optimisation"))
         #Process optimisation interface 1
-        self.qOptiProProcess1 = self.tree.AppendItem(self.qOptiProProcess, _("Process optimisation interface 1"))
-                #Process optimisation interface 2
-        self.qOptiProProcess2 = self.tree.AppendItem(self.qOptiProProcess, _("Process optimisation interface 2"))
-            #Pinch analysis
-        self.qOptiProPinch = self.tree.AppendItem(self.qOptiProDesign, _("Pinch analysis"))
-                #Pinch interface 1
-        self.qOptiProPinch1 = self.tree.AppendItem(self.qOptiProPinch, _("Pinch interface 1"))
-                #Pinch interface 2
-        self.qOptiProPinch2 = self.tree.AppendItem(self.qOptiProPinch, _("Pinch interface 2"))
-            #HX network
-        self.qOptiProHX = self.tree.AppendItem (self.qOptiProDesign, _("HX network"))
-
+        self.qHX = self.tree.AppendItem (self.qDesign, _("HX network"))
             #H&C Supply
-        self.qHC = self.tree.AppendItem (self.qOptiProDesign, _("H&C Supply"))
+        self.qHC = self.tree.AppendItem (self.qDesign, _("H&C Supply"))
                 #H&C Storage
-        self.qOptiProSupply1 = self.tree.AppendItem (self.qHC, _("H&C Storage"))
+        self.qStorage = self.tree.AppendItem (self.qHC, _("H&C Storage"))
                 #CHP
         self.qCHP = self.tree.AppendItem (self.qHC, _("CHP"))
                 #Solar Thermal
@@ -1521,24 +1518,24 @@ class EinsteinFrame(wx.Frame):
                 #Heat Pumps
         self.qHP = self.tree.AppendItem (self.qHC, _("Heat Pumps"))
                 #Biomass
-        self.qOptiProSupply5 = self.tree.AppendItem (self.qHC, _("Biomass"))
+        self.qBIO = self.tree.AppendItem (self.qHC, _("Biomass"))
                 #Chillers
-        self.qOptiProSupply6 = self.tree.AppendItem (self.qHC, _("Chillers"))
+        self.qCH = self.tree.AppendItem (self.qHC, _("Chillers"))
                 #Boilers & burners
         self.qBB = self.tree.AppendItem (self.qHC, _("Boilers & burners"))
 
             #H&C Distribution
-        self.qOptiProDistribution = self.tree.AppendItem (self.qOptiProDesign, _("H&C Distribution"))
+        self.qDistribution = self.tree.AppendItem (self.qDesign, _("H&C Distribution"))
 
         #Energy performance
         self.qEnergy = self.tree.AppendItem (self.qA, _("Energy performance"))
 
         #Total Cost Assessment
-        self.qOptiProEconomic  = self.tree.AppendItem (self.qA, _("Total Cost Assessment"))  
-        self.qOptiProEconomic1 = self.tree.AppendItem (self.qOptiProEconomic, _("Investment"))
-        self.qOptiProEconomic2 = self.tree.AppendItem (self.qOptiProEconomic, _("Energy and operating costs"))
-        self.qOptiProEconomic3 = self.tree.AppendItem (self.qOptiProEconomic, _("Contingencies"))
-        self.qOptiProEconomic4 = self.tree.AppendItem (self.qOptiProEconomic, _("Non reocurring costs"))    
+        self.qECO  = self.tree.AppendItem (self.qA, _("Total Cost Assessment"))  
+        self.qECO1 = self.tree.AppendItem (self.qECO, _("Investment"))
+        self.qECO2 = self.tree.AppendItem (self.qECO, _("Energy and operating costs"))
+        self.qECO3 = self.tree.AppendItem (self.qECO, _("Contingencies"))
+        self.qECO4 = self.tree.AppendItem (self.qECO, _("Non reocurring costs"))    
 
 
         #Comparative analysis

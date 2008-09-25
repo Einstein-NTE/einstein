@@ -66,6 +66,7 @@ class ModuleHR(object):
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
         self.ExHX = False
+        self.HiddenHX = []
         self.data = HRData(Status.PId,Status.ANo)
         self.data.loadDatabaseData()             
 
@@ -98,14 +99,21 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------ 
         try:     
             dataList = []  
+            index = 0
             for hx in self.data.hexers:
                 try:
                     opcost = float(hx["OMVar"])+float(hx["OMFix"])
                     opcost_str = str(opcost)
                 except:
                     opcost_str = ""
-                row = [hx["HXName"],hx["QdotHX"],hx["StorageSize"],hx["HXSource"],hx["HXTSourceInlet"],hx["HXTSourceOutlet"],hx["HXSink"],hx["HXTSinkInlet"],hx["HXTSinkOutlet"],hx["Area"],hx["TurnKeyPrice"],opcost_str]
+                name = hx["HXName"]
+                
+                if (index in self.HiddenHX):
+                    name=name+" (hidden)"
+                
+                row = [name,hx["QdotHX"],hx["StorageSize"],hx["HXSource"],hx["HXTSourceInlet"],hx["HXTSourceOutlet"],hx["HXSink"],hx["HXTSinkInlet"],hx["HXTSinkOutlet"],hx["Area"],hx["TurnKeyPrice"],opcost_str]
                 dataList.append(noneFilter(row))
+                index+=1
             data = array(dataList)
             Status.int.setGraphicsData(self.keys[0], data)
         except:
@@ -127,7 +135,11 @@ class ModuleHR(object):
 #3) updates panel
 #------------------------------------------------------------------------------    
         try:
-            self.data.deleteHexAndGenStreams(index)                       
+            if index in self.HiddenHX:
+                self.HiddenHX.remove(index)
+            else: 
+                self.HiddenHX.append(index)
+            #self.data.deleteHexAndGenStreams(index)                       
         except:
             logError(_("Could not delete HEX"))
             logDebug("(moduleHR.py) deleteHX: deleting failed.")
@@ -149,11 +161,20 @@ class ModuleHR(object):
 #   6) runSimulateHR
 #   7) updatePanel 
 #------------------------------------------------------------------------------
+        #self.HiddenHX = []
 
+        redesign_network_flag = None
         if Status.HRTool == "estimate":
+            redesign_network_flag = "f"
+
+#HS: re-activated. We need this for testing until real HR module does not work 100%.
             self.simulateHR()
-            
         else:
+            redesign_network_flag = "t"
+            
+
+#HS: I indented this again. PE should be called only if HRTool != estimate
+            
             logWarning(_("Recalculating HX network. This may take some time."))
             
             if Status.schedules.outOfDate == True:
@@ -162,7 +183,7 @@ class ModuleHR(object):
             XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
             
             try:
-                retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml"], shell=True)
+                retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag], shell=True)
                 logDebug(_("External program returned: ")+str(retcode))
                 if (retcode!=0):
                     raise
@@ -173,15 +194,15 @@ class ModuleHR(object):
                 doc = XMLImportHRModule.importXML("export.xml")
                           
                 self.data = HRData(Status.PId,Status.ANo)
-                self.data.loadFromDocument(doc)
+                
+#                if Status.HRTool == "estimate":
+#                    self.data.loadFromDocument(doc,overrideHX = False)
+#                else:
+#HS: HERE PE should calculate in override = False mode.
+                self.data.loadFromDocument(doc,overrideHX = False)
                         
                 self.simulateHRnew()
 
-
-        print "ModuleHR (runHRModule): QWHAmb = %s"%Status.int.QWHAmb_T[Status.NT+1]
-        print "ModuleHR (runHRModule): USH = %s"%Status.int.USHTotal_T[Status.NT+1]
-        print "ModuleHR (runHRModule): UPH = %s"%Status.int.UPHTotal_T[Status.NT+1]
-        print "ModuleHR (runHRModule): UPHProc = %s"%Status.int.UPHProcTotal_T[Status.NT+1]
 
 #HS2008-09-06: updatePanel should be called both for simulateHR and for simulateHRnew, isn't it ?                    
         self.updatePanel()
@@ -274,7 +295,12 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
 # Matrix and List calculation
 #------------------------------------------------------------------------------    
-    def calcQD_T(self):    
+    def calcQD_T(self): 
+        streams = self.data.streams[:]
+        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+        for stream in hidden:
+            streams.append(stream)
+           
         QD_T = []
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
@@ -282,7 +308,7 @@ class ModuleHR(object):
     
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
-            for stream in self.data.streams:                
+            for stream in streams:                
                 if (stream.HotColdType == "cold"):
                     if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):  
                         if (temperature <= stream.EndTemp):                                                                                                                                  
@@ -295,7 +321,12 @@ class ModuleHR(object):
                         
         self.data.QD_T = QD_T
         
-    def calcQA_T(self):        
+    def calcQA_T(self):      
+        streams = self.data.streams[:]
+        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+        for stream in hidden:
+            streams.append(stream)
+          
         QA_T = []
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
@@ -303,7 +334,7 @@ class ModuleHR(object):
     
         temperature_step = 5;
         for temperature in xrange(406, 0, -temperature_step):
-            for stream in self.data.streams:                
+            for stream in streams:                
                 if (stream.HotColdType == "hot"):
                     if  ((temperature - stream.StartTemp) <= 0) and (stream.HeatType == "sensible"):  
                         if (temperature >= stream.EndTemp):                                                                                                                                  

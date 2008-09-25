@@ -17,8 +17,9 @@
 #
 #   Version No.: 0.01
 #   Created by:        Florian Joebstl 17/09/2008
-#   Last revised by:      
+#   Last revised by:   Florian Joebstl 23/09/2008     
 #
+#   17/09/08 FJ Fixed bug in storeTCAGeneral so that no data is overwritten  
 #   
 #------------------------------------------------------------------------------
 
@@ -26,20 +27,22 @@
 from einstein.GUI.status import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+import math
 
 class TCAData(object):
         
     def __init__(self,pid,ano):
-        print "Init TCA Data (%s,%s)" % (pid,ano)
+        #print "Init TCA Data (%s,%s)" % (pid,ano)
         self.pid = pid
         self.ano = ano
         self.tcaid = None   #will be set after generaldata is loaded
+        self.ResultPresent = False
             
 #--------------------------------------------------------------------------------------------
 # Public Methodes
 #--------------------------------------------------------------------------------------------                                 
     def loadTCAData(self):
-        print "Load Data"
+        #print "Load Data"
         #General Data
         if (self.__getTCAGeneralData()    == False):
             self.__setTCAGeneralDataDefault()
@@ -77,7 +80,7 @@ class TCAData(object):
             self.__getTCARevenueData()
 
     def storeTCAData(self):
-        print "Store Data"        
+        #print "Store Data"        
         self.__storeTCAGeneralDataEntry()
         
         self.__deleteTCAInvestmentDataEntry()  
@@ -95,7 +98,7 @@ class TCAData(object):
         self.__storeTCARevenueDataEntry()     
     
     def resetTCAData(self):
-        print "Reset Data"
+        #print "Reset Data"
         self.__deleteTCAGeneralDataEntry() 
         self.__deleteTCAInvestmentDataEntry()  
         self.__deleteTCAEnergyDataEntry()
@@ -103,12 +106,45 @@ class TCAData(object):
         self.__deleteTCAContingenciesDataEntry()
         self.__deleteTCADetailedOpCostDataEntry()
         self.__deleteTCARevenueDataEntry()
-            
+                       
+          
+    def setResult(self,name,npv,mirr,bcr,annuity,paybackperiod,display):
+        self.name = name
+        self.npv = npv
+        self.mirr = mirr
+        self.bcr = bcr
+        self.annuity = annuity
+        self.display = display
+        self.TIC = self.cashflow.TotalInvestmentCapital
+        self.EIC = self.cashflow.EffectiveInvstmentCapital  
+        self.PP  = paybackperiod 
+        self.totalfunding = self.cashflow.TotalFundings
+        self.ResultPresent = True
+    
+    def setResultInvalid(self,name,display):
+        self.name = name
+        self.display = display
+        self.ResultPresent = False
+        
+    def storeResultToCGeneralData(self):
+        try:
+            if (self.ResultPresent):
+                #mirr = self.mirr[int(math.ceil(self.PP))] #mirr at payback period
+                mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year
+                query = """UPDATE cgeneraldata 
+                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, AmortisationTime  = %s
+                           WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+                query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,self.pid,self.ano)
+                Status.DB.sql_query(query)
+        except Exception, inst:
+            print type(inst)
+            print inst.args
+            print inst
 #--------------------------------------------------------------------------------------------
 # General Data
 #--------------------------------------------------------------------------------------------     
     def __setTCAGeneralDataDefault(self):
-        print "Set Default Data (General)"
+        #print "Set Default Data (General)"
         self.tcaid     = None
         self.Inflation = 0.0
         self.NIR       = 0.0
@@ -119,7 +155,7 @@ class TCAData(object):
         self.revenue     = 0.0
         
     def __getTCAGeneralData(self):
-        print "Get Data (General)"
+        #print "Get Data (General)"
         query = """SELECT IDTca, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue 
                    FROM tcaGeneralData 
                    WHERE ProjectID=%s AND AlternativeProposalNo=%s;""" 
@@ -139,7 +175,7 @@ class TCAData(object):
             return True
         
     def __storeTCAGeneralDataEntry(self):
-        print "Store Data (General)"
+        #print "Store Data (General)"
         if (self.tcaid == None):
             query = """SELECT `InflationRate`,`NominalInterestRate`,`CompSpecificDiscountRate`,`FulePriceRate`,`AmotisationTime` FROM `tcageneraldata` WHERE ProjectID=%s"""
             query = query % (self.pid)
@@ -157,16 +193,23 @@ class TCAData(object):
             query = """INSERT INTO tcaGeneralData (ProjectID,AlternativeProposalNo, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue)
                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
             query = query %(self.pid,self.ano,self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue)
+            Status.DB.sql_query(query)
         else:
+            #Update for all proposals
             query = """UPDATE tcaGeneralData 
-                       SET InflationRate = %s, NominalInterestRate = %s , CompSpecificDiscountRate  = %s , FulePriceRate  = %s, AmotisationTime  = %s, TotalOperatingCost = %s, TotalRevenue = %s
+                       SET InflationRate = %s, NominalInterestRate = %s , CompSpecificDiscountRate  = %s , FulePriceRate  = %s, AmotisationTime  = %s
                        WHERE ProjectID = %s"""
-            query = query %(self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue,self.pid)
-        Status.DB.sql_query(query)
-       
+            query = query %(self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.pid)
+            Status.DB.sql_query(query)
+            #Update for current proposal only
+            query = """UPDATE tcaGeneralData 
+                       SET TotalOperatingCost = %s, TotalRevenue = %s
+                       WHERE ProjectID = %s AND AlternativeProposalNo=%s"""
+            query = query %(self.totalopcost,self.revenue,self.pid,self.ano)
+            Status.DB.sql_query(query)                           
         
     def __deleteTCAGeneralDataEntry(self):
-        print "Delete Data (General)"
+        #print "Delete Data (General)"
         query = """DELETE FROM tcaGeneralData
                    WHERE ProjectID=%s AND AlternativeProposalNo=%s;""" 
         query = query % (Status.PId,Status.ANo)
@@ -177,11 +220,11 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------  
 
     def __setTCAInvestmentDataDefault(self):
-        print "Set Default Data (Investment)"
+        #print "Set Default Data (Investment)"
         self.investment = []
                 
     def __storeTCAInvestmentDataEntry(self):
-        print "Store Data (Investment)"
+        #print "Store Data (Investment)"
         for investment in self.investment:
             query = """INSERT INTO tcaInvestments (TcaID, Description, Investment, FundingPerc, FundingFix)
                        VALUES(%s,\"%s\",%s,%s,%s)"""
@@ -190,7 +233,7 @@ class TCAData(object):
             
     
     def __getTCAInvestmentData(self):
-        print "Get Data (Investment)"
+        #print "Get Data (Investment)"
         query = """SELECT Description, Investment, FundingPerc, FundingFix
                    FROM tcaInvestments
                    WHERE TcaID = %s"""
@@ -207,7 +250,7 @@ class TCAData(object):
             return True                                                   
 
     def __deleteTCAInvestmentDataEntry(self):
-        print "Delete Data (Investment)"
+        #print "Delete Data (Investment)"
         query = """DELETE FROM tcaInvestments
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
@@ -217,11 +260,11 @@ class TCAData(object):
 # Energy
 #-------------------------------------------------------------------------------------------- 
     def __setTCAEnergyDataDefault(self):
-        print "Set Default Data (Energy)"
+        #print "Set Default Data (Energy)"
         self.energycosts = []
                 
     def __storeTCAEnergyDataEntry(self):
-        print "Store Data (Energy)"
+        #print "Store Data (Energy)"
         for energycost in self.energycosts:
             query = """INSERT INTO tcaEnergy (TcaID, Description, EnergyDemand, EnergyPrice, DevelopmentOfEnergyPrice)
                        VALUES(%s,\"%s\",%s,%s,%s)"""
@@ -230,7 +273,7 @@ class TCAData(object):
             
     
     def __getTCAEnergyData(self):
-        print "Get Data (Energy)"
+        #print "Get Data (Energy)"
         query = """SELECT Description, EnergyDemand, EnergyPrice, DevelopmentOfEnergyPrice
                    FROM tcaEnergy
                    WHERE TcaID = %s"""
@@ -247,7 +290,7 @@ class TCAData(object):
             return True                                                   
 
     def __deleteTCAEnergyDataEntry(self):
-        print "Delete Data (Energy)"
+        #print "Delete Data (Energy)"
         query = """DELETE FROM tcaEnergy
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
@@ -257,11 +300,11 @@ class TCAData(object):
 # Non reocurring costs
 #-------------------------------------------------------------------------------------------- 
     def __setTCANonDataDefault(self):
-        print "Set Default Data (Non reocurring costs)"
+        #print "Set Default Data (Non reocurring costs)"
         self.nonreoccuringcosts = []
                 
     def __storeTCANonDataEntry(self):
-        print "Store Data (Non reocurring costs)"
+        #print "Store Data (Non reocurring costs)"
         for cost in self.nonreoccuringcosts:
             query = """INSERT INTO tcaNonReoccuringCosts (TcaID, Description, Value, Year, Type)
                        VALUES(%s,\"%s\",%s,%s,\"%s\")"""
@@ -270,7 +313,7 @@ class TCAData(object):
             
     
     def __getTCANonData(self):
-        print "Get Data (Non reocurring costs)"
+        #print "Get Data (Non reocurring costs)"
         query = """SELECT Description, Value, Year, Type
                    FROM tcaNonReoccuringCosts
                    WHERE TcaID = %s"""
@@ -287,7 +330,7 @@ class TCAData(object):
             return True                                                   
 
     def __deleteTCANonDataEntry(self):
-        print "Delete Data (Non reocurring costs)"
+        #print "Delete Data (Non reocurring costs)"
         query = """DELETE FROM tcanonreoccuringcosts
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
@@ -298,11 +341,11 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------
 
     def __setTCAContingenciesDataDefault(self):
-        print "Set Default Data (Contingencies)"
+        #print "Set Default Data (Contingencies)"
         self.contingencies = []
                 
     def __storeTCAContingenciesDataEntry(self):
-        print "Store Data (Contingencies)"
+        #print "Store Data (Contingencies)"
         for contingency in self.contingencies:
             query = """INSERT INTO tcaContingencies (TcaID, Description, Value, TimeFrame)
                        VALUES(%s,\"%s\",%s,%s)"""
@@ -310,7 +353,7 @@ class TCAData(object):
             Status.DB.sql_query(query)                          
     
     def __getTCAContingenciesData(self):
-        print "Get Data (Contingencies)"
+        #print "Get Data (Contingencies)"
         query = """SELECT Description, Value, TimeFrame
                    FROM tcaContingencies
                    WHERE TcaID = %s"""
@@ -328,7 +371,7 @@ class TCAData(object):
                                                                 
 
     def __deleteTCAContingenciesDataEntry(self):
-        print "Delete Data (Contingencies)"
+        #print "Delete Data (Contingencies)"
         query = """DELETE FROM tcaContingencies
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
@@ -339,11 +382,11 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------
 
     def __setTCADetailedOpCostDataDefault(self):
-        print "Set Default Data (Detailed operting cost)"
+        #print "Set Default Data (Detailed operting cost)"
         self.detailedopcost = [[],[],[],[],[],[],[]] 
                 
     def __storeTCADetailedOpCostDataEntry(self):
-        print "Store Data (Detailed operting cost)"
+        #print "Store Data (Detailed operting cost)"
         for i in range(0,7): #7 categorys in detailed opcost
             for opcost in self.detailedopcost[i]:
                 query = """INSERT INTO tcaDetailedOpCost (TcaID, Description, Value, Category)
@@ -352,7 +395,7 @@ class TCAData(object):
                 Status.DB.sql_query(query)                          
     
     def __getTCADetailedOpCostData(self):
-        print "Get Data (Detailed operting cost)"
+        #print "Get Data (Detailed operting cost)"
         self.detailedopcost = [[],[],[],[],[],[],[]] 
         for i in range(0,7):
             query = """SELECT Description, Value
@@ -370,7 +413,7 @@ class TCAData(object):
                                                                 
 
     def __deleteTCADetailedOpCostDataEntry(self):
-        print "Delete Data (Detailed operting cost)"
+        #print "Delete Data (Detailed operting cost)"
         query = """DELETE FROM tcaDetailedOpCost
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
@@ -381,11 +424,11 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------
 
     def __setTCARevenueDataDefault(self):
-        print "Set Default Data (Revenue)"
+        #print "Set Default Data (Revenue)"
         self.revenues = [] 
                 
     def __storeTCARevenueDataEntry(self):
-        print "Store Data (Revenue)"
+        #print "Store Data (Revenue)"
         for revenue in self.revenues:
             query = """INSERT INTO tcaDetailedRevenue (TcaID, Description, InitialInvestment, DeprecationPeriod, RemainingPeriod) 
                        VALUES(%s,\"%s\",%s,%s,%s)"""
@@ -393,7 +436,7 @@ class TCAData(object):
             Status.DB.sql_query(query)                          
     
     def __getTCARevenueData(self):
-        print "Get Data (Revenue)"        
+        #print "Get Data (Revenue)"        
         query = """SELECT Description, InitialInvestment, DeprecationPeriod, RemainingPeriod
                    FROM tcaDetailedRevenue
                    WHERE TcaID = %s"""
@@ -411,7 +454,7 @@ class TCAData(object):
                                                                 
 
     def __deleteTCARevenueDataEntry(self):
-        print "Delete Data (Revenue)"
+        #print "Delete Data (Revenue)"
         query = """DELETE FROM tcaDetailedRevenue
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
