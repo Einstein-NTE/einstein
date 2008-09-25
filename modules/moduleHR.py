@@ -170,7 +170,9 @@ class ModuleHR(object):
 #HS: re-activated. We need this for testing until real HR module does not work 100%.
             self.simulateHR()
         else:
-            redesign_network_flag = "t"
+#            redesign_network_flag = "t"
+            redesign_network_flag = "f"
+#HS: runHRModule should NEVER redesign the network, neither in "estimate" nor in "PE2" mode !!!
             
 
 #HS: I indented this again. PE should be called only if HRTool != estimate
