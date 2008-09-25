@@ -29,12 +29,13 @@
 #==============================================================================
 import wx
 import pSQL
-from status import Status
+#from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
 from fonts import *
 from einstein.GUI.dialogOK import *
+import copy
 
 # constants that control the default sizes
 # 1. font sizes
@@ -57,7 +58,7 @@ def create(parent):
  wxID_FRAME1STATICTEXT2, 
 ] = [wx.NewId() for _init_ctrls in range(4)]
 
-class PreferencesFrame(wx.Frame):
+class PreferencesFrame(wx.Dialog):
     def __init__(self, parent):
         self._init_ctrls(parent)
         self.__do_layout()
@@ -65,7 +66,7 @@ class PreferencesFrame(wx.Frame):
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
-        wx.Frame.__init__(self, id=wxID_FRAME1, name='', parent=prnt,
+        wx.Dialog.__init__(self, id=wxID_FRAME1, name='', parent=prnt,
               pos=wx.Point(300, 140), size=wx.Size(600, 400),
               style=wx.DEFAULT_FRAME_STYLE, title='EINSTEINs preferences')
         self.SetClientSize(wx.Size(600, 400))
@@ -107,6 +108,7 @@ class PreferencesFrame(wx.Frame):
 
         self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+        
         self.buttonOK.SetDefault()
         self.buttonOK.SetFont(fp.getFont())
 
@@ -150,12 +152,13 @@ class PreferencesFrame(wx.Frame):
 
     def OnButtonCancel(self, event):
         confirm =  DialogOK(self,_("exit settings"),_("do you want to exit without saving ?"))
-        if confirm.ShowModal() == wx.ID_OK: self.Close()
+        if confirm.ShowModal() == wx.ID_OK: self.EndModal(wx.ID_CANCEL)
 
     def OnButtonOK(self, event):
-        Status.HRTool = self.par2_1.GetValue(text="True")
-        print "Preferences (ButtonOK): HRTool = ",Status.HRTool
-        self.Close()
+        Status.HRTool = copy.deepcopy(self.par2_1.GetValue(text="True"))
+        Status.HRToolNo = self.par2_1.GetValue()
+        print "Preferences (ButtonOK): HRTool = ",Status.HRTool,Status.HRToolNo
+        self.EndModal(wx.ID_OK)
 
     def fillPage(self):
         try:
@@ -165,5 +168,4 @@ class PreferencesFrame(wx.Frame):
             Status.HRTool = "PE2"
             
         self.par2_1.entry.SetStringSelection(Status.HRTool)
-
 

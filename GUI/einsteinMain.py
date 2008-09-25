@@ -713,8 +713,9 @@ class EinsteinFrame(wx.Frame):
 
 
     def OnMenuSettingsPreferences(self, event):
-        framePreferences = PreferencesFrame(None)
-        framePreferences.Show()
+        framePreferences = PreferencesFrame(self)
+        x = framePreferences.ShowModal()
+        print "EinsteinMain: HRTool set to ",Status.HRTool
 
     def OnMenuSettingsLanguage(self,event):
         dialogLang = DialogLanguage(self)

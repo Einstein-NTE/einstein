@@ -48,7 +48,7 @@ from math import *
 from numpy import *
 
 from einstein.auxiliary.auxiliary import *
-from einstein.GUI.status import *
+from einstein.GUI.status import Status
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
@@ -162,14 +162,17 @@ class ModuleHR(object):
 #   7) updatePanel 
 #------------------------------------------------------------------------------
         #self.HiddenHX = []
+        print "ModuleHR (runHRModule): running in %s mode"%Status.HRTool
 
         redesign_network_flag = None
         if Status.HRTool == "estimate":
+            print "ModuleHR (runHRModule): running in estimate mode"
             redesign_network_flag = "f"
 
 #HS: re-activated. We need this for testing until real HR module does not work 100%.
             self.simulateHR()
         else:
+            print "ModuleHR (runHRModule): running in PE2 mode"
 #            redesign_network_flag = "t"
             redesign_network_flag = "f"
 #HS: runHRModule should NEVER redesign the network, neither in "estimate" nor in "PE2" mode !!!

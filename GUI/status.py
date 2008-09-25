@@ -90,16 +90,15 @@ class Status(object):
   SIMULATED_YEAR = Nt*TimeStep
   EXTRAPOLATE_TO_YEAR = 8760.0 / SIMULATED_YEAR
 
-  HRTool = "estimate" #default tool for heat recovery calculations
+  HRTool = "estimate"
 
-  #------------------------------------------------------------------------------		
-  # Instance variables
+#------------------------------------------------------------------------------		
+# Instance variables
 
   def __init__(self, name):
     self.myname = name
-    print "instance of Status created"
-    
-  #==============================================================================
+
+#==============================================================================
 
 
 if __name__ == "__main__":
