@@ -18,7 +18,7 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.101
+#   Version No.: 0.102
 #   Created by:         Heiko Henning (Imsai e-soft)    February 2008
 #   Revisions:          Tom Sobota                          12/03/2008
 #                       Hans Schweiger                      22/03/2008
@@ -64,6 +64,7 @@
 #                       Hans Schweiger                      05/09/2008
 #                       Hans Schweiger                      12/09/2008
 #                       Florian Joebstl                     15/09/2008
+#                       Hans Schweiger                      25/09/2008
 #
 #       Change list:
 #       12/03/2008- panel Energy added
@@ -145,6 +146,7 @@
 #       05/09/2008  HS PanelCHP activated
 #       12/09/2008  HS Preferences frame added
 #       15/09/2008  FJ TCA GUI added
+#       25/09/2008  HS Activation of import / export data from databases
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -254,6 +256,7 @@ from einstein.modules.exportdata import *
 from fonts import FontProperties
 #TS2008-06-30 database management
 from dialogDatabase import DlgDatabase
+from dialogImport import DialogImport
 
 #----- Constants
 qPageSize = (800, 600)
@@ -584,14 +587,48 @@ class EinsteinFrame(wx.Frame):
         if self.askConfirmation(_("Do you really want to exit?")) == wx.ID_YES:
             wx.Exit()
 
-    def OnMenuExportData(self, event):
-        showMessage(_("sorry: this option is not yet available"))
-#        print 'PId='+repr(Status.PId)
-#        ex = ExportDataXML(pid=Status.PId,ano=Status.ANo, fuels=[1,2,3], fluids=[1,2,3,4])
+    def OnMenuExportAll(self, event):
+        ex = ExportDB("all")
+
+    def OnMenuExportDBBenchmark(self, event):
+        ex = ExportDB("dbbenchmark")
+        
+    def OnMenuExportDBNaceCode(self, event):
+        ex = ExportDB("dbnacecode")
+        
+    def OnMenuExportDBUnitOperation(self, event):
+        ex = ExportDB("dbunitoperation")
+        
+    def OnMenuExportAllEquipments(self, event):
+        ex = ExportDB("all equipments")
+        
+    def OnMenuExportDBCHP(self, event):
+        ex = ExportDB("dbchp")
+        
+    def OnMenuExportDBHeatPump(self, event):
+        ex = ExportDB("dbheatpump")
+        
+    def OnMenuExportDBFluid(self, event):
+        ex = ExportDB("dbfluid")
+        
+    def OnMenuExportDBFuel(self, event):
+        ex = ExportDB("dbfuel")
+        
+    def OnMenuExportDBElectricityMix(self, event):
+        ex = ExportDB("dbelectricitymix")
+        
+    def OnMenuExportDBBoiler(self, event):
+        ex = ExportDB("dbboiler")
+        
+    def OnMenuExportDBSolarThermal(self, event):
+        ex = ExportDB("dbsolarthermal")
+        
+    def OnMenuExportDBChiller(self, event):
+        ex = ExportDB("dbchiller")
+        
 
     def OnMenuImportData(self, event):
-        showMessage(_("sorry: this option is not yet available"))
-#        ex = ImportDataXML()
+        im = ImportDB()
 
     def OnMenuExportProject(self, event):
         print 'PId='+repr(Status.PId)
@@ -1259,8 +1296,10 @@ class EinsteinFrame(wx.Frame):
 
         self.submenuPrint = wx.Menu()
         self.submenuEditDB = wx.Menu()
+        self.submenuExportDB = wx.Menu()
 
         self.submenuEquipments = wx.Menu()
+        self.submenuExportEquipments = wx.Menu()
         self.submenuUserLevel = wx.Menu()
         self.submenuClassification = wx.Menu()
 
@@ -1276,7 +1315,7 @@ class EinsteinFrame(wx.Frame):
         self.ImportQ = self.menuFile.Append(-1, _("Import &Questionnaire"))
         self.menuFile.AppendSeparator()
         self.ImportData = self.menuFile.Append(-1, _("Import data"))
-        self.ExportData = self.menuFile.Append(-1, _("Export data"))
+        self.ExportData = self.menuFile.AppendMenu(-1, _("Export data"),self.submenuExportDB)
         self.menuFile.AppendSeparator()
         self.Print = self.menuFile.AppendMenu(-1, _("&Print"), self.submenuPrint)
         self.menuFile.AppendSeparator()
@@ -1299,6 +1338,22 @@ class EinsteinFrame(wx.Frame):
 
         self.EditDBNaceCode = self.submenuClassification.Append(-1, _("&Nace code"))
         self.EditDBUnitOperation = self.submenuClassification.Append(-1, _("&Unit operation"))
+
+        self.ExportAll = self.submenuExportDB.Append(-1, _("all data bases"))
+        self.ExportEquipments = self.submenuExportDB.AppendMenu(-1, _("Equipments"), self.submenuExportEquipments)
+        self.ExportDBFuel = self.submenuExportDB.Append(-1, _("Fue&ls"))
+        self.ExportDBFluid = self.submenuExportDB.Append(-1, _("Flui&ds"))
+        self.ExportDBElectricityMix = self.submenuExportDB.Append(-1, _("Electricity mix"))
+        self.ExportDBBenchmark = self.submenuExportDB.Append(-1, _("&Benchmarks"))
+        self.ExportDBBAT = self.submenuExportDB.Append(-1, "Best available technologies")
+
+        self.ExportAllEquipments = self.submenuExportEquipments.Append(-1, _("all equipment data bases"))
+        self.ExportDBCHP = self.submenuExportEquipments.Append(-1, _("&CHP"))
+        self.ExportDBHeatPump = self.submenuExportEquipments.Append(-1, _("&Heat pumps"))
+        self.ExportDBChiller = self.submenuExportEquipments.Append(-1, _("&Chillers"))
+        self.ExportDBBoiler = self.submenuExportEquipments.Append(-1, _("B&oilers"))
+        self.ExportDBStorage = self.submenuExportEquipments.Append(-1, _("Stora&ge"))
+        self.ExportDBSolarThermal = self.submenuExportEquipments.Append(-1, _("&Solar Collectors"))
 
         self.interactionLevelList=[]
         i = wx.NewId()
@@ -1520,7 +1575,6 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuOpenProject, self.OpenProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExit, self.ExitApp)
         self.Bind(wx.EVT_MENU, self.OnMenuImportData, self.ImportData)
-        self.Bind(wx.EVT_MENU, self.OnMenuExportData, self.ExportData)
         self.Bind(wx.EVT_MENU, self.OnMenuImportProject, self.ImportProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExportProject, self.ExportProject)
 
@@ -1536,6 +1590,18 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarThermal, self.EditDBSolarThermal)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
+
+        self.Bind(wx.EVT_MENU, self.OnMenuExportAll, self.ExportAll)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBBenchmark, self.ExportDBBenchmark)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportAllEquipments, self.ExportAllEquipments)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBCHP, self.ExportDBCHP)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBHeatPump, self.ExportDBHeatPump)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBFluid, self.ExportDBFluid)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBFuel, self.ExportDBFuel)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBElectricityMix, self.ExportDBElectricityMix)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBBoiler, self.ExportDBBoiler)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBSolarThermal, self.ExportDBSolarThermal)
+        self.Bind(wx.EVT_MENU, self.OnMenuExportDBChiller, self.ExportDBChiller)
 
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel1, self.UserSelectLevel1)
         self.Bind(wx.EVT_MENU, self.OnMenuUserSelectLevel2, self.UserSelectLevel2)
