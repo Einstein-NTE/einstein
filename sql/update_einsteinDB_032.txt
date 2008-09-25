@@ -1,0 +1,7 @@
+use energyxperts;
+
+ALTER TABLE qprocessdata DROP COLUMN UPHtotQ;
+ALTER TABLE cgeneraldata DROP COLUMN OMBiuildFung;
+
+ALTER TABLE qdistributionhc CHANGE COLUMN UDistPipe UAPipe DOUBLE COMMENT 'Total pipe heat loss coefficient';
+ALTER TABLE questionnaire CHANGE COLUMN Address Address VARCHAR(200) COMMENT 'Address of industry';
