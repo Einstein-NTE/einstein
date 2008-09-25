@@ -35,6 +35,7 @@
 #                           Hans Schweiger      18/08/2008
 #                           Hans Schweiger      02/09/2008 ff
 #                           Hans Schweiger      11/09/2008
+#                           Hans Schweiger      24/09/2008
 #
 #       Changes in last update:
 #       09/04/08    Change in adjustProd ..
@@ -70,6 +71,7 @@
 #       02/09/2008  skip very bad estimates in meanValueOf - functions
 #                   latent heat added in calcH
 #       11/09/2008  linear propagation of errors in sums and diffs
+#       24/09/2008  calcDiff/adjustDiff-GTZero introduced (provisional solution)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -871,6 +873,7 @@ def calcDiff(yname,x1,x2):
         y.sqerr = INFINITE
     else:
         y.val = x1.val - x2.val
+            
         if (y.val <> 0):
             x1.calcDev()
             x2.calcDev()
@@ -1751,7 +1754,7 @@ def adjRowSum(name,y,row,m):
     return diff     #returns the value of the adjustment difference for iteration control
 
 #------------------------------------------------------------------------------
-def adjustDiff(y,x1,x2):
+def adjustDiff(y,x1,x2,GTZero=False):
 #------------------------------------------------------------------------------
 #   Default function for calculating and adjusting the components of a difference of two values
 #------------------------------------------------------------------------------
@@ -1766,16 +1769,18 @@ def adjustDiff(y,x1,x2):
     if y.val is not None:
 
         y.calcDev()
+        x1.calcDev()
+        x2.calcDev()
 
         if iszero(y):   #special case SUM = 0
                     # in this case holds x1 = x2                    
-            ccheck1(x1,x2)
+            if GTZero == False:
+                ccheck1(x1,x2)
 
         elif (x1.val is not None) and ((x1.sqdev < x2.sqdev) or x2.val ==None):
           
             x2.val = x1.val - y.val
 
-            x1.calcDev()
             x2.dev = y.dev + x1.dev
             x2.sqdev = pow(x2.dev,2.0)
             x2.calcErr()
@@ -1783,7 +1788,6 @@ def adjustDiff(y,x1,x2):
         elif x2.val is not None:
             
             x1.val = y.val + x2.val
-            x2.calcDev()
             x1.dev = y.dev + x2.dev
             x1.sqdev = pow(x1.dev,2.0)
             x1.calcErr()

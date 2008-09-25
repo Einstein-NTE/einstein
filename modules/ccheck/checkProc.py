@@ -182,10 +182,7 @@ class CheckProc():
         self.QHXProc = CCPar("QHXProc")# It comes from the matrix
         self.QWHProc = CCPar("QWHProc")# It comes from the matrix. In theory it is the sum UPHw and UPHmass (not existing yet)
 
-        if TEST==True:
-            self.importTestData(k)
-        else:
-            self.importData(k)
+        self.importData(k)
 
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllUPH()
@@ -268,6 +265,12 @@ class CheckProc():
                 self.internalHR = False
             else:
                 self.internalHR = True
+
+            if (self.PTFinal.val is None) and (self.HeatRecOK == True):
+                self.PTFinal.setValue(0.0)  #set to zero if nothing is specified !!!
+                if self.VOutFlow.val > 0 or self.VOutFlow.val is None:
+                    logMessage(_("Process No. %s: no final temperature specified for outflowing medium. ")+\
+                               _("zero assumed !"))
                
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -328,303 +331,6 @@ class CheckProc():
 
 
 
-    def importTestData(self,k):  #later on should import data from SQL. now simply sets to some value
-
-        if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.FluidCp = 0.001 # kWh/K*Kg 
-            self.FluidDensity = 1.03 # Kg/m3 
-            
-
-            self.PTInFlow = CCPar("PTInFlow")
-            self.PTInFlow.val = 4
-            self.PTInFlow.sqerr = 0.0
-
-            self.PT = CCPar("PT")
-            self.PT.val = 72
-            self.PT.sqerr = 0.05
-
-            self.PTOutFlow = CCPar("PTOutFlow") # assumed to be Tpor
-            self.PTOutFlow.val = 37
-            self.PTOutFlow.sqerr = 0.5
-
-            self.PTOutFlowRec = CCPar("PTOutFlowRec") # It is not defined in the questionnaire. it has to be estimated
-            self.PTOutFlowRec.val = 35
-            self.PTOutFlowRec.sqerr = 0.5
-
-            self.PTInFlowRec = CCPar("PTInFlowRec")
-            self.PTInFlowRec.val = 50
-            self.PTInFlowRec.sqerr = 0.5
-
-            self.PTStartUp = CCPar("PTStartUp")
-            self.PTStartUp.val = None
-            self.PTStartUp.sqerr = INFINITE
-            
-            self.VInFlowDay = CCPar("VInFlowDay ")
-            self.VInFlowDay.val = 4000
-            self.VInFlowDay.sqerr = 0.0
-            
-            self.VolProcMed = CCPar("VolProcMed")
-            self.VolProcMed.val = 15
-            self.VolProcMed.sqerr = 0.1   #
-            
-            self.NDaysProc = CCPar("NDaysProc")
-            self.NDaysProc.val = 260 # 5 days/week
-            self.NDaysProc.sqerr = 0.0  #example: big uncertainty in operating hours
-
-            self.HPerDayProc = CCPar("HPerDay")
-            self.HPerDayProc.val = 10
-            self.HPerDayProc.sqerr = 0.3  #example: uncertainty in operating hours
-
-            self.NBatch = CCPar("NBatch")
-            self.NBatch.val = 5
-            self.NBatch.sqerr = 0.0
-
-            self.HPerYearProc = CCPar("HPerYearProc")
-            self.HPerYearProc.val = None
-            self.HPerYearProc.sqerr = INFINITE  
-
-            self.TEnvProc = CCPar("TEnvProc")
-            self.TEnvProc.val = 20
-            self.TEnvProc.sqerr = 0.0
-
-            self.QEvapProc = CCPar("QEvapProc")# not into questionnaire only for test
-            self.QEvapProc.val = 30000
-            self.QEvapProc.sqerr = INFINITE
-            
-            self.QOpProc = CCPar("QOpProc")
-            self.QOpProc.val = 50000
-            self.QOpProc.sqerr = INFINITE
-            
-            self.UPHProc = CCPar("UPHProc")
-            self.UPHProc.val = 5e+6
-            self.UPHProc.sqerr = 0.05    #example: quantity of heat required is well known
-
-            self.QHXProc = CCPar("QHXProc")# It comes from the matrix not from the questionnaire
-            self.QHXProc.val = 1.e+6
-            self.QHXProc.sqerr = 0
-
-        elif TESTCASE == 3:       #original test case Kla - first version of FECel
-
-            if (k==0):
-                self.FluidCp = 0.001 # kWh/K*Kg 
-                self.FluidDensity = 1.03 # Kg/m3 
-                
-
-                self.PTInFlow = CCPar("PTInFlow")
-                self.PTInFlow.val = 4
-                self.PTInFlow.sqerr = 0.0
-
-                self.PT = CCPar("PT")
-                self.PT.val = 72
-                self.PT.sqerr = 0.0
-
-                self.PTOutFlow = CCPar("PTOutFlow") # assumed to be Tpor
-                self.PTOutFlow.val = None
-                self.PTOutFlow.sqerr = INFINITE
-
-                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
-                self.PTOutFlowRec.val = 50
-                self.PTOutFlowRec.sqerr = 0.0
-
-                self.PTInFlowRec = CCPar("PTInFlowRec")
-                self.PTInFlowRec.val = 50
-                self.PTInFlowRec.sqerr = 0.0
-
-                self.PTStartUp = CCPar("PTStartUp")
-                self.PTStartUp.val = None
-                self.PTStartUp.sqerr = INFINITE
-                
-                self.VInFlowDay = CCPar("VInFlowDay ")
-                self.VInFlowDay.val = None
-                self.VInFlowDay.sqerr = INFINITE
-                
-                self.VolProcMed = CCPar("VolProcMed")
-                self.VolProcMed.val = 0.0
-                self.VolProcMed.sqerr = 0.0   #
-                
-                self.NDaysProc = CCPar("NDaysProc")
-                self.NDaysProc.val = 250 # 5 days/week
-                self.NDaysProc.sqerr = 0.0  #example: big uncertainty in operating hours
-
-                self.HPerDayProc = CCPar("HPerDay")
-                self.HPerDayProc.val = 16
-                self.HPerDayProc.sqerr = 0.0  #example: uncertainty in operating hours
-
-                self.NBatch = CCPar("NBatch")
-                self.NBatch.val = 5
-                self.NBatch.sqerr = 0.0
-
-                self.HPerYearProc = CCPar("HPerYearProc")
-                self.HPerYearProc.val = None
-                self.HPerYearProc.sqerr = INFINITE  
-
-                
-                self.TEnvProc = CCPar("TEnvProc")
-                self.TEnvProc.val = 20
-                self.TEnvProc.sqerr = 0.0
-
-                                
-                self.QOpProc = CCPar("QOpProc")
-                self.QOpProc.val = 0.0
-                self.QOpProc.sqerr = 0.0
-                
-                self.UPHProc = CCPar("UPHProc")
-                self.UPHProc.val = 5000
-                self.UPHProc.sqerr = 0.0    #example: quantity of heat required is well known
-
-                self.QHXProc = CCPar("QHXProc")# It comes from the matrix not from the questionnaire
-                self.QHXProc.val = 0
-                self.QHXProc.sqerr = 0
-
-            elif (k==1):
-                self.FluidCp = 0.001 # kWh/K*Kg 
-                self.FluidDensity = 1.03 # Kg/m3 
-                
-
-                self.PTInFlow = CCPar("PTInFlow")
-                self.PTInFlow.val = 4
-                self.PTInFlow.sqerr = 0.0
-
-                self.PT = CCPar("PT")
-                self.PT.val = 72
-                self.PT.sqerr = 0.0
-
-                self.PTOutFlow = CCPar("PTOutFlow") # assumed to be Tpor
-                self.PTOutFlow.val = None
-                self.PTOutFlow.sqerr = INFINITE
-
-                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
-                self.PTOutFlowRec.val = 50
-                self.PTOutFlowRec.sqerr = 0.0
-
-                self.PTInFlowRec = CCPar("PTInFlowRec")
-                self.PTInFlowRec.val = 50
-                self.PTInFlowRec.sqerr = 0.0
-
-                self.PTStartUp = CCPar("PTStartUp")
-                self.PTStartUp.val = None
-                self.PTStartUp.sqerr = INFINITE
-                
-                self.VInFlowDay = CCPar("VInFlowDay ")
-                self.VInFlowDay.val = None
-                self.VInFlowDay.sqerr = INFINITE
-                
-                self.VolProcMed = CCPar("VolProcMed")
-                self.VolProcMed.val = 0.0
-                self.VolProcMed.sqerr = 0.0   #
-                
-                self.NDaysProc = CCPar("NDaysProc")
-                self.NDaysProc.val = 250 # 5 days/week
-                self.NDaysProc.sqerr = 0.0  #example: big uncertainty in operating hours
-
-                self.HPerDayProc = CCPar("HPerDay")
-                self.HPerDayProc.val = 16
-                self.HPerDayProc.sqerr = 0.0  #example: uncertainty in operating hours
-
-                self.NBatch = CCPar("NBatch")
-                self.NBatch.val = 5
-                self.NBatch.sqerr = 0.0
-
-                self.HPerYearProc = CCPar("HPerYearProc")
-                self.HPerYearProc.val = None
-                self.HPerYearProc.sqerr = INFINITE  
-
-                
-                self.TEnvProc = CCPar("TEnvProc")
-                self.TEnvProc.val = 20
-                self.TEnvProc.sqerr = 0.0
-
-                                
-                self.QOpProc = CCPar("QOpProc")
-                self.QOpProc.val = 0.0
-                self.QOpProc.sqerr = 0.0
-                
-                self.UPHProc = CCPar("UPHProc")
-                self.UPHProc.val = 2000
-                self.UPHProc.sqerr = 0.0    #example: quantity of heat required is well known
-
-                self.QHXProc = CCPar("QHXProc")# It comes from the matrix not from the questionnaire
-                self.QHXProc.val = None
-                self.QHXProc.sqerr = INFINITE
-
-                
-            elif (k==2):
-                self.FluidCp = 0.001 # kWh/K*Kg 
-                self.FluidDensity = 1.03 # Kg/m3 
-                
-
-                self.PTInFlow = CCPar("PTInFlow")
-                self.PTInFlow.val = 4
-                self.PTInFlow.sqerr = 0.0
-
-                self.PT = CCPar("PT")
-                self.PT.val = 72
-                self.PT.sqerr = 0.0
-
-                self.PTOutFlow = CCPar("PTOutFlow") # assumed to be Tpor
-                self.PTOutFlow.val = None
-                self.PTOutFlow.sqerr = INFINITE
-
-                self.PTOutFlowRec = CCPar("PTOutFlowRec") # It si not defined in the questionnaire. it has to be estimated
-                self.PTOutFlowRec.val = 50
-                self.PTOutFlowRec.sqerr = 0.0
-
-                self.PTInFlowRec = CCPar("PTInFlowRec")
-                self.PTInFlowRec.val = 50
-                self.PTInFlowRec.sqerr = 0.0
-
-                self.PTStartUp = CCPar("PTStartUp")
-                self.PTStartUp.val = None
-                self.PTStartUp.sqerr = INFINITE
-                
-                self.VInFlowDay = CCPar("VInFlowDay ")
-                self.VInFlowDay.val = None
-                self.VInFlowDay.sqerr = INFINITE
-                
-                self.VolProcMed = CCPar("VolProcMed")
-                self.VolProcMed.val = 0.0
-                self.VolProcMed.sqerr = 0.0   #
-                
-                self.NDaysProc = CCPar("NDaysProc")
-                self.NDaysProc.val = 250 # 5 days/week
-                self.NDaysProc.sqerr = 0.0  #example: big uncertainty in operating hours
-
-                self.HPerDayProc = CCPar("HPerDay")
-                self.HPerDayProc.val = 16
-                self.HPerDayProc.sqerr = 0.0  #example: uncertainty in operating hours
-
-                self.NBatch = CCPar("NBatch")
-                self.NBatch.val = 5
-                self.NBatch.sqerr = 0.0
-
-                self.HPerYearProc = CCPar("HPerYearProc")
-                self.HPerYearProc.val = None
-                self.HPerYearProc.sqerr = INFINITE  
-
-                
-                self.TEnvProc = CCPar("TEnvProc")
-                self.TEnvProc.val = 20
-                self.TEnvProc.sqerr = 0.0
-
-                
-                self.QOpProc = CCPar("QOpProc")
-                self.QOpProc.val = 0.0
-                self.QOpProc.sqerr = 0.0
-                
-                self.UPHProc = CCPar("UPHProc")# It comes from the questionnaire
-                self.UPHProc.val = None
-                self.UPHProc.sqerr = INFINITE
-
-
-                self.QHXProc = CCPar("QHXProc")# It comes from the matrix 
-                self.QHXProc.val = None
-                self.QHXProc.sqerr = INFINITE
-
-        else:
-            print "CheckUPH: WARNING - don't have input data for this test case no. ",TESTCASE
-
-        if DEBUG in ["ALL"]:
-            self.showAllUPH()
 
     def showAllUPH(self):
         print "====================="
@@ -717,7 +423,7 @@ class CheckProc():
 
         if iszero(self.VInFlowDay):
             self.PTInFlow.priority = 99
-            self.PTInFlowrec.priority = 99
+            self.PTInFlowRec.priority = 99
         if iszero(self.VOutFlow) or (self.HeatRecOK == False):
             self.PTOutFlow.priority = 99
             self.PTOutFlowRec.priority = 99
@@ -942,6 +648,7 @@ class CheckProc():
                            self.PTOutFlow3,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
             else:
                 self.PTFinal.update(self.PTOutFlow) #for security (link with HR module): -> zero UPHw !!!
+                self.PTFinal1.update(self.PTOutFlow) #avoid conflicts !!!
                 
             adjustProd(self.UPHw1,self.UPHw_dot,self.NBatchPerYear)
 

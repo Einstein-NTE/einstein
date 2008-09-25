@@ -2047,37 +2047,37 @@ class Project(object):
 #   substitutes the links to fluids in import of project tables
 #------------------------------------------------------------------------------
 
-        eqs = Status.prj.qgenerationhc.Questionnaire_id[PId].Refrigerant[oldID]
+        eqs = Status.DB.qgenerationhc.Questionnaire_id[PId].Refrigerant[oldID]
         for eq in eqs:
             eq.Refrigerant = newID
             logTrack("Project (substituteFluidID): table qgenerationhc - FluidID %s substituted by %s in ID %s"%\
                      (oldID,newID,eq.QGenerationHC_ID))
         
-        pipes = Status.prj.qdistributionhc.Questionnaire_id[PId].HeatDistMedium[oldID]
+        pipes = Status.DB.qdistributionhc.Questionnaire_id[PId].HeatDistMedium[oldID]
         for pipe in pipes:
             pipe.HeatDistMedium = newID
             logTrack("Project (substituteFluidID): table qdistributionhc - FluidID %s substituted by %s in ID %s"%\
                      (oldID,newID,pipe.QDistributionHC_ID))
         
-        processes = Status.prj.qprocessdata.Questionnaire_id[PId].ProcMedDBFluid_id[oldID]
+        processes = Status.DB.qprocessdata.Questionnaire_id[PId].ProcMedDBFluid_id[oldID]
         for process in processes:
             process.ProcMedDBFluid_id = newID
             logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for process medium"%\
                      (oldID,newID,process.QProcessData_ID))
         
-        processes = Status.prj.qprocessdata.Questionnaire_id[PId].ProcMedOut[oldID]
+        processes = Status.DB.qprocessdata.Questionnaire_id[PId].ProcMedOut[oldID]
         for process in processes:
             process.ProcMedOut = newID
             logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for ProcMedOut"%\
                      (oldID,newID,process.QProcessData_ID))
         
-        processes = Status.prj.qprocessdata.Questionnaire_id[PId].SupplyMedDBFluid_id[oldID]
+        processes = Status.DB.qprocessdata.Questionnaire_id[PId].SupplyMedDBFluid_id[oldID]
         for process in processes:
             process.SupplyMedDBFluid_id = newID
             logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for supply medium"%\
                      (oldID,newID,process.QProcessData_ID))
         
-        whees = Status.prj.qwasteheatelequip.ProjectID[PId].WHEEMedium[oldID]
+        whees = Status.DB.qwasteheatelequip.ProjectID[PId].WHEEMedium[oldID]
         for whee in whees:
             whees.WHEEMedium = newID
             logTrack("Project (substituteFluidID): table qwasteheatelequip - FluidID %s substituted by %s in ID %s"%\
@@ -2091,13 +2091,13 @@ class Project(object):
 #   substitutes the links to fluids in import of project tables
 #------------------------------------------------------------------------------
 
-        fuels = Status.prj.qfuel.Questionnaire_id[PId].DBFuel_id[oldID]
+        fuels = Status.DB.qfuel.Questionnaire_id[PId].DBFuel_id[oldID]
         for fuel in fuels:
             fuel.DBFuel_id = newID
             logTrack("Project (substituteFuelID): table qfuel - FuelID %s substituted by %s in ID %s"%\
                      (oldID,newID,fuel.QFuel_ID))
         
-        eqs = Status.prj.qgenerationhc.Questionnaire_id[PId].DBFuel_id[oldID]
+        eqs = Status.DB.qgenerationhc.Questionnaire_id[PId].DBFuel_id[oldID]
         for eq in eqs:
             logTrack("Project (substituteFuelID): table qgenerationhc - FuelID %s substituted by %s in ID %s"%\
                      (oldID,newID,eq.QGenerationHC_ID))
@@ -2111,7 +2111,7 @@ class Project(object):
 #   substitutes the links to fluids in import of project tables
 #------------------------------------------------------------------------------
 
-        sprojects = Status.prj.sproject.ProjectID[PId].Auditor_ID[oldID]
+        sprojects = Status.DB.sproject.ProjectID[PId].Auditor_ID[oldID]
         for sproject in sprojects:
             sproject.Auditor_ID = newID
             logTrack("Project (substituteAuditorID): table sproject - AuditorID %s substituted by %s in SProject_ID %s"%\

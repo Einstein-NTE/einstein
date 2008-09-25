@@ -1420,14 +1420,15 @@ class ModuleST(object):
 
         config=self.getUserDefinedPars()       
 
-        if config[0]!= None:
+        if config[0]is not None:
             try:    #if the field is empty division may given an error
-                self.desiredSolarFraction=config[0]/100
+                self.desiredSolarFraction=float(config[0])/100.0
             except:
+                logDebug("ModuleST (designAssistant1): non-readable solar fraction [%s]"%config[0])
                 self.desiredSolarFraction = 0.5 
         else:
             self.desiredSolarFraction= 0.5
-        if config[2]!= None:
+        if config[2]is not None:
             try:
                 self.QuSolarUnitaryMin = float(config[2])
             except:

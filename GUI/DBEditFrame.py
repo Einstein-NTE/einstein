@@ -24,6 +24,7 @@
 #                           Stoyan Danov        19/06/2008
 #                           Tom Sobota          05/07/2008
 #                           Tom Sobota          07/07/2008
+#                           Hans Schweiger      25/09/2008
 #
 #       Changes in last update:
 #       13/04/08:       preselection added as input
@@ -32,6 +33,7 @@
 #       19/06/2008 SD: change to translatable text _(...)
 #       05/07/08: TS    implemented preselection, some cleanup of code...
 #       07/07/08: TS    headers of grid now taken from DBTitles.
+#       25/09/08: HS    bug-fix -> show message in delete button
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -299,7 +301,7 @@ class DBEditFrame(wx.Dialog):
                                     'to select a row'))
         else:
             field = self.table.columns()[0]
-            if wx.ID_NO == askConfirmation(_('Delete row with %s=%s?') % (field,self.col0)):
+            if wx.ID_NO == self.main.askConfirmation(_('Delete row with %s=%s?') % (field,self.col0)):
                 return
             try:
                 dummy = int(self.col0)

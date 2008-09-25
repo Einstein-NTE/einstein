@@ -201,7 +201,8 @@ class ModuleEA4(object):
 
         if self.keys[0] == "EA4b_Table":
 
-            Status.mod.moduleHR.simulateHR()        #loads UPHProcTotal and USHTotal
+#            Status.mod.moduleHR.simulateHR()        #loads UPHProcTotal and USHTotal
+            Status.mod.moduleHR.runHRModule()        #loads UPHProcTotal and USHTotal
 
             UPHTotal = Status.int.UPHTotal_T[Status.NT+1]/1000.0
             UPHProcTotal = Status.int.UPHProcTotal_T[Status.NT+1]/1000.0
@@ -380,9 +381,9 @@ class ModuleEA4(object):
                 mediumLoad[i] /= Status.TimeStep
                 peakLoad[i] /= Status.TimeStep
 
-                energy_baseLoad[i] /= 1000.0           #convert to MWh
-                energy_mediumLoad[i] /= 1000.0  
-                energy_peakLoad[i] /= 1000.0  
+                energy_baseLoad[i] *= Status.EXTRAPOLATE_TO_YEAR/1000.0           #convert to MWh
+                energy_mediumLoad[i] *= Status.EXTRAPOLATE_TO_YEAR/1000.0  
+                energy_peakLoad[i] *= Status.EXTRAPOLATE_TO_YEAR/1000.0  
             
 # now determine maximum number of operating hours
 

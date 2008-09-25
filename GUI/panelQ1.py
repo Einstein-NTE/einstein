@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #	Created by: 	    Heiko Henning February2008
 #       Revised by:         Tom Sobota March/April 2008
 #                           Hans Schweiger 02/05/2008
@@ -27,6 +27,7 @@
 #                           Hans Schweiger  18/06/2008
 #                           Tom Sobota      01/07/2008
 #                           Hans Schwieger  03/07/2008
+#                           Hans Schweiger  25/07/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -48,7 +49,8 @@
 #                       -> commented out in tc19
 #                       -> call of self.clear() BEFORE filling list of NACE codes
 #       03/07/2008: HS  bug-fix in read/write of parameter "Independent" (tc19)
-#       16/07/2008: HS  bug-fix: findKey in reading of Independent ? [yes/no] 
+#       16/07/2008: HS  bug-fix: findKey in reading of Independent ? [yes/no]
+#       25/09/2008: HS  possibility to change project name introduced
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -574,8 +576,11 @@ class PanelQ1(wx.Panel):
 
     def OnButtonOK(self, event):
         if Status.PId <> 0 and self.notebook.GetSelection()<3:
-            if check(self.tc1.GetValue()) <> 'NULL' and \
-                Status.DB.questionnaire.Name[check(self.tc1.GetValue())][0].Questionnaire_ID == Status.PId:
+            if check(self.tc1.GetValue()) <> 'NULL':
+                projects = Status.DB.questionnaire.Name[check(self.tc1.GetValue())]
+                if len(projects) > 0 and projects[0].Questionnaire_ID <> Status.PId:
+                    self.main.showError(_("Name has to be an unique value!"))
+                    return
 
                 branchSplit = self.tc12.GetValue(text=True).split("|")
                 if len(branchSplit) > 1:
@@ -624,6 +629,8 @@ class PanelQ1(wx.Panel):
                                 
                 q = Status.DB.questionnaire.Questionnaire_ID[Status.PId][0]
                 q.update(tmp)
+
+                Status.ActiveProjectName = q.Name
                     
                 Status.SQL.commit()
 
@@ -716,6 +723,7 @@ class PanelQ1(wx.Panel):
         self.clear()
         self.fillPage()
         self.Show()
+        self.main.panelinfo.update()
 
     def fillChoiceOfNaceCode(self):
         naceDict,naceSubDict = Status.prj.getNACEDict(self.branch)

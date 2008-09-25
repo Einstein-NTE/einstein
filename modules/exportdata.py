@@ -52,6 +52,7 @@ import xml.dom.minidom
 import wx
 import MySQLdb
 from einstein.GUI.status import Status
+from messageLogger import *
 
 def openfilecreate(text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
     # ask for file for exporting
@@ -449,7 +450,9 @@ class ExportProject(object):
 #..............................................................................
 #..............................................................................
 
-        
+        self.DBName = Status.main.conf.get('DB', 'DBName')
+        print "DBName = ",self.DBName
+
         if outfile is None:
             outfile = openfilecreate('Output file for exporting project')
             if outfile is None:
@@ -460,11 +463,21 @@ class ExportProject(object):
         fd = open(outfile, 'w')
         fd.write('<?xml version="1.0" encoding="utf-8"?>\n')
         fd.write('<EinsteinProject pid="%s">\n' % (pid,))
-        cursor.execute("SHOW TABLES FROM einstein")
+        cursor.execute("SHOW TABLES FROM %s"%self.DBName)
         tables = cursor.fetchall()
         for field in tables:
-            tablename = field['Tables_in_einstein']
+            tablename = field['Tables_in_%s'%self.DBName]
             self.dumpProjectTable(cursor, fd, tablename, pid)
+
+        if len(fuelIDs)>0:
+            criterium = "WHERE DBFuel_ID IN %s" % (str(fuelIDs),)
+            criterium = criterium.replace('[','(').replace(']',')')
+            self.dumpTable(cursor, fd, 'dbfuel', criterium)
+
+        if len(fluidIDs)>0:
+            criterium = "WHERE DBFluid_ID IN %s" % (str(fluidIDs),)
+            criterium = criterium.replace('[','(').replace(']',')')
+            self.dumpTable(cursor, fd, 'dbfluid', criterium)
 
         fd.write('</EinsteinProject>\n')
         fd.close()
@@ -473,7 +486,7 @@ class ExportProject(object):
 
     def dumpProjectTable(self, cursor, fd, table, pid):
         fieldtypes = {}
-        cursor.execute("SHOW COLUMNS FROM `%s` FROM einstein" % (table,))
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM %s" % (table,self.DBName))
         result_set = cursor.fetchall()
         nfields = cursor.rowcount
         criterium = None
@@ -509,6 +522,47 @@ class ExportProject(object):
                         fd.write(s)
                 fd.write('</row>\n')
             fd.write('</table>\n')
+
+    def dumpTable(self, cursor, fd, table, criterium, order=None):
+        fieldtypes = {}
+        #cursor.execute("SELECT column_name, data_type FROM information_schema.columns " \
+        #                "WHERE table_name = '%s' AND table_schema = 'einstein'" % (table,))
+        cursor.execute("SHOW COLUMNS FROM `%s` FROM %s" % (table,self.DBName))
+        result_set = cursor.fetchall()
+        nfields = cursor.rowcount
+        for field in result_set:
+            fname = field['Field']
+            ftype = field['Type']
+            fextra = field['Extra']
+            fieldtypes[fname] = (ftype,fextra)
+    
+        sql = "SELECT * FROM %s" % (table,)
+
+        if criterium:
+            sql += (' ' + criterium)
+        if order:
+            sql += (' ' + order)
+        cursor.execute(sql)
+        result_set = cursor.fetchall()
+        nrows = cursor.rowcount
+        if nrows <= 0:
+            fd.write('<!-- table %s has no values -->\n' % (table,))
+        else:
+            fd.write('<table name="%s">\n' % (table,))
+            nn = 0
+            for row in result_set:
+                nn+=1
+                fd.write('<row n="%s">\n' % (nn,))
+                for key in row.keys():
+                    value = row[key]
+                    if value is not None:
+                        type,extra = fieldtypes[key]
+                        s = '<element name="%s" type="%s" auto="%s" value="%s" />\n' % (key,type,extra,value)
+#                        s = '<%s>%s</%s>\n' % (key,value,key)
+                        fd.write(s)
+                fd.write('</row>\n')
+            fd.write('</table>\n')
+
 
 #..............................................................................
 #..............................................................................
@@ -592,11 +646,26 @@ class ImportProject(object):
                     sqlist = []
                     nrow =  row.getAttribute('n')
                     elements = row.getElementsByTagName("element")
+
+                    rowName = None #characteristic name of the row
+                    
                     for element in elements:
                         fieldname = element.getAttribute('name').lower()
                         eltype = element.getAttribute('type')
                         elauto = element.getAttribute('auto')
                         elvalue = element.getAttribute('value')
+
+                        if tablename == "questionnaire" and fieldname == "name":
+                            rowName = elvalue
+                            existingRows = Status.DB.questionnaire.Name[rowName]
+                            if len(existingRows) > 0:
+                                showWarning(_("Project with name %s already exists in database\nProject renamed to: IMPORTED PROJECT")%rowName)
+                                elvalue = 'IMPORTED PROJECT'
+                        elif tablename == "dbfluid" and fieldname == "fluidname":
+                            rowName = elvalue
+                        elif tablename == "dbfuel" and fieldname == "fuelname":
+                            rowName = elvalue
+
                         # substitute new pid in id field
                         if fieldname == 'projectid' or \
                              fieldname == 'questionnaire_id':
@@ -611,13 +680,38 @@ class ImportProject(object):
                             elvalue = 'NULL'
 
                         sqlist.append("%s=%s" % (fieldname,elvalue))
-                    # create sql sentence and update database
-                    sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
-                    cursor.execute(sql)
-                    # get last inserted
-                    cursor.execute('SELECT LAST_INSERT_ID() AS last')
-                    field = cursor.fetchone()
-                    newKey = int(field['last'])
+
+#......................................................................
+# before inserting new entry, check if entry with the same name exists
+# (only for questionnaire, dbfluid, dbfuel
+
+                    ignoreRow = False
+                    if tablename == "dbfluid":
+                        existingRows = Status.DB.dbfluid.FluidName[rowName]
+                        if len(existingRows) > 0:
+                            showWarning(_("Fluid %s already in database. Data will be ignored")%rowName)
+                            ignoreRow = True
+                            newID = existingRows[0].DBFluid_ID
+
+                    elif tablename == "dbfuel":
+                        existingRows = Status.DB.dbfuel.FuelName[rowName]
+                        if len(existingRows) > 0:
+                            showWarning(_("Fuel %s already in database. Data will be ignored")%rowName)
+                            ignoreRow = True
+                            newID = existingRows[0].DBFuel_ID
+                    else:
+                        existingRows = []
+                                             
+                    if ignoreRow == False:
+                        # create sql sentence and update database
+                        sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
+                        cursor.execute(sql)
+                        # get last inserted
+                        cursor.execute('SELECT LAST_INSERT_ID() AS last')
+                        field = cursor.fetchone()
+                        newKey = int(field['last'])
+                    else:
+                        newKey = newID
                     tablelist.append((oldKey,newKey))
                 tabledict[tablename] = tablelist
             self.projectdict[self.pid] = tabledict

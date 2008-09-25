@@ -485,7 +485,7 @@ class CheckPipe():
 #        self.DTForwLoss1.show()
         self.DTForwLoss.show()
 
-#        self.DTRetLoss1.show()
+        self.DTRetLoss1.show()
         self.DTRetLoss.show()
         
         self.QdotLossForw.show()
@@ -681,11 +681,11 @@ class CheckPipe():
             self.USHdotPipe1 = calcProd("USHdotPipe1",self.DhIn,self.DistribCircFlow2)#DistribCircFlow2
             self.UPHdotProcm1 = calcProd("UPHdotProcm1",self.DhOut,self.DistribCircFlow3)#DistribCircFlow3
 
-            self.UAPipe1 = calcProd("UAPipe1",self.dUAPipe,self.TotLengthDistPipe)
+            self.UAPipe1 = calcProdC("UAPipe1",2.0,self.dUAPipe,self.TotLengthDistPipe)
             self.DTForwLoss1 = calcDiff("DTForwLoss1",self.ToutDistrib2,self.TenvPipe) #ToutDistrib2
             self.DTRetLoss1 = calcDiff("DTRetLoss1",self.TreturnDistrib2,self.TenvPipe) #TreturnDistrib2
-            self.QdotLossForw2 = calcProd("QdotLossForw2",self.UAPipe,self.DTForwLoss)#DTForwLoss
-            self.QdotLossRet2 = calcProd("QdotLossRet2",self.UAPipe2,self.DTForwLoss2)#DTForwLoss2
+            self.QdotLossForw2 = calcProdC("QdotLossForw2",0.5,self.UAPipe,self.DTForwLoss)#DTForwLoss
+            self.QdotLossRet2 = calcProdC("QdotLossRet2",0.5,self.UAPipe2,self.DTRetLoss)#DTForwLoss2
 
             self.QdotLossPipe1 = calcSum("QdotLossPipe1",self.QdotLossForw,self.QdotLossRet)
 
@@ -725,11 +725,11 @@ class CheckPipe():
             adjustProd(self.USHPipe1,self.USHdotPipe,self.HPerYearPipe1)
             adjustSum3(self.USHdotPipe2,self.QdotLossPipe,self.UPHdotProcm,self.QdotWHPipe)
             adjustSum(self.QdotLossPipe1,self.QdotLossForw,self.QdotLossRet)
-            adjustProd(self.QdotLossRet2,self.UAPipe2,self.DTForwLoss2)
-            adjustProd(self.QdotLossForw2,self.UAPipe,self.DTForwLoss)
-            adjustDiff(self.DTRetLoss1,self.TreturnDistrib2,self.TenvPipe)
-            adjustDiff(self.DTForwLoss1,self.ToutDistrib2,self.TenvPipe)
-            adjustProd(self.UAPipe1,self.dUAPipe,self.TotLengthDistPipe)
+            adjustProdC(self.QdotLossRet2,0.5,self.UAPipe2,self.DTRetLoss)
+            adjustProdC(self.QdotLossForw2,0.5,self.UAPipe,self.DTForwLoss)
+            adjustDiff(self.DTRetLoss1,self.TreturnDistrib2,self.TenvPipe,GTZero=True)
+            adjustDiff(self.DTForwLoss1,self.ToutDistrib2,self.TenvPipe,GTZero=True)
+            adjustProdC(self.UAPipe1,2.0,self.dUAPipe,self.TotLengthDistPipe)
             adjustProd(self.UPHdotProcm1,self.DhOut,self.DistribCircFlow3)
             adjustProd(self.USHdotPipe1,self.DhIn,self.DistribCircFlow2)
             adjustProd(self.QdotWHPipe1,self.DhWH,self.FeedUpFlow)
