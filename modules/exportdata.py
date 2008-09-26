@@ -27,6 +27,7 @@
 #                           Hans Schweiger  23/06/2008
 #                           Tom Sobota      July 2008
 #                           Hans Schweiger  14/07/2008
+#                           Hans Schweiger  26/09/2008
 #
 #       Changes to previous version:
 #       19/06/2008: HS  ExportDataHR created based on ExportDataXML
@@ -34,6 +35,10 @@
 #       23/06/2008: HS  Improvement of ExportDataHR: schedules now exported
 #                       - although not yet correctly :-(
 #       14/07/2008: HS  Call to "RestoreLinks" added in importProject
+#       26/09/2008: HS  Import/Export DB introduced
+#                       Import/Export of fluids, fuels and auditorDB in ex/im-project
+#                       Workaround in ImportProject for determination of
+#                       auto-increment value in questionnaire
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -594,7 +599,14 @@ class ImportProject(object):
         #
         # get the highest project number so far in the database, add 1, and assign to the
         # imported project
+
+#NOTE: a dummy row is added and later on deleted in order to obtain the auto-increment
+# status of the table. there should be a more elegant way to to this ...
+# => to be changed in the future ...
+
+        dummyID = Status.DB.questionnaire.insert({"Name":"dummy"})
         cursor.execute('SELECT MAX(Questionnaire_id) AS n FROM questionnaire')
+
         nrows = cursor.rowcount
         if nrows <= 0:
             self.newpid = 1
@@ -602,6 +614,10 @@ class ImportProject(object):
             field = cursor.fetchone()
             # new pid for this project
             self.newpid = int(field['n']) + 1
+
+        dummyRows = Status.DB.questionnaire.Questionnaire_ID[dummyID]
+        if len(dummyRows) > 0:
+            dummyRows[0].delete()
 
         # create a dom and import in it the xml project file
         self.document = xml.dom.minidom.parse(infile)
