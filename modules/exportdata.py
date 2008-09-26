@@ -947,7 +947,7 @@ class ImportDB(object):
                             newdict.update({fieldnameCapitalLetters:elvalue})
 
                         # substitute invalid chars in char fields and enclose in ''
-                        if eltype.startswith('char') or eltype.startswith('varchar'):
+                        if eltype.startswith('char') or eltype.startswith('varchar') or eltype.startswith('text'):
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':

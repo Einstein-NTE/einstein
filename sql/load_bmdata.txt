@@ -1,5 +1,7 @@
 --update einstein database: add BB parameters to UHEATPUMP
 USE einstein;
 
+ALTER TABLE dbbenchmark CHANGE COLUMN DataRelevance DataRelevance VARCHAR(200);
+
 LOAD DATA INFILE 'c:/work/bench.csv' REPLACE INTO TABLE dbbenchmark 
-	FIELDS TERMINATED BY ';'
+	FIELDS TERMINATED BY '|';
