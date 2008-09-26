@@ -713,9 +713,10 @@ class EinsteinFrame(wx.Frame):
 
 
     def OnMenuSettingsPreferences(self, event):
+        print "EinsteinMain (OnMenuSettingsPreferences): HRTool received as ",Status.HRTool
         framePreferences = PreferencesFrame(self)
         x = framePreferences.ShowModal()
-        print "EinsteinMain: HRTool set to ",Status.HRTool
+        print "EinsteinMain (OnMenuSettingsPreferences): HRTool set to ",Status.HRTool
 
     def OnMenuSettingsLanguage(self,event):
         dialogLang = DialogLanguage(self)
@@ -970,7 +971,7 @@ class EinsteinFrame(wx.Frame):
             self.panelA.display()
 
         #panelPO
-        elif select == _("Process optimization"):
+        elif select == _("Process optimisation"):
             self.hidePages()
             self.panelPO = PanelPO(id=-1, name='panelPO', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
@@ -1249,6 +1250,8 @@ class EinsteinFrame(wx.Frame):
         except:pass
 
         try:self.panelA.Destroy()
+        except:pass
+        try:self.panelPO.Destroy()
         except:pass
         try:self.panelHR.Destroy()
         except:pass

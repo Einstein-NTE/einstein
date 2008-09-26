@@ -29,7 +29,7 @@
 #==============================================================================
 import wx
 import pSQL
-#from status import Status
+from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
