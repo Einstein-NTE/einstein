@@ -328,7 +328,7 @@ class ModuleEA4(object):
 
         if self.keys[0] == "EA4c_Table":
 
-            Status.mod.moduleHR.simulateHR()        #loads UPHProcTotal and USHTotal
+            Status.mod.moduleHR.runHRModule()        #loads UPHProcTotal and USHTotal
 
 # prepare data for table
             TLevels = [10000.0,80.0,120.0,250.0,400.0]

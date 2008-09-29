@@ -115,8 +115,11 @@ class CheckFETel():
         if len(cgeneraldataTable) > 0:
             cgeneraldata = cgeneraldataTable[0]
 
-            self.ElectricityGen.setValue(cgeneraldata.ElectricityGen)
-            self.ElectricitySales.setValue(cgeneraldata.ElectricitySales)
+            pass
+
+# to be checked where's the right place for those parameters ... 
+#            self.ElectricityGen.setValue(cgeneraldata.ElectricityGen)
+#            self.ElectricitySales.setValue(cgeneraldata.ElectricitySales)
                 
 
 #..............................................................................
@@ -125,6 +128,9 @@ class CheckFETel():
         qelectricityTable = Status.DB.qelectricity.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
         if len(qelectricityTable) > 0:
             qelectricity = qelectricityTable[0]
+
+            self.ElectricityGen.setValue(qelectricity.ElGenera)
+            self.ElectricitySales.setValue(qelectricity.ElSales)
 
             self.ElectricityTotYear.setValue(qelectricity.ElectricityTotYear)
             self.ElectricityMotors.setValue(qelectricity.ElectricityMotors)
@@ -144,10 +150,10 @@ class CheckFETel():
                (self.ElectricityLight.val is None) or \
                (self.ElectricityChem.val is None):
                 logWarning(_("WARNING: No data available for electricity consumption for non-thermal uses. Set to 0 !!!"))
-                self.ElectricityMotors.setValue(0.0)
-                self.ElectricityLight.setValue(0.0)
-                self.ElectricityChem.setValue(0.0)
-                self.FEOel.setValue(0.0)
+                if (self.ElectricityMotors.val is None): self.ElectricityMotors.setValue(0.0)
+                if (self.ElectricityLight.val is None): self.ElectricityLight.setValue(0.0)
+                if (self.ElectricityChem.val is None): self.ElectricityChem.setValue(0.0)
+#                self.FEOel.setValue(0.0)
 
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -183,6 +189,8 @@ class CheckFETel():
             qelectricity = qelectricityTable[0]
 
             qelectricity.ElectricityTotYear = check(self.ElectricityTotYear.val)
+            qelectricity.ElGenera = check(self.ElectricityGen.val)
+            qelectricity.ElSales = check(self.ElectricitySales.val)
             
             qelectricity.ElectricityMotors = check(self.ElectricityMotors.val)
             qelectricity.ElectricityChem = check(self.ElectricityChem.val)

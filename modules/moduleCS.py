@@ -85,6 +85,8 @@ class ModuleCS(object):
         
 #Panel CS1: Primary energy
         if self.keys[0] == "CS1_Plot":
+            
+            PEC0 = 0.0
             for ANo in range(len(generalData)-1):
                 i = ANo+1
 
