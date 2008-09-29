@@ -29,13 +29,13 @@
 #==============================================================================
 import wx
 import pSQL
-from status import Status
 from GUITools import *
 from displayClasses import *
 from units import *
 from fonts import *
 from einstein.GUI.dialogOK import *
 import copy
+from einstein.GUI.status import Status
 
 # constants that control the default sizes
 # 1. font sizes

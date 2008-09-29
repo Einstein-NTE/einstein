@@ -275,7 +275,7 @@ class PanelHR(wx.Panel):
               id=wxID_PANELHRCBEXHX)
 
         self.btnDeleteHX = wx.Button(id=wxID_PANELHRBTNDELETEHX,
-              label=_('Delete HX'), name='btnDeleteHX', parent=self,
+              label=_('Hide HX'), name='btnDeleteHX', parent=self,
               pos=wx.Point(16, 544), size=wx.Size(75, 23), style=0)
         self.btnDeleteHX.Bind(wx.EVT_BUTTON, self.OnBtnDeleteHXButton,
               id=wxID_PANELHRBTNDELETEHX)
@@ -324,8 +324,7 @@ class PanelHR(wx.Panel):
 
         self.rbRedesign = wx.RadioButton(id=wxID_PANELHRRBREDESIGN,
               label=_(u'Redesign network'), name=u'rbRedesign', parent=self,
-              pos=wx.Point(648, 88), size=wx.Size(104, 13), style=0)
-        self.rbRedesign.SetValue(True)
+              pos=wx.Point(648, 88), size=wx.Size(104, 13), style=0)        
         self.rbRedesign.Bind(wx.EVT_RADIOBUTTON, self.OnRbRedesignRadiobutton,
               id=wxID_PANELHRRBREDESIGN)
 
@@ -382,6 +381,10 @@ class PanelHR(wx.Panel):
 
         self.grid.SetGridCursor(0, 0)         
         self.plotpanel = HRPlotPanelHCG(self.panel_drawcurve)
+        #----------------------------------------------------------------
+        self.rbRedesign.SetValue(True)
+        self.mod.redesign = True
+        
         self.Show()  
         
        
@@ -390,22 +393,11 @@ class PanelHR(wx.Panel):
 #------------------------------------------------------------------------------		
 #   function activated on each entry into the panel from the tree
 #------------------------------------------------------------------------------		
-        #print "display"
         self.mod.initPanel()        # prepares data for plotting
-
         self.UpdateGrid()           
-        self.UpdatePlot()   
-        self.UpdateRadio() 
+        self.UpdatePlot()          
         self.Show()
     
-    def UpdateRadio(self):
-        if (Status.HRTool == "estimate"):
-            self.rbRedesign.SetValue(False)
-            self.rbCalc.SetValue(True)
-        else:
-            self.rbRedesign.SetValue(True)
-            self.rbCalc.SetValue(False)
-
     def UpdateGrid(self):
         try:
             data = Interfaces.GData[self.keys[0]]
@@ -506,14 +498,17 @@ class PanelHR(wx.Panel):
         event.Skip()
 
     def OnBtnCalculateButton(self, event):
-        print _("PanelHR (OnBtnCalculateButton)")        
-        self.mod.runHRModule()
+        print _("PanelHR (OnBtnCalculateButton)")      
+        if (self.mod.redesign):
+            self.mod.runHRDesign()  
+        else:
+            self.mod.runHRModule()            
         self.enableButtons(False)
         self.display()        
         event.Skip()
 
     def OnBtnDeleteHXButton(self, event):        
-        self.mod.deleteHX(self.selectedRow)
+        self.mod.ShowHideHX(self.selectedRow)
         self.enableButtons(False)
         self.OnCbCurveDisplayChoice(event)
         self.display()
@@ -535,9 +530,9 @@ class PanelHR(wx.Panel):
         event.Skip()
 
     def OnRbRedesignRadiobutton(self, event):
-        Status.HRTool == "redesign"
+        self.mod.redesign = True
         event.Skip()
 
     def OnRbCalcRadiobutton(self, event):
-        Status.HRTool = "estimate"
+        self.mod.redesign = False
         event.Skip()

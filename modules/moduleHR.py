@@ -21,6 +21,7 @@
 #                       Florian Joebstl 04/09/2008
 #                       Hans Schweiger  05/09/2008
 #                       Hans Schweiger  12/09/2008
+#                       Florian Jöbstl  29/09/2008
 #
 #
 #   Changes to previous version:
@@ -32,6 +33,9 @@
 #   12/09/2008: HS  bug-fix in function simulateHR() -> completely rewritten
 #                   selection of calculation mode by Status.HRTool in function
 #                   runHRModule (is set in preferences).
+#   29/09/2008: FJ  split into runHRModule and runHRDesign, some renaming,
+#                   changed every other method to privat
+#                   changed the delete HX functionality to Show/Hide HX
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -48,7 +52,7 @@ from math import *
 from numpy import *
 
 from einstein.auxiliary.auxiliary import *
-from einstein.GUI.status import Status
+from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
@@ -68,35 +72,25 @@ class ModuleHR(object):
         self.ExHX = False
         self.HiddenHX = []
         self.data = HRData(Status.PId,Status.ANo)
-        self.data.loadDatabaseData()             
-
-#------------------------------------------------------------------------------
-    def initPanel(self):
-#------------------------------------------------------------------------------
-#       screens existing equipment, whether there are already heat pumps
-#------------------------------------------------------------------------------
-        #Status.int.getEquipmentCascade() ##old code, dont know what its for...
-        #self.cascadeIndex = 0   
-                
+        self.data.loadDatabaseData()   
+                  
+#----------------------------------------------------------------------------------------------------
+# GUI Interaction
+#----------------------------------------------------------------------------------------------------
+    def initPanel(self):                      
         if (Status.PId != self.data.pid)or(Status.ANo!=self.data.ano):
               self.data = HRData(Status.PId,Status.ANo)                                 
-        self.updatePanel()
+        self.__updatePanel()
             
-#------------------------------------------------------------------------------
-    def updatePanel(self):
-#------------------------------------------------------------------------------
-#       Here all the information should be prepared so that it can be plotted on the panel
-#------------------------------------------------------------------------------
+
+    def __updatePanel(self):
         if (self.data!=None):
             self.data.loadDatabaseData()  
-            self.updateGridData()
-            self.updateCurveData()
+            self.__updateGridData()
+            self.__updateCurveData()
 
-#------------------------------------------------------------------------------
-    def updateGridData(self):
-#------------------------------------------------------------------------------
-# generates rows for the grid 
-#------------------------------------------------------------------------------ 
+
+    def __updateGridData(self): 
         try:     
             dataList = []  
             index = 0
@@ -119,109 +113,74 @@ class ModuleHR(object):
         except:
             logDebug("(moduleHR.py) UpdateGridData: Create rows failed")        
         
-#------------------------------------------------------------------------------
-    def updateCurveData(self):                 
-#------------------------------------------------------------------------------
-# stores data for mathplot in panelHR
-#------------------------------------------------------------------------------          
-        Status.int.hrdata = self.data  
- 
-#------------------------------------------------------------------------------
-    def deleteHX(self,index):   
-#------------------------------------------------------------------------------
-#called when "Delete HX"-Button pressed
-#1) generates and adds 2 new streams
-#2) deletes selected hx
-#3) updates panel
-#------------------------------------------------------------------------------    
-        try:
-            if index in self.HiddenHX:
-                self.HiddenHX.remove(index)
-            else: 
-                self.HiddenHX.append(index)
-            #self.data.deleteHexAndGenStreams(index)                       
-        except:
-            logError(_("Could not delete HEX"))
-            logDebug("(moduleHR.py) deleteHX: deleting failed.")
-        try:
-            self.simulateHRnew()  
-            self.updatePanel()
-        except:
-            logError(_("Recalculation failed."))
-                           
-#------------------------------------------------------------------------------
+    def __updateCurveData(self):                 
+        # stores data for mathplot in panelHR         
+        Status.int.hrdata = self.data
+        
+#----------------------------------------------------------------------------------------------------
+# Public Methodes
+#----------------------------------------------------------------------------------------------------   
+                         
+    def runHRDesign(self):        
+        self.__runPE2(redesign = True)
+        self.__doPostProcessing()
+        self.__updatePanel()
+                      
     def runHRModule(self):
-#------------------------------------------------------------------------------
-#   runs the calculations on the external HR module
-#   1) create schedules 
-#   2) exports data into xml
-#   3) calls external calculation
-#   4) imports results from xml
-#   5) store hxs in database
-#   6) runSimulateHR
-#   7) updatePanel 
-#------------------------------------------------------------------------------
-        #self.HiddenHX = []
-        print "ModuleHR (runHRModule): running in %s mode"%Status.HRTool
-
         redesign_network_flag = None
         if Status.HRTool == "estimate":
-            print "ModuleHR (runHRModule): running in estimate mode"
-            redesign_network_flag = "f"
-
-#HS: re-activated. We need this for testing until real HR module does not work 100%.
-            self.simulateHR()
+            self.__estimativMethod()
         else:
-            print "ModuleHR (runHRModule): running in PE2 mode"
-#            redesign_network_flag = "t"
+            self.__runPE2(redesign = False)            
+            self.__doPostProcessing()
+               
+        self.__updatePanel()
+
+
+#----------------------------------------------------------------------------------------------------
+# Internal Calculations
+#----------------------------------------------------------------------------------------------------  
+
+    def __runPE2(self,redesign = True):        
+        if (redesign):
+            logWarning(_("Redesigning HX network. This may take some time. (Tool: PE2)"))
+            redesign_network_flag = "t"
+        else:
+            logWarning(_("Recalculating HX network. This may take some time.(Tool: PE2)"))
             redesign_network_flag = "f"
-#HS: runHRModule should NEVER redesign the network, neither in "estimate" nor in "PE2" mode !!!
-            
-
-#HS: I indented this again. PE should be called only if HRTool != estimate
-            
-            logWarning(_("Recalculating HX network. This may take some time."))
-            
-            if Status.schedules.outOfDate == True:
-                Status.schedules.create()   #creates the process and equipment schedules
-                             
-            XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
-            
-            try:
-                retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag], shell=True)
-                logDebug(_("External program returned: ")+str(retcode))
-                if (retcode!=0):
-                    raise
-            except:
-                logError(_("Error in external program (ProcessEngineering.exe) Run default simulation.."))            
-                self.simulateHR()
-            else:    
-                doc = XMLImportHRModule.importXML("export.xml")
-                          
-                self.data = HRData(Status.PId,Status.ANo)
-                
-#                if Status.HRTool == "estimate":
-#                    self.data.loadFromDocument(doc,overrideHX = False)
-#                else:
-#HS: HERE PE should calculate in override = False mode.
-                self.data.loadFromDocument(doc,overrideHX = False)
+                                            
+        if Status.schedules.outOfDate == True:
+            Status.schedules.create()   #creates the process and equipment schedules
+                         
+        XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
+        
+        try:
+            retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag], shell=True)
+            logDebug(_("External program returned: ")+str(retcode))
+            if (retcode!=0):
+                raise
+        except:
+            logError(_("Error in external program (ProcessEngineering.exe)"))                      
+        else:    
+            doc = XMLImportHRModule.importXML("export.xml")                      
+            self.data = HRData(Status.PId,Status.ANo)
                         
-                self.simulateHRnew()
+            if (redesign):
+                self.data.loadFromDocument(doc,overrideHX = True)
+            else:
+                self.data.loadFromDocument(doc,overrideHX = False)
+                    
 
-
-#HS2008-09-06: updatePanel should be called both for simulateHR and for simulateHRnew, isn't it ?                    
-        self.updatePanel()
     
 #------------------------------------------------------------------------------
-    def simulateHRnew(self):
+    def __doPostProcessing(self):
 #------------------------------------------------------------------------------
 # starts all (internal) calculations
 #------------------------------------------------------------------------------        
-
-        self.calcQD_T()
-        self.calcQA_T()
-        self.calcQD_Tt()
-        self.calcQA_Tt()
+        self.__calcQD_T()
+        self.__calcQA_T()
+        self.__calcQD_Tt()
+        self.__calcQA_Tt()
 
 #------------------------------------------------------------------------------
 #   HS: From here on necessary functions of the original simulateHR
@@ -300,7 +259,7 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
 # Matrix and List calculation
 #------------------------------------------------------------------------------    
-    def calcQD_T(self): 
+    def __calcQD_T(self): 
         streams = self.data.streams[:]
         hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
         for stream in hidden:
@@ -326,7 +285,7 @@ class ModuleHR(object):
                         
         self.data.QD_T = QD_T
         
-    def calcQA_T(self):      
+    def __calcQA_T(self):      
         streams = self.data.streams[:]
         hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
         for stream in hidden:
@@ -353,7 +312,12 @@ class ModuleHR(object):
         self.data.QA_T = QA_T
    
     
-    def calcQD_Tt(self):
+    def __calcQD_Tt(self):
+        streams = self.data.streams[:]
+        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+        for stream in hidden:
+            streams.append(stream)
+            
         temperature_step = 5
         time_step        = 1
         
@@ -366,7 +330,7 @@ class ModuleHR(object):
         
         for hours in xrange(0,8760,time_step):
             for temperature in xrange(0,406,temperature_step):
-                for stream in self.data.streams:                
+                for stream in streams:                
                     if (stream.HotColdType == "cold"):
                         if (hours < stream.OperatingHours):                            
                             if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):  
@@ -381,7 +345,12 @@ class ModuleHR(object):
         #self.debugPrint("QD_Tt.csv", QD_Tt)     
     
     
-    def calcQA_Tt(self):
+    def __calcQA_Tt(self):
+        streams = self.data.streams[:]
+        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+        for stream in hidden:
+            streams.append(stream)
+            
         temperature_step = 5
         time_step        = 1
         
@@ -394,7 +363,7 @@ class ModuleHR(object):
                 
         for hours in xrange(0,8760,time_step):  
             for temperature in xrange(406,0,-temperature_step):                      
-                for stream in self.data.streams:                
+                for stream in streams:                
                     if (stream.HotColdType == "hot"):
                         if (hours < stream.OperatingHours):                            
                             if  ((temperature - stream.StartTemp) <= 0) and (stream.HeatType == "sensible"):  
@@ -407,9 +376,33 @@ class ModuleHR(object):
                                     QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
         self.data.QA_Tt = QA_Tt
         #self.debugPrint("QA_Tt.csv", QA_Tt)   
-        
+
+
 #------------------------------------------------------------------------------
-    def changeHX(self,index):
+    def __showHideHX(self,index):   
+#------------------------------------------------------------------------------
+#called when "Show/HideHX"-Button pressed
+#1) adds or removes the index of the hx to the/fromthe hide list
+#2) redo result postprocessing
+#------------------------------------------------------------------------------    
+        try:
+            if index in self.HiddenHX:
+                self.HiddenHX.remove(index)
+            else: 
+                self.HiddenHX.append(index)
+            #self.data.deleteHexAndGenStreams(index)                       
+        except:
+            logError(_("Could not delete HEX"))
+            logDebug("(moduleHR.py) deleteHX: deleting failed.")
+        try:
+            self.__doPostProcessing()  
+            self.__updatePanel()
+        except:
+            logError(_("Recalculation failed."))
+            
+     
+#------------------------------------------------------------------------------
+    def __changeHX(self,index):
 #------------------------------------------------------------------------------
 # recalculates cost values for HEX
 # uses values from DlgChangeHX
@@ -542,14 +535,14 @@ class ModuleHR(object):
                 Status.DB.sql_query(query)
                 
                 #updateInformation in panel                                                                           
-                self.updatePanel()
+                self.__updatePanel()
         except:
             logError(_("Recalculation of HEX failed."))         
 
 
         
 #------------------------------------------------------------------------------
-    def simulateHR(self):
+    def __estimativMethod(self):
 #------------------------------------------------------------------------------
 #       simulates the action of the HR module while the module is not yet
 #       available

@@ -41,7 +41,7 @@ import wx.lib.intctrl
 import wx.lib.stattext
 #import wx.lib.masked
 import wx.calendar
-from status import Status
+from einstein.GUI.status import Status
 import units
 from fonts import FontProperties
 

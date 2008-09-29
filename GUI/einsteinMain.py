@@ -184,7 +184,6 @@ from einstein.modules.modules import Modules
 from einstein.modules.constants import *
 
 #--- popup frames
-from status import Status #processing status of the tool
 from einstein.modules.project import Project #functions for handling of PId/ANo
 
 #--- popup frames
@@ -259,6 +258,8 @@ from fonts import FontProperties
 #TS2008-06-30 database management
 from dialogDatabase import DlgDatabase
 from dialogImport import DialogImport
+
+from einstein.GUI.status import Status #processing status of the tool
 
 #----- Constants
 qPageSize = (800, 600)

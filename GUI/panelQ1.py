@@ -593,7 +593,9 @@ class PanelQ1(wx.Panel):
                     subBranch = subBranchSplit[1]
                 else:
                     subBranch = None
-                    
+
+                logMessage("Panel1 (OK): City = %s"%self.tc2.GetValue())
+                
                 tmp = {
                     "Name":check(self.tc1.GetValue()),
                     "City":check(self.tc2.GetValue()),
