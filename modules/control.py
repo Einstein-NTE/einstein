@@ -180,7 +180,7 @@ def autoRun(parent):
         
     Status.prj.createNewAlternative(basedOn,shortName,description)
 
-    Status.mod.moduleHR.simulateHR()
+    Status.mod.moduleHR.runHRModule()
 
 # Finally check the boiler dimensioning for the remaining heat demand
 #    Status.mod.moduleBB.designAssistant()
@@ -199,7 +199,7 @@ def autoRun(parent):
         
     Status.prj.createNewAlternative(basedOn,shortName,description)
 
-    Status.mod.moduleHR.simulateHR()
+    Status.mod.moduleHR.runHRModule()
 
     Status.mod.moduleST.initPanel()
     Status.mod.moduleST.updatePanel()
