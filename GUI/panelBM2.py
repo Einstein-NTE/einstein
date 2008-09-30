@@ -23,12 +23,14 @@
 #       Revised by:         Tom Sobota              28/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          25/06/2008
+#                           Stoyan Danov            30/09/2008
 #                           
 #
 #       Changes to previous version:
 #       28/04/2008: TS  created method display
 #       18/06/2008: SD  change to translatable text _(...)
-#       25/06/2008: HS  adaptation to changes in module  
+#       25/06/2008: HS  adaptation to changes in module
+#       30/09/2008: SD  graphics figure added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -112,6 +114,42 @@ def drawFigure(self):
                           'g-', label='min/max', linewidth=1)
     self.subplot.axis(axis)
 
+###SD-20080930
+#    self.subplot.legend()
+
+    self.subplot.axes.set_ylabel(_('SEC - fuels [kWh/%s]')%"p.u.")
+    self.subplot.axes.set_xlabel(_('SEC - electricity [kWh/%s]')%"p.u.")
+    
+    for label in self.subplot.axes.get_yticklabels():
+#        label.set_color(self.params['ytickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['yticksangle'])
+    #
+    # properties of labels on the x axis
+    #
+    for label in self.subplot.axes.get_xticklabels():
+#        label.set_color(self.params['xtickscolor'])
+        label.set_fontsize(8)
+#        label.set_rotation(self.params['xticksangle'])
+
+    try:
+        lg = self.subplot.get_legend()
+        ltext  = lg.get_texts()             # all the text.Text instance in the legend
+        for txt in ltext:
+            txt.set_fontsize(10)  # the legend text fontsize
+        # legend line thickness
+        llines = lg.get_lines()             # all the lines.Line2D instance in the legend
+        for lli in llines:
+            lli.set_linewidth(1.5)          # the legend linewidth
+        # color of the legend frame
+        # this only works when the frame is painted (see below draw_frame)
+        frame  = lg.get_frame()             # the patch.Rectangle instance surrounding the legend
+        frame.set_facecolor('#F0F0F0')      # set the frame face color to light gray
+        # should the legend frame be painted
+        lg.draw_frame(False)
+    except:
+        # no legend
+        pass
 
 #XXXXXX To be checked how to bring x/y- labels to this plot ...
 #    self.figure.xlabel('time (s)')

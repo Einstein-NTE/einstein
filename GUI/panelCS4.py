@@ -34,7 +34,7 @@ import wx
 from status import Status
 from einstein.modules.moduleCS import *
 import einstein.modules.matPanel as Mp
-from einstein.GUI.graphics import drawStackedBarPlot
+from einstein.GUI.graphics import drawSimpleBarPlot
 from GUITools import *
 from numCtrl import *
 
@@ -76,7 +76,7 @@ class PanelCS4(wx.Panel):
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0]}                        # rows that should not be plotted
         
-        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawStackedBarPlot,
+        dummy = Mp.MatPanel(self.panelGraphMPHD,wx.Panel,drawSimpleBarPlot,
                             paramList)
 
         #
