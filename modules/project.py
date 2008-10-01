@@ -2081,7 +2081,7 @@ class Project(object):
         for whee in whees:
             whees.WHEEMedium = newID
             logTrack("Project (substituteFluidID): table qwasteheatelequip - FluidID %s substituted by %s in ID %s"%\
-                     (oldID,newID,process.QWasteHeatElEquip_ID))
+                     (oldID,newID,whee.QWasteHeatElEquip_ID))
         
         Status.SQL.commit()
 
