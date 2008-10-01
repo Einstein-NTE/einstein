@@ -111,7 +111,7 @@ class PanelQ4(wx.Panel):
                     self.tc5.SetValue(prefill[key])
         except:
             pass
-
+        self.turnKeyPrice = 0.0
 
     def _init_ctrls(self, parent):
 #------------------------------------------------------------------------------
@@ -510,6 +510,9 @@ class PanelQ4(wx.Panel):
         fluidDict = Status.prj.getFluidDict()
         pipeDict = Status.prj.getPipeDict()
 
+        if self.tc6.GetValue() > 1:
+            showMessage("Number of Equipments > 1 not yet supported\nWorkaround: multiply nominal power by N")
+            
         tmp = {
             "Equipment":check(self.tc1.GetValue()),
             "Manufact":check(self.tc2.GetValue()),
@@ -537,7 +540,8 @@ class PanelQ4(wx.Panel):
             "DestinationWasteHeat":check(self.tc35.GetValue(text=True)),
             "TemperatureReCooling":check(self.tc36.GetValue()),
             "HPerDayEq":check(self.tc18.GetValue()),
-            "NDaysEq":check(self.tc19.GetValue()),  
+            "NDaysEq":check(self.tc19.GetValue()),
+            "TurnKeyPrice":self.turnKeyPrice,
             }
 
         equipe.update(tmp)
@@ -612,6 +616,9 @@ class PanelQ4(wx.Panel):
     #        self.tc35.SetValue(str(q.))
     #        self.tc36.SetValue(str(q.))
 
+            self.turnKeyPrice = q.TurnKeyPrice
+            if self.turnKeyPrice is None: self.turnKeyPrice = 0.0
+
         self.Show()
 
     def clear(self):
@@ -642,6 +649,8 @@ class PanelQ4(wx.Panel):
         self.tc34.SetValue('')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
+
+        self.turnKeyPrice = 0.0
 
     def fillEquipmentList(self):
         self.listBoxEquipment.Clear()

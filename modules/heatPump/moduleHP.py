@@ -493,6 +493,11 @@ class ModuleHP():
         if model.HPType != None: equipe.update({"EquipTypeFromDB":model.HPType})
         equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
 
+        if model.HPTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelHPTurnKeyPrice})
+        else:
+            logDebug("ModuleHP: turn key price of heat pump model %s not specified"%equipe.Model)
+            equipe.update({"TurnKeyPrice":0.0})
+
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------

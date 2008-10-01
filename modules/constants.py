@@ -46,7 +46,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "R1.00b Revision No. 224" #Number of upload in sourceforge
+VERSION = "R1.00b Revision No. 230" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "BASIC"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
@@ -180,11 +180,11 @@ TRANSSTTYPES = {"Flat-plate collector":     _("Flat-plate collector"),
 
 HXTYPES = [ "plate HX (liquid-liquid)",
             "plate HX (air-air)",
-            "shell&tube HX (liquid-liquid)",
+            "shell and tube HX (liquid-liquid)",
             "finned tubes (liquid-air)"]
 TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
                 "plate HX (air-air)":           _("plate HX (air-air)"),
-                "shell&tube HX (liquid-liquid)":_("shell&tube HX (liquid-liquid)"),
+                "shell and tube HX (liquid-liquid)":_("shell and tube HX (liquid-liquid)"),
                 "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
                 }
 
@@ -219,7 +219,7 @@ EQUIPMENTSUBTYPE = [HPTYPES[0],
                "fuel cell",
                "plate HX (liquid-liquid)",
                "plate HX (air-air)",
-               "shell&tube HX (liquid-liquid)",
+               "shell and tube HX (liquid-liquid)",
                "finned tubes (liquid-air)"]
 
 # EQUIPMENT associates equipment class and sub-class

@@ -34,6 +34,7 @@
 #                           Enrico Facci        06/06/2008
 #                           Hans Schweiger      02/07/2008
 #                           Hans Schweiger      03/07/2008
+#                           Hans Schweiger      16/09/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -80,6 +81,7 @@
 #                       some bug-fixing and clean-up
 #                       boiler efficiency set as fraction of 1
 #                       introduction of several security items and bug-fixes
+#       16/09/2008: HS  change in function findmaxTemp: -> attempt to eliminate rounding errors ...
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -459,6 +461,12 @@ class ModuleBB(object):
         if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
+
+        if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
+        else:
+            logDebug("ModuleBB: turn key price of boiler model %s not specified"%equipe.Model)
+            equipe.update({"TurnKeyPrice":0.0})
+            
         Status.SQL.commit()
         logTrack("moduleBB (setEquipmentFromDB): boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%\
                  (model.BoilerManufacturer,model.BoilerType,model.BBPnom,model.BoilerTemp))
@@ -733,12 +741,12 @@ class ModuleBB(object):
 #       QDa is the annual heat demand by temperature
 #------------------------------------------------------------------------------
         maxTemp=0
-        for i in range(Status.NT+1):
-            if i>0:
-                if QDa[i]>QDa[i-1]:
-                    self.maxTemp=Status.TemperatureInterval*(i+1) #temperatureInterval is defined in status.py
-        print "maxtemp=", self.maxTemp
 
+        QDcrit = 0.99*QDa[Status.NT+1]
+        
+        for i in range(1,Status.NT+1):
+            if QDa[i]>QDa[i-1] and QDa[i-1] < QDcrit:
+                self.maxTemp=Status.TemperatureInterval*i #temperatureInterval is defined in status.py
 
 #------------------------------------------------------------------------------
     def redundancy(self):

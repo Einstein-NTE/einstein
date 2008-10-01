@@ -663,8 +663,13 @@ class ImportProject(object):
                              fieldname == 'questionnaire_id':
                             elvalue = self.newpid
                         # substitute invalid chars in char fields and enclose in ''
-                        if eltype.startswith('char') or eltype.startswith('varchar'):
+                        if eltype.startswith('char') or \
+                           eltype.startswith('varchar') or \
+                           eltype.startswith('text') or \
+                           eltype.startswith('date'):
+                            
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
+                            
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':
                             # main key field
@@ -703,6 +708,7 @@ class ImportProject(object):
                     if ignoreRow == False:
                         # create sql sentence and update database
                         sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
+                        print sql
                         cursor.execute(sql)
                         # get last inserted
                         cursor.execute('SELECT LAST_INSERT_ID() AS last')
@@ -947,7 +953,10 @@ class ImportDB(object):
                             newdict.update({fieldnameCapitalLetters:elvalue})
 
                         # substitute invalid chars in char fields and enclose in ''
-                        if eltype.startswith('char') or eltype.startswith('varchar') or eltype.startswith('text'):
+                        if eltype.startswith('char') or \
+                           eltype.startswith('varchar') or \
+                           eltype.startswith('text') or \
+                           eltype.startswith('date'):
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':

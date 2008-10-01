@@ -225,14 +225,14 @@ class PanelQ3(wx.Panel):
 
 
         self.tc8 = FloatEntry(self.page0,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='VOLUME',
                               label=_("Daily inflow of process medium"),
                               tip=_("Continuous process: Fluid flow rate times hours of circulation. Batch process with fluid renewal: volume times No. of batches."))
 
 
         self.tc9 = FloatEntry(self.page0,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='VOLUME',
                               label=_("Volume of the process medium within the equipment or storage"),
                               tip=_("e.g. volume of liquid in a bottle for cleaning"))
@@ -516,6 +516,7 @@ class PanelQ3(wx.Panel):
         unitOpDict = Status.prj.getUnitOpDict()
 
         self.tc1.SetValue(str(q.Process))
+        self.tc1_1.SetValue(str(q.Description))
         if q.ProcType in TRANSPROCTYPES.keys():
             self.tc2.SetValue(TRANSPROCTYPES[str(q.ProcType)])
         else:
@@ -613,6 +614,7 @@ class PanelQ3(wx.Panel):
             "Questionnaire_id":Status.PId,
             "AlternativeProposalNo":Status.ANo,
             "Process":check(self.tc1.GetValue()),
+            "Description":check(self.tc1_1.GetValue()),
             "DBUnitOperation_id":check(findKey(unitOpDict,self.tc3.GetValue(text=True))),
             "ProcType":check(findKey(TRANSPROCTYPES,self.tc2.GetValue(text=True))),             
             "ProcMedDBFluid_id":check(findKey(fluidDict,self.tc4.GetValue(text=True))),
@@ -661,7 +663,9 @@ class PanelQ3(wx.Panel):
 
     def fillChoiceOfDBUnitOperation(self): # tc3
         unitOpDict = Status.prj.getUnitOpDict()
-        self.tc3.SetValue(unitOpDict.values())
+        unitOpList = unitOpDict.values()
+        unitOpList.sort()
+        self.tc3.SetValue(unitOpList)
             
     def fillChoiceOfPMDBFluid(self):
         fluidDict = Status.prj.getFluidDict()

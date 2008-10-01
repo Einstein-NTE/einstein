@@ -596,6 +596,8 @@ class ModuleST(object):
 #   the equipment data base
 #------------------------------------------------------------------------------
 
+        print "ModuleST (setEquipmentFromDB): modelID = ",modelID
+        
         models = Status.DB.dbsolarthermal.DBSolarThermal_ID[modelID]
         if len(models) > 0:
             model = models[0]
@@ -631,6 +633,11 @@ class ModuleST(object):
         if model.STAreaFactor != None: equipe.update({"STAreaFactor":model.STAreaFactor})           ### E.F. 28/07
 #        if model.STAreaGross != None and model.STAreaAper != None:
 #            self.avAreaFactor = model.STAreaGross/model.STAreaAper
+
+#        if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
+#        else:
+        logDebug("ModuleST: turn key price of solar system type %s not specified"%equipe.Model)
+        equipe.update({"TurnKeyPrice":0.0})
         
         Status.SQL.commit()
         logTrack("ModuleST: dummy equipe after commit of everything %s"%str(equipe))

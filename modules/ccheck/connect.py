@@ -19,15 +19,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	13/06/2008
 #	Last revised by:
 #                           Hans Schweiger      21/07/2008
+#                           Hans Schweiger      01/10/2008
 #                    
 #
 #       Changes in last update:
 #
 #       21/07/2008: HS  Split-up of FETLink into FETFuelLink and FETelLink
+#       01/10/2008: HS  Error messages when equipments or processes are not connected
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -42,6 +44,7 @@
 from einstein.GUI.status import *
 from einstein.modules.project import *
 from numpy import *
+from einstein.modules.messageLogger import *
 
 #------------------------------------------------------------------------------
 def getConnections():
@@ -91,18 +94,29 @@ def getConnections():
     Status.FETFuelLink = arange((NI-1)*NJ).reshape(NJ,(NI-1))  # reshape(rows,cols)
     Status.FETelLink = arange(1*NJ).reshape(NJ,1)  # reshape(rows,cols)
     
-    
+    check_j = []
+    check_i = []
+    for i in range(NI-1):
+        check_i.append(0)
+        
     for j in range(NJ):
+        check_j.append(0)
+        
         for i in range(NI-1):
             if fuelIDs_i[i] == fuelIDs_j[j]:
                 Status.FETFuelLink[j][i] = 1
+                check_j[j] = 1
+                check_i[i] = 1
             else:
                 Status.FETFuelLink[j][i] = 0
         Status.FETelLink[j][0] = 1  #all equipments potentially consume something of (parasitic) electricity.
 
-    print "Connect: FETLink created"
-    print Status.FETFuelLink
-    print Status.FETelLink
+#    print "Connect: FETLink created"
+#    print Status.FETFuelLink
+#    print Status.FETelLink
+    for j in range(NJ):
+        if check_j[j] == 0:
+            showError(_("Fuel used in equipment no. %s is not specified or is not in fuel list")%(j+1))
         
 #..............................................................................
 # 2. USHj-USHm-Link: conecction equipment to pipe
@@ -116,7 +130,11 @@ def getConnections():
        
     Status.USHLink = arange(NJ*NM).reshape(NM,NJ)  # reshape(rows,cols)
 
-    for m in range(NM):
+    check_j = []
+    for j in range(NJ):
+        check_j.append(0)
+
+    for m in range(NM):        
         for j in range(NJ):
             pipeIDs_j = []
             if pipes_j[j] is not None:
@@ -131,14 +149,20 @@ def getConnections():
                 
             if pipeID_m[m] in pipeIDs_j:
                 Status.USHLink[m][j] = 1
+                check_j[j] = 1
             else:
                 Status.USHLink[m][j] = 0
         
-    print "Connect: USHLink created"
-    print Status.USHLink
+#    print "Connect: USHLink created"
+#    print Status.USHLink
+    for j in range(NJ):
+        if check_j[j] == 0:
+            showError(_("Equipment no. %s is not connected to any pipe")%(j+1))
 
 #..............................................................................
 # 3. UPHm-UPHk Link: conecction pipe to process
+
+    check_k = []
 
     pipeName_k = Status.prj.getProcessList("PipeDuctProc")    
     pipeName_m = Status.prj.getPipeList("Pipeduct")
@@ -149,9 +173,11 @@ def getConnections():
     Status.UPHLink = arange(NM*NK).reshape(NK,NM)  # reshape(rows,cols)
 
     for k in range(NK):
+        check_k.append(0)
         for m in range(NM):
             if pipeName_m[m] == pipeName_k[k]:
                 Status.UPHLink[k][m] = 1
+                check_k[k] = 1
             else:
                 Status.UPHLink[k][m] = 0
         
@@ -216,6 +242,7 @@ def getConnections():
                 
             if sinkName_h[h] == procName_k[k]:
                 Status.QHXProcLink[k][h] = 1
+                check_k[k] = 1
             else:
                 Status.QHXProcLink[k][h] = 0
         
@@ -225,20 +252,24 @@ def getConnections():
             else:
                 Status.QWHEELink[n][h] = 0
                         
-    print "Connect: QWHEqLink created"
-    print Status.QWHEqLink
-    print "Connect: QHXEqLink created"
-    print Status.QHXEqLink
-    print "Connect: QWHPipeLink created"
-    print Status.QWHPipeLink
-    print "Connect: QHXPipeLink created"
-    print Status.QHXPipeLink
-    print "Connect: QWHProcLink created"
-    print Status.QWHProcLink
-    print "Connect: QHXProcLink created"
-    print Status.QHXProcLink
-    print "Connect: QWHEELink created"
-    print Status.QWHEELink
+#    print "Connect: QWHEqLink created"
+#    print Status.QWHEqLink
+#    print "Connect: QHXEqLink created"
+#    print Status.QHXEqLink
+#    print "Connect: QWHPipeLink created"
+#    print Status.QWHPipeLink
+#    print "Connect: QHXPipeLink created"
+#    print Status.QHXPipeLink
+#    print "Connect: QWHProcLink created"
+#    print Status.QWHProcLink
+#    print "Connect: QHXProcLink created"
+#    print Status.QHXProcLink
+#    print "Connect: QWHEELink created"
+#    print Status.QWHEELink
+
+    for k in range(NK):
+        if check_k[k] == 0:
+            showError(_("No heat supply (pipe or heat exchanger) connected to process no. %s")%(k+1))
 
 
 #==============================================================================

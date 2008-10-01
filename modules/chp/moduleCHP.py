@@ -339,6 +339,13 @@ class ModuleCHP(object):
         if model.CHPequip != None: equipe.update({"EquipTypeFromDB":model.CHPequip})
         if model.DBCHP_ID != None: equipe.update({"EquipIDFromDB":model.DBCHP_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
+
+#        if model.CHPTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
+#        else:
+        logDebug("ModuleCHP: turn key price of CHP equipment model %s not specified"%equipe.Model)
+        equipe.update({"TurnKeyPrice":0.0})
+
+
         Status.SQL.commit()
         logTrack("moduleCHP (setEquipmentFromDB): boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%\
                  ("---",model.CHPequip,model.CHPPt,-1.0))
@@ -376,6 +383,11 @@ class ModuleCHP(object):
         if PNom is None:
             PNom = 0.0
             logWarning("ModuleCHP (calculateEnergyFlows): No nominal power specified for equipe no. %s"%\
+                 (EquipmentNo))
+
+        if COPe is None:
+            COPe = 0.0
+            logWarning("ModuleCHP (calculateEnergyFlows): No electrical efficiency specified for equipe no. %s"%\
                  (EquipmentNo))
 
         if TMax is None:
