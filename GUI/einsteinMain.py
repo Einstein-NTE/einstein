@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: cp1252 -*-
+# -*- coding: utf_8 -*-
 
 #==============================================================================
 #
@@ -189,6 +189,7 @@ from einstein.modules.project import Project #functions for handling of PId/ANo
 #--- popup frames
 import DBEditFrame
 from PreferencesFrame import *
+from dialogPOManageDB import DialogPOManageDB
 
 #--- Module Panels
 from panelCC import *
@@ -665,6 +666,12 @@ class EinsteinFrame(wx.Frame):
     def OnMenuEditDBBenchmark(self, event):
         frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
         frameEditDBBenchmark.ShowModal()
+
+    def OnMenuEditDBBAT(self, event):
+        dlg = DialogPOManageDB(self)
+        dlg.ShowModal()
+        event.Skip()
+
     def OnMenuEditDBNaceCode(self, event):
         frameEditDBNaceCode = DBEditFrame(None, "Edit DBNaceCode", 'dbnacecode', 0, True)
         frameEditDBNaceCode.ShowModal()
@@ -788,13 +795,13 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.pageTitle.Show()
         #Page0
-        elif select == _("Edit Industry Data"): #Edit Industry Data
+        elif select == _(u'Edit Industry Data'): #Edit Industry Data
             self.hidePages()
             self.Page0 = PanelQ0(self.leftpanel2, self)
             self.Page0.fillPage()
             self.Page0.Show()
         #Page1
-        elif select == _("General data"): #General data
+        elif select == _(u'General data'): #General data
             self.hidePages()
             self.Page1 = PanelQ1(self.leftpanel2, self)
             self.Page1.display()
@@ -1453,8 +1460,8 @@ class EinsteinFrame(wx.Frame):
         
         self.qRoot = self.tree.AddRoot("Einstein")
 
-        self.qPage0 = self.tree.AppendItem (self.qRoot, _("Edit Industry Data"),0)
-        self.qPage1 = self.tree.AppendItem (self.qPage0, _("General data"),0)
+        self.qPage0 = self.tree.AppendItem (self.qRoot, _(u'Edit Industry Data'),0)
+        self.qPage1 = self.tree.AppendItem (self.qPage0, _(u'General data'),0)
         self.qPage2 = self.tree.AppendItem (self.qPage0, _("Energy consumption"),0)
         self.qPage3 = self.tree.AppendItem (self.qPage0, _("Processes data"),0)
         self.qPage4 = self.tree.AppendItem (self.qPage0, _("Generation of heat and cold"),0)
@@ -1545,19 +1552,19 @@ class EinsteinFrame(wx.Frame):
 
         #Comparative analysis
         self.qCS = self.tree.AppendItem (self.qA, _("Comparative study"))
-            #Comparative study – Detail Info 1
+            #Comparative study â€“ Detail Info 1
         self.qCS1 = self.tree.AppendItem (self.qCS, _("Comp.study: Primary energy"))
-            #Comparative study – Detail Info 2
+            #Comparative study â€“ Detail Info 2
         self.qCS2 = self.tree.AppendItem (self.qCS, _("Comp.study: Process & supply heat"))
-            #Comparative study – Detail Info 3
+            #Comparative study â€“ Detail Info 3
         self.qCS3 = self.tree.AppendItem (self.qCS, _("Comp.study: Environmental  impact"))
-            #Comparative study – Detail Info 4
+            #Comparative study â€“ Detail Info 4
         self.qCS4 = self.tree.AppendItem (self.qCS, _("Comp.study: Investment cost"))
-            #Comparative study – Detail Info 5
+            #Comparative study â€“ Detail Info 5
         self.qCS5 = self.tree.AppendItem (self.qCS, _("Comp.study: Annual cost"))
-            #Comparative study – Detail Info 6
+            #Comparative study â€“ Detail Info 6
         self.qCS6 = self.tree.AppendItem (self.qCS, _("Comp.study: Additional cost per saved energy"))
-            #Comparative study – Detail Info 7
+            #Comparative study â€“ Detail Info 7
         self.qCS7 = self.tree.AppendItem (self.qCS, _("Comp.study: Internal rate of return"))
 
         self.qFinalReport = self.tree.AppendItem (self.qRoot, _("Report"))
@@ -1582,6 +1589,7 @@ class EinsteinFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBAdmin, self.EditDBAdmin)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBBAT, self.EditDBBAT)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBUnitOperation, self.EditDBUnitOperation)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBCHP, self.EditDBCHP)

@@ -102,6 +102,7 @@ class CheckProc():
         self.PTInFlowRec1 = CCPar("PTInFlowRec1")
         self.PTInFlowRec2 = CCPar("PTInFlowRec2")
         self.PTInFlowRec3 = CCPar("PTInFlowRec3")
+        self.PTStartUp1 = CCPar("PTStartUp1")
         self.PTOutFlow1 = CCPar("PTOutFlow1")
         self.PTOutFlow2 = CCPar("PTOutFlow2")
         self.PTOutFlow3 = CCPar("PTOutFlow3")
@@ -120,6 +121,7 @@ class CheckProc():
         self.VInFlowDay3 = CCPar("VInFlowDay3") 
         self.VOutFlow1 = CCPar("VOutFlow1")
         self.VOutFlow2 = CCPar("VOutFlow2")
+        self.VolProcMed1 = CCPar("VolProcMed1")
         self.QLoss = CCPar("QLoss")
         self.QLoss1 = CCPar("QLoss1")
         self.QOpProc1 = CCPar("QOpProc1")
@@ -659,7 +661,7 @@ class CheckProc():
             adjustSum(self.UPH2,self.UPHProc,self.QHXProc)
             adjustSum3(self.UPH1,self.UPHm,self.UPHc,self.UPHs)
             
-            adjustProd(self.UPHs1,self.UPHsdot1,self.NBatchPerYear2)
+            adjustProd(self.UPHs1,self.UPHsdot,self.NBatchPerYear2)
             adjustProd(self.NBatchPerYear1,self.NDaysProc2,self.NBatch)
             adjustFlow(self.UPHsdot1,self.FluidRhoCp,self.VolProcMed,
                        self.PT3,self.PTStartUp,self.DTUPHs,self.DTUPHs1)
@@ -718,6 +720,8 @@ class CheckProc():
         ccheck4(self.PT,self.PT1,self.PT2,self.PT3,self.PT4)  
         ccheck2(self.PTInFlow,self.PTInFlow1,self.PTInFlow2)
         ccheck3(self.PTInFlowRec,self.PTInFlowRec1,self.PTInFlowRec2,self.PTInFlowRec3)
+        ccheck1(self.PTStartUp,self.PTStartUp1)
+        ccheck1(self.VolProcMed,self.VolProcMed1)
         ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
         ccheck1(self.VOutFlow,self.VOutFlow1)
         ccheck2(self.PTOutFlow,self.PTOutFlow1,self.PTOutFlow2)

@@ -1,0 +1,9 @@
+-- update einstein database:
+USE einstein;
+
+ALTER TABLE dbbenchmark CHANGE COLUMN DataRelevance DataRelevance VARCHAR(200);
+
+ALTER TABLE qheatexchanger CHANGE HXSource HXSource VARCHAR( 300 );  
+ALTER TABLE qheatexchanger CHANGE HXSink HXSink VARCHAR( 300 );  
+ALTER TABLE qheatexchanger CHANGE HXName HXName VARCHAR( 300 );  
+ALTER TABLE qheatexchanger CHANGE HXType HXType VARCHAR( 300 );
