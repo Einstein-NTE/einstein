@@ -44,6 +44,7 @@
 #                           Stoyan Danov            16/05/2008
 #                           Hans Schweiger          28/06/2008
 #                           Hans Schweiger          02/08/2008
+#                           Hans Schweiger          03/10/2008
 #   
 #
 #       Changes to previous version:
@@ -91,6 +92,7 @@
 #       16/05/2008 SD:  some prints added in designAssistant1, calculateEnergyFlows; runSimulation activated in DA2 ->problems here, see prints
 #       28/06/2008: HS  new modality of runSimulation(first=xy,last=xy) implemented. Some clean-up.
 #       02/08/2008: HS  conversion kWh - MWh in panel
+#       03/10/2008: HS  calculateOM added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -938,6 +940,8 @@ class ModuleHP():
                     FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
                     HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
                    
+        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        
         return USHj*Status.EXTRAPOLATE_TO_YEAR    
 
 #============================================================================== 								
@@ -1013,4 +1017,21 @@ if __name__ == "__main__":
     mod.designAssistant2(HPId)
 
 
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
 
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
+#------------------------------------------------------------------------------
+#==============================================================================

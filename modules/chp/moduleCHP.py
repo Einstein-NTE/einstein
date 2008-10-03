@@ -15,12 +15,15 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger	05/09/2008
 #                           based on ModuleBB
-#	Last revised by:    
+#	Last revised by:
+#                           Hans Schweiger      03/10/2008
 #
 #       Changes to previous version:
+#
+#       03/10/08: HS    calculatOM added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -496,6 +499,9 @@ class ModuleCHP(object):
                     FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
                     QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
                     HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+
+        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        
         return USHj    
 
 
@@ -625,6 +631,23 @@ class ModuleCHP(object):
             self.setEquipmentFromDB(self.equipe,modelID) #add selected equipment to the equipment list #SD change 30/04.2008
             logTrack("ModuleCHP (DA2): heat pump added. model no: %s"%modelID)
         
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
+
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
 #------------------------------------------------------------------------------
         
 

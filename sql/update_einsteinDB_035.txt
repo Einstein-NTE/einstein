@@ -1,0 +1,6 @@
+USE einstein;
+
+ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceLT HeatSourceLT VARCHAR(200);
+ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceHT HeatSourceHT VARCHAR(200);
+
+ALTER TABLE qgenerationhc ADD COLUMN OandM DOUBLE After TurnKeyPrice;

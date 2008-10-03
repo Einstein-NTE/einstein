@@ -15,7 +15,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
+#	Version No.: 0.13
 #	Created by: 	    Hans Schweiger	25/06/2008
 #                           (based on ModuleST from Enrico Facci)
 #	Last revised by:    Enrico Facci &      05/07/2008
@@ -27,6 +27,7 @@
 #                           Enrico Facci        (...)
 #                           Hans Schweiger      01/08/2008
 #                           Hans Schweiger      13/09/2008
+#                           Hans Schweiger      03/10/2008
 #
 #       Changes to previous version:
 #
@@ -45,6 +46,7 @@
 #                       - calculateEnergyFlows (cEF)
 #       13/09/2008: HS  bug-fix in display of desired solar fraction
 #                       temporary change in selectST: factor 0.8 for concentrating collectors
+#       03/10/2008: HS  calculateOM added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -978,6 +980,8 @@ class ModuleST(object):
                    annualGbT*Status.EXTRAPOLATE_TO_YEAR,
                    annualGdT*Status.EXTRAPOLATE_TO_YEAR)
 
+        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        
         return USHj*Status.EXTRAPOLATE_TO_YEAR    
 
 #==============================================================================
@@ -1589,6 +1593,23 @@ class ModuleST(object):
             else:
                 showWarning(_("The suitable surfaces are quite small. Einstein suggests not to install a solar system"))
 
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
+
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
+#------------------------------------------------------------------------------
 
 #==============================================================================
                                   

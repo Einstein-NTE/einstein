@@ -313,6 +313,9 @@ class ModuleEnergy(object):
                     0.0,\
                     FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
                     HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+
+        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        
         
 #------------------------------------------------------------------------------
 
@@ -394,6 +397,23 @@ class ModuleEnergy(object):
             Status.mod.moduleEA.calculateEquipmentEnergyBalances()
             Status.prj.setStatus("Energy")
     
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
+
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
+#------------------------------------------------------------------------------
               
 #==============================================================================
 

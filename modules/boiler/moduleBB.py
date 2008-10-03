@@ -35,6 +35,7 @@
 #                           Hans Schweiger      02/07/2008
 #                           Hans Schweiger      03/07/2008
 #                           Hans Schweiger      16/09/2008
+#                           Hans Schweiger      03/10/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -82,6 +83,7 @@
 #                       boiler efficiency set as fraction of 1
 #                       introduction of several security items and bug-fixes
 #       16/09/2008: HS  change in function findmaxTemp: -> attempt to eliminate rounding errors ...
+#       03/10/2008: HS  calculateOM added
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -604,13 +606,16 @@ class ModuleBB(object):
         Status.int.FETel_j[cascadeIndex-1] = FETel_j
         Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
         
-        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
-                   (equipe.EqNo,\
-                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    FETFuel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+#        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
+#                   (equipe.EqNo,\
+#                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+#                    FETFuel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+#                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+#                    QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+#                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+
+        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        
         return USHj    
 
 
@@ -1237,6 +1242,23 @@ class ModuleBB(object):
         
 #        self.updatePanel()    #updatePanel should be called only from the Panel !!!
 
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
+
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
+#------------------------------------------------------------------------------
     
 #==============================================================================
 
