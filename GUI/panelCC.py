@@ -375,7 +375,7 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
     def OnGridPanelGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
-        OnGridPanelGridCellLeftClick(event)
+        self.OnGridPanelGridCellLeftClick(event)
         event.Skip()
 
     def OnGridPanelGridCellRightClick(self, event):

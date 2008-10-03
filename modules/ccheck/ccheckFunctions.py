@@ -2270,7 +2270,8 @@ def checkIfConflict(y1,y2):
 
     if y1.val is not None and y2.val is not None:
         dif=abs(y1.val-y2.val)
-        maxDif = max(y1.val,y2.val)*pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE
+        maxDif = max(y1.val,y2.val)* \
+                 max(pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE,NUMERIC_ERR)
         
         if dif > maxDif + NUMERIC_ERR:
             print "======================================================"
@@ -2284,7 +2285,7 @@ def checkIfConflict(y1,y2):
             conflict.screen(y1,y2,dif,maxDif)
 
     difLimits = max(y2.valMin - y1.valMax,y1.valMin - y2.valMax)
-    if difLimits > 0:
+    if difLimits > NUMERIC_ERR*max(y1.valMin,y2.valMin):
         print "======================================================"
         print "WARNING !!!! "
         print "CCheckFunctions (checkIfConflict): contradiction found"

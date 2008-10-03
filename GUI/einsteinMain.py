@@ -468,7 +468,7 @@ class EinsteinFrame(wx.Frame):
         self.logWarning(text)
         dlg = wx.MessageDialog(None, text, _("Warning"), wx.OK | wx.ICON_EXCLAMATION)
         ret = dlg.ShowModal()
-        dlg.Destroy()
+        #dlg.Destroy()
         self.doLog.LogThis('Warning: '+text)
 
     def showInfo(self, text):

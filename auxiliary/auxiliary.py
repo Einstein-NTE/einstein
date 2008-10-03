@@ -261,6 +261,16 @@ def noneFilter(datalist,substitute=" "):
     return datalist
 
 #------------------------------------------------------------------------------		
+def noneFilterNumber(val,substitute=0.0):   
+#------------------------------------------------------------------------------
+#   A range function with float arguments
+#------------------------------------------------------------------------------		
+
+    if val is None:
+        val = substitute
+    return val
+
+#------------------------------------------------------------------------------		
 def cutInterval(x, x0, x1):
 #------------------------------------------------------------------------------		
 #   returns the fraction of the interval [x0,x1] or [x1,x0] that is below x
