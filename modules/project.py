@@ -2077,6 +2077,18 @@ class Project(object):
             logTrack("Project (substituteFluidID): table qprocessdata - FluidID %s substituted by %s in ID %s for supply medium"%\
                      (oldID,newID,process.QProcessData_ID))
         
+        hxes = Status.DB.qheatexchanger.ProjectID[PId].FluidIDSource[oldID]
+        for hx in hxes:
+            hx.FluidIDSource = newID
+            logTrack("Project (substituteFluidID): table qheatexchanger - FluidID %s substituted by %s in ID %s for source medium"%\
+                     (oldID,newID,hx.FluidIDSource))
+        
+        hxes = Status.DB.qheatexchanger.ProjectID[PId].FluidIDSink[oldID]
+        for hx in hxes:
+            hx.FluidIDSink = newID
+            logTrack("Project (substituteFluidID): table qheatexchanger - FluidID %s substituted by %s in ID %s for sink medium"%\
+                     (oldID,newID,hx.FluidIDSink))
+        
         whees = Status.DB.qwasteheatelequip.ProjectID[PId].WHEEMedium[oldID]
         for whee in whees:
             whees.WHEEMedium = newID

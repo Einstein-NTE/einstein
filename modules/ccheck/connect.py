@@ -19,17 +19,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	13/06/2008
 #	Last revised by:
 #                           Hans Schweiger      21/07/2008
 #                           Hans Schweiger      01/10/2008
+#                           Hans Schweiger      07/10/2008
 #                    
 #
 #       Changes in last update:
 #
 #       21/07/2008: HS  Split-up of FETLink into FETFuelLink and FETelLink
 #       01/10/2008: HS  Error messages when equipments or processes are not connected
+#       07/10/2008: HS  FluidID of source and sink in HX's checked and stored
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -212,46 +214,100 @@ def getConnections():
     Status.QHXProcLink = arange(NK*NH).reshape(NK,NH)
     
     for h in range(NH):
+        sourceFluidID = None
+        sinkFluidID = None
+        
         for j in range(NJ):
             if sourceName_h[h] == equipeName_j[j]:
                 Status.QWHEqLink[j][h] = 1
+                sourceFluidID = None
             else:
                 Status.QWHEqLink[j][h] = 0
                 
             if sinkName_h[h] == equipeName_j[j]:
                 Status.QHXEqLink[j][h] = 1
+                sinkFluidID = None
             else:
                 Status.QHXEqLink[j][h] = 0
         
         for m in range(NM):
             if sourceName_h[h] == pipeName_m[m]:
                 Status.QWHPipeLink[m][h] = 1
+
+                pipes = Status.DB.qdistributionhc.\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        Pipeduct[sourceName_h[h]]
+                if len(pipes) > 0:
+                    sourceFluidID = pipes[0].HeatDistMedium
+
             else:
                 Status.QWHPipeLink[m][h] = 0
                 
             if sinkName_h[h] == pipeName_m[m]:
                 Status.QHXPipeLink[m][h] = 1
+
+                pipes = Status.DB.qdistributionhc.\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        Pipeduct[sinkName_h[h]]
+                if len(pipes) > 0:
+                    sinkFluidID = pipes[0].HeatDistMedium
+
             else:
                 Status.QHXPipeLink[m][h] = 0
         
         for k in range(NK):
             if sourceName_h[h] == procName_k[k]:
                 Status.QWHProcLink[k][h] = 1
+
+                processes = Status.DB.qprocessdata.\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        Process[sourceName_h[h]]
+                if len(processes) > 0:
+                    sourceFluidID = processes[0].ProcMedOut
+
             else:
                 Status.QWHProcLink[k][h] = 0
                 
             if sinkName_h[h] == procName_k[k]:
                 Status.QHXProcLink[k][h] = 1
                 check_k[k] = 1
+
+                processes = Status.DB.qprocessdata.\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        Process[sinkName_h[h]]
+                if len(processes) > 0:
+                    sinkFluidID = processes[0].SupplyMedDBFluid_id
             else:
                 Status.QHXProcLink[k][h] = 0
         
         for n in range(NN):                         #WHEE can only be source, not sink !!!
             if sourceName_h[h] == wheeName_n[n]:
                 Status.QWHEELink[n][h] = 1
+
+                whees = Status.DB.qwasteheatelequip.\
+                        ProjectID[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        WHEEName[sourceName_h[h]]
+                if len(whees) > 0:
+                    sourceFluidID = whees[0].WHEEMedium
             else:
                 Status.QWHEELink[n][h] = 0
-                        
+
+
+        hxes = Status.DB.qheatexchanger.\
+                        ProjectID[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        HXNo[h+1]
+        if len(hxes) > 0:
+            hxes[0].FluidIDSource = sourceFluidID
+            hxes[0].FluidIDSink = sinkFluidID
+
+    Status.SQL.commit()
+    
 #    print "Connect: QWHEqLink created"
 #    print Status.QWHEqLink
 #    print "Connect: QHXEqLink created"
