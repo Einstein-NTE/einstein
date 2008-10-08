@@ -224,9 +224,21 @@ class PanelTCAEnergy(wx.Panel):
         for r in range(self.rows):
             self.grid.SetRowSize(r,20)
             self.grid.SetRowAttr(r, attr)
-        
+    
+    def updatePanel(self):
+        #TCA should no run with present state(original)
+        if (Status.ANo == -1):
+            wx.MessageBox("Could not display TCA for unchecked state!")
+            #self.Hide()
+            self.main.tree.SelectItem(self.main.qCC, select=True)
+            return False
+        else:
+            self.mod.updatePanel()
+            return True    
+       
     def display(self):  
-        self.mod.updatePanel()         
+        if not(self.updatePanel()):
+            return     
         #Update grid------------------------------------------------
         div = len(self.mod.data.energycosts) - self.rows
         if (div>0):
@@ -240,7 +252,8 @@ class PanelTCAEnergy(wx.Panel):
             for c in range(self.cols):
                 self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
         #Update opcost
-        self.tbTotalOpCost.SetValue(str(self.mod.data.totalopcost))
+        opcost = "%.0f" % self.mod.data.totalopcost
+        self.tbTotalOpCost.SetValue(opcost)
     
     def OnGrid1GridCellLeftClick(self, event):
         self.selectedRow = event.GetRow()  
@@ -313,10 +326,10 @@ class PanelTCAEnergy(wx.Panel):
     def OnBtnNextButton(self, event):
         self.Hide()
         self.mod.storeData()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic3, select=True)
+        self.main.tree.SelectItem(self.main.qECO3, select=True)
         event.Skip()        
 
     def OnBtnGoMainButton(self, event):
         self.Hide()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
+        self.main.tree.SelectItem(self.main.qECO, select=True)
         event.Skip()        

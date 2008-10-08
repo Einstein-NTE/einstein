@@ -15,12 +15,13 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.03
+#   Version No.: 0.06
 #   Created by:         Hans Schweiger  03/04/2008
 #   Last revised by:    Stoyan Danov    29/04/2008
 #                       Stoyan Danov    30/04/2008
 #                       Stoyan Danov    05/05/2008
 #                       Hans Schweiger  06/05/2008
+#                       Hans Schweiger  08/10/2008
 #
 #       Changes to previous version:
 #   29/04/2008 SD: added: cascadeMoveUp, cascadeMoveDown, cascadeMoveToTop, ...
@@ -28,6 +29,7 @@
 #   05/05/2008 SD: move query PId,ANo from __init__ to initPanel
 #   06/05/2008 HS: self.NEquipe substituted by Status.int.NEquipe
 #                   the latter one is updated in the moves, adds, etc.
+#   08/10/2008 HS: table for report added
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -81,7 +83,11 @@ class ModuleHC(object):
         equipments = Status.prj.getEquipments(cascade=True)
 
         dataList = []
+        dataListReport = []
+
+        j = 0        
         for equipe in equipments:
+            j += 1
 #..............................................................................
 # getting pipe names of equipes
 
@@ -118,9 +124,50 @@ class ModuleHC(object):
                                         equipe.EquipType,
                                         equipe.HCGPnom,
                                         pipes]))
+
+            if j <= 10:
+                try:
+                    USHj = equipe.USHj/1000.
+                except:
+                    USHj = " "
+                dataListReport.append(noneFilter([equipe.Equipment,
+                                                  equipe.EquipType,
+                                                  pipes,
+                                                  equipe.HCGPnom,
+                                                  USHj,
+                                                  0.0]))
         data = array(dataList)
 
         Status.int.setGraphicsData(self.keys[0], data)
+
+#Now create table for Report
+        
+        if Status.ANo > 0:
+            SumUSH = 0.0
+            SumPnom = 0.0
+            for row in dataListReport:
+                try:
+                    SumUSH += row[4]
+                except:
+                    pass
+                try:
+                    SumPnom += row[3]
+                except:
+                    pass
+
+            if SumUSH > 0:
+                for row in dataListReport:
+                    row[5] = 100.0*row[4]/SumUSH
+
+            NJ = len(dataListReport)
+            for j in range(NJ,10):
+                dataListReport.append([" "," "," "," "," "," "])
+            dataListReport.append([_("Total")," "," ",SumPnom,SumUSH,100.0])
+            dataReport = array(dataListReport)
+        
+            print "ModuleHC (updatePanel): writing key HC%02d_REPORT"%Status.ANo
+            Status.int.setGraphicsData("HC%02d_REPORT"%Status.ANo, dataReport)
+        
 
 #------------------------------------------------------------------------------
     def cascadeMoveUp(self,actualCascadeIndex):

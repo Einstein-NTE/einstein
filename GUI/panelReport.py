@@ -11,14 +11,16 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Tom Sobota	30/04/2008
 #
 #       Last revised by:    Hans Schweiger  18/06/2008
+#                           Hans Schweiger  08/10/2008
 #
 #       Changes to previous version:
 #
 #       18/06/2008: HS  Call to function prepareDataForReport() in control.py added
+#       08/10/2008: HS  Security features added for avoiding crashes
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -79,6 +81,7 @@ from numpy import *
 import wx
 from einstein.modules.interfaces import *
 from einstein.modules.control import *
+from GUITools import *
 #
 # constants
 #
@@ -89,6 +92,8 @@ TMPFILE     = "./workfile"
 CONTENTFILE = 'content.xml'
 
 wxID_BTNSELECTREPORT = wx.NewId()
+wxID_PANELBUTTONFWD = wx.NewId()
+wxID_PANELBUTTONBACK = wx.NewId()
 
         
 class PanelReport(wx.Panel):
@@ -98,26 +103,65 @@ class PanelReport(wx.Panel):
               pos=wx.Point(0,0), size=wx.Size(800, 600))
         self.SetClientSize(wx.Size(800, 600))
 
-        self.staticText1 = wx.StaticText(id=-1,
-              label=_(u'Report generation'), name='staticText1', parent=self,
-              pos=wx.Point(352, 25), size=wx.Size(127, 17), style=0)
-        self.staticText1.SetFont(wx.Font(12, wx.SWISS,wx.NORMAL,wx.BOLD, False))
-
         self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
               label=_(u'Select report'), name=u'btnSelectReport', parent=self,
               pos=wx.Point(304, 88), size=wx.Size(240, 40), style=0)
         self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
               id=wxID_BTNSELECTREPORT)
 
-        self.txtMessage = wx.StaticText(id=-1,
-              label='', name=u'txtMessage', parent=self,
-              pos=wx.Point(264, 152), size=wx.Size(320, 192), style=0)
+#..............................................................................
+# Description of selected industry
 
+        self.box1 = wx.StaticBox(id=-1,
+              label=_('Project Summary'),
+              name='box1', parent=self, pos=wx.Point(10, 10),
+              size=wx.Size(780, 520), style=0)
+        self.box1.SetForegroundColour(TITLE_COLOR)
+        self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-    def __init__(self, parent,main):
-        self._init_ctrls(parent)
+        self.tc1 = wx.TextCtrl(id=-1, name='tc1',
+              parent=self, pos=wx.Point(20, 40), size=wx.Size(760, 480),
+                               style=wx.TE_MULTILINE | wx.TE_LINEWRAP, value="")
+
+#------------------------------------------------------------------------------		
+#       Default action buttons: FWD / BACK / OK / Cancel
+#------------------------------------------------------------------------------		
+
+        self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
+              label=_(u'Select report'), name=u'btnSelectReport', parent=self,
+              pos=wx.Point(10, 560), size=wx.Size(150, 20), style=0)
+        self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
+              id=wxID_BTNSELECTREPORT)
+
+        self.buttonOk = wx.Button(id=wx.ID_OK, label=_('OK'),
+              name='buttonOk', parent=self, pos=wx.Point(528, 560),
+              size=wx.Size(75, 20), style=0)
+
+        self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+              name='buttonCancel', parent=self, pos=wx.Point(616,
+              560), size=wx.Size(75, 20), style=0)
+
+        self.buttonFwd = wx.Button(id=wxID_PANELBUTTONFWD,
+              label='>>>', name='buttonFwd', parent=self,
+              pos=wx.Point(704, 560), size=wx.Size(75, 20), style=0)
+
+        self.buttonFwd.Bind(wx.EVT_BUTTON,
+              self.OnButtonFwdButton,
+              id=wxID_PANELBUTTONFWD)
+
+        self.buttonBack = wx.Button(id=wxID_PANELBUTTONBACK,
+              label='<<<', name='buttonBack', parent=self,
+              pos=wx.Point(440, 560), size=wx.Size(75, 20), style=0)
+
+        self.buttonBack.Bind(wx.EVT_BUTTON,
+              self.OnButtonBackButton,
+              id=wxID_PANELBUTTONBACK)
+
+    def __init__(self, parent, main):
         self.parent = parent
         self.main=main
+        self._init_ctrls(parent)
+        
     #
     # GUI events
     #
@@ -138,6 +182,34 @@ class PanelReport(wx.Panel):
             self.master = None
 
         event.Skip()
+
+#------------------------------------------------------------------------------		
+#   Default event handlers: FWD / BACK / OK / Cancel - Buttons
+#------------------------------------------------------------------------------		
+
+    def OnButtonBackButton(self, event):
+#        self.Hide
+#        self.main.tree.SelectItem(self.main.qHC, select=True)
+        event.Skip()
+
+    def OnButtonFwdButton(self, event):
+#        self.Hide
+#        self.main.tree.SelectItem(self.main.qHP, select=True)
+        event.Skip()
+
+    def OnButtonOkButton(self, event):
+        summary = self.tc1.value
+        
+#        self.Hide()
+#        self.main.tree.SelectItem(self.main.qHC, select=True)
+        event.Skip()
+
+    def OnButtonCancelButton(self, event):
+        logTrack("Button exitModuleCancel: CANCEL Option not yet foreseen")
+
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
     #
     # public instance methods
     #
@@ -170,7 +242,7 @@ class PanelReport(wx.Panel):
         dataOut = open(CONTENTFILE, "wb")
         dataOut.write(self.document.toxml(encoding='utf-8'))
         dataOut.close()
-        self.main.logMessage('Adding OO component '+CONTENTFILE)
+#        self.main.logMessage('Adding OO component '+CONTENTFILE)
         outfile.write(CONTENTFILE)
         self.close()
 
@@ -179,7 +251,7 @@ class PanelReport(wx.Panel):
         infile = ZipFile(self.master, "r")
         for component in infile.namelist():
             if component != CONTENTFILE:
-                self.main.logMessage('Adding OO component '+component)
+#                self.main.logMessage('Adding OO component '+component)
                 dataIn = infile.read(component)
                 dataOut = open(TMPFILE, "wb")
                 dataOut.write(dataIn)
@@ -270,13 +342,18 @@ class PanelReport(wx.Panel):
                 if not Interfaces.GData.has_key(thename):
                     continue
                 # found a name on this sheet
+                print "PanelReport (replaceData): Key = ",thename
                 data = Interfaces.GData[thename]
                 thelist = cl[1]
                 ncol = thelist[0]
                 nrow = thelist[1]
                 #print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
                 #      (sheetname,thename,nrow,ncol)
-                (datarows,datacols) = data.shape
+                try:
+                    (datarows,datacols) = data.shape
+                except:
+                    logDebug("PanelReport (replaceData): no data shape found for key %s"%thename)
+                    continue
                 #print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
                 for c in range(datacols):
                     for r in range(datarows):
@@ -342,6 +419,8 @@ class PanelReport(wx.Panel):
 
         newval = str(newval)
         if aNumber:
+            print "PanelReport: converting -> %s as a number"%newval
+        
             element.setAttribute('office:value',newval)
             ##print "Do: element.setAttribute('office:value',%s)" % (newval,)
             element.setAttribute('office:value-type','float')
@@ -355,13 +434,17 @@ class PanelReport(wx.Panel):
                     element.removeChild(child)
                 child = next
         else:
+            print "PanelReport: converting -> %s as text"%newval
             # the value is a text element
             child = element.firstChild
             while child is not None:
                 next = child.nextSibling
                 if child.nodeType == child.ELEMENT_NODE:
-                    child.firstChild.data = newval
-                    ##print 'Do: child.firstChild.data = %s' % (newval,)
+                    print 'panelReport (changeOneCell): writing data to firstChild -> %s' % (newval)
+                    try:
+                        child.firstChild.data = newval
+                    except:
+                        logDebug("PanelReport (_changeOneCell): error writing to child.firstchild.data)")
                     return
                 child = next
             # if comes here, there was not a previous text node.
@@ -369,7 +452,8 @@ class PanelReport(wx.Panel):
             dataelement = self.document.createElement('text:p')
             # now the text with the value
             text = self.document.createTextNode(newval)
-            ##print 'Do: text = self.document.createTextNode(%s)' % (newval,)
+            print 'panelReport (changeOneCell): text = self.document.createTextNode(%s) -> %s' % (newval,text)
+            
             dataelement.appendChild(text)
             element.appendChild(dataelement)
             

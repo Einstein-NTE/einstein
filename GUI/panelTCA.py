@@ -206,20 +206,35 @@ class PanelTCA(wx.Panel):
         self.main = main
         self.mod = Status.mod.moduleTCA
         self.shortName = _("TCA")
-        self.description = _("")        
-        self.mod.updatePanel()
-        self.mod.runTCAModule() 
+        self.description = _("")                
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
-                
+    
+    def updatePanel(self):
+        #TCA should no run with present state(original)
+        if (Status.ANo == -1):
+            wx.MessageBox("Could not display TCA for unchecked state!")
+            #self.Hide()
+            self.main.tree.SelectItem(self.main.qCC, select=True)
+            return False
+        else:
+            self.mod.updatePanel()
+            return True                  
     
     def display(self):
-        self.mod.updatePanel()
+        if not(self.updatePanel()):
+            return
+        
+        self.mod.runTCAModule() 
         self.tbInflation.SetValue(str(self.mod.data.Inflation))
         self.tbNIR.SetValue(str(self.mod.data.NIR))
         self.tbCSDRate.SetValue(str(self.mod.data.CSDR))
         self.tbEnergyPrices.SetValue(str(self.mod.data.DEP))
-        self.tbTimeFame.SetValue(str(self.mod.data.TimeFrame))      
+        self.tbTimeFame.SetValue(str(self.mod.data.TimeFrame))
+        
+        self.resultpage1.display()        
+        self.resultpage2.updatePanel()
+        self.resultpage2.display()      
 
 #Focus events------------------------------------------------------------------------------------------------
     def OnTbNIRKillFocus(self, event):
@@ -322,12 +337,17 @@ class PanelTCA(wx.Panel):
         
 #-Nav----------------------------------------------------------------------------------------
     def OnBtnResetDataButton(self, event):
+        dlg = wx.MessageDialog(None,_('Do you want to reset the data to proposed values from Einstein?\nAll your previous changes in the TCA will be lost.'),'Info',wx.YES_NO)
+        if dlg.ShowModal()==wx.ID_YES:
+            #print "reset tca data"
+            self.mod.resetData()
+            self.display()
         event.Skip()
 
     def OnBtnNextButton(self, event):
         self.Hide()
         self.mod.storeData()       
-        self.main.tree.SelectItem(self.main.qOptiProEconomic1, select=False)
+        self.main.tree.SelectItem(self.main.qECO1, select=False)
         #event.Skip()
          
 

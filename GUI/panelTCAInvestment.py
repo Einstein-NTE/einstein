@@ -233,14 +233,25 @@ class PanelTCAInvestment(wx.Panel):
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)       
         #self.display()              
-        
+    
+    def updatePanel(self):
+        #TCA should no run with present state(original)
+        if (Status.ANo == -1):
+            wx.MessageBox("Could not display TCA for unchecked state!")
+            #self.Hide()
+            self.main.tree.SelectItem(self.main.qCC, select=True)
+            return False
+        else:
+            self.mod.updatePanel()
+            return True 
+       
     def display(self):
         if (Status.ANo == 0):            
-            wx.MessageBox("There are no investments to enter for the current process. \n Please proceed with Energy and Operating costs")                        
-            self.Hide()
-            self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)            
+            wx.MessageBox("There are no investments to enter for the current process. \n Please proceed with Energy and Operating costs")                                   
+            self.main.tree.SelectItem(self.main.qECO2, select=True)            
         else:          
-            self.mod.updatePanel()  
+            if not(self.updatePanel()):
+                return  
             #Revenue-----------------------------------------------------
             self.tbRevenueValue.SetValue(str(self.mod.data.revenue))                    
             #Update grid------------------------------------------------
@@ -338,11 +349,11 @@ class PanelTCAInvestment(wx.Panel):
 
     def OnBtnGoMainButton(self, event):
         self.Hide()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
+        self.main.tree.SelectItem(self.main.qECO, select=True)
         event.Skip()        
 
     def OnBtnNextButton(self, event):
         self.Hide()
         self.mod.storeData()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic2, select=True)
+        self.main.tree.SelectItem(self.main.qECO2, select=True)
         event.Skip()

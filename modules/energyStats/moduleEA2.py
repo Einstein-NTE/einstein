@@ -169,12 +169,23 @@ class ModuleEA2(object):
 
         TableColumnList = [fuelNames,FEC,FECPercentage,FETi,FETPercentage]
         matrix = transpose(TableColumnList)
+
         data = array(matrix)
 
         Status.int.setGraphicsData(self.keys[0], data)
 
-        print data
+        reportMatrix = []
+        for i in range(len(matrix)-1):
+            if i < 10:
+                reportMatrix.append(matrix[i])
+        for i in range(len(matrix)-1,10):
+            reportMatrix.append([" "," "," "," "," "])
+        reportMatrix.append(matrix[len(matrix)-1])
 
+        reportData = array(reportMatrix)
+        print reportData
+        Status.int.setGraphicsData("EA2_REPORT", reportData)
+        
 #------------------------------------------------------------------------------
 
 #==============================================================================

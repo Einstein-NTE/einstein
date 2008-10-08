@@ -119,7 +119,6 @@ class PanelA(wx.Panel):
 #==============================================================================
 
     def __init__(self, parent, main):
-        self._init_ctrls(parent)
 	keys = ['A Table','A Plot']
 	self.keys = keys
 	self.main = main
@@ -127,6 +126,9 @@ class PanelA(wx.Panel):
         self.shortName = _("new alternative")
         self.description = _("describe shortly the main differential features of the new alternative")
         self.ANo = Status.ANo
+        self.selectedProposalName = "---"
+        self._init_ctrls(parent)
+        
 #==============================================================================
 #   graphic: Cumulative heat demand by hours
 #==============================================================================
@@ -253,6 +255,18 @@ class PanelA(wx.Panel):
         self.selectProposal.Bind(wx.EVT_BUTTON, self.OnSelectProposalButton,
               id=-1)
 
+        self.stSelected = wx.StaticText(id=-1,
+              label=_("selected proposal: "),
+              name='stSelected', parent=self, pos=wx.Point(440, 310),
+              style=0)
+        self.stSelected.SetForegroundColour(TITLE_COLOR)
+        self.stSelected.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        
+        self.selectedProposal = wx.StaticText(id=-1,
+              label=self.selectedProposalName,
+              name='selectedProposal', parent=self, pos=wx.Point(580, 310),
+              style=0)
+
 
 #..............................................................................
 # comparative graphics
@@ -270,21 +284,15 @@ class PanelA(wx.Panel):
 # action buttons for design of subsystems
 
         self.box3 = wx.StaticBox(self, -1, _("design of subsystems"),
-                                 pos = (430,310),size=(360,240))
+                                 pos = (430,350),size=(360,200))
         self.box3.SetForegroundColour(TITLE_COLOR)
         self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.DesignPO = wx.Button(id=wxID_PANELADESIGNPO,
               label=_('process optimisation'), name='DesignPO', parent=self,
-              pos=wx.Point(590, 360), size=wx.Size(180, 24), style=0)
+              pos=wx.Point(590, 400), size=wx.Size(180, 24), style=0)
         self.DesignPO.Bind(wx.EVT_BUTTON, self.OnDesignPOButton,
               id=wxID_PANELADESIGNPO)
-
-        self.DesignPA = wx.Button(id=wxID_PANELADESIGNPA,
-              label=_('pinch analysis'), name='DesignPA', parent=self,
-              pos=wx.Point(590, 400), size=wx.Size(180, 24), style=0)
-        self.DesignPA.Bind(wx.EVT_BUTTON, self.OnDesignPAButton,
-              id=wxID_PANELADESIGNPA)
 
         self.DesignHX = wx.Button(id=wxID_PANELADESIGNHX,
               label=_('HX network design'), name='DesignHX', parent=self,
@@ -339,7 +347,7 @@ class PanelA(wx.Panel):
         (rows,cols) = data.shape
 
         decimals = [-1,-1,-1,-1,2,2]
-        for r in range(rows):
+        for r in range(rows):                
             for c in range(cols):
                 try:
                     if decimals[c] >= 0: # -1 indicates text
@@ -356,6 +364,9 @@ class PanelA(wx.Panel):
                 self.grid.SetCellValue(r, c, "")
 
         self.grid.SelectRow(Status.ANo+1)
+        self.ANo = Status.ANo
+
+        self.selectedProposal.SetLabel(check(Status.FinalAlternativeName))
 
         self.Hide()
         self.panelAFig.draw()
@@ -436,8 +447,12 @@ class PanelA(wx.Panel):
 #   Select alternative proposal
 #------------------------------------------------------------------------------		
 
-#        Status.prj.setFinalAlternative(self.ANo)
-        event.skip()
+        showMessage(_("Alternative %s selected as final proposal")%self.ANo)
+        Status.prj.setFinalAlternative(self.ANo)
+        self.selectedProposalName = check(Status.FinalAlternativeName)
+        logMessage("Final alternative selected = %s"%self.selectedProposalName)
+        self.selectedProposal.SetLabel(self.selectedProposalName)
+        self.display()
         
 #------------------------------------------------------------------------------		
     def OnGridPageAGridCellLeftClick(self, event):
@@ -466,18 +481,18 @@ class PanelA(wx.Panel):
 #==============================================================================
 #   EVENT HANDLERS BUTTONS TO DESIGN ASSISTANTS
 #==============================================================================
-    def OnDesignPAButton(self, event):
-        event.Skip()
 
     def OnDesignHXButton(self, event):
-        event.Skip()
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHX, select=True)
 
     def OnDesignHCButton(self, event):
         self.Hide()
         self.main.tree.SelectItem(self.main.qHC, select=True)
 
     def OnDesignPOButton(self, event):
-        event.Skip()
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qPO, select=True)
 
 #------------------------------------------------------------------------------		
 #   <<< OK Cancel >>>

@@ -469,6 +469,37 @@ class Project(object):
         self.setStatus("CC",0)
 
 #------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
+    def setFinalAlternative(self,ANo):
+#------------------------------------------------------------------------------
+        finalANo = 0
+        if ANo < 0:
+            finalANo = 0
+            
+        if finalANo > Status.NoOfAlternatives:
+            logDebug("Project (setFinalAlternative): error in no. of selected alternative [%s]"%finalANo)
+            return
+
+        sprojects = Status.DB.sproject.ProjectID[Status.PId]
+        if len(sprojects) > 0:
+            sproject = sprojects[0]
+            sproject.FinalAlternative = finalANo
+            Status.SQL.commit()
+            
+        Status.FinalAlternative = finalANo
+
+        Status.FinalAlternativeName = "---"
+
+        if finalANo is not None:
+            self.setStatus("CS")
+            aa = Status.DB.salternatives.ProjectID[Status.PId].\
+                 AlternativeProposalNo[finalANo]
+            if len(aa) > 0:
+                name = aa[0].ShortName
+                if name is not None:
+                    Status.FinalAlternativeName = name
+            
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------		
 # HANDLING OF PROJECTS (CREATE,COPY,DELETE,INIT ...)
@@ -543,6 +574,7 @@ class Project(object):
                 sproject = Status.DB.sproject.ProjectID[PId][0]
                 Status.NoOfAlternatives = sproject.NoOfAlternatives
                 Status.ANo = sproject.ActiveAlternative
+                Status.FinalAlternative = sproject.FinalAlternative
                 logTrack("Project (setActiveProject): number of alternatives in the project %s"%Status.NoOfAlternatives)
                 logTrack("Project (setActiveProject): active alternative %s"%Status.ANo)
             except:
@@ -552,6 +584,7 @@ class Project(object):
                 
             Status.PId = PId
 
+
             try:
                 Status.DB.stool.STool_ID[1][0].ActiveProject = PId
                 logTrack("Project (setActiveProject): active project set to %s"%PId)
@@ -559,6 +592,7 @@ class Project(object):
                 logTrack("Project (setActiveProject): error writing new active project ID to stool")                
 
             self.setActiveAlternative(Status.ANo)
+            self.setFinalAlternative(Status.FinalAlternative)
 
         Status.SQL.commit()
 

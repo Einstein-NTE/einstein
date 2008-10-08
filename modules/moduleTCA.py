@@ -47,13 +47,7 @@ class ModuleTCA(object):
         self.updatePanel()
               
 #------------------------------------------------------------------------------
-    def updatePanel(self):
-        #TCA should no run with present state(original)
-        if (Status.ANo == -1):
-            wx.MessageBox("Could not display TCA for unchecked state!")
-            self.Hide()
-            self.main.tree.SelectItem(self.main.qA, select=True)
-        
+    def updatePanel(self):           
         #Create or Update data according to PID and ANo in Status    
         if (self.data == None):
             self.data = TCAData(Status.PId,Status.ANo)
@@ -114,7 +108,10 @@ class ModuleTCA(object):
                 data.setResult(name,npv,mirr,bcr,annuity,pp,display)                                
                 self.result.append(data)
                 data.storeResultToCGeneralData()
-            except:
+            except Exception, inst:
+                #print type(inst)
+                #print inst.args
+                #print inst
                 data.setResultInvalid(name,display)
                 self.result.append(data)
                 logWarning((_("TCA: No result for %s") % ano[1]))        
@@ -181,3 +178,7 @@ class ModuleTCA(object):
        
     def storeData(self):
         self.data.storeTCAData() 
+    
+    def resetData(self):
+        self.data.resetTCAData()
+        self.data.loadTCAData() 

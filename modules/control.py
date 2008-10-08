@@ -45,16 +45,28 @@ from einstein.modules.energyStats.moduleEA4 import *
 from einstein.modules.energyStats.moduleEA5 import *
 from einstein.modules.moduleCS import *
 
+from numpy import *
+
 #------------------------------------------------------------------------------		
 def prepareDataForReport():
 #------------------------------------------------------------------------------		
 #   calls the functions necessary for writing the report
 #------------------------------------------------------------------------------		
 
+#Title page
+    (projectData,generalData) = Status.prj.getProjectData()
+    reportTitle = projectData.Name
+    if projectData.City is not None: reportTitle += ", " + projectData.City
+    if projectData.Country is not None: reportTitle += ", " + projectData.Country
+    Status.int.setGraphicsData("TITLE", array([[reportTitle]]))
+    print "Control (prepareDataForReport): Title = ",reportTitle
+    print Status.int.GData["TITLE"]
+    
     Status.prj.setActiveAlternative(0)  #select present state
     
     Status.mod.moduleEA.update()
 
+#Cap. 2.1 - 2.3
     modEA1 = ModuleEA1(['EA1'])
     modEA1.initModule()
 
@@ -72,20 +84,48 @@ def prepareDataForReport():
     modEA4.updatePanel()   
 
     modEA5 = ModuleEA5(['EA5_EI','EA5_SEC'])
-    modEA5.initModule()   
+    modEA5.initModule()
 
+
+#Cap. 2.4
+    Status.mod.moduleBM.initPanel(['BM1'])
+
+    products = Status.mod.moduleBM.products
+    if len(products) > 0:
+        Status.mod.moduleBM.product = products[0]
+    Status.mod.moduleBM.initPanel(['BM2'])
+
+    processes = Status.mod.moduleBM.processes
+    if len(processes) > 0:
+        Status.mod.moduleBM.process = processes[0]
+    Status.mod.moduleBM.initPanel(['BM3'])
+
+#Cap. 3
+    Status.mod.moduleA.updatePanel()
+
+    for ANo in range(1,(Status.NoOfAlternatives+1)):
+        Status.prj.setActiveAlternative(ANo)
+        Status.mod.moduleHC.updatePanel()
+
+#Cap. 4
     modCS = ModuleCS(['CS1_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS2_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS3_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS4_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS5_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS6_Plot'])
     modCS.updatePanel()
+    
     modCS = ModuleCS(['CS7_Plot'])
     modCS.updatePanel()
 

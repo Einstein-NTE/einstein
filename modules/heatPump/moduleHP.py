@@ -943,7 +943,25 @@ class ModuleHP():
         self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
         
         return USHj*Status.EXTRAPOLATE_TO_YEAR    
+#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+    def calculateOM(self,equipe,USH):
+#------------------------------------------------------------------------------
+
+        OMFix = equipe.OandMfix
+        OMVar = equipe.OandMvar
+
+        try:
+            OM = OMFix + OMVar*USH
+        except:
+            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
+            OM = 0.0
+
+        equipe.OandM = OM
+
+        Status.SQL.commit()
+#------------------------------------------------------------------------------
 #============================================================================== 								
 
 if __name__ == "__main__":
@@ -1016,22 +1034,4 @@ if __name__ == "__main__":
     
     mod.designAssistant2(HPId)
 
-
-#------------------------------------------------------------------------------
-    def calculateOM(self,equipe,USH):
-#------------------------------------------------------------------------------
-
-        OMFix = equipe.OandMfix
-        OMVar = equipe.OandMvar
-
-        try:
-            OM = OMFix + OMVar*USH
-        except:
-            logWarning(_("OM costs for equipment %s could not be calculated")%equipe.Equipment)
-            OM = 0.0
-
-        equipe.OandM = OM
-
-        Status.SQL.commit()
-#------------------------------------------------------------------------------
 #==============================================================================

@@ -19,6 +19,7 @@
 #                           Stoyan Danov        13/07/2008
 #                           Stoyan Danov        14/07/2008
 #                           Stoyan Danov        15/07/2008
+#                           Hans Schweiger      08/10/2008
 #
 #       Changes to previous version:
 #       09/07/2008ff SD: add modules for CS2, CS3,
@@ -28,6 +29,7 @@
 #       13/07/2008   SD: CS4 added
 #       14/07/2008   SD: CS5, queries: qelectricity, qfuel
 #       15/07/2008   SD: CS6, CS7
+#       08/10/2008   HS: Table generation for report added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,6 +43,7 @@
 
 from math import *
 from numpy import *
+import copy
 
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
@@ -138,8 +141,14 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS1_Plot", data2)
 
-            print 'Table: data1\n',data1
-            print 'Plot: data2\n',data2
+#            print 'Table: data1\n',data1
+#            print 'Plot: data2\n',data2
+
+            PECReport = copy.deepcopy(PECTable)
+            for i in range(len(PECTable),11):
+                PECReport.append([" "," "," "," "])
+            dataReport1 = array(PECReport)                  
+            Status.int.setGraphicsData("CS1_REPORT", dataReport1)
 
 #------------------------------------------------------------------------------
 
@@ -250,6 +259,13 @@ class ModuleCS(object):
 ##            print 'CS2 plot =', data2
 ##            print 'USH =', USH
 ##            print 'UPH =', UPH
+
+            CS2Report = copy.deepcopy(CS2Table)
+            for i in range(len(CS2Table),11):
+                CS2Report.append([" "," "," "," "," "])
+            dataReport2 = array(CS2Report)                  
+            Status.int.setGraphicsData("CS2_REPORT", dataReport2)
+
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -380,6 +396,12 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS3_Plot", data2)
 
+            CS3Report = copy.deepcopy(CS3Table)
+            for i in range(len(CS3Table),11):
+                CS3Report.append([" "," "," "," "])
+            dataReport3 = array(CS3Report)                  
+            Status.int.setGraphicsData("CS3_REPORT", dataReport3)
+
 #------------------------------------------------------------------------------
 
 ##########################################################################
@@ -476,6 +498,13 @@ class ModuleCS(object):
             data2 = array(CS4Plot)
 
             Status.int.setGraphicsData("CS4_Plot", data2)
+
+            CS4Report = copy.deepcopy(CS4Table)
+            for i in range(len(CS4Table),11):
+                CS4Report.append([" "," "," "," "])
+            dataReport4 = array(CS4Report)                  
+            Status.int.setGraphicsData("CS4_REPORT", dataReport4)
+
 
 #------------------------------------------------------------------------------
 
@@ -597,6 +626,12 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS5_Plot", data2)
 
+            CS5Report = copy.deepcopy(CS5Table)
+            for i in range(len(CS5Table),11):
+                CS5Report.append([" "," "," "," "])
+            dataReport5 = array(CS5Report)                  
+            Status.int.setGraphicsData("CS5_REPORT", dataReport5)
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # Panel CS6: Annual cost
@@ -713,6 +748,11 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS6_Plot", data2)
 
+            CS6Report = copy.deepcopy(CS6Table)
+            for i in range(len(CS6Table),11):
+                CS6Report.append([" "," "," "," "])
+            dataReport6 = array(CS6Report)                  
+            Status.int.setGraphicsData("CS6_REPORT", dataReport6)
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -770,5 +810,10 @@ class ModuleCS(object):
 
             Status.int.setGraphicsData("CS7_Plot", data2)
 
+            CS7Report = copy.deepcopy(CS7Table)
+            for i in range(len(CS7Table),10):
+                CS7Report.append([" "," "])
+            dataReport7 = array(CS7Report)                  
+            Status.int.setGraphicsData("CS7_REPORT", dataReport7)
 
-            
+#==============================================================================            

@@ -171,9 +171,20 @@ class PanelTCAContingencies(wx.Panel):
         for r in range(self.rows):
             self.grid.SetRowSize(r,20)
             self.grid.SetRowAttr(r, attr)
+    
+    def updatePanel(self):
+        #TCA should no run with present state(original)
+        if (Status.ANo == -1):
+            wx.MessageBox("Could not display TCA for unchecked state!")            
+            self.main.tree.SelectItem(self.main.qCC, select=True)
+            return False
+        else:
+            self.mod.updatePanel()
+            return True    
              
     def display(self):          
-        self.mod.updatePanel() 
+        if not(self.updatePanel()):
+            return
         #Update grid------------------------------------------------  
         div = len(self.mod.data.contingencies) - self.rows
         if (div>0):
@@ -236,11 +247,11 @@ class PanelTCAContingencies(wx.Panel):
     def OnBtnGoMainButton(self, event):
         self.Hide()
         self.mod.storeData()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic, select=True)
+        self.main.tree.SelectItem(self.main.qECO, select=True)
         event.Skip()        
 
     def OnButton1Button(self, event):
         self.Hide()
         self.mod.storeData()
-        self.main.tree.SelectItem(self.main.qOptiProEconomic4, select=True)
+        self.main.tree.SelectItem(self.main.qECO4, select=True)
         event.Skip()        

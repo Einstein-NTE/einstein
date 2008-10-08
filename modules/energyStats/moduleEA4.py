@@ -41,7 +41,6 @@
 #	Software Foundation (www.gnu.org).
 #
 #============================================================================== 
-
 from math import *
 from numpy import *
 
@@ -164,37 +163,19 @@ class ModuleEA4(object):
 
             Status.int.setGraphicsData("EA4a_Table", data1)
 
-# report field PROCESS: process info
+# table in EA4a: for report
 
-        tableReport = []
-        for process in processes:
-            k = process.ProcNo - 1
-            if k < 10:   #present master limited to 10 processes !!!
+            reportMatrix1 = []
+            for i in range(len(matrix1)-1):
+                if i < 10:
+                    reportMatrix1.append(matrix1[i])
+            for i in range(len(matrix1)-1,10):
+                reportMatrix1.append([" "," "," "," "," "," "," "," "])
+            reportMatrix1.append(matrix1[len(matrix1)-1])
 
-                tableReport.append([process.Process,                              # col C-D
-                                    process.Description,                            # cols E-K 
-                                    process.UPH,                                  # cols L-M are merged
-                                    UPHPercentage[k],                             # cols N-O are merged
-                                    process.PT])                                  # col P-Q
-            elif k == 10:
-                print "WARNING: present standard report is limited to a maximum of 10 processes !!!"
-
-        for k in range(len(processes),10):
-                tableReport.append([" ",                             # col C-D
-                                    " ",                             # cols E-K 
-                                    " ",                             # cols L-M are merged
-                                    " ",                             # cols N-O are merged
-                                    " "])                             # col P-Q
-
-
-        tableReport.append([_("Total"),                                           # col C-D
-                            " ",                                                 # cols E-K 
-                            TotalUPH,                                           # cols L-M are merged
-                            100,                                                # cols N-O are merged
-                            " "])                                                 # col P-Q
-
-        Status.int.setGraphicsData("PROCESSES", array(tableReport))
-        print "ModuleEA4 -> data table for processes",array(tableReport)
+            reportData1 = array(reportMatrix1)
+            print reportData1
+            Status.int.setGraphicsData("EA4a_REPORT", reportData1)
 
 #..............................................................................
 # Data for Panel EA4b: temperature dependent plots
@@ -234,16 +215,16 @@ class ModuleEA4(object):
             USHPercCum = []
 
             TLevels = [60.0,80.0,100.0,120.0,140.0,180.0,220.0,300.0,400.0,10000.0]
-            Titles = ["    <  60 ºC",
-                      " 60 -  80 ºC",
-                      " 80 - 100 ºC",
-                      "100 - 120 ºC",
-                      "120 - 140 ºC",
-                      "140 - 180 ºC",
-                      "180 - 220 ºC",
-                      "220 - 300 ºC",
-                      "300 - 400 ºC",
-                      "    > 400 ºC",
+            Titles = ["    <  60 C",
+                      " 60 -  80 C",
+                      " 80 - 100 C",
+                      "100 - 120 C",
+                      "120 - 140 C",
+                      "140 - 180 C",
+                      "180 - 220 C",
+                      "220 - 300 C",
+                      "300 - 400 C",
+                      "    > 400 C",
                       "Total"]
 
             for i in range(len(TLevels)):
@@ -295,10 +276,11 @@ class ModuleEA4(object):
             USHPercCum.append(100.0)
             
 #..............................................................................
-            
+
 # data for EA4b table
             data1 = array(transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum]))
             Status.int.setGraphicsData(self.keys[0],data1)
+            print 'moduleEA4b.py: Status.int.GData[EA4b_Table] =', Status.int.GData['EA4b_Table']
                                   
 # data for EA4b plot
 
@@ -316,12 +298,29 @@ class ModuleEA4(object):
                 UPH_plot.append(Status.int.UPHTotal_T[iT]/1000.0)
                 UPHproc_plot.append(Status.int.UPHProcTotal_T[iT]/1000.0)
                 USH_plot.append(Status.int.USHTotal_T[iT]/1000.0)
-                
+
             Status.int.setGraphicsData(self.keys[1],[Status.int.T[0:iTmax],
                                                      UPH_plot,
                                                      UPHproc_plot,
                                                      USH_plot])
-            print 'moduleEA4b.py: Status.int.GData[EA4b_Table] =', Status.int.GData['EA4b_Table']
+
+#add identical values as dummies to the plot. -> fixed array size needed for report !!!
+                
+            TT = copy.deepcopy(Status.int.T[0:iTmax])
+            UPH_rep = copy.deepcopy(UPH_plot)
+            UPHproc_rep = copy.deepcopy(UPHproc_plot)
+            USH_rep = copy.deepcopy(USH_plot)
+            
+            for iT in range(iTmax,(Status.NT+1)):
+                TT.append(Status.int.T[iTmax-1])
+                UPH_rep.append(Status.int.UPHTotal_T[iTmax-1]/1000.0)
+                UPHproc_rep.append(Status.int.UPHProcTotal_T[iTmax-1]/1000.0)
+                USH_rep.append(Status.int.USHTotal_T[iTmax-1]/1000.0)
+
+            dataList = [TT,UPH_rep,UPHproc_rep,USH_rep]
+
+            Status.int.setGraphicsData("EA4b_PLOT_REPORT",array(transpose(dataList)))
+                
 
 #..............................................................................
 # Data for Panel EA4c: cumulative heat demand curve
@@ -333,10 +332,10 @@ class ModuleEA4(object):
 # prepare data for table
             TLevels = [10000.0,80.0,120.0,250.0,400.0]
             Titles = ["  Total  ",
-                      " <  80 ºC",
-                      " < 120 ºC",
-                      " < 250 ºC",
-                      " < 400 ºC"]
+                      " <  80 C",
+                      " < 120 C",
+                      " < 250 C",
+                      " < 400 C"]
 
             tLevels = [4000.0,2000.0,0]
             
@@ -394,18 +393,19 @@ class ModuleEA4(object):
                             
 #..............................................................................
             
-# data for EA4b table
+# data for EA4c table
 
             dataList =[Titles,baseLoad,energy_baseLoad,mediumLoad,energy_mediumLoad,peakLoad,energy_peakLoad]
             data = array(transpose(dataList))
             Status.int.setGraphicsData(self.keys[0],data)
+
+            print "EA4c_Table data:",data
                                   
 # data for EA4c plot
 
             time = ["t"]
             for it in range(itMax+1):
                 time.append(it * YEAR / Status.Nt)
-
 
             dataList = [time[0:itMax+1]]
             for i in range(len(TLevels)):
@@ -415,6 +415,33 @@ class ModuleEA4(object):
             data = array(dataList)
             Status.int.setGraphicsData(self.keys[1],data)
 
+# data for EA4c plot in report
 
+            print "ModuleEA4c: generating data for report"
+            timeReport = ["t"]
+
+            DATAPOINTS = 100
+            
+            step = max(1.0, 1.0 * itMax / DATAPOINTS)
+            
+            for itr in range(DATAPOINTS):
+                it = int(step*itr)
+                timeReport.append(it*YEAR/Status.Nt)
+
+            print "step = %s itMax = %s Status.Nt = %s"%(step,itMax,Status.Nt)
+            print timeReport
+
+            dataListReport = [timeReport]
+            for i in range(len(TLevels)):
+                row = [Titles[i]]
+                for itr in range(DATAPOINTS):
+                    it = int(step*itr)
+                    USH[i][itr] = USH[i][it]
+                row.extend(USH[i][0:DATAPOINTS])
+                dataListReport.append(row)
+            dataReport = array(transpose(dataListReport))
+            Status.int.setGraphicsData("EA4c_PLOT_REPORTXXX",dataReport)
+
+            print "EA4c_PLOT_REPORT data:",dataReport
             
 #==============================================================================

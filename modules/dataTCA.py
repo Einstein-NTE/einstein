@@ -32,7 +32,7 @@ import math
 class TCAData(object):
         
     def __init__(self,pid,ano):
-        #print "Init TCA Data (%s,%s)" % (pid,ano)
+        print "Init TCA Data (%s,%s)" % (pid,ano)
         self.pid = pid
         self.ano = ano
         self.tcaid = None   #will be set after generaldata is loaded
@@ -137,6 +137,7 @@ class TCAData(object):
                 query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,self.pid,self.ano)
                 Status.DB.sql_query(query)
         except Exception, inst:
+            print "storeResultToCGeneral"
             print type(inst)
             print inst.args
             print inst
@@ -150,7 +151,7 @@ class TCAData(object):
         self.NIR       = 0.0
         self.CSDR      = 0.0
         self.DEP       = 0.0
-        self.TimeFrame = 0.0
+        self.TimeFrame = 20.0
         self.totalopcost = 0.0
         self.revenue     = 0.0
         
@@ -221,8 +222,84 @@ class TCAData(object):
 
     def __setTCAInvestmentDataDefault(self):
         #print "Set Default Data (Investment)"
+        # Structure [Descritpion, Investment, Fundig%, FundingFix]
+        #try:
         self.investment = []
+        if (self.ano > 0):
+            self.__setDefaultEquipmentInvestment()
+            self.__setDefaultHXInvestment()
+            self.__setDefaultStorageInvestment()
+    
+    def __setDefaultHXInvestment(self):
+        total_hx_investment = 0.0
+        query = """SELECT TurnKeyPrice, OMFix, OMVar FROM qheatexchanger WHERE `ProjectID`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            
+            for result in results:                
+                Investment = result[0]
+                if Investment == None:
+                    Investment = 0
+                total_hx_investment +=  Investment 
+        self.investment.append(["HX Network",total_hx_investment,30,0])  
+        
+    def __setDefaultEquipmentInvestment(self):
+        keys = []
+        dict = {}
+        query = """SELECT Equipment, EquipType, TurnKeyPrice, OandMvar,OandMfix FROM `qgenerationhc` WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            
+            for result in results:
+                EquipType = result[1]
+                Investment = result[2]
+                                   
+                if (EquipType != None):              
+                    if not(EquipType in keys):
+                        keys.append(EquipType)
+                        dict[EquipType] = 0
+                    if Investment == None:
+                        Investment = 0
+                    dict[EquipType] +=  Investment 
                 
+        for key in keys:
+            self.investment.append([key,dict[key],30,0])                                         
+        #except:        
+        #    self.investment = []
+        
+    def __setDefaultStorageInvestment(self):
+        query = """SELECT `NumStorageUnits`,`VUnitStorage` FROM `qdistributionhc` WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo` = %s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            #XXX Constants should come from database! 
+            #fixed cepci bad.... 
+            CEPCI1976= 192.1
+            CEPCI2008=539.7
+            EUR_USD_ratio = 1.55
+            m3_ft3_ratio = 0.0283
+            ratio = (CEPCI2008/CEPCI1976)/EUR_USD_ratio
+            total_storage = 0.0
+            for result in results:
+                print result
+                NumStorageUnits = result[0]
+                VUnitStorage = result[1]
+                if not((NumStorageUnits == None) or (VUnitStorage==None) or (NumStorageUnits == 0) or (VUnitStorage==0)):                     
+                    V=VUnitStorage/m3_ft3_ratio 
+                    Storage_cost = (352*pow(V,0.515))*ratio
+                    Storage_cost *= NumStorageUnits
+                    total_storage+=Storage_cost
+            self.investment.append(["H&C Storage",total_storage,30,0])
+                
+            
     def __storeTCAInvestmentDataEntry(self):
         #print "Store Data (Investment)"
         for investment in self.investment:
@@ -262,6 +339,51 @@ class TCAData(object):
     def __setTCAEnergyDataDefault(self):
         #print "Set Default Data (Energy)"
         self.energycosts = []
+        self.__setElectricityDefault()
+        self.__setOtherFuelsDefault()
+    
+    def __setElectricityDefault(self):
+        query = """SELECT FECel FROM cgeneraldata WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        FECel = Status.DB.sql_query(query)
+        if (FECel == None):
+            FECel = 0.0
+        
+        query = """SELECT ElTariffCTot, ElTariffPowTot,PowerContrTot FROM qelectricity
+                WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        result = Status.DB.sql_query(query)
+        ElTariffCTot = result[0]
+        ElTariffPowTot = result[1]
+        PowerContrTot = result[2]
+        Tariff = 0.0
+        if not((ElTariffCTot==None)or(ElTariffPowTot==None)or(PowerContrTot==None)):
+            Tariff = ElTariffCTot 
+            if (FECel > 0):
+                Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel
+                
+        self.energycosts.append(["Electricity",FECel,Tariff,self.DEP]) 
+            
+                
+    
+    def __setOtherFuelsDefault(self):
+        query = """SELECT FuelName, FETFuel, FuelTariff FROM qfuel, dbfuel 
+                   WHERE dbfuel.DBFuel_ID=qfuel.DBFuel_ID
+                   AND `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]   
+            for result in results:
+                Name = result[0]
+                FETFuel = result[1]
+                if (FETFuel == None):
+                    FETFuel = 0.0
+                FuelTariff = result[2]
+                if (FuelTariff == None):
+                    FuelTariff = 0.0
+                self.energycosts.append([Name,FETFuel,FuelTariff,self.DEP])                                                         
                 
     def __storeTCAEnergyDataEntry(self):
         #print "Store Data (Energy)"
@@ -382,8 +504,89 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------
 
     def __setTCADetailedOpCostDataDefault(self):
-        #print "Set Default Data (Detailed operting cost)"
+        if self.ano == 0:
+            self.__setDefaultOPCostCurrent()
+        else:
+            self.__setDefaultOPCostProposal()
+     
+    def __setDefaultOPCostCurrent(self):
+        self.detailedopcost = [[],[],[],[],[],[],[]]
+        query = """SELECT OMTotalTot FROM questionnaire WHERE Questionnaire_id=%s"""
+        query = query % (self.pid)
+        result = Status.DB.sql_query(query)
+        if (result !=None):
+            print "questionair opcost"
+            print result
+            self.totalopcost = result
+        else:        
+            print "no opcost in db ("+str(self.ano)+")"
+            self.totalopcost = 0.0
+    
+    def __setDefaultOPCostProposal(self):
         self.detailedopcost = [[],[],[],[],[],[],[]] 
+        self.totalopcost = 0.0
+        self.__setDefaultEquipOpcost()
+        self.__setDefaultHXOpcost()
+    
+    def __setDefaultHXOpcost(self):
+        total_hx_opcost = 0.0
+        query = """SELECT TurnKeyPrice, OMFix, OMVar FROM qheatexchanger WHERE `ProjectID`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            
+            for result in results:                
+                OMVar = result[2]
+                OMFix = result[1]
+                if OMVar == None:
+                    OMVar = 0
+                if OMFix == None:
+                    OMFix = 0
+                total_hx_opcost +=  (OMFix + OMVar)        
+        self.detailedopcost[0].append(["HX network",total_hx_opcost])               
+        self.totalopcost+= total_hx_opcost    
+        
+        
+    def __setDefaultEquipOpcost(self):
+        #print "Set Default Data (Detailed operting cost)"        
+        #                   page1                page2             page7
+        # Structure [[[Desc,Value],[Desc,Value]],[...],[],[],[],[],[]]
+        #try:       
+        keys = []
+        dict = {}
+        total = 0
+        query = """SELECT Equipment, EquipType, TurnKeyPrice, OandMvar,OandMfix FROM `qgenerationhc` WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = query % (self.pid,self.ano)
+        results = Status.DB.sql_query(query)  
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            
+            for result in results:
+                EquipType = result[1]
+                OMVar = result[3]
+                OMFix = result[4]
+                                   
+                if (EquipType != None):              
+                    if not(EquipType in keys):
+                        keys.append(EquipType)
+                        dict[EquipType] = 0
+                    if OMVar == None:
+                        OMVar = 0
+                    if OMFix == None:
+                        OMFix = 0
+                    
+                    dict[EquipType] +=  (OMVar + OMFix) 
+                    total += (OMVar + OMFix) 
+                
+        for key in keys:
+            self.detailedopcost[0].append([key,dict[key]])
+               
+        self.totalopcost+= total                                       
+        #except:        
+        #    self.detailedopcost = [[],[],[],[],[],[],[]] 
                 
     def __storeTCADetailedOpCostDataEntry(self):
         #print "Store Data (Detailed operting cost)"
@@ -407,9 +610,9 @@ class TCAData(object):
                 if (type(results[0])!=type(())):
                     results = [ results ]         #needed to have same behaviour if only one result
                 for result in results:                
-                    self.detailedopcost[i].append([result[0],result[1]])
-                                
-        return True
+                    self.detailedopcost[i].append([result[0],result[1]])                                
+                return True
+            return False
                                                                 
 
     def __deleteTCADetailedOpCostDataEntry(self):

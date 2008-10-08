@@ -139,8 +139,9 @@ class ModuleBM(object):
 #..............................................................................
 # benchmarks on energy intensity
 
-        data = array(noneFilter(self.findBenchmarks()[0]))
-        print "ModuleBM (updatePanel): key %s data %s"%(self.keys[0],data)
+        bmList = self.findBenchmarks()[0]
+        data = array(noneFilter(bmList))
+#        print "ModuleBM (updatePanel): key %s data %s"%(self.keys[0],data)
 
         Status.int.setGraphicsData(self.keys[0], data)
 
@@ -156,6 +157,16 @@ class ModuleBM(object):
                                               self.processes,\
                                               self.unitOps,\
                                               self.selector])
+
+        bmListReport = [["","","","","",""]]
+        for i in range(10):
+            if i < len(bmList): #bmList
+                bmListReport.append(bmList[i])
+            else:
+                bmListReport.append([" "," "," "," "," "," "])
+
+        dataReport = array(noneFilter(bmListReport))
+        Status.int.setGraphicsData("%s_REPORT"%self.keys[0], dataReport)
 
 #------------------------------------------------------------------------------
 

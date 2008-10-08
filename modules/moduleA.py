@@ -15,15 +15,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	03/04/2008
 #	Last revised by:    Hans Schweiger      18/04/2008
 #                           Hans Schweiger      01/07/2008
+#                           Hans Schweiger      08/10/2008
 #
 #       Changes to previous version:
 #       18/04/2008 HS   Reference to Status.int
 #       01/07/2008: HS  Clean-up; call to updatePanel eliminated in init and
 #                       initPanel
+#       08/10/2008: HS  Table for report added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -76,6 +78,17 @@ class ModuleA(object):
                 alternative[5] = 0.0
         plotdata = array(alternativeList)
         Status.int.setGraphicsData("A Plot",plotdata)
+
+        tableReport = []
+        for i in range(10):
+            if i < (len(alternativeList)-2):
+                tableReport.append(alternativeList[i+2][1:3])
+            else:
+                tableReport.append([" "," "])
+        dataReport = array(tableReport)
+        Status.int.setGraphicsData("A_REPORT",dataReport)
+                
+            
 
 #------------------------------------------------------------------------------
 #==============================================================================

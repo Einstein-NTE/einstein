@@ -175,12 +175,15 @@ class HRPlotPanelYED (PlotPanel):
         max_ = 0
         
         X = xrange(0, 406, 5)      
-        Y = data       
+        Y = data   
+        for i in range(0,len(Y)): #scale to MWh
+            Y[i]=Y[i]/1000.0
+             
         self.subplot = self.figure.add_subplot(121)
         self.subplot.plot(X,Y,'b',label ="QD_T")    
         self.subplot.legend(loc = 0)                             
         self.subplot.axis([min(X),max(X),min(Y),max(Y)*1.1])   
-        self.subplot.set_ylabel(_('Power [kW]'))
+        self.subplot.set_ylabel(_('Energy [MWh]'))
         self.subplot.set_xlabel(_('Temperature [C]'))
         
         if not hasattr(Status.int.hrdata, 'QA_T'):
@@ -190,12 +193,14 @@ class HRPlotPanelYED (PlotPanel):
         max_ = 0
                         
         X = xrange(0, 406, 5)      
-        Y = data       
+        Y = data 
+        for i in range(0,len(Y)): #scale to MWh
+            Y[i]=Y[i]/1000.0                    
 
         self.subplot2.plot(X,Y,'r',label ="QA_T")    
         self.subplot2.legend(loc = 0)                             
         self.subplot2.axis([min(X),max(X),min(Y),max(Y)*1.1])   
-        self.subplot2.set_ylabel(_('Power [kW]'))
+        self.subplot2.set_ylabel(_('Energy [MWh]'))
         self.subplot2.set_xlabel(_('Temperature [C]'))  
         
 

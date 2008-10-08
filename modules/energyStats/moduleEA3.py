@@ -182,5 +182,29 @@ class ModuleEA3(object):
         Status.int.setGraphicsData(self.keys[1], data2)
 
 #------------------------------------------------------------------------------
+        reportMatrix1 = []
+        for i in range(len(matrix1)-1):
+            if i < 10:
+                reportMatrix1.append(matrix1[i])
+        for i in range(len(matrix1)-1,10):
+            reportMatrix1.append([" "," "," "," "])
+        reportMatrix1.append(matrix1[len(matrix1)-1])
+
+        reportData1 = array(reportMatrix1)
+        print reportData1
+        Status.int.setGraphicsData("EA3_FET_REPORT", reportData1)
+
+        reportMatrix2 = []
+        for i in range(len(matrix2)-1):
+            if i < 10:
+                reportMatrix2.append(matrix2[i])
+        for i in range(len(matrix2)-1,10):
+            reportMatrix2.append([" "," "," "])
+        reportMatrix2.append(matrix2[len(matrix2)-1])
+
+        reportData2 = array(reportMatrix2)
+        print reportData2
+        Status.int.setGraphicsData("EA3_USH_REPORT", reportData2)
+#------------------------------------------------------------------------------
 
 #==============================================================================

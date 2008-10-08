@@ -379,7 +379,7 @@ class ModuleHR(object):
 
 
 #------------------------------------------------------------------------------
-    def __showHideHX(self,index):   
+    def ShowHideHX(self,index):   
 #------------------------------------------------------------------------------
 #called when "Show/HideHX"-Button pressed
 #1) adds or removes the index of the hx to the/fromthe hide list
@@ -402,7 +402,7 @@ class ModuleHR(object):
             
      
 #------------------------------------------------------------------------------
-    def __changeHX(self,index):
+    def changeHX(self,index):
 #------------------------------------------------------------------------------
 # recalculates cost values for HEX
 # uses values from DlgChangeHX
