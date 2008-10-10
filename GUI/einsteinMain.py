@@ -164,6 +164,7 @@ import sys
 import os
 import time
 import gettext
+import locale   #HS2008-10-09 added
 import exceptions
 import wx
 import wx.grid
@@ -262,6 +263,10 @@ from dialogImport import DialogImport
 
 from einstein.GUI.status import Status #processing status of the tool
 
+
+def _U(text):
+    return unicode(_(text),"utf-8")
+    
 #----- Constants
 qPageSize = (800, 600)
 KFramesize = (1024, 740)
@@ -290,6 +295,7 @@ class EinsteinFrame(wx.Frame):
         wx.Frame.__init__(self, parent, id, title, size=KFramesize, pos=(0,0))
 
         self.treePermissions = {}
+        self.prnt = parent
 
 
     def connectToDB(self):
@@ -336,6 +342,10 @@ class EinsteinFrame(wx.Frame):
         gettext.install("einstein", "locale", unicode=False)
         language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)], fallback=True)
         language.install()
+
+#HS2008-10-09 added (see http://wiki.wxpython.org/Internationalization#head-45277e6d8f10a94d0f9dadaa64a7e8527f59f948)
+#        self.prnt.locale = wx.Locale(wx.wxLANGUAGE_ITALIAN)
+#        locale.setlocale(locale.LC_ALL, 'IT')
         
     def createUI(self):
         self.activeQid = 0
@@ -403,7 +413,7 @@ class EinsteinFrame(wx.Frame):
                    name='message',
                    parent=self.splitter2,
                    style= wx.RAISED_BORDER | wx.LC_REPORT | wx.LC_NO_HEADER)
-        self.message.InsertColumn(0, _("Message log"))
+        self.message.InsertColumn(0, _U("Message log"))
         self.message.SetBackgroundColour('white')
         # show/hide is a main menu action
         # ini. state is hidden
@@ -419,7 +429,7 @@ class EinsteinFrame(wx.Frame):
         self.CreateTitlePage()
 
         #----- initial message
-        self.logMessage(_("einstein started"))
+        self.logMessage(_U("einstein started"))
         #self.logWarning('an example of a warning')
         #self.logError('an example of an error')
 
@@ -459,28 +469,28 @@ class EinsteinFrame(wx.Frame):
 
     def showError(self, text):
         self.logError(text)
-        dlg = wx.MessageDialog(None, text, _("Error"), wx.OK | wx.ICON_ERROR)
+        dlg = wx.MessageDialog(None, text, _U("Error"), wx.OK | wx.ICON_ERROR)
         ret = dlg.ShowModal()
         dlg.Destroy()
         self.doLog.LogThis('Error: '+text)
 
     def showWarning(self, text):
         self.logWarning(text)
-        dlg = wx.MessageDialog(None, text, _("Warning"), wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(None, text, _U("Warning"), wx.OK | wx.ICON_EXCLAMATION)
         ret = dlg.ShowModal()
         #dlg.Destroy()
         self.doLog.LogThis('Warning: '+text)
 
     def showInfo(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, text, _("Info"), wx.OK | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(None, text, _U("Info"), wx.OK | wx.ICON_INFORMATION)
         ret = dlg.ShowModal()
         dlg.Destroy()
         self.doLog.LogThis('Info: '+text)
 
     def askConfirmation(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, text, _("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, text, _U("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
         ret = dlg.ShowModal()
         dlg.Destroy()
         self.doLog.LogThis('Confirm: '+text+'. Answer='+str(ret))
@@ -537,7 +547,7 @@ class EinsteinFrame(wx.Frame):
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to the Magic World of ..."),
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - the tool that never fails ..."),
        # self.box1 = wx.StaticBox(self.pageTitle, -1, _("EINSTEIN - summer special edition ..."),
-        self.box1 = wx.StaticBox(self.pageTitle, -1, _("Welcome to ..."),
+        self.box1 = wx.StaticBox(self.pageTitle, -1, _U("Welcome to ..."),
                                  pos = (10,10),size=(780,580))
         
 #        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
@@ -588,7 +598,7 @@ class EinsteinFrame(wx.Frame):
 
     def OnMenuExit(self, event):
         #TS20080421 Ask before exiting
-        if self.askConfirmation(_("Do you really want to exit?")) == wx.ID_YES:
+        if self.askConfirmation(_U("Do you really want to exit?")) == wx.ID_YES:
             wx.Exit()
 
     def OnMenuExportAll(self, event):
@@ -661,7 +671,7 @@ class EinsteinFrame(wx.Frame):
         dlgdb = DlgDatabase(parent=None,id=-1)
         rsp = dlgdb.ShowModal()
         if dlgdb.getChanges():
-            self.showWarning(_('Any changes will be in effect next time you restart Einstein'))
+            self.showWarning(_U('Any changes will be in effect next time you restart Einstein'))
             
     def OnMenuEditDBBenchmark(self, event):
         frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
@@ -770,7 +780,7 @@ class EinsteinFrame(wx.Frame):
             if not allow:
                 event.Veto()
                 if not message:
-                    message = _('Cannot open this action')
+                    message = _U('Cannot open this action')
                 self.showWarning(message)
                 
     def OnTreeItemExpanding(self, event):
@@ -795,13 +805,13 @@ class EinsteinFrame(wx.Frame):
             self.hidePages()
             self.pageTitle.Show()
         #Page0
-        elif select == _(u'Edit Industry Data'): #Edit Industry Data
+        elif select == _U('Edit Industry Data'): #Edit Industry Data
             self.hidePages()
             self.Page0 = PanelQ0(self.leftpanel2, self)
             self.Page0.fillPage()
             self.Page0.Show()
         #Page1
-        elif select == _(u'General data'): #General data
+        elif select == _U('General data'): #General data
             self.hidePages()
             self.Page1 = PanelQ1(self.leftpanel2, self)
             self.Page1.display()
@@ -811,7 +821,7 @@ class EinsteinFrame(wx.Frame):
 ##            self.Page1.Show()
             
         #Page2
-        elif select == _("Energy consumption"): #Energy consumption
+        elif select == _U("Energy consumption"): #Energy consumption
             self.hidePages()
             self.Page2 = PanelQ2(self.leftpanel2, self)
             self.Page2.display()
@@ -821,25 +831,25 @@ class EinsteinFrame(wx.Frame):
 ##            self.Page2.Show()
             
         #Page3
-        elif select == _("Processes data"): #Processes data
+        elif select == _U("Processes data"): #Processes data
             self.hidePages()
             self.Page3 = PanelQ3(self.leftpanel2, self)
             self.Page3.display()
 
         #Page4
-        elif select == _("Generation of heat and cold"): #Generation of heat and cold
+        elif select == _U("Generation of heat and cold"): #Generation of heat and cold
             self.hidePages()
             #HS2008-04-13 None as argument added.
             self.Page4 = PanelQ4(self.leftpanel2, self, None)
             self.Page4.display()
         #Page5
-        elif select == _("Distribution of heat and cold"): #Distribution of heat and cold
+        elif select == _U("Distribution of heat and cold"): #Distribution of heat and cold
             self.hidePages()
             self.Page5 = PanelQ5(self.leftpanel2, self)
             self.Page5.display()
 
         #Page6 (Heat Recovery Missing)
-        elif select == _("Heat recovery"): #Heat recovery
+        elif select == _U("Heat recovery"): #Heat recovery
             self.hidePages()
             self.Page6 = PanelQ6(self.leftpanel2, self)
             self.Page6.display()
@@ -848,17 +858,17 @@ class EinsteinFrame(wx.Frame):
 ##            self.Page6.Show()
 
         #Page7
-        elif select == _("Renewable energies"): # Renewable energies
+        elif select == _U("Renewable energies"): # Renewable energies
             self.hidePages()
             self.Page7 = PanelQ7(self.leftpanel2, self)
-            self.logMessage(_("city / country"))
+            self.logMessage(_U("city / country"))
             self.Page7.display()
 ##            self.Page7.clear()
 ##            self.Page7.fillPage()
 ##            self.Page7.Show()
             
         #Page8
-        elif select == _("Buildings"): #Buildings
+        elif select == _U("Buildings"): #Buildings
             self.hidePages()
             self.Page8 = PanelQ8(self.leftpanel2, self)
             self.Page8.display()
@@ -867,7 +877,7 @@ class EinsteinFrame(wx.Frame):
 ##            self.Page8.Show()
             
         #Page9
-        elif select == _("Economic parameters"): #Economic parameters
+        elif select == _U("Economic parameters"): #Economic parameters
             self.hidePages()
             self.Page9 = PanelQ9(self.leftpanel2, self)
             self.Page9.display()
@@ -876,51 +886,51 @@ class EinsteinFrame(wx.Frame):
 ##            self.Page9.Show()
             
         #qDataCheck
-        elif select == _("Consistency Check"):
+        elif select == _U("Consistency Check"):
             self.hidePages()
             self.panelCC = PanelCC(id=-1, name='panelCC',
                                    parent=self.leftpanel2, main=self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600))
             self.panelCC.display()
         #qStatistics
-        elif select == _("Energy statistics"):
+        elif select == _U("Energy statistics"):
             #TS 2008-3-26 No action here
             #self.hidePages()
             #self.pageStatistics.Show()
             pass
         #qEA1 'Primary energy - Yearly'
-        elif select == _("Primary energy"):
+        elif select == _U("Primary energy"):
             self.hidePages()
             self.panelEA1 = PanelEA1(parent=self.leftpanel2)
             self.panelEA1.display()
 
         #qEA2 'Final energy by fuels - Yearly'
-        elif select == _("Final energy by fuels"):
+        elif select == _U("Final energy by fuels"):
             self.hidePages()
             self.panelEA2 = PanelEA2(parent=self.leftpanel2)
             self.panelEA2.display()
         #qEA3 'Final energy by equipment - Yearly'
-        elif select == _("Final energy by equipment"):
+        elif select == _U("Final energy by equipment"):
             self.hidePages()
             self.panelEA3 = PanelEA3(parent=self.leftpanel2)
             self.panelEA3.display()
         #qEA4a 'Process heat 1 - Yearly'   #SD2008-07-01
-        elif select == _("Heat demand (proc.)"):
+        elif select == _U("Heat demand (proc.)"):
             self.hidePages()
             self.panelEA4a = PanelEA4a(parent=self.leftpanel2)
             self.panelEA4a.display()
         #qEA4b 'Process heat 2 - Yearly'   #SD2008-07-01
-        elif select == _("Heat demand (temp.)"):
+        elif select == _U("Heat demand (temp.)"):
             self.hidePages()
             self.panelEA4b = PanelEA4b(parent=self.leftpanel2)
             self.panelEA4b.display()
         #qEA4c 'Process heat 3 - Yearly'   #SD2008-07-01
-        elif select == _("Heat demand (time)"):
+        elif select == _U("Heat demand (time)"):
             self.hidePages()
             self.panelEA4c = PanelEA4c(parent=self.leftpanel2)
             self.panelEA4c.display()
         #qEA5 'Energy intensity - Yearly'
-        elif select == _("Energy intensity"):
+        elif select == _U("Energy intensity"):
             self.hidePages()
             self.panelEA5 = PanelEA5(parent=self.leftpanel2)
             self.panelEA5.display()
@@ -947,7 +957,7 @@ class EinsteinFrame(wx.Frame):
         #
         #
         #qBenchmarkCheck
-        elif select == _("Benchmark check"):
+        elif select == _U("Benchmark check"):
             #TS 2008-3-26 No action here
             #self.hidePages()
             #self.pageBenchmarkCheck = wx.Panel(id=-1, name='pageBenchmarkCheck',
@@ -973,13 +983,13 @@ class EinsteinFrame(wx.Frame):
             self.panelBM3.display()
 
         #qA
-        elif select == _("Alternative proposals"):        #generation of alternatives
+        elif select == _U("Alternative proposals"):        #generation of alternatives
             self.hidePages()
             self.panelA = PanelA(parent=self.leftpanel2,main=self)
             self.panelA.display()
 
         #panelPO
-        elif select == _("Process optimisation"):
+        elif select == _U("Process optimisation"):
             self.hidePages()
             self.panelPO = PanelPO(id=-1, name='panelPO', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
@@ -1027,7 +1037,7 @@ class EinsteinFrame(wx.Frame):
             self.panelEnergy.display()
 
         #panelHR
-        elif select == _("HX network"):
+        elif select == _U("HX network"):
             self.hidePages()
             self.panelHR = PanelHR(id=-1, name='panelHR', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
@@ -1041,71 +1051,71 @@ class EinsteinFrame(wx.Frame):
             self.panelHC.display()
 
 
-  	elif select ==  _("Total Cost Assessment"):
+  	elif select ==  _U("Total Cost Assessment"):
             self.hidePages()
             self.panelTCA = PanelTCA(id=-1, name='panelTCA', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelTCA.display()
         
-        elif select ==  _("Investment"):
+        elif select ==  _U("Investment"):
             self.hidePages()
             self.panelTCAInvestment = PanelTCAInvestment(id=-1, name='panelTCAInvestment', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelTCAInvestment.display()
             
-        elif select ==  _("Energy and operating costs"):
+        elif select ==  _U("Energy and operating costs"):
             self.hidePages()
             self.panelTCAEnergy = PanelTCAEnergy(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelTCAEnergy.display()
         
-        elif select ==  _("Contingencies"):
+        elif select ==  _U("Contingencies"):
             self.hidePages()
             self.panelTCACont = PanelTCAContingencies(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelTCACont.display()
         
-        elif select ==  _("Non reocurring costs"):
+        elif select ==  _U("Non reocurring costs"):
             self.hidePages()
             self.panelTCANon = PanelTCANon(id=-1, name='panelTCAEnergy', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
             self.panelTCANon.display()
         #qCS1 'Primary energy - Yearly'   #SD2008-07-01
-        elif select == _("Comp.study: Primary energy"):
+        elif select == _U("Comp.study: Primary energy"):
             self.hidePages()
             self.panelCS1 = PanelCS1(parent=self.leftpanel2)
             self.panelCS1.display()
         #qCS2 'Process & supply heat - Yearly'   #SD2008-07-01
-        elif select == _("Comp.study: Process & supply heat"):
+        elif select == _U("Comp.study: Process & supply heat"):
             self.hidePages()
             self.panelCS2 = PanelCS2(parent=self.leftpanel2)
             self.panelCS2.display()
         #qCS3 'Environmental  impact - Yearly'   #SD2008-07-01
-        elif select == _("Comp.study: Environmental  impact"):
+        elif select == _U("Comp.study: Environmental  impact"):
             self.hidePages()
             self.panelCS3 = PanelCS3(parent=self.leftpanel2)
             self.panelCS3.display()
         #qCS4 'Investment cost - Yearly'   #SD2008-07-10
-        elif select == _("Comp.study: Investment cost"):
+        elif select == _U("Comp.study: Investment cost"):
             self.hidePages()
             self.panelCS4 = PanelCS4(parent=self.leftpanel2)
             self.panelCS4.display()
         #qCS5 'Annual cost - Yearly'   #SD2008-07-10
-        elif select == _("Comp.study: Annual cost"):
+        elif select == _U("Comp.study: Annual cost"):
             self.hidePages()
             self.panelCS5 = PanelCS5(parent=self.leftpanel2)
             self.panelCS5.display()
         #qCS6 'Additional cost per saved energy - Yearly'   #SD2008-07-10
-        elif select == _("Comp.study: Additional cost per saved energy"):
+        elif select == _U("Comp.study: Additional cost per saved energy"):
             self.hidePages()
             self.panelCS6 = PanelCS6(parent=self.leftpanel2)
             self.panelCS6.display()
         #qCS7 'Internal rate of return - Yearly'   #SD2008-07-10
-        elif select == _("Comp.study: Internal rate of return"):
+        elif select == _U("Comp.study: Internal rate of return"):
             self.hidePages()
             self.panelCS7 = PanelCS7(parent=self.leftpanel2)
             self.panelCS7.display()
-        elif select == _("Report"):
+        elif select == _U("Report"):
             #TS 2008-3-26 No action here
             #self.hidePages()
             #self.pageFinalReport.Show()
@@ -1325,56 +1335,56 @@ class EinsteinFrame(wx.Frame):
         self.submenuClassification = wx.Menu()
 
 
-        self.PrintFullReport = self.submenuPrint.Append(-1, _("full report"))
-        self.PrintQuestionnaire = self.submenuPrint.Append(-1, _("questionnaire"))
+        self.PrintFullReport = self.submenuPrint.Append(-1, _U("full report"))
+        self.PrintQuestionnaire = self.submenuPrint.Append(-1, _U("questionnaire"))
 
-        self.NewProject = self.menuFile.Append(-1, _("&New Project"))
-        self.OpenProject = self.menuFile.Append(-1, _("&Open Project"))
-        self.ImportProject = self.menuFile.Append(-1, _("&Import Project"))
-        self.ExportProject = self.menuFile.Append(-1, _("&Export Project"))
+        self.NewProject = self.menuFile.Append(-1, _U("&New Project"))
+        self.OpenProject = self.menuFile.Append(-1, _U("&Open Project"))
+        self.ImportProject = self.menuFile.Append(-1, _U("&Import Project"))
+        self.ExportProject = self.menuFile.Append(-1, _U("&Export Project"))
         self.menuFile.AppendSeparator()
-        self.ImportQ = self.menuFile.Append(-1, _("Import &Questionnaire"))
+        self.ImportQ = self.menuFile.Append(-1, _U("Import &Questionnaire"))
         self.menuFile.AppendSeparator()
-        self.ImportData = self.menuFile.Append(-1, _("Import data"))
-        self.ExportData = self.menuFile.AppendMenu(-1, _("Export data"),self.submenuExportDB)
+        self.ImportData = self.menuFile.Append(-1, _U("Import data"))
+        self.ExportData = self.menuFile.AppendMenu(-1, _U("Export data"),self.submenuExportDB)
         self.menuFile.AppendSeparator()
-        self.Print = self.menuFile.AppendMenu(-1, _("&Print"), self.submenuPrint)
+        self.Print = self.menuFile.AppendMenu(-1, _U("&Print"), self.submenuPrint)
         self.menuFile.AppendSeparator()
-        self.ExitApp = self.menuFile.Append(-1, _("E&xit"))
+        self.ExitApp = self.menuFile.Append(-1, _U("E&xit"))
 
-        self.EditDBCHP = self.submenuEquipments.Append(-1, _("&CHP"))
-        self.EditDBHeatPump = self.submenuEquipments.Append(-1, _("&Heat pumps"))
-        self.EditDBChiller = self.submenuEquipments.Append(-1, _("&Chillers"))
-        self.EditDBBoiler = self.submenuEquipments.Append(-1, _("B&oilers"))
-        self.EditDBStorage = self.submenuEquipments.Append(-1, _("Stora&ge"))
-        self.EditDBSolarThermal = self.submenuEquipments.Append(-1, _("&Solar Collectors"))
+        self.EditDBCHP = self.submenuEquipments.Append(-1, _U("&CHP"))
+        self.EditDBHeatPump = self.submenuEquipments.Append(-1, _U("&Heat pumps"))
+        self.EditDBChiller = self.submenuEquipments.Append(-1, _U("&Chillers"))
+        self.EditDBBoiler = self.submenuEquipments.Append(-1, _U("B&oilers"))
+        self.EditDBStorage = self.submenuEquipments.Append(-1, _U("Stora&ge"))
+        self.EditDBSolarThermal = self.submenuEquipments.Append(-1, _U("&Solar Collectors"))
 
-        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _("Equipments"), self.submenuEquipments)
-        self.EditDBFuel = self.menuDatabase.Append(-1, _("Fue&ls"))
-        self.EditDBFluid = self.menuDatabase.Append(-1, _("Flui&ds"))
-        self.EditDBElectricityMix = self.menuDatabase.Append(-1, _("Electricity mix"))
-        self.EditDBBenchmark = self.menuDatabase.Append(-1, _("&Benchmarks"))
-        self.EditDBBAT = self.menuDatabase.Append(-1, "Best available technologies")
-        self.EditDBAdmin = self.menuDatabase.Append(-1, _("Database administration"))
+        self.EditSubDB = self.menuDatabase.AppendMenu(-1, _U("Equipments"), self.submenuEquipments)
+        self.EditDBFuel = self.menuDatabase.Append(-1, _U("Fue&ls"))
+        self.EditDBFluid = self.menuDatabase.Append(-1, _U("Flui&ds"))
+        self.EditDBElectricityMix = self.menuDatabase.Append(-1, _U("Electricity mix"))
+        self.EditDBBenchmark = self.menuDatabase.Append(-1, _U("&Benchmarks"))
+        self.EditDBBAT = self.menuDatabase.Append(-1, _U("Best available technologies"))
+        self.EditDBAdmin = self.menuDatabase.Append(-1, _U("Database administration"))
 
-        self.EditDBNaceCode = self.submenuClassification.Append(-1, _("&Nace code"))
-        self.EditDBUnitOperation = self.submenuClassification.Append(-1, _("&Unit operation"))
+        self.EditDBNaceCode = self.submenuClassification.Append(-1, _U("&Nace code"))
+        self.EditDBUnitOperation = self.submenuClassification.Append(-1, _U("&Unit operation"))
 
-        self.ExportAll = self.submenuExportDB.Append(-1, _("all data bases"))
-        self.ExportEquipments = self.submenuExportDB.AppendMenu(-1, _("Equipments"), self.submenuExportEquipments)
-        self.ExportDBFuel = self.submenuExportDB.Append(-1, _("Fue&ls"))
-        self.ExportDBFluid = self.submenuExportDB.Append(-1, _("Flui&ds"))
-        self.ExportDBElectricityMix = self.submenuExportDB.Append(-1, _("Electricity mix"))
-        self.ExportDBBenchmark = self.submenuExportDB.Append(-1, _("&Benchmarks"))
-        self.ExportDBBAT = self.submenuExportDB.Append(-1, "Best available technologies")
+        self.ExportAll = self.submenuExportDB.Append(-1, _U("all data bases"))
+        self.ExportEquipments = self.submenuExportDB.AppendMenu(-1, _U("Equipments"), self.submenuExportEquipments)
+        self.ExportDBFuel = self.submenuExportDB.Append(-1, _U("Fue&ls"))
+        self.ExportDBFluid = self.submenuExportDB.Append(-1, _U("Flui&ds"))
+        self.ExportDBElectricityMix = self.submenuExportDB.Append(-1, _U("Electricity mix"))
+        self.ExportDBBenchmark = self.submenuExportDB.Append(-1, _U("&Benchmarks"))
+        self.ExportDBBAT = self.submenuExportDB.Append(-1, _U("Best available technologies"))
 
-        self.ExportAllEquipments = self.submenuExportEquipments.Append(-1, _("all equipment data bases"))
-        self.ExportDBCHP = self.submenuExportEquipments.Append(-1, _("&CHP"))
-        self.ExportDBHeatPump = self.submenuExportEquipments.Append(-1, _("&Heat pumps"))
-        self.ExportDBChiller = self.submenuExportEquipments.Append(-1, _("&Chillers"))
-        self.ExportDBBoiler = self.submenuExportEquipments.Append(-1, _("B&oilers"))
-        self.ExportDBStorage = self.submenuExportEquipments.Append(-1, _("Stora&ge"))
-        self.ExportDBSolarThermal = self.submenuExportEquipments.Append(-1, _("&Solar Collectors"))
+        self.ExportAllEquipments = self.submenuExportEquipments.Append(-1, _U("all equipment data bases"))
+        self.ExportDBCHP = self.submenuExportEquipments.Append(-1, _U("&CHP"))
+        self.ExportDBHeatPump = self.submenuExportEquipments.Append(-1, _U("&Heat pumps"))
+        self.ExportDBChiller = self.submenuExportEquipments.Append(-1, _U("&Chillers"))
+        self.ExportDBBoiler = self.submenuExportEquipments.Append(-1, _U("B&oilers"))
+        self.ExportDBStorage = self.submenuExportEquipments.Append(-1, _U("Stora&ge"))
+        self.ExportDBSolarThermal = self.submenuExportEquipments.Append(-1, _U("&Solar Collectors"))
 
         self.interactionLevelList=[]
         i = wx.NewId()
@@ -1386,27 +1396,27 @@ class EinsteinFrame(wx.Frame):
         i = wx.NewId()
         self.interactionLevelList.append(i)
         self.UserSelectLevel3 = self.submenuUserLevel.AppendRadioItem(i, INTERACTIONLEVELS[2])
-        self.UserLevel = self.menuSettings.AppendMenu(-1, _("User interaction &level"), self.submenuUserLevel)
-        self.Preferences = self.menuSettings.Append(-1, _("&Preferences"))
-        self.Classification = self.menuSettings.AppendMenu(-1, _("C&lassification"), self.submenuClassification)
-        self.Language = self.menuSettings.Append(-1, _("Language"))
+        self.UserLevel = self.menuSettings.AppendMenu(-1, _U("User interaction &level"), self.submenuUserLevel)
+        self.Preferences = self.menuSettings.Append(-1, _U("&Preferences"))
+        self.Classification = self.menuSettings.AppendMenu(-1, _U("C&lassification"), self.submenuClassification)
+        self.Language = self.menuSettings.Append(-1, _U("Language"))
 
         i = wx.NewId()
-        self.ViewMessages = self.menuSettings.AppendCheckItem(i, _("View message log"))
+        self.ViewMessages = self.menuSettings.AppendCheckItem(i, _U("View message log"))
 
-        self.ManageFonts = self.menuSettings.Append(-1, _("Fonts"))
+        self.ManageFonts = self.menuSettings.Append(-1, _U("Fonts"))
 
         
-        self.HelpUserManual = self.menuHelp.Append(-1, _("&Documentation"))
+        self.HelpUserManual = self.menuHelp.Append(-1, _U("&Documentation"))
         self.menuHelp.AppendSeparator()
-        self.HelpAbout = self.menuHelp.Append(-1, _("&About"))
+        self.HelpAbout = self.menuHelp.Append(-1, _U("&About"))
 
-        self.menuBar.Append(self.menuFile, _("&File"))
+        self.menuBar.Append(self.menuFile, _U("&File"))
         self.showMainMenuAlternatives()
 
-        self.menuBar.Append(self.menuDatabase, _("Database"))
-        self.menuBar.Append(self.menuSettings, _("&Settings"))
-        self.menuBar.Append(self.menuHelp, _("&Help"))
+        self.menuBar.Append(self.menuDatabase, _U("Database"))
+        self.menuBar.Append(self.menuSettings, _U("&Settings"))
+        self.menuBar.Append(self.menuHelp, _U("&Help"))
 
         self.SetMenuBar(self.menuBar)
         self.menuBar.Check(i,True)
@@ -1425,15 +1435,15 @@ class EinsteinFrame(wx.Frame):
 
         self.rangeId = (id0,id1-1)
         self.Bind(wx.EVT_MENU_RANGE, self.OnMenuPresentState, id=self.rangeId[0], id2=self.rangeId[1])
-        pos = self.menuBar.FindMenu(_('View'))
+        pos = self.menuBar.FindMenu(_U('View'))
         if pos < 0:
             # the first time just append
-            self.menuBar.Append(self.menuView, _("View"))
+            self.menuBar.Append(self.menuView, _U("View"))
         else:
             # first delete existing
             self.menuBar.Remove(pos)
             # then insert new
-            self.menuBar.Insert(1,self.menuView, _("View"))
+            self.menuBar.Insert(1,self.menuView, _U("View"))
 
         if checkedId is not None:
             self.menuBar.Check(checkedId,True)
@@ -1460,46 +1470,46 @@ class EinsteinFrame(wx.Frame):
         
         self.qRoot = self.tree.AddRoot("Einstein")
 
-        self.qPage0 = self.tree.AppendItem (self.qRoot, _(u'Edit Industry Data'),0)
-        self.qPage1 = self.tree.AppendItem (self.qPage0, _(u'General data'),0)
-        self.qPage2 = self.tree.AppendItem (self.qPage0, _("Energy consumption"),0)
-        self.qPage3 = self.tree.AppendItem (self.qPage0, _("Processes data"),0)
-        self.qPage4 = self.tree.AppendItem (self.qPage0, _("Generation of heat and cold"),0)
-        self.qPage5 = self.tree.AppendItem (self.qPage0, _("Distribution of heat and cold"),0)
-        self.qPage6 = self.tree.AppendItem (self.qPage0, _("Heat recovery"),0)
-        self.qPage7 = self.tree.AppendItem (self.qPage0, _("Renewable energies"),0)
-        self.qPage8 = self.tree.AppendItem (self.qPage0, _("Buildings"),0)
-        self.qPage9 = self.tree.AppendItem (self.qPage0, _("Economic parameters"),0)
+        self.qPage0 = self.tree.AppendItem (self.qRoot, _U("Edit Industry Data"),0)
+        self.qPage1 = self.tree.AppendItem (self.qPage0, _U("General data"),0)
+        self.qPage2 = self.tree.AppendItem (self.qPage0, _U("Energy consumption"),0)
+        self.qPage3 = self.tree.AppendItem (self.qPage0, _U("Processes data"),0)
+        self.qPage4 = self.tree.AppendItem (self.qPage0, _U("Generation of heat and cold"),0)
+        self.qPage5 = self.tree.AppendItem (self.qPage0, _U("Distribution of heat and cold"),0)
+        self.qPage6 = self.tree.AppendItem (self.qPage0, _U("Heat recovery"),0)
+        self.qPage7 = self.tree.AppendItem (self.qPage0, _U("Renewable energies"),0)
+        self.qPage8 = self.tree.AppendItem (self.qPage0, _U("Buildings"),0)
+        self.qPage9 = self.tree.AppendItem (self.qPage0, _U("Economic parameters"),0)
 
-        self.qCC = self.tree.AppendItem (self.qRoot, _("Consistency Check"))
+        self.qCC = self.tree.AppendItem (self.qRoot, _U("Consistency Check"))
         
         #
         # statistics subtree
         #
-        self.qStatistics = self.tree.AppendItem (self.qRoot, _("Energy statistics"))
-        self.qEA = self.tree.AppendItem (self.qStatistics, _("Annual data"))
-        self.qEM = self.tree.AppendItem (self.qStatistics, _("Monthly data"))
-        self.qEH = self.tree.AppendItem (self.qStatistics, _("Hourly performance data"))
+        self.qStatistics = self.tree.AppendItem (self.qRoot, _U("Energy statistics"))
+        self.qEA = self.tree.AppendItem (self.qStatistics, _U("Annual data"))
+        self.qEM = self.tree.AppendItem (self.qStatistics, _U("Monthly data"))
+        self.qEH = self.tree.AppendItem (self.qStatistics, _U("Hourly performance data"))
         # annual statistics subtree
-        self.qEA1 = self.tree.AppendItem (self.qEA, _("Primary energy"))
-        self.qEA2 = self.tree.AppendItem (self.qEA, _("Final energy by fuels"))
-        self.qEA3 = self.tree.AppendItem (self.qEA, _("Final energy by equipment"))
-        self.qEA4a = self.tree.AppendItem (self.qEA, _("Heat demand (proc.)"))
-        self.qEA4b = self.tree.AppendItem (self.qEA, _("Heat demand (temp.)"))
-        self.qEA4c = self.tree.AppendItem (self.qEA, _("Heat demand (time)"))
-        self.qEA5 = self.tree.AppendItem (self.qEA, _("Energy intensity"))
+        self.qEA1 = self.tree.AppendItem (self.qEA, _U("Primary energy"))
+        self.qEA2 = self.tree.AppendItem (self.qEA, _U("Final energy by fuels"))
+        self.qEA3 = self.tree.AppendItem (self.qEA, _U("Final energy by equipment"))
+        self.qEA4a = self.tree.AppendItem (self.qEA, _U("Heat demand (proc.)"))
+        self.qEA4b = self.tree.AppendItem (self.qEA, _U("Heat demand (temp.)"))
+        self.qEA4c = self.tree.AppendItem (self.qEA, _U("Heat demand (time)"))
+        self.qEA5 = self.tree.AppendItem (self.qEA, _U("Energy intensity"))
         # monthly statistics subtree
-        self.qEM1 = self.tree.AppendItem (self.qEM, _("Monthly demand"))
-        self.qEM2 = self.tree.AppendItem (self.qEM, _("Monthly supply"))
+        self.qEM1 = self.tree.AppendItem (self.qEM, _U("Monthly demand"))
+        self.qEM2 = self.tree.AppendItem (self.qEM, _U("Monthly supply"))
         # hourly statistics subtree
-        self.qEH1 = self.tree.AppendItem (self.qEH, _("Hourly demand"))
-        self.qEH2 = self.tree.AppendItem (self.qEH, _("Hourly supply"))
+        self.qEH1 = self.tree.AppendItem (self.qEH, _U("Hourly demand"))
+        self.qEH2 = self.tree.AppendItem (self.qEH, _U("Hourly supply"))
 
 
-        self.qBM = self.tree.AppendItem (self.qRoot, _("Benchmark check"))
-        self.qBM1 = self.tree.AppendItem (self.qBM, _("Global energy intensity"))
-        self.qBM2 = self.tree.AppendItem (self.qBM, _("SEC by product"))
-        self.qBM3 = self.tree.AppendItem (self.qBM, _("SEC by process"))
+        self.qBM = self.tree.AppendItem (self.qRoot, _U("Benchmark check"))
+        self.qBM1 = self.tree.AppendItem (self.qBM, _U("Global energy intensity"))
+        self.qBM2 = self.tree.AppendItem (self.qBM, _U("SEC by product"))
+        self.qBM3 = self.tree.AppendItem (self.qBM, _U("SEC by process"))
         
         #TS20080419 Example of a conditional tree branch.
         # the argument 'data=' is a list of two members:
@@ -1511,64 +1521,64 @@ class EinsteinFrame(wx.Frame):
         # There is a Cond utility function to help loading the data argument.
         #
         #
-        self.qA = self.tree.AppendItem (self.qRoot, _("Alternative proposals"))
+        self.qA = self.tree.AppendItem (self.qRoot, _U("Alternative proposals"))
 
         #Design
-        self.qDesign = self.tree.AppendItem (self.qA, _("Design"))
+        self.qDesign = self.tree.AppendItem (self.qA, _U("Design"))
         #Process optimisation
-        self.qPO = self.tree.AppendItem (self.qDesign, _("Process optimisation"))
+        self.qPO = self.tree.AppendItem (self.qDesign, _U("Process optimisation"))
         #Process optimisation interface 1
-        self.qHX = self.tree.AppendItem (self.qDesign, _("HX network"))
+        self.qHX = self.tree.AppendItem (self.qDesign, _U("HX network"))
             #H&C Supply
-        self.qHC = self.tree.AppendItem (self.qDesign, _("H&C Supply"))
+        self.qHC = self.tree.AppendItem (self.qDesign, _U("H&C Supply"))
                 #H&C Storage
-        self.qStorage = self.tree.AppendItem (self.qHC, _("H&C Storage"))
+        self.qStorage = self.tree.AppendItem (self.qHC, _U("H&C Storage"))
                 #CHP
-        self.qCHP = self.tree.AppendItem (self.qHC, _("CHP"))
+        self.qCHP = self.tree.AppendItem (self.qHC, _U("CHP"))
                 #Solar Thermal
-        self.qST = self.tree.AppendItem (self.qHC, _("Solar Thermal"))
+        self.qST = self.tree.AppendItem (self.qHC, _U("Solar Thermal"))
                 #Heat Pumps
-        self.qHP = self.tree.AppendItem (self.qHC, _("Heat Pumps"))
+        self.qHP = self.tree.AppendItem (self.qHC, _U("Heat Pumps"))
                 #Biomass
-        self.qBIO = self.tree.AppendItem (self.qHC, _("Biomass"))
+        self.qBIO = self.tree.AppendItem (self.qHC, _U("Biomass"))
                 #Chillers
-        self.qCH = self.tree.AppendItem (self.qHC, _("Chillers"))
+        self.qCH = self.tree.AppendItem (self.qHC, _U("Chillers"))
                 #Boilers & burners
-        self.qBB = self.tree.AppendItem (self.qHC, _("Boilers & burners"))
+        self.qBB = self.tree.AppendItem (self.qHC, _U("Boilers & burners"))
 
             #H&C Distribution
-        self.qDistribution = self.tree.AppendItem (self.qDesign, _("H&C Distribution"))
+        self.qDistribution = self.tree.AppendItem (self.qDesign, _U("H&C Distribution"))
 
         #Energy performance
-        self.qEnergy = self.tree.AppendItem (self.qA, _("Energy performance"))
+        self.qEnergy = self.tree.AppendItem (self.qA, _U("Energy performance"))
 
         #Total Cost Assessment
-        self.qECO  = self.tree.AppendItem (self.qA, _("Total Cost Assessment"))  
-        self.qECO1 = self.tree.AppendItem (self.qECO, _("Investment"))
-        self.qECO2 = self.tree.AppendItem (self.qECO, _("Energy and operating costs"))
-        self.qECO3 = self.tree.AppendItem (self.qECO, _("Contingencies"))
-        self.qECO4 = self.tree.AppendItem (self.qECO, _("Non reocurring costs"))    
+        self.qECO  = self.tree.AppendItem (self.qA, _U("Total Cost Assessment"))  
+        self.qECO1 = self.tree.AppendItem (self.qECO, _U("Investment"))
+        self.qECO2 = self.tree.AppendItem (self.qECO, _U("Energy and operating costs"))
+        self.qECO3 = self.tree.AppendItem (self.qECO, _U("Contingencies"))
+        self.qECO4 = self.tree.AppendItem (self.qECO, _U("Non reocurring costs"))    
 
 
         #Comparative analysis
-        self.qCS = self.tree.AppendItem (self.qA, _("Comparative study"))
+        self.qCS = self.tree.AppendItem (self.qA, _U("Comparative study"))
             #Comparative study – Detail Info 1
-        self.qCS1 = self.tree.AppendItem (self.qCS, _("Comp.study: Primary energy"))
+        self.qCS1 = self.tree.AppendItem (self.qCS, _U("Comp.study: Primary energy"))
             #Comparative study – Detail Info 2
-        self.qCS2 = self.tree.AppendItem (self.qCS, _("Comp.study: Process & supply heat"))
+        self.qCS2 = self.tree.AppendItem (self.qCS, _U("Comp.study: Process & supply heat"))
             #Comparative study – Detail Info 3
-        self.qCS3 = self.tree.AppendItem (self.qCS, _("Comp.study: Environmental  impact"))
+        self.qCS3 = self.tree.AppendItem (self.qCS, _U("Comp.study: Environmental  impact"))
             #Comparative study – Detail Info 4
-        self.qCS4 = self.tree.AppendItem (self.qCS, _("Comp.study: Investment cost"))
+        self.qCS4 = self.tree.AppendItem (self.qCS, _U("Comp.study: Investment cost"))
             #Comparative study – Detail Info 5
-        self.qCS5 = self.tree.AppendItem (self.qCS, _("Comp.study: Annual cost"))
+        self.qCS5 = self.tree.AppendItem (self.qCS, _U("Comp.study: Annual cost"))
             #Comparative study – Detail Info 6
-        self.qCS6 = self.tree.AppendItem (self.qCS, _("Comp.study: Additional cost per saved energy"))
+        self.qCS6 = self.tree.AppendItem (self.qCS, _U("Comp.study: Additional cost per saved energy"))
             #Comparative study – Detail Info 7
-        self.qCS7 = self.tree.AppendItem (self.qCS, _("Comp.study: Internal rate of return"))
+        self.qCS7 = self.tree.AppendItem (self.qCS, _U("Comp.study: Internal rate of return"))
 
-        self.qFinalReport = self.tree.AppendItem (self.qRoot, _("Report"))
-        self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _("Report generation"))
+        self.qFinalReport = self.tree.AppendItem (self.qRoot, _U("Report"))
+        self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _U("Report generation"))
 
         self.tree.Expand(self.qRoot)
         self.tree.Expand(self.qPage0)

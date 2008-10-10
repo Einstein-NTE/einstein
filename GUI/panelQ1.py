@@ -97,6 +97,8 @@ VSEP_RIGHT           =   4
 ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelQ1(wx.Panel):
     def __init__(self, parent, main):
@@ -125,51 +127,51 @@ class PanelQ1(wx.Panel):
         self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook) # left panel
-        self.notebook.AddPage(self.page0, _('General information'))
+        self.notebook.AddPage(self.page0, _U('General information'))
         self.page0.SetForegroundColour(TITLE_COLOR)
         self.page0.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.page1 = wx.Panel(self.notebook) # middle left panel
-        self.notebook.AddPage(self.page1, _('Statistical and economical data'))
+        self.notebook.AddPage(self.page1, _U('Statistical and economical data'))
         self.page1.SetForegroundColour(TITLE_COLOR)
         self.page1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.page2 = wx.Panel(self.notebook) # middle right panel
-        self.notebook.AddPage(self.page2, _('Period of operation'))
+        self.notebook.AddPage(self.page2, _U('Period of operation'))
         self.page2.SetForegroundColour(TITLE_COLOR)
         self.page2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.page3 = wx.Panel(self.notebook) # right panel
-        self.notebook.AddPage(self.page3, _('Information on products'))
+        self.notebook.AddPage(self.page3, _U('Information on products'))
         self.page3.SetForegroundColour(TITLE_COLOR)
         self.page3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_general_information = wx.StaticBox(self.page0, -1, _("General information"))
+        self.frame_general_information = wx.StaticBox(self.page0, -1, _U("General information"))
         self.frame_general_information.SetForegroundColour(TITLE_COLOR)
         self.frame_general_information.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_statistical_data = wx.StaticBox(self.page1, -1, _("Statistical and economical data"))
+        self.frame_statistical_data = wx.StaticBox(self.page1, -1, _U("Statistical and economical data"))
         self.frame_statistical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_statistical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_period_operation = wx.StaticBox(self.page2, -1, _("Period of operation"))
+        self.frame_period_operation = wx.StaticBox(self.page2, -1, _U("Period of operation"))
         self.frame_period_operation.SetForegroundColour(TITLE_COLOR)
         self.frame_period_operation.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_information_products = wx.StaticBox(self.page3, -1, _("Information on products"))
+        self.frame_information_products = wx.StaticBox(self.page3, -1, _U("Information on products"))
         self.frame_information_products.SetForegroundColour(TITLE_COLOR)
         self.frame_information_products.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_energy_consumption = wx.StaticBox(self.page3, -1, _("Energy consumption by product"))
+        self.frame_energy_consumption = wx.StaticBox(self.page3, -1, _U("Energy consumption by product"))
         self.frame_energy_consumption.SetForegroundColour(TITLE_COLOR)
         self.frame_energy_consumption.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_product_list = wx.StaticBox(self.page3, -1, _("Product list"))
+        self.frame_product_list = wx.StaticBox(self.page3, -1, _U("Product list"))
         self.frame_product_list.SetForegroundColour(TITLE_COLOR)
         self.frame_product_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.st27 = wx.StaticText(self.page2,-1,
-                                  label=_('Principal periods of holidays or stops for maintenance'))
+                                  label=_U('Principal periods of holidays or stops for maintenance'))
 
         # set font for titles
         # 1. save actual font parameters on the stack
@@ -199,61 +201,61 @@ class PanelQ1(wx.Panel):
         fp.changeFont(size=TYPE_SIZE_LEFT)
 
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Name of the company"),
+                             label=unicode(_("Name of the company"),"utf-8").encode("latin-1"),
                              tip=_("Legal name of the company"))
 
         self.tc2 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("City / Country"),
-                             tip=_("City where production is located"))
+                             label=unicode(_("City / Country"),"utf-8"),
+                             tip=_U("City where production is located"))
 
         self.tc3 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Name of contact person"),
-                             tip=_(" "))
+                             label=_U("Name of contact person"),
+                             tip=" ")
 
         self.tc4 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Position of contact person in the company"),
-                             tip=_(" "))
+                             label=_U("Position of contact person in the company"),
+                             tip=" ")
 
         self.tc5 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Address"),
-                             tip=_(" "))
+                             label=_U("Address"),
+                             tip=" ")
 
         self.tc6 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Telephone No"),
-                             tip=_(" "))
+                             label=_U("Telephone No"),
+                             tip=" ")
 
         self.tc7 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Fax No"),
-                             tip=_(" "))
+                             label=_U("Fax No"),
+                             tip=" ")
 
         self.tc8 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("E-mail"),
-                             tip=_(" "))
+                             label=_U("E-mail"),
+                             tip=" ")
 
         self.tc9 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Description of the industry"),
-                             tip=_(" "))
+                             label=_U("Description of the industry"),
+                             tip=" ")
 
         self.tc10 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Branch"),
-                             tip=_(" "))
+                             label=_U("Branch"),
+                             tip=" ")
 
         self.tc11 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Sub-branch"),
-                             tip=_(" "))
+                             label=_U("Sub-branch"),
+                             tip=" ")
 
 
 #        fs = FieldSizes(wData=DATA_ENTRY_WIDTH_LEFT / 3)
 #HS2008-07-02 shifted down, so that field size for choice entry remains large
         self.tc12 = ChoiceEntry(self.page0, 
                                values=['NACE code list','one source'],
-                               label=_("NACE code branch"),
-                               tip=_(" "))
+                               label=_U("NACE code branch"),
+                               tip=" ")
 
         self.tc13 = ChoiceEntry(self.page0, 
                                values=['NACE code sublist','one source'],
-                               label=_("NACE code sub-branch"),
-                               tip=_(" "))
+                               label=_U("NACE code sub-branch"),
+                               tip=" ")
 
         fs = FieldSizes(wData=DATA_ENTRY_WIDTH_LEFT / 3)
 
@@ -268,61 +270,61 @@ class PanelQ1(wx.Panel):
         self.tc14 = IntEntry(self.page1,
                               minval=0, maxval=999999, value=0,
                               unitdict=None,
-                              label=_("Number of employees"),
-                              tip=_(" "))
+                              label=_U("Number of employees"),
+                              tip=" ")
 
         self.tc15 = FloatEntry(self.page1,
                               decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='PRICE',
-                              label=_("Annual turnover"),
-                              tip=_("Million of euro per year"))
+                              label=_U("Annual turnover"),
+                              tip=_U("Million of euro per year"))
 
         self.tc16 = FloatEntry(self.page1,
                               decimals=1, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='PRICE',
-                              label=_("Annual production cost"),
-                              tip=_("Specify total factor inputs for production"))
+                              label=_U("Annual production cost"),
+                              tip=_U("Specify total factor inputs for production"))
 
         self.tc17 = IntEntry(self.page1,
                               minval=2000, maxval=2050, value=0,
                               unitdict=None,
-                              label=_("Base year for economic data"),
-                              tip=_("Specify the reference year for economic parameters"))
+                              label=_U("Base year for economic data"),
+                              tip=_U("Specify the reference year for economic parameters"))
 
         self.tc18 = FloatEntry(self.page1,
                               decimals=1, minval=0., maxval=100, value=0.,
                               unitdict=None,
-                              label=_("Growth rate of the production volume foreseen for the next 5 years [%/year]"),
-                              tip=_(" "))
+                              label=_U("Growth rate of the production volume foreseen for the next 5 years [%/year]"),
+                              tip=" ")
 
         self.tc19 = ChoiceEntry(self.page1,
                                values=TRANSYESNO.values(),
-                               label=_("Is the company independent?"),
-                               tip=_(" "))
+                               label=_U("Is the company independent?"),
+                               tip=" ")
 
         self.tc20 = FloatEntry(self.page1,
                               decimals=1, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='PRICE',
-                              label=_("Yearly O&M heat & cold"),
-                              tip=_(" "))
+                              label=_U("Yearly O&M heat & cold"),
+                              tip=" ")
 
         self.tc21 = FloatEntry(self.page1,
                               decimals=1, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='PRICE',
-                              label=_("Yearly O&M electrical"),
-                              tip=_(" "))
+                              label=_U("Yearly O&M electrical"),
+                              tip=" ")
 
         self.tc22 = FloatEntry(self.page1,
                               decimals=2, minval=0., maxval=99.9, value=0.,
                               unitdict=None,
-                              label=_("Percentage of fuel cost on overall production cost"),
-                              tip=_(" "))
+                              label=_U("Percentage of fuel cost on overall production cost"),
+                              tip=" ")
 
         self.tc23 = FloatEntry(self.page1,
                               decimals=2, minval=0., maxval=99.9, value=0.,
                               unitdict=None,
-                              label=_("Percentage of electricity cost on overall production cost"),
-                              tip=_(" "))        
+                              label=_U("Percentage of electricity cost on overall production cost"),
+                              tip=" ")        
 
         #
         # middle right tab controls
@@ -331,50 +333,50 @@ class PanelQ1(wx.Panel):
         self.tc24 = FloatEntry(self.page2,
                               decimals=2, minval=0., maxval=24, value=0.,
                               unitdict=None,
-                              label=_("Total hours of operation per working day"),
-                              tip=_(" "))
+                              label=_U("Total hours of operation per working day"),
+                              tip=" ")
 
         self.tc25 = FloatEntry(self.page2,
                                decimals=0, minval=0., maxval=10., value=0.,
                                unitdict=None,
-                               label=_("Number of shifts"),
-                               tip=_(" "))
+                               label=_U("Number of shifts"),
+                               tip=" ")
 
         self.tc26 = FloatEntry(self.page2,
                                decimals=0, minval=0., maxval=365., value=0.,
                                unitdict=None,
-                               label=_("Days of production / operation per year"),
-                               tip=_(" "))
+                               label=_U("Days of production / operation per year"),
+                               tip=" ")
 
         self.tc27_10 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 1 - start date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 1 - start date"),
+                              tip=" ")
 
         self.tc27_11 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 1 - stop date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 1 - stop date"),
+                              tip=" ")
 
         self.tc27_20 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 2 - start date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 2 - start date"),
+                              tip=" ")
 
         self.tc27_21 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 2 - stop date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 2 - stop date"),
+                              tip=" ")
 
         self.tc27_30 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 3 - start date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 3 - start date"),
+                              tip=" ")
 
         self.tc27_31 = DateEntry(self.page2,
                               #value='',
-                              label=_("Period of holidays No. 3 - stop date"),
-                              tip=_(" "))
+                              label=_U("Period of holidays No. 3 - stop date"),
+                              tip=" ")
 
         #
         # right tab controls
@@ -389,53 +391,53 @@ class PanelQ1(wx.Panel):
         # panel 3.Right top. Information on products
 
         self.tc30 = TextEntry(self.page3,maxchars=255,value='',
-                             label=_("Type of product"),
-                             tip=_(" "))
+                             label=_U("Type of product"),
+                             tip=" ")
 
         self.tc31 = ChoiceEntry(self.page3, 
                                values=PRODUCTCODES.values(),
-                               label=_("Product code"),
-                               tip=_(" "))
+                               label=_U("Product code"),
+                               tip=" ")
 
         self.tc32 = FloatEntry(self.page3,
                               decimals=2, minval=0., maxval=1.e+9, value=0.,
                               unitdict=None,
-                              label=_("Quantity of product(s) per year [product-units/year]"),
-                              tip=_(" "))
+                              label=_U("Quantity of product(s) per year [product-units/year]"),
+                              tip=" ")
 
         self.tc33 = TextEntry(self.page3,maxchars=255,value='',
-                             label=_("Measurement unit for\nproduct quantity"),
-                             tip=_(" "))
+                             label=_U("Measurement unit for\nproduct quantity"),
+                             tip=" ")
 
         self.tc34 = FloatEntry(self.page3,
                               decimals=2, minval=0., maxval=1e+9, value=0.,
                               unitdict='PRICE',
-                              label=_("Annual turnover per product"),
-                              tip=_(" "))
+                              label=_U("Annual turnover per product"),
+                              tip=" ")
 
         # panel 3.Right bottom. Energy consumption by product
 
         self.tc35 = FloatEntry(self.page3,
                               decimals=2, minval=0., maxval=1.e+9, value=0.,
                               unitdict='ENERGY',
-                              label=_("Electricity consumption per product"),
-                              tip=_(" "))
+                              label=_U("Electricity consumption per product"),
+                              tip=" ")
 
         self.tc36 = FloatEntry(self.page3,
                               decimals=2, minval=0., maxval=1.e+9, value=0.,
                               unitdict='ENERGY',
-                              label=_("Fuel consumption per product(LCV)"),
-                              tip=_("Specify energy content of fuels in LCV "))
+                              label=_U("Fuel consumption per product(LCV)"),
+                              tip=_U("Specify energy content of fuels in LCV "))
 
         #
         # buttons
         #
-        self.buttonAddProduct = wx.Button(self.page3,-1,label=_('Add product'))
+        self.buttonAddProduct = wx.Button(self.page3,-1,label=_U('Add product'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddProduct, self.buttonAddProduct)
         self.buttonAddProduct.SetMinSize((136, 32))
         self.buttonAddProduct.SetFont(fp.getFont())
 
-        self.buttonDeleteProduct = wx.Button(self.page3,-1,label=_('Delete product'))
+        self.buttonDeleteProduct = wx.Button(self.page3,-1,label=_U('Delete product'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProduct, self.buttonDeleteProduct)
         self.buttonDeleteProduct.SetMinSize((136, 32))
         self.buttonDeleteProduct.SetFont(fp.getFont())
@@ -579,7 +581,7 @@ class PanelQ1(wx.Panel):
             if check(self.tc1.GetValue()) <> 'NULL':
                 projects = Status.DB.questionnaire.Name[check(self.tc1.GetValue())]
                 if len(projects) > 0 and projects[0].Questionnaire_ID <> Status.PId:
-                    self.main.showError(_("Name has to be an unique value!"))
+                    self.main.showError(_U("Name has to be an unique value!"))
                     return
 
                 branchSplit = self.tc12.GetValue(text=True).split("|")
@@ -594,11 +596,18 @@ class PanelQ1(wx.Panel):
                 else:
                     subBranch = None
 
-                logMessage("Panel1 (OK): City = %s"%self.tc2.GetValue())
-                
+                print "ButtonOK"
+                try:
+                    self.main.logMessage("new city = %s"%check(self.tc2.GetValue()))
+                except:
+                    print "error in logMessage"
+                print "Could execute log command"
+                print "condition direct <> = ",(self.tc2.GetValue()<>"")
+
                 tmp = {
                     "Name":check(self.tc1.GetValue()),
                     "City":check(self.tc2.GetValue()),
+#                    "City":"hä",
                     "DescripIndustry":check(self.tc9.GetValue()),
                     "Branch":check(branch),
                     "SubBranch":check(subBranch),
@@ -640,7 +649,7 @@ class PanelQ1(wx.Panel):
                 self.display()
                           
             else:
-                self.main.showError(_("Name has to be an unique value!"))
+                self.main.showError(_U("Name has to be an unique value!"))
             
 #..............................................................................
 # aqui parte que guarda la información del producto
@@ -702,7 +711,7 @@ class PanelQ1(wx.Panel):
                           
             else:
                 print "PanelQ1 (OK): some error saving product info"
-                self.main.showError(_("Product must be an unique value!"))
+                self.main.showError(_U("Product must be an unique value!"))
 
 #------------------------------------------------------------------------------
 #--- Private methods
@@ -759,6 +768,7 @@ class PanelQ1(wx.Panel):
         naceDict,naceSubDict = self.fillChoiceOfNaceCode()
         
         self.tc1.SetValue(str(q.Name))
+        print "City read from database = ",q.City
         self.tc2.SetValue(str(q.City))
         self.tc3.SetValue(str(q.Contact))
         self.tc4.SetValue(str(q.Role))

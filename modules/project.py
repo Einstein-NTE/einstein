@@ -445,6 +445,8 @@ class Project(object):
                     print "problems updating main menu and panelinfo"
             else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
+                Status.StatusCC = None
+                Status.StatusQ = None
 
         else:
             logTrack("Project (setActiveAlternative): alternative number out of range [%s,%s]"%(-1,Status.NoOfAlternatives))
@@ -472,11 +474,10 @@ class Project(object):
 #------------------------------------------------------------------------------
     def setFinalAlternative(self,ANo):
 #------------------------------------------------------------------------------
-        finalANo = 0
+        finalANo = ANo
         if ANo < 0:
-            finalANo = 0
-            
-        if finalANo > Status.NoOfAlternatives:
+            finalANo = 0     
+        elif finalANo > Status.NoOfAlternatives:
             logDebug("Project (setFinalAlternative): error in no. of selected alternative [%s]"%finalANo)
             return
 
@@ -575,12 +576,14 @@ class Project(object):
                 Status.NoOfAlternatives = sproject.NoOfAlternatives
                 Status.ANo = sproject.ActiveAlternative
                 Status.FinalAlternative = sproject.FinalAlternative
+                
                 logTrack("Project (setActiveProject): number of alternatives in the project %s"%Status.NoOfAlternatives)
                 logTrack("Project (setActiveProject): active alternative %s"%Status.ANo)
             except:
                 Status.NoOfAlternatives = -1
                 Status.ANo = -1
-                logTrack("Project (setActiveProject): error in table sproject")
+                Status.FinalAlternative = None
+                logTrack("Project (setActiveProject): could not open project no. %s"%PId)
                 
             Status.PId = PId
 
@@ -1139,7 +1142,7 @@ class Project(object):
                 sproject.StatusCC = EINSTEIN_NOTOK
                 Status.StatusCC = EINSTEIN_NOTOK
         else:
-            print _("Project (getStatus): could not find project table of last opened project")
+            logTrack("Project (getStatus): could not find project table of last opened project")
 #XXX -> getStatus is called BEFORE GUI is built -> logError not yet available !!!
             Status.StatusCC = EINSTEIN_NOTOK
             Status.StatusQ = EINSTEIN_NOTOK

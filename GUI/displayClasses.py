@@ -12,14 +12,16 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota 06/06/2008
+#       Changed by:         Hans Schweiger 10/10/2008
 #
 #       Changes to previous version:
 #       TS20080530          Added several classes for data display and edition
 #       06/06/2008: TS      Some changes for Stoyan's panel changes
 #       14/06/2008: TS      Added multiple choices
 #       27/06/2008: TS      Rewrote Float and Date entrys
+#       10/10/2008: HS      conversion to unicode added in TextEntry(SetValue)
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,6 +54,8 @@ EMPTYBKGCOLOR      = (255,255,255)
 INVALIDBKGCOLOR    = (255,255,0)
 LOWERACCEPTEDDATE  = '01/01/1900'
 UPPERACCEPTEDDATE  = '12/31/2050'
+
+ENCODING = "latin-1"    #local encoding
 
 def error(text):
     dlg = wx.MessageDialog(None,text,'Error',wx.OK | wx.ICON_ERROR)
@@ -1114,13 +1118,18 @@ class TextEntry(wx.Panel):
         pass
 
     def GetValue(self):
-        return self.entry.GetValue()
+        return self.entry.GetValue().encode(ENCODING)
 
     def Clear(self):
         self.SetValue('')
 
     def SetValue(self, value):
-        self.entry.SetValue(value)
+        print "DisplayClasses - TextEntry - SetValue. printing value"
+        print value
+        try:
+            self.entry.SetValue(unicode(value,"utf-8"))
+        except:
+            self.entry.SetValue(unicode(value,ENCODING))
     
     def getUnit(self):
         # this method is just for compatibility

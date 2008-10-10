@@ -1,3 +1,4 @@
+# -*- coding: utf_8 -*-
 #   18/04/2008  HS  function "update added" and import of Status added.
 #                           Stoyan Danov            18/06/2008
 #       Changes to previous version:
@@ -27,19 +28,24 @@ class PanelInfo(wx.StatusBar):
 	self.SetFieldsCount(3)
         self.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 
-	self.SetStatusText(_('Project'),0)
+	self.SetStatusText(unicode(_('Project'),"utf-8"),0)
         self.t0 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(60,0),size=wx.Size(270, 21),
 			      value=project, style=wx.TE_READONLY)
         self.t0.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t0.Center(direction=wx.VERTICAL)
 
-	self.SetStatusText(_('Alternative'),1)
+#	self.SetStatusText(wxString(_('Alternative')),1)
+	self.SetStatusText(unicode(_('Alternative'),"utf-8"),1)
         self.t1 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(416, 0),size=wx.Size(260, 21),
 			      value=alternative, style=wx.TE_READONLY)
         self.t1.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t1.Center(direction=wx.VERTICAL)
 
-	self.SetStatusText(_('Design assistant'),2)
+#        myString = _('Design assistant')
+#        print myString
+#        myStringUTF = myString.encode("utf-8")
+	self.SetStatusText(unicode(_('Design assistant'),"utf-8"),2)
+#	self.SetStatusText(myStringUTF,2)
         self.choiceAssistant = wx.Choice(choices=ASSISTANTLIST,
               id=-1, name='choiceAssistant', parent=self, pos=wx.Point(800, 0),size=wx.Size(200,21))
         self.choiceAssistant.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
