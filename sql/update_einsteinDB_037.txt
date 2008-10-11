@@ -1,0 +1,14 @@
+-- update einstein database: 09.10.2008
+USE einstein;
+
+ALTER TABLE cgeneraldata ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount rate' AFTER InterestExtFinancing;
+
+
+
+
+
+
+
+
+
+

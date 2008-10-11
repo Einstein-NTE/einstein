@@ -47,6 +47,7 @@ from einstein.GUI.status import *
 from einstein.modules.project import *
 from numpy import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.GUITools import check
 
 #------------------------------------------------------------------------------
 def getConnections():
@@ -303,8 +304,8 @@ def getConnections():
                         AlternativeProposalNo[Status.ANo].\
                         HXNo[h+1]
         if len(hxes) > 0:
-            hxes[0].FluidIDSource = sourceFluidID
-            hxes[0].FluidIDSink = sinkFluidID
+            hxes[0].FluidIDSource = check(sourceFluidID)
+            hxes[0].FluidIDSink = check(sinkFluidID)
 
     Status.SQL.commit()
     

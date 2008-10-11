@@ -126,8 +126,6 @@ class PanelQ9(wx.Panel):
         #
         # labels
         #
-        self.label_funding = wx.StaticText(self.page0, -1, _("Public funding for energy\nsaving measures"))
-        self.label_credit = wx.StaticText(self.page0, -1, _("Type (credit, subvention)"))
 
         self.labelSpc0= wx.StaticText(self.page1, -1,'')
         self.label_14 = wx.StaticText(self.page1, -1, _("Total costs\n[EUR]"))
@@ -146,8 +144,6 @@ class PanelQ9(wx.Panel):
         self.frame_management.SetFont(fp.getFont())
         # set font for labels
         fp.changeFont(size=8, weight = wx.NORMAL)
-        self.label_funding.SetFont(fp.getFont())
-        self.label_credit.SetFont(fp.getFont())
         self.label_14.SetFont(fp.getFont())
         self.label_15.SetFont(fp.getFont())
         self.label_16.SetFont(fp.getFont())
@@ -195,19 +191,6 @@ class PanelQ9(wx.Panel):
                               tip=_("Amortization time"))
 
         fs = FieldSizes(wLabel=LABEL_WIDTH_LEFT_MIDDLE)
-
-
-        self.tc6_1 = TextEntry(self.page0,maxchars=255,value='')
-        self.tc6_2 = TextEntry(self.page0,maxchars=255,value='')
-
-        self.tc7_1 = TextEntry(self.page0,maxchars=255,value='')
-        self.tc7_2 = TextEntry(self.page0,maxchars=255,value='')
-
-        self.tc8_1 = TextEntry(self.page0,maxchars=255,value='')
-        self.tc8_2 = TextEntry(self.page0,maxchars=255,value='')
-
-        self.tc9_1 = TextEntry(self.page0,maxchars=255,value='')
-        self.tc9_2 = TextEntry(self.page0,maxchars=255,value='')
 
 
         # tab 0 bottom side. energy management
@@ -309,20 +292,6 @@ class PanelQ9(wx.Panel):
         sizerP0PartTop.Add(self.tc5, 0, flagText, VSEP_LEFT)
         sizerP0Parts.Add(sizerP0PartTop,2,0,0)
 
-        # middle part: funding
-        sizerP0PartMiddle = wx.FlexGridSizer(5, 2, 1, 2) #r,c,vsep,hsep
-        sizerP0PartMiddle.Add(self.label_funding,0,flagLabel,0)
-        sizerP0PartMiddle.Add(self.label_credit,0,flagLabel,0)
-        sizerP0PartMiddle.Add(self.tc6_1,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc6_2,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc7_1,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc7_2,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc8_1,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc8_2,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc9_1,0,flagText,0)
-        sizerP0PartMiddle.Add(self.tc9_2,0,flagText,0)
-        sizerP0Parts.Add(sizerP0PartMiddle,2,wx.LEFT,70)
-
         # bottom part: management
         sizerP0Bottom= wx.StaticBoxSizer(self.frame_management, wx.VERTICAL)
         sizerP0Bottom.Add(self.checkBox6,0,flagText,0)
@@ -423,8 +392,8 @@ class PanelQ9(wx.Panel):
                 "OMHCGenDistExternal":check(self.tc13_4.GetValue()),
                 "OMHCGenDistRegulatory":check(self.tc13_5.GetValue()),
                 "OMTotalTot":check(self.tc14_1.GetValue()),
-                "OMTotalOP":check(self.tc14_2.GetValue()),
-                "OMTotalEP":check(self.tc14_3.GetValue()),
+                "OMTotalUtilities":check(self.tc14_2.GetValue()),
+                "OMTotalLabour":check(self.tc14_3.GetValue()),
                 "OMTotalExternal":check(self.tc14_4.GetValue()),
                 "OMTotalRegulatory":check(self.tc14_5.GetValue())
                   }
