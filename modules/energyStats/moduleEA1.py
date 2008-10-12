@@ -139,6 +139,12 @@ class ModuleEA1(object):
         
         Status.int.setGraphicsData(self.keys[0], data)
 
+        if Status.ANo == 0:
+            Status.int.setGraphicsData("EA1_REPORT", data)
+        elif Status.ANo == Status.FinalAlternative:
+            Status.int.setGraphicsData("EA1_REPORT_F", data)
+            
+
         print data
 
 #------------------------------------------------------------------------------

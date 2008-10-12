@@ -25,12 +25,13 @@
 #   
 #------------------------------------------------------------------------------
 from einstein.auxiliary.auxiliary import *
-from einstein.GUI.status import *
+from einstein.GUI.status import Status
 from einstein.modules.interfaces import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
 from einstein.modules.dataTCA import TCAData
 from einstein.modules.calculationTCA import *
+
 import sys
 from pylab import *
 import wx
@@ -114,7 +115,9 @@ class ModuleTCA(object):
                 #print inst
                 data.setResultInvalid(name,display)
                 self.result.append(data)
-                logWarning((_("TCA: No result for %s") % ano[1]))        
+                logWarning((_("TCA: No result for %s") % ano[1]))
+
+        self.__setDataForReport()        
             
         
     def calculateCashFlow(self,data):                                     
@@ -167,6 +170,100 @@ class ModuleTCA(object):
         
         data.cashflow = a    
         return data 
+    
+    def __setDataForReport(self):
+        FixedLineCount = 10
+        self.__setReport47(self.keys[0], FixedLineCount)
+        self.__setReport471(self.keys[1],FixedLineCount)
+        bestAlternative = self.__setReport472(self.keys[2],FixedLineCount)
+        self.__setReport52(self.keys[3], bestAlternative)
+        
+    def __setReport47(self,key,FixedLineCount):
+        #Report Data 4.7
+        #  1  Name OwnInvestment Npv PP MIRR BCR
+        #...
+        # 10
+        data = []
+        list = []  
+        for result in self.result:                                 
+            if result.ResultPresent:
+                list.append([result.name, result.EIC, result.npv[len(result.npv)-1],result.PP,result.mirr[len(result.mirr)-1],result.bcr[len(result.bcr)-1]])     
+        for i in range(0,min(len(list),FixedLineCount)):
+            entry = list[i]
+            data.append(entry)
+        for i in range(len(list),FixedLineCount):
+            data.append(["","","","","",""])                    
+        Status.int.setGraphicsData(key,data)
+        
+    def __setReport471(self,key,FixedLineCount):
+        #Report Data 4.7.1
+        #  1  Name NPV MIRR PBP
+        #...
+        # 10
+        data = []
+        list = []  
+        for result in self.result:                             
+            if result.ResultPresent:
+                if result.npv[len(result.npv)-1]<0:
+                    list.append([result.name, result.npv[len(result.npv)-1],result.mirr[len(result.mirr)-1],result.PP])     
+        for i in range(0,min(len(list),FixedLineCount)):
+            entry = list[i]
+            data.append(entry)
+        for i in range(len(list),FixedLineCount):
+            data.append(["","","",""])                    
+        Status.int.setGraphicsData(key,data)
+                
+    def __setReport472(self,key,FixedLineCount):
+        #Report Data 4.7.2
+        #  1  Rating Name NPV
+        #...
+        # 10
+        data = []
+        list = []  
+        for result in self.result:                  
+            if result.ResultPresent:
+                if result.npv[len(result.npv)-1]>0:
+                    list.append([0, result.name, result.npv[len(result.npv)-1]])
+        list.sort(lambda x, y: int(x[2])-int(y[2]))
+        count = 1       
+        for i in range(0,min(len(list),FixedLineCount)):
+            entry = list[i]
+            entry[0]=count
+            count+=1
+            data.append(entry)
+        for i in range(len(list),FixedLineCount):
+            data.append(["","",""])                    
+        Status.int.setGraphicsData(key,data) 
+        
+        if (len(list)==0):
+            return None
+        else:
+            name = list[0][1]
+            for result in self.result:
+                if (result.name == name):
+                    return result         
+        
+    def __setReport52(self,key,bestAlternative):
+        data = []
+        
+        if (bestAlternative==None):
+            return
+
+        data.append(bestAlternative.TIC)
+        data.append(bestAlternative.totalfunding)   
+        data.append(bestAlternative.revenue)  
+        data.append(bestAlternative.annuity)
+        data.append(bestAlternative.totalenergycost)
+        data.append(bestAlternative.totalopcost)
+        data.append(bestAlternative.contingencies)
+        data.append(bestAlternative.nonreoccuringcosts)
+        data.append(bestAlternative.npv[len(bestAlternative.npv)-1])
+        data.append(bestAlternative.mirr[len(bestAlternative.mirr)-1])
+        data.append(bestAlternative.PP)
+        data.append(bestAlternative.bcr[len(bestAlternative.bcr)-1])
+        
+        Status.int.setGraphicsData(key,data) 
+
     
     def calculateTotalOpCostFromDetailedOpcost(self):
         cost = 0

@@ -73,6 +73,7 @@ from einstein.modules.constants import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.dialogGauge import DialogGauge
 
 #============================================================================== 
 #============================================================================== 
@@ -348,6 +349,8 @@ class ModuleEnergy(object):
 # now calculate the cascade
 # call the calculation modules for each equipment
 
+        dlg = DialogGauge(Status.main,_("EINSTEIN system simulation"),_("calculating energy flows"))
+
         for cascadeIndex in range(first,last+1):
             
             equipeID = Status.int.cascade[cascadeIndex-1]["equipeID"]
@@ -374,9 +377,13 @@ class ModuleEnergy(object):
 
             logTrack("ModuleEnergy (runSimulation): end simulation=====================================")
 
+            dlg.update(100.0*(cascadeIndex-first+1)/(last-first+1))
+
 #..............................................................................
 # update the pointer to the last calculated cascade
 
+        dlg.Destroy()
+                          
         Status.int.cascadeUpdateLevel = last
 
 #..............................................................................

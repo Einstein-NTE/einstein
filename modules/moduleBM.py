@@ -58,6 +58,8 @@ class ModuleBM(object):
         self.keys = keys # the key to the data is sent by the panel
         self.process = None
         self.product = None
+        self.procNo = 0
+        self.prodNo = 0
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def initPanel(self, keys):
@@ -167,6 +169,20 @@ class ModuleBM(object):
 
         dataReport = array(noneFilter(bmListReport))
         Status.int.setGraphicsData("%s_REPORT"%self.keys[0], dataReport)
+
+        if self.keys[0] == "BM1":
+            ext = ""
+        elif self.keys[0] == "BM2":
+            ext = "%02d_"%self.prodNo
+        elif self.keys[0] == "BM3":
+            ext = "%02d_"%self.procNo
+
+        print "ModuleBM (updatePanel): extenstion = %s"%ext
+                        
+        if Status.ANo == 0:
+            Status.int.setGraphicsData("%s_%sREPORT"%(self.keys[0],ext),dataReport)
+        elif Status.ANo == Status.FinalAlternative:
+            Status.int.setGraphicsData("%s_%sREPORT_F"%(self.keys[0],ext),dataReport)
 
 #------------------------------------------------------------------------------
 
@@ -407,11 +423,13 @@ class ModuleBM(object):
 
                 if self.product in self.products:
                     idx = self.products.index(self.product)
+                    self.prodNo = idx+1
                     self.productCode = self.productCodes[idx]
                     pu = self.productUnits[idx]
                     
                 else:
                     self.productCode = None
+                    self.prodNo = 0
                     pu = "t"
                     
                 print "ModuleBM (findBMs): productCode BM: %s - product %s [%s]"%\
@@ -475,14 +493,17 @@ class ModuleBM(object):
                 if self.process in self.processes:
                     idx = self.processes.index(self.process)
                     self.unitOp = self.unitOps[idx]
+                    self.procNo = idx+1
                     unitOpTable = Status.DB.dbunitoperation.UnitOperation[self.unitOp]
                     if len(unitOpTable) > 0:
                         self.unitOpCode = unitOpTable[0].UnitOperationCode
                     else:
                         self.unitOpCode = None
+                        self.procNo = 0
                 else:
                     self.unitOp = None
                     self.unitOpCode = None
+                    self.procNo = 0
                 print "ModuleBM (findBMs): looking for unitOp %s [BM: %s]"%(self.unitOpCode,unitOpCode)
                     
                 if self.unitOpCode == unitOpCode:

@@ -11,16 +11,19 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.03
+#	Version No.: 0.04
 #	Created by: 	    Tom Sobota	30/04/2008
 #
 #       Last revised by:    Hans Schweiger  18/06/2008
 #                           Hans Schweiger  08/10/2008
+#                           Hans Schweiger  12/10/2008
 #
 #       Changes to previous version:
 #
 #       18/06/2008: HS  Call to function prepareDataForReport() in control.py added
 #       08/10/2008: HS  Security features added for avoiding crashes
+#       12/10/2008: HS  findOneCell substituted by findCellRange ->
+#                       speed-up of about factor 10 or more in report writing
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -82,6 +85,7 @@ import wx
 from einstein.modules.interfaces import *
 from einstein.modules.control import *
 from GUITools import *
+from dialogGauge import DialogGauge
 #
 # constants
 #
@@ -103,12 +107,6 @@ class PanelReport(wx.Panel):
               pos=wx.Point(0,0), size=wx.Size(800, 600))
         self.SetClientSize(wx.Size(800, 600))
 
-        self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
-              label=_(u'Select report'), name=u'btnSelectReport', parent=self,
-              pos=wx.Point(304, 88), size=wx.Size(240, 40), style=0)
-        self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
-              id=wxID_BTNSELECTREPORT)
-
 #..............................................................................
 # Description of selected industry
 
@@ -124,7 +122,7 @@ class PanelReport(wx.Panel):
                                style=wx.TE_MULTILINE | wx.TE_LINEWRAP, value="")
 
 #------------------------------------------------------------------------------		
-#       Default action buttons: FWD / BACK / OK / Cancel
+#       Button for report selection
 #------------------------------------------------------------------------------		
 
         self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
@@ -133,13 +131,25 @@ class PanelReport(wx.Panel):
         self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
               id=wxID_BTNSELECTREPORT)
 
+#------------------------------------------------------------------------------		
+#       Default action buttons: FWD / BACK / OK / Cancel
+#------------------------------------------------------------------------------		
+
         self.buttonOk = wx.Button(id=wx.ID_OK, label=_('OK'),
               name='buttonOk', parent=self, pos=wx.Point(528, 560),
               size=wx.Size(75, 20), style=0)
 
+        self.buttonOk.Bind(wx.EVT_BUTTON,
+              self.OnButtonOkButton,
+              id=wx.ID_OK)
+
         self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
               name='buttonCancel', parent=self, pos=wx.Point(616,
               560), size=wx.Size(75, 20), style=0)
+
+        self.buttonCancel.Bind(wx.EVT_BUTTON,
+              self.OnButtonCancelButton,
+              id=wx.ID_CANCEL)
 
         self.buttonFwd = wx.Button(id=wxID_PANELBUTTONFWD,
               label='>>>', name='buttonFwd', parent=self,
@@ -161,6 +171,8 @@ class PanelReport(wx.Panel):
         self.parent = parent
         self.main=main
         self._init_ctrls(parent)
+
+        self.display()
         
     #
     # GUI events
@@ -184,6 +196,20 @@ class PanelReport(wx.Panel):
         event.Skip()
 
 #------------------------------------------------------------------------------		
+    def display(self):
+#------------------------------------------------------------------------------		
+#   obtains data from SQL and displays in the panel
+#------------------------------------------------------------------------------		
+
+        sprojects = Status.DB.sproject.ProjectID[Status.PId]
+        if len(sprojects) > 0:
+            summary = sprojects[0].Summary
+
+            if summary is not None:
+                self.tc1.SetValue(summary)
+        self.Show()
+        
+#------------------------------------------------------------------------------		
 #   Default event handlers: FWD / BACK / OK / Cancel - Buttons
 #------------------------------------------------------------------------------		
 
@@ -198,7 +224,15 @@ class PanelReport(wx.Panel):
         event.Skip()
 
     def OnButtonOkButton(self, event):
-        summary = self.tc1.value
+        summary = self.tc1.GetValue()
+        print summary
+
+        logMessage(_("summary of project report updated"))
+
+        sprojects = Status.DB.sproject.ProjectID[Status.PId]
+        if len(sprojects) > 0:
+            sprojects[0].Summary = check(summary)
+            Status.SQL.commit()
         
 #        self.Hide()
 #        self.main.tree.SelectItem(self.main.qHC, select=True)
@@ -218,12 +252,17 @@ class PanelReport(wx.Panel):
 
         prepareDataForReport()
 
+        dlg = DialogGauge(None,_("Report generation"),_("creating copy of master"))
+
         folder = os.path.dirname(self.master)
         thisreport = os.path.join(folder,NEWREPORT)
 
         infile = ZipFile(self.master, "r")
         dataSource = StringIO(infile.read(CONTENTFILE))
         self.document = xml.dom.minidom.parse(dataSource)
+
+        dlg.Destroy()
+        
          # create the names list
         self.createNamesTable()
         # replace values
@@ -232,6 +271,7 @@ class PanelReport(wx.Panel):
         # and destroy the tree
         # and store the file in a new OO doc
         
+        dlg = DialogGauge(None,_("Report generation"),_("storing report file"))
         try:
             outfile = ZipFile(thisreport, "w", ZIP_DEFLATED)
         except IOError,e:
@@ -260,6 +300,7 @@ class PanelReport(wx.Panel):
 
         outfile.close()
         infile.close()
+        dlg.Destroy()
         self.main.showInfo(_('Report generation is finished\n'
                              'The generated report is:') + thisreport)
 
@@ -300,10 +341,16 @@ class PanelReport(wx.Panel):
             return None
 
     def createNamesTable(self):
+
+        dlg = DialogGauge(None,"Report generation","screening master")
+
         self.names = {}
         self.sheetnames = {}
 
         namelements = self.document.getElementsByTagName("table:named-range")
+
+        nElements = len(namelements)
+        i = 0
         for namelement in namelements:
             name = namelement.getAttribute('table:name')
             if not name.startswith(PREFIX):
@@ -323,12 +370,19 @@ class PanelReport(wx.Panel):
         #    print 'self.names. key',s,'value',self.names[s]
         #for s in self.sheetnames.keys():
         #    print 'self.sheetnames. key',s,'value',self.sheetnames[s]
+            dlg.update(100.0 * i / nElements)
+            i += 1
+        dlg.Destroy()
 
     def replaceData(self):
         #
         # Scan the sheet names list and change values on each
         # sheet on the list
         #
+        dlg = DialogGauge(None,"Report generation","writing report")
+        nSheets = len(self.sheetnames.keys())
+        i = 0.0
+
         for sheetname in self.sheetnames.keys():
             #
             # get the list of names,changes for this sheet
@@ -336,8 +390,10 @@ class PanelReport(wx.Panel):
             # [name,[col,row]] for cells
             # [name,[left_col, upper_row,  right_col,lower_row]] for ranges
             #
-            changeslist = self.sheetnames[sheetname]
-            for cl in changeslist:
+            changesList = self.sheetnames[sheetname]
+            nChanges = len(changesList)
+            if nChanges == 0: i += 1
+            for cl in changesList:
                 thename = cl[0]
                 if not Interfaces.GData.has_key(thename):
                     continue
@@ -355,21 +411,22 @@ class PanelReport(wx.Panel):
                     logDebug("PanelReport (replaceData): no data shape found for key %s"%thename)
                     continue
                 #print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
-                for c in range(datacols):
-                    for r in range(datarows):
-                        #print 'Call _findOneCell with data="%s" for row %s col %s' %\
-                        #    (data[r,c],nrow+r,ncol+c)
-                        self._findOneCell(sheetname,nrow+r,ncol+c,data[r,c])
+                self._findCellRange(sheetname,nrow,datarows,ncol,datacols,data)
+                i += 1.0/nChanges
+                dlg.update(100.0 * i / nSheets)
 
+            dlg.update(100.0 * i / nSheets)
+        dlg.Destroy()
 #
 # private instance methods
 #
 
-    def _findOneCell(self,sheetname,nrowfound,ncolfound,newval):
+    def _findCellRange(self,sheetname,nrow0,nrows,ncol0,ncols,newdata):
         # traverse the DOM looking for one element, identified by:
         # the name of the sheet, the row and the column
         # When found, call _changeOneCell to modify the element
         #
+        elementCounter = nrows*ncols
         worksheets = self.document.getElementsByTagName("table:table")
         for sheet in worksheets:
             thissheet =  sheet.getAttribute('table:name')
@@ -378,7 +435,7 @@ class PanelReport(wx.Panel):
                 rowElements = sheet.getElementsByTagName("table:table-row")
                 for row in rowElements:
                     nrow += 1
-                    if nrow != nrowfound:
+                    if nrow < nrow0 or nrow >= (nrow0+nrows):
                         continue
 
                     ncol = 1
@@ -386,13 +443,14 @@ class PanelReport(wx.Panel):
                         if element.nodeName == 'table:covered-table-cell':
                             pass # looks like this doesn't count
                         elif element.nodeName == 'table:table-cell':
-                            if ncol == ncolfound:
+                            if ncol in range(ncol0,ncol0+ncols):
                                 # found the place!
                                 # replace and exit
                                 #print 'Call _changeOneCell with element=%s newval %s' %\
                                 #      (element.nodeName,newval)
-                                self._changeOneCell(element,newval)
-                                return
+                                self._changeOneCell(element,newdata[nrow-nrow0,ncol-ncol0])
+                                elementCounter -= 1
+                                if elementCounter == 0: return
                             n = element.getAttribute('table:number-columns-repeated')
                             if n:
                                 # if repeated, add the value
@@ -400,9 +458,6 @@ class PanelReport(wx.Panel):
                             else:
                                 # if not, add 1
                                 ncol += 1
-
-        print 'panelReport (_findOneCell) warning: Element at sheet %s, row %s col %s not found' %\
-              (sheetname,nrowfound,ncolfound)
 
     def _changeOneCell(self,element,newval):
         if newval is None:

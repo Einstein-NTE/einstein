@@ -183,8 +183,10 @@ class ModuleEA2(object):
         reportMatrix.append(matrix[len(matrix)-1])
 
         reportData = array(reportMatrix)
-        print reportData
-        Status.int.setGraphicsData("EA2_REPORT", reportData)
+        if Status.ANo == 0:
+            Status.int.setGraphicsData("EA2_REPORT", reportData)
+        elif Status.ANo == Status.FinalAlternative:
+            Status.int.setGraphicsData("EA2_REPORT_F", reportData)
         
 #------------------------------------------------------------------------------
 

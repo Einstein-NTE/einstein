@@ -75,6 +75,7 @@ import einstein.GUI.pSQL as pSQL
 import einstein.GUI.HelperClass as HelperClass
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+import copy
 
 QUERY = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' ORDER BY IndexNo ASC"
 
@@ -439,7 +440,7 @@ class Interfaces(object):
 # method for storing graphics data
 # the data are stored in the dictionary GData under the key 'key'
 #------------------------------------------------------------------------------		
-        self.GData[key] = data
+        self.GData[key] = copy.deepcopy(data)
 
 
 #------------------------------------------------------------------------------		

@@ -109,17 +109,24 @@ class TCAData(object):
                        
           
     def setResult(self,name,npv,mirr,bcr,annuity,paybackperiod,display):
-        self.name = name
-        self.npv = npv
-        self.mirr = mirr
-        self.bcr = bcr
-        self.annuity = annuity
-        self.display = display
-        self.TIC = self.cashflow.TotalInvestmentCapital
-        self.EIC = self.cashflow.EffectiveInvstmentCapital  
-        self.PP  = paybackperiod 
-        self.totalfunding = self.cashflow.TotalFundings
-        self.ResultPresent = True
+        try:
+            self.name = name
+            self.npv = npv[:]
+            self.mirr = mirr[:]
+            self.bcr = bcr[:]
+            self.annuity = annuity
+            self.display = display
+            self.TIC = self.cashflow.TotalInvestmentCapital
+            self.EIC = self.cashflow.EffectiveInvstmentCapital  
+            self.PP  = paybackperiod 
+            self.totalfunding = self.cashflow.TotalFundings
+            self.totalenergycost = self.__getTotalEnergyCost()
+            self.ResultPresent = True
+        except Exception, inst:
+            print type(inst)
+            print inst.args
+            print inst
+            
     
     def setResultInvalid(self,name,display):
         self.name = name
@@ -132,7 +139,7 @@ class TCAData(object):
                 #mirr = self.mirr[int(math.ceil(self.PP))] #mirr at payback period
                 mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year
                 query = """UPDATE cgeneraldata 
-                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, AmortisationTime  = %s
+                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, Amortisation  = %s
                            WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
                 query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,self.pid,self.ano)
                 Status.DB.sql_query(query)
@@ -146,17 +153,44 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------     
     def __setTCAGeneralDataDefault(self):
         #print "Set Default Data (General)"
-        self.tcaid     = None
-        self.Inflation = 0.0
-        self.NIR       = 0.0
-        self.CSDR      = 0.0
-        self.DEP       = 0.0
-        self.TimeFrame = 20.0
-        self.totalopcost = 0.0
-        self.revenue     = 0.0
+        query = """SELECT InflationRate,FuelPriceRate,InterestExtFinancing,CompSpecificDiscountRate, PercentExtFinancing, AmortisationTime 
+                   FROM `cgeneraldata` WHERE Questionnaire_id=%s AND AlternativeProposalNo=%s"""
+        query = query % (self.pid,self.ano) 
+        print query         
+        result = Status.DB.sql_query(query)        
+        if (len(result)!=0):
+            print "result form cgeneral"
+            self.tcaid     = None
+            self.Inflation = result[0]
+            if (self.Inflation==None):
+                self.Inflation = 0.0
+            self.NIR       = result[2]
+            if (self.NIR==None):
+                self.NIR = 0.0
+            self.CSDR      = result[3]
+            if (self.CSDR==None):
+                self.CSDR = 0.0
+            self.DEP       = result[1]
+            if (self.DEP==None):
+                self.DEP = 0.0
+            self.TimeFrame = result[5]
+            if (self.TimeFrame==None):
+                self.TimeFrame = 0.0
+            self.totalopcost = 0.0 #will be read later
+            self.revenue     = 0.0 #will be read later
+        else:
+            print "no result"
+            self.tcaid     = None
+            self.Inflation = 0.0
+            self.NIR       = 0.0
+            self.CSDR      = 0.0
+            self.DEP       = 0.0
+            self.TimeFrame = 20.0
+            self.totalopcost = 0.0
+            self.revenue     = 0.0
         
     def __getTCAGeneralData(self):
-        #print "Get Data (General)"
+        #print "Get Data (General)"        
         query = """SELECT IDTca, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue 
                    FROM tcaGeneralData 
                    WHERE ProjectID=%s AND AlternativeProposalNo=%s;""" 
@@ -185,11 +219,11 @@ class TCAData(object):
                 if (type(result[0])==type(())):
                     result = result[0]
                     
-                self.Inflation = result[0]
-                self.NIR       = result[1]
-                self.CSDR      = result[2]
-                self.DEP       = result[3] 
-                self.TimeFrame = result[4]
+           #     self.Inflation = result[0]
+           #     self.NIR       = result[1]
+           #     self.CSDR      = result[2]
+           #     self.DEP       = result[3] 
+           #     self.TimeFrame = result[4]
             
             query = """INSERT INTO tcaGeneralData (ProjectID,AlternativeProposalNo, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue)
                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -393,6 +427,12 @@ class TCAData(object):
             query = query %(self.tcaid,energycost[0],energycost[1],energycost[2],energycost[3])
             Status.DB.sql_query(query)  
             
+    
+    def __getTotalEnergyCost(self):
+        totalenergycost = 0.0
+        for energycost in self.energycosts:
+            totalenergycost+=energycost[1]*energycost[2]
+        return totalenergycost
     
     def __getTCAEnergyData(self):
         #print "Get Data (Energy)"

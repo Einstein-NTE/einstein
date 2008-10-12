@@ -38,6 +38,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.modules.constants import *
 from einstein.GUI.status import Status
 from einstein.modules.messageLogger import *
+from einstein.GUI.dialogGauge import DialogGauge
 
 
 #------------------------------------------------------------------------------		
@@ -61,6 +62,7 @@ class Processes(object):
 #------------------------------------------------------------------------------		
 
         logTrack("Processes (createYearlyDemand): starting")
+#        dlg = DialogGauge(Status.main,_("Yearly process heat demand"),_("generate demand profile"))
         
         (projectData,generalData) = Status.prj.getProjectData()
 
@@ -76,6 +78,9 @@ class Processes(object):
 
         NT = Status.NT
 
+#        NK = len (processes)
+#        i = 0
+        
         for process in processes:
 
             UPH_T.append(Status.int.createQ_T())
@@ -106,7 +111,10 @@ class Processes(object):
                 UPHw_T[k][iT] = UPHw*distUPHw[iT]
                 UPHTotal_T[iT] += UPH_T[k][iT]
                 UPHwTotal_T[iT] += UPHw_T[k][iT]
-                 
+
+#            i += 1
+#            dlg.update(100.0*i/NK)
+
         Status.int.UPH_T = UPH_T   
         Status.int.UPHc_T = UPHc_T   
         Status.int.UPHm_T = UPHm_T   
@@ -115,8 +123,9 @@ class Processes(object):
         Status.int.UPHTotal_T = UPHTotal_T
         Status.int.UPHwTotal_T = UPHwTotal_T
 
-        logMessage("Processes (createYearlyDemand): yearly heat demand = %s yearly waste heat availability = %s"%\
+        logTrack("Processes (createYearlyDemand): yearly heat demand = %s yearly waste heat availability = %s"%\
               (Status.int.UPHTotal_T[NT+1],Status.int.UPHwTotal_T[0]))
+#        dlg.Destroy()
 
         self.outOfDateYearly = False
 
@@ -125,7 +134,8 @@ class Processes(object):
     def createAggregateDemand(self):
 #------------------------------------------------------------------------------		
 
-        logMessage(_("Processes (createAggregateDemand): Creating time and temperature dependent heat demand"))
+        logTrack("Processes (createAggregateDemand): Creating time and temperature dependent heat demand")
+        dlg = DialogGauge(Status.main,_("Time dependent aggregate heat demand"),_("generate demand profile"))
         
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
@@ -134,11 +144,11 @@ class Processes(object):
             logTrack("Processes (createAggregateDemand): WARNING - someone wants to create demand profile which is already up to date")
 
         if Status.processData.outOfDateYearly == True:
-            logMessage("Processes (createAggregateDemand): creating yearly demand UPHk(T)")
+            logTrack("Processes (createAggregateDemand): creating yearly demand UPHk(T)")
             self.createYearlyDemand()
 
         if Status.schedules.outOfDate == True:
-            logMessage("Processes (createAggregateDemand): creating process schedules")
+            logTrack("Processes (createAggregateDemand): creating process schedules")
             Status.schedules.create()
 
         processes = Status.prj.getProcesses()
@@ -148,6 +158,9 @@ class Processes(object):
 
         UPHTotal_Tt = Status.int.createQ_Tt()
         UPHwTotal_Tt = Status.int.createQ_Tt()
+
+        NK = len (processes)
+        i = 0
 
         for process in processes:
             k = process.ProcNo - 1
@@ -181,6 +194,9 @@ class Processes(object):
                     UPHTotal_Tt[iT][it] += UPH_Tt[k][iT][it]
                     UPHwTotal_Tt[iT][it] += UPHw_Tt[k][iT][it]
                  
+            i += 1
+            dlg.update(90.0*i/NK)
+
         Status.int.UPH_Tt = UPH_Tt    
         Status.int.UPHw_Tt = UPHw_Tt
 
@@ -214,6 +230,7 @@ class Processes(object):
         Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
 
         logTrack("Aggregate demand = %s"%str(Status.int.QD_T))
+        dlg.Destroy()
 
         Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
 

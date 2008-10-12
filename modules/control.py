@@ -37,6 +37,7 @@
 from einstein.GUI.status import *
 from einstein.modules.messageLogger import *
 from einstein.GUI.conflictFrame import *
+from dialogGauge import DialogGauge
 
 from einstein.modules.energyStats.moduleEA1 import *
 from einstein.modules.energyStats.moduleEA2 import *
@@ -53,6 +54,8 @@ def prepareDataForReport():
 #   calls the functions necessary for writing the report
 #------------------------------------------------------------------------------		
 
+    dlg = DialogGauge(Status.main,"Report generation","preparing data")
+    
 #Title page
     (projectData,generalData) = Status.prj.getProjectData()
     reportTitle = projectData.Name
@@ -66,6 +69,8 @@ def prepareDataForReport():
     
     Status.mod.moduleEA.update()
 
+    dlg.update(10)
+
 #Cap. 2.1 - 2.3
     modEA1 = ModuleEA1(['EA1'])
     modEA1.initModule()
@@ -75,6 +80,8 @@ def prepareDataForReport():
 
     modEA3 = ModuleEA3(['EA3_FET','EA3_USH'])
     modEA3.initModule()
+
+    dlg.update(15)
 
     modEA4 = ModuleEA4(['EA4a_Table','EA4a_Plot'])
     modEA4.updatePanel()   
@@ -86,19 +93,27 @@ def prepareDataForReport():
     modEA5 = ModuleEA5(['EA5_EI','EA5_SEC'])
     modEA5.initModule()
 
+    dlg.update(20)
+
 
 #Cap. 2.4
     Status.mod.moduleBM.initPanel(['BM1'])
+
+    dlg.update(30)
 
     products = Status.mod.moduleBM.products
     if len(products) > 0:
         Status.mod.moduleBM.product = products[0]
     Status.mod.moduleBM.initPanel(['BM2'])
 
+    dlg.update(40)
+
     processes = Status.mod.moduleBM.processes
     if len(processes) > 0:
         Status.mod.moduleBM.process = processes[0]
     Status.mod.moduleBM.initPanel(['BM3'])
+
+    dlg.update(50)
 
 #Cap. 3
     Status.mod.moduleA.updatePanel()
@@ -107,6 +122,12 @@ def prepareDataForReport():
         Status.prj.setActiveAlternative(ANo)
         Status.mod.moduleHC.updatePanel()
 
+        Status.mod.moduleEA.update()    #calculate for update of CS plots
+
+
+        dlg.update(50 + 20.0 * ANo / Status.NoOfAlternatives)
+    dlg.update(70)
+    
 #Cap. 4
     modCS = ModuleCS(['CS1_Plot'])
     modCS.updatePanel()
@@ -129,6 +150,71 @@ def prepareDataForReport():
     modCS = ModuleCS(['CS7_Plot'])
     modCS.updatePanel()
 
+    dlg.update(80)
+
+
+#Cap. 5 and 6
+    
+    if Status.FinalAlternative is not None:
+        Status.prj.setActiveAlternative(Status.FinalAlternative)
+    else:
+        Status.prj.setActiveAlternative(0)
+
+    Status.mod.moduleEA.update()
+
+#Chap. 5
+
+    Status.mod.moduleTCA.updatePanel()
+
+#Chap. 6.1 - 6.3
+    modEA1 = ModuleEA1(['EA1'])
+    modEA1.initModule()
+
+    modEA2 = ModuleEA2(['EA2'])
+    modEA2.initPanel()
+
+    modEA3 = ModuleEA3(['EA3_FET','EA3_USH'])
+    modEA3.initModule()
+
+    modEA4 = ModuleEA4(['EA4a_Table','EA4a_Plot'])
+    modEA4.updatePanel()   
+    modEA4 = ModuleEA4(['EA4b_Table','EA4b_Plot'])
+    modEA4.updatePanel()   
+    modEA4 = ModuleEA4(['EA4c_Table','EA4c_Plot'])
+    modEA4.updatePanel()   
+
+    modEA5 = ModuleEA5(['EA5_EI','EA5_SEC'])
+    modEA5.initModule()
+
+    dlg.update(90)
+
+#Cap. 6.4
+    Status.mod.moduleBM.initPanel(['BM1'])
+
+    dlg.update(93)
+
+    products = Status.mod.moduleBM.products
+    if len(products) > 0:
+        Status.mod.moduleBM.product = products[0]
+    Status.mod.moduleBM.initPanel(['BM2'])
+
+    dlg.update(96)
+
+    processes = Status.mod.moduleBM.processes
+    if len(processes) > 0:
+        Status.mod.moduleBM.process = processes[0]
+    Status.mod.moduleBM.initPanel(['BM3'])
+
+    dlg.update(99)
+
+#Summary
+    
+    modCS = ModuleCS(['Summary'])
+    modCS.updatePanel()
+
+
+    dlg.update(100)
+    dlg.Destroy()
 
 #------------------------------------------------------------------------------		
 def autoRun(parent):

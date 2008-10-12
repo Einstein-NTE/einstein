@@ -91,7 +91,7 @@ class Modules(object):
 
         self.moduleEA = ModuleEA()
        
-        keys = []
+        keys = ["TCA","TCA_UNVIABLE","TCA_CRITERIA","TCA_RATING"]
         self.moduleTCA = ModuleTCA(keys)
 
         keys = []

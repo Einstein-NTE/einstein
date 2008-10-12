@@ -40,6 +40,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import Status
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.dialogGauge import DialogGauge
 
 DEFAULTSCHEDULES = ["continuous","batch","batchCharge","batchDischarge"]
 DEFAULTCHARGETIME = 0.2 #20% of batch duration
@@ -311,11 +312,19 @@ class Schedules(object):
         (projectData,generalData) = Status.prj.getProjectData()
         Status.HPerDayInd = projectData.HPerDayInd
         if Status.HPerDayInd is None:
+            logWarning(_("Industry operating hours are not defined !\n12 hours per day assumed"))
             Status.HPerDayInd = 12.0
 
+        dlg = DialogGauge(Status.main,_("Schedules of operation"),_("generating schedules"))
+
         self.calculateProcessSchedules()
+        dlg.update(40)
+        
         self.calculateEquipmentSchedules()
+        dlg.update(80)
+        
         self.calculateWHEESchedules()
+        dlg.Destroy()
 
         self.outOfDate = False
        

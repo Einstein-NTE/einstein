@@ -816,4 +816,65 @@ class ModuleCS(object):
             dataReport7 = array(CS7Report)                  
             Status.int.setGraphicsData("CS7_REPORT", dataReport7)
 
+#------------------------------------------------------------------------------
+# Summary for report
+        elif self.keys[0] == "Summary":
+            qq = Status.DB.sproject.ProjectID[Status.PId]
+            if len(qq) > 0:
+                summary = qq[0].Summary
+            else:
+                summary = _(" ")
+
+            Status.int.setGraphicsData("SUMMARY",array([[summary]]))
+
+# build summary table
+
+            if Status.FinalAlternative is not None:
+                ANoList = [0,int(Status.FinalAlternative),None]
+            else:
+                ANoList = [0,-1,None]
+            for ANo in range(1,len(generalData)-1):
+                if ANo <> Status.FinalAlternative:
+                    ANoList.append(ANo)
+            
+            summaryTable = []
+                             
+            for ANo in ANoList:
+
+                if ANo is None:
+                    row = [_("Other possible alternatives studied:"),
+                           " "," "," "]
+                elif ANo == -1:
+                    row = [_("No alternative selected"),
+                           " "," "," "]
+                else:
+                    row = []
+                    i = ANo + 1
+
+                    if salternatives[i].ShortName is None:
+                        row.append('---')
+                    else:
+                        row.append(salternatives[i].ShortName)
+
+                    if generalData[i].TotalInvCost is None: #protection against None
+                        row.append('---')
+                    else:
+                        row.append(generalData[i].TotalInvCost)
+
+                    if generalData[i].EnergyCost is None: #protection against None
+                        row.append('---')
+                    else:
+                        row.append(generalData[i].EnergyCost)
+            
+                    if generalData[i].PEC is None: #protection against None
+                        row.append('---')
+                    else:
+                        row.append(generalData[i].PEC/1000.0)
+
+                summaryTable.append(row)
+
+            Status.int.setGraphicsData("SUMMARY_TABLE", array(summaryTable))
+
+                
+
 #==============================================================================            

@@ -174,8 +174,11 @@ class ModuleEA4(object):
             reportMatrix1.append(matrix1[len(matrix1)-1])
 
             reportData1 = array(reportMatrix1)
-            print reportData1
-            Status.int.setGraphicsData("EA4a_REPORT", reportData1)
+
+            if Status.ANo == 0:
+                Status.int.setGraphicsData("EA4a_REPORT", reportData1)
+            elif Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("EA4a_REPORT_F", reportData1)
 
 #..............................................................................
 # Data for Panel EA4b: temperature dependent plots
@@ -280,7 +283,11 @@ class ModuleEA4(object):
 # data for EA4b table
             data1 = array(transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum]))
             Status.int.setGraphicsData(self.keys[0],data1)
-            print 'moduleEA4b.py: Status.int.GData[EA4b_Table] =', Status.int.GData['EA4b_Table']
+
+            if Status.ANo == 0:
+                Status.int.setGraphicsData("EA4b_REPORT", data1)
+            elif Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("EA4b_REPORT_F", data1)
                                   
 # data for EA4b plot
 
@@ -304,6 +311,7 @@ class ModuleEA4(object):
                                                      UPHproc_plot,
                                                      USH_plot])
 
+
 #add identical values as dummies to the plot. -> fixed array size needed for report !!!
                 
             TT = copy.deepcopy(Status.int.T[0:iTmax])
@@ -319,7 +327,10 @@ class ModuleEA4(object):
 
             dataList = [TT,UPH_rep,UPHproc_rep,USH_rep]
 
-            Status.int.setGraphicsData("EA4b_PLOT_REPORT",array(transpose(dataList)))
+            if Status.ANo == 0:
+                Status.int.setGraphicsData("EA4b_PLOT_REPORT",array(transpose(dataList)))
+            elif Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("EA4b_PLOT_REPORT_F",array(transpose(dataList)))
                 
 
 #..............................................................................
@@ -399,7 +410,10 @@ class ModuleEA4(object):
             data = array(transpose(dataList))
             Status.int.setGraphicsData(self.keys[0],data)
 
-            print "EA4c_Table data:",data
+            if Status.ANo == 0:
+                Status.int.setGraphicsData("EA4c_REPORT",data)
+            elif Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("EA4c_REPORT_F",data)
                                   
 # data for EA4c plot
 
@@ -440,8 +454,11 @@ class ModuleEA4(object):
                 row.extend(USH[i][0:DATAPOINTS])
                 dataListReport.append(row)
             dataReport = array(transpose(dataListReport))
-            Status.int.setGraphicsData("EA4c_PLOT_REPORTXXX",dataReport)
+            print "Data for EA4c_PLOT_REPORT\n",dataReport
 
-            print "EA4c_PLOT_REPORT data:",dataReport
+            if Status.ANo == 0:
+                Status.int.setGraphicsData("EA4c_PLOT_REPORT",dataReport)
+            elif Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("EA4c_PLOT_REPORT_F",dataReport)
             
 #==============================================================================

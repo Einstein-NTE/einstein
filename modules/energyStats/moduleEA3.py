@@ -192,7 +192,11 @@ class ModuleEA3(object):
 
         reportData1 = array(reportMatrix1)
         print reportData1
-        Status.int.setGraphicsData("EA3_FET_REPORT", reportData1)
+
+        if Status.ANo == 0:
+            Status.int.setGraphicsData("EA3_FET_REPORT", reportData1)
+        elif Status.ANo == Status.FinalAlternative:
+            Status.int.setGraphicsData("EA3_FET_REPORT_F", reportData1)
 
         reportMatrix2 = []
         for i in range(len(matrix2)-1):
@@ -204,7 +208,11 @@ class ModuleEA3(object):
 
         reportData2 = array(reportMatrix2)
         print reportData2
-        Status.int.setGraphicsData("EA3_USH_REPORT", reportData2)
+
+        if Status.ANo == 0:
+            Status.int.setGraphicsData("EA3_USH_REPORT", reportData2)
+        elif Status.ANo == Status.FinalAlternative:
+            Status.int.setGraphicsData("EA3_USH_REPORT_F", reportData1)
 #------------------------------------------------------------------------------
 
 #==============================================================================

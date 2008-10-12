@@ -44,6 +44,7 @@
 from sys import *
 from math import *
 from numpy import *
+import copy
 
 
 from einstein.auxiliary.auxiliary import *
@@ -108,7 +109,7 @@ class ModuleHC(object):
                             newPipes = pipes + str(pipeDict[pipeID])
                             pipes = newPipes
                         else:
-                            newPipes = pipes+"==]\n[=="+str(pipeDict[pipeID])
+                            newPipes = pipes+"==o\no=="+str(pipeDict[pipeID])
                             pipes = newPipes
                         idx += 1
                 except:
@@ -136,6 +137,24 @@ class ModuleHC(object):
                                                   equipe.HCGPnom,
                                                   USHj,
                                                   0.0]))
+
+                if Status.ANo == Status.FinalAlternative:
+                    equipmentDataReport = [[equipe.EquipType,
+                                            equipe.Manufact,
+                                            equipe.Model,
+                                            equipe.HCGPnom,
+                                            equipe.DBFuel_id,
+                                            equipe.FuelConsum,
+                                            equipe.ElectriConsum,
+                                            equipe.ElectriProduction,
+                                            equipe.HCGEEfficiency,
+                                            equipe.Refrigerant]]
+
+                    equipeData = array(transpose(noneFilter(equipmentDataReport,substitute=" ")))
+                    print "ModuleHC (updatePanel): writing data for Key %s"%("EQ%02d"%(j))
+                    print equipeData
+                    Status.int.setGraphicsData("EQ%02d"%(j),copy.deepcopy(equipeData))
+                
         data = array(dataList)
 
         Status.int.setGraphicsData(self.keys[0], data)
@@ -167,6 +186,10 @@ class ModuleHC(object):
         
             print "ModuleHC (updatePanel): writing key HC%02d_REPORT"%Status.ANo
             Status.int.setGraphicsData("HC%02d_REPORT"%Status.ANo, dataReport)
+
+            if Status.ANo == Status.FinalAlternative:
+                Status.int.setGraphicsData("HC_REPORT_F", dataReport)
+                
         
 
 #------------------------------------------------------------------------------
