@@ -88,7 +88,7 @@ class DataBaseClass:
 class HexData(DataBaseClass):
     nodes  = ['HXNo','HxName','HXType','QdotHX','HXLMTD','QHX','HXSource','HXTSourceInlet','HXTSourceOutlet','HXhSourceInlet','HXhSourceOutlet',
               'HXSink','HXTSinkInlet','HXTSinkOutlet','HXSource_FluidID','HXSink_FluidID','storage_size','HEX_area','HEX_turnkeyprice',
-              'HX_OandMfix','HX_OandMvar','HperYear','streamstatusSource','streamstatusSink','streamtypeSink','streamtypeSource']
+              'HX_OandMfix','HX_OandMvar','HperYear','StreamStatusSource','StreamStatusSink','StreamTypeSink','StreamTypeSource']
     
     def __getValuesInDBOrder(self):        
     ## hopefully the external C# program get this right soon so so this is not nessecary...
@@ -104,7 +104,7 @@ class HexData(DataBaseClass):
         values.append(self.getValue("QHX"))
         values.append("NULL")                       #HPerYearHX
         values.append(self.getValue("HXSource"))
-        values.append("NULL")                       #FluidIDSource
+        values.append(self.getValue("HXSource_FluidID"))                #FluidIDSource
         values.append("NULL")                       #FlowSource
         values.append(self.getValue("HXTSourceInlet"))
         values.append(self.getValue("HXhSourceInlet"))
@@ -119,10 +119,10 @@ class HexData(DataBaseClass):
         values.append(self.getValue("HX_OandMfix")) 
         values.append(self.getValue("HX_OandMvar")) 
         values.append(self.getValue("storage_size"))
-        values.append(self.getValue("streamstatusSource")) 
-        values.append(self.getValue("streamstatusSink")) 
-        values.append(self.getValue("streamtypeSink"))
-        values.append(self.getValue("streamtypeSource"))                        #StreamTypeSource
+        values.append(self.getValue("StreamStatusSource")) 
+        values.append(self.getValue("StreamStatusSink")) 
+        values.append(self.getValue("StreamTypeSink"))
+        values.append(self.getValue("StreamTypeSource"))                        #StreamTypeSource
         return values
     
     def getInsertSQL(self,pid,ano):                

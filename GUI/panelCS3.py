@@ -16,9 +16,11 @@
 #	Created by: 	    Hans Schweiger  05/07/2008
 #       Revised by:
 #                           Stoyan Danov    10/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:#
 #       10/07/2008 SD: graphic ComparedBarPlot set, labels and legend arranged
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -47,6 +49,9 @@ from numCtrl import *
 COLNO = 4
 MAXROWS = 20
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #============================================================================== 
 #============================================================================== 
 class PanelCS3(wx.Panel):
@@ -70,9 +75,9 @@ class PanelCS3(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS3_Plot",                      # key for Interface
-                   'title'       :_('Relative comparison'), # title of the graph
-                   'ylabel'      :_('[%]'),                   # y axis label
-                   'legend'      :[_('CO2'),_('Nuclear waste'),_('Water consumption')],                   # legend (list)
+                   'title'       :_U('Relative comparison'), # title of the graph
+                   'ylabel'      :_U('[%]'),                   # y axis label
+                   'legend'      :[_U('CO2'),_U('Nuclear waste'),_U('Water consumption')],                   # legend (list)
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[]}                        # rows that should not be plotted
@@ -103,10 +108,10 @@ class PanelCS3(wx.Panel):
 #            self.grid1.SetColLabelValue(col, headings[col])
         self.grid1.SetDefaultColSize(140)
         self.grid1.SetColSize(0,285)
-        self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Production of CO2\n[t]"))
-        self.grid1.SetColLabelValue(2, _("Highly Radioactive\nNuclear Waste [kg]"))
-        self.grid1.SetColLabelValue(3, _("Water Consumption\n[m3]"))
+        self.grid1.SetColLabelValue(0, _U("Alternative"))
+        self.grid1.SetColLabelValue(1, _U("Production of CO2\n[t]"))
+        self.grid1.SetColLabelValue(2, _U("Highly Radioactive\nNuclear Waste [kg]"))
+        self.grid1.SetColLabelValue(3, _U("Water Consumption\n[m3]"))
 
         self.display()
 
@@ -118,7 +123,7 @@ class PanelCS3(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _('Environmental impact of the industry'),
+        self.box1 = wx.StaticBox(self, -1, _U('Environmental impact of the industry'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -130,7 +135,7 @@ class PanelCS3(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Relative comparison of different alternatives'),
+        self.box2 = wx.StaticBox(self, -1, _U('Relative comparison of different alternatives'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -151,7 +156,7 @@ class PanelCS3(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

@@ -1,14 +1,19 @@
 #Boa:Dialog:DialogGauge
 #	Last revised by:    
 #                           Stoyan Danov        19/06/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes in last update:
 #       19/06/2008 SD: change to translatable text _(...)
+#       13/10/2008: SD  change _() to _U()
 
 import wx
 
 [wxID_DIALOGGAUGE, wxID_STGAUGE, wxID_GAUGE,
 ] = [wx.NewId() for _init_ctrls in range(3)]
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class DialogGauge(wx.Dialog):
     def _init_ctrls(self, prnt):

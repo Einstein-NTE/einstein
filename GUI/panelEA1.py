@@ -20,6 +20,7 @@
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    06/07/2008
 #                           Stoyan Danov    07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -29,6 +30,7 @@
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #       06/07/2008 SD: arrange column width, change background colour -> lightgrey
 #       07/07/2008 SD:                       ->highlite Total
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -72,6 +74,8 @@ GRID_BACKGROUND_COLOR = LIGHTGREY # idem
 GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelEA1(wx.Panel):
     def __init__(self, parent):
@@ -87,7 +91,7 @@ class PanelEA1(wx.Panel):
         paramList={'labels'      : 0,                     # labels column
                    'data'        : 2,                     # data column for this graph
                    'key'         : keys[0],               # key for Interface
-                   'title'       :_('PEC by fuel'),          # title of the graph
+                   'title'       :_U('PEC by fuel'),          # title of the graph
                    'backcolor'   :GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' :[2]}                    # rows that should not be plotted
 
@@ -103,7 +107,7 @@ class PanelEA1(wx.Panel):
         paramList={'labels'      : 0,                     # labels column
                    'data'        : 4,                     # data column for this graph
                    'key'         : keys[0],               # key for Interface
-                   'title'       :_('PET by fuel'),          # title of the graph
+                   'title'       :_U('PET by fuel'),          # title of the graph
                    'backcolor'   :GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' :[2]}                    # rows that should not be plotted
 
@@ -153,17 +157,17 @@ class PanelEA1(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Fuel type"))
-        self.grid.SetColLabelValue(1, _("MWh"))
-        self.grid.SetColLabelValue(2, _("%"))
-        self.grid.SetColLabelValue(3, _("MWh"))
-        self.grid.SetColLabelValue(4, _("%"))
-        self.grid.SetColLabelValue(5, _(" "))
-        self.grid.SetColLabelValue(6, _(" "))
+        self.grid.SetColLabelValue(0, _U("Fuel type"))
+        self.grid.SetColLabelValue(1, _U("MWh"))
+        self.grid.SetColLabelValue(2, _U("%"))
+        self.grid.SetColLabelValue(3, _U("MWh"))
+        self.grid.SetColLabelValue(4, _U("%"))
+        self.grid.SetColLabelValue(5, _U(" "))
+        self.grid.SetColLabelValue(6, _U(" "))
         
-        self.grid.SetCellValue(0,0,_("Total Fuels"))
-        self.grid.SetCellValue(1,0,_("Total Electricity"))
-        self.grid.SetCellValue(2,0,_("Total (Fuels+Electricity)"))
+        self.grid.SetCellValue(0,0,_U("Total Fuels"))
+        self.grid.SetCellValue(1,0,_U("Total Electricity"))
+        self.grid.SetCellValue(2,0,_U("Total (Fuels+Electricity)"))
         attr = wx.grid.GridCellAttr()
         attr.SetTextColour(GRID_LETTER_COLOR)
         attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
@@ -207,7 +211,7 @@ class PanelEA1(wx.Panel):
               style=wx.DEFAULT_FRAME_STYLE)
 
 #SD2008-06-30
-        self.box1 = wx.StaticBox(self, -1, _(u'Total primary energy consumption (PEC) and primary energy consumption for thermal use (PET)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Total primary energy consumption (PEC) and primary energy consumption for thermal use (PET)'),
                                  pos = (10,10),size=(780,240))        
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -218,7 +222,7 @@ class PanelEA1(wx.Panel):
               style=0)
 
 #SD2008-06-30
-        self.box2 = wx.StaticBox(self, -1, _(u'PEC by fuel'),
+        self.box2 = wx.StaticBox(self, -1, _U('PEC by fuel'),
                                  pos = (10,270),size=(380,280))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -229,7 +233,7 @@ class PanelEA1(wx.Panel):
         self.panelGraphPEC.SetBackgroundColour(wx.Colour(127, 127, 127))
 
 #SD2008-06-30
-        self.box3 = wx.StaticBox(self, -1, _(u'PET by fuel'),
+        self.box3 = wx.StaticBox(self, -1, _U('PET by fuel'),
                                  pos = (410,270),size=(380,280))
 
         self.box3.SetForegroundColour(TITLE_COLOR)
@@ -241,11 +245,11 @@ class PanelEA1(wx.Panel):
         self.panelGraphPET.SetBackgroundColour(wx.Colour(127, 127, 127))
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA1STATICTEXT2,
-              label=_(u'PEC'), name='staticText2', parent=self, pos=wx.Point(320,
+              label=_U('PEC'), name='staticText2', parent=self, pos=wx.Point(320,
               24), size=wx.Size(56, 17), style=0)
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA1STATICTEXT3,
-              label=_(u'PET'), name='staticText3', parent=self, pos=wx.Point(490,
+              label=_U('PET'), name='staticText3', parent=self, pos=wx.Point(490,
               24), size=wx.Size(40, 17), style=0)
 
 #..............................................................................
@@ -257,7 +261,7 @@ class PanelEA1(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

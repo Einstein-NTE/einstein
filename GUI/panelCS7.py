@@ -15,9 +15,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger  05/07/2008
 #       Revised by:         Stoyan Danov    15/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       15/07/2008 SD: adaptation to module CS
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -46,6 +48,9 @@ from numCtrl import *
 COLNO = 4
 MAXROWS = 20
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #============================================================================== 
 #============================================================================== 
 class PanelCS7(wx.Panel):
@@ -69,9 +74,9 @@ class PanelCS7(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS7_Plot",                      # key for Interface
-                   'title'       :_('Modified nternal rate of return'), # title of the graph
-                   'ylabel'      :_('[%]'),                   # y axis label
-                   'legend'      :[_('IRR')],                   # legend
+                   'title'       :_U('Modified nternal rate of return'), # title of the graph
+                   'ylabel'      :_U('[%]'),                   # y axis label
+                   'legend'      :[_U('IRR')],                   # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0]}                        # rows that should not be plotted
@@ -102,10 +107,10 @@ class PanelCS7(wx.Panel):
 #            self.grid1.SetColLabelValue(col, headings[col])
         self.grid1.SetDefaultColSize(155)
         self.grid1.SetColSize(0,240)
-        self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Modified internal\nrate of return [%]"))
-        self.grid1.SetColLabelValue(2, _("Pay-back period\n[years]"))
-        self.grid1.SetColLabelValue(3, _("Cost benefit ratio\n[-]"))
+        self.grid1.SetColLabelValue(0, _U("Alternative"))
+        self.grid1.SetColLabelValue(1, _U("Modified internal\nrate of return [%]"))
+        self.grid1.SetColLabelValue(2, _U("Pay-back period\n[years]"))
+        self.grid1.SetColLabelValue(3, _U("Cost benefit ratio\n[-]"))
 
         self.display()
 
@@ -117,7 +122,7 @@ class PanelCS7(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Modified internal rate of return (IRR)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Modified internal rate of return (IRR)'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -129,7 +134,7 @@ class PanelCS7(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Comparative of the internal rate of return'),
+        self.box2 = wx.StaticBox(self, -1, _U('Comparative of the internal rate of return'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -150,7 +155,7 @@ class PanelCS7(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

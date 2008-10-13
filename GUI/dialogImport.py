@@ -20,8 +20,10 @@
 #
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger	    25/09/2008
+#                           Stoyan Danov    13/10/2008
 #
-#       Last modified by:   
+#       Last modified by:
+#       13/10/2008: SD  change _() to _U()
 #
 #       Changes to previous version:
 #
@@ -37,6 +39,9 @@
 
 import wx
 from einstein.GUI.status import Status
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 def create(parent):
     return DialogImport(parent)
@@ -58,20 +63,20 @@ class DialogImport(wx.Dialog):
               pos=wx.Point(24, 16), size=wx.Size(344, 64), style=0)
         self.stDialog.Center(wx.HORIZONTAL)
 
-        self.buttonOverwrite = wx.Button(id=wxID_DIALOGOKBUTTONOVERWRITE, label=_('overwrite'),
+        self.buttonOverwrite = wx.Button(id=wxID_DIALOGOKBUTTONOVERWRITE, label=_U('overwrite'),
               name='buttonOverwrite', parent=self, pos=wx.Point(20, 100),
               size=wx.Size(100, 24), style=0)
         self.buttonOverwrite.Bind(wx.EVT_BUTTON, self.OnButtonOverwriteButton,
               id=wxID_DIALOGOKBUTTONOVERWRITE)
 
-        self.buttonIgnore = wx.Button(id=wxID_DIALOGOKBUTTONIGNORE, label=_('ignore'),
+        self.buttonIgnore = wx.Button(id=wxID_DIALOGOKBUTTONIGNORE, label=_U('ignore'),
               name='buttonIgnore', parent=self, pos=wx.Point(140, 100),
               size=wx.Size(100, 24), style=0)
         self.buttonIgnore.Bind(wx.EVT_BUTTON, self.OnButtonIgnoreButton,
               id=wxID_DIALOGOKBUTTONIGNORE)
 
         self.buttonCancel = wx.Button(id=wxID_DIALOGOKBUTTONCANCEL,
-              label=_('cancel'), name='buttonCancel', parent=self,
+              label=_U('cancel'), name='buttonCancel', parent=self,
               pos=wx.Point(260, 100), size=wx.Size(100, 24), style=0)
         self.buttonCancel.Bind(wx.EVT_BUTTON, self.OnButtonCancelButton,
               id=wxID_DIALOGOKBUTTONCANCEL)

@@ -550,10 +550,17 @@ class Project(object):
 #------------------------------------------------------------------------------
     def getProjectID(self,name):
 #------------------------------------------------------------------------------
-#   returns a list with the names of the projects
+#   returns the ID of a project as a function of the name
 #------------------------------------------------------------------------------
 
-        return Status.DB.questionnaire.Name[name][0].Questionnaire_ID
+        projects = Status.DB.questionnaire.Name[name]
+        
+        if len(projects) > 0:
+            return projects[0].Questionnaire_ID
+        
+        else:
+            logTrack("Project (getProjectID): project name %s unknown"%name)
+            return None
 
 #------------------------------------------------------------------------------
     def setActiveProject(self,PId,name=None):

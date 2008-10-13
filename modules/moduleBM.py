@@ -177,7 +177,7 @@ class ModuleBM(object):
         elif self.keys[0] == "BM3":
             ext = "%02d_"%self.procNo
 
-        print "ModuleBM (updatePanel): extenstion = %s"%ext
+#        print "ModuleBM (updatePanel): extenstion = %s"%ext
                         
         if Status.ANo == 0:
             Status.int.setGraphicsData("%s_%sREPORT"%(self.keys[0],ext),dataReport)
@@ -204,7 +204,7 @@ class ModuleBM(object):
 
         self.selector = searchCriteria[9]
 
-        print "ModuleBM (updateSearch): new search criteria",searchCriteria
+#        print "ModuleBM (updateSearch): new search criteria",searchCriteria
 
         self.updatePanel()
         
@@ -310,10 +310,10 @@ class ModuleBM(object):
 
         config = [0.9*elmin,elmax*1.1,0.9*fuelmin,fuelmax*1.1]
 
-        print "createBMgraphs: bmtar_el  ",bmtar_el
-        print "createBMgraphs: bmtar_fuel",bmtar_fuel
-        print "createBMgraphs: ps_el  ",ps_el
-        print "createBMgraphs: ps_fuel  ",ps_fuel
+#        print "createBMgraphs: bmtar_el  ",bmtar_el
+#        print "createBMgraphs: bmtar_fuel",bmtar_fuel
+#        print "createBMgraphs: ps_el  ",ps_el
+#        print "createBMgraphs: ps_fuel  ",ps_fuel
         
         
         return [config,bmtar_el,bmtar_fuel,bm_el,bm_fuel,ps_el,ps_fuel]
@@ -324,7 +324,7 @@ class ModuleBM(object):
 #       looks up for benchmarks within the database
 #------------------------------------------------------------------------------
 
-        print "ModuleBM (findBenchmarks): creating panel data"
+#        print "ModuleBM (findBenchmarks): creating panel data"
         
         if self.year0 > 0:
             sqlQuery = "YearReference > %s AND YearReference < %s ORDER BY YearReference DESC"%(self.year0,self.year1)
@@ -334,7 +334,7 @@ class ModuleBM(object):
             
         benchmarks = Status.DB.dbbenchmark.sql_select(sqlQuery)
 
-        print "ModuleBM (findBenchmarks): screening year of reference -> %s benchmarks found"%len(benchmarks)
+#        print "ModuleBM (findBenchmarks): screening year of reference -> %s benchmarks found"%len(benchmarks)
         
         self.bmIDs = []
         self.bmTable = []
@@ -370,13 +370,13 @@ class ModuleBM(object):
                     else:
                         naceCodeSub = "00"                
 
-                    print "naceCode of benchmark entry: ",naceCode,naceCodeSub
+#                    print "naceCode of benchmark entry: ",naceCode,naceCodeSub
 
                     if str(naceCode) == self.naceFilter:
 
                         level = self.naceSearch #from 0 to 2
 
-                        print "now comparing with level %s: "%level,self.naceSearch,naceCodeSub,self.naceCodeSub
+#                        print "now comparing with level %s: "%level,self.naceSearch,naceCodeSub,self.naceCodeSub
 
                         subOK = 2
                         if ((str(naceCodeSub)[0:1] == self.naceCodeSub[0:1]) or (self.naceCodeSub == "0")):
@@ -406,7 +406,7 @@ class ModuleBM(object):
 
                             hasData = hasFECelData or hasFECfuelData or hasPECData
 
-                            print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+#                            print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
                             if hasData:
                                 selected = True
                 else:
@@ -432,8 +432,8 @@ class ModuleBM(object):
                     self.prodNo = 0
                     pu = "t"
                     
-                print "ModuleBM (findBMs): productCode BM: %s - product %s [%s]"%\
-                      (productCode,self.product,self.productCode)
+#                print "ModuleBM (findBMs): productCode BM: %s - product %s [%s]"%\
+#                      (productCode,self.product,self.productCode)
 
                 
                 if self.productCode == productCode and productCode is not None:
@@ -457,8 +457,8 @@ class ModuleBM(object):
                     pu_BM = benchmark.H_Unit
                     fc = conversionFactor(pu)/conversionFactor(pu_BM)
 
-                    print "pu %s [%s] pu_BM %s [%s] fc %s"%\
-                          (pu,conversionFactor(pu),pu_BM,conversionFactor(pu_BM),fc)
+#                    print "pu %s [%s] pu_BM %s [%s] fc %s"%\
+#                          (pu,conversionFactor(pu),pu_BM,conversionFactor(pu_BM),fc)
                     
                     for i in range(len(FECfuel)):
                         if FECfuel[i] is not None:
@@ -480,7 +480,7 @@ class ModuleBM(object):
 
                     hasData = hasFECelData or hasFECfuelData or hasPECData
 
-                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+#                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
                     if hasData:
                         selected = True
 
@@ -504,7 +504,7 @@ class ModuleBM(object):
                     self.unitOp = None
                     self.unitOpCode = None
                     self.procNo = 0
-                print "ModuleBM (findBMs): looking for unitOp %s [BM: %s]"%(self.unitOpCode,unitOpCode)
+#                print "ModuleBM (findBMs): looking for unitOp %s [BM: %s]"%(self.unitOpCode,unitOpCode)
                     
                 if self.unitOpCode == unitOpCode:
                                    
@@ -528,7 +528,7 @@ class ModuleBM(object):
 
                     hasData = hasFECelData or hasFECfuelData or hasPECData
 
-                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
+#                    print "hasData el %s fuel %s PEC %s "%(hasFECelData,hasFECfuelData,hasPECData)
                     if hasData:
                         selected = True
                 
@@ -548,7 +548,7 @@ class ModuleBM(object):
                 tableEntry.extend(FECfuel)
                 tableEntry.extend(FECel)
 
-                print "selected benchmark: ",tableEntry
+#                print "selected benchmark: ",tableEntry
                 self.bmTable.append(tableEntry)
 
         return self.bmTable,self.bmIDs

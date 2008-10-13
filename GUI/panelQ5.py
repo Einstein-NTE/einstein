@@ -26,6 +26,7 @@
 #                           Tom Sobota      21/06/2008
 #                           Hans Schweiger  23/06/2008
 #                           Hans Schweiger  07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
@@ -45,6 +46,7 @@
 #       23/06/2008      HS: filling of choices
 #       07/07/2008: HS  bug-fix: substitute self.check by check
 #                       (compatibility with new FloatEntry)
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -79,6 +81,8 @@ LABEL_WIDTH_RIGHT = 180
 DATA_ENTRY_WIDTH  = 100
 UNITS_WIDTH       =  90
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelQ5(wx.Panel):
     def __init__(self, parent, main):
@@ -108,11 +112,11 @@ class PanelQ5(wx.Panel):
         self.page0 = wx.Panel(self.notebook) # left panel
         self.page1 = wx.Panel(self.notebook) # right panel
 
-        self.frame_distrib_list = wx.StaticBox(self.page0, -1, _("Distribution list"))
-        self.frame_distrib_heat_cold = wx.StaticBox(self.page0, -1, _("Distribution of heat/cold"))
-        self.frame_general_data = wx.StaticBox(self.page0, -1, _("General data"))
-        self.frame_temp_pressures = wx.StaticBox(self.page0, -1, _("Temperatures, pressures and flow rates"))
-        self.frame_piping_specs = wx.StaticBox(self.page0, -1, _("Piping specifications"))
+        self.frame_distrib_list = wx.StaticBox(self.page0, -1, _U("Distribution list"))
+        self.frame_distrib_heat_cold = wx.StaticBox(self.page0, -1, _U("Distribution of heat/cold"))
+        self.frame_general_data = wx.StaticBox(self.page0, -1, _U("General data"))
+        self.frame_temp_pressures = wx.StaticBox(self.page0, -1, _U("Temperatures, pressures and flow rates"))
+        self.frame_piping_specs = wx.StaticBox(self.page0, -1, _U("Piping specifications"))
         self.frame_storage = wx.StaticBox(self.page1, -1, "Storage")
 
         # set font for titles
@@ -150,14 +154,14 @@ class PanelQ5(wx.Panel):
 #In StaticBox "Distribution of heat/cold"
 #In StaticBox "General data" within "Distribution of heat/cold"    
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Name of the branch / distribution system"),
-                             tip=_("Give some brief name or number of the distribution tube consistent with the hydraulic scheme"))
+                             label=_U("Name of the branch / distribution system"),
+                             tip=_U("Give some brief name or number of the distribution tube consistent with the hydraulic scheme"))
         
        
         self.tc3 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Heat or cold distribution medium"),
-                               tip=_("e.g. air for drying process, vapour, hot water, refrigerant,..."))
+                               label=_U("Heat or cold distribution medium"),
+                               tip=_U("e.g. air for drying process, vapour, hot water, refrigerant,..."))
 
         self.tc4 = FloatEntry(self.page0,
                               ipart=6,                       # max n. of characters left of decimal point
@@ -166,67 +170,67 @@ class PanelQ5(wx.Panel):
                               maxval=999999.,                # max value accepted
                               value=0.,                      # initial value
                               unitdict='MASSORVOLUMEFLOW',            # values for the units chooser
-                              #label=_("Nominal production"), # label
-                              label=_("Nominal production or circulation rate (specify units)"),
-                              tip=_(" "))
+                              #label=_U("Nominal production"), # label
+                              label=_U("Nominal production or circulation rate (specify units)"),
+                              tip=_U(" "))
 
 #In StaticBox "Temperatures and pressures" within "Distribution of heat/cold" 
         self.tc5 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Outlet temperature (to distribution)"),
-                              tip=_("Temperature of supply medium from equipment"))
+                              label=_U("Outlet temperature (to distribution)"),
+                              tip=_U("Temperature of supply medium from equipment"))
 
         self.tc6 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Return temperature"),
-                              tip=_("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vapour system)"))
+                              label=_U("Return temperature"),
+                              tip=_U("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vapour system)"))
 
         self.tc7 = FloatEntry(self.page0,
                               ipart=4, decimals=3, minval=0., maxval=1., value=0.,
                               unitdict=None,
-                              label=_("Rate of recirculation"),
-                              tip=_("Specify the rate of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
+                              label=_U("Rate of recirculation"),
+                              tip=_U("Specify the rate of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
 
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Temperature of feed-up in open circuit"),
-                              tip=_("Temperature of medium of distribution of heat/cold entering in open circuit (e.g. temperature of water entering from network...)"))
+                              label=_U("Temperature of feed-up in open circuit"),
+                              tip=_U("Temperature of medium of distribution of heat/cold entering in open circuit (e.g. temperature of water entering from network...)"))
 
         self.tc9 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='PRESSURE',
-                              label=_("Pressure of heat or cold distribution medium"),
-                              tip=_("Working pressure for the heat/cold supply medium"))
+                              label=_U("Pressure of heat or cold distribution medium"),
+                              tip=_U("Working pressure for the heat/cold supply medium"))
 
 
 #In StaticBox "Piping specifications" within "Distribution of heat/cold" 
         self.tc11 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
                               unitdict='LENGTH',
-                              label=_("Total length of distribution piping or ducts (one way)"),
-                              tip=_("Only distance one way"))
+                              label=_U("Total length of distribution piping or ducts (one way)"),
+                              tip=_U("Only distance one way"))
 
         self.tc12 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
                               unitdict='HEATTRANSFERCOEF',
-                              label=_("Total coefficient of heat losses for piping or ducts"),
-                              tip=_("For the whole duct: go and return"))
+                              label=_U("Total coefficient of heat losses for piping or ducts"),
+                              tip=_U("For the whole duct: go and return"))
 
         self.tc13 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
                               unitdict='LENGTH',
-                              label=_("Mean pipe diameter"),
-                              tip=_(" "))
+                              label=_U("Mean pipe diameter"),
+                              tip=_U(" "))
 
         self.tc14 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
                               unitdict='LENGTH',
-                              label=_("Insulation thickness"),
-                              tip=_(" "))
+                              label=_U("Insulation thickness"),
+                              tip=_U(" "))
         #
         # Right panel controls
         #
@@ -235,47 +239,47 @@ class PanelQ5(wx.Panel):
 
         self.tc15 = IntEntry(self.page1,
                              minval=0, maxval=100, value=0,
-                             label=_("Number of storage units"),
-                             tip=_("Specify the number of storage units of the same type"))
+                             label=_U("Number of storage units"),
+                             tip=_U("Specify the number of storage units of the same type"))
 
         self.tc16 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='VOLUME',
-                              label=_("Volume of one storage unit"),
-                              tip=_("Volume of the storage medium of a single single storage unit"))
+                              label=_U("Volume of one storage unit"),
+                              tip=_U("Volume of the storage medium of a single single storage unit"))
 
         self.tc17 = ChoiceEntry(self.page1,
                                values=TRANSSTORAGETYPES.values(),
-                               label=_("Type of heat storage"),
-                               tip=_("Select from predefined list"))
+                               label=_U("Type of heat storage"),
+                               tip=_U("Select from predefined list"))
 
         self.tc18 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='PRESSURE',
-                              label=_("Pressure of heat storage medium"),
-                              tip=_("Pressure of the process medium entering the storage unit if different from storage medium"))
+                              label=_U("Pressure of heat storage medium"),
+                              tip=_U("Pressure of the process medium entering the storage unit if different from storage medium"))
 
         self.tc19 = FloatEntry(self.page1,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Maximum temperature of the storage"),
-                              tip=_("The maximum temperature to which storage unit can be operated"))
+                              label=_U("Maximum temperature of the storage"),
+                              tip=_U("The maximum temperature to which storage unit can be operated"))
 
 
 
-        self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
+        self.buttonOK = wx.Button(self,wx.ID_OK,_U("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 
-        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_U("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.buttonDeleteDistribution = wx.Button(self.page0,-1,_("Delete distribution"))
+        self.buttonDeleteDistribution = wx.Button(self.page0,-1,_U("Delete distribution"))
         self.buttonDeleteDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteDistribution, self.buttonDeleteDistribution)
         self.buttonDeleteDistribution.SetFont(fp.getFont())
 
-        self.buttonAddDistribution = wx.Button(self.page0, -1, _("Add distribution"))
+        self.buttonAddDistribution = wx.Button(self.page0, -1, _U("Add distribution"))
         self.buttonAddDistribution.SetMinSize((136, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddDistribution, self.buttonAddDistribution)
         self.buttonAddDistribution.SetFont(fp.getFont())
@@ -334,8 +338,8 @@ class PanelQ5(wx.Panel):
         sizer_st.Add(self.tc19, 0, flagText, 0)
         self.page1.SetSizer(sizer_st)
         
-        self.notebook.AddPage(self.page0, _('Distribution'))
-        self.notebook.AddPage(self.page1, _('Storage'))
+        self.notebook.AddPage(self.page0, _U('Distribution'))
+        self.notebook.AddPage(self.page1, _U('Storage'))
         sizerGlobal.Add(self.notebook, 1, wx.EXPAND, 0)
 
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
@@ -411,7 +415,7 @@ class PanelQ5(wx.Panel):
         elif pipeName != 'NULL' and len(pipes) == 1:
             pipe = pipes[0]
         else:
-	    self.main.showError(_("PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"))
+	    self.main.showError(_U("PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"))
 	    return
 
 

@@ -107,7 +107,7 @@ class DBConnection:
 #------------------------------------------------------------------------------
 class SQLViews(object):
     SQL_HeatGeneration = """SELECT q.`Equipment`, d.`FuelName`, q.`HCGPnom`, q.`FuelConsum`, q.`UnitsFuelConsum`, d.`FuelDensity`, 
-                            q.`ExcessAirRatio`, q.`TExhaustGas`, q.`PartLoad`, q.`HPerDayEq`, q.`NDaysEq`, d.`Offgas`, d.`CombAir`, 
+                            q.`ExcessAirRatio`, q.`TExhaustGas`,q.QExhaustGas, q.FlowExhaustGas, q.`PartLoad`, q.`HPerDayEq`, q.`NDaysEq`, d.`Offgas`, d.`CombAir`, 
                             d.`Humidity`, d.`OffgasHeatCapacity`, d.`OffgasDensity` 
                             FROM qgenerationhc q, dbfuel d
                             WHERE q.`Questionnaire_id`=%s AND q.`AlternativeProposalNo`=%s AND q.`DBFuel_id` = d.`DBFuel_ID` 
@@ -150,13 +150,14 @@ class SQLViews(object):
     SQL_WasteHeatElec   = """SELECT q.`WHEEName`, q.`QWHEE`, q.`WHEEMedium`, q.`WHEEFlow`, q.`WHEETOutlet`, q.`HPerDayWHEE`, q.`NDaysWHEE`,
                             d.`DBFluid_ID`, d.`FluidCp`, d.`FluidDensity` 
                             FROM qwasteheatelequip q, dbfluid d
-                            WHERE q.`ProjectID`=%s AND q.`AlternativeProposalNo`=%s AND q.`WHEEMedium`=d.`FluidName` 
+                            WHERE q.`ProjectID`=%s AND q.`AlternativeProposalNo`=%s AND q.`WHEEMedium`=d.`DBFluid_ID` 
                             ORDER BY q.`WHEENo`;"""
     
     SQL_ExistingHeatEx = """SELECT q.`HXName`, q.`HXType`, q.`QdotHX` , q.`HXSource`, q.`HXTSourceInlet`, q.`HXhSourceInlet`, q.`HXTSourceOutlet`, q.`HXhSourceOutlet`,  
                             q.`HXSink`, q.`HXTSinkInlet`, q.`HXTSinkOutlet`, q.`HXLMTD`, q.`Area`,  q.`QHX`, q.`HPerYearHX`, q.`FluidIDSource`, q.`FlowSource`, 
                             d.`FluidCp` as 'FluidCPSource', d.`FluidDensity` as 'FluidDensitySource', q.`FluidIDSink`, q.`FlowSink`, d1.`FluidCp` as 'FluidCPSink', 
-                            d1.`FluidDensity` as 'FluidDensitySink', q.`TurnKeyPrice`, q.`OMFix`, q.`OMVar`, q.`StorageSize`, q.`StreamStatusSource`, q.`StreamStatusSink` 
+                            d1.`FluidDensity` as 'FluidDensitySink', q.`TurnKeyPrice`, q.`OMFix`, q.`OMVar`, q.`StorageSize`, q.`StreamStatusSource`, q.`StreamStatusSink`,
+                            q.StreamTypeSink, q.StreamTypeSource 
                             FROM qheatexchanger q, dbfluid d, dbfluid d1
                             WHERE q.`ProjectID`=%s AND q.`AlternativeProposalNo`=%s AND q.`FluidIDSource`=d.`DBFluid_ID` AND q.`FluidIDSink`=d1.`DBFluid_ID`
                             ORDER BY q.`HXNo`;"""
@@ -286,8 +287,20 @@ class XMLDocHRModuleBase:
                 return "true"
             if (string.find(value.lower(),"no")!=-1):
                 return "false"
-            
-        #5) default
+        
+        #5) StreamStatusConversion
+        if (tag=="StreamStatusSink")or(tag=="StreamStatusSource"):
+            s=str(value)
+            if(s=='sst_none'):
+                return "0"
+            if(s=='sst_liquid'):
+                return "1"
+            if(s=='sst_gaseous'):
+                return "2"
+            if(s=='sst_condensation'):
+                return "3"
+                
+        #6) default
         return str(value)
          
 #------------------------------------------------------------------------------               
@@ -409,6 +422,8 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
         db = DBConnection();
         db.connect()
         r = db.sql( sql % (self.qid,self.ano) )
+        #print sql % (self.qid,self.ano)
+        #print r
         for result in r:
             entry = self.document.createElement(name)
             count = 0
@@ -492,7 +507,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     
     #ListOfHeatGenerationData struture
     heatgentags     = ["EquipmentName","FuelType","HCGPNom","FuelConsum","UnitFuelConsum","FuelDensity",
-                       "EcessAirRatio","TExhaustGas","PartLoad","HPerDayEq","NDaysEq","OffGas","CombAir",
+                       "EcessAirRatio","TExhaustGas","QExhaustGas", "FlowExhaustGas","PartLoad","HPerDayEq","NDaysEq","OffGas","CombAir",
                        "FuelHumidityFactor","FuelOffGasCp","FuelOffGasDensity"]    
     heatgen         =  ["ListOfHeatGenerationData","InputXMLHeatGeneration",heatgentags,SQLViews.SQL_HeatGeneration,None,None]
     
@@ -527,7 +542,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     procedata       = ["ListOfQProcessData", "InputXMLQProcessData", procdatatags, SQLViews.SQL_ProcessData ,[qprocmed1,qwhprocmed1,insupplymed,qprocmed2,procdatabatch], HandleProcessData]
     
     #ListOfWasteHeatElectrical structure    
-    wasteheattags   = ["WHEEName","QWHEE","WHEEFlow","WHEETOutlet","HPerDayWHEE","NDaysWHEE","FluidId","FluidCp",
+    wasteheattags   = ["WHEEName","QWHEE","WHEEMedium","WHEEFlow","WHEETOutlet","HPerDayWHEE","NDaysWHEE","FluidId","FluidCp",
                     "FluidDensity"]
     wasteheat       = ["InputXMLWasteHeatElectrical","InputXMLWasteHeatElectrical",wasteheattags,SQLViews.SQL_WasteHeatElec,None,None]
     
@@ -535,7 +550,8 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     #ListOfExistingHeatExchangers structure 
     exheatextags    = ["HXName","HXType","QdotHX","HXSource","HXTSourceInlet","HXhSourceInlet","HXTSourceOutlet","HXhSourceOutlet","HXSink","HXTSinkInlet",
                        "HXTSinkOutlet","HxLmtd","Area","Qhx","HPerYearHx","FluidIdSource","FlowSource","FluidCpSource","FluidDensitySource","FluidIdSink",
-                       "FlowSink","FluidCpSink","FluidDensitySink","TurnKeyPrice","OmFix","OmVar","StorageSize","StreamStatusSource","StreamStatusSink"]
+                       "FlowSink","FluidCpSink","FluidDensitySink","TurnKeyPrice","OmFix","OmVar","StorageSize","StreamStatusSource","StreamStatusSink",
+                       "StreamTypeSink","StreamTypeSource"]
     exheatex        = ["ListOfExistingHeatExchangers","InputXMLExistingHeatExchanger",exheatextags,SQLViews.SQL_ExistingHeatEx,None,HandleExHeatEx]
         
     schedules       = ["Schedule","Process",[],None,None,HandleSchedules]
@@ -567,6 +583,7 @@ class XMLExportHRModule:
                 
         if (export_exheatex):
             doc = XMLDocHRModuleAll(qid,ano)
+            print len(doc.docStruct)
         else:
             doc = XMLDocHRModuleNoHX(qid,ano)
         doc.writeToFile(path)

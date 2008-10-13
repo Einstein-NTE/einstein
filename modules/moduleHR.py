@@ -65,11 +65,15 @@ from einstein.modules.dataHR import *
 
 from einstein.GUI.dialog_changeHX import *
 
+from einstein.GUI.dialogGauge import DialogGauge
+
+
 class ModuleHR(object):
 
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
         self.ExHX = False
+        self.ConCondensation = False
         self.HiddenHX = []
         self.data = HRData(Status.PId,Status.ANo)
         self.data.loadDatabaseData()   
@@ -122,32 +126,50 @@ class ModuleHR(object):
 #----------------------------------------------------------------------------------------------------   
                          
     def runHRDesign(self):        
-        self.__runPE2(redesign = True)
+        dlg = DialogGauge(Status.main,_("EINSTEIN heat recovery module"),_("calculating"))
+        self.__runPE2(redesign = True,concondensation = self.ConCondensation)
+        dlg.update(50.0)
+        
         self.__doPostProcessing()
+        dlg.update(99.0)
+
         self.__updatePanel()
                       
+        dlg.Destroy()
+
     def runHRModule(self):
+        dlg = DialogGauge(Status.main,_("EINSTEIN heat recovery module"),_("calculating"))
         redesign_network_flag = None
         if Status.HRTool == "estimate":
             self.__estimativMethod()
         else:
-            self.__runPE2(redesign = False)            
-            self.__doPostProcessing()
-               
+            self.__runPE2(redesign = False,concondensation = self.ConCondensation)
+            
+            dlg.update(50.0)
+            self.__doPostProcessing()               
+
+        dlg.update(99.0)
+
         self.__updatePanel()
 
+        dlg.Destroy()
 
 #----------------------------------------------------------------------------------------------------
 # Internal Calculations
 #----------------------------------------------------------------------------------------------------  
 
-    def __runPE2(self,redesign = True):        
+    def __runPE2(self,redesign = True, concondensation = False):        
         if (redesign):
             logWarning(_("Redesigning HX network. This may take some time. (Tool: PE2)"))
             redesign_network_flag = "t"
         else:
             logWarning(_("Recalculating HX network. This may take some time.(Tool: PE2)"))
             redesign_network_flag = "f"
+        
+        if (concondensation):
+            con_condensation_flag = "t"
+        else:
+            con_condensation_flag = "f"
                                             
         if Status.schedules.outOfDate == True:
             Status.schedules.create()   #creates the process and equipment schedules
@@ -155,7 +177,8 @@ class ModuleHR(object):
         XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
         
         try:
-            retcode = call(['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag], shell=True)
+            args = ['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag,con_condensation_flag]
+            retcode = call(args, shell=True)
             logDebug(_("External program returned: ")+str(retcode))
             if (retcode!=0):
                 raise

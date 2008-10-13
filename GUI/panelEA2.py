@@ -22,6 +22,7 @@
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    06/07/2008
 #                           Stoyan Danov    07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       28/03/08:           included functions draw ... (before in module)
@@ -32,6 +33,7 @@
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #       06/07/2008 SD: arrange column width, change background colour -> lightgrey
 #       07/07/2008 SD:                       ->highlite Total
+#       13/10/2008: SD  change _() to _U()
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	http://www.energyxperts.net/
@@ -68,6 +70,8 @@ from GUITools import *
 MAXROWS = 20
 COLNO = 7
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelEA2(wx.Panel):
 
@@ -97,7 +101,7 @@ class PanelEA2(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : self.keys[0],                # key for Interface
-                   'title'       : _('FEC by fuel'),       # title of the graph
+                   'title'       : _U('FEC by fuel'),       # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -113,7 +117,7 @@ class PanelEA2(wx.Panel):
         paramList={'labels'      : labels_column,              # labels column
                    'data'        : 4,                          # data column for this graph
                    'key'         : self.keys[0],                    # key for Interface
-                   'title'       : _('FET by fuel'),# title of the graph
+                   'title'       : _U('FET by fuel'),# title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR,    # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -151,13 +155,13 @@ class PanelEA2(wx.Panel):
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(GRID_LABEL_SIZE, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Fuel type"))
-        self.grid.SetColLabelValue(1, _("MWh"))
-        self.grid.SetColLabelValue(2, _("%"))
-        self.grid.SetColLabelValue(3, _("MWh"))
-        self.grid.SetColLabelValue(4, _("%"))
-        self.grid.SetColLabelValue(5, _(" "))
-        self.grid.SetColLabelValue(6, _(" "))
+        self.grid.SetColLabelValue(0, _U("Fuel type"))
+        self.grid.SetColLabelValue(1, _U("MWh"))
+        self.grid.SetColLabelValue(2, _U("%"))
+        self.grid.SetColLabelValue(3, _U("MWh"))
+        self.grid.SetColLabelValue(4, _U("%"))
+        self.grid.SetColLabelValue(5, _U(" "))
+        self.grid.SetColLabelValue(6, _U(" "))
 
         #
         # copy values from dictionary to grid
@@ -184,7 +188,7 @@ class PanelEA2(wx.Panel):
               size=wx.Size(800, 600), style=wx.DEFAULT_FRAME_STYLE)
 
 #SD2008-06-30
-        self.box1 = wx.StaticBox(self, -1, _(u'Total final energy consumption (FEC) and final energy consumption for thermal use (FET)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Total final energy consumption (FEC) and final energy consumption for thermal use (FET)'),
                                  pos = (10,10),size=(780,240))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -195,7 +199,7 @@ class PanelEA2(wx.Panel):
               style=0)
 
 #SD2008-06-30
-        self.box2 = wx.StaticBox(self, -1, _(u'FEC by fuel'),
+        self.box2 = wx.StaticBox(self, -1, _U('FEC by fuel'),
                                  pos = (10,270),size=(380,280))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -206,7 +210,7 @@ class PanelEA2(wx.Panel):
         self.panelGraphFEC.SetBackgroundColour(wx.Colour(127, 127, 127))
 
 #SD2008-06-30
-        self.box3 = wx.StaticBox(self, -1, _(u'FET by fuel'),
+        self.box3 = wx.StaticBox(self, -1, _U('FET by fuel'),
                                  pos = (410,270),size=(380,280))
         self.box3.SetForegroundColour(TITLE_COLOR)
         self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -217,12 +221,12 @@ class PanelEA2(wx.Panel):
         self.panelGraphFET.SetBackgroundColour(wx.Colour(127, 127, 127))
 
         self.staticText2 = wx.StaticText(id=wxID_PANELEA2STATICTEXT2,
-              label=_(u'FEC'), name='staticText3',
+              label=_U('FEC'), name='staticText3',
               parent=self, pos=wx.Point(320, 24), size=wx.Size(219, 30),#SD pos (300, 70) before
               style=0)
 
         self.staticText3 = wx.StaticText(id=wxID_PANELEA2STATICTEXT3,
-              label=_(u'FET'), name='staticText4',
+              label=_U('FET'), name='staticText4',
               parent=self, pos=wx.Point(490, 24), size=wx.Size(191, 30),#SD pos (460, 70) before
               style=0)
 
@@ -235,7 +239,7 @@ class PanelEA2(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

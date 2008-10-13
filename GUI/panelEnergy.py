@@ -23,6 +23,7 @@
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger  26/06/2008
 #                           Hans Schweiger  09/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       31/03/08:           mod. to use numpy based graphics arg passing
@@ -33,6 +34,7 @@
 #       26/06/2008: HS  figure of instantaneous supply added
 #       09/07/2008: HS  restructuring of the panel
 #                       - elimination of pie-plot (already in E-stats)
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -69,6 +71,10 @@ from numCtrl import *
 
 MAXROWS = 1
 COLNO = 5
+
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #------------------------------------------------------------------------------		
 def drawFigure(self):
 #------------------------------------------------------------------------------
@@ -91,13 +97,13 @@ def drawFigure(self):
     self.subplot.legend(loc = 0)   #4: left lower; 0: best
 
     if Status.Nt == 12*168:
-        self.subplot.axes.set_ylabel(_('Heat supply by equipment [MWh/month]'))
-        self.subplot.axes.set_xlabel(_('Month'))
+        self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/month]'))
+        self.subplot.axes.set_xlabel(_U('Month'))
         self.subplot.axis(xmax = 12)
         
     else:
-        self.subplot.axes.set_ylabel(_('Heat supply by equipment [MWh/week]'))
-        self.subplot.axes.set_xlabel(_('Week'))
+        self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/week]'))
+        self.subplot.axes.set_xlabel(_U('Week'))
         self.subplot.axis(xmax = 52)
 
     for label in self.subplot.axes.get_yticklabels():
@@ -151,7 +157,7 @@ class PanelEnergy(wx.Panel):
         paramList={'labels'      : 0,                       # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : 'ENERGY Plot1',                # key for Interface
-                   'title'       : _('Energy demand'),        # title of the graph
+                   'title'       : _U('Energy demand'),        # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
 
@@ -178,11 +184,11 @@ class PanelEnergy(wx.Panel):
         self.grid.SetDefaultColSize(105)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Primary energy\n(PET)\n [MWh]"))
-        self.grid.SetColLabelValue(1, _("Primary energy\nFuels (LCV)\n[MWh]"))
-        self.grid.SetColLabelValue(2, _("Primary energy\nElectricity\n[MWh]"))
-        self.grid.SetColLabelValue(3, _("Useful supply\nheat\n[MWh]"))
-        self.grid.SetColLabelValue(4, _("Useful process\nheat\n[MWh]"))
+        self.grid.SetColLabelValue(0, _U("Primary energy\n(PET)\n [MWh]"))
+        self.grid.SetColLabelValue(1, _U("Primary energy\nFuels (LCV)\n[MWh]"))
+        self.grid.SetColLabelValue(2, _U("Primary energy\nElectricity\n[MWh]"))
+        self.grid.SetColLabelValue(3, _U("Useful supply\nheat\n[MWh]"))
+        self.grid.SetColLabelValue(4, _U("Useful process\nheat\n[MWh]"))
         #
         # copy values from dictionary to grid
         #
@@ -208,27 +214,27 @@ class PanelEnergy(wx.Panel):
 #..............................................................................
 # upper box: simulation set-up and global results
         
-        self.box1 = wx.StaticBox(self, -1, _('energy performance'),
+        self.box1 = wx.StaticBox(self, -1, _U('energy performance'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.buttonRunSimulation = wx.Button(id=wxID_PANELENERGYBUTTONRUNSIMULATION,
-              label=_('run simulation'), name='buttonRunSimulation', parent=self,
+              label=_U('run simulation'), name='buttonRunSimulation', parent=self,
               pos=wx.Point(20, 40), size=wx.Size(200, 24), style=0)
         self.buttonRunSimulation.Bind(wx.EVT_BUTTON,
               self.OnButtonRunSimulationButton,
               id=wxID_PANELENERGYBUTTONRUNSIMULATION)
 
         self.st3 = wx.StaticText(id=wxID_PANELENERGYST3,
-              label=_('simulation setup: '), name='st3', parent=self,
+              label=_U('simulation setup: '), name='st3', parent=self,
               pos=wx.Point(280, 40), style=0)
         self.st3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL, False,
               'Tahoma'))
 
-        self.choiceSimulationTool = wx.Choice(choices=[_("einstein"),
-              _("external tool 1"),_("external tool 2")], id=wxID_PANELENERGYCHOICESIMULATIONTOOL,
+        self.choiceSimulationTool = wx.Choice(choices=[_U("einstein"),
+              _U("external tool 1"),_U("external tool 2")], id=wxID_PANELENERGYCHOICESIMULATIONTOOL,
               name='choiceSimulationTool', parent=self, pos=wx.Point(400, 40),
               size=wx.Size(160, 21), style=0)
         self.choiceSimulationTool.Bind(wx.EVT_CHOICE,
@@ -236,7 +242,7 @@ class PanelEnergy(wx.Panel):
               id=wxID_PANELENERGYCHOICESIMULATIONTOOL)
 
         self.st1 = wx.StaticText(id=wxID_PANELENERGYST1,
-              label=_('global energy performance data'), name='st1', parent=self,
+              label=_U('global energy performance data'), name='st1', parent=self,
               pos=wx.Point(20, 80), style=0)
         self.st1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL, False,
               'Tahoma'))
@@ -248,25 +254,25 @@ class PanelEnergy(wx.Panel):
 #right side of box: buttons annual/monthly/hourly
         
         self.st2 = wx.StaticText(id=wxID_PANELENERGYST2,
-              label=_('simulation results'), name='st2', parent=self,
+              label=_U('simulation results'), name='st2', parent=self,
               pos=wx.Point(640, 40), style=0)
         self.st2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL, False,
               'Tahoma'))
 
-        self.annual = wx.Button(id=wxID_PANELENERGYANNUAL, label=_('annual data'),
+        self.annual = wx.Button(id=wxID_PANELENERGYANNUAL, label=_U('annual data'),
               name='annual', parent=self, pos=wx.Point(600, 80),
               size=wx.Size(180, 24), style=0)
         self.annual.Bind(wx.EVT_BUTTON, self.OnAnnualButton,
               id=wxID_PANELENERGYANNUAL)
 
         self.monthly = wx.Button(id=wxID_PANELENERGYMONTHLY,
-              label=_('monthly data'), name='monthly', parent=self,
+              label=_U('monthly data'), name='monthly', parent=self,
               pos=wx.Point(600, 120), size=wx.Size(180, 24), style=0)
         self.monthly.Bind(wx.EVT_BUTTON, self.OnMonthlyButton,
               id=wxID_PANELENERGYMONTHLY)
 
         self.hourly = wx.Button(id=wxID_PANELENERGYHOURLY,
-              label=_('hourly performance'), name='hourly', parent=self,
+              label=_U('hourly performance'), name='hourly', parent=self,
               pos=wx.Point(600, 160), size=wx.Size(180, 24), style=0)
         self.hourly.Bind(wx.EVT_BUTTON, self.OnHourlyButton,
               id=wxID_PANELENERGYHOURLY)
@@ -274,7 +280,7 @@ class PanelEnergy(wx.Panel):
 #..............................................................................
 # lower box: graph of simulation results
 
-        self.box2 = wx.StaticBox(self, -1, _('daily heat supply by equipment'),
+        self.box2 = wx.StaticBox(self, -1, _U('daily heat supply by equipment'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -287,14 +293,14 @@ class PanelEnergy(wx.Panel):
 #..............................................................................
 # default action buttons
 
-        self.buttonOK = wx.Button(id=wxID_PANELENERGYBUTTONOK, label=_('ok'),
+        self.buttonOK = wx.Button(id=wxID_PANELENERGYBUTTONOK, label=_U('ok'),
               name='buttonOK', parent=self, pos=wx.Point(500, 560),
               size=wx.Size(80, 20), style=0)
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton,
               id=wxID_PANELENERGYBUTTONOK)
 
         self.buttonCancel = wx.Button(id=wxID_PANELENERGYBUTTONCANCEL,
-              label=_('cancel'), name='buttonCancel', parent=self,
+              label=_U('cancel'), name='buttonCancel', parent=self,
               pos=wx.Point(600, 560), size=wx.Size(80, 20), style=0)
         self.buttonCancel.Bind(wx.EVT_BUTTON, self.OnButtonCancelButton,
               id=wxID_PANELENERGYBUTTONCANCEL)
@@ -350,7 +356,7 @@ class PanelEnergy(wx.Panel):
         paramList={'labels'      : 0,                       # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : 'ENERGY Plot1',                # key for Interface
-                   'title'       : _('Energy demand'),        # title of the graph
+                   'title'       : _U('Energy demand'),        # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
 

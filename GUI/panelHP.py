@@ -38,6 +38,7 @@
 #                           Stoyan Danov            22/05/2008
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          28/06/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       - Event handler Design Assistant 1
@@ -62,6 +63,7 @@
 #       18/06/2008 SD: change to translatable text _(...)
 #       28/06/2008: HS  eliminated sql and db as input parameters; minor clean-up.
 #                   - bug-fix in read/write of HP type
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -117,6 +119,11 @@ COLNO = 6
 
 TYPELIST = TRANSHPTYPES.values()
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 #------------------------------------------------------------------------------		
 #HS2008-03-22: 
@@ -144,8 +151,8 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_('Temperature [ºC]'))
+    self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
+    self.subplot.axes.set_xlabel(_U('Temperature [ºC]'))
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -205,7 +212,7 @@ class PanelHP(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : self.keys[0],                # key for Interface
-                   'title'       : _('Some title'),           # title of the graph
+                   'title'       : _U('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -238,12 +245,12 @@ class PanelHP(wx.Panel):
         self.grid.SetColSize(5,100)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Short name"))
-        self.grid.SetColLabelValue(1, _("Nom. power"))
-        self.grid.SetColLabelValue(2, _("COP"))
-        self.grid.SetColLabelValue(3, _("Type"))
-        self.grid.SetColLabelValue(4, _("Operating\nhours"))
-        self.grid.SetColLabelValue(5, _("Year manufact."))
+        self.grid.SetColLabelValue(0, _U("Short name"))
+        self.grid.SetColLabelValue(1, _U("Nom. power"))
+        self.grid.SetColLabelValue(2, _U("COP"))
+        self.grid.SetColLabelValue(3, _U("Type"))
+        self.grid.SetColLabelValue(4, _U("Operating\nhours"))
+        self.grid.SetColLabelValue(5, _U("Year manufact."))
         #
         # copy values from dictionary to grid
         #
@@ -273,7 +280,7 @@ class PanelHP(wx.Panel):
 # Figure to be plotted
 
         self.boxFig = wx.StaticBox(id=-1,
-              label=_('Heat demand and availability with and w/o HP'),
+              label=_U('Heat demand and availability with and w/o HP'),
               name='boxFig', parent=self, pos=wx.Point(440, 170),
               size=wx.Size(350, 260), style=0)
         self.boxFig.SetForegroundColour(TITLE_COLOR)
@@ -287,7 +294,7 @@ class PanelHP(wx.Panel):
 # Grid for display of existing heat pumps
 
         self.boxTable = wx.StaticBox(id=-1,
-              label=_('Existing heat pumps in the system'),
+              label=_U('Existing heat pumps in the system'),
               name='boxTable', parent=self, pos=wx.Point(10, 10),
               size=wx.Size(780, 140), style=0)
         self.boxTable.SetForegroundColour(TITLE_COLOR)
@@ -308,7 +315,7 @@ class PanelHP(wx.Panel):
 
 # Button "run design assistant"
         self.hpCalculate = wx.Button(id=wxID_PANELHPHPCALCULATE,
-              label=_('Run design assistant'), name='HP_Calculate', parent=self,
+              label=_U('Run design assistant'), name='HP_Calculate', parent=self,
               pos=wx.Point(220, 160), size=wx.Size(180, 24), style=0)
 
         self.hpCalculate.Bind(wx.EVT_BUTTON, self.OnHpCalculateButton,
@@ -316,7 +323,7 @@ class PanelHP(wx.Panel):
 
 # Button "add heat pump"
         self.buttonpageHeatPumpAdd = wx.Button(id=-1,
-              label=_('add heat pump manually'), name='buttonpageHeatPumpAdd',
+              label=_U('add heat pump manually'), name='buttonpageHeatPumpAdd',
               parent=self, pos=wx.Point(20, 160), size=wx.Size(180, 24),
               style=0)
         self.buttonpageHeatPumpAdd.Bind(wx.EVT_BUTTON, self.OnButtonpageHPAddButton,
@@ -327,7 +334,7 @@ class PanelHP(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.boxDA = wx.StaticBox(id=-1,
-              label=_('Configuration of design assistant'),
+              label=_U('Configuration of design assistant'),
               name='boxDA', parent=self, pos=wx.Point(10, 250),
               size=wx.Size(420, 320), style=0)
         self.boxDA.SetForegroundColour(TITLE_COLOR)
@@ -337,7 +344,7 @@ class PanelHP(wx.Panel):
 # 1. Maintain existing equipment ?
 
         self.stConfig1 = wx.StaticText(id=-1,
-              label=_('Maintain existing equipment ?'), name='stConfig1',
+              label=_U('Maintain existing equipment ?'), name='stConfig1',
               parent=self, pos=wx.Point(40, 304), style=0)
 
         self.cbConfig1 = wx.CheckBox(id=-1, label='',
@@ -350,7 +357,7 @@ class PanelHP(wx.Panel):
 #..............................................................................
 # 2. Heat pump type 
 
-        self.stConfig2 = wx.StaticText(id=-1, label=_('Type of heat pump'),
+        self.stConfig2 = wx.StaticText(id=-1, label=_U('Type of heat pump'),
               name='stConfig2', parent=self, pos=wx.Point(40, 344),
               style=0)
 
@@ -364,7 +371,7 @@ class PanelHP(wx.Panel):
 # 3. Minimum operating hours
 
         self.stConfig3 = wx.StaticText(id=-1,
-              label=_('Minimum desired annual operation hours, h'),
+              label=_U('Minimum desired annual operation hours, h'),
               name='stConfig3', parent=self, pos=wx.Point(40, 384),
               style=0)
 
@@ -380,7 +387,7 @@ class PanelHP(wx.Panel):
 # 4. Temperature lift
 
         self.stConfig4 = wx.StaticText(id=-1,
-              label=_('Maximum desired temperature lift, \xbaC'),
+              label=_U('Maximum desired temperature lift, \xbaC'),
               name='stConfig4', parent=self, pos=wx.Point(40, 424),
               style=0)
 
@@ -395,7 +402,7 @@ class PanelHP(wx.Panel):
 # 5. condensing temperature
 
         self.stConfig5 = wx.StaticText(id=-1,
-              label=_('Maximum desired condensing temperature, \xbaC'),
+              label=_U('Maximum desired condensing temperature, \xbaC'),
               name='stConfig5', parent=self, pos=wx.Point(40, 464),
               style=0)
 
@@ -410,7 +417,7 @@ class PanelHP(wx.Panel):
 # 6. evaporating temperature
 
         self.stConfig6 = wx.StaticText(id=-1,
-              label=_('Minimum desired evaporating temperature, \xbaC'),
+              label=_U('Minimum desired evaporating temperature, \xbaC'),
               name='stConfig6', parent=self, pos=wx.Point(40, 504),
               style=0)
 
@@ -425,11 +432,11 @@ class PanelHP(wx.Panel):
 # 7. condensing temperature: inlet temp.
 
         self.stConfig7a = wx.StaticText(id=-1,
-              label=_('Only for absorption type:'), name='stConfig7a',
+              label=_U('Only for absorption type:'), name='stConfig7a',
               parent=self, pos=wx.Point(40, 536), style=0)
 
         self.stConfig7b = wx.StaticText(id=-1,
-              label=_('Inlet temperature of heating fluid in generator, \xbaC'),
+              label=_U('Inlet temperature of heating fluid in generator, \xbaC'),
               name='stConfig7b', parent=self, pos=wx.Point(40, 552),
               style=0)
 
@@ -446,7 +453,7 @@ class PanelHP(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label=_('Pinch temperature \xb0C'), name='stInfo1',
+              label=_U('Pinch temperature \xb0C'), name='stInfo1',
               parent=self, pos=wx.Point(440, 460), style=0)
 
         self.tcInfo1 = wx.TextCtrl(id=-1, name='tcInfo1',
@@ -454,7 +461,7 @@ class PanelHP(wx.Panel):
               style=0, value="")
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label=_('Temperature gap \xb0K'), name='stInfo2',
+              label=_U('Temperature gap \xb0K'), name='stInfo2',
               parent=self, pos=wx.Point(440, 500), style=0)
 
         self.tcInfo2 = wx.TextCtrl(id=-1, name='tcInfo2',
@@ -467,11 +474,11 @@ class PanelHP(wx.Panel):
 #       Default action buttons: FWD / BACK / OK / Cancel
 #------------------------------------------------------------------------------		
 
-        self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label=_('OK'),
+        self.buttonpageHeatPumpOk = wx.Button(id=wx.ID_OK, label=_U('OK'),
               name='buttonpageHeatPumpOk', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
 
-        self.buttonpageHeatPumpCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+        self.buttonpageHeatPumpCancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
               name='buttonpageHeatPumpCancel', parent=self, pos=wx.Point(616,
               544), size=wx.Size(75, 23), style=0)
 
@@ -526,7 +533,7 @@ class PanelHP(wx.Panel):
         if self.config[1] in TRANSHPTYPES.keys():
             self.choiceConfig2.SetStringSelection(TRANSHPTYPES[self.config[1]])
         else:
-            self.main.logWarning(_("PanelHP (display): was asked to display an erroneous heat pump type -> %s")%self.config[1])
+            self.main.logWarning(_U("PanelHP (display): was asked to display an erroneous heat pump type -> %s")%self.config[1])
 
         self.tcConfig3.SetValue(str(self.config[2]))
         self.tcConfig4.SetValue(str(self.config[3]))
@@ -567,7 +574,7 @@ class PanelHP(wx.Panel):
 
         if (mode == "MANUAL"):
             self.dbe = DBEditFrame(self,
-                            _('Select heat pump from preselected list'), # title for the dialogs
+                            _U('Select heat pump from preselected list'), # title for the dialogs
 			    'dbheatpump',              # database table
 			    0,                         # column to be returned
 			    False,
@@ -603,13 +610,13 @@ class PanelHP(wx.Panel):
 
         pu1 =  AddEquipment(self,                      # pointer to this panel
                             self.mod,                # pointer to the associated module
-                            _('Add Heat Pump equipment'), # title for the dialogs
-                            _('dbheatpump'),              # database table
+                            _U('Add Heat Pump equipment'), # title for the dialogs
+                            _U('dbheatpump'),              # database table
                             0,                         # column to be returned
                             False)                     # database table can be edited in DBEditFrame?
 
         if pu1.ShowModal() == wx.ID_OK:
-            print _('PanelHP AddEquipment accepted. Id=')+str(pu1.theId)
+            print 'PanelHP AddEquipment accepted. Id='+str(pu1.theId)
         else:
             self.mod.deleteEquipment(None)
 
@@ -627,7 +634,7 @@ class PanelHP(wx.Panel):
 	dialog = ManualAddDialog(self, EqId)
 
         if (dialog.ShowModal() ==wx.ID_OK):
-            print _("PanelHP (OnGridLeftDclick) - OK")
+            print "PanelHP (OnGridLeftDclick) - OK"
 
         self.display()
 
@@ -646,7 +653,7 @@ class PanelHP(wx.Panel):
 # "delete" selected:
 
         if (ret=="delete"):
-            pu2 =  DialogOK(self,_("delete equipment"),_("do you really want to delete this equipment ?"))
+            pu2 =  DialogOK(self,_U("delete equipment"),_U("do you really want to delete this equipment ?"))
             if pu2.ShowModal() == wx.ID_OK:
                 self.mod.deleteEquipment(rowNo)
                 self.display()
@@ -660,7 +667,7 @@ class PanelHP(wx.Panel):
 
     def OnCbConfig1Checkbox(self, event):
         self.config[0] = self.cbConfig1.GetValue()
-        print _("new config[%s] value: ")%0,self.config[0]
+        print "new config[%s] value: "%0,self.config[0]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
@@ -668,37 +675,37 @@ class PanelHP(wx.Panel):
         newType = self.choiceConfig2.GetStringSelection()
         print "newType =",newType
         if newType in TRANSHPTYPES.values(): self.config[1] = findKey(TRANSHPTYPES,newType)
-        print _("new config[%s] value: ")%1,self.config[1]
+        print "new config[%s] value: "%1,self.config[1]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig3TextEnter(self, event):
-        print _("new config[%s] value: ")%2,self.config[2]
+        print "new config[%s] value: "%2,self.config[2]
         self.config[2] = self.tcConfig3.GetValue()
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig4TextEnter(self, event):
         self.config[3] = self.tcConfig4.GetValue()
-        print _("new config[%s] value: ")%3,self.config[3]
+        print "new config[%s] value: "%3,self.config[3]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig5TextEnter(self, event):
         self.config[4] = self.tcConfig5.GetValue()
-        print _("new config[%s] value: ")%4,self.config[4]
+        print "new config[%s] value: "%4,self.config[4]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig6TextEnter(self, event):
         self.config[5] = self.tcConfig6.GetValue()
-        print _("new config[%s] value: ")%5,self.config[5]
+        print "new config[%s] value: "%5,self.config[5]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
     def OnTcConfig7TextEnter(self, event):
         self.config[6] = self.tcConfig7.GetValue()
-        print _("new config[%s] value: ")%6,self.config[6]
+        print "new config[%s] value: "%6,self.config[6]
         Status.int.GData["HP Config"] = self.config
         self.mod.setUserDefinedParamHP()
 
@@ -722,7 +729,7 @@ class PanelHP(wx.Panel):
         event.Skip()
 
     def OnButtonpageBBCancelButton(self, event):
-        print _("Button exitModuleCancel: CANCEL Option not yet foreseen")
+        print "Button exitModuleCancel: CANCEL Option not yet foreseen"
 
 #============================================================================== 				
 

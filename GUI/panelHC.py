@@ -24,6 +24,7 @@
 #	Last revised by:    Hans Schweiger          16/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          06/07/2008
+#                           Stoyan Danov    13/10/2008
 #                           
 #
 #       Changes to previous version:
@@ -31,6 +32,7 @@
 #       18/06/2008 SD: change to translatable text _(...)
 #       06/07/2008: HS  improvement of design
 #                       update information displayed on table
+#       13/10/2008: SD  change _() to _U()
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -63,6 +65,9 @@ from einstein.modules.interfaces import *
 
 MAXROWS = 50
 COLNO = 5
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -107,11 +112,11 @@ class PanelHC(wx.Panel):
 
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Equipe\nNo."))
-        self.grid.SetColLabelValue(1, _("Equipment"))
-        self.grid.SetColLabelValue(2, _("Type"))
-        self.grid.SetColLabelValue(3, _("Nominal Power\n[kW]"))
-        self.grid.SetColLabelValue(4, _("Heat Supplied to\nPipe/Duct"))
+        self.grid.SetColLabelValue(0, _U("Equipe\nNo."))
+        self.grid.SetColLabelValue(1, _U("Equipment"))
+        self.grid.SetColLabelValue(2, _U("Type"))
+        self.grid.SetColLabelValue(3, _U("Nominal Power\n[kW]"))
+        self.grid.SetColLabelValue(4, _U("Heat Supplied to\nPipe/Duct"))
         #
         # copy values from dictionary to grid
         #
@@ -137,7 +142,7 @@ class PanelHC(wx.Panel):
 # autoDesign button
 
         self.AutoDesign = wx.Button(id=wxID_PANELHCAUTODESIGN,
-              label=_('get recommendations and automatic pre-design'),
+              label=_U('get recommendations and automatic pre-design'),
               name='AutoDesign', parent=self, pos=wx.Point(20, 20),
               size=wx.Size(620, 40), style=0)
         self.AutoDesign.Bind(wx.EVT_BUTTON, self.OnAutoDesignButton,
@@ -145,7 +150,7 @@ class PanelHC(wx.Panel):
 #..............................................................................
 # box 1 table
 
-        self.box1 = wx.StaticBox(self, -1, _("Existing equipment in the system"),
+        self.box1 = wx.StaticBox(self, -1, _U("Existing equipment in the system"),
                                  pos = (10,70),size=(640,400))
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -163,7 +168,7 @@ class PanelHC(wx.Panel):
 #..............................................................................
 # box 2 up/down buttons
 
-        self.box2 = wx.StaticBox(self, -1, _("Order Cascade"),
+        self.box2 = wx.StaticBox(self, -1, _U("Order Cascade"),
                                  pos = (670,70),size=(120,400))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -175,18 +180,18 @@ class PanelHC(wx.Panel):
               id=wxID_PANELHCMOVETOBOTTOM)
 
         self.MoveDownwards = wx.Button(id=wxID_PANELHCMOVEDOWNWARDS,
-              label=_('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
+              label=_U('down'), name='MoveDownwards', parent=self, pos=wx.Point(680,
               310), size=wx.Size(96, 60), style=0)
         self.MoveDownwards.Bind(wx.EVT_BUTTON, self.OnMoveDownwardsButton,
               id=wxID_PANELHCMOVEDOWNWARDS)
 
-        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label=_('up'),
+        self.MoveUpwards = wx.Button(id=wxID_PANELHCMOVEUPWARDS, label=_U('up'),
               name='MoveUpwards', parent=self, pos=wx.Point(680, 220),
               size=wx.Size(96, 60), style=0)
         self.MoveUpwards.Bind(wx.EVT_BUTTON, self.OnMoveUpwardsButton,
               id=wxID_PANELHCMOVEUPWARDS)
 
-        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label=_('to top'),
+        self.MoveToTop = wx.Button(id=wxID_PANELHCMOVETOTOP, label=_U('to top'),
               name='MoveToTop', parent=self, pos=wx.Point(680, 140),
               size=wx.Size(96, 24), style=0)
         self.MoveToTop.Bind(wx.EVT_BUTTON, self.OnMoveToTopButton,
@@ -196,13 +201,13 @@ class PanelHC(wx.Panel):
 # default action buttons
 
         self.buttonpageHCOk = wx.Button(id=wxID_PANELHCBUTTONPAGEHCOK,
-              label=_('ok'), name='buttonpageHCOk', parent=self, pos=wx.Point(528,
+              label=_U('ok'), name='buttonpageHCOk', parent=self, pos=wx.Point(528,
               544), size=wx.Size(75, 23), style=0)
         self.buttonpageHCOk.Bind(wx.EVT_BUTTON, self.OnButtonpageHCOkButton,
               id=wxID_PANELHCBUTTONPAGEHCOK)
 
         self.buttonpageHCCancel = wx.Button(id=wxID_PANELHCBUTTONPAGEHCCANCEL,
-              label=_('cancel'), name='buttonpageHCCancel', parent=self,
+              label=_U('cancel'), name='buttonpageHCCancel', parent=self,
               pos=wx.Point(616, 544), size=wx.Size(75, 23), style=0)
         self.buttonpageHCCancel.Bind(wx.EVT_BUTTON,
               self.OnButtonpageHCCancelButton,
@@ -253,19 +258,19 @@ class PanelHC(wx.Panel):
     def OnGridGridCellLeftDclick(self, event):
 #------------------------------------------------------------------------------		
         self.selectedRow = event.GetRow()
-        print _("PanelHC (GridLeftDclick): selected row = "),self.selectedRow
+        print "PanelHC (GridLeftDclick): selected row = ",self.selectedRow
         event.Skip()
 
 #------------------------------------------------------------------------------		
     def OnGridGridCellLeftClick(self, event):
 #------------------------------------------------------------------------------		
 	self.selectedRow = event.GetRow()
-        print _("PanelHC (GridLeftClick): selected row = "),self.selectedRow
+        print "PanelHC (GridLeftClick): selected row = ",self.selectedRow
         event.Skip()
 
     def OnGridGridCellRightClick(self, event):
 	self.selectedRow = event.GetRow()
-        print _("PanelHC (GridRightClick): selected row = "),self.selectedRow
+        print "PanelHC (GridRightClick): selected row = ",self.selectedRow
         event.Skip()
         
 #==============================================================================
@@ -296,25 +301,25 @@ class PanelHC(wx.Panel):
 #==============================================================================
     def OnMoveToBottomButton(self, event):
         ci = self.selectedRow + 1
-        print _("PanelHC (move to bottom)"),ci
+        print "PanelHC (move to bottom)",ci
         self.mod.cascadeMoveToBottom(ci)
         self.display()
 
     def OnMoveDownwardsButton(self, event):
         ci = self.selectedRow + 1
-        print _("PanelHC (move down)"),ci
+        print "PanelHC (move down)",ci
         self.mod.cascadeMoveDown(ci)
         self.display()
 
     def OnMoveUpwardsButton(self, event):
         ci = self.selectedRow + 1
-        print _("PanelHC (move up)"),ci
+        print "PanelHC (move up)",ci
         self.mod.cascadeMoveUp(ci)
         self.display()
 
     def OnMoveToTopButton(self, event):
         ci = self.selectedRow + 1
-        print _("PanelHC (move to top)"),ci
+        print "PanelHC (move to top)",ci
         self.mod.cascadeMoveToTop(ci)   
         self.display()
 #==============================================================================

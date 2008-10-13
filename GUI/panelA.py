@@ -27,6 +27,7 @@
 #                           Tom Sobota              28/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          16/09/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       05/04/08    changed call to popup1 in OnButtonpageHPAddButton
@@ -35,6 +36,7 @@
 #       28/04/2008  added 'draw' to method display
 #       18/06/2008 SD: change to translatable text _(...)
 #       16/09/2008  HS  call to showMainMenuAlternatives added in display
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -71,6 +73,12 @@ from numCtrl import *
 COLNO = 6
 MAXROWS = 20
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 #------------------------------------------------------------------------------		
 def drawFigure(self):
 #------------------------------------------------------------------------------
@@ -86,7 +94,7 @@ def drawFigure(self):
     NAlternatives = rows - 2
 
     if rows >= 2:
-        N0 = _("present state")
+        N0 = _U("present state")
         E0 = gdata[1][4]
         C0 = gdata[1][5]
         print "PanelA (drawFigure): present state data E= %s C= %s"%(E0,C0)
@@ -123,8 +131,8 @@ class PanelA(wx.Panel):
 	self.keys = keys
 	self.main = main
         self.mod = Status.mod.moduleA
-        self.shortName = _("new alternative")
-        self.description = _("describe shortly the main differential features of the new alternative")
+        self.shortName = _U("new alternative")
+        self.description = _U("describe shortly the main differential features of the new alternative")
         self.ANo = Status.ANo
         self.selectedProposalName = "---"
         self._init_ctrls(parent)
@@ -179,12 +187,12 @@ class PanelA(wx.Panel):
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("No."))
-        self.grid.SetColLabelValue(1, _("Name"))
-        self.grid.SetColLabelValue(2, _("Description"))
-        self.grid.SetColLabelValue(3, _("State"))
-        self.grid.SetColLabelValue(4, _("Primary energy\nconsumption\n[MWh/a]"))
-        self.grid.SetColLabelValue(5, _("Total annual\nenergy cost\n[€/a]"))
+        self.grid.SetColLabelValue(0, _U("No."))
+        self.grid.SetColLabelValue(1, _U("Name"))
+        self.grid.SetColLabelValue(2, _U("Description"))
+        self.grid.SetColLabelValue(3, _U("State"))
+        self.grid.SetColLabelValue(4, _U("Primary energy\nconsumption\n[MWh/a]"))
+        self.grid.SetColLabelValue(5, _U("Total annual\nenergy cost\n[€/a]"))
         #
         # copy values from dictionary to grid
         #
@@ -211,7 +219,7 @@ class PanelA(wx.Panel):
 #..............................................................................
 # grid for displaying alternatives
 
-        self.box1 = wx.StaticBox(self, -1, _("design of alternative prooposals"),
+        self.box1 = wx.StaticBox(self, -1, _U("design of alternative prooposals"),
                                  pos = (10,10),size=(780,260))
         
 #        self.box1.SetForegroundColour(wx.Colour(255, 128, 0))
@@ -232,31 +240,31 @@ class PanelA(wx.Panel):
 # action buttons for management of alternatives
 
         self.GenerateNew = wx.Button(id=wxID_PANELAGENERATENEW,
-              label=_('generate new proposal'), name='GenerateNew', parent=self,
+              label=_U('generate new proposal'), name='GenerateNew', parent=self,
               pos=wx.Point(10, 280), size=wx.Size(120, 20), style=0)
         self.GenerateNew.Bind(wx.EVT_BUTTON, self.OnGenerateNewButton,
               id=wxID_PANELAGENERATENEW)
 
         self.copyProposal = wx.Button(id=wxID_PANELACOPYPROPOSAL,
-              label=_('copy proposal'), name='copyProposal', parent=self,
+              label=_U('copy proposal'), name='copyProposal', parent=self,
               pos=wx.Point(150, 280), size=wx.Size(120, 20), style=0)
         self.copyProposal.Bind(wx.EVT_BUTTON, self.OnCopyProposalButton,
               id=wxID_PANELACOPYPROPOSAL)
 
         self.deleteProposal = wx.Button(id=wxID_PANELADELETEPROPOSAL,
-              label=_('delete proposal'), name='deleteProposal', parent=self,
+              label=_U('delete proposal'), name='deleteProposal', parent=self,
               pos=wx.Point(290, 280), size=wx.Size(120, 20), style=0)
         self.deleteProposal.Bind(wx.EVT_BUTTON, self.OnDeleteProposalButton,
               id=wxID_PANELADELETEPROPOSAL)
 
         self.selectProposal = wx.Button(id=-1,
-              label=_('select proposal'), name='selectProposal', parent=self,
+              label=_U('select proposal'), name='selectProposal', parent=self,
               pos=wx.Point(430, 280), size=wx.Size(120, 20), style=0)
         self.selectProposal.Bind(wx.EVT_BUTTON, self.OnSelectProposalButton,
               id=-1)
 
         self.stSelected = wx.StaticText(id=-1,
-              label=_("selected proposal: "),
+              label=_U("selected proposal: "),
               name='stSelected', parent=self, pos=wx.Point(440, 310),
               style=0)
         self.stSelected.SetForegroundColour(TITLE_COLOR)
@@ -271,7 +279,7 @@ class PanelA(wx.Panel):
 #..............................................................................
 # comparative graphics
 
-        self.box2 = wx.StaticBox(self, -1, _("comparison of primary energy consumption and effective annual cost"),
+        self.box2 = wx.StaticBox(self, -1, _U("comparison of primary energy consumption and effective annual cost"),
                                  pos = (10,310),size=(400,270))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -283,38 +291,38 @@ class PanelA(wx.Panel):
 #..............................................................................
 # action buttons for design of subsystems
 
-        self.box3 = wx.StaticBox(self, -1, _("design of subsystems"),
+        self.box3 = wx.StaticBox(self, -1, _U("design of subsystems"),
                                  pos = (430,350),size=(360,200))
         self.box3.SetForegroundColour(TITLE_COLOR)
         self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.DesignPO = wx.Button(id=wxID_PANELADESIGNPO,
-              label=_('process optimisation'), name='DesignPO', parent=self,
+              label=_U('process optimisation'), name='DesignPO', parent=self,
               pos=wx.Point(590, 400), size=wx.Size(180, 24), style=0)
         self.DesignPO.Bind(wx.EVT_BUTTON, self.OnDesignPOButton,
               id=wxID_PANELADESIGNPO)
 
         self.DesignHX = wx.Button(id=wxID_PANELADESIGNHX,
-              label=_('HX network design'), name='DesignHX', parent=self,
+              label=_U('HX network design'), name='DesignHX', parent=self,
               pos=wx.Point(590, 440), size=wx.Size(180, 24), style=0)
         self.DesignHX.Bind(wx.EVT_BUTTON, self.OnDesignHXButton,
               id=wxID_PANELADESIGNHX)
 
         self.DesignHC = wx.Button(id=wxID_PANELADESIGNHC,
-              label=_('Heat and cold supply'), name='DesignHC', parent=self,
+              label=_U('Heat and cold supply'), name='DesignHC', parent=self,
               pos=wx.Point(590, 480), size=wx.Size(180, 24), style=0)
         self.DesignHC.Bind(wx.EVT_BUTTON, self.OnDesignHCButton,
               id=wxID_PANELADESIGNHC)
 
 #..............................................................................
 # default action buttons for design of subsystems
-        self.buttonpageAOk = wx.Button(id=wx.ID_OK, label=_('OK'),
+        self.buttonpageAOk = wx.Button(id=wx.ID_OK, label=_U('OK'),
               name='buttonpageAOk', parent=self, pos=wx.Point(528, 560),
               size=wx.Size(75, 20), style=0)
         self.buttonpageAOk.Bind(wx.EVT_BUTTON, self.OnButtonpageAOkButton,
               id=wx.ID_OK)
 
-        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+        self.buttonpageACancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
               name='buttonpageACancel', parent=self, pos=wx.Point(616, 560),
               size=wx.Size(75, 0), style=0)
         self.buttonpageACancel.Bind(wx.EVT_BUTTON,
@@ -391,16 +399,16 @@ class PanelA(wx.Panel):
         
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print _("PanelA - OK"),self.shortName,self.description
+            print "PanelA - OK",self.shortName,self.description
             print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(0,self.shortName,self.description)
             self.display()
 
         elif pu1.ShowModal() == wx.ID_Cancel:
-            print _("PanelA - Cancel")
+            print "PanelA - Cancel"
         else:
-            print _("PanelA ???")
+            print "PanelA ???"
 
         self.display()
         
@@ -414,16 +422,16 @@ class PanelA(wx.Panel):
 
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print _("PanelA - OK"),self.shortName,self.description
+            print "PanelA - OK",self.shortName,self.description
             print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(self.ANo,self.shortName,self.description)
             self.display()
 
         elif pu1.ShowModal() == wx.ID_Cancel:
-            print _("PanelA - Cancel")
+            print "PanelA - Cancel"
         else:
-            print _("PanelA - ???")
+            print "PanelA - ???"
 
 #------------------------------------------------------------------------------		
     def OnDeleteProposalButton(self, event):
@@ -431,15 +439,15 @@ class PanelA(wx.Panel):
 #   Delete alternative proposal
 #------------------------------------------------------------------------------		
 
-        pu2 =  DialogOK(self,_("delete alternative"),_("do you really want to delete this alternative ?"))
+        pu2 =  DialogOK(self,_U("delete alternative"),_U("do you really want to delete this alternative ?"))
         if pu2.ShowModal() == wx.ID_OK:
             if self.ANo > 0:
                 Status.prj.deleteAlternative(self.ANo)
                 self.display()
             elif self.ANo in [-1,0]:
-                print _("PanelA (DeleteButton): cannot delete alternative "),self.ANo
+                print "PanelA (DeleteButton): cannot delete alternative ",self.ANo
             else:
-                print _("PanelA (DeleteButton): erroneous alternative number "),self.ANo
+                print "PanelA (DeleteButton): erroneous alternative number ",self.ANo
 
 #------------------------------------------------------------------------------		
     def OnSelectProposalButton(self, event):
@@ -447,7 +455,7 @@ class PanelA(wx.Panel):
 #   Select alternative proposal
 #------------------------------------------------------------------------------		
 
-        showMessage(_("Alternative %s selected as final proposal")%self.ANo)
+        showMessage(_U("Alternative %s selected as final proposal")%self.ANo)
         Status.prj.setFinalAlternative(self.ANo)
         self.selectedProposalName = check(Status.FinalAlternativeName)
         logMessage("Final alternative selected = %s"%self.selectedProposalName)

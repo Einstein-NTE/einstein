@@ -22,6 +22,7 @@
 #                           Tom Sobota      25/06/2008
 #                           Hans Schweiger  26/06/2008
 #                           Hans Schweiger  08/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -34,6 +35,7 @@
 #       08/07/2008: HS  bug-fixing
 #                       adding functions related with surface management
 #                       (add/delete/select ...)
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -69,6 +71,8 @@ LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
 UNITS_WIDTH        = 120
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #------------------------------------------------------------------------------
 class PanelQ7(wx.Panel):
@@ -107,11 +111,11 @@ class PanelQ7(wx.Panel):
         self.frame_main_motivation.SetForegroundColour(TITLE_COLOR)
         self.frame_main_motivation.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_surfaceslist = wx.StaticBox(self.page1, -1, _("Solar energy surfaces"))
+        self.frame_surfaceslist = wx.StaticBox(self.page1, -1, _U("Solar energy surfaces"))
         self.frame_surfaceslist.SetForegroundColour(TITLE_COLOR)
         self.frame_surfaceslist.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_surfacedata = wx.StaticBox(self.page1, -1, _("Surface  data"))
+        self.frame_surfacedata = wx.StaticBox(self.page1, -1, _U("Surface  data"))
         self.frame_surfacedata.SetForegroundColour(TITLE_COLOR)
         self.frame_surfacedata.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -180,66 +184,66 @@ class PanelQ7(wx.Panel):
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxEnergy, self.listBoxEnergy)
 
         self.tc6_0 = TextEntry(self.page1,maxchars=255,value='',
-                             label=_("Short name of the available area"),
-                             tip=_("Define a short name for each surface area available for installation in order to clearly identify them"))
+                             label=_U("Short name of the available area"),
+                             tip=_U("Define a short name for each surface area available for installation in order to clearly identify them"))
 
         self.tc6 = FloatEntry(self.page1,
                               decimals=0, minval=0., maxval=1e+9,
-                              unitdict='AREA',label=_("Available area"),\
-                              tip=_("If there are different surfaces available, give the measure of each surface area"))
+                              unitdict='AREA',label=_U("Available area"),\
+                              tip=_U("If there are different surfaces available, give the measure of each surface area"))
 
         self.tc7 = FloatEntry(self.page1,
                               decimals=1, minval=0., maxval=90.,
                               unitdict='ANGLE',
-                              label=_("Inclination of the area"),
-                              tip=_("Positioning of the area (inclination in degrees)"))
+                              label=_U("Inclination of the area"),
+                              tip=_U("Positioning of the area (inclination in degrees)"))
                                   
 
         self.tc8 = ChoiceEntry(self.page1,
                               values=ORIENTATIONS.values(),
-                              label=_("Orientation of the roof, ground,\nwall area (to south)"),
-			      tip=_("Give the surface  inclination with respect to the  horizontal ( i.e. tilt angle, in degrees only)"))
+                              label=_U("Orientation of the roof, ground,\nwall area (to south)"),
+			      tip=_U("Give the surface  inclination with respect to the  horizontal ( i.e. tilt angle, in degrees only)"))
 
         self.tc9 = ChoiceEntry(self.page1,
                              values=SHADINGTYPES.values(),
-                             label=_("Shading problems?"),
-                             tip=_("Consider shadows due to other buildings, trees, obstacles all over the year, in winter time or in early morning/late afternoon"))
+                             label=_U("Shading problems?"),
+                             tip=_U("Consider shadows due to other buildings, trees, obstacles all over the year, in winter time or in early morning/late afternoon"))
 
         self.tc10 = FloatEntry(self.page1,
                                decimals=2, minval=0., maxval=1e+9,
                                unitdict='LENGTH',
-                               label=_("Distance between the roof, ground, wall area(s) and the technical room or process"),
-			       tip=_("Estimate the piping length (single way) from  the roof, ground,wall area to the technical room or to the process"))
+                               label=_U("Distance between the roof, ground, wall area(s) and the technical room or process"),
+			       tip=_U("Estimate the piping length (single way) from  the roof, ground,wall area to the technical room or to the process"))
 
         self.tc11 = ChoiceEntry(self.page1,
                               values=ROOFTYPES.values(),
-                              label=_("Type of roof"),
-                              tip=_("Specify the type of roof, e.g. composite sandwich panels, etc..."))
+                              label=_U("Type of roof"),
+                              tip=_U("Specify the type of roof, e.g. composite sandwich panels, etc..."))
 
         # determinar dónde está esta unidad (kg/mü). en units no la encuentro.
         self.tc12 = FloatEntry(self.page1,
                                decimals=2, minval=0., maxval=99999.,
-                               label=_("Static load capacity of the roof"),
-                               tip=_("The additional weight of a solar collector field is about 25-30 kg/m²"))
+                               label=_U("Static load capacity of the roof"),
+                               tip=_U("The additional weight of a solar collector field is about 25-30 kg/m2"))
 
         self.tc13 = ChoiceEntry(self.page1,
                                 values=TRANSYESNO.values(),
-                                label=_("Is a plant/drawing of building(s)\nand surface(s) available?"),
-                                tip=_("Enclose the plant of the building(s) and/or a drawing of the surface(s)"))
+                                label=_U("Is a plant/drawing of building(s)\nand surface(s) available?"),
+                                tip=_U("Enclose the plant of the building(s) and/or a drawing of the surface(s)"))
 
 
         self.tc1_21 = FloatEntry(self.page1,
                         decimals=2, minval=-90.0, maxval=90.0,
-                        unitdict='ANGLE',label=_("Geographic latitude"),\
-                        tip=_("Insert the latitude in degree only. E.g.  Rome's latitude is 41,90°"))
+                        unitdict='ANGLE',label=_U("Geographic latitude"),\
+                        tip=_U("Insert the latitude in degree only. E.g.  Rome's latitude is 41,90 degrees"))
         self.tc1_22 = FloatEntry(self.page1,
                         decimals=1, minval=0., maxval=3000.,
-                        unitdict='ENERGYFLOW',label=_("Solar radiation on horizontal"),\
-                        tip=_("Annual total solar radiation on horizontal"))
+                        unitdict='ENERGYFLOW',label=_U("Solar radiation on horizontal"),\
+                        tip=_U("Annual total solar radiation on horizontal"))
         self.tc1_23 = FloatEntry(self.page1,
                                  decimals=1, minval=0., maxval=300.,
-                                 unitdict='TEMPERATURE',label=_("Yearly average ambient temperature"),
-                                 tip=_("Yearly average ambient temperature"))
+                                 unitdict='TEMPERATURE',label=_U("Yearly average ambient temperature"),
+                                 tip=_U("Yearly average ambient temperature"))
 
         # recover previous font state
         fp.popFont()
@@ -255,83 +259,83 @@ class PanelQ7(wx.Panel):
         fp.changeFont(size=TYPE_SIZE_RIGHT)
 
         self.tc14 = TextEntry(self.page2,maxchars=255,value='',
-                             label=_("Type of biomass available from processes"),
-                             tip=_("Specify if the availability is continuous or during some specific season of the year"))
+                             label=_U("Type of biomass available from processes"),
+                             tip=_U("Specify if the availability is continuous or during some specific season of the year"))
 
         self.tc15_1 = DateEntry(self.page2,
                               value='',
-                              label=_("Start of period of year the biomass is available"),
-                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+                              label=_U("Start of period of year the biomass is available"),
+                              tip=_U("Specify if the availability is continuous or during some specific season of the year"))
 
         self.tc15_2 = DateEntry(self.page2,
                               value='',
-                              label=_("Stop of period of year the biomass is available"),
-                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+                              label=_U("Stop of period of year the biomass is available"),
+                              tip=_U("Specify if the availability is continuous or during some specific season of the year"))
 
 
         self.tc16 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=365, value=0.,
                               unitdict=None,
-                              label=_("Number of days biomass is produced"),
-                              tip=_(" "))
+                              label=_U("Number of days biomass is produced"),
+                              tip=_U(" "))
 
         self.tc17 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='MASS',
-                              label=_("Daily quantity of biomass"),
-                              tip=_(" "))
+                              label=_U("Daily quantity of biomass"),
+                              tip=_U(" "))
 
 
         self.tc18 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='VOLUME',
-                              label=_("Space availability to stock biomass?"),
-                              tip=_("Specify the volume"))
+                              label=_U("Space availability to stock biomass?"),
+                              tip=_U("Specify the volume"))
 
         self.tc19 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='ENERGY',
-                              label=_("LCV biomass"),
-                              tip=_(" "))
+                              label=_U("LCV biomass"),
+                              tip=_U(" "))
 
         self.tc20 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict=None,
-                              label=_("Humidity"),
-                              tip=_("Specify the percentage of humidity in biomass"))
+                              label=_U("Humidity"),
+                              tip=_U("Specify the percentage of humidity in biomass"))
 
         self.tc21 = TextEntry(self.page2,maxchars=255,value='',
-                             label=_("Type of biomass available"),
-                             tip=_(" "))
+                             label=_U("Type of biomass available"),
+                             tip=_U(" "))
 
         self.tc22 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=1e+9, value=0.,
                               unitdict='ENERGYTARIFF',
-                              label=_("Unit price of biomass"),
-                              tip=_(" "))
+                              label=_U("Unit price of biomass"),
+                              tip=_U(" "))
 
         self.tc23_1 = DateEntry(self.page2,
                               value='',
-                              label=_("Start of period of year the biomass is available"),
-                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+                              label=_U("Start of period of year the biomass is available"),
+                              tip=_U("Specify if the availability is continuous or during some specific season of the year"))
 
         self.tc23_2 = DateEntry(self.page2,
                               value='',
-                              label=_("Stop of period of year the biomass is available"),
-                              tip=_("Specify if the availability is continuous or during some specific season of the year"))
+                              label=_U("Stop of period of year the biomass is available"),
+                              tip=_U("Specify if the availability is continuous or during some specific season of the year"))
 
         self.tc24 = FloatEntry(self.page2,
                               decimals=1, minval=0., maxval=365, value=0.,
                               unitdict=None,
-                              label=_("Number of days biomass is produced"),
-                              tip=_(" "))
+                              label=_U("Number of days biomass is produced"),
+                              tip=_U(" "))
 
-        self.buttonAddEnergy = wx.Button(self.page1,-1,_("Add surface"))
+        self.buttonAddEnergy = wx.Button(self.page1,-1,_U("Add surface"))
         self.buttonAddEnergy.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEnergy, self.buttonAddEnergy)
         self.buttonAddEnergy.SetFont(fp.getFont())
 
-        self.buttonDeleteEnergy = wx.Button(self.page1,-1,_("Delete surface"))
+        self.buttonDeleteEnergy = wx.Button(self.page1,-1,_U("Delete surface"))
         self.buttonDeleteEnergy.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEnergy, self.buttonDeleteEnergy)
         self.buttonDeleteEnergy.SetFont(fp.getFont())

@@ -19,6 +19,7 @@
 #                           Stoyan Danov June 2008 ???
 #                           Tom Sobota      02/07/2008
 #                           Hans Schweiger  03/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous versions:
 #       03/05/08:   Change of button functions -> new version
@@ -28,6 +29,7 @@
 #        2/07/2008 TS   General fields arranging
 #       03/07/2008: HS  Reactivated list-filling in WHEE page
 #                       bug-fix in read/write functions WHEE page
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -75,6 +77,9 @@ VSEP_RIGHT           =   2
 ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelQ6(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -103,36 +108,36 @@ class PanelQ6(wx.Panel):
         self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page0, _('Heat recovery from thermal equipment'))
+        self.notebook.AddPage(self.page0, _U('Heat recovery from thermal equipment'))
 
         self.page1 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page1, _('Heat recovery from electrical equipment'))
+        self.notebook.AddPage(self.page1, _U('Heat recovery from electrical equipment'))
 
-        self.frame_exchangers_list = wx.StaticBox(self.page0, -1, _("Heat exchangers list"))
+        self.frame_exchangers_list = wx.StaticBox(self.page0, -1, _U("Heat exchangers list"))
         self.frame_exchangers_list.SetForegroundColour(TITLE_COLOR)
         self.frame_exchangers_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_exchanger_data = wx.StaticBox(self.page0, -1, _("Heat exchanger data"))
+        self.frame_exchanger_data = wx.StaticBox(self.page0, -1, _U("Heat exchanger data"))
         self.frame_exchanger_data.SetForegroundColour(TITLE_COLOR)
         self.frame_exchanger_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
-        self.frame_source_sink = wx.StaticBox(self.page0, -1, _("Heat source / sink"))
+        self.frame_source_sink = wx.StaticBox(self.page0, -1, _U("Heat source / sink"))
         self.frame_source_sink.SetForegroundColour(TITLE_COLOR)
         self.frame_source_sink.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
-        self.frame_electrical_equipment_list = wx.StaticBox(self.page1, -1, _("Electrical equipment list"))
+        self.frame_electrical_equipment_list = wx.StaticBox(self.page1, -1, _U("Electrical equipment list"))
         self.frame_electrical_equipment_list.SetForegroundColour(TITLE_COLOR)
         self.frame_electrical_equipment_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
-        self.frame_equipment_data = wx.StaticBox(self.page1, -1, _("Equipment data"))
+        self.frame_equipment_data = wx.StaticBox(self.page1, -1, _U("Equipment data"))
         self.frame_equipment_data.SetForegroundColour(TITLE_COLOR)
         self.frame_equipment_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
-        self.frame_schedule = wx.StaticBox(self.page1, -1, _("Schedule"))
+        self.frame_schedule = wx.StaticBox(self.page1, -1, _U("Schedule"))
         self.frame_schedule.SetForegroundColour(TITLE_COLOR)
         self.frame_schedule.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -173,82 +178,82 @@ class PanelQ6(wx.Panel):
         # right top static box: Heat exchanger data	
 
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Short name of heat exchanger"),
-                             tip=_("Give a short name of the equipment"))
+                             label=_U("Short name of heat exchanger"),
+                             tip=_U("Give a short name of the equipment"))
 
         self.tc2 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Heat exchanger type"),
-                               tip=_("Specify the type of heat exchanger, e.g. shell-and-tube, plate, fin-and-tube, ..."))
+                               label=_U("Heat exchanger type"),
+                               tip=_U("Specify the type of heat exchanger, e.g. shell-and-tube, plate, fin-and-tube, ..."))
 
         
         self.tc3 = FloatEntry(self.page0,
                               decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='POWER',
-                              label=_("Heat transfer rate"),
-                              tip=_("Heat transfer rate for the specific working conditions"))
+                              label=_U("Heat transfer rate"),
+                              tip=_U("Heat transfer rate for the specific working conditions"))
 
         self.tc4 = FloatEntry(self.page0,
                               decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Log. Mean Temperature Diff. (LMTD)"),
-                              tip=_("Between the fluids in the heat exchanger"))
+                              label=_U("Log. Mean Temperature Diff. (LMTD)"),
+                              tip=_U("Between the fluids in the heat exchanger"))
 
         self.tc5 = FloatEntry(self.page0,
                               decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='ENERGY',
-                              label=_("Total heat transfered"),
-                              tip=_("Total heat transferred per year"))
+                              label=_U("Total heat transfered"),
+                              tip=_U("Total heat transferred per year"))
 
         # right bottom staticbox Heat source / sink
 
         self.tc6 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Heat source (process [+outflow no.],\nequipment, ...)"),
-                               tip=_("Indicate: Process, Equipment, Distribution line, Compressor, Electric motor, together with its number"))
+                               label=_U("Heat source (process [+outflow no.],\nequipment, ...)"),
+                               tip=_U("Indicate: Process, Equipment, Distribution line, Compressor, Electric motor, together with its number"))
 
         self.tc7 = FloatEntry(self.page0,
                               decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Inlet temperature (source)"),
-                              tip=_("Inlet temperature of the hot fluid"))
+                              label=_U("Inlet temperature (source)"),
+                              tip=_U("Inlet temperature of the hot fluid"))
 
         self.tc8 = FloatEntry(self.page0,
                               decimals=4, minval=0., maxval=99999., value=0.,
                               unitdict='SPECIFICENTHALPY',
-                              label=_("Inlet specific enthalpy (source)"),
-                              tip=_("Inlet enthalpy of the hot fluid"))
+                              label=_U("Inlet specific enthalpy (source)"),
+                              tip=_U("Inlet enthalpy of the hot fluid"))
 
         self.tc9 = FloatEntry(self.page0,
                               decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Outlet temperature (source)"),
-                              tip=_("Outlet temperature of hot fluid"))
+                              label=_U("Outlet temperature (source)"),
+                              tip=_U("Outlet temperature of hot fluid"))
 
         self.tc10 = FloatEntry(self.page0,
                               decimals=4, minval=0., maxval=99999., value=0.,
                               unitdict='SPECIFICENTHALPY',
-                              label=_("Outlet specific enthalpy (source)"),
-                              tip=_("Outlet enthalpy of the hot fluid"))
+                              label=_U("Outlet specific enthalpy (source)"),
+                              tip=_U("Outlet enthalpy of the hot fluid"))
 
 
         self.tc11 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Heat sink (process, pipe/duct)"),
-                               tip=_("Indicate: Process or Distribution line and number. If heat exchange is via storage, it should be defined in the distribution line"))
+                               label=_U("Heat sink (process, pipe/duct)"),
+                               tip=_U("Indicate: Process or Distribution line and number. If heat exchange is via storage, it should be defined in the distribution line"))
 
 
         self.tc12 = FloatEntry(self.page0,
                                decimals=1, minval=0., maxval=999., value=0.,
                                unitdict='TEMPERATURE',
-                               label=_("Inlet temperature (sink)"),
-                               tip=_("Inlet temperature of the cold fluid"))
+                               label=_U("Inlet temperature (sink)"),
+                               tip=_U("Inlet temperature of the cold fluid"))
 
         self.tc13 = FloatEntry(self.page0,
                                decimals=1, minval=0., maxval=999., value=0.,
                                unitdict='TEMPERATURE',
-                               label=_("Outlet temperature (sink)"),
-                               tip=_("Inlet enthalpy of the cold fluid"))
+                               label=_U("Outlet temperature (sink)"),
+                               tip=_U("Inlet enthalpy of the cold fluid"))
 
 
 
@@ -271,71 +276,71 @@ class PanelQ6(wx.Panel):
         # right upper static box: Equipment data
 
         self.tc101 = TextEntry(self.page1,maxchars=255,value='',
-                               label=_("Short name of electrical equipment"),
-                               tip=_("Give a short name of the equipment"))
+                               label=_U("Short name of electrical equipment"),
+                               tip=_U("Give a short name of the equipment"))
 
         self.tc102 = ChoiceEntry(self.page1,
                                  values=TRANSWHEEEQTYPES.values(),
-                                 label=_("Equipment type"),
-                                 tip=_("specify type of equipment, e.g. compressor, electric motor,..."))
+                                 label=_U("Equipment type"),
+                                 tip=_U("specify type of equipment, e.g. compressor, electric motor,..."))
 
         self.tc103 = ChoiceEntry(self.page1,
                                  values=TRANSWHEEWASTEHEATTYPES.values(),
-                                 label=_("Waste heat type"),
-                                 tip=_("Specify type of waste heat (e.g. Recooling of compressed air, cooling water of motor/compressor, ...)"))
+                                 label=_U("Waste heat type"),
+                                 tip=_U("Specify type of waste heat (e.g. Recooling of compressed air, cooling water of motor/compressor, ...)"))
         
         self.tc104 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='POWER',
-                                label=_("Available waste heat"),
-                                tip=_("Estimated quantity"))
+                                label=_U("Available waste heat"),
+                                tip=_U("Estimated quantity"))
 
         self.tc105 = ChoiceEntry(self.page1,
                                  values=[],
-                                 label=_("Medium"),
-                                 tip=_("Waste heat carrying medium (fluid)"))
+                                 label=_U("Medium"),
+                                 tip=_U("Waste heat carrying medium (fluid)"))
 
         self.tc106 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='MASSORVOLUMEFLOW',
-                                label=_("Flow rate"),
-                                tip=_("Specify the flow rate of the waste heat carrying medium"))
+                                label=_U("Flow rate"),
+                                tip=_U("Specify the flow rate of the waste heat carrying medium"))
 
         self.tc107 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='TEMPERATURE',
-                                label=_("Waste heat temperature"),
-                                tip=_("Specify the temperature of the waste heat medium at the outlet"))
+                                label=_U("Waste heat temperature"),
+                                tip=_U("Specify the temperature of the waste heat medium at the outlet"))
 
 
         self.tc108 = ChoiceEntry(self.page1,
                                  values=TRANSYESNO.values(),
-                                 label=_("Present use of waste heat"),
-                                 tip=_("If yes, specify distribution pipe / duct or heat exchanger where waste heat is used at present"))
+                                 label=_U("Present use of waste heat"),
+                                 tip=_U("If yes, specify distribution pipe / duct or heat exchanger where waste heat is used at present"))
 
         # right lower static box Schedule
 
         self.tc110 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='TIME',
-                                label=_("Hours of  operation per day"),
-                                tip=_(" "))
+                                label=_U("Hours of  operation per day"),
+                                tip=_U(" "))
 
         self.tc111 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
-                                label=_("Number of batches per day"),
-                                tip=_(" "))
+                                label=_U("Number of batches per day"),
+                                tip=_U(" "))
 
         self.tc112 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
                                 unitdict='TIME',
-                                label=_("Duration of 1 batch"),
-                                tip=_(" "))
+                                label=_U("Duration of 1 batch"),
+                                tip=_U(" "))
 
         self.tc113 = FloatEntry(self.page1,
                                 decimals=1, minval=0., maxval=999., value=0.,
-                                label=_("Days of operation per year"),
-                                tip=_(" "))
+                                label=_U("Days of operation per year"),
+                                tip=_U(" "))
 
         #
         # buttons

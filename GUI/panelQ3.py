@@ -32,6 +32,7 @@
 #                           Hans Schweiger  23/06/2008
 #                           Hans Schweiger  18/07/2008
 #                           Hans Schweiger  15/09/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -57,6 +58,7 @@
 #                       fillPage substituted by display in the button-event handlers
 #       15/09/2008: HS  function fillPage moved from __init__ to display()
 #                       call to display added in OK button event handler
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -89,6 +91,9 @@ LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
 UNITS_WIDTH        = 100
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelQ3(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -115,28 +120,28 @@ class PanelQ3(wx.Panel):
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
 
-        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Process list"))
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _U("Process list"))
         self.sizer_5_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_5_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _("Processes description"))
+        self.sizer_7_staticbox = wx.StaticBox(self.page0, -1, _U("Processes description"))
         self.sizer_7_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_7_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _("Schedule"))
+        self.sizer_8_staticbox = wx.StaticBox(self.page0, -1, _U("Schedule"))
         self.sizer_8_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_8_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_11_staticbox = wx.StaticBox(self.page1, -1,_("Waste heat (heat available for recovery)"))
+        self.sizer_11_staticbox = wx.StaticBox(self.page1, -1,_U("Waste heat (heat available for recovery)"))
         self.sizer_11_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_11_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_12_staticbox = wx.StaticBox(self.page1, -1, _("Waste heat recovery for this process"))
+        self.sizer_12_staticbox = wx.StaticBox(self.page1, -1, _U("Waste heat recovery for this process"))
         self.sizer_12_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_12_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.sizer_13_staticbox = wx.StaticBox(self.page1, -1,
-                                               _("Data of existing heat (or cold) supply to the process"))
+                                               _U("Data of existing heat (or cold) supply to the process"))
         self.sizer_13_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_13_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -181,91 +186,91 @@ class PanelQ3(wx.Panel):
         # Processes description
         #
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Process short name"),
-                             tip=_("Give an organizational diagram of the production process (e.g. the flux of crude milk in chease production or the the flux of car chasis in the automobile industry)"))
+                             label=_U("Process short name"),
+                             tip=_U("Give an organizational diagram of the production process (e.g. the flux of crude milk in chease production or the the flux of car chasis in the automobile industry)"))
         self.tc1_1 = TextEntry(self.page0,maxchars=200,value='',
-                             label=_("Description"),
-                             tip=_("Give a short description of the process"))
+                             label=_U("Description"),
+                             tip=_U("Give a short description of the process"))
 
         self.tc2 = ChoiceEntry(self.page0,
                                values=TRANSPROCTYPES.values(),
-                               label=_("Process type"),
-                               tip=_("Give a brief description of the process or the unitary operation, and specify if it is continuous or batch"))        
+                               label=_U("Process type"),
+                               tip=_U("Give a brief description of the process or the unitary operation, and specify if it is continuous or batch"))        
 
         self.tc3 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Unit operation type"),
-                               tip=_("Select from predefined list"))       
+                               label=_U("Unit operation type"),
+                               tip=_U("Select from predefined list"))       
 
         self.tc4 = ChoiceEntry(self.page0,
                                values=[],
-                               label=_("Product or process medium"),
-                               tip=_("The medium that is in direct contact with the treated product, e.g. air for drying, lye or water for washing, etc..."))           
+                               label=_U("Product or process medium"),
+                               tip=_U("The medium that is in direct contact with the treated product, e.g. air for drying, lye or water for washing, etc..."))           
 
         self.tc5 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Typical (final) temperature of the  process medium during operation"),
-                              tip=_("Give the temperature of the process medium and not that of the heat supplying medium."))
+                              label=_U("Typical (final) temperature of the  process medium during operation"),
+                              tip=_U("Give the temperature of the process medium and not that of the heat supplying medium."))
 
 
         self.tc6 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Inlet temperature of the process medium (before heat recovery)"),
-                              tip=_("Inlet temperature of the process medium before heat recovery"))
+                              label=_U("Inlet temperature of the process medium (before heat recovery)"),
+                              tip=_U("Inlet temperature of the process medium before heat recovery"))
 
 
         self.tc7 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Start-up temperature of process medium (after breaks)"),
-                              tip=_("Temperature of the process equipment before heating up when process start-up begins"))
+                              label=_U("Start-up temperature of process medium (after breaks)"),
+                              tip=_U("Temperature of the process equipment before heating up when process start-up begins"))
 
 
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='VOLUME',
-                              label=_("Daily inflow of process medium"),
-                              tip=_("Continuous process: Fluid flow rate times hours of circulation. Batch process with fluid renewal: volume times No. of batches."))
+                              label=_U("Daily inflow of process medium"),
+                              tip=_U("Continuous process: Fluid flow rate times hours of circulation. Batch process with fluid renewal: volume times No. of batches."))
 
 
         self.tc9 = FloatEntry(self.page0,
                               ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='VOLUME',
-                              label=_("Volume of the process medium within the equipment or storage"),
-                              tip=_("e.g. volume of liquid in a bottle for cleaning"))
+                              label=_U("Volume of the process medium within the equipment or storage"),
+                              tip=_U("e.g. volume of liquid in a bottle for cleaning"))
 
         self.tc10 = FloatEntry(self.page0,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
-                              label=_("Power requirement of the process in operation"),
-                              tip=_("Power requierment during operation at steady state (thermal losses, evapoartion, endogenous chemical recations; without heating of circulating fluid)"))
+                              label=_U("Power requirement of the process in operation"),
+                              tip=_U("Power requierment during operation at steady state (thermal losses, evapoartion, endogenous chemical recations; without heating of circulating fluid)"))
         #
         # schedule
         #
         self.tc11 = FloatEntry(self.page0,
                               ipart=2, decimals=1, minval=0., maxval=24., value=0.,
                               unitdict = 'TIME',
-                              label=_("Hours of process operation per day"),
-                              tip=_("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
+                              label=_U("Hours of process operation per day"),
+                              tip=_U("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
         self.tc12 = FloatEntry(self.page0,
                               ipart=2, decimals=1, minval=0., maxval=99., value=0.,
-                              label=_("Number of batches per day"),
-                              tip=_("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
+                              label=_U("Number of batches per day"),
+                              tip=_U("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
         self.tc13 = FloatEntry(self.page0,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TIME',
-                              label=_("Duration of 1 batch"),
-                              tip=_("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
+                              label=_U("Duration of 1 batch"),
+                              tip=_U("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
         self.tc14 = FloatEntry(self.page0,
                               ipart=3, decimals=1, minval=0., maxval=365., value=0.,
-                              label=_("Days of process operation per year"),
-                              tip=_("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
+                              label=_U("Days of process operation per year"),
+                              tip=_U("For batch processes: specify the total duration of process, e.g. 3 batches/day x 2 hrs/batch = 6 hrs. If possible, specify daily program."))
 
 
         # Right panel controls
@@ -279,55 +284,55 @@ class PanelQ3(wx.Panel):
 
         self.tc15_1 = ChoiceEntry(self.page1, 
                                values=[],
-                               label=_("Medium of outgoing waste heat flows"),
-                               tip=_("Specify media of waste heat flows (up to 3)")) 
+                               label=_U("Medium of outgoing waste heat flows"),
+                               tip=_U("Specify media of waste heat flows (up to 3)")) 
         self.tc15 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Temperature of outgoing (waste) heat flows"),
-                              tip=_("Temperature of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
+                              label=_U("Temperature of outgoing (waste) heat flows"),
+                              tip=_U("Temperature of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
 
         self.tc15_2 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='SPECIFICENTHALPY',
-                              label=_("Specific enthalpy of outgoing (waste) heat flows"),
-                              tip=_("Enthalpy of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
+                              label=_U("Specific enthalpy of outgoing (waste) heat flows"),
+                              tip=_U("Enthalpy of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
 
         self.tc16 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Final  temperature of outgoing (waste) heat flows"),
-                              tip=_("Minimum temperature to which the waste heat flow can be cooled. If there is no limit specify 0"))
+                              label=_U("Final  temperature of outgoing (waste) heat flows"),
+                              tip=_U("Minimum temperature to which the waste heat flow can be cooled. If there is no limit specify 0"))
 
         self.tc17 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='VOLUME',
-                              label=_("Daily outflow of process medium"),
-                              tip=_("Can be different from the incoming flow if e.g. there is evaporation or some chemical reaction."))
+                              label=_U("Daily outflow of process medium"),
+                              tip=_U("Can be different from the incoming flow if e.g. there is evaporation or some chemical reaction."))
 
         self.tc18 = ChoiceEntry(self.page1, 
                                values=TRANSYESNO.values(),
-                               label=_("Can heat be recovered from the outflowing medium?"),
-                               tip=_("If NO, specify why: e.g. contamination with substances which can affect the heat exchanger,..."))
+                               label=_U("Can heat be recovered from the outflowing medium?"),
+                               tip=_U("If NO, specify why: e.g. contamination with substances which can affect the heat exchanger,..."))
 
         # waste heat recovery
 
         self.tc19 = ChoiceEntry(self.page1, 
                                values=TRANSYESNO.values(),
-                               label=_("Exists heat from heat  recovery for the process?"),
-                               tip=_("If affirmative, give some brief description of the heat recovery system"))
+                               label=_U("Exists heat from heat  recovery for the process?"),
+                               tip=_U("If affirmative, give some brief description of the heat recovery system"))
         
 
         self.tc20 = ChoiceEntry(self.page1,
                                 values=TRANSYESNO.values(),
-                               label=_("Source of waste heat"),
-                               tip=_("Specify the heat source (e.g. heat lossed from process X, flue gases from  boiler Y, etc)"))
+                               label=_U("Source of waste heat"),
+                               tip=_U("Specify the heat source (e.g. heat lossed from process X, flue gases from  boiler Y, etc)"))
 
         self.tc21 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Inlet temperature of the process medium  (after heat recovery)"),
-                              tip=_("Inlet temperature (towards the system) of the process medium after the heat recovery"))
+                              label=_U("Inlet temperature of the process medium  (after heat recovery)"),
+                              tip=_U("Inlet temperature (towards the system) of the process medium after the heat recovery"))
         
 
 
@@ -335,50 +340,50 @@ class PanelQ3(wx.Panel):
         
         self.tc22 = ChoiceEntry(self.page1, 
                                values=[],
-                               label=_("Medium supplying heat or cold to the process (water, steam, air)"),
-                               tip=_("Medium supplying heat or cold to the process (up to 3)"))
+                               label=_U("Medium supplying heat or cold to the process (water, steam, air)"),
+                               tip=_U("Medium supplying heat or cold to the process (up to 3)"))
 
 
         self.tc23 = ChoiceEntry(self.page1,
                              values = [],
-                             label=_("Heat or cold supply to the process from distribution line / branch No."),
-                             tip=_("Specify the distribution(supply) line of heat/cold feeding the process, using the nomenclature of the hydraulic scheme"))
+                             label=_U("Heat or cold supply to the process from distribution line / branch No."),
+                             tip=_U("Specify the distribution(supply) line of heat/cold feeding the process, using the nomenclature of the hydraulic scheme"))
 
         self.tc24 = FloatEntry(self.page1,
                                ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                                unitdict='TEMPERATURE',
-                               label=_("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
-                               tip=_("Temperature of the supplying medium at heat exchangers inlet"),
+                               label=_U("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
+                               tip=_U("Temperature of the supplying medium at heat exchangers inlet"),
                                fontsize=TYPE_SIZE_RIGHT-1)
 
         self.tc25 = FloatEntry(self.page1,
                                ipart=6, decimals=1, minval=0., maxval=999999., value = 0.,
                                unitdict='MASSFLOW',
-                               label=_("Flow rate of the heat supply medium (close to process)"),
-                               tip=_("Mass flow of the heat/cold supplyind medium"))
+                               label=_U("Flow rate of the heat supply medium (close to process)"),
+                               tip=_U("Mass flow of the heat/cold supplyind medium"))
 
         self.tc26 = FloatEntry(self.page1,
                                ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
                                unitdict='ENERGY',
-                               label=_("Total yearly process heat consumption"),
-                               tip=_("Only for the process"))
+                               label=_U("Total yearly process heat consumption"),
+                               tip=_U("Only for the process"))
 
         fp.popFont()
-        self.buttonAddProcess = wx.Button(self.page0,-1,_("Add process"))
+        self.buttonAddProcess = wx.Button(self.page0,-1,_U("Add process"))
         self.buttonAddProcess.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddProcess, self.buttonAddProcess)
         self.buttonAddProcess.SetFont(fp.getFont())
 
-        self.buttonDeleteProcess = wx.Button(self.page0,-1,_("Delete process"))
+        self.buttonDeleteProcess = wx.Button(self.page0,-1,_U("Delete process"))
         self.buttonDeleteProcess.SetMinSize((125, 32))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteProcess, self.buttonDeleteProcess)
         self.buttonDeleteProcess.SetFont(fp.getFont())
 
-        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_("Cancel"))
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_U("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
         self.buttonCancel.SetFont(fp.getFont())
 
-        self.buttonOK = wx.Button(self,wx.ID_OK,_("OK"))
+        self.buttonOK = wx.Button(self,wx.ID_OK,_U("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
         self.buttonOK.SetFont(fp.getFont())
@@ -467,8 +472,8 @@ class PanelQ3(wx.Panel):
         sizer_13.Add(sizer_25, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_13, 1, wx.EXPAND, 0)
         self.page1.SetSizer(sizer_10)
-        self.notebook.AddPage(self.page0, _('Process data'))
-        self.notebook.AddPage(self.page1, _('Heat supply and waste heat'))
+        self.notebook.AddPage(self.page0, _U('Process data'))
+        self.notebook.AddPage(self.page1, _U('Heat supply and waste heat'))
         sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
@@ -738,9 +743,9 @@ class PanelQ3(wx.Panel):
 
     def checkIfAllowed(self):
 	if Status.ANo >= 0:
-            showWarning(_("In the present version of EINSTEIN it is not allowed to modify\n")+\
-                        _("processes in the checked state or alternative proposals. Go to the original data view\n")+\
-                        _("Workaround for studying process optimisation: create a copy of your project\nand modify on this copy in original state"))
+            showWarning(_U("In the present version of EINSTEIN it is not allowed to modify\n")+\
+                        _U("processes in the checked state or alternative proposals. Go to the original data view\n")+\
+                        _U("Workaround for studying process optimisation: create a copy of your project\nand modify on this copy in original state"))
             return False
         else:   
             return True

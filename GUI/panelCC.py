@@ -25,12 +25,14 @@
 #                           Hans Schweiger          24/04/2008
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          17/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       23/04/08: HS    copy based on PanelA
 #       24/04/08: HS    table for error messages adapted
 #       18/06/2008 SD:  change to translatable text _(...)
 #       17/07/2008: HS  bug-fix in translatable text (check list button)
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -68,6 +70,9 @@ from GUITools import *
 
 MAXROWS = 50
 COLNO = 5
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelCC(wx.Panel):
 
@@ -111,11 +116,11 @@ class PanelCC(wx.Panel):
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Name"))
-        self.grid.SetColLabelValue(1, _("Description"))
-        self.grid.SetColLabelValue(2, _("Value"))
-        self.grid.SetColLabelValue(3, _("max.Error"))
-        self.grid.SetColLabelValue(4, _("Action to be taken"))
+        self.grid.SetColLabelValue(0, _U("Name"))
+        self.grid.SetColLabelValue(1, _U("Description"))
+        self.grid.SetColLabelValue(2, _U("Value"))
+        self.grid.SetColLabelValue(3, _U("max.Error"))
+        self.grid.SetColLabelValue(4, _U("Action to be taken"))
         #
         # copy values from dictionary to grid
         #
@@ -138,25 +143,25 @@ class PanelCC(wx.Panel):
 #..............................................................................
 # box 1: grid display
 
-        self.box1 = wx.StaticBox(self, -1, _('Cross checking of data'),
+        self.box1 = wx.StaticBox(self, -1, _U('Cross checking of data'),
                                  pos = (10,10),size=(780,400))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.st1panel = wx.StaticText(id=-1, label=_('list of data with unsufficient accuracy'),
+        self.st1panel = wx.StaticText(id=-1, label=_U('list of data with unsufficient accuracy'),
               name='st1panel', parent=self, pos=wx.Point(20, 30), style=0)
 
-        self.cbSetAccuracy = wx.ComboBox(choices=[_("quick & dirty"),_("standard"),_("detailed")],
+        self.cbSetAccuracy = wx.ComboBox(choices=[_U("quick & dirty"),_U("standard"),_U("detailed")],
               id=wxID_PANELCCCBSETACCURACY, name='cbSetAccuracy', parent=self,
               pos=wx.Point(616, 26), size=wx.Size(162, 32), style=0,
-              value=_("quick and dirty"))
-        self.cbSetAccuracy.SetLabel(_("quick and dirty"))
+              value=_U("quick and dirty"))
+        self.cbSetAccuracy.SetLabel(_U("quick and dirty"))
         self.cbSetAccuracy.Bind(wx.EVT_COMBOBOX, self.OnCbSetAccuracyCombobox,
               id=wxID_PANELCCCBSETACCURACY)
 
         self.stSetAccuracy = wx.StaticText(id=wxID_PANELCCSTSETACCURACY,
-              label=_('required accuracy'), name='stSetAccuracy', parent=self,
+              label=_U('required accuracy'), name='stSetAccuracy', parent=self,
               pos=wx.Point(512, 30), size=wx.Size(87, 13), style=0)
 
         self.grid = wx.grid.Grid(id=wxID_PANELCCGRID, name='gridpanel',
@@ -180,12 +185,12 @@ class PanelCC(wx.Panel):
               id=wxID_PANELCCBASICCHECK)
 
         self.estimateData = wx.Button(id=wxID_PANELCCESTIMATEDATA,
-              label=_('estimate data'), name='estimateData', parent=self,
+              label=_U('estimate data'), name='estimateData', parent=self,
               pos=wx.Point(176, 420), size=wx.Size(136, 24), style=0)
         self.estimateData.Bind(wx.EVT_BUTTON, self.OnEstimateDataButton,
               id=wxID_PANELCCESTIMATEDATA)
 
-        self.checkList = wx.Button(id=wxID_PANELCCCHECKLIST, label=_('check list'),
+        self.checkList = wx.Button(id=wxID_PANELCCCHECKLIST, label=_U('check list'),
               name='checkList', parent=self, pos=wx.Point(328, 420),
               size=wx.Size(136, 24), style=0)
         self.checkList.Bind(wx.EVT_BUTTON, self.OnCheckListButton,
@@ -193,23 +198,23 @@ class PanelCC(wx.Panel):
 
 #..............................................................................
 # box 2: display of statistics
-        self.box2 = wx.StaticBox(self, -1, _('Cross check statistics'),
+        self.box2 = wx.StaticBox(self, -1, _U('Cross check statistics'),
                                  pos = (10,460),size=(780,80))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         
         self.stStatistics1 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1,
-              label=_('No. of data checked'), name='stStatistics1', parent=self,
+              label=_U('No. of data checked'), name='stStatistics1', parent=self,
               pos=wx.Point(24, 480), size=wx.Size(98, 13), style=0)
 
         self.stStatistics2 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS2,
-              label=_('No. of input data fixed'), name='stStatistics2',
+              label=_U('No. of input data fixed'), name='stStatistics2',
               parent=self, pos=wx.Point(24, 500), size=wx.Size(110, 13),
               style=0)
 
         self.stStatistics3 = wx.StaticText(id=wxID_PANELCCSTSTATISTICS3,
-              label=_('No. of missing data'), name='stStatistics3', parent=self,
+              label=_U('No. of missing data'), name='stStatistics3', parent=self,
               pos=wx.Point(24, 520), size=wx.Size(93, 13), style=0)
 
         self.stStatistics1Val = wx.StaticText(id=wxID_PANELCCSTSTATISTICS1VAL,
@@ -319,9 +324,9 @@ class PanelCC(wx.Panel):
 #   Generate new alterantive proposal
 #------------------------------------------------------------------------------		
 
-        popup =  DialogOK(self,_("confirm basic check"),\
-                          _("\nTake care: running the check will invalidate existing alternative proposals")+\
-                          _("\nDo You want to continue ?"))
+        popup =  DialogOK(self,_U("confirm basic check"),\
+                          _U("\nTake care: running the check will invalidate existing alternative proposals")+\
+                          _U("\nDo You want to continue ?"))
         if popup.ShowModal() == wx.ID_OK:
 
             Status.prj.copyQuestionnaire()
@@ -343,10 +348,10 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
 #   Generate new porposal copying from existing alternative
 #------------------------------------------------------------------------------		
-        popup =  DialogOK(self,_("confirm data estimation"),\
-                          _("\nTake care: running data estimate will automatically estimate missing data.")+\
-                          _("\nAlternatively you can also manually add estimated data to the questionnaire and rerun basic check")+\
-                          _("\nDo You want to continue ?"))
+        popup =  DialogOK(self,_U("confirm data estimation"),\
+                          _U("\nTake care: running data estimate will automatically estimate missing data.")+\
+                          _U("\nAlternatively you can also manually add estimated data to the questionnaire and rerun basic check")+\
+                          _U("\nDo You want to continue ?"))
         if popup.ShowModal() == wx.ID_OK:
             nc = self.mod.basicCheck(estimate=True)
             self.display()
@@ -358,7 +363,7 @@ class PanelCC(wx.Panel):
 #   Delete alternative proposal
 #------------------------------------------------------------------------------		
 
-        pu2 =  DialogOK(self,_("confirm check list"),_("CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"))
+        pu2 =  DialogOK(self,_U("confirm check list"),_U("CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"))
         if pu2.ShowModal() == wx.ID_OK:
             pass
 #------------------------------------------------------------------------------		
@@ -397,17 +402,17 @@ class PanelCC(wx.Panel):
     def OnButtonpanelOkButton(self, event):
 
         if self.checkOK == True:
-            popup =  DialogOK(self,_("accept data"),\
-                              _("Press OK to confirm that the data are correct\n")+\
-                              _("(This will block the questionnaire for further modifications)"))
+            popup =  DialogOK(self,_U("accept data"),\
+                              _U("Press OK to confirm that the data are correct\n")+\
+                              _U("(This will block the questionnaire for further modifications)"))
             if popup.ShowModal() == wx.ID_OK:
                 Status.prj.setActiveAlternative(0,checked = True)
                 Status.mod.moduleEA.update()
                 self.Hide()
                 self.main.tree.SelectItem(self.main.qEA4a, select=True)
         else:
-            popup =  DialogOK(self,_("revise data"),\
-                              _("EINSTEIN cannot accept these data. You first have to eliminate inconsistencies"))
+            popup =  DialogOK(self,_U("revise data"),\
+                              _U("EINSTEIN cannot accept these data. You first have to eliminate inconsistencies"))
 
     def OnButtonpanelCancelButton(self, event):
         #warning: do you want to leave w/o saving ???

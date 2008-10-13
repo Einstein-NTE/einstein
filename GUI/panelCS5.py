@@ -15,9 +15,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger  05/07/2008
 #       Revised by:         Stoyan Danov    14/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       14/07/2008 SD: adaptation to module CS
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -46,6 +48,9 @@ from numCtrl import *
 COLNO = 4
 MAXROWS = 20
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #============================================================================== 
 #============================================================================== 
 class PanelCS5(wx.Panel):
@@ -69,9 +74,9 @@ class PanelCS5(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS5_Plot",                      # key for Interface
-                   'title'       :_('Annual cost'), # title of the graph
-                   'ylabel'      :_('Total annual cost [EUR]'),                   # y axis label
-                   'legend'      :[_('Amortization [EUR]'),_('Energy cost [EUR]'),_('O&M cost [EUR]')],  # legend
+                   'title'       :_U('Annual cost'), # title of the graph
+                   'ylabel'      :_U('Total annual cost [EUR]'),                   # y axis label
+                   'legend'      :[_U('Amortization [EUR]'),_U('Energy cost [EUR]'),_U('O&M cost [EUR]')],  # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[]}                        # rows that should not be plotted
@@ -102,10 +107,10 @@ class PanelCS5(wx.Panel):
 #            self.grid1.SetColLabelValue(col, headings[col])
         self.grid1.SetDefaultColSize(150)
         self.grid1.SetColSize(0,255)
-        self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Amortization\n[EUR]"))
-        self.grid1.SetColLabelValue(2, _("Energy cost\n[EUR]"))
-        self.grid1.SetColLabelValue(3, _("Operation and maintenance\n(O&M) cost [EUR]"))
+        self.grid1.SetColLabelValue(0, _U("Alternative"))
+        self.grid1.SetColLabelValue(1, _U("Amortization\n[EUR]"))
+        self.grid1.SetColLabelValue(2, _U("Energy cost\n[EUR]"))
+        self.grid1.SetColLabelValue(3, _U("Operation and maintenance\n(O&M) cost [EUR]"))
 
         self.display()
 
@@ -117,7 +122,7 @@ class PanelCS5(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Annual cost'),
+        self.box1 = wx.StaticBox(self, -1, _U('Annual cost'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -129,7 +134,7 @@ class PanelCS5(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Annual cost comparative'),
+        self.box2 = wx.StaticBox(self, -1, _U('Annual cost comparative'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -150,7 +155,7 @@ class PanelCS5(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

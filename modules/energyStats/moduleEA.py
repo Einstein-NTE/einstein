@@ -95,7 +95,7 @@ class ModuleEA(object):
                                     Status.int.QA_T[iT],                                  # cols L-M are merged
                                     Status.int.QA_T[iT]])                                  # col P-Q
             elif k == 81:
-                print "WARNING: present standard report is limited to 80 temperature intervals !!!"
+                logWarning("WARNING: present standard report is limited to 80 temperature intervals !!!")
 
         for iT in range(Status.NT+1,81):
                 tableReport.append([" ",                             
@@ -106,8 +106,8 @@ class ModuleEA(object):
 
 
         Status.int.setGraphicsData("PROCHEATTEMP", array(tableReport))
-        print "ModuleEA (procHeatTemp): resulting array"
-        print array(tableReport)
+#        print "ModuleEA (procHeatTemp): resulting array"
+#        print array(tableReport)
 
 #------------------------------------------------------------------------------
     def calculateAnnualResults(self):
@@ -395,18 +395,18 @@ class ModuleEA(object):
                 quantity = product.QProdYear
 
                 PEC = generalData.PEC
-                if PEC is not None and quantity > 0:
+                if PEC is not None and quantity > 0 and quantity is not None:
                     product.PE_SEC = fTurnover*PEC/quantity
                 else:
                     product.PE_SEC = 0.0
 
                 FECel = generalData.FECel
-                if FECel is not None and quantity > 0:
+                if FECel is not None and quantity > 0 and quantity is not None:
                     product.EL_SEC = fTurnover*FECel/quantity
                 else:
                     product.EL_SEC = 0.0
 
-                if FECFuels is not None and quantity > 0:
+                if FECFuels is not None and quantity > 0 and quantity is not None:
                     product.FUEL_SEC = fTurnover*FECFuels/quantity
                 else:
                     product.FUEL_SEC = 0.0

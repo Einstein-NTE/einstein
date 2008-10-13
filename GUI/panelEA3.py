@@ -20,6 +20,7 @@
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    06/07/2008
 #                           Stoyan Danov    07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -30,6 +31,7 @@
 #       06/07/2008 SD: arrange column width, change background colour -> lightgrey,
 #                       security feature modified (see #SD2008-07-06)
 #       07/07/2008 SD:                       ->highlite Total
+#       13/10/2008: SD  change _() to _U()
 #
 #	
 #------------------------------------------------------------------------------		
@@ -75,6 +77,9 @@ TITLE_COLOR = ORANGE
 
 MAXCOLS = 10
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelEA3(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
@@ -98,7 +103,7 @@ class PanelEA3(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : _('FET by equipment'),     # title of the graph
+                   'title'       : _U('FET by equipment'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -122,7 +127,7 @@ class PanelEA3(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : keys[1],                # key for Interface
-                   'title'       : _('USH by equipment'),     # title of the graph
+                   'title'       : _U('USH by equipment'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -176,10 +181,10 @@ class PanelEA3(wx.Panel):
 
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Equipment"))
-        self.grid1.SetColLabelValue(1, _("Fuel type"))
-        self.grid1.SetColLabelValue(2, _("MWh"))
-        self.grid1.SetColLabelValue(3, _("%"))
+        self.grid1.SetColLabelValue(0, _U("Equipment"))
+        self.grid1.SetColLabelValue(1, _U("Fuel type"))
+        self.grid1.SetColLabelValue(2, _U("MWh"))
+        self.grid1.SetColLabelValue(3, _U("%"))
         #
         # copy values from dictionary to grid
         #
@@ -230,10 +235,10 @@ class PanelEA3(wx.Panel):
         
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, _("Equipment"))
-        self.grid2.SetColLabelValue(1, _("MWh"))
-        self.grid2.SetColLabelValue(2, _("%"))
-        self.grid2.SetColLabelValue(3, _(" "))
+        self.grid2.SetColLabelValue(0, _U("Equipment"))
+        self.grid2.SetColLabelValue(1, _U("MWh"))
+        self.grid2.SetColLabelValue(2, _U("%"))
+        self.grid2.SetColLabelValue(3, _U(" "))
         #
         # copy values from dictionary to grid
         #
@@ -269,7 +274,7 @@ class PanelEA3(wx.Panel):
 #..............................................................................
 #   box 1
 
-        self.box1 = wx.StaticBox(self, -1, _(u'Final energy consumption for thermal use (FET) by equipment'),
+        self.box1 = wx.StaticBox(self, -1, _U('Final energy consumption for thermal use (FET) by equipment'),
                                  pos = (10,10),size=(780,260))
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -287,7 +292,7 @@ class PanelEA3(wx.Panel):
 #..............................................................................
 #   box 2
 
-        self.box2 = wx.StaticBox(self, -1, _(u'Useful supply heat (USH) by equipment'),
+        self.box2 = wx.StaticBox(self, -1, _U('Useful supply heat (USH) by equipment'),
                                  pos = (10,290),size=(780,260))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -311,7 +316,7 @@ class PanelEA3(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

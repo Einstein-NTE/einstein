@@ -24,6 +24,7 @@
 #                           Tom Sobota      03/07/2008
 #                           Hans Schweiger  07/07/2008
 #                           Tom Sobota      07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       02/05/08:       AlternativeProposalNo added in queries for table qproduct
@@ -36,6 +37,7 @@
 #       07/07/2008: HS  bug-fix: self.check - GUITools-check
 #                       (compatibility with Tom's new FloatEntry)
 #        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -80,6 +82,9 @@ VSEP_RIGHT             =   2
 ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelQ8(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -105,25 +110,25 @@ class PanelQ8(wx.Panel):
         self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page0, _('General data'))
+        self.notebook.AddPage(self.page0, _U('General data'))
 
         self.page1 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page1, _('Occupation'))
+        self.notebook.AddPage(self.page1, _U('Occupation'))
         
-        self.frame_building_list = wx.StaticBox(self.page0, -1, _("Building list"))
+        self.frame_building_list = wx.StaticBox(self.page0, -1, _U("Building list"))
         self.frame_building_list.SetForegroundColour(TITLE_COLOR)
         self.frame_building_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        #self.frame_building = wx.StaticBox(self.page0, -1, _("Building (or part of building)"))
-        self.frame_general_data = wx.StaticBox(self.page0, -1, _("General data"))
+        #self.frame_building = wx.StaticBox(self.page0, -1, _U("Building (or part of building)"))
+        self.frame_general_data = wx.StaticBox(self.page0, -1, _U("General data"))
         self.frame_general_data.SetForegroundColour(TITLE_COLOR)
         self.frame_general_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_energy_demand = wx.StaticBox(self.page0, -1, _("Energy demand"))
+        self.frame_energy_demand = wx.StaticBox(self.page0, -1, _U("Energy demand"))
         self.frame_energy_demand.SetForegroundColour(TITLE_COLOR)
         self.frame_energy_demand.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_occupation = wx.StaticBox(self.page1, -1, _("Period of occupation"))
+        self.frame_occupation = wx.StaticBox(self.page1, -1, _U("Period of occupation"))
         self.frame_occupation.SetForegroundColour(TITLE_COLOR)
         self.frame_occupation.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -158,51 +163,51 @@ class PanelQ8(wx.Panel):
         # tab 0 top staticbox: General data
 
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Building short name"),
-                             tip=_("Give some brief name of the buildings to identify them in the reports"))
+                             label=_U("Building short name"),
+                             tip=_U("Give some brief name of the buildings to identify them in the reports"))
 
 
         self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='AREA',
-                              label=_("Constructed surface"),
-                              tip=_("Surface limited by building's perimeter multiplied by number of floors"))
+                              label=_U("Constructed surface"),
+                              tip=_U("Surface limited by building's perimeter multiplied by number of floors"))
 
         self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='AREA',
-                              label=_("Useful surface"),
-                              tip=_("Total useful surface of building (excluding walls)"))
+                              label=_U("Useful surface"),
+                              tip=_U("Total useful surface of building (excluding walls)"))
 
         self.tc4 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Use of the building"),
-                             tip=_("Specify use, e.g. offices, production, storage,..."))
+                             label=_U("Use of the building"),
+                             tip=_U("Specify use, e.g. offices, production, storage,..."))
 
 
         # tab 0 bottom staticbox: Energy demand
         
         self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='POWER',
-                              label=_("Maximum heating power"),
-                              tip=_("Maximum heating power (without including the security coefficient of the equipment)"))
+                              label=_U("Maximum heating power"),
+                              tip=_U("Maximum heating power (without including the security coefficient of the equipment)"))
 
         self.tc6 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='POWER',
-                              label=_("Maximum cooling power"),
-                              tip=_(" "))
+                              label=_U("Maximum cooling power"),
+                              tip=_U(" "))
 
         self.tc7 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='ENERGY',
-                              label=_("Annual heating demand"),
-                              tip=_("Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate table (if available)"))
+                              label=_U("Annual heating demand"),
+                              tip=_U("Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate table (if available)"))
 
         self.tc8 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='ENERGY',
-                              label=_("Annual demand of air conditioning"),
-                              tip=_(" "))
+                              label=_U("Annual demand of air conditioning"),
+                              tip=_U(" "))
 
         self.tc9 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='VOLUME',
-                              label=_("Daily consumption of  DHW"),
-                              tip=_("Only consumption of hot water that is not included yet in 'Processes'"))
+                              label=_U("Daily consumption of  DHW"),
+                              tip=_U("Only consumption of hot water that is not included yet in 'Processes'"))
 
         #
         # right tab controls
@@ -214,74 +219,74 @@ class PanelQ8(wx.Panel):
         #SD:change type of entry?? -> time start - time stop?? or change tip: hours of occupation per day??
         self.tc10 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
                                unitdict=None,
-                               label=_("Hours of occupation"),
-                               tip=_("Hours of occupation of the building, during which heating and air conditionning is active"))
+                               label=_U("Hours of occupation"),
+                               tip=_U("Hours of occupation of the building, during which heating and air conditionning is active"))
 
         self.tc11 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
                                unitdict=None,
-                               label=_("Days of use per year"),
-                               tip=_(" "))
+                               label=_U("Days of use per year"),
+                               tip=_U(" "))
 
         self.tc12_10 = DateEntry(self.page1, value='',
-                              label=_("Start holiday period 1"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Start holiday period 1"),
+                              tip=_U("Period of year that the building is not used"))
 
         self.tc12_11 = DateEntry(self.page1, value='',
-                              label=_("Stop holiday period 1"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Stop holiday period 1"),
+                              tip=_U("Period of year that the building is not used"))
 
         self.tc12_20 = DateEntry(self.page1, value='',
-                              label=_("Start holiday period 2"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Start holiday period 2"),
+                              tip=_U("Period of year that the building is not used"))
 
         self.tc12_21 = DateEntry(self.page1, value='',
-                              label=_("Stop holiday period 2"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Stop holiday period 2"),
+                              tip=_U("Period of year that the building is not used"))
 
         self.tc12_30 = DateEntry(self.page1, value='',
-                              label=_("Start holiday period 3"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Start holiday period 3"),
+                              tip=_U("Period of year that the building is not used"))
 
         self.tc12_31 = DateEntry(self.page1, value='',
-                              label=_("Stop holiday period 3"),
-                              tip=_("Period of year that the building is not used"))
+                              label=_U("Stop holiday period 3"),
+                              tip=_U("Period of year that the building is not used"))
 
 
         self.tc13_1 = DateEntry(self.page1, value='',
-                              label=_("Start of heating period"),
-                              tip=_(" "))
+                              label=_U("Start of heating period"),
+                              tip=_U(" "))
 
         self.tc13_2 = DateEntry(self.page1, value='',
-                              label=_("Stop of heating period"),
-                              tip=_(" "))
+                              label=_U("Stop of heating period"),
+                              tip=_U(" "))
 
 
         self.tc14_1 = DateEntry(self.page1, value='',
-                              label=_("Start of air\nconditioning period"),
-                              tip=_(" "))
+                              label=_U("Start of air\nconditioning period"),
+                              tip=_U(" "))
 
         self.tc14_2 = DateEntry(self.page1, value='',
-                              label=_("Stop of air\nconditioning period"),
-                              tip=_(" "))
+                              label=_U("Stop of air\nconditioning period"),
+                              tip=_U(" "))
 
         #
         # buttons
         #
-        self.buttonDeleteBuilding = wx.Button(self.page0,-1,_("Delete building"))
+        self.buttonDeleteBuilding = wx.Button(self.page0,-1,_U("Delete building"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteBuilding, self.buttonDeleteBuilding)
         self.buttonDeleteBuilding.SetMinSize((136, 32))
         self.buttonDeleteBuilding.SetFont(fp.getFont())
         
-        self.buttonAddBuilding = wx.Button(self.page0,-1,_("Add building"))
+        self.buttonAddBuilding = wx.Button(self.page0,-1,_U("Add building"))
 	self.Bind(wx.EVT_BUTTON, self.OnButtonAddBuilding, self.buttonAddBuilding)
         self.buttonAddBuilding.SetMinSize((136, 32))
         self.buttonAddBuilding.SetFont(fp.getFont())
         
-        self.buttonOK = wx.Button(self,wx.ID_OK, label=_("OK"))
+        self.buttonOK = wx.Button(self,wx.ID_OK, label=_U("OK"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
         self.buttonOK.SetDefault()
 
-        self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label=_("Cancel"))
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL, label=_U("Cancel"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
          # recover previous font parameters from the stack
@@ -481,7 +486,7 @@ class PanelQ8(wx.Panel):
         self.clear()
         self.fillPage()
         self.Show()
-        self.main.showWarning(_("You can fill in data if you are happy with this, but building H&C demand is not yet considered in this version of EINSTEIN"))
+        self.main.showWarning(_U("You can fill in data if you are happy with this, but building H&C demand is not yet considered in this version of EINSTEIN"))
 
     def fillBuildingList(self):
         self.listBoxBuildingList.Clear()

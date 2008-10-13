@@ -17,8 +17,10 @@
 #	Created by: 	    Hans Schweiger  06/07/2008
 #                           (based on PanelEA4b)
 #       Revised by:
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -51,6 +53,12 @@ import einstein.modules.matPanel as Mp
 COLNO = 7
 MAXROWS = 5
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 #------------------------------------------------------------------------------		
 def drawFigure(self):
 #------------------------------------------------------------------------------
@@ -76,8 +84,8 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend(loc = 0)
 
-    self.subplot.axes.set_ylabel(_('Heat supply load [kW]'))
-    self.subplot.axes.set_xlabel(_('Annual operating hours [h]'))
+    self.subplot.axes.set_ylabel(_U('Heat supply load [kW]'))
+    self.subplot.axes.set_xlabel(_U('Annual operating hours [h]'))
 
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -131,7 +139,7 @@ class PanelEA4c(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : 'EA4c_Plot',                # key for Interface
-                   'title'       : _('Some title'),           # title of the graph
+                   'title'       : _U('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
 
@@ -168,13 +176,13 @@ class PanelEA4c(wx.Panel):
         self.grid1.SetColSize(0,115)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Temperature Levels\n[ºC]"))
-        self.grid1.SetColLabelValue(1, _("Base Load\n(power)\n[kW]"))
-        self.grid1.SetColLabelValue(2, _("Base Load\n(energy)\n[MWh]"))
-        self.grid1.SetColLabelValue(3, _("Medium Load\n(power)\n[kW]"))
-        self.grid1.SetColLabelValue(4, _("Medium Load\n(energy)\n[MWh]"))
-        self.grid1.SetColLabelValue(5, _("Peak Load\n(power)\n[kW]"))
-        self.grid1.SetColLabelValue(6, _("Peak Load\n(energy)\n[MWh]"))
+        self.grid1.SetColLabelValue(0, _U("Temperature Levels\n[ºC]"))
+        self.grid1.SetColLabelValue(1, _U("Base Load\n(power)\n[kW]"))
+        self.grid1.SetColLabelValue(2, _U("Base Load\n(energy)\n[MWh]"))
+        self.grid1.SetColLabelValue(3, _U("Medium Load\n(power)\n[kW]"))
+        self.grid1.SetColLabelValue(4, _U("Medium Load\n(energy)\n[MWh]"))
+        self.grid1.SetColLabelValue(5, _U("Peak Load\n(power)\n[kW]"))
+        self.grid1.SetColLabelValue(6, _U("Peak Load\n(energy)\n[MWh]"))
 
 #..............................................................................
 # bring data to table
@@ -186,9 +194,9 @@ class PanelEA4c(wx.Panel):
             logDebug("PanelEA4c: received corrupt data in key: EA4c_Table")
             (rows,cols) = (0,COLNO)
 
-        print "PanelEA4c: data arriving"
-        print data
-        print rows,cols
+#        print "PanelEA4c: data arriving"
+#        print data
+#        print rows,cols
 
         decimals = [-1,2,2,2,2,2,2]   #number of decimal digits for each colum
         for r in range(rows):
@@ -218,7 +226,7 @@ class PanelEA4c(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _('Useful supply heat demand (USH) - peak and base load'),
+        self.box1 = wx.StaticBox(self, -1, _U('Useful supply heat demand (USH) - peak and base load'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -229,7 +237,7 @@ class PanelEA4c(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _('Cumulative heat demand (USH)'),
+        self.box2 = wx.StaticBox(self, -1, _U('Cumulative heat demand (USH)'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -249,7 +257,7 @@ class PanelEA4c(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

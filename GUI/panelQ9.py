@@ -23,6 +23,7 @@
 #                           Hans Schweiger  03/07/2008
 #                           Hans Schweiger  07/07/2008
 #                           Hans Schweiger  17/09/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -35,6 +36,7 @@
 #       07/07/2008: HS  bug-fix: self.check -> GUITools-check
 #                       (compatibility with Tom's new FloatEntry)
 #       17/09/2008: HS  adaptation to new nomenclature of TCA
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -81,6 +83,9 @@ VSEP_RIGHT              =   2
 ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelQ9(wx.Panel):
     def __init__(self, parent, main):
 	self.main = main
@@ -105,22 +110,22 @@ class PanelQ9(wx.Panel):
         self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page0, _('Parameters and management'))
+        self.notebook.AddPage(self.page0, _U('Parameters and management'))
 
         self.page1 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page1, _('Operation and maintenance'))
+        self.notebook.AddPage(self.page1, _U('Operation and maintenance'))
         #
         # frames
         #
-        self.frame_management = wx.StaticBox(self.page0, -1, _("Management of energetic services"))
+        self.frame_management = wx.StaticBox(self.page0, -1, _U("Management of energetic services"))
         self.frame_management.SetForegroundColour(TITLE_COLOR)
         self.frame_management.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_parameters = wx.StaticBox(self.page0, -1, _("Parameters used in the economic and comparative analysis of the possible alternatives"))
+        self.frame_parameters = wx.StaticBox(self.page0, -1, _U("Parameters used in the economic and comparative analysis of the possible alternatives"))
         self.frame_parameters.SetForegroundColour(TITLE_COLOR)
         self.frame_parameters.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_costs = wx.StaticBox(self.page1, -1, _("Yearly operation and maintenance costs"))
+        self.frame_costs = wx.StaticBox(self.page1, -1, _U("Yearly operation and maintenance costs"))
         self.frame_costs.SetForegroundColour(TITLE_COLOR)
         self.frame_costs.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         #
@@ -128,11 +133,11 @@ class PanelQ9(wx.Panel):
         #
 
         self.labelSpc0= wx.StaticText(self.page1, -1,'')
-        self.label_14 = wx.StaticText(self.page1, -1, _("Total costs\n[EUR]"))
-        self.label_15 = wx.StaticText(self.page1, -1, _("Utilities and\noperating materials\n[EUR]"))
-        self.label_16 = wx.StaticText(self.page1, -1, _("Labour costs\n[EUR]"))
-        self.label_17 = wx.StaticText(self.page1, -1, _("External costs\n[EUR]"))
-        self.label_18 = wx.StaticText(self.page1, -1, _("Regulatory compliance,\ninsurance and\nfuture liability costs\n[EUR]"))
+        self.label_14 = wx.StaticText(self.page1, -1, _U("Total costs\n[EUR]"))
+        self.label_15 = wx.StaticText(self.page1, -1, _U("Utilities and\noperating materials\n[EUR]"))
+        self.label_16 = wx.StaticText(self.page1, -1, _U("Labour costs\n[EUR]"))
+        self.label_17 = wx.StaticText(self.page1, -1, _U("External costs\n[EUR]"))
+        self.label_18 = wx.StaticText(self.page1, -1, _U("Regulatory compliance,\ninsurance and\nfuture liability costs\n[EUR]"))
 
         # set font for frames
         # 1. save actual font parameters on the stack
@@ -163,41 +168,41 @@ class PanelQ9(wx.Panel):
 
         self.tc1 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='GROWTHRATE',
-                              label=_("General inflation rate"),
-                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
+                              label=_U("General inflation rate"),
+                              tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
         self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='GROWTHRATE',
-                              label=_("Rate of increment of energy prices"),
-                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
+                              label=_U("Rate of increment of energy prices"),
+                              tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
         self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='GROWTHRATE',
-                              label=_("Nominal rate of interest for external financing of installations"),
-                              tip=_("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
+                              label=_U("Nominal rate of interest for external financing of installations"),
+                              tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
         self.tc4 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='FRACTION',
-                              label=_("Percentage of external financing for installations"),
-                              tip=_("Percentage of the external financing for the inversions"))
+                              label=_U("Percentage of external financing for installations"),
+                              tip=_U("Percentage of the external financing for the inversions"))
 
         self.tc4b = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='GROWTHRATE',
-                              label=_("Company specific discount rate"),
-                              tip=_(" "))
+                              label=_U("Company specific discount rate"),
+                              tip=_U(" "))
         self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='LONGTIME',
-                              label=_("Time for economic amortization of installations"),
-                              tip=_("Amortization time"))
+                              label=_U("Time for economic amortization of installations"),
+                              tip=_U("Amortization time"))
 
         fs = FieldSizes(wLabel=LABEL_WIDTH_LEFT_MIDDLE)
 
 
         # tab 0 bottom side. energy management
-        self.checkBox6 = wx.CheckBox(self.page0, -1, _("An energy management system is already implemented"))
+        self.checkBox6 = wx.CheckBox(self.page0, -1, _U("An energy management system is already implemented"))
         self.checkBox6.SetValue(False)
         self.checkBox6.SetFont(fp.getFont())
-        self.checkBox7 = wx.CheckBox(self.page0, -1, _("The energy management is externalized"))
+        self.checkBox7 = wx.CheckBox(self.page0, -1, _U("The energy management is externalized"))
         self.checkBox7.SetValue(False)
         self.checkBox7.SetFont(fp.getFont())
 
@@ -210,35 +215,35 @@ class PanelQ9(wx.Panel):
                        wData=DATA_ENTRY_WIDTH_RIGHT,wUnits=UNITS_WIDTH)
         
 
-        self.label_9 = wx.StaticText(self.page1, -1, _("General maintenance"))
+        self.label_9 = wx.StaticText(self.page1, -1, _U("General maintenance"))
         self.tc10_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_4 = wx.TextCtrl(self.page1,-1, '')
         self.tc10_5 = wx.TextCtrl(self.page1,-1, '')
         
-        self.label_10 = wx.StaticText(self.page1, -1, _("Buildings"))
+        self.label_10 = wx.StaticText(self.page1, -1, _U("Buildings"))
         self.tc11_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_4 = wx.TextCtrl(self.page1,-1, '')
         self.tc11_5 = wx.TextCtrl(self.page1,-1, '')
         
-        self.label_11 = wx.StaticText(self.page1, -1, _("Machines and equipment for processes"))
+        self.label_11 = wx.StaticText(self.page1, -1, _U("Machines and equipment for processes"))
         self.tc12_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_4 = wx.TextCtrl(self.page1,-1, '')
         self.tc12_5 = wx.TextCtrl(self.page1,-1, '')
         
-        self.label_12 = wx.StaticText(self.page1, -1, _("Generation and distribution of heat and cold"))
+        self.label_12 = wx.StaticText(self.page1, -1, _U("Generation and distribution of heat and cold"))
         self.tc13_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_3 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_4 = wx.TextCtrl(self.page1,-1, '')
         self.tc13_5 = wx.TextCtrl(self.page1,-1, '')
         
-        self.label_13 = wx.StaticText(self.page1, -1, _("Total"))
+        self.label_13 = wx.StaticText(self.page1, -1, _U("Total"))
         self.tc14_1 = wx.TextCtrl(self.page1,-1, '')
         self.tc14_2 = wx.TextCtrl(self.page1,-1, '')
         self.tc14_3 = wx.TextCtrl(self.page1,-1, '')

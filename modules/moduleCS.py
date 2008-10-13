@@ -164,6 +164,9 @@ class ModuleCS(object):
 
             CS2Table = []
             CS2Plot = []
+
+            USH0 = 0.0
+            UPH0 = 0.0
             
             for ANo in range(len(generalData)-1):
                 i = ANo+1
@@ -283,6 +286,10 @@ class ModuleCS(object):
 
             CS3Table = []
             CS3Plot = []
+
+            CO2_0 = 0
+            NucWaste0 = 0
+            WatConsum0 = 0
 
             for ANo in range(len(generalData)-1):
                 i = ANo+1
@@ -419,6 +426,10 @@ class ModuleCS(object):
             CS4Table = []
             CS4Plot = []
 
+            TotalCost0 = 0
+            OwnCost0 = 0
+            Subsidies0 = 0
+
             for ANo in range(len(generalData)-1):
                 i = ANo+1
 
@@ -541,6 +552,10 @@ class ModuleCS(object):
             CS5Table = []
             CS5Plot = []
 
+            Amortization0 = 0
+            OMCost0 = 0
+            EnergyCost0 = 0
+
             for ANo in range(len(generalData)-1):
                 i = ANo+1
 
@@ -652,6 +667,9 @@ class ModuleCS(object):
             CS6Table = []
             CS6Plot = []
 
+
+            PEC0 = 0.0
+            EnergyCost0 = 0.0
 
             for ANo in range(len(generalData)-1):
                 i = ANo+1

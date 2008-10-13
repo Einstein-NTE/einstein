@@ -30,6 +30,7 @@
 #                           Hans Schweiger  03/07/2008
 #                           Hans Schweiger  07/07/2008
 #                           Hans Schweiger  16/09/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
@@ -52,6 +53,7 @@
 #       07/07/2008: HS  bug-fix: self.check substituted by GUITools->check
 #                       the old one didn't work with Tom's new FloatEntry
 #       16/09/2008: HS  bug-fix: introduced ANo in electricity table
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -86,6 +88,9 @@ UNITS_WIDTH       = 110
 
 ORANGE = '#FF6000'
 TITLE_COLOR = ORANGE
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #------------------------------------------------------------------------------
 def scale(val,fscale):
@@ -128,14 +133,14 @@ class PanelQ2(wx.Panel):
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
 
-        self.notebook.AddPage(self.page0, _('Fuel consumption and cost'))#SD put this later in do_layout
-        self.notebook.AddPage(self.page1, _('Electricity consumption and cost'))
+        self.notebook.AddPage(self.page0, _U('Fuel consumption and cost'))#SD put this later in do_layout
+        self.notebook.AddPage(self.page1, _U('Electricity consumption and cost'))
 
-        self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _("Fuels list"))
+        self.sizer_3_staticbox = wx.StaticBox(self.page0, -1, _U("Fuels list"))
         self.sizer_3_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_3_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _("Fuel consumption data"))
+        self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _U("Fuel consumption data"))
         self.sizer_5_staticbox.SetForegroundColour(TITLE_COLOR)
         self.sizer_5_staticbox.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -161,51 +166,51 @@ class PanelQ2(wx.Panel):
         self.fuelListBox.SetFont(fp.getFont())
         self.Bind(wx.EVT_LISTBOX, self.OnFuelListBoxClick, self.fuelListBox)
 
-        self.buttonRemoveFuelFromList = wx.Button(self.page0, -1, _("Remove from list"))
+        self.buttonRemoveFuelFromList = wx.Button(self.page0, -1, _U("Remove from list"))
         self.buttonRemoveFuelFromList.SetMinSize((125, 32))
         self.buttonRemoveFuelFromList.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonRemoveFuelFromList, self.buttonRemoveFuelFromList)
 
-        self.buttonAddFuel = wx.Button(self.page0, -1, _("Add fuel"))
+        self.buttonAddFuel = wx.Button(self.page0, -1, _U("Add fuel"))
         self.buttonAddFuel.SetMinSize((125, 32))
         self.buttonAddFuel.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddFuel, self.buttonAddFuel)
 
         self.tc1 = ChoiceEntry(self.page0, 
                                values=[],
-                               label=_("Fuels used"),
-                               tip=_(" "))
+                               label=_U("Fuels used"),
+                               tip=_U(" "))
         
         self.tc3 = FloatEntry(self.page0,
                               ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='MASSORVOLUME',
-                              label=_("Annual consumption (fuel units)"),
-                              tip=_("If possible, provide the monthly data in separate sheet and/or the fuel bills. Specify the energy equivalent in base of LCV (lower calorific value)"))  
+                              label=_U("Annual consumption (fuel units)"),
+                              tip=_U("If possible, provide the monthly data in separate sheet and/or the fuel bills. Specify the energy equivalent in base of LCV (lower calorific value)"))  
         
         self.tc4 = FloatEntry(self.page0,
                               ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='ENERGY',
-                              label=_("Annual consumption (LCV)"),
-                              tip=_(" "))  
+                              label=_U("Annual consumption (LCV)"),
+                              tip=_U(" "))  
         
         self.tc5 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
                               unitdict='ENERGYTARIFF',
-                              label=_("Fuel price(LCV)"),
-                              tip=_("Specify expenditures without VAT"))  
+                              label=_U("Fuel price(LCV)"),
+                              tip=_U("Specify expenditures without VAT"))  
         
         self.tc6 = FloatEntry(self.page0,
                               ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
                               unitdict='PRICE',
-                              label=_("Annual energy cost"),
-                              tip=_("Total cost"))  
+                              label=_U("Annual energy cost"),
+                              tip=_U("Total cost"))  
 
         # fillers
         self.dummy1 = wx.StaticText(self.page0, -1, "")
         self.dummy2 = wx.StaticText(self.page0, -1, "")
 
         # OK/Cancel buttons
-        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, _("Cancel"))
+        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, _U("Cancel"))
         self.buttonCancel.SetFont(fp.getFont())
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
@@ -257,22 +262,22 @@ class PanelQ2(wx.Panel):
         attr4.SetFont(fp.getFont())
         self.grid.SetAttr(1, 4, attr4)
         
-        self.grid.SetColLabelValue(0,_('Peak'))
-        self.grid.SetColLabelValue(1,_('Standard'))
-        self.grid.SetColLabelValue(2,_('Valley'))
-        self.grid.SetColLabelValue(3,_('TOTAL'))
-        self.grid.SetColLabelValue(4,_('Self-generation'))
-        self.grid.SetColLabelValue(5,_('Sales to grid'))
+        self.grid.SetColLabelValue(0,_U('Peak'))
+        self.grid.SetColLabelValue(1,_U('Standard'))
+        self.grid.SetColLabelValue(2,_U('Valley'))
+        self.grid.SetColLabelValue(3,_U('TOTAL'))
+        self.grid.SetColLabelValue(4,_U('Self-generation'))
+        self.grid.SetColLabelValue(5,_U('Sales to grid'))
 
-        self.grid.SetRowLabelValue(0,_('Annual consumption [MWh]'))
-        self.grid.SetRowLabelValue(1,_('Contracted power [kW]'))
-        self.grid.SetRowLabelValue(2,_('Tariff type'))
-        self.grid.SetRowLabelValue(3,_('Tariff installed power [EUR/kW.month]'))
-        self.grid.SetRowLabelValue(4,_('Tariff on consumption [EUR/kWh]'))
-        self.grid.SetRowLabelValue(5,_('Annual electricity cost [EUR]'))
-        self.grid.SetRowLabelValue(6,_('Electric consumption -'))
-        self.grid.SetRowLabelValue(7,_('according type of use'))
-        self.grid.SetRowLabelValue(8,_('Annual consumption [MWh]'))
+        self.grid.SetRowLabelValue(0,_U('Annual consumption [MWh]'))
+        self.grid.SetRowLabelValue(1,_U('Contracted power [kW]'))
+        self.grid.SetRowLabelValue(2,_U('Tariff type'))
+        self.grid.SetRowLabelValue(3,_U('Tariff installed power [EUR/kW.month]'))
+        self.grid.SetRowLabelValue(4,_U('Tariff on consumption [EUR/kWh]'))
+        self.grid.SetRowLabelValue(5,_U('Annual electricity cost [EUR]'))
+        self.grid.SetRowLabelValue(6,_U('Electric consumption -'))
+        self.grid.SetRowLabelValue(7,_U('according type of use'))
+        self.grid.SetRowLabelValue(8,_U('Annual consumption [MWh]'))
 
         self.grid.SetRowLabelAlignment(wx.LEFT, wx.BOTTOM)
 
@@ -281,14 +286,14 @@ class PanelQ2(wx.Panel):
         self.grid.SetCellSize(1, 4, 1, 2)
         self.grid.SetCellSize(2, 4, 4, 1)
 
-        self.grid.SetCellValue(6, 0, _('Electricity for thermal uses'))
-        self.grid.SetCellValue(6, 3, _('Electricity for non-thermal uses'))
-        self.grid.SetCellValue(7, 0, _('Refrigeration'))
-        self.grid.SetCellValue(7, 1, _('Air Conditioning'))
-        self.grid.SetCellValue(7, 2, _('Other uses'))
-        self.grid.SetCellValue(7, 3, _('Motor and machines'))
-        self.grid.SetCellValue(7, 4, _('Electro-chemics'))
-        self.grid.SetCellValue(7, 5, _('Lighting'))
+        self.grid.SetCellValue(6, 0, _U('Electricity for thermal uses'))
+        self.grid.SetCellValue(6, 3, _U('Electricity for non-thermal uses'))
+        self.grid.SetCellValue(7, 0, _U('Refrigeration'))
+        self.grid.SetCellValue(7, 1, _U('Air Conditioning'))
+        self.grid.SetCellValue(7, 2, _U('Other uses'))
+        self.grid.SetCellValue(7, 3, _U('Motor and machines'))
+        self.grid.SetCellValue(7, 4, _U('Electro-chemics'))
+        self.grid.SetCellValue(7, 5, _U('Lighting'))
 
         self.grid.SetReadOnly(6, 0, isReadOnly=True)
         self.grid.SetReadOnly(6, 3, isReadOnly=True)
@@ -641,10 +646,10 @@ class PanelQ2(wx.Panel):
 
     def checkIfAllowed(self):
 	if Status.ANo >= 0:
-            showWarning(_("In the present version of EINSTEIN it is not allowed to modify\n")+\
-                        _("fuel consumption in the checked state or alternative proposals. This is a RESULT of calculation\n")+\
-                        _("Workaround for studying fuel substitution: add all fuels You want to consider already in the original state\n")+\
-                        _("and set original consumption of these additional fuels to 0"))
+            showWarning(_U("In the present version of EINSTEIN it is not allowed to modify\n")+\
+                        _U("fuel consumption in the checked state or alternative proposals. This is a RESULT of calculation\n")+\
+                        _U("Workaround for studying fuel substitution: add all fuels You want to consider already in the original state\n")+\
+                        _U("and set original consumption of these additional fuels to 0"))
             return False
         else:   
             return True

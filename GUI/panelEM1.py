@@ -21,6 +21,7 @@
 #                           Stoyan Danov    04/07/2008
 #                           Stoyan Danov    07/07/2008
 #                           Stoyan Danov    09/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -30,6 +31,7 @@
 #       04/07/2008 SD: changed min No columns, col width,
 #       07/07/2008 SD: data split: totals eliminated from data to plot, colours, columnwidth, Totals line highlited
 #       09/07/2008 SD: set initially emptu labels to columns and fixed columnwidth to first 5 col
+#       13/10/2008: SD  change _() to _U()
 #
 #	
 #------------------------------------------------------------------------------		
@@ -72,6 +74,8 @@ GRID_BACKGROUND_COLOR = LIGHTGREY  # idem
 GRAPH_BACKGROUND_COLOR = WHITE # idem
 TITLE_COLOR = ORANGE
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelEM1(wx.Panel):
     def __init__(self, parent):
@@ -94,8 +98,8 @@ class PanelEM1(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 3,                            # data column for this graph ##SD: nothing happens if number changes, error if this line commented
                    'key'         : keys[1],                      # key for Interface ##SD this points the data
-                   'title'       :_('Monthly process heat demand'), # title of the graph
-                   'ylabel'      :_('UPH (MWh)'),                   # y axis label
+                   'title'       :_U('Monthly process heat demand'), # title of the graph
+                   'ylabel'      :_U('UPH (MWh)'),                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0,1]}                        # rows that should not be plotted
@@ -136,11 +140,11 @@ class PanelEM1(wx.Panel):
         self.grid1.SetRowLabelSize(30)
         self.grid1.EnableEditing(False)
 
-        self.grid1.SetColLabelValue(0, _(" ")) #set initially empty column labels
-        self.grid1.SetColLabelValue(1, _(" "))
-        self.grid1.SetColLabelValue(2, _(" "))
-        self.grid1.SetColLabelValue(3, _(" "))
-        self.grid1.SetColLabelValue(4, _(" "))
+        self.grid1.SetColLabelValue(0, _U(" ")) #set initially empty column labels
+        self.grid1.SetColLabelValue(1, _U(" "))
+        self.grid1.SetColLabelValue(2, _U(" "))
+        self.grid1.SetColLabelValue(3, _U(" "))
+        self.grid1.SetColLabelValue(4, _U(" "))
         
         headings = data[0] # extract the array of headings
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
@@ -191,7 +195,7 @@ class PanelEM1(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Monthly useful process heat'),
+        self.box1 = wx.StaticBox(self, -1, _U('Monthly useful process heat'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -203,7 +207,7 @@ class PanelEM1(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of useful process heat per months'),
+        self.box2 = wx.StaticBox(self, -1, _U('Distribution of useful process heat per months'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -224,7 +228,7 @@ class PanelEM1(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

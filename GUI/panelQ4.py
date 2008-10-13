@@ -29,6 +29,7 @@
 #                           Tom Sobota      02/07/2008
 #                           Hans Schweiger  02/07/2008
 #                           Tom Sobota      07/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       13/04/08:       Additional inputs in init: selection
@@ -47,6 +48,7 @@
 #       02/07/2008: HS  Read/write functions for tc20 adapted to new MultipleChoiceEntry
 #                       small bug-fix (TRANSEQUIPTYPES)
 #        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -92,6 +94,9 @@ VSEP_LEFT            =   2
 VSEP_MIDDLE          =   4
 VSEP_RIGHT           =   4
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class PanelQ4(wx.Panel):
     def __init__(self, parent, main, eqId,prefill=None):
 	self.parent = parent
@@ -129,34 +134,34 @@ class PanelQ4(wx.Panel):
         self.notebook.SetFont(fp.getFont())
 
         self.page0 = wx.Panel(self.notebook) # left panel
-        self.notebook.AddPage(self.page0, _('Descriptive data'))
+        self.notebook.AddPage(self.page0, _U('Descriptive data'))
 
         self.page1 = wx.Panel(self.notebook) # middle left panel
-        self.notebook.AddPage(self.page1, _('Technical data'))
+        self.notebook.AddPage(self.page1, _U('Technical data'))
 
         self.page2 = wx.Panel(self.notebook) # middle right panel
-        self.notebook.AddPage(self.page2, _('Heat source / sink'))
+        self.notebook.AddPage(self.page2, _U('Heat source / sink'))
 
         self.page3 = wx.Panel(self.notebook) # right panel
-        self.notebook.AddPage(self.page3, _('Schedule'))
+        self.notebook.AddPage(self.page3, _U('Schedule'))
 
-        self.frame_descriptive_data = wx.StaticBox(self.page0, -1,_("Descriptive data"))
+        self.frame_descriptive_data = wx.StaticBox(self.page0, -1,_U("Descriptive data"))
         self.frame_descriptive_data.SetForegroundColour(TITLE_COLOR)
         self.frame_descriptive_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_equipment_list = wx.StaticBox(self.page0, -1, _("Equipment list"))
+        self.frame_equipment_list = wx.StaticBox(self.page0, -1, _U("Equipment list"))
         self.frame_equipment_list.SetForegroundColour(TITLE_COLOR)
         self.frame_equipment_list.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_technical_data = wx.StaticBox(self.page1, -1, _("Technical data"))
+        self.frame_technical_data = wx.StaticBox(self.page1, -1, _U("Technical data"))
         self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_heat_source_sink = wx.StaticBox(self.page2, -1, _("Heat source / sink"))
+        self.frame_heat_source_sink = wx.StaticBox(self.page2, -1, _U("Heat source / sink"))
         self.frame_heat_source_sink.SetForegroundColour(TITLE_COLOR)
         self.frame_heat_source_sink.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.frame_schedule = wx.StaticBox(self.page3, -1, _("Schedule"))
+        self.frame_schedule = wx.StaticBox(self.page3, -1, _U("Schedule"))
         self.frame_schedule.SetForegroundColour(TITLE_COLOR)
         self.frame_schedule.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -189,33 +194,33 @@ class PanelQ4(wx.Panel):
 
         #right side: entries
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Short name of equipment"),
-                             tip=_("Give some brief name of the equipments to identify them in the reports"))
+                             label=_U("Short name of equipment"),
+                             tip=_U("Give some brief name of the equipments to identify them in the reports"))
         
         self.tc2 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Manufacturer"),
-                             tip=_("Attach the technical data if available"))
+                             label=_U("Manufacturer"),
+                             tip=_U("Attach the technical data if available"))
         
         self.tc3 = FloatEntry(self.page0,
                             decimals=0, minval=1950, maxval=2050, value=2000,
-                            label=_("Year of  manufacturing\nor/and installation?"),
-                            tip=_("Year of manufacturing or installation"))
+                            label=_U("Year of  manufacturing\nor/and installation?"),
+                            tip=_U("Year of manufacturing or installation"))
 
         self.tc4 = TextEntry(self.page0,maxchars=255,value='',
-                             label=_("Model"),
-                             tip=_("Model according manufacturer nomenclature"))
+                             label=_U("Model"),
+                             tip=_U("Model according manufacturer nomenclature"))
 
         equipeTypeChoices = TRANSEQUIPTYPE.values()
         equipeTypeChoices.sort()
         self.tc5 = ChoiceEntry(self.page0,
                                values=equipeTypeChoices,
-                               label=_("Type of equipment"),
-                               tip=_("e.g. boiler / burner / chiller / compressor / CHP motor"))
+                               label=_U("Type of equipment"),
+                               tip=_U("e.g. boiler / burner / chiller / compressor / CHP motor"))
 
         self.tc6 = FloatEntry(self.page0,
                             decimals=0,minval=0, maxval=100, value=0,
-                            label=_("Number of units of the same type"),
-                            tip=_("Specify how many units of this type exist"))
+                            label=_U("Number of units of the same type"),
+                            tip=_U("Specify how many units of this type exist"))
         #
         # middle left tab controls
         #
@@ -227,65 +232,65 @@ class PanelQ4(wx.Panel):
         self.tc7 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
-                              label=_("Nominal power (heat or cold, output)"),
-                              tip=_("Power at manufacturer nominal conditions"))
+                              label=_U("Nominal power (heat or cold, output)"),
+                              tip=_U("Power at manufacturer nominal conditions"))
 
         self.tc8 = ChoiceEntry(self.page1,
                                values=[],
-                               label=_("Fuel type"),
-                               tip=_("Select fuel type from predefined list"))
+                               label=_U("Fuel type"),
+                               tip=_U("Select fuel type from predefined list"))
 
         self.tc9 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='MASSORVOLUME',
-                              label=_("Fuel consumption (nominal)"),
-                              tip=_("Specify the units below"))
+                              label=_U("Fuel consumption (nominal)"),
+                              tip=_U("Specify the units below"))
 
         self.tc12 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
-                              label=_("Electrical power input"),
-                              tip=_("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
+                              label=_U("Electrical power input"),
+                              tip=_U("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
 
         self.tc13 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=2000., value=0.,
                               unitdict='FRACTION',
-                              label=_("Mean overall thermal conversion efficiency"),
-                              tip=_("Specify the efficiency of boiler or EER(COP) for cold generation"))
+                              label=_U("Mean overall thermal conversion efficiency"),
+                              tip=_U("Specify the efficiency of boiler or EER(COP) for cold generation"))
 
         self.tc17 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=100., value=0.,
                               unitdict='FRACTION',
-                              label=_("Mean utilisation factor (full capacity = 100%)"),
-                              tip=_("Specify the mean supplied power of the boiler/cooler/etc. with respect to its nominal power"))
+                              label=_U("Mean utilisation factor (full capacity = 100%)"),
+                              tip=_U("Specify the mean supplied power of the boiler/cooler/etc. with respect to its nominal power"))
 
 
         self.tc16 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Temperature of exhaust gas at standard operation conditions (boilers only)"),
-                              tip=_("Only for boilers and CHP"))
+                              label=_U("Temperature of exhaust gas at standard operation conditions (boilers only)"),
+                              tip=_U("Only for boilers and CHP"))
 
         self.tc16_2 = FloatEntry(self.page1,
                               ipart=2, decimals=2, minval=0., maxval=99.99, value=0.,
-                              label=_("Excess air ratio (boilers only)"),
-                              tip=_("Only for boilers and CHP"))
+                              label=_U("Excess air ratio (boilers only)"),
+                              tip=_U("Only for boilers and CHP"))
 
         self.tc15 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
-                              label=_("Electricity production (CHP only)"),
-                              tip=_("Only for CHP"))
+                              label=_U("Electricity production (CHP only)"),
+                              tip=_U("Only for CHP"))
 
         self.tc14 = FloatEntry(self.page1,
                               ipart=1, decimals=3, minval=0., maxval=1., value=0.,
-                              label=_("Electrical conversion efficiency (CHP only)"),
-                              tip=_("Only for CHP"))
+                              label=_U("Electrical conversion efficiency (CHP only)"),
+                              tip=_U("Only for CHP"))
 #next from Q4C
         self.tc102 = ChoiceEntry(self.page1,
                                values=[],
-                               label=_("Refrigerant (HP or Chiller only)"),
-                               tip=_("Refrigerant or working fluid (HP or Chiller only)"))
+                               label=_U("Refrigerant (HP or Chiller only)"),
+                               tip=_U("Refrigerant or working fluid (HP or Chiller only)"))
 
         #
         # middle right tab controls
@@ -293,54 +298,54 @@ class PanelQ4(wx.Panel):
         #
 
         self.tc20 = MultipleChoiceEntry(self.page2,
-                             label=_("Heat or cold supplied to the distribution line / branch\n(piping or duct) no."),
-                             tip=_("Specify the pipe(s) or duct(s) receiving heat from the equipment\n")+\
-                                 _("Pipes and ducts are defined in the panel 'distribution of heat and cold'"))
+                             label=_U("Heat or cold supplied to the distribution line / branch\n(piping or duct) no."),
+                             tip=_U("Specify the pipe(s) or duct(s) receiving heat from the equipment\n")+\
+                                 _U("Pipes and ducts are defined in the panel 'distribution of heat and cold'"))
         #
         self.tc30 = ChoiceEntry(self.page2,
                                values=[],
-                               label=_("Low temperature heat source"),
-                               tip=_("If waste heat is used, indicate the process or equipment from which waste heat originates\n")+\
-                                _("(e.g.feed-water or combustion air pre-heating, heat source for heat pumps, etc.)"))
+                               label=_U("Low temperature heat source"),
+                               tip=_U("If waste heat is used, indicate the process or equipment from which waste heat originates\n")+\
+                                _U("(e.g.feed-water or combustion air pre-heating, heat source for heat pumps, etc.)"))
 
 
         self.tc31 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Temperature of low temp. heat source"),
-                              tip=_("Temperature of the medium entering the evaporator"))
+                              label=_U("Temperature of low temp. heat source"),
+                              tip=_U("Temperature of the medium entering the evaporator"))
 
 
         self.tc34 = FloatEntry(self.page2,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
                               unitdict='POWER',
-                              label=_("Thermal power input high temp. (thermal HP and chillers only)"),
-                              tip=_("Power applied to the generator of a thermal heat pump or chiller"))
+                              label=_U("Thermal power input high temp. (thermal HP and chillers only)"),
+                              tip=_U("Power applied to the generator of a thermal heat pump or chiller"))
 
 
         self.tc33 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Driving temperature (thermal HP and chillers only)"),
-                              tip=_("Temperature of heat supply fluid entering the generator"))
+                              label=_U("Driving temperature (thermal HP and chillers only)"),
+                              tip=_U("Temperature of heat supply fluid entering the generator"))
 
 
         self.tc32 = ChoiceEntry(self.page2,
                                values=[],
-                               label=_("High temperature heat source (thermal HP and chillers only)"),
-                               tip=_("Indicate if the circuit of the heat supply to generator is closed or opened (waste heat released to ambient)"))
+                               label=_U("High temperature heat source (thermal HP and chillers only)"),
+                               tip=_U("Indicate if the circuit of the heat supply to generator is closed or opened (waste heat released to ambient)"))
 
 #next 2 from Q4C
         self.tc35 = ChoiceEntry(self.page2,
                                values=[],
-                               label=_("Destination of waste heat (chillers only)"),
-                               tip=_("If applies, specify heat exchanger where waste heat is used"))
+                               label=_U("Destination of waste heat (chillers only)"),
+                               tip=_U("If applies, specify heat exchanger where waste heat is used"))
 
         self.tc36 = FloatEntry(self.page2,
                               ipart=3, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
-                              label=_("Temperature of re-cooling (chillers only)"),
-                              tip=_("Outlet temperature of cooling water or hot air stream"))
+                              label=_U("Temperature of re-cooling (chillers only)"),
+                              tip=_U("Outlet temperature of cooling water or hot air stream"))
 
         #
         # right tab controls
@@ -351,23 +356,23 @@ class PanelQ4(wx.Panel):
 
         self.tc18 = FloatEntry(self.page3,
                               ipart=2, decimals=1, minval=0., maxval=24., value=0.,
-                              label=_("Hours of operation per day"),
-                              tip=_("Specify representative mean values"))
+                              label=_U("Hours of operation per day"),
+                              tip=_U("Specify representative mean values"))
 
         self.tc19 = FloatEntry(self.page3,
                               ipart=3, decimals=1, minval=0., maxval=365., value=0.,
-                              label=_("Days of operation per year"),
-                              tip=_("Specify representative mean values"))
+                              label=_U("Days of operation per year"),
+                              tip=_U("Specify representative mean values"))
 
         #
         # buttons
         #
-        self.buttonDeleteEquipment = wx.Button(self.page0,-1,label=_("Delete equipment"))
+        self.buttonDeleteEquipment = wx.Button(self.page0,-1,label=_U("Delete equipment"))
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
         self.buttonDeleteEquipment.SetMinSize((136, 32))
         self.buttonDeleteEquipment.SetFont(fp.getFont())
 
-        self.buttonAddEquipment = wx.Button(self.page0,-1,label=_("Add equipment"))
+        self.buttonAddEquipment = wx.Button(self.page0,-1,label=_U("Add equipment"))
         self.Bind(wx.EVT_BUTTON,self.OnButtonAddEquipment, self.buttonAddEquipment)
         self.buttonAddEquipment.SetMinSize((136, 32))
         self.buttonAddEquipment.SetFont(fp.getFont())

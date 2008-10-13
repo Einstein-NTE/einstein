@@ -1,14 +1,19 @@
 # -*- coding: utf_8 -*-
 #   18/04/2008  HS  function "update added" and import of Status added.
 #                           Stoyan Danov            18/06/2008
+#                           Stoyan Danov    13/10/2008
 #       Changes to previous version:
 #       18/06/2008 SD: change to translatable text _(...)
+#       13/10/2008: SD  change _() to _U()
 
 import wx
 
 from einstein.GUI.status import Status
 from einstein.modules.constants import *
 ASSISTANTLIST = INTERACTIONLEVELS
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class PanelInfo(wx.StatusBar):
     def __init__(self, parent, main):
@@ -28,24 +33,19 @@ class PanelInfo(wx.StatusBar):
 	self.SetFieldsCount(3)
         self.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 
-	self.SetStatusText(unicode(_('Project'),"utf-8"),0)
+	self.SetStatusText(_U('Project'),0)
         self.t0 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(60,0),size=wx.Size(270, 21),
 			      value=project, style=wx.TE_READONLY)
         self.t0.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t0.Center(direction=wx.VERTICAL)
 
-#	self.SetStatusText(wxString(_('Alternative')),1)
-	self.SetStatusText(unicode(_('Alternative'),"utf-8"),1)
+	self.SetStatusText(_U('Alternative'),1)
         self.t1 = wx.TextCtrl(id=-1, parent=self,pos=wx.Point(416, 0),size=wx.Size(260, 21),
 			      value=alternative, style=wx.TE_READONLY)
         self.t1.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
 	self.t1.Center(direction=wx.VERTICAL)
 
-#        myString = _('Design assistant')
-#        print myString
-#        myStringUTF = myString.encode("utf-8")
-	self.SetStatusText(unicode(_('Design assistant'),"utf-8"),2)
-#	self.SetStatusText(myStringUTF,2)
+	self.SetStatusText(_U('Design assistant'),2)
         self.choiceAssistant = wx.Choice(choices=ASSISTANTLIST,
               id=-1, name='choiceAssistant', parent=self, pos=wx.Point(800, 0),size=wx.Size(200,21))
         self.choiceAssistant.SetFont(wx.Font(8, wx.ROMAN, wx.NORMAL, wx.BOLD, False, 'Times Roman'))
@@ -72,7 +72,7 @@ class PanelInfo(wx.StatusBar):
 
     def OnChoiceAssistant(self, event):
 	i = self.choiceAssistant.GetCurrentSelection()
-	self.main.logWarning(_('Design assistant changed to ')+repr(ASSISTANTLIST[i]))	
+	self.main.logWarning(_U('Design assistant changed to ')+repr(ASSISTANTLIST[i]))	
         Status.prj.setUserInteractionLevel(ASSISTANTLIST[i])
         self.main.changeAssistantMainMenu(i)
         if event is not None:

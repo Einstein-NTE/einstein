@@ -15,9 +15,11 @@
 #	Created by: 	    Tom Sobota	April 2008
 #	Last revised by:
 #                           Stoyan Danov        19/06/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       19/06/2008 SD: change to translatable text _(...)
+#       13/10/2008: SD  change _() to _U()
 #
 #
 #------------------------------------------------------------------------------
@@ -32,15 +34,18 @@
 
 import wx
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class DialogLanguage(wx.Dialog):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Dialog.__init__(self, id=-1, name='DialogLanguage', parent=prnt,
               pos=wx.Point(433, 283), size=wx.Size(350, 300),
-              style=wx.DEFAULT_DIALOG_STYLE, title=_('Select language'))
+              style=wx.DEFAULT_DIALOG_STYLE, title=_U('Select language'))
 
         self.st1 = wx.StaticText(id=-1,
-                                 label=_('Available languages'),
+                                 label=_U('Available languages'),
                                  name='st1',
                                  parent=self,
                                  pos=wx.Point(10, 16),
@@ -58,7 +63,7 @@ class DialogLanguage(wx.Dialog):
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnListBoxLangDclick, self.listBoxLang)
 
         self.buttonOK = wx.Button(id=wx.ID_OK,
-                                  label=_('OK'),
+                                  label=_U('OK'),
                                   name='buttonOK',
                                   parent=self,
                                   pos=wx.Point(220, 50),
@@ -67,7 +72,7 @@ class DialogLanguage(wx.Dialog):
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton, id=wx.ID_OK)
 
         self.buttonCancel = wx.Button(id=wx.ID_CANCEL,
-                                      label=_('Cancel'),
+                                      label=_U('Cancel'),
                                       name='buttonCancel',
                                       parent=self,
                                       pos=wx.Point(220, 80),
@@ -103,14 +108,14 @@ class DialogLanguage(wx.Dialog):
         self.listBoxLang.Clear()
 
     def fillPage(self):
-	self.SetLangList([_('en-English'),
-                          _('cat-Catalan'),
-                          _('cz-Czech'),
-                          _('de-Deutsch'),
-                          _('it-Italiano'),
-                          _('pl-Polish'),
-                          _('si-Slovenian'),
-                          _('es-Spanish')])
+	self.SetLangList([_U('en-English'),
+                          _U('cat-Catalan'),
+                          _U('cz-Czech'),
+                          _U('de-Deutsch'),
+                          _U('it-Italiano'),
+                          _U('pl-Polish'),
+                          _U('si-Slovenian'),
+                          _U('es-Spanish')])
 
     def GetLanguage(self):
         return self.language

@@ -23,6 +23,7 @@
 #                           Stoyan Danov    01/07/2008
 #                           Stoyan Danov    02/07/2008
 #                           Stoyan Danov    03/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -34,6 +35,7 @@
 #       01/07/2008: SD  adappted as panelEAb - heat demand by temperature
 #       02/07/2008: SD  changed to orange colour (staticBox)
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -66,6 +68,12 @@ import einstein.modules.matPanel as Mp
 COLNO = 7
 MAXROWS = 20
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 #------------------------------------------------------------------------------		
 def drawFigure(self):
 #------------------------------------------------------------------------------
@@ -90,8 +98,8 @@ def drawFigure(self):
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend(loc = 2)
-    self.subplot.axes.set_ylabel(_('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_('Temperature [ºC]'))
+    self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
+    self.subplot.axes.set_xlabel(_U('Temperature [ºC]'))
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -144,7 +152,7 @@ class PanelEA4b(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : 'EA4b_Plot',                # key for Interface
-                   'title'       : _('Some title'),           # title of the graph
+                   'title'       : _U('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : []}            # rows that should not be plotted
 
@@ -185,13 +193,13 @@ class PanelEA4b(wx.Panel):
         self.grid1.SetColSize(6,105)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Temperature levels\n[ºC]"))
-        self.grid1.SetColLabelValue(1, _("[MWh]"))
-        self.grid1.SetColLabelValue(2, _("[%]"))
-        self.grid1.SetColLabelValue(3, _("cumulative\n[%]"))
-        self.grid1.SetColLabelValue(4, _("[MWh]"))
-        self.grid1.SetColLabelValue(5, _("[%]"))
-        self.grid1.SetColLabelValue(6, _("cumulative\n[%]"))
+        self.grid1.SetColLabelValue(0, _U("Temperature levels\n[ºC]"))
+        self.grid1.SetColLabelValue(1, _U("[MWh]"))
+        self.grid1.SetColLabelValue(2, _U("[%]"))
+        self.grid1.SetColLabelValue(3, _U("cumulative\n[%]"))
+        self.grid1.SetColLabelValue(4, _U("[MWh]"))
+        self.grid1.SetColLabelValue(5, _U("[%]"))
+        self.grid1.SetColLabelValue(6, _U("cumulative\n[%]"))
 
 #..............................................................................
 # bring data to table
@@ -234,19 +242,19 @@ class PanelEA4b(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _('Heat demand (UPH) and supply (USH) by temperature'),
+        self.box1 = wx.StaticBox(self, -1, _U('Heat demand (UPH) and supply (USH) by temperature'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.staticText2 = wx.StaticText(id=-1,
-              label=_('Heat demand (UPH) by process temperature (PT)'),
+              label=_U('Heat demand (UPH) by process temperature (PT)'),
               name='staticText2', parent=self, pos=wx.Point(200, 24),
               size=wx.Size(50, 17), style=0)
 
         self.staticText3 = wx.StaticText(id=-1,
-              label=_('Heat supply (USH) by central supply temperature (CST)'),
+              label=_U('Heat supply (USH) by central supply temperature (CST)'),
               name='staticText3', parent=self, pos=wx.Point(470, 24),
               size=wx.Size(50, 17), style=0)
 
@@ -255,7 +263,7 @@ class PanelEA4b(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _('Distribution of heat demand (UPH) and supply (USH) by process temperatures'),
+        self.box2 = wx.StaticBox(self, -1, _U('Distribution of heat demand (UPH) and supply (USH) by process temperatures'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -275,7 +283,7 @@ class PanelEA4b(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

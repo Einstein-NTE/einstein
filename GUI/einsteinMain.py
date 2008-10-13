@@ -161,6 +161,7 @@
 
 #-----  Imports
 import sys
+
 import os
 import time
 import gettext
@@ -443,7 +444,14 @@ class EinsteinFrame(wx.Frame):
         tl = time.localtime()
         now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
         item = wx.ListItem()
-        item.SetText(now + text)
+        try:
+            item.SetText(now + text.encode("latin-1","replace"))  
+        except:
+            try:
+                item.SetText(now + unicode(text,"utf-8").encode("latin-1","replace"))
+            except:
+                item.SetText(now + "---")
+
         item.SetTextColour(fcolor)
         item.SetBackgroundColour(bcolor)
         item.SetColumn(0)
@@ -796,12 +804,8 @@ class EinsteinFrame(wx.Frame):
         self.item = event.GetItem()
         select = self.tree.GetItemText(self.item)
 
-        #if self.item:
-        #    str1 = "Selected item = %s\n" % select
-        #    self.logMessage(str1)
-        #print 'select='+select
         #PageTitle
-        if select == "Einstein":
+        if select == _U("Einstein"):
             self.hidePages()
             self.pageTitle.Show()
         #Page0
@@ -935,22 +939,22 @@ class EinsteinFrame(wx.Frame):
             self.panelEA5 = PanelEA5(parent=self.leftpanel2)
             self.panelEA5.display()
         #qEM1 'Energy performance - Monthly'
-        elif select == 'Monthly demand':
+        elif select == _U('Monthly demand'):
             self.hidePages()
             self.panelEM1 = PanelEM1(parent=self.leftpanel2)
             self.panelEM1.display()
         #qEM2 'Heat supply - Monthly'
-        elif select == 'Monthly supply':
+        elif select == _U('Monthly supply'):
             self.hidePages()
             self.panelEM2 = PanelEM2(parent=self.leftpanel2)
             self.panelEM2.display()
         #qEH1 'Energy performance - Hourly'
-        elif select == 'Hourly demand':
+        elif select == _U('Hourly demand'):
             self.hidePages()
             #self.panelEH1 = PanelEH1(parent=self.leftpanel2)
             #self.panelEH1.Show()
         #qEH2 'Heat supply - Hourly'
-        elif select == 'Hourly supply':
+        elif select == _U('Hourly supply'):
             self.hidePages()
             #self.panelEH2 = PanelEH2(parent=self.leftpanel2)
             #self.panelEH2.Show()
@@ -967,17 +971,17 @@ class EinsteinFrame(wx.Frame):
             pass
 
 #XXXHS2008-04-08
-        elif select == "Global energy intensity":
+        elif select == _U("Global energy intensity"):
             self.hidePages()
             self.panelBM1 = PanelBM1(parent=self.leftpanel2)
             self.panelBM1.display()
 
-        elif select == "SEC by product":
+        elif select == _U("SEC by product"):
             self.hidePages()
             self.panelBM2 = PanelBM2(parent=self.leftpanel2)
             self.panelBM2.display()
 
-        elif select == "SEC by process":
+        elif select == _U("SEC by process"):
             self.hidePages()
             self.panelBM3 = PanelBM3(parent=self.leftpanel2)
             self.panelBM3.display()
@@ -996,38 +1000,35 @@ class EinsteinFrame(wx.Frame):
             self.panelPO.display()
 
         #panelCHP
-        elif select == "CHP":
+        elif select == _U("CHP"):
             self.hidePages()
             self.panelCHP = PanelCHP(id=-1, name='panelCHP', parent=self.leftpanel2,
                                    main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),
                                    style=wx.TAB_TRAVERSAL)
             self.panelCHP.display()
         #panelST
-        elif select == "Solar Thermal":
+        elif select == _U("Solar Thermal"):
             self.hidePages()
             self.panelST = PanelST(id=-1, name='panelST', parent=self.leftpanel2,main=self)
             self.panelST.display()
             
         #panelHP
-        elif select == "Heat Pumps":
-            ret = self.OnEnterHeatPumpPage()
-            if  ret == 0:
-                self.hidePages()
-                self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2,
-                                       main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600),
-                                       style=wx.TAB_TRAVERSAL)
-                self.panelHP.display()
-            else:
-                self.showInfo("OnEnterHeatPumpPage return %s" %(ret))
+        elif select == _U("Heat Pumps"):
+            self.hidePages()
+            self.panelHP = PanelHP(id=-1, name='panelHP', parent=self.leftpanel2,
+                                   main=self, pos=wx.Point(0, 0), size=wx.Size(800, 600),
+                                   style=wx.TAB_TRAVERSAL)
+            self.panelHP.display()
+
         #pageBoilers
-        elif select == "Boilers & burners":
+        elif select == _U("Boilers & burners"):
             self.hidePages()
             self.panelBB = PanelBB(id=-1, name='panelBB', parent=self.leftpanel2,
                                    main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),
                                    style=wx.TAB_TRAVERSAL)
             self.panelBB.display()
         #panelEnergy
-        elif select == "Energy performance":
+        elif select == _U("Energy performance"):
             ###TS2008-03-11 Boiler Page activated
             self.hidePages()
             self.panelEnergy = PanelEnergy(id=-1, name='panelEnergy',
@@ -1044,7 +1045,7 @@ class EinsteinFrame(wx.Frame):
             self.panelHR.display()
 
         #panelHC
-        elif select == "H&C Supply":
+        elif select == _U("H&C Supply"):
             self.hidePages()
             self.panelHC = PanelHC(id=-1, name='panelHC', parent=self.leftpanel2, main = self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600), style=wx.TAB_TRAVERSAL)
@@ -1116,16 +1117,9 @@ class EinsteinFrame(wx.Frame):
             self.panelCS7 = PanelCS7(parent=self.leftpanel2)
             self.panelCS7.display()
         elif select == _U("Report"):
-            #TS 2008-3-26 No action here
-            #self.hidePages()
-            #self.pageFinalReport.Show()
-            pass
-        #qFinalReportPage1
-        #TS20080501 changed 'Report page 1' to 'Report generation'
-        elif select == 'Report generation':
             self.hidePages()
-            self.pageFinalReport = PanelReport(parent=self.leftpanel2, main=self)
-            self.pageFinalReport.Show()
+            self.panelReport = PanelReport(parent=self.leftpanel2, main=self)
+            self.panelReport.Show()
 
 
 #------------------------------------------------------------------------------
@@ -1138,15 +1132,6 @@ class EinsteinFrame(wx.Frame):
             pass
         else:
             self.showError("Select Questionnaire first!")
-
-    def OnEnterHeatPumpPage(self):
-        if Status.PId <> 0:
-            #ret = self.ModBridge.StartpanelHP(Status.SQL, DB, self.activeQid)
-            #self.showInfo("Return of StartpanelHP %s" %(ret))
-            return 0
-        else:
-            self.showError("Select project first!")
-            return 1
 
 #------------------------------------------------------------------------------
 # Auxiliary Functions
@@ -1211,6 +1196,7 @@ class EinsteinFrame(wx.Frame):
         #TS20080428 Modified for loading on demand
         # but pageTitle is not destroyed, just hidden
         self.pageTitle.Hide()
+
         try:self.Page0.Destroy()
         except:pass
         try:self.Page1.Destroy()
@@ -1235,9 +1221,6 @@ class EinsteinFrame(wx.Frame):
         try:self.panelCC.Destroy()
         except:pass
         
-        #try:self.pageStatistics.Destroy()
-        #except:pass
-
         try:self.panelEA1.Destroy()
         except:pass
         try:self.panelEA2.Destroy()
@@ -1257,9 +1240,6 @@ class EinsteinFrame(wx.Frame):
         try:self.panelEM2.Destroy()
         except:pass
 
-        #HS2008-04-08
-        try:self.pageBenchmarkCheck.Destroy()
-        except:pass
         try:self.panelBM1.Destroy()
         except:pass
         try:self.panelBM2.Destroy()
@@ -1312,9 +1292,8 @@ class EinsteinFrame(wx.Frame):
         try:self.panelCS7.Destroy()
         except:pass
 
-        try:self.pageFinalReport.Destroy()
+        try:self.panelReport.Destroy()
         except:pass
-
 
 
     def CreateMenu(self):
@@ -1577,16 +1556,14 @@ class EinsteinFrame(wx.Frame):
             #Comparative study – Detail Info 7
         self.qCS7 = self.tree.AppendItem (self.qCS, _U("Comp.study: Internal rate of return"))
 
-        self.qFinalReport = self.tree.AppendItem (self.qRoot, _U("Report"))
-        self.qFinalReport = self.tree.AppendItem (self.qFinalReport, _U("Report generation"))
-
+        self.qReport = self.tree.AppendItem (self.qRoot, _U("Report"))
+        
         self.tree.Expand(self.qRoot)
         self.tree.Expand(self.qPage0)
         self.tree.Expand(self.qStatistics)
         self.tree.Expand(self.qBM)
         self.tree.Expand(self.qA)
-        self.tree.Expand(self.qFinalReport)
-        
+    
 
     def BindEvents(self):
         #--- binding the menu

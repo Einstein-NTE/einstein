@@ -20,6 +20,7 @@
 #                           Stoyan Danov    30/06/2008
 #                           Stoyan Danov    03/07/2008
 #                           Stoyan Danov    06/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:           mod. to use external graphics module
@@ -29,6 +30,7 @@
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #       06/07/2008 SD: arrange column width, change background colour -> lightgrey,
 #                       security feature modified (see #SD2008-07-06)
+#       13/10/2008: SD  change _() to _U()
 #
 #	
 #------------------------------------------------------------------------------		
@@ -79,6 +81,12 @@ TITLE_COLOR = ORANGE
 ##COLNO2 = 4
 ##MAXROWS = 10
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 class PanelEA5(wx.Panel):
     def __init__(self, parent):
         self._init_ctrls(parent)
@@ -100,7 +108,7 @@ class PanelEA5(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : _('Energy intensity'),     # title of the graph
+                   'title'       : _U('Energy intensity'),     # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}                    # rows that should not be plotted
 
@@ -119,9 +127,9 @@ class PanelEA5(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 1,                      # data column for this graph
                    'key'         : keys[1],                # key for Interface
-                   'title'       : _('SEC by product'),       # title of the graph
+                   'title'       : _U('SEC by product'),       # title of the graph
                    'ylabel'      : 'Energy',
-                   'legend'      : [_('Energy by fuels'), _('Energy by electricity'), _('Primary energy')], # legend
+                   'legend'      : [_U('Energy by fuels'), _U('Energy by electricity'), _U('Primary energy')], # legend
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -163,9 +171,9 @@ class PanelEA5(wx.Panel):
         
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Energy type"))
-        self.grid1.SetColLabelValue(1, _("Energy intensity\n[kWh/EUR]"))
-        self.grid1.SetColLabelValue(2, _(" "))
+        self.grid1.SetColLabelValue(0, _U("Energy type"))
+        self.grid1.SetColLabelValue(1, _U("Energy intensity\n[kWh/€]"))
+        self.grid1.SetColLabelValue(2, _U(" "))
         #
         # copy values from dictionary to grid
         #
@@ -215,10 +223,10 @@ class PanelEA5(wx.Panel):
         
         self.grid2.EnableEditing(False)
         self.grid2.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid2.SetColLabelValue(0, _("Product"))
-        self.grid2.SetColLabelValue(1, _("Energy by\nfuels\n[kWh/pu]"))
-        self.grid2.SetColLabelValue(2, _("Energy by\nelectricity\n[kWh/pu]"))
-        self.grid2.SetColLabelValue(3, _("Primary\nenergy\n[kWh/pu]"))
+        self.grid2.SetColLabelValue(0, _U("Product"))
+        self.grid2.SetColLabelValue(1, _U("Energy by\nfuels\n[kWh/pu]"))
+        self.grid2.SetColLabelValue(2, _U("Energy by\nelectricity\n[kWh/pu]"))
+        self.grid2.SetColLabelValue(3, _U("Primary\nenergy\n[kWh/pu]"))
         #
         # copy values from dictionary to grid
         #
@@ -264,14 +272,14 @@ class PanelEA5(wx.Panel):
 #   box 1
 
 #SD2008-06-30
-        self.box1 = wx.StaticBox(self, -1, _(u'Energy intensity by energy type (turnover)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Energy intensity by energy type (turnover)'),
                                  pos = (10,10),size=(780,260))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 ##        self.staticText1 = wx.StaticText(id=wxID_PANELEA5STATICTEXT1,
-##              label=_(u'Energy intensity by energy type (turnover)'),
+##              label=_U('Energy intensity by energy type (turnover)'),
 ##              name='staticText1', parent=self, pos=wx.Point(40, 8),
 ##              size=wx.Size(580, 20), style=0)
 
@@ -288,14 +296,14 @@ class PanelEA5(wx.Panel):
 #   box 2
 
 #SD2008-06-30
-        self.box2 = wx.StaticBox(self, -1, _(u'Specific energy consumption (SEC) by product.'),
+        self.box2 = wx.StaticBox(self, -1, _U('Specific energy consumption (SEC) by product.'),
                                  pos = (10,290),size=(780,260))
         
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 ##        self.staticText2 = wx.StaticText(id=wxID_PANELEA5STATICTEXT2,
-##              label=_(u'Specific energy consumption (SEC) by product.'),
+##              label=_U('Specific energy consumption (SEC) by product.'),
 ##              name='staticText2', parent=self, pos=wx.Point(40, 324),
 ##              size=wx.Size(580, 20), style=0)
 
@@ -319,7 +327,7 @@ class PanelEA5(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

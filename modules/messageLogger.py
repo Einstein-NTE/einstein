@@ -87,7 +87,7 @@ def logError(message):
 #   writes a message to the EINSTEIN GUI and parallely to the log-file
 #   highlights as ERROR
 #------------------------------------------------------------------------------		
-    Status.main.logMessage(message)
+    Status.main.logError(message)
 
 #------------------------------------------------------------------------------		
 def logWarning(message):
@@ -95,7 +95,7 @@ def logWarning(message):
 #   writes a message to the EINSTEIN GUI and parallely to the log-file
 #   highlights as WARNING
 #------------------------------------------------------------------------------		
-    Status.main.logMessage(message)
+    Status.main.logWarning(message)
 
 #------------------------------------------------------------------------------		
 def logDebug(message):

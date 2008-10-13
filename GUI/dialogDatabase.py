@@ -6,6 +6,9 @@ from subprocess import *
 import MySQLdb
 import wx
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class DlgDatabase(wx.Dialog):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
@@ -39,20 +42,20 @@ class DlgDatabase(wx.Dialog):
         self.label_4 = wx.StaticText(self.notebook_1_pane_1, -1, "Password")
         self.text_password = wx.TextCtrl(self.notebook_1_pane_1, -1, value=self.DBPass)
         self.buttonDBParams = wx.Button(self.notebook_1_pane_1, -1, "Save parameters")
-        self.label_5 = wx.StaticText(self.notebook_1_pane_2, -1, _("This operation will:\n\n1.- DELETE a previous Einstein database from\nyour MySQL server, if found.\n2.- INSTALL a new Einstein database from a\nprevious backup file (or from your installation\npackage)\n\nWARNING: all your previous data will be lost.\n\n"))
+        self.label_5 = wx.StaticText(self.notebook_1_pane_2, -1, _U("This operation will:\n\n1.- DELETE a previous Einstein database from\nyour MySQL server, if found.\n2.- INSTALL a new Einstein database from a\nprevious backup file (or from your installation\npackage)\n\nWARNING: all your previous data will be lost.\n\n"))
         self.buttonLoadDatabase = wx.Button(self.notebook_1_pane_2, -1, "Select a database file to install")
-        self.label_5_copy = wx.StaticText(self.notebook_1_pane_3, -1, _("This operation will create a backup file containing\nALL the current information from your Einstein\ndatabase.\n\nThis file could be used to restore the contents of\nthe database in the case of accidents, server or\nmachine upgrades, and so on.\n\nThe current contents of the database is not affected\nby this operation."))
+        self.label_5_copy = wx.StaticText(self.notebook_1_pane_3, -1, _U("This operation will create a backup file containing\nALL the current information from your Einstein\ndatabase.\n\nThis file could be used to restore the contents of\nthe database in the case of accidents, server or\nmachine upgrades, and so on.\n\nThe current contents of the database is not affected\nby this operation."))
 
-        self.label_6 = wx.StaticText(self.notebook_1_pane_1, -1, _("Folder with MySql executables"))
+        self.label_6 = wx.StaticText(self.notebook_1_pane_1, -1, _U("Folder with MySql executables"))
         self.text_ctrl_6 = wx.TextCtrl(self.notebook_1_pane_1, -1, value=self.MySQLBin)
 
-        self.label_8 = wx.StaticText(self.notebook_1_pane_1, -1, _("Character encoding"))
+        self.label_8 = wx.StaticText(self.notebook_1_pane_1, -1, _U("Character encoding"))
         self.chEncoding = wx.Choice(self.notebook_1_pane_1, -1, choices=[])
 
         self.buttonBackupDatabase = wx.Button(self.notebook_1_pane_3, -1,
-                                              _("Select a file to save the database backup"))
-        self.buttonFinish = wx.Button(self, -1, _("Finish"))
-        self.buttonTestConnection = wx.Button(self.notebook_1_pane_1, -1, _("Test connection"))
+                                              _U("Select a file to save the database backup"))
+        self.buttonFinish = wx.Button(self, -1, _U("Finish"))
+        self.buttonTestConnection = wx.Button(self.notebook_1_pane_1, -1, _U("Test connection"))
         self.buttonFindMySQL = wx.Button(self.notebook_1_pane_1, -1, "...")
         self.buttonFindMySQL.SetMinSize((40, 32))
 
@@ -70,7 +73,7 @@ class DlgDatabase(wx.Dialog):
         self.ReadValidEncodings()
         
     def __set_properties(self):
-        self.SetTitle(_("Database administration"))
+        self.SetTitle(_U("Database administration"))
         #self.label_5.SetBackgroundColour(wx.Colour(255, 0, 0))
         self.label_5.SetForegroundColour(wx.Colour(255, 0, 0))
         self.label_5.SetFont(wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.BOLD, 0, ""))
@@ -115,9 +118,9 @@ class DlgDatabase(wx.Dialog):
         sizer_3.Add(self.label_5_copy, 0, wx.EXPAND, 0)
         sizer_3.Add(self.buttonBackupDatabase, 0, wx.EXPAND, 0)
         self.notebook_1_pane_3.SetSizer(sizer_3)
-        self.notebook_1.AddPage(self.notebook_1_pane_1, _("Database parameters"))
-        self.notebook_1.AddPage(self.notebook_1_pane_2, _("Restore database"))
-        self.notebook_1.AddPage(self.notebook_1_pane_3, _("Backup database"))
+        self.notebook_1.AddPage(self.notebook_1_pane_1, _U("Database parameters"))
+        self.notebook_1.AddPage(self.notebook_1_pane_2, _U("Restore database"))
+        self.notebook_1.AddPage(self.notebook_1_pane_3, _U("Backup database"))
         sizerGlobal.Add(self.notebook_1, 1, wx.EXPAND, 0)
         sizerOKCancel.Add(self.buttonFinish, 0, 0, 0)
         sizerGlobal.Add(sizerOKCancel, 0, wx.ALIGN_RIGHT, 0)
@@ -130,14 +133,14 @@ class DlgDatabase(wx.Dialog):
         #----- try to connect to the Database
         (rsp,msg) = self.testConnection()
         if rsp:
-            self.main.showInfo(_('Connection OK'))
+            self.main.showInfo(_U('Connection OK'))
         else:
-            self.main.showError(_('Connection error:\n%s') % msg)
+            self.main.showError(_U('Connection error:\n%s') % msg)
         
     def OnSaveParameters(self, event):
         (rsp,msg) = self.testConnection()
         if not rsp:
-            txt = _('Cannot connect with these parameters.\n\nError message:\n%s\n\nWant to save them anyway?')
+            txt = _U('Cannot connect with these parameters.\n\nError message:\n%s\n\nWant to save them anyway?')
             if self.main.askConfirmation(txt % msg) == wx.NO:
                 return
 
@@ -151,11 +154,11 @@ class DlgDatabase(wx.Dialog):
 
 
         if not hostname or not dbname or not username:
-            self.main.showWarning(_('Host name, database name and user name cannot be empty'))
+            self.main.showWarning(_U('Host name, database name and user name cannot be empty'))
             return
 
         if not mysqlbin:
-            self.main.showWarning(_('Mysql binary folder is unknown. Database dumps will not be made.'))
+            self.main.showWarning(_U('Mysql binary folder is unknown. Database dumps will not be made.'))
 
         groupmarker = re.compile(r'\[(\w+?)\]')
         itemmarker =  re.compile(r'(\w+?):(.*)')
@@ -194,7 +197,7 @@ class DlgDatabase(wx.Dialog):
                         oldDict[group] = {}
                     oldDict[group][key] = value
                 else:
-                    self.main.showWarning(_('Bad value in einstein.ini file: %s' % s))
+                    self.main.showWarning(_U('Bad value in einstein.ini file: %s' % s))
 
         # substitute new values
         for group in oldDict.keys():        # GUI,DB
@@ -217,12 +220,12 @@ class DlgDatabase(wx.Dialog):
 
         fw.close()
         self.savedchanges=True
-        self.main.showInfo(_('The configuration has been updated'))
+        self.main.showInfo(_U('The configuration has been updated'))
 
     def OnRestoreDatabase(self, event):
         self.main.showWarning("Not yet, sorry!")
         return
-        infile = self.openfile(_('Choose a file for restoring the Database'),
+        infile = self.openfile(_U('Choose a file for restoring the Database'),
                                 style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if infile is not None:
             pass
@@ -230,7 +233,7 @@ class DlgDatabase(wx.Dialog):
 
     def OnFindMySQL(self, event):
         dialog = wx.DirDialog(parent=None,
-                              message=_('Please select the folder where MySQL binaries reside'),
+                              message=_U('Please select the folder where MySQL binaries reside'),
                               defaultPath=self.MySQLBin,
                               style=wx.DD_DIR_MUST_EXIST)
         if dialog.ShowModal() != wx.ID_OK:
@@ -244,7 +247,7 @@ class DlgDatabase(wx.Dialog):
         if binfolder == '':
             self.main.showWarning("The MySQL binary folder is not known. Cannot proceed with backup")
             return
-        outfile = self.openfile(_('Choose a file for writing the Database backup'))
+        outfile = self.openfile(_U('Choose a file for writing the Database backup'))
         if outfile is not None:
             if not outfile.endswith('.sql'):
                 outfile += '.sql'
@@ -261,20 +264,20 @@ class DlgDatabase(wx.Dialog):
             try:
                 retcode = call(program + args, shell=True)
                 if retcode == 0:
-                    self.main.showInfo(_("The database backup has finished"))
+                    self.main.showInfo(_U("The database backup has finished"))
                 elif retcode < 0:
-                    self.main.showError(_("The database backup was terminated by signal %s") % (-retcode))
+                    self.main.showError(_U("The database backup was terminated by signal %s") % (-retcode))
                 else:
-                    self.main.showWarning(_("The database backup has returned %s") % retcode)
+                    self.main.showWarning(_U("The database backup has returned %s") % retcode)
             except OSError, e:
-                    self.main.showError(_("The database backup has failed:\n%s") % e)
+                    self.main.showError(_U("The database backup has failed:\n%s") % e)
 
 
     def openfile(self, text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
         # ask for file for exporting
         dialog = wx.FileDialog(parent=None,
                                message=text,
-                               wildcard=_('SQL files (*.sql)|*.sql'),
+                               wildcard=_U('SQL files (*.sql)|*.sql'),
                                style=style)
         if dialog.ShowModal() != wx.ID_OK:
             return None

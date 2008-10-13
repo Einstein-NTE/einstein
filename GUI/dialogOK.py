@@ -1,11 +1,16 @@
 #Boa:Dialog:DialogOK
 #	Last revised by:    
 #                           Stoyan Danov        19/06/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes in last update:
 #       19/06/2008 SD: change to translatable text _(...)
+#       13/10/2008: SD  change _() to _U()
 
 import wx
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 def create(parent):
     return DialogOK(parent)
@@ -27,14 +32,14 @@ class DialogOK(wx.Dialog):
               pos=wx.Point(24, 16), size=wx.Size(344, 64), style=0)
         self.stDialog.Center(wx.HORIZONTAL)
 
-        self.buttonOK = wx.Button(id=wxID_DIALOGOKBUTTONOK, label=_('OK'),
+        self.buttonOK = wx.Button(id=wxID_DIALOGOKBUTTONOK, label=_U('OK'),
               name='buttonOK', parent=self, pos=wx.Point(176, 96),
               size=wx.Size(91, 23), style=0)
         self.buttonOK.Bind(wx.EVT_BUTTON, self.OnButtonOKButton,
               id=wxID_DIALOGOKBUTTONOK)
 
         self.buttonCancel = wx.Button(id=wxID_DIALOGOKBUTTONCANCEL,
-              label=_('cancel'), name='buttonCancel', parent=self,
+              label=_U('cancel'), name='buttonCancel', parent=self,
               pos=wx.Point(280, 96), size=wx.Size(91, 23), style=0)
         self.buttonCancel.Bind(wx.EVT_BUTTON, self.OnButtonCancelButton,
               id=wxID_DIALOGOKBUTTONCANCEL)

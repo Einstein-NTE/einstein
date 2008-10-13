@@ -24,6 +24,7 @@
 #                           Stoyan Danov    02/07/2008
 #                           Stoyan Danov    03/07/2008
 #                           Hans Schweiger  06/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       29/03/08:       mod. to use external graphics module
@@ -36,6 +37,7 @@
 #       02/07/2008: SD  changed to orange colour (staticBox)
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #       06/07/2008: HS  made it work again. finish layout
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -67,6 +69,12 @@ from GUITools import *
 
 COLNO1 = 8
 MAXROWS = 20
+
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 #============================================================================== 
 #============================================================================== 
@@ -107,7 +115,7 @@ class PanelEA4a(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 2,                      # data column for this graph
                    'key'         : keys[0],                # key for Interface
-                   'title'       : _('UPH by process'),       # title of the graph
+                   'title'       : _U('UPH by process'),       # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -143,14 +151,14 @@ class PanelEA4a(wx.Panel):
         self.grid1.SetColSize(0,145)
         self.grid1.EnableEditing(False)
         self.grid1.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid1.SetColLabelValue(0, _("Process"))
-        self.grid1.SetColLabelValue(1, _("UPH Total\n[MWh]"))
-        self.grid1.SetColLabelValue(2, _("Share\n[%]"))
-        self.grid1.SetColLabelValue(3, _("Circulation\n[MWh]"))
-        self.grid1.SetColLabelValue(4, _("Maintenance\n[MWh]"))
-        self.grid1.SetColLabelValue(5, _("Start-Up\n[MWh]"))
-        self.grid1.SetColLabelValue(6, _("Process\nTemp. [ºC]"))
-        self.grid1.SetColLabelValue(7, _("Process Supply\nTemp. [ºC]"))
+        self.grid1.SetColLabelValue(0, _U("Process"))
+        self.grid1.SetColLabelValue(1, _U("UPH Total\n[MWh]"))
+        self.grid1.SetColLabelValue(2, _U("Share\n[%]"))
+        self.grid1.SetColLabelValue(3, _U("Circulation\n[MWh]"))
+        self.grid1.SetColLabelValue(4, _U("Maintenance\n[MWh]"))
+        self.grid1.SetColLabelValue(5, _U("Start-Up\n[MWh]"))
+        self.grid1.SetColLabelValue(6, _U("Process\nTemp. [ºC]"))
+        self.grid1.SetColLabelValue(7, _U("Process Supply\nTemp. [ºC]"))
         #
         # copy values from dictionary to grid
         #
@@ -196,7 +204,7 @@ class PanelEA4a(wx.Panel):
               pos=wx.Point(0, 0), size=wx.Size(800, 600))
 
 
-        self.box1 = wx.StaticBox(self, -1, _(u'Useful heat demand by process (UPH)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Useful heat demand by process (UPH)'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -207,7 +215,7 @@ class PanelEA4a(wx.Panel):
               style=0)
 
 
-        self.box2 = wx.StaticBox(self, -1, _(u'Distribution of process heat demand (UPH Total) by processes'),
+        self.box2 = wx.StaticBox(self, -1, _U('Distribution of process heat demand (UPH Total) by processes'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -228,7 +236,7 @@ class PanelEA4a(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

@@ -26,12 +26,14 @@
 #                           Hans Schweiger          23/07/2008
 #                           Enrico Facci            23/07/2008
 #                           Hans Schweiger          24/07/2008
+#                           Stoyan Danov    13/10/2008
 #       
 #       Changes to previous version:
 #
 #       23/07/2008: HS  convertDoubleToString introduced
 #       24/07/2008: HS  KT and KL introduced in table
 #                       - bug-fix in setSelection of choice of ST Type
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -90,6 +92,12 @@ GRAPH_BACKGROUND_COLOR = '#FFFFFF' # idem
 MAXROWS = 1
 COLNO = 7
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 #------------------------------------------------------------------------------		
 #HS2008-03-22: 
 #------------------------------------------------------------------------------		
@@ -113,8 +121,8 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_('Temperature [ºC]'))
+    self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
+    self.subplot.axes.set_xlabel(_U('Temperature [ºC]'))
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -173,7 +181,7 @@ class PanelST(wx.Panel):
         paramList={'labels'      : labels_column,          # labels column
                    'data'        : 3,                      # data column for this graph
                    'key'         : self.keys[0],                # key for Interface
-                   'title'       : _('Some title'),           # title of the graph
+                   'title'       : _U('Some title'),           # title of the graph
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
@@ -196,13 +204,13 @@ class PanelST(wx.Panel):
         self.grid.SetColSize(1,150)
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Collector model"))
-        self.grid.SetColLabelValue(1, _("Collector type"))
-        self.grid.SetColLabelValue(2, _("c0"))
-        self.grid.SetColLabelValue(3, _("c1"))
-        self.grid.SetColLabelValue(4, _("c2"))
-        self.grid.SetColLabelValue(5, _("K(50º)\n(longitudinal)"))
-        self.grid.SetColLabelValue(6, _("K(50º)\n(tranversal)"))
+        self.grid.SetColLabelValue(0, _U("Collector model"))
+        self.grid.SetColLabelValue(1, _U("Collector type"))
+        self.grid.SetColLabelValue(2, _U("c0"))
+        self.grid.SetColLabelValue(3, _U("c1"))
+        self.grid.SetColLabelValue(4, _U("c2"))
+        self.grid.SetColLabelValue(5, _U("K(50º)\n(longitudinal)"))
+        self.grid.SetColLabelValue(6, _U("K(50º)\n(tranversal)"))
         #
         # copy values from dictionary to grid
         #
@@ -231,7 +239,7 @@ class PanelST(wx.Panel):
 # Figure to be plotted
 
         self.staticBox1 = wx.StaticBox(id=-1,
-              label=_('Temperature dependent heat demand with and w/o solar system'),
+              label=_U('Temperature dependent heat demand with and w/o solar system'),
               name='staticBox1', parent=self, pos=wx.Point(450, 130),
               size=wx.Size(340, 260), style=0)
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
@@ -245,7 +253,7 @@ class PanelST(wx.Panel):
 # Grid for display of existing heat pumps
 
         self.boxTable = wx.StaticBox(id=-1,
-              label=_('Solar collector'),
+              label=_U('Solar collector'),
               name='boxTable', parent=self, pos=wx.Point(10, 10),
               size=wx.Size(780, 100), style=0)
         self.boxTable.SetForegroundColour(TITLE_COLOR)
@@ -265,7 +273,7 @@ class PanelST(wx.Panel):
 
 # Button "run design assistant"
         self.calculate = wx.Button(id=wxID_PANELCALCULATE,
-              label=_('run design assistant'), name='ST_Calculate', parent=self,
+              label=_U('run design assistant'), name='ST_Calculate', parent=self,
               pos=wx.Point(230, 130), size=wx.Size(200, 24), style=0)
 
         self.calculate.Bind(wx.EVT_BUTTON, self.OnCalculateButton,
@@ -273,7 +281,7 @@ class PanelST(wx.Panel):
 
 # Button "add heat pump"
         self.selectCol = wx.Button(id=-1,
-              label=_('choose solar collector'), name='selectCol',
+              label=_U('choose solar collector'), name='selectCol',
               parent=self, pos=wx.Point(10, 130), size=wx.Size(200, 24),
               style=0)
         self.selectCol.Bind(wx.EVT_BUTTON, self.OnSelectColButton,
@@ -283,14 +291,14 @@ class PanelST(wx.Panel):
 #       System parameters
 #------------------------------------------------------------------------------		
         self.boxSystem = wx.StaticBox(id=-1,
-              label=_('Lay-out of solar thermal system'),
+              label=_U('Lay-out of solar thermal system'),
               name='boxSystem', parent=self, pos=wx.Point(10, 330),
               size=wx.Size(420, 120), style=0)
         self.boxSystem.SetForegroundColour(TITLE_COLOR)
         self.boxSystem.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stSys1 = wx.StaticText(id=-1,
-              label=_('Installed capacity [kW]'),
+              label=_U('Installed capacity [kW]'),
               name='stSys1', parent=self, pos=wx.Point(20, 360),
               style=0)
 
@@ -303,7 +311,7 @@ class PanelST(wx.Panel):
 
 
         self.stSys2 = wx.StaticText(id=-1,
-              label=_('Efficiency of heat storage and distribution [-]'),
+              label=_U('Efficiency of heat storage and distribution [-]'),
               name='stSys2', parent=self, pos=wx.Point(20, 390),
               style=0)
 
@@ -316,7 +324,7 @@ class PanelST(wx.Panel):
         
 
         self.stSys3 = wx.StaticText(id=-1,
-              label=_('Solar buffer storage volume [m3]'),
+              label=_U('Solar buffer storage volume [m3]'),
               name='stSys3', parent=self, pos=wx.Point(20, 420),
               style=0)
 
@@ -333,7 +341,7 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.boxDA = wx.StaticBox(id=-1,
-              label=_('Configuration of design assistant'),
+              label=_U('Configuration of design assistant'),
               name='boxDA', parent=self, pos=wx.Point(10, 170),
               size=wx.Size(420, 120), style=0)
         self.boxDA.SetForegroundColour(TITLE_COLOR)
@@ -343,7 +351,7 @@ class PanelST(wx.Panel):
 # 1. Solar fraction
 
         self.stConfig1 = wx.StaticText(id=-1,
-              label=_('Target solar fraction [%]'),
+              label=_U('Target solar fraction [%]'),
               name='stConfig1', parent=self, pos=wx.Point(20, 200),
               style=0)
 
@@ -357,12 +365,12 @@ class PanelST(wx.Panel):
 #        self.tc1 = FloatEntry(self,
 #                              ipart=4, decimals=2, minval=0., maxval=1., value=0.5,
 #                              unitdict='FRACTION',
-#                              label=_("Target solar fraction"),
-#                              tip=_("Reasonable values should be between 0 and 80 %"))
+#                              label=_U("Target solar fraction"),
+#                              tip=_U("Reasonable values should be between 0 and 80 %"))
 #..............................................................................
 # 2. Solar collector type 
 
-        self.stConfig2 = wx.StaticText(id=-1, label=_('Solar collector type'),
+        self.stConfig2 = wx.StaticText(id=-1, label=_U('Solar collector type'),
               name='stConfig2', parent=self, pos=wx.Point(20, 230),
               style=0)
 
@@ -376,7 +384,7 @@ class PanelST(wx.Panel):
 # 3. Minimum operating hours
 
         self.stConfig3 = wx.StaticText(id=-1,
-              label=_('Minimum annual energy yield [kWh/kW.a]'),
+              label=_U('Minimum annual energy yield [kWh/kW.a]'),
               name='stConfig3', parent=self, pos=wx.Point(20, 260),
               style=0)
 
@@ -394,7 +402,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label=_('Gross surface area suitable for installation [m2]'), name='stInfo1',
+              label=_U('Gross surface area suitable for installation [m2]'), name='stInfo1',
               parent=self, pos=wx.Point(460, 400), style=0)
 
         self.stInfo1val = wx.StaticText(id=-1,
@@ -403,7 +411,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label=_('Maximum possible solar thermal capacity [kW]'), name='stInfo2',
+              label=_U('Maximum possible solar thermal capacity [kW]'), name='stInfo2',
               parent=self, pos=wx.Point(460, 420), style=0)
 
         self.stInfo2val = wx.StaticText(id=-1,
@@ -412,7 +420,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo3 = wx.StaticText(id=-1,
-              label=_('Solar fraction (up to 200°C) [%]'), name='stInfo3',
+              label=_U('Solar fraction (up to 200°C) [%]'), name='stInfo3',
               parent=self, pos=wx.Point(460, 450), style=0)
 
         self.stInfo3val = wx.StaticText(id=-1,
@@ -421,7 +429,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo4 = wx.StaticText(id=-1,
-              label=_('Annual energy yield [kWh/kW.a]'), name='stInfo4',
+              label=_U('Annual energy yield [kWh/kW.a]'), name='stInfo4',
               parent=self, pos=wx.Point(460, 470), style=0)
 
         self.stInfo4val = wx.StaticText(id=-1,
@@ -430,7 +438,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo5 = wx.StaticText(id=-1,
-              label=_('Average system efficiency [%]'), name='stInfo5',
+              label=_U('Average system efficiency [%]'), name='stInfo5',
               parent=self, pos=wx.Point(460, 490), style=0)
 
         self.stInfo5val = wx.StaticText(id=-1,
@@ -439,7 +447,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo6 = wx.StaticText(id=-1,
-              label=_('Average operating temperature (coll.) [\xb0C]'), name='stInfo6',
+              label=_U('Average operating temperature (coll.) [\xb0C]'), name='stInfo6',
               parent=self, pos=wx.Point(460, 510), style=0)
 
         self.stInfo6val = wx.StaticText(id=-1,
@@ -451,11 +459,11 @@ class PanelST(wx.Panel):
 #       Default action buttons: FWD / BACK / OK / Cancel
 #------------------------------------------------------------------------------		
 
-        self.buttonOk = wx.Button(id=wx.ID_OK, label=_('OK'),
+        self.buttonOk = wx.Button(id=wx.ID_OK, label=_U('OK'),
               name='buttonOk', parent=self, pos=wx.Point(528, 560),
               size=wx.Size(75, 20), style=0)
 
-        self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+        self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
               name='buttonCancel', parent=self, pos=wx.Point(616,
               560), size=wx.Size(75, 20), style=0)
 
@@ -521,7 +529,7 @@ class PanelST(wx.Panel):
         self.tcConfig1.SetValue(convertDoubleToString(self.config[0]))
 
         TRANSCOLLTYPES = copy.deepcopy(TRANSSTTYPES)
-        TRANSCOLLTYPES.update({"any":_("--any--"),"preselected":_("--preselected collector--")})
+        TRANSCOLLTYPES.update({"any":_U("--any--"),"preselected":_U("--preselected collector--")})
         collTypes = TRANSCOLLTYPES.values()
         collTypes.sort()
 
@@ -580,7 +588,7 @@ class PanelST(wx.Panel):
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
 
-        self.dbe = DBEditFrame(self, _("Select solar collector"), "dbsolarthermal", 0, False)
+        self.dbe = DBEditFrame(self, _U("Select solar collector"), "dbsolarthermal", 0, False)
         if self.dbe.ShowModal() == wx.ID_OK:
 	    self.theId = self.dbe.theId
             self.mod.setManualSelection(self.theId)
@@ -606,7 +614,7 @@ class PanelST(wx.Panel):
 	dialog = ManualAddDialog(self, EqId)
 
         if (dialog.ShowModal() ==wx.ID_OK):
-            logTrack(_("PanelST (OnGridLeftDclick) - OK"))
+            logTrack(_U("PanelST (OnGridLeftDclick) - OK"))
 
         self.display()
 
@@ -625,7 +633,7 @@ class PanelST(wx.Panel):
 # "delete" selected:
 
         if (ret=="delete"):
-            pu2 =  DialogOK(self,_("delete equipment"),_("do you really want to eliminate the solar system ?"))
+            pu2 =  DialogOK(self,_U("delete equipment"),_U("do you really want to eliminate the solar system ?"))
             if pu2.ShowModal() == wx.ID_OK:
                 self.mod.deleteEquipment(rowNo)
                 self.display()

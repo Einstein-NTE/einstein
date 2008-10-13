@@ -15,9 +15,11 @@
 #	Version No.: 0.01
 #	Created by: 	    Hans Schweiger  05/07/2008
 #       Revised by:         Stoyan Danov    15/07/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #       15/07/2008 SD: adaptation to module CS
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -46,6 +48,9 @@ from numCtrl import *
 COLNO = 4
 MAXROWS = 20
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #============================================================================== 
 #============================================================================== 
 class PanelCS6(wx.Panel):
@@ -69,8 +74,8 @@ class PanelCS6(wx.Panel):
         paramList={'labels'      : 0,                            # labels column
                    'data'        : 2,                            # data column for this graph
                    'key'         : "CS6_Plot",                      # key for Interface
-                   'title'       :_('Additional cost per saved primary energy'), # title of the graph
-                   'ylabel'      :_('[EUR/MWh saved]'),                   # y axis label
+                   'title'       :_U('Additional cost per saved primary energy'), # title of the graph
+                   'ylabel'      :_U('[EUR/MWh saved]'),                   # y axis label
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0]}                        # rows that should not be plotted
@@ -104,10 +109,10 @@ class PanelCS6(wx.Panel):
         self.grid1.SetColSize(1,165)
         self.grid1.SetColSize(2,150)
         self.grid1.SetColSize(3,150)
-        self.grid1.SetColLabelValue(0, _("Alternative"))
-        self.grid1.SetColLabelValue(1, _("Total energy cost\n(incl.O&M and invest.) [EUR]"))
-        self.grid1.SetColLabelValue(2, _("Additional cost\n[EUR]"))
-        self.grid1.SetColLabelValue(3, _("Additional cost per\nsaved PE [EUR/MWh]"))
+        self.grid1.SetColLabelValue(0, _U("Alternative"))
+        self.grid1.SetColLabelValue(1, _U("Total energy cost\n(incl.O&M and invest.) [EUR]"))
+        self.grid1.SetColLabelValue(2, _U("Additional cost\n[EUR]"))
+        self.grid1.SetColLabelValue(3, _U("Additional cost per\nsaved PE [EUR/MWh]"))
 
         self.display()
 
@@ -119,7 +124,7 @@ class PanelCS6(wx.Panel):
 
 #...........box1....................................................................
         
-        self.box1 = wx.StaticBox(self, -1, _(u'Additional cost per saved primary energy (PE)'),
+        self.box1 = wx.StaticBox(self, -1, _U('Additional cost per saved primary energy (PE)'),
                                  pos = (10,10),size=(780,200))
 
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -131,7 +136,7 @@ class PanelCS6(wx.Panel):
 
 #...........box2.....................................................................
         
-        self.box2 = wx.StaticBox(self, -1, _(u'Comparative of additional cost per saved primary energy'),
+        self.box2 = wx.StaticBox(self, -1, _U('Comparative of additional cost per saved primary energy'),
                                  pos = (10,230),size=(780,320))
 
         self.box2.SetForegroundColour(TITLE_COLOR)
@@ -152,7 +157,7 @@ class PanelCS6(wx.Panel):
         self.btnBack.Bind(wx.EVT_BUTTON, self.OnBtnBackButton,
               id=-1)
 
-        self.btnOK = wx.Button(id=wx.ID_OK, label=_(u'OK'), name=u'btnOK',
+        self.btnOK = wx.Button(id=wx.ID_OK, label=_U('OK'), name=u'btnOK',
               parent=self, pos=wx.Point(600, 560), size=wx.Size(80, 20),
               style=0)
         self.btnOK.Bind(wx.EVT_BUTTON, self.OnBtnOKButton,

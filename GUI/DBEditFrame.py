@@ -25,6 +25,7 @@
 #                           Tom Sobota          05/07/2008
 #                           Tom Sobota          07/07/2008
 #                           Hans Schweiger      25/09/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes in last update:
 #       13/04/08:       preselection added as input
@@ -34,6 +35,7 @@
 #       05/07/08: TS    implemented preselection, some cleanup of code...
 #       07/07/08: TS    headers of grid now taken from DBTitles.
 #       25/09/08: HS    bug-fix -> show message in delete button
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -49,6 +51,9 @@ import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
 from DBTitles import *
+
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #
 # constants
@@ -73,18 +78,18 @@ class DBEditFrame(wx.Dialog):
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid1)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellLeftDClick, self.grid1)
 
-        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_('Cancel'))
+        self.buttonCancel = wx.Button(self,wx.ID_CANCEL,_U('Cancel'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
 
-        self.buttonOK = wx.Button(self,wx.ID_OK,_('OK'))
+        self.buttonOK = wx.Button(self,wx.ID_OK,_U('OK'))
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
         if self.can_edit:
             # add and delete row buttons are shown only if
             # editing is allowed
-            self.buttonAddRow = wx.Button(self, -1, _("Add row"))
+            self.buttonAddRow = wx.Button(self, -1, _U("Add row"))
             self.Bind(wx.EVT_BUTTON, self.OnButtonAddRow, self.buttonAddRow)
-            self.buttonDeleteRow = wx.Button(self, -1, _("Delete row"))
+            self.buttonDeleteRow = wx.Button(self, -1, _U("Delete row"))
             self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteRow, self.buttonDeleteRow)
 
         self.lblTableName = wx.StaticText(self, -1, "")
@@ -107,10 +112,10 @@ class DBEditFrame(wx.Dialog):
         self.grid1.EnableEditing(can_edit)
 	if can_edit:
 	    self.backcolor = GRID_BACKGROUND_COLOR_EDITABLE
-            self.lblTableName.SetLabel(_(" Editing table ")+tablename)
+            self.lblTableName.SetLabel(_U(" Editing table ")+tablename)
 	else:
 	    self.backcolor = GRID_BACKGROUND_COLOR_NOEDITABLE
-            self.lblTableName.SetLabel(_(" Viewing table ")+tablename)
+            self.lblTableName.SetLabel(_U(" Viewing table ")+tablename)
 
         self.lastEditRow = 0
         self.lastEditCol = 0
@@ -163,11 +168,11 @@ class DBEditFrame(wx.Dialog):
                 self.nrows = len(self.table.sql_select(self.query))
                 return True
             except MySQLdb.Error, e:
-                self.main.showError('DBEditFrame: '+_('Database error in query ')+'\n'+self.query+
+                self.main.showError('DBEditFrame: '+_U('Database error in query ')+'\n'+self.query+
                                     '\n'+str(e))
 
         except MySQLdb.Error, e:
-            self.main.showError('DBEditFrame: '+_('Error accessing table ')+self.tablename+
+            self.main.showError('DBEditFrame: '+_U('Error accessing table ')+self.tablename+
                                 '\n'+str(e))
         return False
 
@@ -254,7 +259,7 @@ class DBEditFrame(wx.Dialog):
 	    self.theId = int(i)
 	except:
             self.main.showError('DBEditFrame: '+
-                                _('Returned cell is empty or not integer ') + repr(i))
+                                _U('Returned cell is empty or not integer ') + repr(i))
 	    self.theId = -1
         self.col0 = self.grid1.GetCellValue(event.GetRow(), 0)
 
@@ -296,12 +301,12 @@ class DBEditFrame(wx.Dialog):
 
     def OnButtonDeleteRow(self,event):
         if self.col0 is None:
-            self.main.showWarning(_('A row must be selected!\n'\
+            self.main.showWarning(_U('A row must be selected!\n'\
                                     'Please click on any data cell\n'\
                                     'to select a row'))
         else:
             field = self.table.columns()[0]
-            if wx.ID_NO == self.main.askConfirmation(_('Delete row with %s=%s?') % (field,self.col0)):
+            if wx.ID_NO == self.main.askConfirmation(_U('Delete row with %s=%s?') % (field,self.col0)):
                 return
             try:
                 dummy = int(self.col0)
@@ -311,5 +316,5 @@ class DBEditFrame(wx.Dialog):
                     row.delete()
                     self.displayData()
             except:
-                self.main.showWarning(_('Cannot delete row with %s=%s') % (field,self.col0))
+                self.main.showWarning(_U('Cannot delete row with %s=%s') % (field,self.col0))
         event.Skip()

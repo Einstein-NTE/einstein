@@ -24,6 +24,7 @@
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          25/06/2008
 #                           Stoyan Danov            30/09/2008
+#                           Stoyan Danov    13/10/2008
 #                           
 #
 #       Changes to previous version:
@@ -31,6 +32,7 @@
 #       18/06/2008: SD  change to translatable text _(...)
 #       25/06/2008: HS  adaptation to changes in module
 #       30/09/2008: SD  graphics figure added, changed units - line 340
+#       13/10/2008: SD  change _() to _U()
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -73,6 +75,8 @@ from einstein.modules.interfaces import *
 COLNO = 6
 MAXROWS = 20
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #------------------------------------------------------------------------------		
 def drawFigure(self):
@@ -116,8 +120,8 @@ def drawFigure(self):
 ###SD-20080930
 #    self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_('SEC - fuels [kWh/%s]')%"p.u.")
-    self.subplot.axes.set_xlabel(_('SEC - electricity [kWh/%s]')%"p.u.")
+    self.subplot.axes.set_ylabel(_U('SEC - fuels [kWh/%s]')%"p.u.")
+    self.subplot.axes.set_xlabel(_U('SEC - electricity [kWh/%s]')%"p.u.")
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -232,12 +236,12 @@ class PanelBM3(wx.Panel):
         self.gridPage.SetColSize(2,80)
         self.gridPage.EnableEditing(False)
         self.gridPage.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.gridPage.SetColLabelValue(0, _("Source"))
-        self.gridPage.SetColLabelValue(1, _("Reference"))
-        self.gridPage.SetColLabelValue(2, _("Validity"))
-        self.gridPage.SetColLabelValue(3, _("Primary energy"))
-        self.gridPage.SetColLabelValue(4, _("Fuels"))
-        self.gridPage.SetColLabelValue(5, _("Electricity"))
+        self.gridPage.SetColLabelValue(0, _U("Source"))
+        self.gridPage.SetColLabelValue(1, _U("Reference"))
+        self.gridPage.SetColLabelValue(2, _U("Validity"))
+        self.gridPage.SetColLabelValue(3, _U("Primary energy"))
+        self.gridPage.SetColLabelValue(4, _U("Fuels"))
+        self.gridPage.SetColLabelValue(5, _U("Electricity"))
              #
         # copy values from dictionary to grid
         #
@@ -260,13 +264,13 @@ class PanelBM3(wx.Panel):
 #..............................................................................
 # box 1: grid display
 
-        self.box1 = wx.StaticBox(self, -1, _('Benchmark (3): specific energy consumption (SEC) by unit operation'),
+        self.box1 = wx.StaticBox(self, -1, _U('Benchmark (3): specific energy consumption (SEC) by unit operation'),
                                  pos = (10,10),size=(780,260))
         self.box1.SetForegroundColour(TITLE_COLOR)
         self.box1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stProcess = wx.StaticText(id=-1,
-              label=_('Process:'), name='stProcess', parent=self, pos=wx.Point(10,
+              label=_U('Process:'), name='stProcess', parent=self, pos=wx.Point(10,
               280), size=wx.Size(80, 24), style=0)
 
         self.comboProcess = wx.ComboBox(choices=self.processes,
@@ -288,7 +292,7 @@ class PanelBM3(wx.Panel):
               self.OnGridPageGridCellRightClick, id=wxID_PANELBM3GRIDPAGE)
 
         self.FindBenchmarks = wx.Button(id=wxID_PANELBM3FINDBENCHMARKS,
-              label=_('find benchmarks'), name='FindBenchmarks', parent=self,
+              label=_U('find benchmarks'), name='FindBenchmarks', parent=self,
               pos=wx.Point(592, 280), size=wx.Size(184, 24), style=0)
         self.FindBenchmarks.Bind(wx.EVT_BUTTON, self.OnFindBenchmarksButton,
               id=wxID_PANELBM3FINDBENCHMARKS)
@@ -296,7 +300,7 @@ class PanelBM3(wx.Panel):
 #..............................................................................
 # box 2: copmarison benchmarks
 
-        self.box2 = wx.StaticBox(self, -1, _('Comparison benchmark data'),
+        self.box2 = wx.StaticBox(self, -1, _U('Comparison benchmark data'),
                                  pos = (10,310),size=(400,260))
         self.box2.SetForegroundColour(TITLE_COLOR)
         self.box2.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -309,13 +313,13 @@ class PanelBM3(wx.Panel):
 #..............................................................................
 # box 3: search criteria
 
-        self.box3 = wx.StaticBox(self, -1, _('Search criteria'),
+        self.box3 = wx.StaticBox(self, -1, _U('Search criteria'),
                                  pos = (430,310),size=(360,220))
         self.box3.SetForegroundColour(TITLE_COLOR)
         self.box3.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.stSearchCrit1 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT1,
-              label=_('NACE Code range (digits)'), name='stSearchCrit1',
+              label=_U('NACE Code range (digits)'), name='stSearchCrit1',
               parent=self, pos=wx.Point(448, 352), size=wx.Size(123, 13),
               style=0)
 
@@ -324,24 +328,24 @@ class PanelBM3(wx.Panel):
               size=wx.Size(136, 21), style=0)
         self.comboSearchCrit1.SetSelection(self.naceSearch)
 
-        self.st1 = wx.StaticText(id=wxID_PANELBM3ST1, label=_('max.'), name='st1',
+        self.st1 = wx.StaticText(id=wxID_PANELBM3ST1, label=_U('max.'), name='st1',
               parent=self, pos=wx.Point(728, 384), size=wx.Size(25, 13),
               style=0)
 
-        self.st2 = wx.StaticText(id=wxID_PANELBM3ST2, label=_('min.'), name='st2',
+        self.st2 = wx.StaticText(id=wxID_PANELBM3ST2, label=_U('min.'), name='st2',
               parent=self, pos=wx.Point(664, 384), size=wx.Size(21, 13),
               style=0)
 
         self.SearchCrit2 = wx.StaticText(id=wxID_PANELBM3SEARCHCRIT2,
-              label=_('Volume of process medium'), name='SearchCrit2', parent=self,
+              label=_U('Volume of process medium'), name='SearchCrit2', parent=self,
               pos=wx.Point(448, 416), size=wx.Size(120, 13), style=0)
 
         self.stSearchCrit2Unit = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT2UNIT,
-              label=_('[t/a]'), name='stSearchCrit2Unit', parent=self,#SD:[t/year]->[t/a]
+              label=_U('[t/a]'), name='stSearchCrit2Unit', parent=self,#SD:[t/year]->[t/a]
               pos=wx.Point(592, 416), size=wx.Size(22, 13), style=0)
 
         self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT3,
-              label=_('Year of data'), name='stSearchCrit3', parent=self,
+              label=_U('Year of data'), name='stSearchCrit3', parent=self,
               pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
 
         self.tcSearchCrit2b = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT2B,
@@ -353,7 +357,7 @@ class PanelBM3(wx.Panel):
               size=wx.Size(64, 24), style=0, value=str(self.turnover0))
 
         self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM3STSEARCHCRIT3,
-              label=_('Year of data'), name='stSearchCrit3', parent=self,
+              label=_U('Year of data'), name='stSearchCrit3', parent=self,
               pos=wx.Point(448, 440), size=wx.Size(61, 13), style=0)
 
         self.tcSearchCrit3a = wx.TextCtrl(id=wxID_PANELBM3TCSEARCHCRIT3A,
@@ -367,13 +371,13 @@ class PanelBM3(wx.Panel):
 #..............................................................................
 # default action buttons
 
-        self.buttonpageBM3Ok = wx.Button(id=wx.ID_OK, label=_('OK'),
+        self.buttonpageBM3Ok = wx.Button(id=wx.ID_OK, label=_U('OK'),
               name='buttonpageBM3Ok', parent=self, pos=wx.Point(528, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBM3Ok.Bind(wx.EVT_BUTTON, self.OnButtonpageBM3OkButton,
               id=wx.ID_OK)
 
-        self.buttonpageBM3Cancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+        self.buttonpageBM3Cancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
               name='buttonpageBM3Cancel', parent=self, pos=wx.Point(616, 544),
               size=wx.Size(75, 23), style=0)
         self.buttonpageBM3Cancel.Bind(wx.EVT_BUTTON,
@@ -444,7 +448,7 @@ class PanelBM3(wx.Panel):
         turnover1 = float(self.tcSearchCrit2b.GetValue())
 
         if turnover0 < 0 or turnover1 > 1.0e+6 or turnover0 > turnover1:
-            showWarning(_("revise your search criteria: turnover in between %s and %s M€")%(turnover0,turnover1))
+            showWarning(_U("revise your search criteria: turnover in between %s and %s M€")%(turnover0,turnover1))
             print (turnover0<=0.0),(turnover1 > 1.0e+6),(turnover0 > turnover1)
             return
 
@@ -452,7 +456,7 @@ class PanelBM3(wx.Panel):
         year1 = int(self.tcSearchCrit3b.GetValue())
 
         if (year0 < 1980 or year1 > 2050 or year0 > year1) and year0 > 0:
-            showWarning(_("revise your search criteria: year of data in between %s and %s")%(year0,year1))
+            showWarning(_U("revise your search criteria: year of data in between %s and %s")%(year0,year1))
             return
 
         process = self.comboProcess.GetValue()

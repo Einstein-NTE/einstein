@@ -59,11 +59,12 @@ from einstein.modules.messageLogger import *
  wxID_PANELHRBTNDELETEHX, wxID_PANELHRBTNSHOWSTDVALUES, 
  wxID_PANELHRBUTTONPAGEHRBACK, wxID_PANELHRBUTTONPAGEHRCANCEL, 
  wxID_PANELHRBUTTONPAGEHRFWD, wxID_PANELHRBUTTONPAGEHROK, 
- wxID_PANELHRCBCURVEDISPLAY, wxID_PANELHRCBEXHX, wxID_PANELHRGRID, 
- wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRRBCALC, wxID_PANELHRRBREDESIGN, 
- wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, wxID_PANELHRSTATICBOX3, 
- wxID_PANELHRSTATICBOX4, wxID_PANELHRSTATICTEXT2, 
-] = [wx.NewId() for _init_ctrls in range(20)]
+ wxID_PANELHRCBCONSIDERCOND, wxID_PANELHRCBCURVEDISPLAY, wxID_PANELHRCBEXHX, 
+ wxID_PANELHRGRID, wxID_PANELHRPANEL_DRAWCURVE, wxID_PANELHRRBCALC, 
+ wxID_PANELHRRBREDESIGN, wxID_PANELHRSTATICBOX1, wxID_PANELHRSTATICBOX2, 
+ wxID_PANELHRSTATICBOX3, wxID_PANELHRSTATICBOX4, wxID_PANELHRSTATICTEXT1, 
+ wxID_PANELHRSTATICTEXT2, 
+] = [wx.NewId() for _init_ctrls in range(22)]
 
 # constants
 #
@@ -87,63 +88,62 @@ class HRPlotPanelHCG (PlotPanel):
         PlotPanel.__init__( self, parent, **kwargs )
         self.SetColor( (255,255,255) )
 
-    def draw( self ):
-        """Draw data."""
-        if not hasattr( self, 'subplot' ):
-            self.subplot = self.figure.add_subplot( 121 )
-        if not hasattr(self, 'subplot2'):
-            self.subplot2 = self.figure.add_subplot(122)
-       
-        if not hasattr(Status.int, 'hrdata'):
-            return
-        data = Status.int.hrdata.curves            
-        if (len(data)==0):
-            return
-               
-        self.subplot = self.figure.add_subplot(121)
-        curve = data[0]
-        self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
-        self.subplot.legend(loc = 0)
-        self.subplot.set_title(curve.Name)
-        self.subplot.set_xlabel(_('Power [kW]'))
-        self.subplot.set_ylabel(_('Temperature [C]'))
-        
-        mmx = [ max(curve.X), min(curve.X) ]
-        mmy = [ max(curve.Y), min(curve.Y) ]
-        
-                          
-        curve = data[1]
-        self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
-        self.subplot.legend(loc = 0)
-        self.subplot.set_title(curve.Name)
-        #self.subplot.set_xlabel(_('Power [kW]'))
-        #self.subplot.set_ylabel(_('Temperature [C]'))
-        
-        mmx.append(max(curve.X))
-        mmx.append(min(curve.X))
-        mmy.append(max(curve.Y))
-        mmy.append(min(curve.Y))            
-        
-        m = (max(mmy) - min(mmy))*0.2
-        m2 = (max(mmx) - min(mmx))*0.2
-        
-        self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
-                            
-        curve = data[2]
-        self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
-        
-        m = (max(curve.Y) - min(curve.Y))*0.2
-        m2 = (max(curve.X) - min(curve.X))*0.2
-        
-        self.subplot2.axis([min(curve.X),max(curve.X)+m2,min(curve.Y),max(curve.Y)+m])
-        self.subplot2.legend(loc = 0)
-        self.subplot2.set_title(curve.Name)
-        self.subplot2.set_xlabel(_('Power [kW]'))
-        self.subplot2.set_ylabel(_('Temperature [C]'))
-
-        #change axis
-        self.subplot.xaxis.set_major_locator(MaxNLocator(4))
-        self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
+    def draw( self ):            
+        try:
+            if not hasattr( self, 'subplot' ):
+                self.subplot = self.figure.add_subplot( 121 )
+            if not hasattr(self, 'subplot2'):
+                self.subplot2 = self.figure.add_subplot(122)
+           
+            if not hasattr(Status.int, 'hrdata'):
+                return
+            data = Status.int.hrdata.curves            
+            if (len(data)==0):
+                return
+                   
+            self.subplot = self.figure.add_subplot(121)
+            curve = data[0]
+            self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
+            self.subplot.legend(loc = 0)
+            self.subplot.set_title(curve.Name)
+            self.subplot.set_xlabel(_('Power [kW]'))
+            self.subplot.set_ylabel(_('Temperature [C]'))
+            
+            mmx = [ max(curve.X), min(curve.X) ]
+            mmy = [ max(curve.Y), min(curve.Y) ]
+                                          
+            curve = data[1]
+            self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
+            self.subplot.legend(loc = 0)
+            self.subplot.set_title(curve.Name)          
+            
+            mmx.append(max(curve.X))
+            mmx.append(min(curve.X))
+            mmy.append(max(curve.Y))
+            mmy.append(min(curve.Y))            
+            
+            m = (max(mmy) - min(mmy))*0.2
+            m2 = (max(mmx) - min(mmx))*0.2
+            
+            self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
+                                
+            curve = data[2]
+            self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
+            
+            m = (max(curve.Y) - min(curve.Y))*0.2
+            m2 = (max(curve.X) - min(curve.X))*0.2
+            
+            self.subplot2.axis([min(curve.X),max(curve.X)+m2,min(curve.Y),max(curve.Y)+m])
+            self.subplot2.legend(loc = 0)
+            self.subplot2.set_title(curve.Name)
+            self.subplot2.set_xlabel(_('Power [kW]'))
+            self.subplot2.set_ylabel(_('Temperature [C]'))
+    
+            #change axis
+            self.subplot.xaxis.set_major_locator(MaxNLocator(4))
+            self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
+        except:
+            pass
 
 
 class HRPlotPanelYED (PlotPanel):
@@ -175,7 +175,7 @@ class HRPlotPanelYED (PlotPanel):
         max_ = 0
         
         X = xrange(0, 406, 5)      
-        Y = data   
+        Y = data[:]   
         for i in range(0,len(Y)): #scale to MWh
             Y[i]=Y[i]/1000.0
              
@@ -193,7 +193,7 @@ class HRPlotPanelYED (PlotPanel):
         max_ = 0
                         
         X = xrange(0, 406, 5)      
-        Y = data 
+        Y = data[:] 
         for i in range(0,len(Y)): #scale to MWh
             Y[i]=Y[i]/1000.0                    
 
@@ -266,14 +266,14 @@ class PanelHR(wx.Panel):
 
         self.cbCurveDisplay = wx.Choice(choices=['HCC/CCC/GCC', 'YED'],
               id=wxID_PANELHRCBCURVEDISPLAY, name='cbCurveDisplay', parent=self,
-              pos=wx.Point(640, 224), size=wx.Size(120, 21),
+              pos=wx.Point(640, 248), size=wx.Size(120, 21),
               style=wx.FULL_REPAINT_ON_RESIZE)
         self.cbCurveDisplay.SetSelection(0)
         self.cbCurveDisplay.Bind(wx.EVT_CHOICE, self.OnCbCurveDisplayChoice,
               id=wxID_PANELHRCBCURVEDISPLAY)
 
         self.cbExHX = wx.CheckBox(id=wxID_PANELHRCBEXHX,
-              label=_('  Consider existing'), name='cbExHX', parent=self,
+              label=_(u'Consider existing'), name='cbExHX', parent=self,
               pos=wx.Point(648, 112), size=wx.Size(112, 16), style=0)
         self.cbExHX.SetValue(False)
         self.cbExHX.Bind(wx.EVT_CHECKBOX, self.OnCbExHXCheckbox,
@@ -293,7 +293,7 @@ class PanelHR(wx.Panel):
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELHRSTATICBOX1,
               label=_('HX Network'), name='staticBox1', parent=self,
-              pos=wx.Point(632, 8), size=wx.Size(136, 184), style=0)
+              pos=wx.Point(632, 8), size=wx.Size(136, 208), style=0)
 
         self.btnShowStdValues = wx.Button(id=wxID_PANELHRBTNSHOWSTDVALUES,
               label=_('Standard values for HX'), name='btnShowStdValues',
@@ -304,11 +304,11 @@ class PanelHR(wx.Panel):
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELHRSTATICBOX2,
               label=_('Display Options'), name='staticBox2', parent=self,
-              pos=wx.Point(632, 200), size=wx.Size(136, 64), style=0)
+              pos=wx.Point(632, 224), size=wx.Size(136, 56), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELHRSTATICTEXT2,
               label=_('HXs in network \ncalculation'), name='staticText2',
-              parent=self, pos=wx.Point(672, 128), size=wx.Size(74, 26),
+              parent=self, pos=wx.Point(667, 128), size=wx.Size(74, 26),
               style=0)
 
         self.staticBox3 = wx.StaticBox(id=wxID_PANELHRSTATICBOX3,
@@ -329,9 +329,21 @@ class PanelHR(wx.Panel):
 
         self.rbRedesign = wx.RadioButton(id=wxID_PANELHRRBREDESIGN,
               label=_(u'Redesign network'), name=u'rbRedesign', parent=self,
-              pos=wx.Point(648, 88), size=wx.Size(104, 13), style=0)        
+              pos=wx.Point(648, 88), size=wx.Size(104, 13), style=0)
         self.rbRedesign.Bind(wx.EVT_RADIOBUTTON, self.OnRbRedesignRadiobutton,
               id=wxID_PANELHRRBREDESIGN)
+
+        self.cbConsiderCond = wx.CheckBox(id=wxID_PANELHRCBCONSIDERCOND,
+              label=_(u'Consider conden-'), name=u'cbConsiderCond', parent=self,
+              pos=wx.Point(648, 160), size=wx.Size(112, 24), style=0)
+        self.cbConsiderCond.SetValue(False)
+        self.cbConsiderCond.Bind(wx.EVT_CHECKBOX, self.OnCbConsiderCondCheckbox,
+              id=wxID_PANELHRCBCONSIDERCOND)
+
+        self.staticText1 = wx.StaticText(id=wxID_PANELHRSTATICTEXT1,
+              label=u'sation heat in off \ngas of boilers?', name='staticText1',
+              parent=self, pos=wx.Point(667, 179), size=wx.Size(88, 26),
+              style=0)
 
     def __init_custom_ctrls(self, prnt):
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
@@ -532,6 +544,7 @@ class PanelHR(wx.Panel):
 
     def OnCbExHXCheckbox(self, event):
         self.mod.ExHX = self.cbExHX.GetValue()
+        #print self.mod.ExHX
         event.Skip()
 
     def OnRbRedesignRadiobutton(self, event):
@@ -540,4 +553,8 @@ class PanelHR(wx.Panel):
 
     def OnRbCalcRadiobutton(self, event):
         self.mod.redesign = False
+        event.Skip()
+
+    def OnCbConsiderCondCheckbox(self, event):
+        self.mod.ConCondensation = self.cbConsiderCond.GetValue()
         event.Skip()

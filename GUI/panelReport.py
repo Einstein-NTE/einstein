@@ -17,6 +17,7 @@
 #       Last revised by:    Hans Schweiger  18/06/2008
 #                           Hans Schweiger  08/10/2008
 #                           Hans Schweiger  12/10/2008
+#                           Stoyan Danov    13/10/2008
 #
 #       Changes to previous version:
 #
@@ -24,6 +25,7 @@
 #       08/10/2008: HS  Security features added for avoiding crashes
 #       12/10/2008: HS  findOneCell substituted by findCellRange ->
 #                       speed-up of about factor 10 or more in report writing
+#       13/10/2008: SD  change _() to _U()
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -99,6 +101,8 @@ wxID_BTNSELECTREPORT = wx.NewId()
 wxID_PANELBUTTONFWD = wx.NewId()
 wxID_PANELBUTTONBACK = wx.NewId()
 
+def _U(text):
+    return unicode(_(text),"utf-8")
         
 class PanelReport(wx.Panel):
     def _init_ctrls(self, prnt):
@@ -111,7 +115,7 @@ class PanelReport(wx.Panel):
 # Description of selected industry
 
         self.box1 = wx.StaticBox(id=-1,
-              label=_('Project Summary'),
+              label=_U('Project Summary'),
               name='box1', parent=self, pos=wx.Point(10, 10),
               size=wx.Size(780, 520), style=0)
         self.box1.SetForegroundColour(TITLE_COLOR)
@@ -126,7 +130,7 @@ class PanelReport(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
-              label=_(u'Select report'), name=u'btnSelectReport', parent=self,
+              label=_U(u'Select report'), name=u'btnSelectReport', parent=self,
               pos=wx.Point(10, 560), size=wx.Size(150, 20), style=0)
         self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
               id=wxID_BTNSELECTREPORT)
@@ -135,7 +139,7 @@ class PanelReport(wx.Panel):
 #       Default action buttons: FWD / BACK / OK / Cancel
 #------------------------------------------------------------------------------		
 
-        self.buttonOk = wx.Button(id=wx.ID_OK, label=_('OK'),
+        self.buttonOk = wx.Button(id=wx.ID_OK, label=_U('OK'),
               name='buttonOk', parent=self, pos=wx.Point(528, 560),
               size=wx.Size(75, 20), style=0)
 
@@ -143,7 +147,7 @@ class PanelReport(wx.Panel):
               self.OnButtonOkButton,
               id=wx.ID_OK)
 
-        self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_('Cancel'),
+        self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
               name='buttonCancel', parent=self, pos=wx.Point(616,
               560), size=wx.Size(75, 20), style=0)
 
@@ -182,7 +186,7 @@ class PanelReport(wx.Panel):
         # Open an existing OpenDocument workbook
         # for processing
         #
-        dialog = wx.FileDialog(parent=None,message=_('Choose a master report file'),
+        dialog = wx.FileDialog(parent=None,message=_U('Choose a master report file'),
                                defaultDir=os.path.join(os.getcwd(),'reports'),
                      wildcard='Open Office spreadsheets files (*.ods)|*.ods',
                      style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_PREVIEW)
@@ -227,7 +231,7 @@ class PanelReport(wx.Panel):
         summary = self.tc1.GetValue()
         print summary
 
-        logMessage(_("summary of project report updated"))
+        logMessage(_U("summary of project report updated"))
 
         sprojects = Status.DB.sproject.ProjectID[Status.PId]
         if len(sprojects) > 0:
@@ -252,7 +256,7 @@ class PanelReport(wx.Panel):
 
         prepareDataForReport()
 
-        dlg = DialogGauge(None,_("Report generation"),_("creating copy of master"))
+        dlg = DialogGauge(None,_U("Report generation"),_U("creating copy of master"))
 
         folder = os.path.dirname(self.master)
         thisreport = os.path.join(folder,NEWREPORT)
@@ -271,11 +275,11 @@ class PanelReport(wx.Panel):
         # and destroy the tree
         # and store the file in a new OO doc
         
-        dlg = DialogGauge(None,_("Report generation"),_("storing report file"))
+        dlg = DialogGauge(None,_U("Report generation"),_U("storing report file"))
         try:
             outfile = ZipFile(thisreport, "w", ZIP_DEFLATED)
         except IOError,e:
-            self.main.showError(_('Error creating report %s. You have probably another version opened:%s') %\
+            self.main.showError(_U('Error creating report %s. You have probably another version opened:%s') %\
                   (thisreport,str(e)))
             return
 
@@ -301,7 +305,7 @@ class PanelReport(wx.Panel):
         outfile.close()
         infile.close()
         dlg.Destroy()
-        self.main.showInfo(_('Report generation is finished\n'
+        self.main.showInfo(_U('Report generation is finished\n'
                              'The generated report is:') + thisreport)
 
 
