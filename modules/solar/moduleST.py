@@ -28,6 +28,7 @@
 #                           Hans Schweiger      01/08/2008
 #                           Hans Schweiger      13/09/2008
 #                           Hans Schweiger      03/10/2008
+#                           Enrico Facci        12/10/2008
 #
 #       Changes to previous version:
 #
@@ -47,6 +48,7 @@
 #       13/09/2008: HS  bug-fix in display of desired solar fraction
 #                       temporary change in selectST: factor 0.8 for concentrating collectors
 #       03/10/2008: HS  calculateOM added
+#       12/10/2008: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -640,6 +642,15 @@ class ModuleST(object):
 #        else:
         logDebug("ModuleST: turn key price of solar system type %s not specified"%equipe.Model)
         equipe.update({"TurnKeyPrice":0.0})
+
+###### E.F. 12/10
+        if model.STOMUnitFix is not None: equipe.update({"OandMfix":model.STOMUnitFix})
+        else:
+            logDebug("ModuleST: fix costs for O and M of the solar sistem %s not specified"%equipe.Model)
+            equipe.update({"OandMfix":0.0})
+        equipe.update({"OandMvar":0.0})
+######
+        
         
         Status.SQL.commit()
         logTrack("ModuleST: dummy equipe after commit of everything %s"%str(equipe))

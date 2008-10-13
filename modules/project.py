@@ -70,6 +70,7 @@ from constants import *
 from schedules import Schedules
 from processes import Processes
 from messageLogger import *
+from einstein.GUI.GUITools import check
 
 #------------------------------------------------------------------------------		
 def copySQLRows(table,query,keyID,keyPar,valPar):
@@ -285,6 +286,14 @@ class Project(object):
             logWarning(_("Project (deleteAlternative) - project %s, cannot delete alternative %s")%(Status.PId,ANo))
             return -1
         
+        finalAlternative = Status.FinalAlternative
+        if finalAlternative is not None:
+            if finalAlternative > ANo:
+                finalAlternative -= 1
+            elif finalAlternative == ANo:
+                finalAlternative = None
+        self.setFinalAlternative(finalAlternative)
+        
         logTrack("Project (deleteAlternative) - project %s, deleting alternative %s"%(Status.PId,ANo))
 
 #..............................................................................
@@ -475,23 +484,17 @@ class Project(object):
     def setFinalAlternative(self,ANo):
 #------------------------------------------------------------------------------
         finalANo = ANo
-        if ANo < 0:
-            finalANo = 0     
-        elif finalANo > Status.NoOfAlternatives:
-            logDebug("Project (setFinalAlternative): error in no. of selected alternative [%s]"%finalANo)
-            return
+        if finalANo is None:
+            self.setStatus("CS",0)
+        else:
+            if ANo < 0:
+                finalANo = 0     
+            elif finalANo > Status.NoOfAlternatives:
+                logDebug("Project (setFinalAlternative): error in no. of selected alternative [%s]"%finalANo)
+                return
 
-        sprojects = Status.DB.sproject.ProjectID[Status.PId]
-        if len(sprojects) > 0:
-            sproject = sprojects[0]
-            sproject.FinalAlternative = finalANo
-            Status.SQL.commit()
-            
-        Status.FinalAlternative = finalANo
+            Status.FinalAlternativeName = "---"
 
-        Status.FinalAlternativeName = "---"
-
-        if finalANo is not None:
             self.setStatus("CS")
             aa = Status.DB.salternatives.ProjectID[Status.PId].\
                  AlternativeProposalNo[finalANo]
@@ -499,6 +502,14 @@ class Project(object):
                 name = aa[0].ShortName
                 if name is not None:
                     Status.FinalAlternativeName = name
+
+        sprojects = Status.DB.sproject.ProjectID[Status.PId]
+        if len(sprojects) > 0:
+            sproject = sprojects[0]
+            sproject.FinalAlternative = check(finalANo)
+            Status.SQL.commit()
+            
+        Status.FinalAlternative = finalANo
             
 #------------------------------------------------------------------------------
 

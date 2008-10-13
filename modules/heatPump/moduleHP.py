@@ -45,7 +45,8 @@
 #                           Hans Schweiger          28/06/2008
 #                           Hans Schweiger          02/08/2008
 #                           Hans Schweiger          03/10/2008
-#   
+#                           Enrico Facci            12/10/2008
+#
 #
 #       Changes to previous version:
 #       22/03/2008 general restructuring and clean-up
@@ -93,6 +94,7 @@
 #       28/06/2008: HS  new modality of runSimulation(first=xy,last=xy) implemented. Some clean-up.
 #       02/08/2008: HS  conversion kWh - MWh in panel
 #       03/10/2008: HS  calculateOM added
+#       12/10/2008: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -500,6 +502,17 @@ class ModuleHP():
             logDebug("ModuleHP: turn key price of heat pump model %s not specified"%equipe.Model)
             equipe.update({"TurnKeyPrice":0.0})
 
+###### E.F. 12/10
+        if model.HPOandMfix is not None: equipe.update({"OandMfix":model.HPOandMfix})
+        else:
+            logDebug("ModuleHP: fix costs for O and M of heat pump model %s not specified"%equipe.Model)
+            equipe.update({"OandMfix":0.0})
+        if model.HPOandMvar is not None: equipe.update({"OandMvar":model.HPOandMvar})
+        else:
+            logDebug("ModuleHP: variable costs for O and M of heat pump model %s not specified"%equipe.Model)
+            equipe.update({"OandMvar":0.0})
+######
+            
         Status.SQL.commit()
 
 #------------------------------------------------------------------------------

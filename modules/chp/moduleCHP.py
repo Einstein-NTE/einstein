@@ -20,10 +20,12 @@
 #                           based on ModuleBB
 #	Last revised by:
 #                           Hans Schweiger      03/10/2008
+#                           Enrico Facci        12/10/2008
 #
 #       Changes to previous version:
 #
 #       03/10/08: HS    calculatOM added
+#       12/10/08: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -347,6 +349,16 @@ class ModuleCHP(object):
 #        else:
         logDebug("ModuleCHP: turn key price of CHP equipment model %s not specified"%equipe.Model)
         equipe.update({"TurnKeyPrice":0.0})
+###### E.F. 12/10
+        if model.OMRateFix is not None: equipe.update({"OandMfix":model.OMRateFix})
+        else:
+            logDebug("ModuleCHP: fix costs for O and M of CHP model %s not specified"%equipe.Model)
+            equipe.update({"OandMfix":0.0})
+        if model.OMRateVar is not None: equipe.update({"OandMvar":model.OMRateVar})
+        else:
+            logDebug("ModuleCHP: variable costs for O and M of CHP model %s not specified"%equipe.Model)
+            equipe.update({"OandMvar":0.0})
+######
 
 
         Status.SQL.commit()

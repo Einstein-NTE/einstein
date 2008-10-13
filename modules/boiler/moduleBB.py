@@ -36,6 +36,7 @@
 #                           Hans Schweiger      03/07/2008
 #                           Hans Schweiger      16/09/2008
 #                           Hans Schweiger      03/10/2008
+#                           Enrico Facci        12/10/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -84,6 +85,7 @@
 #                       introduction of several security items and bug-fixes
 #       16/09/2008: HS  change in function findmaxTemp: -> attempt to eliminate rounding errors ...
 #       03/10/2008: HS  calculateOM added
+#       12/10/08: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -468,6 +470,18 @@ class ModuleBB(object):
         else:
             logDebug("ModuleBB: turn key price of boiler model %s not specified"%equipe.Model)
             equipe.update({"TurnKeyPrice":0.0})
+
+###### E.F. 12/10
+        if model.BoilerOandMfix is not None: equipe.update({"OandMfix":model.BoilerOandMfix})
+        else:
+            logDebug("ModuleBB: fix costs for O and M of boiler model %s not specified"%equipe.Model)
+            equipe.update({"OandMfix":0.0})
+        if model.BoilerOandMvar is not None: equipe.update({"OandMvar":model.BoilerOandMvar})
+        else:
+            logDebug("ModuleBB: variable costs for O and M of boiler model %s not specified"%equipe.Model)
+            equipe.update({"OandMvar":0.0})
+######
+
             
         Status.SQL.commit()
         logTrack("moduleBB (setEquipmentFromDB): boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%\
