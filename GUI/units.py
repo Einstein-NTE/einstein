@@ -12,7 +12,7 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
+#	Version No.: 0.07
 #	Created by: 	    Stoyan Danov    03/06/2008
 #
 #       Revised by:         Stoyan Danov    10/06/2008
@@ -20,6 +20,7 @@
 #                           Hans Schweiger  11/06/2008
 #                           Stoyan Danov    12/06/2008
 #                           Hans Schweiger  01/09/2008
+#                           Hans Schweiger  14/10/2008
 #
 #       Changes to previous version:
 #       SD: 10/06/2008: added FUELPRICELCV, PRICE
@@ -29,6 +30,7 @@
 #       SD: 12/06/2008: completing the new structure: MASSFLOW,PRESSURE,SPECIFICENTHALPY,
 #                       VOLUMEFLOW,TIME,
 #       HS: 01/09/2008: bug-fix in SPECIFICENTHALPY and SPECIFICHEAT
+#       HS: 14/10/2008: conversion from mass to volume brought to work
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -41,17 +43,64 @@
 #==============================================================================
 
 from einstein.modules.fluids import Fluid
+from einstein.modules.fluids import Fuel
 from einstein.modules.messageLogger import *
 
 CURRENCY = 'EUR'
 
-UNITSFLUIDDENSITY = 1000.0
+UNITSDENSITY = 1000.0
 
 def setUnitsFluidDensity(fluidID):
-    global UNITSFLUIDDENSITY
+    global UNITSDENSITY
 
     fluid = Fluid(fluidID)
-    UNITSFLUIDDENSITY = fluid.rho
+    UNITSDENSITY = fluid.rho
+    changeMassOrVolumeUnits()
+
+def setUnitsFuelDensity(fuelID):
+    global UNITSDENSITY
+
+    fuel = Fuel(fuelID)
+    UNITSDENSITY = fuel.rho
+    changeMassOrVolumeUnits()
+
+
+def changeMassOrVolumeUnits():
+    global UNITSDENSITY
+    
+    UNITS["MASSORVOLUME"] = {
+        'kg' : (1.0,0.0),
+        'lb' : (0.45359,0.0),
+        't' : (1000.0,0.0),
+        'm3' : (1.0*UNITSDENSITY,0.0),
+        'l' : (1.0e-3*UNITSDENSITY,0.0),
+        'ft3' : (0.028317*UNITSDENSITY,0.0),
+        'U.S. gal' : (0.003785*UNITSDENSITY,0.0),
+        'Brit. gal' : (0.004546*UNITSDENSITY,0.0),
+        'barrel (U.S. pet.)' : (0.15898*UNITSDENSITY,0.0)
+        }
+
+    UNITS['MASSORVOLUMEFLOW'] = {
+        'kg/h' : (1.0,0.0),
+        'kg/s' : (3600.0,0.0),
+        'lb/h' : (0.45359,0.0),
+        'lb/s' : (1632.924,0.0),
+        'm3/h' : (1.0*UNITSDENSITY,0.0),
+        'm3/s' : (3600.0*UNITSDENSITY,0.0)
+        }
+
+    UNITS['VOLUMEORMASS'] = {
+        'kg' : (1.0/UNITSDENSITY,0.0),
+        'lb' : (0.45359/UNITSDENSITY,0.0),
+        't' : (1000.0/UNITSDENSITY,0.0),
+        'm3' : (1.0,0.0),
+        'l' : (1.0e-3,0.0),
+        'ft3' : (0.028317,0.0),
+        'U.S. gal' : (0.003785,0.0),
+        'Brit. gal' : (0.004546,0.0),
+        'barrel (U.S. pet.)' : (0.15898,0.0)
+        }
+
 
 UNITS = {
 # conversion to internal unit: [ºC]
@@ -145,12 +194,12 @@ UNITS = {
         'kg' : (1.0,0.0),
         'lb' : (0.45359,0.0),
         't' : (1000.0,0.0),
-        'm3' : (1.0*UNITSFLUIDDENSITY,0.0),
-        'l' : (1.0e-3*UNITSFLUIDDENSITY,0.0),
-        'ft3' : (0.028317*UNITSFLUIDDENSITY,0.0),
-        'U.S. gal' : (0.003785*UNITSFLUIDDENSITY,0.0),
-        'Brit. gal' : (0.004546*UNITSFLUIDDENSITY,0.0),
-        'barrel (U.S. pet.)' : (0.15898*UNITSFLUIDDENSITY,0.0)
+        'm3' : (1.0*UNITSDENSITY,0.0),
+        'l' : (1.0e-3*UNITSDENSITY,0.0),
+        'ft3' : (0.028317*UNITSDENSITY,0.0),
+        'U.S. gal' : (0.003785*UNITSDENSITY,0.0),
+        'Brit. gal' : (0.004546*UNITSDENSITY,0.0),
+        'barrel (U.S. pet.)' : (0.15898*UNITSDENSITY,0.0)
         },
 
 # conversion to internal unit: [kg/h]
@@ -159,8 +208,21 @@ UNITS = {
         'kg/s' : (3600.0,0.0),
         'lb/h' : (0.45359,0.0),
         'lb/s' : (1632.924,0.0),
-        'm3/h' : (1.0*UNITSFLUIDDENSITY,0.0),
-        'm3/s' : (3600.0*UNITSFLUIDDENSITY,0.0)
+        'm3/h' : (1.0*UNITSDENSITY,0.0),
+        'm3/s' : (3600.0*UNITSDENSITY,0.0)
+        },
+
+# conversion to internal unit: [kg or m3]
+    'VOLUMEORMASS': {
+        'kg' : (1.0/UNITSDENSITY,0.0),
+        'lb' : (0.45359/UNITSDENSITY,0.0),
+        't' : (1000.0/UNITSDENSITY,0.0),
+        'm3' : (1.0,0.0),
+        'l' : (1.0e-3,0.0),
+        'ft3' : (0.028317,0.0),
+        'U.S. gal' : (0.003785,0.0),
+        'Brit. gal' : (0.004546,0.0),
+        'barrel (U.S. pet.)' : (0.15898,0.0)
         },
 
 # conversion to internal unit: [kWh]
@@ -268,6 +330,7 @@ UNITSYSTEM = {
                 'MASSFLOW':'kg/s',
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
+                'VOLUMEORMASS':'m3',
                 'ENERGY':'GJ',
                 'ENERGYFLOW':'MJ/m2a',
                 'POWER':'kW',
@@ -295,6 +358,7 @@ UNITSYSTEM = {
                 'MASSFLOW':'kg/h',
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
+                'VOLUMEORMASS':'m3',
                 'ENERGY':'MWh',
                 'ENERGYFLOW':'kWh/m2a',
                 'POWER':'kW',
@@ -322,6 +386,7 @@ UNITSYSTEM = {
                 'MASSFLOW':'lb/h',
                 'MASSORVOLUME':'kg',
                 'MASSORVOLUMEFLOW':'kg/h',
+                'VOLUMEORMASS':'m3',
                 'ENERGY':'btu',
                 'ENERGYFLOW':'btu/h.ft2.a',
                 'POWER':'btu/h',
@@ -344,9 +409,15 @@ def internalValue(displayValue,unit,unitType):
 #------------------------------------------------------------------------------
 #   calculates the internal value from the value entered on GUI
 #------------------------------------------------------------------------------
-    (a,b) = UNITS[unitType][unit]
-    
+    (a,b) = UNITS[unitType][unit]    
     internalValue = a*displayValue + b
+
+    print "internalValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
+                                                     internalValue,
+                                                     unit,
+                                                     unitType,
+                                                     a)
+
     return internalValue
     
 #------------------------------------------------------------------------------
@@ -356,8 +427,13 @@ def displayValue(internalValue,unit,unitType):
 #   calculates the value to be displayed from the internally stored value
 #------------------------------------------------------------------------------
     (a,b) = UNITS[unitType][unit]
-    
     displayValue = (internalValue - b)/a
+
+    print "displayValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
+                                                     internalValue,
+                                                     unit,
+                                                     unitType,
+                                                     a)
     return displayValue
     
 #------------------------------------------------------------------------------

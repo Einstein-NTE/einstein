@@ -53,7 +53,10 @@ from einstein.GUI.status import Status
 from DBTitles import *
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 #
 # constants

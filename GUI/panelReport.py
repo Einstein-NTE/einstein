@@ -130,7 +130,7 @@ class PanelReport(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.btnSelectReport = wx.Button(id=wxID_BTNSELECTREPORT,
-              label=_U(u'Select report'), name=u'btnSelectReport', parent=self,
+              label=_U('Select report'), name=u'btnSelectReport', parent=self,
               pos=wx.Point(10, 560), size=wx.Size(150, 20), style=0)
         self.btnSelectReport.Bind(wx.EVT_BUTTON, self.OnBtnSelectReport,
               id=wxID_BTNSELECTREPORT)

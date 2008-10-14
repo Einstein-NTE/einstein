@@ -62,8 +62,8 @@ import wx
 import pSQL
 from status import Status
 from GUITools import *
-from displayClasses import *
 from units import *
+from displayClasses import *
 from fonts import *
 
 
@@ -376,8 +376,7 @@ class PanelQ5(wx.Panel):
         
         if p.HeatDistMedium is not None:
             fluidID = int(p.HeatDistMedium)
-            fluid = Fluid(fluidID)
-            setUnitsFluidDensity(fluid.rho)
+            setUnitsFluidDensity(fluidID)
             #fluidName = fluidDict[p.HeatDistMedium]#SD
             fluidName = fluidDict[fluidID] #SD key must be immutable type, changed to -> int       
             self.tc3.SetValue(fluidName)  

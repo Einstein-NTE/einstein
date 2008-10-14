@@ -70,8 +70,8 @@ import pSQL
 import HelperClass
 from status import Status
 from GUITools import *
-from displayClasses import *
 from units import *
+from displayClasses import *
 from fonts import *
 
 # constants that control the default sizes
@@ -387,9 +387,12 @@ class PanelQ2(wx.Panel):
         dbfuels = Status.DB.dbfuel.FuelName[fuelName]
         if len(dbfuels) > 0:
             dbfid = dbfuels[0].DBFuel_ID
+            setUnitsFuelDensity(dbfid)
         else:
             dbfid = -1
         fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[dbfid]
+
+        set
         
         if Status.PId <> 0 and fuelName <> 'None':
             if len(fuels) == 0:
@@ -496,6 +499,8 @@ class PanelQ2(wx.Panel):
         try:
             self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
             self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
+            setUnitsFuelDensity(self.selectedFuelID)
+            
             q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
             self.tc3.SetValue(str(q.MFuelYear))
             self.tc4.SetValue(str(q.FECFuel))

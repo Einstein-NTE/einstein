@@ -859,6 +859,7 @@ class FloatEntry(wx.Panel):
             # convert to user units
             try:
                 f = self.entry.toFloat(iValue)
+                print "f= ",f
                 if f is not None:
                     dValue = units.displayValue(f,self.defaultDisplayUnit,self.unitdict)
                     self.entry.SetValue(dValue)
@@ -1124,8 +1125,8 @@ class TextEntry(wx.Panel):
         self.SetValue('')
 
     def SetValue(self, value):
-        print "DisplayClasses - TextEntry - SetValue. printing value"
-        print value
+#        print "DisplayClasses - TextEntry - SetValue. printing value"
+#        print value
         try:
             self.entry.SetValue(unicode(value,"utf-8"))
         except:

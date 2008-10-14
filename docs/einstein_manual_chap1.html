@@ -16,11 +16,14 @@
  cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: center;">&lt;&lt;&lt;<br>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="einstein_manual_intro.html">&lt;&lt;&lt;</a><br>
       </td>
-      <td style="vertical-align: top; text-align: center;">UP<br>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="einstein_manual.html">UP</a><br>
       </td>
-      <td style="vertical-align: top; text-align: center;">&gt;&gt;&gt;<br>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="einstein_manual_chap2.html">&gt;&gt;&gt;</a><br>
       </td>
     </tr>
   </tbody>
@@ -31,20 +34,19 @@
 installation</a><br>
 <a href="#1.2._Update_from_previous_Versions_">1.2. Updates</a><br>
 <h2><a name="1.1._Installation_of_EINSTEIN_V1.00a_for"></a><span
- style="font-weight: bold;">1.1. Installation of EINSTEIN V1.00a for
+ style="font-weight: bold;">1.1. Installation of EINSTEIN Version 1.0
+for
 Newcomers<br>
 </span></h2>
-Note: V1.00a is still an INTERNAL testing version !!!<br>
-<br>
-If You already have successfully installed EINSTEIN V.001 (demo version
-of the Sabadell meeting) please <a
+If You already have successfully installed some of the preliminary
+versions of EINSTEIN V1.00a or V1.00b please <a
  href="#1.2._Update_from_previous_Versions_">jump to section 1.2</a>.<br>
 <br>
 <h3>1.1.1. Basic set-up previous to the installation of EINSTEIN<br>
 </h3>
 Einstein uses the following software packages that have to be installed
 PREVIOUSLY to the installation of EINSTEIN itself :<br>
-- MySQL (Version 5.0 or higher)<br>
+- MySQL (Version 5.1 or higher)<br>
 - Python (Version 2.5 or higher)<br>
 - Several Python complements: <br>
 &nbsp;&nbsp;&nbsp; a) wxPython<br>
@@ -57,12 +59,9 @@ HOW TO INSTALL THESE PACKAGES ?<br>
 Step 1: Create your einstein installation folder, e.g. <span
  style="font-weight: bold;">C:\MyEINSTEIN</span>.<br>
 <br>
-Step 2: Copy the following files into C:\MyEINSTEIN and then unzip, in
-the order as specified (the second file will overwrite some of the old
-files. When asked, confirm overwriting files with OK):<br>
-- EINSTEIN_InternalRelease_001.zip (-&gt; the installation package of
-the very first Meeting-Sabadell-Demo Installation)<br>
-- EINSTEIN_R1.00a.zip<br>
+Step 2: Copy the following files into C:\MyEINSTEIN and then unzip:<br>
+- EINSTEIN_1.0.zip<br>
+- MySQLandPython.zip<br>
 <br>
 Please CHECK: After this you should have (at least) the following files
 and folders in your "MyEINSTEIN" directory:<br>
@@ -74,11 +73,13 @@ and folders in your "MyEINSTEIN" directory:<br>
 - folder "einstein"<br>
 - folder "installer"<br>
 <br>
-Step 3: Set-up of MySQL (skip if you have already MySQL 5.0 or higher
+Step 3: Set-up of MySQL (skip if you have already MySQL 5.1 or higher
 running, skip this section)<br>
 <br>
-TAKE CARE: Uninstall any older Version of MySQL BEFORE installing the
-new Version !!! Parallel installation of two different MySQL Versions
+TAKE CARE: Uninstall or deactivate any older Version of MySQL BEFORE
+installing the
+new Version !!! <br>
+Parallel installation of two different MySQL Versions
 may lead to problems.<br>
 <br>
 There are two possible ways to doing MySQL installation. We recomment
@@ -146,23 +147,18 @@ If so, you should free port 3306, which is used by MySQL
 ==&gt; HOW CAN I DO THAT?
 <br>
 <br>
-(EXTRACTS&nbsp; FROM E-MAILS REGARDING FIREWALL PROBLEMS ... to be
-checked ...)<br>
 In general firewalls have an icon on the bottom right part of your
 desktop. It says 'security' or 'firewall' or something like that. <br>
 When you open it, there usually is some button called 'advanced
-settings' or something. A precise answer to your question would depend
+settings' or something. <br>
+A precise answer to your question would depend
 on what firewall do you have installed.
-<br>
-<br>
-I think that this is a very concrete and simple matter that you might
-submit to the people that give technical support at your institution.
-They will certainly know.
 <br>
 <br>
 -------------------------------------------------------------------<br>
 <br>
-And, if it is not a problem with the firewall, please try this:
+If there are problems with MySQL but it is not a problem with the
+firewall, please try this:
 <br>
 Open a command window and write the command:
 <br>
@@ -174,11 +170,14 @@ This should show a more descriptive error diagnostic.
 <br>
 <br>
 <br>
-<br>
-<br>
 <h3><a name="1.1.2._Installation_of_EINSTEIN_"></a>1.1.2. Installation
 of EINSTEIN<br>
 </h3>
+TAKE CARE: If You have a previous installation of EINSTEIN running on
+your computer and do not want to lose the data in your database, you
+should NOT carry out the database installation, as this will overwrite
+existing data !!!<br>
+<br>
 Step 1: Installation of the EINSTEIN database<br>
 <br>
 There are two possible ways to doing the EINSTEIN database
@@ -193,7 +192,7 @@ b) Run EINSTEIN (see below) and use the Menu-Option: <br>
 <br>
 Database -&gt; Database Administration -&gt; Restore Database<br>
 <br>
-You should select the file "einstein_R1.00a.sql" in the folder
+You should select the file "einstein_V1.0.sql" in the folder
 &lt;MyEINSTEIN&gt;\einstein\sql<br>
 <br>
 Step 2: Now have a try -&gt; Run EINSTEIN<br>
@@ -212,7 +211,9 @@ password there. You will see that there is no password, originally.
 <br>
 b) Use the option&nbsp; "Database -&gt; Database Administration" in
 EINSTEIN, and enter your password there.<br>
-<br>
+NOTE: you have to specify the folder where the executables of MySQL are
+located <br>
+(typically something like C:\Program Files\MySQL\MySQL Server 5.1\bin)<br>
 &nbsp;&nbsp; <br>
 <h2><a name="1.2._Update_from_previous_Versions_"></a><span
  style="font-weight: bold;">1.2. Update from previous Versions<br>
@@ -220,9 +221,9 @@ EINSTEIN, and enter your password there.<br>
 Step 1:&nbsp; You can use your existing EINSTEIN installation folder,
 e.g. <span style="font-weight: bold;">C:\&lt;MyEINSTEIN&gt;</span> ,
 or you can create a new one, e.g. <span style="font-weight: bold;">C:\&lt;MyEINSTEIN
-V1.00a&gt;<br>
+V1.0&gt;<br>
 <br>
-</span>Step 2: Copy the file "EINSTEIN_R1.00a.zip" into
+</span>Step 2: Copy the file "EINSTEIN_V1.0.zip" into
 C:\&lt;MyEINSTEIN&gt; and then unzip. <br>
 (if you use the folder of an existing installation, this may overwrite
 some of the old
@@ -235,7 +236,7 @@ and folders in your "MyEINSTEIN" directory:<br>
 - folder "einstein"<br>
 <br>
 Step 3: Install the update of the EINSTEIN database (<a
- href="#1.1.2._Installation_of_EINSTEIN_">-&gt; section 1.1.2</a>)<br>
+ href="#1.1.2._Installation_of_EINSTEIN_">-&gt; section 1.1.2</a>).<br>
 <br>
 Step 4: Now have a try -&gt; Run EINSTEIN<br>
 <br>

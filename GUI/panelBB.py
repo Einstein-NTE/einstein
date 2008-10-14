@@ -29,6 +29,7 @@
 #                           Stoyan Danov            18/06/2008
 #                           Hans Schweiger          03/07/2008
 #                           Stoyan Danov    13/10/2008
+#                           Stoyan Danov    14/10/2008
 #
 #       Changes to previous version:
 #       - structure of plots identical to that of HP
@@ -41,6 +42,7 @@
 #       03/07/2008: HS  change in display: call to updatePanel instead of
 #                       initPanel
 #       13/10/2008: SD  change _() to _U()
+#       13/10/2008: SD  try/except in def _U(
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -90,7 +92,10 @@ MAXROWS = 50
 TABLECOLS = 6
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 TYPELIST = BBTYPES
 FUELLIST = [_U("Natural Gas"),\

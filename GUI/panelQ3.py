@@ -73,8 +73,8 @@ import wx
 import pSQL
 from status import Status
 from GUITools import *
-from displayClasses import *
 from units import *
+from displayClasses import *
 from fonts import *
 
 # constants that control the default sizes
@@ -231,7 +231,7 @@ class PanelQ3(wx.Panel):
 
         self.tc8 = FloatEntry(self.page0,
                               ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
-                              unitdict='VOLUME',
+                              unitdict='VOLUMEORMASS',
                               label=_U("Daily inflow of process medium"),
                               tip=_U("Continuous process: Fluid flow rate times hours of circulation. Batch process with fluid renewal: volume times No. of batches."))
 
@@ -538,11 +538,14 @@ class PanelQ3(wx.Panel):
             self.tc4.SetValue(fluidName)
         else:
             self.tc4.SetValue("None")
-
+            
         self.tc5.SetValue(str(q.PT))
         self.tc6.SetValue(str(q.PTInFlow))
         self.tc7.SetValue(str(q.PTStartUp))
+
+        setUnitsFluidDensity(q.ProcMedDBFluid_id)
         self.tc8.SetValue(str(q.VInFlowDay))
+        
         self.tc9.SetValue(str(q.VolProcMed))
         self.tc10.SetValue(str(q.QOpProc))
         self.tc11.SetValue(str(q.HPerDayProc))
@@ -559,6 +562,8 @@ class PanelQ3(wx.Panel):
 
         self.tc15_2.SetValue(str(q.HOutFlow))
         self.tc16.SetValue(str(q.PTFinal))
+
+###        setUnitsFluidDensity(q.ProcMedOut) works only with One fluid per panel !!!
         self.tc17.SetValue(str(q.VOutFlow))
         
         if q.HeatRecOK in TRANSYESNO:
@@ -615,6 +620,15 @@ class PanelQ3(wx.Panel):
         unitOpDict = Status.prj.getUnitOpDict()          
         fluidDict = Status.prj.getFluidDict()
             
+        setUnitsFluidDensity(findKey(fluidDict,self.tc4.GetValue(text=True)))
+        vIn = self.tc8.GetValue()
+        
+###        setUnitsFluidDensity(findKey(fluidDict,self.tc15_1.GetValue(text=True)))
+### only one fluid per panel can be changed between mass/volume ...
+        
+        vOut = self.tc17.GetValue()
+        
+
         tmp = {
             "Questionnaire_id":Status.PId,
             "AlternativeProposalNo":Status.ANo,
@@ -626,7 +640,7 @@ class PanelQ3(wx.Panel):
             "PT":check(self.tc5.GetValue()), 
             "PTInFlow":check(self.tc6.GetValue()), 
             "PTStartUp":check(self.tc7.GetValue()), 
-            "VInFlowDay":check(self.tc8.GetValue()), 
+            "VInFlowDay":check(vIn), 
             "VolProcMed":check(self.tc9.GetValue()), 
             "QOpProc":check(self.tc10.GetValue()), 
             "HPerDayProc":check(self.tc11.GetValue()), 
@@ -637,7 +651,7 @@ class PanelQ3(wx.Panel):
             "PTOutFlow":check(self.tc15.GetValue()),
             "HOutFlow":check(self.tc15_2.GetValue()),
             "PTFinal":check(self.tc16.GetValue()), 
-            "VOutFlow":check(self.tc17.GetValue()), 
+            "VOutFlow":check(vOut), 
             "HeatRecOK":check(findKey(TRANSYESNO,self.tc18.entry.GetStringSelection())),
             "HeatRecExist":check(findKey(TRANSYESNO,self.tc19.entry.GetStringSelection())),
             "SourceWasteHeat":check(findKey(TRANSYESNO,self.tc20.entry.GetStringSelection())), 	
