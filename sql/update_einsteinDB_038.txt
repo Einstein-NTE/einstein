@@ -1,0 +1,14 @@
+-- update einstein database: 12.10.2008
+USE einstein;
+
+ALTER TABLE sproject ADD COLUMN Summary TEXT COMMENT 'Audit summary' AFTER UnitsReport;
+
+
+
+
+
+
+
+
+
+
