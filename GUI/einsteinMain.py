@@ -249,7 +249,7 @@ from panelTCANon import *
 from panelInfo import *
 
 #TS2008-04-15 help frame added
-from UserHelp import *
+from userHelp import *
 #TS2008-04-22 language selection dialog added
 from dialogLanguage import *
 #TS2008-05-01 report generation
@@ -771,6 +771,10 @@ class EinsteinFrame(wx.Frame):
     def OnMenuHelpUserManual(self, event):
         frameUserManual = FrameHelpUserManual(self, '../docs/einstein_manual.html')
         frameUserManual.Show()
+
+    def OnMenuHelpSupport(self, event):
+        frameSupport = FrameHelpSupport(self)
+        frameSupport.Show()
 
     def OnMenuHelpAbout(self, event):
         frameAbout = FrameHelpAbout(self)
@@ -1388,8 +1392,10 @@ class EinsteinFrame(wx.Frame):
         
         self.HelpUserManual = self.menuHelp.Append(-1, _U("&Documentation"))
         self.menuHelp.AppendSeparator()
+        self.HelpSupport = self.menuHelp.Append(-1, _U("&Support"))
+        self.menuHelp.AppendSeparator()
         self.HelpAbout = self.menuHelp.Append(-1, _U("&About"))
-
+        
         self.menuBar.Append(self.menuFile, _U("&File"))
         self.showMainMenuAlternatives()
 
@@ -1610,6 +1616,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuSettingsManageFonts, self.ManageFonts)
 
         self.Bind(wx.EVT_MENU, self.OnMenuHelpUserManual, self.HelpUserManual)
+        self.Bind(wx.EVT_MENU, self.OnMenuHelpSupport, self.HelpSupport)
         self.Bind(wx.EVT_MENU, self.OnMenuHelpAbout, self.HelpAbout)
 
         #--- binding the Tree
