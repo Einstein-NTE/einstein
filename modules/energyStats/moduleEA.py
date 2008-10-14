@@ -422,7 +422,8 @@ class ModuleEA(object):
             except:
                 quantity = 1.0
                 
-            process.UPH_SEC = UPH/quantity
+            if quantity > 0 and quantity is not None: process.UPH_SEC = UPH/quantity
+            else: process.UPH_SEC = 0.0
             process.PE_SEC = 0.0
             process.EL_SEC = 0.0
 
