@@ -33,6 +33,7 @@
 #==============================================================================
 
 from einstein.modules.messageLogger import *
+from einstein.auxiliary.auxiliary import *
 
 #------------------------------------------------------------------------------		
 class Fluid():
@@ -41,7 +42,6 @@ class Fluid():
     def __init__(self,fluidID):
         fluids = Status.DB.dbfluid.DBFluid_ID[fluidID]
         if len(fluids) > 0:
-            self.rho = fluids[0].FluidDensity
             self.cp = fluids[0].FluidCp
             self.hL = fluids[0].LatentHeat
             self.TCond = fluids[0].TCond
@@ -92,7 +92,7 @@ class Fuel():
             self.CO2Conv = fuel.CO2ConvFuel
             self.rho = fuel.FuelDensity
             self.CombAir = fuel.CombAir
-            self.OffgasHeatCapacity = fuel.OffgasHeatCapacity/3600.0
+            self.OffgasHeatCapacity = fuel.OffgasHeatCapacity
             self.Offgas = fuel.Offgas
             self.OffgasDensity = fuel.OffgasDensity
             self.Humidity = fuel.Humidity
@@ -101,7 +101,6 @@ class Fuel():
                self.HCV is None or \
                self.PEConv is None or \
                self.CO2Conv is None or \
-               self.rho is None or \
                self.CombAir is None or \
                self.OffgasHeatCapacity is None:
 #               self.Offgas is None or \
@@ -110,6 +109,15 @@ class Fuel():
                 logError(_("Severe error in your fuel data for fuel %s: some parameters are missing")%\
                            (fuels[0].FuelName))
                                                 #conversion to kWh/kgK
+            self.OffgasHeatCapacity = noneFilterNumber(self.OffgasHeatCapacity)/3600.
+
+            if self.rho is None or self.rho <= 0.0:
+                logError(_("Severe error in your fuel data for fuel %s: erroneous value for density = %s")%\
+                           (fuels[0].FuelName,self.rho))
+                self.rho = 1.0
+                                                #conversion to kWh/kgK
+            self.OffgasHeatCapacity = noneFilterNumber(self.OffgasHeatCapacity)/3600.
+            
         else:
             self.LCV = 10.0
             self.HCV = 11.0

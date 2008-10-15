@@ -486,6 +486,7 @@ class Project(object):
         finalANo = ANo
         if finalANo is None:
             self.setStatus("CS",0)
+            Status.FinalAlternativeName = "---"
         else:
             if ANo < 0:
                 finalANo = 0     

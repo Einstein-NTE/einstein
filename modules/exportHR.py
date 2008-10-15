@@ -214,6 +214,10 @@ class XMLDocHRModuleBase:
         db = DBConnection();
         db.connect()
         r = db.sql( sql % (self.qid,self.ano) )
+        
+        #if (sql == SQLViews.SQL_WasteHeatElec):
+        #    print (sql % (self.qid,self.ano))
+        
         for result in r:
             entry = self.document.createElement(name)
             count = 0
@@ -542,8 +546,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     procedata       = ["ListOfQProcessData", "InputXMLQProcessData", procdatatags, SQLViews.SQL_ProcessData ,[qprocmed1,qwhprocmed1,insupplymed,qprocmed2,procdatabatch], HandleProcessData]
     
     #ListOfWasteHeatElectrical structure    
-    wasteheattags   = ["WHEEName","QWHEE","WHEEMedium","WHEEFlow","WHEETOutlet","HPerDayWHEE","NDaysWHEE","FluidId","FluidCp",
-                    "FluidDensity"]
+    wasteheattags   = ["WHEEName","QWHEE","WHEEMedium","WHEEFlow","WHEETOutlet","HPerDayWHEE","NDaysWHEE","FluidId","FluidCp","FluidDensity"]
     wasteheat       = ["InputXMLWasteHeatElectrical","InputXMLWasteHeatElectrical",wasteheattags,SQLViews.SQL_WasteHeatElec,None,None]
     
         

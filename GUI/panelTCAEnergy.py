@@ -331,5 +331,6 @@ class PanelTCAEnergy(wx.Panel):
 
     def OnBtnGoMainButton(self, event):
         self.Hide()
+        self.mod.storeData()
         self.main.tree.SelectItem(self.main.qECO, select=True)
         event.Skip()        

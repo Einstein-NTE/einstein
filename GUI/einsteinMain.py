@@ -434,11 +434,26 @@ class EinsteinFrame(wx.Frame):
         #self.logWarning('an example of a warning')
         #self.logError('an example of an error')
 
-        ############################################
-        #
-        # Methods
-        #
-        ############################################
+
+    def changeUI(self):
+        #----- add statusbar
+#        self.CreateStatusBar()
+
+        self.panelinfo.Destroy()
+        self.panelinfo = PanelInfo(self,self)
+
+        self.CreateMenu()
+        self.changeAssistantMainMenu(ASSISTANTLIST.index(Status.UserInteractionLevel))
+
+        self.tree.Destroy()
+        self.CreateTree()
+        root = self.tree.GetRootItem()
+
+        self.DoLayout()
+
+        #----- set binding events
+        self.BindEvents()
+
 #------------------------------------------------------------------------------
     def _log(self,fcolor,bcolor,text):
         tl = time.localtime()
@@ -753,6 +768,7 @@ class EinsteinFrame(wx.Frame):
             language.install()
 
         dialogLang.Destroy()
+        self.changeUI()
 
     def OnMenuSettingsViewMessages(self,event):
         if self.menuBar.IsChecked(event.GetId()):

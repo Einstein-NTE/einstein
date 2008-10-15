@@ -56,19 +56,39 @@ class ModuleTCA(object):
         if (Status.PId != self.data.pid)or(Status.ANo != self.data.ano):
             self.data = TCAData(Status.PId,Status.ANo)
             self.data.loadTCAData()
-       
-    def runTCAModule(self):
-        #reset result       
-        self.result = []
+    
+    def resetTCA(self):
+        query = """SELECT AlternativeProposalNo,ShortName FROM salternatives WHERE ProjectID = %s"""
+        query = query % (self.data.pid)    
+        results = Status.DB.sql_query(query)
+        anos = []              
+                  
+        for result in results:
+            if (result[0]>=0):
+                anos.append([result[0],result[1]])              
         
-        #set parameters
-        InterestRate = self.data.NIR - self.data.Inflation
-        DiscountRate = self.data.CSDR - self.data.Inflation
-        ProjectLifetime = self.data.TimeFrame
-            
+        #print "reset:"
+        #print anos
+        for ano in anos: # ano = [ Number, Name ] !!!           
+            data = TCAData(Status.PId,ano[0])  
+            data.resetTCAData()   
+        
+        self.data = TCAData(Status.PId,Status.ANo)                 
+        self.data.loadTCAData()               
+    
+    def runTCAModule(self):
+        self.updatePanel()   
+        self.result = []
+                        
         #get cashflow for the current process
         data = TCAData(Status.PId,0)                
-        data.loadTCAData() 
+        data.loadTCAData()
+        
+        #set parameters
+        InterestRate = data.NIR - data.Inflation
+        DiscountRate = data.CSDR - data.Inflation
+        ProjectLifetime = data.TimeFrame
+          
         data = self.calculateCashFlow(data)
         old = data.cashflow
         
@@ -76,7 +96,8 @@ class ModuleTCA(object):
         query = """SELECT AlternativeProposalNo,ShortName FROM salternatives WHERE ProjectID = %s"""
         query = query % (self.data.pid)    
         results = Status.DB.sql_query(query)
-        self.anos = []                
+        self.anos = []              
+                  
         for result in results:
             if (result[0]>0):
                 self.anos.append([result[0],result[1]])              
@@ -84,8 +105,9 @@ class ModuleTCA(object):
         #calculate result for each proposal in project
         for ano in self.anos: # ano = [ Number, Name ] !!!
             try:
+                name = ano[1]  
                 #load data for alternative
-                data = TCAData(Status.PId,ano[0])                
+                data = TCAData(Status.PId,ano[0])              
                 data.loadTCAData() 
                 #calculate cashflow for alternative
                 data = self.calculateCashFlow(data)
@@ -98,8 +120,8 @@ class ModuleTCA(object):
                 if (Status.ANo == ano[0]):
                     display = 1
                 
-                #calculate the results  
-                name = ano[1]  
+                #calculate the results                  
+                                
                 npv = NPV(current.CF(), old.CF(), InterestRate)
                 mirr = MIRR(current.CF(), old.CF(), InterestRate, DiscountRate)
                 bcr = BCR(current.CF(), old.CF(), InterestRate)                    
@@ -116,8 +138,9 @@ class ModuleTCA(object):
                 data.setResultInvalid(name,display)
                 self.result.append(data)
                 logWarning((_("TCA: No result for %s") % ano[1]))
+                logWarning(str(type(inst)))
 
-        self.__setDataForReport()        
+        self.__setDataForReport()           
             
         
     def calculateCashFlow(self,data):                                     

@@ -90,12 +90,10 @@ class HexData(DataBaseClass):
               'HXSink','HXTSinkInlet','HXTSinkOutlet','HXSource_FluidID','HXSink_FluidID','storage_size','HEX_area','HEX_turnkeyprice',
               'HX_OandMfix','HX_OandMvar','HperYear','StreamStatusSource','StreamStatusSink','StreamTypeSink','StreamTypeSource']
     
-    def __getValuesInDBOrder(self):        
-    ## hopefully the external C# program get this right soon so so this is not nessecary...
+    def __getValuesInDBOrder(self):           
         values = []
         values.append(self.getValue("HXNo"))
-        values.append(self.getValue("HxName"))     #HXname
-        #values.append("NULL")  
+        values.append(self.getValue("HxName"))     #HXname 
         values.append(self.getValue("HXType"))
         values.append(self.getValue("QdotHX"))
         values.append(self.getValue("HXLMTD"))

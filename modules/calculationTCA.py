@@ -70,7 +70,7 @@ class CashFlow:
         '''cash flow as calculated till now
         
         returns: cash flow (array, on entry per year)'''
-        return self.cashflow
+        return self.cashflow[:]
         
     def Print(self):
         '''Pretty print the cash flow as calculated till now
@@ -96,7 +96,7 @@ def NPV(cf_new, cf_old, rate):
         sum += (cf_new[i] - cf_old[i]) * pow(1 + rate, -i)
         npv[i] = sum
         #print i, (cf_new[i] - cf_old[i]) * pow(1 + rate, -i),  sum
-    return npv
+    return npv[:]
 
 def NPVcf(cf, rate):
     '''NPV -- net present value

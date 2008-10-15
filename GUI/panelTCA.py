@@ -41,16 +41,16 @@ from einstein.modules.messageLogger import *
 from GUITools import *
 
 [wxID_PANELTCA, wxID_PANELTCABTNNEXT, wxID_PANELTCABTNNEXTMODULE, 
- wxID_PANELTCABTNPREVMODULE, wxID_PANELTCABTNRESETDATA, 
- wxID_PANELTCANOTEBOOK1, wxID_PANELTCASTATICBOX1, wxID_PANELTCASTATICBOX2, 
- wxID_PANELTCASTATICTEXT1, wxID_PANELTCASTATICTEXT10, 
+ wxID_PANELTCABTNPREVMODULE, wxID_PANELTCABTNRESETALL, 
+ wxID_PANELTCABTNRESETDATA, wxID_PANELTCANOTEBOOK1, wxID_PANELTCASTATICBOX1, 
+ wxID_PANELTCASTATICBOX2, wxID_PANELTCASTATICTEXT1, wxID_PANELTCASTATICTEXT10, 
  wxID_PANELTCASTATICTEXT11, wxID_PANELTCASTATICTEXT2, 
  wxID_PANELTCASTATICTEXT3, wxID_PANELTCASTATICTEXT4, wxID_PANELTCASTATICTEXT5, 
  wxID_PANELTCASTATICTEXT6, wxID_PANELTCASTATICTEXT7, wxID_PANELTCASTATICTEXT8, 
  wxID_PANELTCASTATICTEXT9, wxID_PANELTCATBCSDRATE, 
  wxID_PANELTCATBENERGYPRICES, wxID_PANELTCATBINFLATION, wxID_PANELTCATBNIR, 
  wxID_PANELTCATBTIMEFAME, 
-] = [wx.NewId() for _init_ctrls in range(24)]
+] = [wx.NewId() for _init_ctrls in range(25)]
 
 class PanelTCA(wx.Panel):
     def _init_ctrls(self, prnt):
@@ -141,8 +141,8 @@ class PanelTCA(wx.Panel):
               pos=wx.Point(8, 168), size=wx.Size(760, 384), style=0)
 
         self.btnResetData = wx.Button(id=wxID_PANELTCABTNRESETDATA,
-              label=_('Reset TCA data'), name=u'btnResetData', parent=self,
-              pos=wx.Point(8, 560), size=wx.Size(192, 23), style=0)
+              label=_(u'Reset TCA data'), name=u'btnResetData', parent=self,
+              pos=wx.Point(8, 560), size=wx.Size(96, 23), style=0)
         self.btnResetData.Bind(wx.EVT_BUTTON, self.OnBtnResetDataButton,
               id=wxID_PANELTCABTNRESETDATA)
 
@@ -157,7 +157,7 @@ class PanelTCA(wx.Panel):
               size=wx.Size(744, 352), style=0)
         self.notebook1.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,
               self.OnNotebook1NotebookPageChanged, id=wxID_PANELTCANOTEBOOK1)
-        
+
         self.btnPrevModule = wx.Button(id=wxID_PANELTCABTNPREVMODULE,
               label=u'<<<', name=u'btnPrevModule', parent=self,
               pos=wx.Point(464, 560), size=wx.Size(48, 23), style=0)
@@ -186,6 +186,12 @@ class PanelTCA(wx.Panel):
         self.staticText11 = wx.StaticText(id=wxID_PANELTCASTATICTEXT11,
               label=u'%', name='staticText11', parent=self, pos=wx.Point(360,
               108), size=wx.Size(11, 13), style=0)
+
+        self.btnResetAll = wx.Button(id=wxID_PANELTCABTNRESETALL,
+              label=u'Reset all', name=u'btnResetAll', parent=self,
+              pos=wx.Point(112, 560), size=wx.Size(96, 23), style=0)
+        self.btnResetAll.Bind(wx.EVT_BUTTON, self.OnBtnResetAllButton,
+              id=wxID_PANELTCABTNRESETALL)
 
     def __init_custom_ctrls(self, prnt):
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
@@ -369,4 +375,13 @@ class PanelTCA(wx.Panel):
             self.resultpage2.display()
         except:
             pass
+        event.Skip()
+
+    def OnBtnResetAllButton(self, event):     
+        #print "------------------------------------"          
+        if not(self.updatePanel()):
+            return
+        
+        self.mod.resetTCA()
+        self.display() 
         event.Skip()

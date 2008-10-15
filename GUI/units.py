@@ -67,6 +67,10 @@ def setUnitsFuelDensity(fuelID):
 
 def changeMassOrVolumeUnits():
     global UNITSDENSITY
+
+    if UNITSDENSITY <= 0 or UNITSDENSITY == None:   #security feature
+        logDebug("Units: UNITSDENSITY undefined or zero [%s]"%UNITSDENSITY)
+        UNITSDENSITY = 1000.0   
     
     UNITS["MASSORVOLUME"] = {
         'kg' : (1.0,0.0),
@@ -412,11 +416,11 @@ def internalValue(displayValue,unit,unitType):
     (a,b) = UNITS[unitType][unit]    
     internalValue = a*displayValue + b
 
-    print "internalValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
-                                                     internalValue,
-                                                     unit,
-                                                     unitType,
-                                                     a)
+#    print "internalValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
+#                                                     internalValue,
+#                                                     unit,
+#                                                     unitType,
+#                                                     a)
 
     return internalValue
     
@@ -429,11 +433,11 @@ def displayValue(internalValue,unit,unitType):
     (a,b) = UNITS[unitType][unit]
     displayValue = (internalValue - b)/a
 
-    print "displayValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
-                                                     internalValue,
-                                                     unit,
-                                                     unitType,
-                                                     a)
+#    print "displayValue d: %s i: %s unit: %s unitType: %s a: %s"%(displayValue,
+#                                                     internalValue,
+#                                                     unit,
+#                                                     unitType,
+#                                                     a)
     return displayValue
     
 #------------------------------------------------------------------------------
