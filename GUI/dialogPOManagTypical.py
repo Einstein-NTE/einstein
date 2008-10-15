@@ -1,4 +1,4 @@
-#Boa:Dialog:DlgManageTech
+#Boa:Dialog:DlgManageTP
 
 import wx
 from einstein.GUI.status import *
@@ -6,68 +6,68 @@ from einstein.GUI.status import *
 def create(parent):
     return Dialog1(parent)
 
-[wxID_DLGMANAGETECH, wxID_DLGMANAGETECHBTNADD, wxID_DLGMANAGETECHBTNCHANGE, 
- wxID_DLGMANAGETECHBTNREMOVE, wxID_DLGMANAGETECHLBLIST, 
- wxID_DLGMANAGETECHTCCODE, wxID_DLGMANAGETECHTCNAME, 
+[wxID_DLGMANAGETP, wxID_DLGMANAGETPBTNADD, wxID_DLGMANAGETPBTNCHANGE, 
+ wxID_DLGMANAGETPBTNREMOVE, wxID_DLGMANAGETPLBLIST, wxID_DLGMANAGETPTCCODE, 
+ wxID_DLGMANAGETPTCNAME, 
 ] = [wx.NewId() for _init_ctrls in range(7)]
 
-class DlgManageTech(wx.Dialog):
+class DlgManageTP(wx.Dialog):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
-        wx.Dialog.__init__(self, id=wxID_DLGMANAGETECH, name='', parent=prnt,
+        wx.Dialog.__init__(self, id=wxID_DLGMANAGETP, name='', parent=prnt,
               pos=wx.Point(414, 71), size=wx.Size(490, 441),
-              style=wx.DEFAULT_DIALOG_STYLE, title=u'Manage Technology')
+              style=wx.DEFAULT_DIALOG_STYLE, title=u'Manage Typical Process')
         self.SetClientSize(wx.Size(482, 414))
 
-        self.lbList = wx.ListBox(choices=[], id=wxID_DLGMANAGETECHLBLIST,
+        self.lbList = wx.ListBox(choices=[], id=wxID_DLGMANAGETPLBLIST,
               name=u'lbList', parent=self, pos=wx.Point(8, 8), size=wx.Size(376,
               368), style=0)
         self.lbList.Bind(wx.EVT_LISTBOX, self.OnLbListListbox,
-              id=wxID_DLGMANAGETECHLBLIST)
+              id=wxID_DLGMANAGETPLBLIST)
 
-        self.tcName = wx.TextCtrl(id=wxID_DLGMANAGETECHTCNAME, name=u'tcName',
+        self.tcName = wx.TextCtrl(id=wxID_DLGMANAGETPTCNAME, name=u'tcName',
               parent=self, pos=wx.Point(96, 384), size=wx.Size(288, 21),
               style=0, value=u'')
 
-        self.btnAdd = wx.Button(id=wxID_DLGMANAGETECHBTNADD, label=u'Add',
+        self.btnAdd = wx.Button(id=wxID_DLGMANAGETPBTNADD, label=u'Add',
               name=u'btnAdd', parent=self, pos=wx.Point(392, 384),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
-              id=wxID_DLGMANAGETECHBTNADD)
+              id=wxID_DLGMANAGETPBTNADD)
 
-        self.btnRemove = wx.Button(id=wxID_DLGMANAGETECHBTNREMOVE,
+        self.btnRemove = wx.Button(id=wxID_DLGMANAGETPBTNREMOVE,
               label=u'Remove', name=u'btnRemove', parent=self, pos=wx.Point(392,
               320), size=wx.Size(75, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
-              id=wxID_DLGMANAGETECHBTNREMOVE)
+              id=wxID_DLGMANAGETPBTNREMOVE)
 
-        self.btnChange = wx.Button(id=wxID_DLGMANAGETECHBTNCHANGE,
+        self.btnChange = wx.Button(id=wxID_DLGMANAGETPBTNCHANGE,
               label=u'Change', name=u'btnChange', parent=self, pos=wx.Point(392,
               352), size=wx.Size(75, 23), style=0)
         self.btnChange.Bind(wx.EVT_BUTTON, self.OnBtnChangeButton,
-              id=wxID_DLGMANAGETECHBTNCHANGE)
+              id=wxID_DLGMANAGETPBTNCHANGE)
 
-        self.tcCode = wx.TextCtrl(id=wxID_DLGMANAGETECHTCCODE, name=u'tcCode',
-              parent=self, pos=wx.Point(8, 384), size=wx.Size(80, 21), style=0,
+        self.tcCode = wx.TextCtrl(id=wxID_DLGMANAGETPTCCODE, name=u'tcCode',
+              parent=self, pos=wx.Point(8, 384), size=wx.Size(88, 21), style=0,
               value=u'')
 
     def __init__(self, parent):
         self._init_ctrls(parent)
-        self.onTechSelected(False)
-        self.updateTech()
+        self.onTPSelected(False)
+        self.updateTP()
     
-    def updateTech(self):
-        self.loadTech()
+    def updateTP(self):
+        self.loadTP()
         self.lbList.Clear()
         for tech in self.techs:
             self.lbList.Append(tech[2]+"|"+tech[1])
     
-    def onTechSelected(self,bool):
+    def onTPSelected(self,bool):
         self.btnChange.Enabled = bool
         self.btnRemove.Enabled = bool
         
-    def loadTech(self):
-        query = """SELECT IDTechnology,Name,Code FROM potech"""
+    def loadTP(self):
+        query = """SELECT IDTypicalProcess,Name,Code FROM poTypicalProcess"""
         results = Status.DB.sql_query(query)
         if len(results)>0:
             if (type(results[0])!=type(())):
@@ -76,52 +76,52 @@ class DlgManageTech(wx.Dialog):
         else:
             self.techs = []
     
-    def addTech(self,name,code):
-        query = """INSERT INTO potech (Name,Code) VALUES (\"%s\")"""
+    def addTP(self,name,code):
+        query = """INSERT INTO poTypicalProcess (Name,Code) VALUES (\"%s\",\"%s\")"""
         query = query % (name,code)
         Status.DB.sql_query(query)
     
-    def deleteTech(self,index):
+    def deleteTP(self,index):
         tech = self.techs[index]
         
-        query = """SELECT * FROM poemlist WHERE TechnologyID = %s"""
+        query = """SELECT * FROM poEMList WHERE TypicalProcessID = %s"""
         query = query % tech[0]
         result = Status.DB.sql_query(query)
         
         if (len(result)==0):                
-            query = """DELETE FROM potech WHERE IDTechnology = %s"""                        
+            query = """DELETE FROM poTypicalProcess WHERE IDTypicalProcess = %s"""                        
             query = query % tech[0]
             Status.DB.sql_query(query)
         else:
-            wx.MessageBox("Could not delete. Technology is in use.")
+            wx.MessageBox("Could not delete. Typical Process is in use.")
         
-    def changeTech(self,index,name,code):
+    def changeTP(self,index,name,code):
         uo = self.techs[index]
-        query = """UPDATE potech SET Name = \"%s\", Code = \"%s\" WHERE IDTechnology = %s"""
+        query = """UPDATE poTypicalProcess SET Name = \"%s\",Code = \"%s\" WHERE IDTypicalProcess = %s"""
         query = query % (name,code,uo[0])
         Status.DB.sql_query(query)
 
     def OnLbListListbox(self, event):
         self.techselection = self.lbList.GetSelection()
         tech = self.techs[self.techselection]
-        self.onTechSelected(True)
-        self.tcName.SetValue(tech[1])
         self.tcCode.SetValue(tech[2])
+        self.tcName.SetValue(tech[1])
+        self.onTPSelected(True)
         event.Skip()
 
     def OnBtnAddButton(self, event):
-        self.addTech(self.tcName.GetValue(),self.tcCode.GetValue())
-        self.updateTech()
+        self.addTP(self.tcName.GetValue(),self.tcCode.GetValue())
+        self.updateTP()
         event.Skip()
 
     def OnBtnRemoveButton(self, event):
-        self.onTechSelected(False)
-        self.deleteTech(self.techselection)
-        self.updateTech()
+        self.onTPSelected(False)
+        self.deleteTP(self.techselection)
+        self.updateTP()
         event.Skip()
 
     def OnBtnChangeButton(self, event):
-        self.onTechSelected(False)
-        self.changeTech(self.techselection,self.tcName.GetValue(),self.tcCode.GetValue())
-        self.updateTech()
+        self.onTPSelected(False)
+        self.changeTP(self.techselection,self.tcName.GetValue(),self.tcCode.GetValue())
+        self.updateTP()
         event.Skip()

@@ -123,7 +123,7 @@ class TCAData(object):
             self.annuity = annuity
             self.display = display
             self.TIC = self.cashflow.TotalInvestmentCapital
-            self.EIC = self.cashflow.EffectiveInvstmentCapital  
+            self.EIC = self.cashflow.EffectiveInvestmentCapital  
             self.PP  = paybackperiod 
             self.totalfunding = self.cashflow.TotalFundings
             self.totalenergycost = self.__getTotalEnergyCost()
@@ -159,7 +159,7 @@ class TCAData(object):
 #--------------------------------------------------------------------------------------------     
     def __setTCAGeneralDataDefault(self):
         #print "Set Default Data (General)"
-        query = """SELECT InflationRate,FuelPriceRate,InterestExtFinancing,CompSpecificDiscountRate, PercentExtFinancing, AmortisationTime 
+        query = """SELECT InflationRate,FuelPriceRate,InterestExtFinancing,CompSpecificDiscountRate, PercentExtFinancing, AmortisationTime, OMTotalTot
                    FROM `questionnaire` WHERE Questionnaire_id=%s"""
         query = query % (self.pid) 
         #print query         
@@ -182,7 +182,9 @@ class TCAData(object):
             self.TimeFrame = result[5]
             if (self.TimeFrame==None):
                 self.TimeFrame = 0.0
-            self.totalopcost = 0.0 #will be read later
+            self.totalopcost = result[6]
+            if (self.totalopcost==None):
+                self.totalopcost = 0.0
             self.revenue     = 0.0 #will be read later
         else:
             #print "no result"
@@ -193,7 +195,13 @@ class TCAData(object):
             self.DEP       = 0.0
             self.TimeFrame = 20.0
             self.totalopcost = 0.0
-            self.revenue     = 0.0        
+            self.revenue     = 0.0   
+        
+        #FIX due to inconsitencies between questionair and tca
+        self.Inflation = self.Inflation * 100.0
+        self.NIR       = self.NIR * 100.0
+        self.CSDR      = self.CSDR * 100.0
+        self.DEP       = self.DEP * 100.0           
         
     def __getTCAGeneralData(self):
         #print "Get Data (General)"        
@@ -393,17 +401,21 @@ class TCAData(object):
         query = """SELECT ElTariffCTot, ElTariffPowTot,PowerContrTot FROM qelectricity
                 WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
         query = query % (self.pid,self.ano)
-        result = Status.DB.sql_query(query)
-        ElTariffCTot = result[0]
-        ElTariffPowTot = result[1]
-        PowerContrTot = result[2]
-        Tariff = 0.0
-        if not((ElTariffCTot==None)or(ElTariffPowTot==None)or(PowerContrTot==None)):
-            Tariff = ElTariffCTot 
-            if (FECel > 0):
-                Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel
-                
-        self.energycosts.append(["Electricity",FECel,Tariff,self.DEP]) 
+        results = Status.DB.sql_query(query)
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ] 
+            for result in results:
+                ElTariffCTot = result[0]
+                ElTariffPowTot = result[1]
+                PowerContrTot = result[2]
+                Tariff = 0.0
+                if not((ElTariffCTot==None)or(ElTariffPowTot==None)or(PowerContrTot==None)):
+                    Tariff = ElTariffCTot 
+                    if (FECel > 0):
+                        Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel
+                        
+                self.energycosts.append(["Electricity",FECel,Tariff,self.DEP]) 
             
                 
     
@@ -556,12 +568,11 @@ class TCAData(object):
         else:
             self.__setDefaultOPCostProposal()
         
-        cost = 0
-        for category in self.detailedopcost:
-            for entry in category:
-                cost+=entry[1]
-               
-        self.totalopcost = cost
+            cost = 0
+            for category in self.detailedopcost:
+                for entry in category:
+                    cost+=entry[1]               
+            self.totalopcost = cost
      
     def __setDefaultOPCostCurrent(self):
         self.detailedopcost = [[],[],[],[],[],[],[]]
@@ -572,13 +583,13 @@ class TCAData(object):
             #print "questionair opcost"
             #print result
             self.totalopcost = result
-        else:        
+        else:                    
             #print "no opcost in db ("+str(self.ano)+")"
             self.totalopcost = 0.0
     
     def __setDefaultOPCostProposal(self):
         self.detailedopcost = [[],[],[],[],[],[],[]] 
-        self.totalopcost = 0.0
+        #self.totalopcost = 0.0
         self.__setDefaultEquipOpcost()
         self.__setDefaultHXOpcost()
     

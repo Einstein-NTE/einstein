@@ -92,6 +92,9 @@ class ModuleTCA(object):
         data = self.calculateCashFlow(data)
         old = data.cashflow
         
+        print "current"
+        print old.CF()
+        
         #get all proposal numbers and names
         query = """SELECT AlternativeProposalNo,ShortName FROM salternatives WHERE ProjectID = %s"""
         query = query % (self.data.pid)    
@@ -113,6 +116,9 @@ class ModuleTCA(object):
                 data = self.calculateCashFlow(data)
                 current = data.cashflow
                 
+                print name
+                print current.CF()
+                
                 #set display option to 1 only for the current proposal
                 display = 0
                 
@@ -120,11 +126,20 @@ class ModuleTCA(object):
                 if (Status.ANo == ano[0]):
                     display = 1
                 
-                #calculate the results                  
+                #calculate the results                                
                                 
                 npv = NPV(current.CF(), old.CF(), InterestRate)
+                print "npv--------------------------------"
+                print npv
+
                 mirr = MIRR(current.CF(), old.CF(), InterestRate, DiscountRate)
-                bcr = BCR(current.CF(), old.CF(), InterestRate)                    
+                print "mirr--------------------------------"
+                print mirr
+
+                bcr = BCR(current.CF(), old.CF(), InterestRate)  
+                print "bcr--------------------------------"
+                print bcr
+                  
                 annuity = ANNUITY(current.TotalInvestmentCapital,InterestRate,ProjectLifetime)              
                 pp = payback_period(npv)
                 #set the results in data, store data in result list
@@ -132,9 +147,9 @@ class ModuleTCA(object):
                 self.result.append(data)
                 data.storeResultToCGeneralData()
             except Exception, inst:
-                #print type(inst)
-                #print inst.args
-                #print inst
+                print type(inst)
+                print inst.args
+                print inst
                 data.setResultInvalid(name,display)
                 self.result.append(data)
                 logWarning((_("TCA: No result for %s") % ano[1]))
@@ -143,7 +158,11 @@ class ModuleTCA(object):
         self.__setDataForReport()           
             
         
-    def calculateCashFlow(self,data):                                     
+    def calculateCashFlow(self,data):
+        investment_factor = 1   
+        if (data.ano == 0):
+            investment_factor = -1
+                                         
         AmotisationTime        = data.TimeFrame + 1 #to fix calculation
         InterestRate           = data.NIR - data.Inflation
         EnergyPriceDevelopment = data.DEP  
@@ -151,7 +170,7 @@ class ModuleTCA(object):
         a = CashFlow(AmotisationTime, InterestRate, EnergyPriceDevelopment)
         
         a.TotalInvestmentCapital = 0
-        a.EffectiveInvstmentCapital = 0
+        a.EffectiveInvestmentCapital = 0
         a.TotalFundings = 0
         for investment in data.investment: 
             #Investment ------------------------------  
@@ -159,37 +178,37 @@ class ModuleTCA(object):
             fp    = investment[2]
             ff    = investment[3]    
             a.TotalInvestmentCapital+= value   
-            a.EffectiveInvstmentCapital+= value
-            a.EffectiveInvstmentCapital-= value*(fp/100)+ff         
-            a.Investment(0,-value)              
+            a.EffectiveInvestmentCapital+= value
+            a.EffectiveInvestmentCapital-= value*(fp/100)+ff         
+            a.Investment(0,-value*investment_factor)              
             #Funding ---------------------------------
             funding = value*(fp/100)+ff         
             a.TotalFundings+= funding
-            a.Investment(0,funding)
+            a.Investment(0,funding*investment_factor)
              
-        a.EffectiveInvstmentCapital-= data.revenue 
-        a.Investment(0,data.revenue)       #Revenue
+        a.EffectiveInvestmentCapital-= data.revenue 
+        a.Investment(0,data.revenue*investment_factor)       #Revenue
             
         for energy in data.energycosts:    #Energy
             demand = energy[1]
             price  = energy[2]
-            a.Energy(-demand*price)     
+            a.Energy(-demand*price*investment_factor)     
 
-        a.Operating(data.totalopcost)      #Operating
+        a.Operating(-data.totalopcost*investment_factor)      #Operating
         
         for cont in data.contingencies:    #Contingencies
             Year  = cont[2]
             Value = cont[1]
-            a.Contingency(Year,-Value)  
+            a.Contingency(Year,Value)  
         
         for non in data.nonreoccuringcosts: #Non reocuring costs
             Value = non[1]
             Year  = non[2]
             Type  = non[3]
             if (Type == 'Cost'):
-                a.Investment(Year,-Value)
+                a.Investment(Year,-Value*investment_factor)
             else:
-                a.Investment(Year,Value)
+                a.Investment(Year,Value*investment_factor)
         
         data.cashflow = a    
         return data 
@@ -293,8 +312,9 @@ class ModuleTCA(object):
         for category in self.data.detailedopcost:
             for entry in category:
                 cost+=entry[1]
-               
-        self.data.totalopcost = cost
+                
+        if (cost>0):
+            self.data.totalopcost = cost
        
     def storeData(self):
         self.data.storeTCAData() 

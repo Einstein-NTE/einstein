@@ -93,7 +93,7 @@ def NPV(cf_new, cf_old, rate):
     assert len(cf_new) == len(cf_old)
     npv = [0.0] * len(cf_new)
     for i in xrange(0,len(cf_new)):
-        sum += (cf_new[i] - cf_old[i]) * pow(1 + rate, -i)
+        sum += (cf_new[i] + cf_old[i])*pow(1 + rate, -i)
         npv[i] = sum
         #print i, (cf_new[i] - cf_old[i]) * pow(1 + rate, -i),  sum
     return npv[:]
@@ -139,6 +139,11 @@ def MIRR(cf_new, cf_old, financeRate, reinvestRate):
     input:   financeRate (scalar, percent)
     input:   reinvestRate (scalar, percent)
     returns: mirr (array, one entry for every year)'''
+    print "mirr calculation-----"
+    print cf_new
+    print cf_old
+    print financeRate
+    print reinvestRate
     assert len(cf_new) == len(cf_old)    
     cf_pos = [0.0] * (len(cf_new))
     cf_neg = [0.0] * (len(cf_new))
@@ -150,19 +155,21 @@ def MIRR(cf_new, cf_old, financeRate, reinvestRate):
 
     # separate positive and negative periods of cash flow
     for i in xrange(0, len(cf_new)):
-        cFlow = cf_old[i] - cf_new[i]
-        if (0 >= cFlow):
+        cFlow = cf_old[i] + cf_new[i]
+        if (cFlow >= 0):
             cf_pos[i] = cFlow
         else:
             cf_neg[i] = cFlow
-        #print i, "CF possitive:  ", cf_pos[i]
-        #print i, "CF negative:   ", cf_neg[i]
+    print "CF possitive:  "
+    print cf_pos
+    print "CF negative:   "
+    print cf_neg
         
     # calculate their future value and net present valuse
     for i in xrange(1, len(cf_new)):
         fv1[i] = 0.0
         for j in xrange (i):
-            fv1[i]+= cf_pos[j+1]*pow(1+ reinvestRate,i-j-1)
+            fv1[i]+= cf_pos[j+1]*pow(1.0+ reinvestRate,i-j-1)
 
             #print j, "cf possitive j:   ", cf_pos[j]
         #print i, "fv1:  ", fv1[i]
@@ -172,8 +179,10 @@ def MIRR(cf_new, cf_old, financeRate, reinvestRate):
 
     # and sum up with their respective interest rates
     for i in xrange(1, len(cf_new)):
-        mirr[i] = pow(fv1[i]/(-npv2[i]),1.0/i) - 1.0
-        #print fv1[t], npv2[t], m, mirr[t]
+        try:
+            mirr[i] = pow(fv1[i]/(-npv2[i]),1.0/i) - 1.0
+        except:
+            mirr[i] = 0.0
 
     return mirr                 
 
@@ -195,9 +204,9 @@ def BCR(cf_new, cf_old, interest):
     sum_new = 0.0;
     bcr = [0.0] * len(cf_new)
     for i in xrange(len(cf_new)):
-        sum_old += cf_old[i] * pow(1.0 + interest, i)
-        sum_new += cf_new[i] * pow(1.0 + interest, i)
-        try: bcr[i] = sum_old / sum_new
+        sum_old += cf_old[i] * pow(1.0 + interest, -i)
+        sum_new += cf_new[i] * pow(1.0 + interest, -i)
+        try: bcr[i] = -sum_old / sum_new
         except ZeroDivisionError: bcr[i] = 1e300000
     return bcr
         

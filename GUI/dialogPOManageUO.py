@@ -7,8 +7,9 @@ def create(parent):
     return Dialog1(parent)
 
 [wxID_DLGMANAGEUO, wxID_DLGMANAGEUOBTNADD, wxID_DLGMANAGEUOBTNCHANGE, 
- wxID_DLGMANAGEUOBTNREMOVE, wxID_DLGMANAGEUOLBLIST, wxID_DLGMANAGEUOTCNAME, 
-] = [wx.NewId() for _init_ctrls in range(6)]
+ wxID_DLGMANAGEUOBTNREMOVE, wxID_DLGMANAGEUOLBLIST, wxID_DLGMANAGEUOTCCODE, 
+ wxID_DLGMANAGEUOTCNAME, 
+] = [wx.NewId() for _init_ctrls in range(7)]
 
 class DlgManageUO(wx.Dialog):
     def _init_ctrls(self, prnt):
@@ -25,8 +26,8 @@ class DlgManageUO(wx.Dialog):
               id=wxID_DLGMANAGEUOLBLIST)
 
         self.tcName = wx.TextCtrl(id=wxID_DLGMANAGEUOTCNAME, name=u'tcName',
-              parent=self, pos=wx.Point(8, 384), size=wx.Size(376, 21), style=0,
-              value=u'')
+              parent=self, pos=wx.Point(104, 384), size=wx.Size(280, 21),
+              style=0, value=u'')
 
         self.btnAdd = wx.Button(id=wxID_DLGMANAGEUOBTNADD, label=u'Add',
               name=u'btnAdd', parent=self, pos=wx.Point(392, 384),
@@ -46,6 +47,10 @@ class DlgManageUO(wx.Dialog):
         self.btnChange.Bind(wx.EVT_BUTTON, self.OnBtnChangeButton,
               id=wxID_DLGMANAGEUOBTNCHANGE)
 
+        self.tcCode = wx.TextCtrl(id=wxID_DLGMANAGEUOTCCODE, name=u'tcCode',
+              parent=self, pos=wx.Point(8, 384), size=wx.Size(88, 21), style=0,
+              value=u'')
+
     def __init__(self, parent):
         self._init_ctrls(parent)
         self.onUOSelected(False)
@@ -55,14 +60,27 @@ class DlgManageUO(wx.Dialog):
         self.loadUO()
         self.lbList.Clear()
         for uo in self.uos:
-            self.lbList.Append(uo[1])
+            self.lbList.Append(uo[2]+"|"+uo[1])
     
     def onUOSelected(self,bool):
         self.btnChange.Enabled = bool
         self.btnRemove.Enabled = bool
         
     def loadUO(self):
-        query = """SELECT IDUnitOperation,Name FROM poUnitOperation"""
+        query = """SELECT IDUnitOperation,Name,Code FROM pounitoperation"""
+        results = Status.DB.sql_query(query)
+        if len(results)>0:
+            if (type(results[0])!=type(())):
+                results = [ results ]
+            self.uos = results 
+        else:
+            self.uos = []
+            
+    def loadUOExisting(self,SSID):
+        query = """SELECT IDUnitOperation,Name,Code FROM pounitoperation as uo, poemlist as list
+                    WHERE list.UnitOperationID = uo.IDUnitOperation AND SubsectorID=%s 
+                    GROUP BY IDUnitOperation"""
+        query = query % SSID
         results = Status.DB.sql_query(query)
         if len(results)>0:
             if (type(results[0])!=type(())):
@@ -71,38 +89,41 @@ class DlgManageUO(wx.Dialog):
         else:
             self.uos = []
     
-    def addUO(self,name):
-        query = """INSERT INTO poUnitOperation (Name) VALUES (\"%s\")"""
-        query = query % name
+    def addUO(self,name,code):
+        query = """INSERT INTO pounitoperation (Name) VALUES (\"%s\",\"%s\")"""
+        query = query % name,code
         Status.DB.sql_query(query)
     
     def deleteUO(self,index):
         uo = self.uos[index]
         
-        query = """SEleCT * FROM poSubsector_to_UO WHERE UnitOperationID = %s"""
+        query = """SELECT * FROM poemlist WHERE UnitOperationID = %s"""
         query = query % uo[0]
         result = Status.DB.sql_query(query)
                 
         if (len(result) == 0):
-            query = """DELETE FROM poUnitOperation WHERE IDUnitOperation = %s"""
+            query = """DELETE FROM pounitoperation WHERE IDUnitOperation = %s"""
             query = query % uo[0]
             Status.DB.sql_query(query)
         else:
             wx.MessageBox("Could not delete. Unit Operation in use.")
         
-    def changeUO(self,index,name):
+    def changeUO(self,index,name,code):
         uo = self.uos[index]
-        query = """UPDATE poUnitOperation SET Name = \"%s\" WHERE IDUnitOperation = %s"""
-        query = query % (name,uo[0])
+        query = """UPDATE pounitoperation SET Name = \"%s\", Code = \"%s\" WHERE IDUnitOperation = %s"""
+        query = query % (name,code,uo[0])
         Status.DB.sql_query(query)
 
     def OnLbListListbox(self, event):
         self.uoSelection = self.lbList.GetSelection()
+        uo = self.uos[self.uoSelection]
         self.onUOSelected(True)
+        self.tcName.SetValue(uo[1])
+        self.tcCode.SetValue(uo[2])
         event.Skip()
 
     def OnBtnAddButton(self, event):
-        self.addUO(self.tcName.GetValue())
+        self.addUO(self.tcName.GetValue(),self.tcCode.GetValue())
         self.updateUos()
         event.Skip()
 
@@ -114,6 +135,6 @@ class DlgManageUO(wx.Dialog):
 
     def OnBtnChangeButton(self, event):
         self.onUOSelected(False)
-        self.changeUO(self.uoSelection,self.tcName.GetValue())
+        self.changeUO(self.uoSelection,self.tcName.GetValue(),self.tcCode.GetValue())
         self.updateUos()
         event.Skip()

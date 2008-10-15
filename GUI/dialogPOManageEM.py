@@ -79,7 +79,7 @@ class DlgManageEM(wx.Dialog):
         self.btnDelete.Enabled = bool
 
     def loadEM(self):
-        query = """SELECT IDEfficiencyMeasure,ShortDescription,Text FROM poEfficiencyMeasure"""
+        query = """SELECT IDEfficiencyMeasure,ShortDescription,Text FROM poefficiencymeasure"""
         results = Status.DB.sql_query(query)
         if len(results)>0:
             if (type(results[0])!=type(())):
@@ -89,7 +89,7 @@ class DlgManageEM(wx.Dialog):
             self.ems = []
            
     def addEM(self,desc,text):
-        query = """INSERT INTO poEfficiencyMeasure (ShortDescription,Text) VALUES (\"%s\",\"%s\")"""
+        query = """INSERT INTO poefficiencymeasure (ShortDescription,Text) VALUES (\"%s\",\"%s\")"""
         query = query % (desc,text) 
         Status.DB.sql_query(query)        
         
@@ -99,7 +99,7 @@ class DlgManageEM(wx.Dialog):
         query = query % (em[0])
         result = Status.DB.sql_query(query)
         if len(result) == 0:                
-            query = """DELETE FROM poEfficiencyMeasure WHERE IDEfficiencyMeasure = %s"""
+            query = """DELETE FROM poefficiencymeasure WHERE IDEfficiencyMeasure = %s"""
             query = query % (em[0])
             Status.DB.sql_query(query)
         else:
@@ -107,7 +107,7 @@ class DlgManageEM(wx.Dialog):
         
     def changeEM(self,index,name,text):
         em = self.ems[index]
-        query = """UPDATE poEfficiencyMeasure SET ShortDescription=\'%s\', Text = \'%s\'   
+        query = """UPDATE poefficiencymeasure SET ShortDescription=\'%s\', Text = \'%s\'   
                    WHERE IDEfficiencyMeasure = %s"""
         query = query % (name,text,em[0])
         Status.DB.sql_query(query)

@@ -63,10 +63,14 @@ class PanelPO(wx.Panel):
         self.btnNext = wx.Button(id=wxID_PANELPOBTNNEXT, label=u'>>>',
               name=u'btnNext', parent=self, pos=wx.Point(696, 560),
               size=wx.Size(75, 23), style=0)
+        self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
+              id=wxID_PANELPOBTNNEXT)
 
         self.btnPrev = wx.Button(id=wxID_PANELPOBTNPREV, label=u'<<<',
               name=u'btnPrev', parent=self, pos=wx.Point(8, 560),
               size=wx.Size(75, 23), style=0)
+        self.btnPrev.Bind(wx.EVT_BUTTON, self.OnBtnPrevButton,
+              id=wxID_PANELPOBTNPREV)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELPOSTATICTEXT1,
               label=_(u'Technologies:'), name='staticText1', parent=self,
@@ -289,4 +293,14 @@ class PanelPO(wx.Panel):
             if (self.lbTech.IsChecked(i)):
                 self.mod.techSelection.append(i)        
         self.display()
+        event.Skip()
+
+    def OnBtnNextButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qHX, select=True)
+        event.Skip()
+
+    def OnBtnPrevButton(self, event):
+        self.Hide()
+        self.main.tree.SelectItem(self.main.qA, select=True)
         event.Skip()

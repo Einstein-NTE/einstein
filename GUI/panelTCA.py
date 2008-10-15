@@ -206,7 +206,7 @@ class PanelTCA(wx.Panel):
         self.resultpage2 = panelResult2(id=wx.NewId(), name=_('Diagram'),
               parent=self.notebook1, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)  
-        self.notebook1.AddPage(imageId=-1, page=self.resultpage2, select=False, text='Diagram')
+        self.notebook1.AddPage(imageId=-1, page=self.resultpage2, select=False, text='Diagram')        
         
     def __init__(self, parent, main, id, pos, size, style, name):      
         self.main = main

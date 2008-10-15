@@ -61,17 +61,17 @@ class ModulePO(object):
             self.unitoperations = [ ]
                
         if (self.unitoperationSelection!=None):
-            self.getTypicalProcess(self.unitoperationSelection)
+            self.getTypicalProcess(self.subsectorSelection,self.unitoperationSelection)
         else:
             self.typicalprocess = [ ] 
         
         if (self.typicalprocessSelection!=None):
-            self.getTechnologies(self.typicalprocessSelection)
+            self.getTechnologies(self.subsectorSelection,self.unitoperationSelection,self.typicalprocessSelection)
         else: 
             self.techs = [ ]
         
         if (self.typicalprocessSelection!=None):
-            self.getMeasures()
+            self.getMeasures(self.subsectorSelection,self.unitoperationSelection,self.typicalprocessSelection)
         else:
             self.measures = []
     
@@ -80,7 +80,7 @@ class ModulePO(object):
        pass 
    
     def getSectors(self):
-        query = """SELECT IDSector,Name FROM poSector"""
+        query = """SELECT IDSector,Name FROM posector"""
         results = Status.DB.sql_query(query)
         if len(results)>0:
             if (type(results[0])!=type(())):
@@ -90,7 +90,7 @@ class ModulePO(object):
             self.sectors = []
             
     def getSubsectors(self,index):
-        query = """SELECT IDSubsector,Name FROM poSubsector WHERE SectorID = %s"""
+        query = """SELECT IDSubsector,Name FROM posubsector WHERE SectorID = %s"""
         sector = self.sectors[index]
         query = query % sector[0] 
         
@@ -102,11 +102,12 @@ class ModulePO(object):
         else:
             self.subsectors = [] 
             
-    def getUnitoperation(self,index):
-        query = """SELECT IDUnitOperation, Name FROM pounitoperation as unit, posubsector_to_uo as link 
-                   WHERE unit.IDUnitOperation = link.UnitOperationID AND link.SubsectorID = %s"""
-        subsector = self.subsectors[index]
-        query = query % subsector[0]  
+    def getUnitoperation(self,ssindex):
+        query = """SELECT IDUnitOperation, Name FROM pounitoperation as unit, poemlist as list 
+                   WHERE unit.IDUnitOperation = list.UnitOperationID AND list.SubsectorID = %s
+                   GROUP BY IDUnitOperation"""
+        subsector = self.subsectors[ssindex]
+        query = query % subsector[0]         
         results = Status.DB.sql_query(query)  
         
         if len(results)>0:
@@ -116,10 +117,14 @@ class ModulePO(object):
         else:
             self.unitoperations = []
     
-    def getTypicalProcess(self,index):
-        query = """SELECT IDTypicalProcess,Name FROM poTypicalProcess WHERE UnitOperationID = %s"""
-        uo = self.unitoperations[index]
-        query = query % uo[0]        
+    def getTypicalProcess(self,ssindex,uoindex):
+        query = """SELECT IDTypicalProcess,Name FROM poemlist as list, potypicalprocess as p 
+                   WHERE list.TypicalProcessID = p.IDTypicalProcess 
+                   AND UnitOperationID = %s AND SubsectorID = %s
+                   GROUP BY IDTypicalProcess"""
+        uo = self.unitoperations[uoindex]
+        subsector = self.subsectors[ssindex]
+        query = query % (uo[0],subsector[0])        
         
         results = Status.DB.sql_query(query)
         if len(results)>0:
@@ -129,13 +134,14 @@ class ModulePO(object):
         else:
             self.typicalprocess = []
                  
-    def getTechnologies(self,index):
-        query = """SELECT tech.IDTechnology, tp.Name, tech.Name FROM poEMList as list, poTypicalProcess as tp, poTech as tech 
+    def getTechnologies(self,ssindex,uoindex,tpindex):
+        query = """SELECT tech.IDTechnology, tp.Name, tech.Name FROM poemlist as list, potypicalprocess as tp, potech as tech 
                    WHERE tp.IDTypicalProcess = list.TypicalProcessID AND tech.IDtechnology = list.TechnologyID 
-                         AND list.TypicalProcessID = %s"""
-        #tech = self.techs[self.cbTech.GetSelection()]
-        tp   = self.typicalprocess[index]
-        query = query % (tp[0]) 
+                         AND list.TypicalProcessID = %s AND list.UnitOperationID=%s AND list.SubsectorID = %s"""
+        tp   = self.typicalprocess[tpindex]
+        subsector = self.subsectors[ssindex]
+        uo = self.unitoperations[uoindex]
+        query = query % (tp[0],uo[0],subsector[0]) 
         
         results = Status.DB.sql_query(query)
         if len(results)>0:
@@ -145,18 +151,22 @@ class ModulePO(object):
         else:
             self.techs = []
     
-    def getMeasures(self):
+    def getMeasures(self,ssindex,uoindex,tpindex):
         allresults = [ ]   
         for techindex in self.techSelection:
-            query = """SELECT em.ShortDescription, em.Text FROM poEfficiencyMeasure as em, poEmListEntry as entry, poEMList as list
+            query = """SELECT em.ShortDescription, em.Text FROM poefficiencymeasure as em, poemlistentry as entry, poemlist as list
                        WHERE  entry.EfficiencyMeasureID = em.IDEfficiencyMeasure
                        AND    entry.EMListID = list.IDEMList
+                       AND    list.SubsectorID = %s
+                       AND    list.UnitOperationID = %s
                        AND    list.TypicalProcessID = %s
                        AND    list.TechnologyID = %s"""
-            tp = self.typicalprocess[self.typicalprocessSelection]
+            subsector = self.subsectors[ssindex]
+            uo = self.unitoperations[uoindex]
+            tp = self.typicalprocess[tpindex]
             tech = self.techs[techindex]
 
-            query = query % (tp[0],tech[0]) 
+            query = query % (subsector[0],uo[0],tp[0],tech[0]) 
             results = Status.DB.sql_query(query)
     
             if len(results)>0:
