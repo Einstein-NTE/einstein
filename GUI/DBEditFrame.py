@@ -200,8 +200,19 @@ class DBEditFrame(wx.Dialog):
             except:
                 text = fieldname
                 units = '\n*****'
+
+            try:
+                collabel1 = unicode(text,"latin-1")
+            except:
+                collabel1 = text
+
+            try:
+                collabel2 = unicode(units,"latin-1")
+            except:
+                collabel2 = units
                 
-            self.grid1.SetColLabelValue(col, text+units)
+            collabel = collabel1+collabel2
+            self.grid1.SetColLabelValue(col, collabel)
 
         self.grid1.AutoSizeColumns(setAsMin=True)
         self.grid1.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)

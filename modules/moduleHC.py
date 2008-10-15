@@ -176,7 +176,10 @@ class ModuleHC(object):
 
             if SumUSH > 0:
                 for row in dataListReport:
-                    row[5] = 100.0*row[4]/SumUSH
+                    try:
+                        row[5] = 100.0*row[4]/SumUSH
+                    except:
+                        row[5] = 0.0
 
             NJ = len(dataListReport)
             for j in range(NJ,10):

@@ -503,6 +503,12 @@ class Project(object):
                 name = aa[0].ShortName
                 if name is not None:
                     Status.FinalAlternativeName = name
+                else:
+                    logDebug("Project (setFinalAlternative): no name specified for alternative no. [%s]"%finalANo)
+                    Status.FinalAlternativeName = "---"
+            else:
+                logDebug("Project (setFinalAlternative): no entry in table salternative for ANo [%s]"%finalANo)
+                Status.FinalAlternativeName = "---"
 
         sprojects = Status.DB.sproject.ProjectID[Status.PId]
         if len(sprojects) > 0:
@@ -577,6 +583,7 @@ class Project(object):
             Status.PId = -1
             Status.ActiveProjectName = "---"
             Status.ActiveProjectDescription = "---"
+            self.setFinalAlternative(None)
             
             logTrack("Project (setActiveProject): no project selected")
 

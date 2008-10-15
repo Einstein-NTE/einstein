@@ -1,0 +1,15 @@
+-- update einstein database: 12.10.2008
+USE einstein;
+
+ALTER TABLE qheatexchanger DROP COLUMN StreamStatus;
+ALTER TABLE qheatexchanger DROP COLUMN StreamType;
+
+
+
+
+
+
+
+
+
+

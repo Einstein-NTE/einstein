@@ -43,10 +43,17 @@ class Fluid():
         fluids = Status.DB.dbfluid.DBFluid_ID[fluidID]
         if len(fluids) > 0:
             self.cp = fluids[0].FluidCp
+            self.rho = fluids[0].FluidDensity
             self.hL = fluids[0].LatentHeat
             self.TCond = fluids[0].TCond
             
-            if self.cp is not None: self.cp = self.cp/3600.0
+            if self.cp is not None and self.cp > 0: self.cp = self.cp/3600.0
+            else:
+                logError(_("Severe error in your fluid data for fluid %s: cp  %s")%\
+                           (fluids[0].FluidName,self.cp))
+                self.cp = 1.16/1000.0
+                
+            
             if self.hL is not None: self.hL = self.hL/3600.0
                                                 #data in DB are in kJ/kgK ->
                                                 #conversion to kWh/kgK
@@ -103,9 +110,7 @@ class Fuel():
                self.CO2Conv is None or \
                self.CombAir is None or \
                self.OffgasHeatCapacity is None:
-#               self.Offgas is None or \
-#               self.OffgasDensity is None or \
-#               self.Humidity is None:
+
                 logError(_("Severe error in your fuel data for fuel %s: some parameters are missing")%\
                            (fuels[0].FuelName))
                                                 #conversion to kWh/kgK
@@ -115,8 +120,6 @@ class Fuel():
                 logError(_("Severe error in your fuel data for fuel %s: erroneous value for density = %s")%\
                            (fuels[0].FuelName,self.rho))
                 self.rho = 1.0
-                                                #conversion to kWh/kgK
-            self.OffgasHeatCapacity = noneFilterNumber(self.OffgasHeatCapacity)/3600.
             
         else:
             self.LCV = 10.0
