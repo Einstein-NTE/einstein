@@ -1,0 +1,8150 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: GUI/panelPO.py:121 GUI/panelTCA.py:209 GUI/panelTCACont.py:164
+#: GUI/panelTCAEnergy.py:215 GUI/panelTCAInvestment.py:232
+#: GUI/panelTCANon.py:161
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-09-30 11:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: GUI/panelCC.py:114 GUI/panelA.py:181 GUI/panelHR.py:364
+msgid "Name"
+msgstr ""
+
+#: GUI/panelCC.py:115 GUI/DBTitles.py:337 GUI/dialogTCARevenue.py:205
+#: GUI/panelA.py:182 GUI/panelQ3.py:187 GUI/panelTCACont.py:141
+#: GUI/panelTCAEnergy.py:188 GUI/panelTCAInvestment.py:208
+#: GUI/panelTCANon.py:135 GUI/panelTCAOpTabpage.py:108
+#: modules/ccheck/parameterList.py:3
+msgid "Description"
+msgstr ""
+
+#: GUI/panelCC.py:116
+msgid "Value"
+msgstr ""
+
+#: GUI/panelCC.py:117
+msgid "max.Error"
+msgstr ""
+
+#: GUI/panelCC.py:118
+msgid "Action to be taken"
+msgstr ""
+
+#: GUI/panelCC.py:141
+msgid "Cross checking of data"
+msgstr ""
+
+#: GUI/panelCC.py:147
+msgid "list of data with unsufficient accuracy"
+msgstr ""
+
+#: GUI/panelCC.py:150
+msgid "quick & dirty"
+msgstr ""
+
+#: GUI/panelCC.py:150
+msgid "standard"
+msgstr ""
+
+#: GUI/panelCC.py:150
+msgid "detailed"
+msgstr ""
+
+#: GUI/panelCC.py:153 GUI/panelCC.py:154
+msgid "quick and dirty"
+msgstr ""
+
+#: GUI/panelCC.py:159
+msgid "required accuracy"
+msgstr ""
+
+#: GUI/panelCC.py:183
+msgid "estimate data"
+msgstr ""
+
+#: GUI/panelCC.py:188
+msgid "check list"
+msgstr ""
+
+#: GUI/panelCC.py:196
+msgid "Cross check statistics"
+msgstr ""
+
+#: GUI/panelCC.py:203
+msgid "No. of data checked"
+msgstr ""
+
+#: GUI/panelCC.py:207
+msgid "No. of input data fixed"
+msgstr ""
+
+#: GUI/panelCC.py:212
+msgid "No. of missing data"
+msgstr ""
+
+#: GUI/panelCC.py:322
+msgid "confirm basic check"
+msgstr ""
+
+#: GUI/panelCC.py:323
+msgid ""
+"\n"
+"Take care: running the check will invalidate existing alternative proposals"
+msgstr ""
+
+#: GUI/panelCC.py:324 GUI/panelCC.py:349
+msgid ""
+"\n"
+"Do You want to continue ?"
+msgstr ""
+
+#: GUI/panelCC.py:346
+msgid "confirm data estimation"
+msgstr ""
+
+#: GUI/panelCC.py:347
+msgid ""
+"\n"
+"Take care: running data estimate will automatically estimate missing data."
+msgstr ""
+
+#: GUI/panelCC.py:348
+msgid ""
+"\n"
+"Alternatively you can also manually add estimated data to the questionnaire "
+"and rerun basic check"
+msgstr ""
+
+#: GUI/panelCC.py:361
+msgid "confirm check list"
+msgstr ""
+
+#: GUI/panelCC.py:361
+msgid "CHECK LIST NOT YET IMPLEMENTED. DO IT YOURSELF AND BE HAPPY"
+msgstr ""
+
+#: GUI/panelCC.py:400
+msgid "accept data"
+msgstr ""
+
+#: GUI/panelCC.py:401
+msgid "Press OK to confirm that the data are correct\n"
+msgstr ""
+
+#: GUI/panelCC.py:402
+msgid "(This will block the questionnaire for further modifications)"
+msgstr ""
+
+#: GUI/panelCC.py:409
+msgid "revise data"
+msgstr ""
+
+#: GUI/panelCC.py:410
+msgid ""
+"EINSTEIN cannot accept these data. You first have to eliminate "
+"inconsistencies"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:53
+msgid "Manual equipment add"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:60
+msgid "AddEquipment_popup (ManualAddDialog): new type = "
+msgstr ""
+
+#: GUI/addEquipment_popup.py:72
+msgid "Select from database"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:80
+msgid "Enter manually"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:86
+msgid "Retrieve from previously deleted equipment"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:94 GUI/conflictFrame.py:80 GUI/DBEditFrame.py:76
+#: GUI/dialogLanguage.py:70 GUI/dialogP.py:43
+#: GUI/dialogTCADetailedOpCost.py:58 GUI/dialog_changeHX.py:100
+#: GUI/panelA.py:309 GUI/panelBB.py:427 GUI/panelBM1.py:320
+#: GUI/panelBM2.py:335 GUI/panelBM3.py:338 GUI/panelCHP.py:397
+#: GUI/panelHP.py:474 GUI/panelQ2.py:208 GUI/panelQ3.py:377 GUI/panelQ5.py:270
+#: GUI/panelQ8.py:284 GUI/panelST.py:458 GUI/PreferencesFrame.py:105
+msgid "Cancel"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:98 GUI/conflictFrame.py:86 GUI/DBEditFrame.py:79
+#: GUI/dialogA.py:31 GUI/dialogLanguage.py:61 GUI/dialogOK.py:30
+#: GUI/dialogP.py:35 GUI/panelA.py:303 GUI/panelBB.py:421 GUI/panelBM1.py:314
+#: GUI/panelBM2.py:329 GUI/panelBM3.py:332 GUI/panelCHP.py:391
+#: GUI/panelCS1.py:162 GUI/panelCS2.py:156 GUI/panelCS3.py:154
+#: GUI/panelCS4.py:153 GUI/panelCS5.py:153 GUI/panelCS6.py:155
+#: GUI/panelCS7.py:153 GUI/panelEA1.py:260 GUI/panelEA2.py:238
+#: GUI/panelEA3.py:314 GUI/panelEA4a.py:231 GUI/panelEA4b.py:278
+#: GUI/panelEA4c.py:252 GUI/panelEA5.py:322 GUI/panelEM1.py:227
+#: GUI/panelEM2.py:221 GUI/panelHP.py:470 GUI/panelQ3.py:381
+#: GUI/panelQ5.py:266 GUI/panelQ8.py:280 GUI/panelST.py:454
+#: GUI/PreferencesFrame.py:109
+msgid "OK"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:140
+msgid "addEquipment popup (Database button): equipment added to Q/C"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:142
+msgid ""
+"addEquipment popup (Database button): setEquipmentFromDB from module did not "
+"execute"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:155
+msgid "AddEquipment_popup (Manual Button): adding equipe ID"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:158
+msgid "AddEquipment_popup (Manual Button): OK"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:161
+msgid "AddEquipment_popup (Manual Button): Cancelled"
+msgstr ""
+
+#: GUI/addEquipment_popup.py:167
+msgid "RetrieveDeleted() not yet implemented"
+msgstr ""
+
+#: GUI/conflictFrame.py:93
+msgid "conflicts in parameter specifications"
+msgstr ""
+
+#: GUI/conflictFrame.py:128
+msgid ""
+"parameter\n"
+"(values in conflict)"
+msgstr ""
+
+#: GUI/conflictFrame.py:129
+msgid ""
+"data group\n"
+"(accuracy)"
+msgstr ""
+
+#: GUI/conflictFrame.py:130
+msgid ""
+"description\n"
+"(calculated from)"
+msgstr ""
+
+#: GUI/DBEditFrame.py:85
+msgid "Add row"
+msgstr ""
+
+#: GUI/DBEditFrame.py:87
+msgid "Delete row"
+msgstr ""
+
+#: GUI/DBEditFrame.py:110
+msgid " Editing table "
+msgstr ""
+
+#: GUI/DBEditFrame.py:113
+msgid " Viewing table "
+msgstr ""
+
+#: GUI/DBEditFrame.py:166
+msgid "Database error in query "
+msgstr ""
+
+#: GUI/DBEditFrame.py:170
+msgid "Error accessing table "
+msgstr ""
+
+#: GUI/DBEditFrame.py:257
+msgid "Returned cell is empty or not integer "
+msgstr ""
+
+#: GUI/DBEditFrame.py:299
+msgid "A row must be selected!\n"
+msgstr ""
+
+#: GUI/DBEditFrame.py:304
+#, python-format
+msgid "Delete row with %s=%s?"
+msgstr ""
+
+#: GUI/DBEditFrame.py:314
+#, python-format
+msgid "Cannot delete row with %s=%s"
+msgstr ""
+
+#: GUI/DBTitles.py:35 GUI/DBTitles.py:65 GUI/DBTitles.py:110
+#: GUI/DBTitles.py:151 GUI/DBTitles.py:172 GUI/DBTitles.py:193
+#: GUI/DBTitles.py:213 GUI/DBTitles.py:228 GUI/DBTitles.py:292
+#: GUI/DBTitles.py:334 GUI/DBTitles.py:342
+msgid "Identifier"
+msgstr ""
+
+#: GUI/DBTitles.py:35 GUI/DBTitles.py:36 GUI/DBTitles.py:37 GUI/DBTitles.py:38
+#: GUI/DBTitles.py:39 GUI/DBTitles.py:41 GUI/DBTitles.py:42 GUI/DBTitles.py:43
+#: GUI/DBTitles.py:44 GUI/DBTitles.py:49 GUI/DBTitles.py:50 GUI/DBTitles.py:55
+#: GUI/DBTitles.py:61 GUI/DBTitles.py:65 GUI/DBTitles.py:66 GUI/DBTitles.py:67
+#: GUI/DBTitles.py:68 GUI/DBTitles.py:69 GUI/DBTitles.py:71 GUI/DBTitles.py:73
+#: GUI/DBTitles.py:74 GUI/DBTitles.py:75 GUI/DBTitles.py:76 GUI/DBTitles.py:77
+#: GUI/DBTitles.py:79 GUI/DBTitles.py:80 GUI/DBTitles.py:81 GUI/DBTitles.py:88
+#: GUI/DBTitles.py:89 GUI/DBTitles.py:90 GUI/DBTitles.py:110
+#: GUI/DBTitles.py:111 GUI/DBTitles.py:112 GUI/DBTitles.py:113
+#: GUI/DBTitles.py:114 GUI/DBTitles.py:115 GUI/DBTitles.py:116
+#: GUI/DBTitles.py:117 GUI/DBTitles.py:118 GUI/DBTitles.py:120
+#: GUI/DBTitles.py:121 GUI/DBTitles.py:122 GUI/DBTitles.py:129
+#: GUI/DBTitles.py:130 GUI/DBTitles.py:131 GUI/DBTitles.py:151
+#: GUI/DBTitles.py:152 GUI/DBTitles.py:153 GUI/DBTitles.py:154
+#: GUI/DBTitles.py:158 GUI/DBTitles.py:160 GUI/DBTitles.py:161
+#: GUI/DBTitles.py:162 GUI/DBTitles.py:163 GUI/DBTitles.py:172
+#: GUI/DBTitles.py:173 GUI/DBTitles.py:174 GUI/DBTitles.py:175
+#: GUI/DBTitles.py:176 GUI/DBTitles.py:177 GUI/DBTitles.py:193
+#: GUI/DBTitles.py:194 GUI/DBTitles.py:195 GUI/DBTitles.py:196
+#: GUI/DBTitles.py:197 GUI/DBTitles.py:198 GUI/DBTitles.py:201
+#: GUI/DBTitles.py:202 GUI/DBTitles.py:203 GUI/DBTitles.py:213
+#: GUI/DBTitles.py:214 GUI/DBTitles.py:215 GUI/DBTitles.py:216
+#: GUI/DBTitles.py:221 GUI/DBTitles.py:222 GUI/DBTitles.py:223
+#: GUI/DBTitles.py:228 GUI/DBTitles.py:229 GUI/DBTitles.py:232
+#: GUI/DBTitles.py:236 GUI/DBTitles.py:237 GUI/DBTitles.py:240
+#: GUI/DBTitles.py:292 GUI/DBTitles.py:293 GUI/DBTitles.py:294
+#: GUI/DBTitles.py:301 GUI/DBTitles.py:302 GUI/DBTitles.py:303
+#: GUI/DBTitles.py:304 GUI/DBTitles.py:311 GUI/DBTitles.py:312
+#: GUI/DBTitles.py:313 GUI/DBTitles.py:314 GUI/DBTitles.py:321
+#: GUI/DBTitles.py:322 GUI/DBTitles.py:323 GUI/DBTitles.py:324
+#: GUI/DBTitles.py:325 GUI/DBTitles.py:326 GUI/DBTitles.py:327
+#: GUI/DBTitles.py:328 GUI/DBTitles.py:329 GUI/DBTitles.py:334
+#: GUI/DBTitles.py:335 GUI/DBTitles.py:336 GUI/DBTitles.py:337
+#: GUI/DBTitles.py:342 GUI/DBTitles.py:343 GUI/DBTitles.py:344
+#: GUI/DBTitles.py:345 GUI/DBTitles.py:346 GUI/DBTitles.py:347
+#: GUI/DBTitles.py:348 GUI/DBTitles.py:349 GUI/DBTitles.py:350
+#: GUI/DBTitles.py:351
+msgid "-"
+msgstr ""
+
+#: GUI/DBTitles.py:36 GUI/DBTitles.py:66
+msgid "Manufacturer data"
+msgstr ""
+
+#: GUI/DBTitles.py:37 GUI/DBTitles.py:67 GUI/DBTitles.py:112
+#: GUI/DBTitles.py:152 GUI/DBTitles.py:174 GUI/DBTitles.py:195
+#: GUI/panelQ4.py:196 modules/ccheck/parameterList.py:203
+msgid "Manufacturer"
+msgstr ""
+
+#: GUI/DBTitles.py:38 GUI/DBTitles.py:68 GUI/DBTitles.py:113
+#: GUI/DBTitles.py:153 GUI/DBTitles.py:175 GUI/DBTitles.py:196
+#: GUI/panelQ4.py:205 modules/ccheck/parameterList.py:205
+msgid "Model"
+msgstr ""
+
+#: GUI/DBTitles.py:39 GUI/DBTitles.py:69
+msgid "Fuel type (identifier in fuel database)"
+msgstr ""
+
+#: GUI/DBTitles.py:40 GUI/DBTitles.py:70
+msgid "Fuel consumption"
+msgstr ""
+
+#: GUI/DBTitles.py:40 GUI/DBTitles.py:70
+msgid "kW (LCV)"
+msgstr ""
+
+#: GUI/DBTitles.py:41 GUI/DBTitles.py:71
+msgid "Fuel units"
+msgstr ""
+
+#: GUI/DBTitles.py:42 GUI/DBTitles.py:72
+msgid "Year of manufacturing"
+msgstr ""
+
+#: GUI/DBTitles.py:43 GUI/panelQ4.py:212 modules/ccheck/parameterList.py:206
+msgid "Type of equipment"
+msgstr ""
+
+#: GUI/DBTitles.py:44
+msgid "Subtype of equipment"
+msgstr ""
+
+#: GUI/DBTitles.py:45
+msgid "Electric power"
+msgstr ""
+
+#: GUI/DBTitles.py:45 GUI/DBTitles.py:46 GUI/DBTitles.py:78 GUI/DBTitles.py:87
+#: GUI/DBTitles.py:100 GUI/DBTitles.py:119 GUI/DBTitles.py:128
+#: GUI/DBTitles.py:141 GUI/DBTitles.py:155
+msgid "kW"
+msgstr ""
+
+#: GUI/DBTitles.py:46
+msgid "Thermal power"
+msgstr ""
+
+#: GUI/DBTitles.py:49
+msgid "Electric efficiency"
+msgstr ""
+
+#: GUI/DBTitles.py:50
+msgid "Thermal efficiency"
+msgstr ""
+
+#: GUI/DBTitles.py:51
+msgid "High temperature at which energy can be delivered"
+msgstr ""
+
+#: GUI/DBTitles.py:51 GUI/DBTitles.py:52 GUI/DBTitles.py:82 GUI/DBTitles.py:83
+#: GUI/DBTitles.py:84 GUI/DBTitles.py:85 GUI/DBTitles.py:86 GUI/DBTitles.py:91
+#: GUI/DBTitles.py:92 GUI/DBTitles.py:93 GUI/DBTitles.py:94 GUI/DBTitles.py:95
+#: GUI/DBTitles.py:96 GUI/DBTitles.py:97 GUI/DBTitles.py:98 GUI/DBTitles.py:99
+#: GUI/DBTitles.py:123 GUI/DBTitles.py:124 GUI/DBTitles.py:125
+#: GUI/DBTitles.py:126 GUI/DBTitles.py:127 GUI/DBTitles.py:132
+#: GUI/DBTitles.py:133 GUI/DBTitles.py:134 GUI/DBTitles.py:135
+#: GUI/DBTitles.py:136 GUI/DBTitles.py:137 GUI/DBTitles.py:138
+#: GUI/DBTitles.py:139 GUI/DBTitles.py:140 GUI/DBTitles.py:159
+#: GUI/DBTitles.py:179 GUI/DBTitles.py:199
+msgid "ºC"
+msgstr ""
+
+#: GUI/DBTitles.py:52
+msgid "Low temperature at which energy can be delivered"
+msgstr ""
+
+#: GUI/DBTitles.py:53
+msgid "Percent of energy at high temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:53 GUI/DBTitles.py:54 GUI/panelEA1.py:158
+#: GUI/panelEA1.py:160 GUI/panelEA2.py:156 GUI/panelEA2.py:158
+#: GUI/panelEA3.py:182 GUI/panelEA3.py:235
+msgid "%"
+msgstr ""
+
+#: GUI/DBTitles.py:54
+msgid "Percent of energy at low temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:55
+msgid "Minimum electric efficiency by law"
+msgstr ""
+
+#: GUI/DBTitles.py:56 GUI/panelCS4.py:72 GUI/panelCS4.py:120
+msgid "Investment cost"
+msgstr ""
+
+#: GUI/DBTitles.py:56 GUI/DBTitles.py:60
+msgid "€/kW_el"
+msgstr ""
+
+#: GUI/DBTitles.py:57
+msgid "Price"
+msgstr ""
+
+#: GUI/DBTitles.py:57 GUI/DBTitles.py:58 GUI/DBTitles.py:101
+#: GUI/DBTitles.py:102
+msgid "€"
+msgstr ""
+
+#: GUI/DBTitles.py:58
+msgid "Turnkey price"
+msgstr ""
+
+#: GUI/DBTitles.py:59
+msgid "Fixed Operation and Maintenance costs"
+msgstr ""
+
+#: GUI/DBTitles.py:59
+msgid "€/kW_el year"
+msgstr ""
+
+#: GUI/DBTitles.py:60
+msgid "Variable Operation and Maintenance costs"
+msgstr ""
+
+#: GUI/DBTitles.py:61
+msgid "Year of update"
+msgstr ""
+
+#: GUI/DBTitles.py:72 GUI/DBTitles.py:105 GUI/DBTitles.py:146
+#: GUI/DBTitles.py:188 GUI/DBTitles.py:208
+msgid "year"
+msgstr ""
+
+#: GUI/DBTitles.py:73 GUI/panelBB.py:205 GUI/panelCHP.py:197
+#: GUI/panelHC.py:112 GUI/panelHP.py:244 GUI/panelTCANon.py:138
+msgid "Type"
+msgstr ""
+
+#: GUI/DBTitles.py:74
+msgid "Sub-type"
+msgstr ""
+
+#: GUI/DBTitles.py:75
+msgid "Effects (absorption)"
+msgstr ""
+
+#: GUI/DBTitles.py:76
+msgid "Heating medium (absorption)"
+msgstr ""
+
+#: GUI/DBTitles.py:77
+msgid "Working fluid"
+msgstr ""
+
+#: GUI/DBTitles.py:78
+msgid "Cooling capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:79
+msgid "Nominal cooling COP"
+msgstr ""
+
+#: GUI/DBTitles.py:80
+msgid "Exergetic cooling COP"
+msgstr ""
+
+#: GUI/DBTitles.py:81
+msgid "Theoretical cooling COP"
+msgstr ""
+
+#: GUI/DBTitles.py:82
+msgid "Temperature range of constant exergetic COP application, cooling"
+msgstr ""
+
+#: GUI/DBTitles.py:83
+msgid "Absorber inlet temperature, cooling mode"
+msgstr ""
+
+#: GUI/DBTitles.py:84
+msgid "Condenser inlet temperature, cooling mode"
+msgstr ""
+
+#: GUI/DBTitles.py:85
+msgid "Generator inlet temperature, cooling mode"
+msgstr ""
+
+#: GUI/DBTitles.py:86
+msgid "Evaporator inlet temperature, cooling mode"
+msgstr ""
+
+#: GUI/DBTitles.py:87
+msgid "Heating capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:88
+msgid "Nominal heating COP"
+msgstr ""
+
+#: GUI/DBTitles.py:89
+msgid "Exergetic heating COP"
+msgstr ""
+
+#: GUI/DBTitles.py:90
+msgid "Theoretical heating COP"
+msgstr ""
+
+#: GUI/DBTitles.py:91
+msgid "Temperature range of constant exergetic COP application, heating"
+msgstr ""
+
+#: GUI/DBTitles.py:92
+msgid "Absorber inlet temperature, heating mode"
+msgstr ""
+
+#: GUI/DBTitles.py:93
+msgid "Condenser inlet temperature, heating mode"
+msgstr ""
+
+#: GUI/DBTitles.py:94
+msgid "Generator inlet temperature, heating mode"
+msgstr ""
+
+#: GUI/DBTitles.py:95
+msgid "Evaporator inlet temperature, heating mode"
+msgstr ""
+
+#: GUI/DBTitles.py:96
+msgid "Limit temperature difference"
+msgstr ""
+
+#: GUI/DBTitles.py:97
+msgid "Minimum generator temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:98
+msgid "Maximum condensing temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:99
+msgid "Minimum evaporating  temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:100 GUI/DBTitles.py:141
+msgid "Electricity consumption"
+msgstr ""
+
+#: GUI/DBTitles.py:101
+msgid "Equipment factory price"
+msgstr ""
+
+#: GUI/DBTitles.py:102
+msgid "Turn-key price"
+msgstr ""
+
+#: GUI/DBTitles.py:103
+msgid "Ratio for O&M costs (fixed)"
+msgstr ""
+
+#: GUI/DBTitles.py:103
+msgid "€/kW year"
+msgstr ""
+
+#: GUI/DBTitles.py:104
+msgid "Ratio for O&M costs (variable)"
+msgstr ""
+
+#: GUI/DBTitles.py:104
+msgid "€/MWh year"
+msgstr ""
+
+#: GUI/DBTitles.py:105 GUI/DBTitles.py:146 GUI/DBTitles.py:188
+#: GUI/DBTitles.py:208
+msgid "Year of last data update"
+msgstr ""
+
+#: GUI/DBTitles.py:111 GUI/DBTitles.py:173 GUI/DBTitles.py:194
+msgid ""
+"Manufacturer data is provided only for Heating (H), Cooling (C), or both (HC)"
+msgstr ""
+
+#: GUI/DBTitles.py:114 GUI/DBTitles.py:176 GUI/DBTitles.py:197
+msgid "Type of HP: compression or absorption"
+msgstr ""
+
+#: GUI/DBTitles.py:115 GUI/DBTitles.py:177 GUI/DBTitles.py:198
+msgid "Heat source - Heat sink, e.g. water-water"
+msgstr ""
+
+#: GUI/DBTitles.py:116
+msgid "Only abs. HP: effects: 1, 2, or 3"
+msgstr ""
+
+#: GUI/DBTitles.py:117
+msgid ""
+"Only abs HP: Heating medium in generator:hot water, vapour, exhaust gas, "
+"directfired"
+msgstr ""
+
+#: GUI/DBTitles.py:118
+msgid "Absorbent-refrigerant pair, e.g. LiBr-H2O"
+msgstr ""
+
+#: GUI/DBTitles.py:119
+msgid "Nominal Cooling capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:120
+msgid "Nominal COP cooling"
+msgstr ""
+
+#: GUI/DBTitles.py:121
+msgid "Exergetic COP cooling"
+msgstr ""
+
+#: GUI/DBTitles.py:122
+msgid "Theoretical COP cooling"
+msgstr ""
+
+#: GUI/DBTitles.py:123
+msgid "Temperature interval COPex is assumed constant, cooling"
+msgstr ""
+
+#: GUI/DBTitles.py:124
+msgid "Absorber inlet temperature, cooling mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:125
+msgid "Condenser inlet temperature, cooling mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:126
+msgid "Generator inlet temperature, cooling mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:127
+msgid "Evaporator inlet temperature, cooling mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:128
+msgid "Nominal Heating capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:129
+msgid "Nominal COP heating"
+msgstr ""
+
+#: GUI/DBTitles.py:130
+msgid "Exergetic COP heating"
+msgstr ""
+
+#: GUI/DBTitles.py:131
+msgid "Theoretical COP heating"
+msgstr ""
+
+#: GUI/DBTitles.py:132
+msgid "Temperature interval COPex is assumed constant, heating"
+msgstr ""
+
+#: GUI/DBTitles.py:133
+msgid "Absorber inlet temperature, heating mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:134
+msgid "Condenser inlet temperature, heating mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:135
+msgid "Generator inlet temperature, heating mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:136
+msgid "Evaporator inlet temperature, heating mode, catalogue (sec. fluid)"
+msgstr ""
+
+#: GUI/DBTitles.py:137
+msgid "Working Limit temperature difference (lift)"
+msgstr ""
+
+#: GUI/DBTitles.py:138
+msgid "Minimum generator temperature (primary)-work limit"
+msgstr ""
+
+#: GUI/DBTitles.py:139
+msgid "Maximum condensing (and absorber) temperature (primary)-work limit"
+msgstr ""
+
+#: GUI/DBTitles.py:140
+msgid "Minimum evaporating temperature (primary)-work limit"
+msgstr ""
+
+#: GUI/DBTitles.py:142 GUI/DBTitles.py:184 GUI/DBTitles.py:204
+msgid "Equipment factory price incl. discount"
+msgstr ""
+
+#: GUI/DBTitles.py:142 GUI/DBTitles.py:143 GUI/DBTitles.py:164
+#: GUI/DBTitles.py:165 GUI/DBTitles.py:184 GUI/DBTitles.py:185
+#: GUI/DBTitles.py:204 GUI/DBTitles.py:205 GUI/panelTCAInvestment.py:110
+#: GUI/panelTCAInvestment.py:118 GUI/panelTCAInvestment.py:144
+#: GUI/panelTCANon.py:136
+msgid "EUR"
+msgstr ""
+
+#: GUI/DBTitles.py:143 GUI/DBTitles.py:185 GUI/DBTitles.py:205
+msgid "Equipment turn-key price"
+msgstr ""
+
+#: GUI/DBTitles.py:144 GUI/DBTitles.py:166 GUI/DBTitles.py:186
+#: GUI/DBTitles.py:206
+msgid "Ratio O&M costs fixed"
+msgstr ""
+
+#: GUI/DBTitles.py:144 GUI/DBTitles.py:166 GUI/DBTitles.py:186
+#: GUI/DBTitles.py:206
+msgid "EUR/kW(heating)"
+msgstr ""
+
+#: GUI/DBTitles.py:145 GUI/DBTitles.py:167 GUI/DBTitles.py:187
+#: GUI/DBTitles.py:207
+msgid "Ratio O&M costs variable"
+msgstr ""
+
+#: GUI/DBTitles.py:145 GUI/DBTitles.py:167 GUI/DBTitles.py:187
+#: GUI/DBTitles.py:207
+msgid "EUR/MWh year(heating)"
+msgstr ""
+
+#: GUI/DBTitles.py:154
+msgid "Type of Boiler"
+msgstr ""
+
+#: GUI/DBTitles.py:155
+msgid "Nominal power"
+msgstr ""
+
+#: GUI/DBTitles.py:156
+msgid "Does the equip. include an economiser (water preheater)?"
+msgstr ""
+
+#: GUI/DBTitles.py:156 GUI/DBTitles.py:157
+msgid "Yes/No"
+msgstr ""
+
+#: GUI/DBTitles.py:157
+msgid "Does the equip. include an air pre-heater?"
+msgstr ""
+
+#: GUI/DBTitles.py:158
+msgid "Boiler efficiency"
+msgstr ""
+
+#: GUI/DBTitles.py:159
+msgid "Maximum operating temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:160
+msgid "Linear dependence of the efficiency on the load"
+msgstr ""
+
+#: GUI/DBTitles.py:161
+msgid "Quadratic dependence of the efficiency on the load"
+msgstr ""
+
+#: GUI/DBTitles.py:162
+msgid "Linear dependence of the efficiency on temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:163
+msgid "Quadratic dependence of the efficiency on temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:164
+msgid "Equipment price at factory applied installers discount"
+msgstr ""
+
+#: GUI/DBTitles.py:165
+msgid "Price of installed equipment (including work, additional accessories)"
+msgstr ""
+
+#: GUI/DBTitles.py:178
+msgid "Maximum heat capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:178
+msgid "kWh"
+msgstr ""
+
+#: GUI/DBTitles.py:179
+msgid "Maximum temperature of storage"
+msgstr ""
+
+#: GUI/DBTitles.py:180 GUI/DBTitles.py:200
+msgid "Heat loss coefficient"
+msgstr ""
+
+#: GUI/DBTitles.py:180 GUI/DBTitles.py:200
+msgid "kW/K"
+msgstr ""
+
+#: GUI/DBTitles.py:181
+msgid "Volume"
+msgstr ""
+
+#: GUI/DBTitles.py:181
+msgid "m3"
+msgstr ""
+
+#: GUI/DBTitles.py:182
+msgid "Height"
+msgstr ""
+
+#: GUI/DBTitles.py:182
+msgid "m"
+msgstr ""
+
+#: GUI/DBTitles.py:183
+msgid "Mass"
+msgstr ""
+
+#: GUI/DBTitles.py:183
+msgid "kg"
+msgstr ""
+
+#: GUI/DBTitles.py:199
+msgid "Maximum temperature"
+msgstr ""
+
+#: GUI/DBTitles.py:201
+msgid "Absorbtivity"
+msgstr ""
+
+#: GUI/DBTitles.py:202
+msgid "Transmittance"
+msgstr ""
+
+#: GUI/DBTitles.py:203
+msgid "Reflectivity"
+msgstr ""
+
+#: GUI/DBTitles.py:214
+msgid "Fuel name"
+msgstr ""
+
+#: GUI/DBTitles.py:215
+msgid "Unit"
+msgstr ""
+
+#: GUI/DBTitles.py:216
+msgid "Fuel code"
+msgstr ""
+
+#: GUI/DBTitles.py:217
+msgid "Lower calorific value"
+msgstr ""
+
+#: GUI/DBTitles.py:217 GUI/DBTitles.py:218
+msgid "kWh/Unit"
+msgstr ""
+
+#: GUI/DBTitles.py:218
+msgid "Higher calorific value"
+msgstr ""
+
+#: GUI/DBTitles.py:219
+msgid "Production of CO2"
+msgstr ""
+
+#: GUI/DBTitles.py:219
+msgid "tCO2/MWh(LCV)"
+msgstr ""
+
+#: GUI/DBTitles.py:220 GUI/DBTitles.py:231
+msgid "Density"
+msgstr ""
+
+#: GUI/DBTitles.py:220 GUI/DBTitles.py:231 GUI/DBTitles.py:239
+msgid "kg/m3"
+msgstr ""
+
+#: GUI/DBTitles.py:221
+msgid "Conversion to primary energy"
+msgstr ""
+
+#: GUI/DBTitles.py:222
+msgid "Data source"
+msgstr ""
+
+#: GUI/DBTitles.py:223 GUI/DBTitles.py:232
+msgid "Comment"
+msgstr ""
+
+#: GUI/DBTitles.py:229
+msgid "Fluid name"
+msgstr ""
+
+#: GUI/DBTitles.py:230
+msgid "Specific heat capacity"
+msgstr ""
+
+#: GUI/DBTitles.py:230 GUI/DBTitles.py:238
+msgid "kJ/kgK"
+msgstr ""
+
+#: GUI/DBTitles.py:237
+msgid "Year of the data"
+msgstr ""
+
+#: GUI/DBTitles.py:238
+msgid "Country of the data"
+msgstr ""
+
+#: GUI/DBTitles.py:239
+msgid "Reference (data source)"
+msgstr ""
+
+#: GUI/DBTitles.py:240
+msgid "ID of auditor"
+msgstr ""
+
+#: GUI/DBTitles.py:293
+msgid "Nace code identifier"
+msgstr ""
+
+#: GUI/DBTitles.py:294
+msgid "Unit operation code"
+msgstr ""
+
+#: GUI/DBTitles.py:295 GUI/DBTitles.py:305 GUI/DBTitles.py:315
+msgid "Energy intensity (production cost) MIN"
+msgstr ""
+
+#: GUI/DBTitles.py:295 GUI/DBTitles.py:296 GUI/DBTitles.py:297
+#: GUI/DBTitles.py:298 GUI/DBTitles.py:299 GUI/DBTitles.py:300
+#: GUI/DBTitles.py:305 GUI/DBTitles.py:306 GUI/DBTitles.py:307
+#: GUI/DBTitles.py:308 GUI/DBTitles.py:309 GUI/DBTitles.py:310
+#: GUI/DBTitles.py:315 GUI/DBTitles.py:316 GUI/DBTitles.py:317
+#: GUI/DBTitles.py:318 GUI/DBTitles.py:319 GUI/DBTitles.py:320
+msgid "kWh/€"
+msgstr ""
+
+#: GUI/DBTitles.py:296 GUI/DBTitles.py:316
+msgid "Energy intensity (production cost) MAX"
+msgstr ""
+
+#: GUI/DBTitles.py:297 GUI/DBTitles.py:307 GUI/DBTitles.py:317
+msgid "Energy intensity (production cost) TARGET"
+msgstr ""
+
+#: GUI/DBTitles.py:298 GUI/DBTitles.py:318
+msgid "Energy intensity (turnover) MIN"
+msgstr ""
+
+#: GUI/DBTitles.py:299 GUI/DBTitles.py:309 GUI/DBTitles.py:319
+msgid "Energy intensity (turnover) MAX"
+msgstr ""
+
+#: GUI/DBTitles.py:300
+msgid "Electricity: Energy intensity TARGET (turnover)"
+msgstr ""
+
+#: GUI/DBTitles.py:301
+msgid "Specific electricity Consumption Min(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:302
+msgid "Specific Electricity Consumption TARGET(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:303
+msgid "Specific Electricity Consumption (SEC) AVERAGE"
+msgstr ""
+
+#: GUI/DBTitles.py:304
+msgid "Unit of SEC electricity"
+msgstr ""
+
+#: GUI/DBTitles.py:306
+msgid "Heat: Energy intensity (production cost) MAX"
+msgstr ""
+
+#: GUI/DBTitles.py:308
+msgid "Heat: Energy intensity (turnover) MIN"
+msgstr ""
+
+#: GUI/DBTitles.py:310
+msgid "Heat: Energy intensity (turnover) TARGET"
+msgstr ""
+
+#: GUI/DBTitles.py:311
+msgid "Specific Heat Consumption Min(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:312
+msgid "Specific Heat Consumption TARGET(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:313
+msgid "Specific Heat Consumption (SEC) AVERAGE"
+msgstr ""
+
+#: GUI/DBTitles.py:314
+msgid "Unit of SEC heat"
+msgstr ""
+
+#: GUI/DBTitles.py:320
+msgid "Energy intensity (turnover) TARGET"
+msgstr ""
+
+#: GUI/DBTitles.py:321
+msgid "Specific Energy Consumption Min(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:322
+msgid "Specific Energy Consumption TARGET(SEC)"
+msgstr ""
+
+#: GUI/DBTitles.py:323
+msgid "Specific Energy Consumption (SEC) AVERAGE"
+msgstr ""
+
+#: GUI/DBTitles.py:324
+msgid "Unit SEC"
+msgstr ""
+
+#: GUI/DBTitles.py:325
+msgid "Comments"
+msgstr ""
+
+#: GUI/DBTitles.py:326
+msgid "Year (reference for economic data)"
+msgstr ""
+
+#: GUI/DBTitles.py:327 GUI/panelBM1.py:194 GUI/panelBM2.py:198
+#: GUI/panelBM3.py:198
+msgid "Reference"
+msgstr ""
+
+#: GUI/DBTitles.py:328
+msgid "Literature"
+msgstr ""
+
+#: GUI/DBTitles.py:329
+msgid "Data relevance/reliability"
+msgstr ""
+
+#: GUI/DBTitles.py:335
+msgid "Unit operation"
+msgstr ""
+
+#: GUI/DBTitles.py:336 modules/ccheck/parameterList.py:193
+msgid "Code"
+msgstr ""
+
+#: GUI/DBTitles.py:343
+msgid "NACE code"
+msgstr ""
+
+#: GUI/DBTitles.py:344
+msgid "NACE subcode"
+msgstr ""
+
+#: GUI/DBTitles.py:345
+msgid "NACE Name"
+msgstr ""
+
+#: GUI/DBTitles.py:346
+msgid "NACE Subname"
+msgstr ""
+
+#: GUI/DBTitles.py:347
+msgid "Product name"
+msgstr ""
+
+#: GUI/DBTitles.py:348
+msgid "National code"
+msgstr ""
+
+#: GUI/DBTitles.py:349
+msgid "National subcode"
+msgstr ""
+
+#: GUI/DBTitles.py:350
+msgid "National code name"
+msgstr ""
+
+#: GUI/DBTitles.py:351
+msgid "National subcode name"
+msgstr ""
+
+#: GUI/dialogA.py:23
+msgid "New alternative proposal"
+msgstr ""
+
+#: GUI/dialogA.py:27 GUI/dialogP.py:30
+msgid "shortname:"
+msgstr ""
+
+#: GUI/dialogA.py:38 GUI/dialogImport.py:74 GUI/dialogOK.py:37
+#: GUI/panelEnergy.py:297 GUI/panelHC.py:205 GUI/panelHR.py:238
+msgid "cancel"
+msgstr ""
+
+#: GUI/dialogA.py:44 GUI/dialogP.py:47
+msgid "description:"
+msgstr ""
+
+#: GUI/dialogA.py:50 GUI/panelA.py:127
+msgid "new alternative"
+msgstr ""
+
+#: GUI/dialogA.py:55
+msgid "describe briefly the new alternative"
+msgstr ""
+
+#: GUI/dialogDatabase.py:42
+msgid ""
+"This operation will:\n"
+"\n"
+"1.- DELETE a previous Einstein database from\n"
+"your MySQL server, if found.\n"
+"2.- INSTALL a new Einstein database from a\n"
+"previous backup file (or from your installation\n"
+"package)\n"
+"\n"
+"WARNING: all your previous data will be lost.\n"
+"\n"
+msgstr ""
+
+#: GUI/dialogDatabase.py:44
+msgid ""
+"This operation will create a backup file containing\n"
+"ALL the current information from your Einstein\n"
+"database.\n"
+"\n"
+"This file could be used to restore the contents of\n"
+"the database in the case of accidents, server or\n"
+"machine upgrades, and so on.\n"
+"\n"
+"The current contents of the database is not affected\n"
+"by this operation."
+msgstr ""
+
+#: GUI/dialogDatabase.py:46
+msgid "Folder with MySql executables"
+msgstr ""
+
+#: GUI/dialogDatabase.py:49
+msgid "Character encoding"
+msgstr ""
+
+#: GUI/dialogDatabase.py:53
+msgid "Select a file to save the database backup"
+msgstr ""
+
+#: GUI/dialogDatabase.py:54 GUI/panelTCANon.py:106
+msgid "Finish"
+msgstr ""
+
+#: GUI/dialogDatabase.py:55
+msgid "Test connection"
+msgstr ""
+
+#: GUI/dialogDatabase.py:73 GUI/einsteinMain.py:1351
+msgid "Database administration"
+msgstr ""
+
+#: GUI/dialogDatabase.py:118
+msgid "Database parameters"
+msgstr ""
+
+#: GUI/dialogDatabase.py:119
+msgid "Restore database"
+msgstr ""
+
+#: GUI/dialogDatabase.py:120
+msgid "Backup database"
+msgstr ""
+
+#: GUI/dialogDatabase.py:133
+msgid "Connection OK"
+msgstr ""
+
+#: GUI/dialogDatabase.py:135
+#, python-format
+msgid ""
+"Connection error:\n"
+"%s"
+msgstr ""
+
+#: GUI/dialogDatabase.py:140
+#, python-format
+msgid ""
+"Cannot connect with these parameters.\n"
+"\n"
+"Error message:\n"
+"%s\n"
+"\n"
+"Want to save them anyway?"
+msgstr ""
+
+#: GUI/dialogDatabase.py:154
+msgid "Host name, database name and user name cannot be empty"
+msgstr ""
+
+#: GUI/dialogDatabase.py:158
+msgid "Mysql binary folder is unknown. Database dumps will not be made."
+msgstr ""
+
+#: GUI/dialogDatabase.py:197
+#, python-format
+msgid "Bad value in einstein.ini file: %s"
+msgstr ""
+
+#: GUI/dialogDatabase.py:220
+msgid "The configuration has been updated"
+msgstr ""
+
+#: GUI/dialogDatabase.py:225
+msgid "Choose a file for restoring the Database"
+msgstr ""
+
+#: GUI/dialogDatabase.py:233
+msgid "Please select the folder where MySQL binaries reside"
+msgstr ""
+
+#: GUI/dialogDatabase.py:247
+msgid "Choose a file for writing the Database backup"
+msgstr ""
+
+#: GUI/dialogDatabase.py:264
+msgid "The database backup has finished"
+msgstr ""
+
+#: GUI/dialogDatabase.py:266
+#, python-format
+msgid "The database backup was terminated by signal %s"
+msgstr ""
+
+#: GUI/dialogDatabase.py:268
+#, python-format
+msgid "The database backup has returned %s"
+msgstr ""
+
+#: GUI/dialogDatabase.py:270
+#, python-format
+msgid ""
+"The database backup has failed:\n"
+"%s"
+msgstr ""
+
+#: GUI/dialogDatabase.py:277
+msgid "SQL files (*.sql)|*.sql"
+msgstr ""
+
+#: GUI/dialogImport.py:61
+msgid "overwrite"
+msgstr ""
+
+#: GUI/dialogImport.py:67
+msgid "ignore"
+msgstr ""
+
+#: GUI/dialogLanguage.py:40
+msgid "Select language"
+msgstr ""
+
+#: GUI/dialogLanguage.py:43
+msgid "Available languages"
+msgstr ""
+
+#: GUI/dialogLanguage.py:106
+msgid "en-English"
+msgstr ""
+
+#: GUI/dialogLanguage.py:107
+msgid "cat-Catalan"
+msgstr ""
+
+#: GUI/dialogLanguage.py:108
+msgid "cz-Czech"
+msgstr ""
+
+#: GUI/dialogLanguage.py:109
+msgid "de-Deutsch"
+msgstr ""
+
+#: GUI/dialogLanguage.py:110
+msgid "it-Italiano"
+msgstr ""
+
+#: GUI/dialogLanguage.py:111
+msgid "pl-Polish"
+msgstr ""
+
+#: GUI/dialogLanguage.py:112
+msgid "si-Slovenian"
+msgstr ""
+
+#: GUI/dialogLanguage.py:113
+msgid "es-Spanish"
+msgstr ""
+
+#: GUI/dialogP.py:26
+msgid "New project"
+msgstr ""
+
+#: GUI/dialogP.py:53
+msgid "New alternative"
+msgstr ""
+
+#: GUI/dialogP.py:58
+msgid "Describe briefly the new alternative"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:51
+msgid "Detailed operating costs calculation"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:64
+msgid "Ok"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:74
+msgid "Cost for water, plant air, inert gas, refrigerant, sewerage, ..."
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:80
+msgid ""
+"chemicals e.g. for conditioning of boiler feed water, lubricants, \n"
+"cleaning materials, materials for maintenance and service)"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:86
+msgid ""
+"labor for operating, on-site handling and storage, onsite pretreatment, "
+"hauling, supervision; \n"
+"personnel, management personnel, maintenance personnel, energy agent, "
+"internal costs for \n"
+"analyses and measurements, internal costs for inspection, supervision and "
+"control"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:92
+msgid ""
+"external maintenance personnel costs, external costs for analyses and "
+"measurements, \n"
+"Off-site Treatment, Off-site Disposal"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:98
+msgid ""
+"permits (if not in labour costs), mandatory trainings  (if not in labour "
+"costs), costs for mandatory \n"
+"monitoring and inspection (if not in labour costs), fees/taxes, reporting "
+"(if not in labour costs)"
+msgstr ""
+
+#: GUI/dialogTCADetailedOpCost.py:110
+msgid ""
+"fines/penalties, legal costs, personal injury, property/natural resource "
+"damage, \n"
+"remediationcosts, (provisions for) clean up costs, (provisions for) "
+"treatment costs "
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:206
+msgid ""
+"Initial investment\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:207
+msgid ""
+"Depreciation period\n"
+"[years]"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:208
+msgid ""
+"Remaining period\n"
+"[years]"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:216
+msgid "Purchased Equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:217
+msgid "Utility Connections"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:218 GUI/einsteinMain.py:854
+#: GUI/einsteinMain.py:1464 GUI/panelQ9.py:237 modules/project.py:988
+msgid "Buildings"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:262
+msgid "process energy generation equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:263
+msgid "equipment for energy generation and transformation"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:264
+msgid "equipment for energy recovery"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:265
+msgid "equipment for cooling/re-cooling/closure of cooling cycles"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:266
+msgid "air condition for processes"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:267
+msgid "conduction system for energy transportation"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:268
+msgid "storage and materials handling equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:269
+msgid "safety/protective equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:270
+msgid "monitoring/control equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:271
+msgid "laboratory/analytical equipment"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:274
+msgid "electricity"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:275
+msgid "steam"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:276
+msgid "water"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:277
+msgid "fuel"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:278
+msgid "plant air"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:279
+msgid "inert gas"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:280
+msgid "refrigeration"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:281
+msgid "sewerage"
+msgstr ""
+
+#: GUI/dialogTCARevenue.py:282
+msgid "pumping"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:87
+msgid "Change Heatexchanger - Parameters for calculation of HEX"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:91
+msgid "4. Type of HEX"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:95
+msgid "Recalcualte HEX"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:107
+msgid "liquid-liquid"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:111
+msgid "1. dTmin values"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:115
+msgid "2. material"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:119
+msgid "3. wall thickness of tubes or plates"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:124
+msgid "5. alpha values"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:128
+msgid "6. cost factor for materials required for installation"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:133
+msgid "7. pressure [bar]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:137
+msgid "8. standart storage"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:141
+msgid "liquids [K]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:145
+msgid "gases [K]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:149
+msgid "phase change [K]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:153
+msgid "material type"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:157
+msgid "s [mm]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:161
+msgid "liquid-gaseus"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:186
+msgid "gaseous-gaseus"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:205
+msgid "liquides"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:209
+msgid "gases"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:213
+msgid "phase change"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:230
+msgid ""
+"additional % based on \n"
+"total equipment costs"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:239
+msgid "pressure [bar]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:247
+msgid "insulation [mm]"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:251
+msgid "material"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:255
+msgid "connections"
+msgstr ""
+
+#: GUI/dialog_changeHX.py:263
+msgid "stainless steel"
+msgstr ""
+
+#: GUI/panelA.py:89
+msgid "present state"
+msgstr ""
+
+#: GUI/panelA.py:128
+msgid "describe shortly the main differential features of the new alternative"
+msgstr ""
+
+#: GUI/panelA.py:180
+msgid "No."
+msgstr ""
+
+#: GUI/panelA.py:183
+msgid "State"
+msgstr ""
+
+#: GUI/panelA.py:184
+msgid ""
+"Primary energy\n"
+"consumption\n"
+"[MWh/a]"
+msgstr ""
+
+#: GUI/panelA.py:185
+msgid ""
+"Total annual\n"
+"energy cost\n"
+"[€/a]"
+msgstr ""
+
+#: GUI/panelA.py:212
+msgid "design of alternative prooposals"
+msgstr ""
+
+#: GUI/panelA.py:233
+msgid "generate new proposal"
+msgstr ""
+
+#: GUI/panelA.py:239
+msgid "copy proposal"
+msgstr ""
+
+#: GUI/panelA.py:245
+msgid "delete proposal"
+msgstr ""
+
+#: GUI/panelA.py:251
+msgid "select proposal"
+msgstr ""
+
+#: GUI/panelA.py:260
+msgid "comparison of primary energy consumption and effective annual cost"
+msgstr ""
+
+#: GUI/panelA.py:272
+msgid "design of subsystems"
+msgstr ""
+
+#: GUI/panelA.py:278
+msgid "process optimisation"
+msgstr ""
+
+#: GUI/panelA.py:284
+msgid "pinch analysis"
+msgstr ""
+
+#: GUI/panelA.py:290
+msgid "HX network design"
+msgstr ""
+
+#: GUI/panelA.py:296
+msgid "Heat and cold supply"
+msgstr ""
+
+#: GUI/panelA.py:383 GUI/panelA.py:406
+msgid "PanelA - OK"
+msgstr ""
+
+#: GUI/panelA.py:390 GUI/panelA.py:413
+msgid "PanelA - Cancel"
+msgstr ""
+
+#: GUI/panelA.py:392
+msgid "PanelA ???"
+msgstr ""
+
+#: GUI/panelA.py:415
+msgid "PanelA - ???"
+msgstr ""
+
+#: GUI/panelA.py:423
+msgid "delete alternative"
+msgstr ""
+
+#: GUI/panelA.py:423
+msgid "do you really want to delete this alternative ?"
+msgstr ""
+
+#: GUI/panelA.py:429
+msgid "PanelA (DeleteButton): cannot delete alternative "
+msgstr ""
+
+#: GUI/panelA.py:431
+msgid "PanelA (DeleteButton): erroneous alternative number "
+msgstr ""
+
+#: GUI/panelBB.py:91 GUI/panelCHP.py:77 GUI/panelTCAEnergy.py:194
+msgid "Natural Gas"
+msgstr ""
+
+#: GUI/panelBB.py:92 GUI/panelCHP.py:78 GUI/einsteinMain.py:1526
+#: GUI/panelTCAInvestment.py:185 GUI/panelTCAOpTabpage.py:117
+#: modules/project.py:1061
+msgid "Biomass"
+msgstr ""
+
+#: GUI/panelBB.py:93 GUI/panelCHP.py:79
+msgid "Fuel oil"
+msgstr ""
+
+#: GUI/panelBB.py:115 GUI/panelCHP.py:107
+msgid "Heat demand [kW]"
+msgstr ""
+
+#: GUI/panelBB.py:116 GUI/panelCHP.py:108
+msgid "Cumulative hours [h]"
+msgstr ""
+
+#: GUI/panelBB.py:202 GUI/panelCHP.py:194 GUI/panelHP.py:241
+msgid "Short name"
+msgstr ""
+
+#: GUI/panelBB.py:203 GUI/panelHP.py:242
+msgid "Nom. power"
+msgstr ""
+
+#: GUI/panelBB.py:204 GUI/panelHP.py:243
+msgid "COP"
+msgstr ""
+
+#: GUI/panelBB.py:206 GUI/panelCHP.py:198 GUI/panelHP.py:245
+msgid ""
+"Operating\n"
+"hours"
+msgstr ""
+
+#: GUI/panelBB.py:207 GUI/panelCHP.py:199 GUI/panelHP.py:246
+msgid "Year manufact."
+msgstr ""
+
+#: GUI/panelBB.py:230
+msgid "Boilers and Burners in the HC Supply System"
+msgstr ""
+
+#: GUI/panelBB.py:246
+msgid "Cumulative heat demand to be covered by boilers"
+msgstr ""
+
+#: GUI/panelBB.py:260 GUI/panelCHP.py:252 GUI/panelST.py:268
+msgid "run design assistant"
+msgstr ""
+
+#: GUI/panelBB.py:266
+msgid "add boiler / burner"
+msgstr ""
+
+#: GUI/panelBB.py:274 GUI/panelCHP.py:266
+msgid "Design assistant options:"
+msgstr ""
+
+#: GUI/panelBB.py:283 GUI/panelCHP.py:275 GUI/panelHP.py:340
+msgid "Maintain existing equipment ?"
+msgstr ""
+
+#: GUI/panelBB.py:294
+msgid "Safety factor [%]"
+msgstr ""
+
+#: GUI/panelBB.py:307
+msgid "Is redundancy necessary ?"
+msgstr ""
+
+#: GUI/panelBB.py:320 GUI/panelCHP.py:297
+msgid "Fuel Type"
+msgstr ""
+
+#: GUI/panelBB.py:332
+msgid "Minimum operating hours (baseload boiler)"
+msgstr ""
+
+#: GUI/panelBB.py:343
+msgid "Minimum boiler power [kW]"
+msgstr ""
+
+#: GUI/panelBB.py:356
+msgid "Minimum effiency allowed [%]"
+msgstr ""
+
+#: GUI/panelBB.py:368 GUI/panelCHP.py:333
+msgid "System Performance Data"
+msgstr ""
+
+#: GUI/panelBB.py:375
+msgid "Maximum demand temperature [°C]"
+msgstr ""
+
+#: GUI/panelBB.py:382
+msgid "Residual power to be supplied [kW]"
+msgstr ""
+
+#: GUI/panelBB.py:393 GUI/panelCHP.py:358 GUI/panelEA4b.py:94
+#: GUI/panelHP.py:148 GUI/panelST.py:117
+msgid "Temperature [ºC]"
+msgstr ""
+
+#: GUI/panelBB.py:395
+msgid "Peak demand [kW]"
+msgstr ""
+
+#: GUI/panelBB.py:398
+msgid "Up to 80"
+msgstr ""
+
+#: GUI/panelBB.py:401
+msgid "80<T<140"
+msgstr ""
+
+#: GUI/panelBB.py:404
+msgid "T<Tmax"
+msgstr ""
+
+#: GUI/panelBB.py:408 GUI/panelBB.py:411 GUI/panelBB.py:414
+#: GUI/panelCHP.py:375 GUI/panelCHP.py:378 GUI/panelCHP.py:381
+#: GUI/panelCHP.py:384 modules/ccheck/parameterList.py:48
+#: modules/ccheck/parameterList.py:79 modules/ccheck/parameterList.py:171
+#: modules/ccheck/parameterList.py:221 modules/ccheck/parameterList.py:231
+#: modules/ccheck/parameterList.py:308 modules/ccheck/parameterList.py:386
+#: modules/ccheck/parameterList.py:397
+msgid "0"
+msgstr ""
+
+#: GUI/panelBB.py:503
+msgid "PanelBB (display): was asked to display an erroneous heat pump type"
+msgstr ""
+
+#: GUI/panelBB.py:559
+msgid "PanelBB AddEquipment accepted. Id="
+msgstr ""
+
+#: GUI/panelBB.py:592 GUI/panelCHP.py:585 GUI/panelHP.py:649
+#: GUI/panelST.py:628
+msgid "delete equipment"
+msgstr ""
+
+#: GUI/panelBB.py:592 GUI/panelCHP.py:585 GUI/panelHP.py:649
+msgid "do you really want to delete this equipment ?"
+msgstr ""
+
+#: GUI/panelBB.py:597 GUI/panelCHP.py:590
+msgid "edit"
+msgstr ""
+
+#: GUI/panelBB.py:614 GUI/panelBB.py:620 GUI/panelBB.py:632 GUI/panelBB.py:638
+#: GUI/panelBB.py:644 GUI/panelBB.py:650 GUI/panelBB.py:656
+#, python-format
+msgid "PanelBB: new config[%s] value: "
+msgstr ""
+
+#: GUI/panelBB.py:670 GUI/panelCHP.py:645 GUI/panelHP.py:725
+msgid "Button exitModuleCancel: CANCEL Option not yet foreseen"
+msgstr ""
+
+#: GUI/panelBM1.py:193 GUI/panelBM2.py:197 GUI/panelBM3.py:197
+msgid "Source"
+msgstr ""
+
+#: GUI/panelBM1.py:195 GUI/panelBM2.py:199 GUI/panelBM3.py:199
+msgid "Validity"
+msgstr ""
+
+#: GUI/panelBM1.py:196 GUI/panelBM2.py:200 GUI/panelBM3.py:200
+#: GUI/panelEA5.py:124 GUI/einsteinMain.py:885 GUI/einsteinMain.py:1477
+#: modules/project.py:1016
+msgid "Primary energy"
+msgstr ""
+
+#: GUI/panelBM1.py:197 GUI/panelBM2.py:201 GUI/panelBM3.py:201
+msgid "Fuels"
+msgstr ""
+
+#: GUI/panelBM1.py:198 GUI/panelBM2.py:202 GUI/panelBM3.py:202
+msgid "Electricity"
+msgstr ""
+
+#: GUI/panelBM1.py:221
+msgid "Benchmark (1): global energy intensity"
+msgstr ""
+
+#: GUI/panelBM1.py:235 GUI/panelBM2.py:250 GUI/panelBM3.py:253
+msgid "find benchmarks"
+msgstr ""
+
+#: GUI/panelBM1.py:243 GUI/panelBM2.py:258 GUI/panelBM3.py:261
+msgid "Comparison benchmark data"
+msgstr ""
+
+#: GUI/panelBM1.py:256 GUI/panelBM2.py:271 GUI/panelBM3.py:274
+msgid "Search criteria"
+msgstr ""
+
+#: GUI/panelBM1.py:262 GUI/panelBM2.py:277 GUI/panelBM3.py:280
+msgid "NACE Code range (digits)"
+msgstr ""
+
+#: GUI/panelBM1.py:271 GUI/panelBM2.py:286 GUI/panelBM3.py:289
+msgid "max."
+msgstr ""
+
+#: GUI/panelBM1.py:275 GUI/panelBM2.py:290 GUI/panelBM3.py:293
+msgid "min."
+msgstr ""
+
+#: GUI/panelBM1.py:280
+msgid "Company size (turnover)"
+msgstr ""
+
+#: GUI/panelBM1.py:284
+msgid "[M€]"
+msgstr ""
+
+#: GUI/panelBM1.py:288 GUI/panelBM1.py:300 GUI/panelBM2.py:303
+#: GUI/panelBM2.py:315 GUI/panelBM3.py:306 GUI/panelBM3.py:318
+msgid "Year of data"
+msgstr ""
+
+#: GUI/panelBM1.py:391 GUI/panelBM2.py:408 GUI/panelBM3.py:409
+#, python-format
+msgid "revise your search criteria: turnover in between %s and %s M€"
+msgstr ""
+
+#: GUI/panelBM1.py:399 GUI/panelBM2.py:416 GUI/panelBM3.py:417
+#, python-format
+msgid "revise your search criteria: year of data in between %s and %s"
+msgstr ""
+
+#: GUI/panelBM2.py:225
+msgid "Benchmark (2): specific energy consumption (SEC) by product"
+msgstr ""
+
+#: GUI/panelBM2.py:232
+msgid "Product:"
+msgstr ""
+
+#: GUI/panelBM2.py:295
+msgid "Production volume"
+msgstr ""
+
+#: GUI/panelBM2.py:299
+msgid "[t/a]"
+msgstr ""
+
+#: GUI/panelBM3.py:225
+msgid "Benchmark (3): specific energy consumption (SEC) by unit operation"
+msgstr ""
+
+#: GUI/panelBM3.py:231
+msgid "Process:"
+msgstr ""
+
+#: GUI/panelBM3.py:298
+msgid "Volume of process medium"
+msgstr ""
+
+#: GUI/panelBM3.py:302
+msgid "[t/year]"
+msgstr ""
+
+#: GUI/panelCHP.py:195
+msgid ""
+"Nom. power\n"
+"el./th.[kW]"
+msgstr ""
+
+#: GUI/panelCHP.py:196
+msgid ""
+"COP\n"
+"el./th. [-]"
+msgstr ""
+
+#: GUI/panelCHP.py:222
+msgid "CHP equipment in the HC Supply System"
+msgstr ""
+
+#: GUI/panelCHP.py:238
+msgid "Cumulative heat demand to be covered by CHP"
+msgstr ""
+
+#: GUI/panelCHP.py:258
+msgid "add CHP system"
+msgstr ""
+
+#: GUI/panelCHP.py:286
+msgid "CHP System Type"
+msgstr ""
+
+#: GUI/panelCHP.py:310
+msgid "Minimum operating hours"
+msgstr ""
+
+#: GUI/panelCHP.py:321
+msgid "Min. electrical efficiency (ef.) [%]"
+msgstr ""
+
+#: GUI/panelCHP.py:340
+msgid "CHP Operating hours"
+msgstr ""
+
+#: GUI/panelCHP.py:347
+msgid "Effective electrical efficiency"
+msgstr ""
+
+#: GUI/panelCHP.py:360
+msgid "Demand at min. op. hours [kW]"
+msgstr ""
+
+#: GUI/panelCHP.py:363
+msgid "T< 80"
+msgstr ""
+
+#: GUI/panelCHP.py:366
+msgid "T<140"
+msgstr ""
+
+#: GUI/panelCHP.py:369
+msgid "T<250"
+msgstr ""
+
+#: GUI/panelCHP.py:372 GUI/panelQ9.py:258 modules/energyStats/moduleEA4.py:190
+#: modules/energyStats/moduleEM1.py:90
+msgid "Total"
+msgstr ""
+
+#: GUI/panelCHP.py:461 GUI/panelCHP.py:468
+msgid "PanelCHP (display): was asked to display an erroneous fuel type"
+msgstr ""
+
+#: GUI/panelCHP.py:511
+msgid "Select CHP equipment from preselected list"
+msgstr ""
+
+#: GUI/panelCHP.py:552
+msgid "PanelCHP AddEquipment accepted. Id="
+msgstr ""
+
+#: GUI/panelCHP.py:607 GUI/panelCHP.py:614 GUI/panelCHP.py:620
+#: GUI/panelCHP.py:626 GUI/panelCHP.py:632
+#, python-format
+msgid "PanelCHP: new config[%s] value: "
+msgstr ""
+
+#: GUI/panelCS1.py:74
+msgid "Primary energy consumption"
+msgstr ""
+
+#: GUI/panelCS1.py:75 GUI/panelCS1.py:76
+msgid "PEC [MWh]"
+msgstr ""
+
+#: GUI/panelCS1.py:114 GUI/panelCS2.py:107 GUI/panelCS3.py:106
+#: GUI/panelCS4.py:105 GUI/panelCS5.py:105 GUI/panelCS6.py:107
+#: GUI/panelCS7.py:105 GUI/panelInfo.py:36
+msgid "Alternative"
+msgstr ""
+
+#: GUI/panelCS1.py:115
+msgid ""
+"Primary energy\n"
+"consumption [MWh]"
+msgstr ""
+
+#: GUI/panelCS1.py:116
+msgid ""
+"Savings\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelCS1.py:117
+msgid ""
+"Savings\n"
+"[%]"
+msgstr ""
+
+#: GUI/panelCS1.py:129
+msgid "Primary energy consumption (PEC)"
+msgstr ""
+
+#: GUI/panelCS1.py:141
+msgid "Relative comparison of PEC"
+msgstr ""
+
+#: GUI/panelCS2.py:74
+msgid "Relative comparison of prosess & supply heat"
+msgstr ""
+
+#: GUI/panelCS2.py:75 GUI/panelCS3.py:74 GUI/panelCS7.py:73
+#: GUI/panelEA4b.py:190 GUI/panelEA4b.py:193
+msgid "[%]"
+msgstr ""
+
+#: GUI/panelCS2.py:76
+#, python-format
+msgid "USH [% of present state]"
+msgstr ""
+
+#: GUI/panelCS2.py:76
+#, python-format
+msgid "UPH [% of present state]"
+msgstr ""
+
+#: GUI/panelCS2.py:108
+msgid ""
+"Useful process\n"
+"heat (UPH) [MWh]"
+msgstr ""
+
+#: GUI/panelCS2.py:109
+msgid ""
+"Savings (UPH)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelCS2.py:110
+msgid ""
+"Useful supply\n"
+"heat (USH) [MWh]"
+msgstr ""
+
+#: GUI/panelCS2.py:111
+msgid ""
+"Savings (USH)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelCS2.py:123
+msgid "Useful process and supply heat (UPH and USH)"
+msgstr ""
+
+#: GUI/panelCS2.py:135
+msgid "Relative comparison of process and supply heat"
+msgstr ""
+
+#: GUI/panelCS3.py:73
+msgid "Relative comparison"
+msgstr ""
+
+#: GUI/panelCS3.py:75
+msgid "CO2"
+msgstr ""
+
+#: GUI/panelCS3.py:75
+msgid "Nuclear waste"
+msgstr ""
+
+#: GUI/panelCS3.py:75
+msgid "Water consumption"
+msgstr ""
+
+#: GUI/panelCS3.py:107
+msgid ""
+"Production of CO2\n"
+"[t]"
+msgstr ""
+
+#: GUI/panelCS3.py:108
+msgid ""
+"Highly Radioactive\n"
+"Nuclear Waste [kg]"
+msgstr ""
+
+#: GUI/panelCS3.py:109
+msgid ""
+"Water Consumption\n"
+"[m3]"
+msgstr ""
+
+#: GUI/panelCS3.py:121
+msgid "Environmental impact of the industry"
+msgstr ""
+
+#: GUI/panelCS3.py:133
+msgid "Relative comparison of different alternatives"
+msgstr ""
+
+#: GUI/panelCS4.py:73
+msgid "Total cost (Own+Subsidies)[EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:74
+msgid "Own cost [EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:74
+msgid "Subsidies [EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:106
+msgid ""
+"Total cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:107
+msgid ""
+"Own cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:108
+msgid ""
+"Subsidies\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS4.py:132
+msgid "Investment cost comparative"
+msgstr ""
+
+#: GUI/panelCS5.py:72 GUI/panelCS5.py:120
+msgid "Annual cost"
+msgstr ""
+
+#: GUI/panelCS5.py:73
+msgid "Total annual cost [EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:74
+msgid "Amortization [EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:74
+msgid "Energy cost [EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:74
+msgid "O&M cost [EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:106
+msgid ""
+"Amortization\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:107
+msgid ""
+"Energy cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:108
+msgid ""
+"Operation and maintenance\n"
+"(O&M) cost [EUR]"
+msgstr ""
+
+#: GUI/panelCS5.py:132
+msgid "Annual cost comparative"
+msgstr ""
+
+#: GUI/panelCS6.py:72
+msgid "Additional cost per saved primary energy"
+msgstr ""
+
+#: GUI/panelCS6.py:73
+msgid "[EUR/MWh saved]"
+msgstr ""
+
+#: GUI/panelCS6.py:108
+msgid ""
+"Total energy cost\n"
+"(incl.O&M and invest.) [EUR]"
+msgstr ""
+
+#: GUI/panelCS6.py:109
+msgid ""
+"Additional cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelCS6.py:110
+msgid ""
+"Additional cost per\n"
+"saved PE [EUR/MWh]"
+msgstr ""
+
+#: GUI/panelCS6.py:122
+msgid "Additional cost per saved primary energy (PE)"
+msgstr ""
+
+#: GUI/panelCS6.py:134
+msgid "Comparative of additional cost per saved primary energy"
+msgstr ""
+
+#: GUI/panelCS7.py:72
+msgid "Modified nternal rate of return"
+msgstr ""
+
+#: GUI/panelCS7.py:74
+msgid "IRR"
+msgstr ""
+
+#: GUI/panelCS7.py:106
+msgid ""
+"Modified internal\n"
+"rate of return [%]"
+msgstr ""
+
+#: GUI/panelCS7.py:107
+msgid ""
+"Pay-back period\n"
+"[years]"
+msgstr ""
+
+#: GUI/panelCS7.py:108
+msgid ""
+"Cost benefit ratio\n"
+"[-]"
+msgstr ""
+
+#: GUI/panelCS7.py:120
+msgid "Modified internal rate of return (IRR)"
+msgstr ""
+
+#: GUI/panelCS7.py:132
+msgid "Comparative of the internal rate of return"
+msgstr ""
+
+#: GUI/panelEA1.py:90 GUI/panelEA1.py:221
+msgid "PEC by fuel"
+msgstr ""
+
+#: GUI/panelEA1.py:106 GUI/panelEA1.py:232
+msgid "PET by fuel"
+msgstr ""
+
+#: GUI/panelEA1.py:156 GUI/panelEA2.py:154 GUI/panelEA3.py:180
+#: GUI/panelQ4.py:235 modules/ccheck/parameterList.py:208
+msgid "Fuel type"
+msgstr ""
+
+#: GUI/panelEA1.py:157 GUI/panelEA1.py:159 GUI/panelEA2.py:155
+#: GUI/panelEA2.py:157 GUI/panelEA3.py:181 GUI/panelEA3.py:234
+msgid "MWh"
+msgstr ""
+
+#: GUI/panelEA1.py:161 GUI/panelEA1.py:162 GUI/panelEA2.py:159
+#: GUI/panelEA2.py:160 GUI/panelEA3.py:236 GUI/panelEA5.py:168
+#: GUI/panelEM1.py:139 GUI/panelEM1.py:140 GUI/panelEM1.py:141
+#: GUI/panelEM1.py:142 GUI/panelEM1.py:143 GUI/panelEM2.py:128
+#: GUI/panelEM2.py:129 GUI/panelEM2.py:130 GUI/panelEM2.py:131
+#: GUI/panelEM2.py:132 GUI/panelQ1.py:211 GUI/panelQ1.py:215
+#: GUI/panelQ1.py:219 GUI/panelQ1.py:223 GUI/panelQ1.py:227 GUI/panelQ1.py:231
+#: GUI/panelQ1.py:235 GUI/panelQ1.py:239 GUI/panelQ1.py:243 GUI/panelQ1.py:251
+#: GUI/panelQ1.py:256 GUI/panelQ1.py:272 GUI/panelQ1.py:296 GUI/panelQ1.py:301
+#: GUI/panelQ1.py:307 GUI/panelQ1.py:313 GUI/panelQ1.py:319 GUI/panelQ1.py:325
+#: GUI/panelQ1.py:335 GUI/panelQ1.py:341 GUI/panelQ1.py:347 GUI/panelQ1.py:352
+#: GUI/panelQ1.py:357 GUI/panelQ1.py:362 GUI/panelQ1.py:367 GUI/panelQ1.py:372
+#: GUI/panelQ1.py:377 GUI/panelQ1.py:393 GUI/panelQ1.py:398 GUI/panelQ1.py:404
+#: GUI/panelQ1.py:408 GUI/panelQ1.py:414 GUI/panelQ1.py:422 GUI/panelQ2.py:177
+#: GUI/panelQ2.py:189 GUI/panelQ5.py:171 GUI/panelQ5.py:223 GUI/panelQ5.py:229
+#: GUI/panelQ6.py:322 GUI/panelQ6.py:327 GUI/panelQ6.py:333 GUI/panelQ6.py:338
+#: GUI/panelQ7.py:276 GUI/panelQ7.py:282 GUI/panelQ7.py:295 GUI/panelQ7.py:305
+#: GUI/panelQ7.py:311 GUI/panelQ7.py:327 GUI/panelQ8.py:190 GUI/panelQ8.py:200
+#: GUI/panelQ8.py:223 GUI/panelQ8.py:252 GUI/panelQ8.py:256 GUI/panelQ8.py:261
+#: GUI/panelQ8.py:265 GUI/panelQ9.py:191
+msgid " "
+msgstr ""
+
+#: GUI/panelEA1.py:164
+msgid "Total Fuels"
+msgstr ""
+
+#: GUI/panelEA1.py:165
+msgid "Total Electricity"
+msgstr ""
+
+#: GUI/panelEA1.py:166
+msgid "Total (Fuels+Electricity)"
+msgstr ""
+
+#: GUI/panelEA1.py:210
+msgid ""
+"Total primary energy consumption (PEC) and primary energy consumption for "
+"thermal use (PET)"
+msgstr ""
+
+#: GUI/panelEA1.py:244
+msgid "PEC"
+msgstr ""
+
+#: GUI/panelEA1.py:248
+msgid "PET"
+msgstr ""
+
+#: GUI/panelEA2.py:100 GUI/panelEA2.py:198
+msgid "FEC by fuel"
+msgstr ""
+
+#: GUI/panelEA2.py:116 GUI/panelEA2.py:209
+msgid "FET by fuel"
+msgstr ""
+
+#: GUI/panelEA2.py:187
+msgid ""
+"Total final energy consumption (FEC) and final energy consumption for "
+"thermal use (FET)"
+msgstr ""
+
+#: GUI/panelEA2.py:220
+msgid "FEC"
+msgstr ""
+
+#: GUI/panelEA2.py:225
+msgid "FET"
+msgstr ""
+
+#: GUI/panelEA3.py:101
+msgid "FET by equipment"
+msgstr ""
+
+#: GUI/panelEA3.py:125
+msgid "USH by equipment"
+msgstr ""
+
+#: GUI/panelEA3.py:179 GUI/panelEA3.py:233 GUI/panelHC.py:111
+msgid "Equipment"
+msgstr ""
+
+#: GUI/panelEA3.py:272
+msgid "Final energy consumption for thermal use (FET) by equipment"
+msgstr ""
+
+#: GUI/panelEA3.py:290
+msgid "Useful supply heat (USH) by equipment"
+msgstr ""
+
+#: GUI/panelEA4a.py:110
+msgid "UPH by process"
+msgstr ""
+
+#: GUI/panelEA4a.py:146
+msgid "Process"
+msgstr ""
+
+#: GUI/panelEA4a.py:147
+msgid ""
+"UPH Total\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4a.py:148
+msgid ""
+"Share\n"
+"[%]"
+msgstr ""
+
+#: GUI/panelEA4a.py:149
+msgid ""
+"Circulation\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4a.py:150
+msgid ""
+"Maintenance\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4a.py:151
+msgid ""
+"Start-Up\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4a.py:152
+msgid ""
+"Process\n"
+"Temp. [ºC]"
+msgstr ""
+
+#: GUI/panelEA4a.py:153
+msgid ""
+"Process Supply\n"
+"Temp. [ºC]"
+msgstr ""
+
+#: GUI/panelEA4a.py:199
+msgid "Useful heat demand by process (UPH)"
+msgstr ""
+
+#: GUI/panelEA4a.py:210
+msgid "Distribution of process heat demand (UPH Total) by processes"
+msgstr ""
+
+#: GUI/panelEA4b.py:93 GUI/panelHP.py:147 GUI/panelST.py:116
+msgid "Yearly energy [MWh]"
+msgstr ""
+
+#: GUI/panelEA4b.py:147 GUI/panelEA4c.py:134 GUI/panelHP.py:208
+#: GUI/panelST.py:176
+msgid "Some title"
+msgstr ""
+
+#: GUI/panelEA4b.py:188
+msgid ""
+"Temperature levels\n"
+"[ºC]"
+msgstr ""
+
+#: GUI/panelEA4b.py:189 GUI/panelEA4b.py:192
+msgid "[MWh]"
+msgstr ""
+
+#: GUI/panelEA4b.py:191 GUI/panelEA4b.py:194
+msgid ""
+"cumulative\n"
+"[%]"
+msgstr ""
+
+#: GUI/panelEA4b.py:237
+msgid "Heat demand (UPH) and supply (USH) by temperature"
+msgstr ""
+
+#: GUI/panelEA4b.py:244
+msgid "Heat demand (UPH) by process temperature (PT)"
+msgstr ""
+
+#: GUI/panelEA4b.py:249
+msgid "Heat supply (USH) by central supply temperature (CST)"
+msgstr ""
+
+#: GUI/panelEA4b.py:258
+msgid ""
+"Distribution of heat demand (UPH) and supply (USH) by process temperatures"
+msgstr ""
+
+#: GUI/panelEA4c.py:79
+msgid "Heat supply load [kW]"
+msgstr ""
+
+#: GUI/panelEA4c.py:80
+msgid "Annual operating hours [h]"
+msgstr ""
+
+#: GUI/panelEA4c.py:171
+msgid ""
+"Temperature Levels\n"
+"[ºC]"
+msgstr ""
+
+#: GUI/panelEA4c.py:172
+msgid ""
+"Base Load\n"
+"(power)\n"
+"[kW]"
+msgstr ""
+
+#: GUI/panelEA4c.py:173
+msgid ""
+"Base Load\n"
+"(energy)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4c.py:174
+msgid ""
+"Medium Load\n"
+"(power)\n"
+"[kW]"
+msgstr ""
+
+#: GUI/panelEA4c.py:175
+msgid ""
+"Medium Load\n"
+"(energy)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4c.py:176
+msgid ""
+"Peak Load\n"
+"(power)\n"
+"[kW]"
+msgstr ""
+
+#: GUI/panelEA4c.py:177
+msgid ""
+"Peak Load\n"
+"(energy)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEA4c.py:221
+msgid "Useful supply heat demand (USH) - peak and base load"
+msgstr ""
+
+#: GUI/panelEA4c.py:232
+msgid "Cumulative heat demand (USH)"
+msgstr ""
+
+#: GUI/panelEA5.py:103 GUI/einsteinMain.py:916 GUI/einsteinMain.py:1483
+#: modules/project.py:1020
+msgid "Energy intensity"
+msgstr ""
+
+#: GUI/panelEA5.py:122 GUI/einsteinMain.py:1494 modules/project.py:1032
+msgid "SEC by product"
+msgstr ""
+
+#: GUI/panelEA5.py:124
+msgid "Energy by fuels"
+msgstr ""
+
+#: GUI/panelEA5.py:124
+msgid "Energy by electricity"
+msgstr ""
+
+#: GUI/panelEA5.py:166
+msgid "Energy type"
+msgstr ""
+
+#: GUI/panelEA5.py:167
+msgid ""
+"Energy intensity\n"
+"[kWh/EUR]"
+msgstr ""
+
+#: GUI/panelEA5.py:218
+msgid "Product"
+msgstr ""
+
+#: GUI/panelEA5.py:219
+msgid ""
+"Energy by\n"
+"fuels\n"
+"[kWh/pu]"
+msgstr ""
+
+#: GUI/panelEA5.py:220
+msgid ""
+"Energy by\n"
+"electricity\n"
+"[kWh/pu]"
+msgstr ""
+
+#: GUI/panelEA5.py:221
+msgid ""
+"Primary\n"
+"energy\n"
+"[kWh/pu]"
+msgstr ""
+
+#: GUI/panelEA5.py:267
+msgid "Energy intensity by energy type (turnover)"
+msgstr ""
+
+#: GUI/panelEA5.py:291
+msgid "Specific energy consumption (SEC) by product."
+msgstr ""
+
+#: GUI/panelEM1.py:97
+msgid "Monthly process heat demand"
+msgstr ""
+
+#: GUI/panelEM1.py:98 GUI/panelEM2.py:89
+msgid "UPH (MWh)"
+msgstr ""
+
+#: GUI/panelEM1.py:194
+msgid "Monthly useful process heat"
+msgstr ""
+
+#: GUI/panelEM1.py:206
+msgid "Distribution of useful process heat per months"
+msgstr ""
+
+#: GUI/panelEM2.py:88
+msgid "Monthly process heat supply"
+msgstr ""
+
+#: GUI/panelEM2.py:188
+msgid "Monthly useful supply heat"
+msgstr ""
+
+#: GUI/panelEM2.py:200
+msgid "Distribution of useful supply heat per months"
+msgstr ""
+
+#: GUI/panelEnergy.py:94
+msgid "Heat supply by equipment [MWh/month]"
+msgstr ""
+
+#: GUI/panelEnergy.py:95
+msgid "Month"
+msgstr ""
+
+#: GUI/panelEnergy.py:99
+msgid "Heat supply by equipment [MWh/week]"
+msgstr ""
+
+#: GUI/panelEnergy.py:100
+msgid "Week"
+msgstr ""
+
+#: GUI/panelEnergy.py:154 GUI/panelEnergy.py:353 GUI/panelQ8.py:122
+msgid "Energy demand"
+msgstr ""
+
+#: GUI/panelEnergy.py:181
+msgid ""
+"Primary energy\n"
+"(PET)\n"
+" [MWh]"
+msgstr ""
+
+#: GUI/panelEnergy.py:182
+msgid ""
+"Primary energy\n"
+"Fuels (LCV)\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEnergy.py:183
+msgid ""
+"Primary energy\n"
+"Electricity\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEnergy.py:184
+msgid ""
+"Useful supply\n"
+"heat\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEnergy.py:185
+msgid ""
+"Useful process\n"
+"heat\n"
+"[MWh]"
+msgstr ""
+
+#: GUI/panelEnergy.py:211
+msgid "energy performance"
+msgstr ""
+
+#: GUI/panelEnergy.py:218
+msgid "run simulation"
+msgstr ""
+
+#: GUI/panelEnergy.py:225
+msgid "simulation setup: "
+msgstr ""
+
+#: GUI/panelEnergy.py:230
+msgid "einstein"
+msgstr ""
+
+#: GUI/panelEnergy.py:231
+msgid "external tool 1"
+msgstr ""
+
+#: GUI/panelEnergy.py:231
+msgid "external tool 2"
+msgstr ""
+
+#: GUI/panelEnergy.py:239
+msgid "global energy performance data"
+msgstr ""
+
+#: GUI/panelEnergy.py:251
+msgid "simulation results"
+msgstr ""
+
+#: GUI/panelEnergy.py:256
+msgid "annual data"
+msgstr ""
+
+#: GUI/panelEnergy.py:263
+msgid "monthly data"
+msgstr ""
+
+#: GUI/panelEnergy.py:269
+msgid "hourly performance"
+msgstr ""
+
+#: GUI/panelEnergy.py:277
+msgid "daily heat supply by equipment"
+msgstr ""
+
+#: GUI/panelEnergy.py:290 GUI/panelHC.py:199 GUI/panelHR.py:232
+msgid "ok"
+msgstr ""
+
+#: GUI/panelHC.py:110
+msgid ""
+"Equipe\n"
+"No."
+msgstr ""
+
+#: GUI/panelHC.py:113
+msgid ""
+"Nominal Power\n"
+"[kW]"
+msgstr ""
+
+#: GUI/panelHC.py:114
+msgid ""
+"Heat Supplied to\n"
+"Pipe/Duct"
+msgstr ""
+
+#: GUI/panelHC.py:140
+msgid "get recommendations and automatic pre-design"
+msgstr ""
+
+#: GUI/panelHC.py:148
+msgid "Existing equipment in the system"
+msgstr ""
+
+#: GUI/panelHC.py:166
+msgid "Order Cascade"
+msgstr ""
+
+#: GUI/panelHC.py:178
+msgid "down"
+msgstr ""
+
+#: GUI/panelHC.py:183
+msgid "up"
+msgstr ""
+
+#: GUI/panelHC.py:189
+msgid "to top"
+msgstr ""
+
+#: GUI/panelHC.py:256
+msgid "PanelHC (GridLeftDclick): selected row = "
+msgstr ""
+
+#: GUI/panelHC.py:263
+msgid "PanelHC (GridLeftClick): selected row = "
+msgstr ""
+
+#: GUI/panelHC.py:268
+msgid "PanelHC (GridRightClick): selected row = "
+msgstr ""
+
+#: GUI/panelHC.py:299
+msgid "PanelHC (move to bottom)"
+msgstr ""
+
+#: GUI/panelHC.py:305
+msgid "PanelHC (move down)"
+msgstr ""
+
+#: GUI/panelHC.py:311
+msgid "PanelHC (move up)"
+msgstr ""
+
+#: GUI/panelHC.py:317
+msgid "PanelHC (move to top)"
+msgstr ""
+
+#: GUI/panelHP.py:276
+msgid "Heat demand and availability with and w/o HP"
+msgstr ""
+
+#: GUI/panelHP.py:290
+msgid "Existing heat pumps in the system"
+msgstr ""
+
+#: GUI/panelHP.py:311
+msgid "Run design assistant"
+msgstr ""
+
+#: GUI/panelHP.py:319
+msgid "add heat pump manually"
+msgstr ""
+
+#: GUI/panelHP.py:330 GUI/panelST.py:336
+msgid "Configuration of design assistant"
+msgstr ""
+
+#: GUI/panelHP.py:353
+msgid "Type of heat pump"
+msgstr ""
+
+#: GUI/panelHP.py:367
+msgid "Minimum desired annual operation hours, h"
+msgstr ""
+
+#: GUI/panelHP.py:383
+msgid "Maximum desired temperature lift, ºC"
+msgstr ""
+
+#: GUI/panelHP.py:398
+msgid "Maximum desired condensing temperature, ºC"
+msgstr ""
+
+#: GUI/panelHP.py:413
+msgid "Minimum desired evaporating temperature, ºC"
+msgstr ""
+
+#: GUI/panelHP.py:428
+msgid "Only for absorption type:"
+msgstr ""
+
+#: GUI/panelHP.py:432
+msgid "Inlet temperature of heating fluid in generator, ºC"
+msgstr ""
+
+#: GUI/panelHP.py:449
+msgid "Pinch temperature °C"
+msgstr ""
+
+#: GUI/panelHP.py:457
+msgid "Temperature gap °K"
+msgstr ""
+
+#: GUI/panelHP.py:529
+#, python-format
+msgid ""
+"PanelHP (display): was asked to display an erroneous heat pump type -> %s"
+msgstr ""
+
+#: GUI/panelHP.py:570
+msgid "Select heat pump from preselected list"
+msgstr ""
+
+#: GUI/panelHP.py:606
+msgid "Add Heat Pump equipment"
+msgstr ""
+
+#: GUI/panelHP.py:607
+msgid "dbheatpump"
+msgstr ""
+
+#: GUI/panelHP.py:612
+msgid "PanelHP AddEquipment accepted. Id="
+msgstr ""
+
+#: GUI/panelHP.py:630
+msgid "PanelHP (OnGridLeftDclick) - OK"
+msgstr ""
+
+#: GUI/panelHP.py:663 GUI/panelHP.py:671 GUI/panelHP.py:676 GUI/panelHP.py:683
+#: GUI/panelHP.py:689 GUI/panelHP.py:695 GUI/panelHP.py:701
+#, python-format
+msgid "new config[%s] value: "
+msgstr ""
+
+#: GUI/panelHR.py:108 GUI/panelHR.py:141 GUI/panelHR.py:183 GUI/panelHR.py:198
+msgid "Power [kW]"
+msgstr ""
+
+#: GUI/panelHR.py:109 GUI/panelHR.py:142 GUI/panelHR.py:184 GUI/panelHR.py:199
+msgid "Temperature [C]"
+msgstr ""
+
+#: GUI/panelHR.py:257
+msgid "calculate"
+msgstr ""
+
+#: GUI/panelHR.py:271
+msgid "  Consider existing"
+msgstr ""
+
+#: GUI/panelHR.py:278 GUI/panelHR.py:441
+msgid "Hide HX"
+msgstr ""
+
+#: GUI/panelHR.py:284
+msgid "Change HX"
+msgstr ""
+
+#: GUI/panelHR.py:290
+msgid "HX Network"
+msgstr ""
+
+#: GUI/panelHR.py:294
+msgid "Standard values for HX"
+msgstr ""
+
+#: GUI/panelHR.py:301
+msgid "Display Options"
+msgstr ""
+
+#: GUI/panelHR.py:305
+msgid ""
+"HXs in network \n"
+"calculation"
+msgstr ""
+
+#: GUI/panelHR.py:310
+msgid "Performance Curves"
+msgstr ""
+
+#: GUI/panelHR.py:314
+msgid "Existing heat exchangers in the system"
+msgstr ""
+
+#: GUI/panelHR.py:319
+msgid "Calculate only"
+msgstr ""
+
+#: GUI/panelHR.py:326
+msgid "Redesign network"
+msgstr ""
+
+#: GUI/panelHR.py:365
+msgid ""
+"Power\n"
+"[kW]"
+msgstr ""
+
+#: GUI/panelHR.py:366
+msgid ""
+"Size storage tank\n"
+"[m³]"
+msgstr ""
+
+#: GUI/panelHR.py:367
+msgid "Hot Medium"
+msgstr ""
+
+#: GUI/panelHR.py:368
+msgid ""
+"T1 hot med.\n"
+"[°C]"
+msgstr ""
+
+#: GUI/panelHR.py:369
+msgid ""
+"T2 hot med.\n"
+"[°C]"
+msgstr ""
+
+#: GUI/panelHR.py:370
+msgid "Cold medium"
+msgstr ""
+
+#: GUI/panelHR.py:371
+msgid ""
+"T3 cold med.\n"
+"[°C]"
+msgstr ""
+
+#: GUI/panelHR.py:372
+msgid ""
+"T4 cold med.\n"
+"[°C]"
+msgstr ""
+
+#: GUI/panelHR.py:373
+msgid ""
+"surface area\n"
+"[m²]"
+msgstr ""
+
+#: GUI/panelHR.py:374
+msgid ""
+"inv. cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelHR.py:375
+msgid ""
+"oper. cost\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelHR.py:439
+msgid "Show HX"
+msgstr ""
+
+#: GUI/panelHR.py:453
+msgid "PanelHR (GridLeftDclick): selected row = "
+msgstr ""
+
+#: GUI/panelHR.py:461
+msgid "PanelHR (GridLeftClick): selected row = "
+msgstr ""
+
+#: GUI/panelHR.py:467
+msgid "PanelHR (GridRightClick): selected row = "
+msgstr ""
+
+#: GUI/panelHR.py:501
+msgid "PanelHR (OnBtnCalculateButton)"
+msgstr ""
+
+#: GUI/panelInfo.py:30
+msgid "Project"
+msgstr ""
+
+#: GUI/panelInfo.py:42
+msgid "Design assistant"
+msgstr ""
+
+#: GUI/panelInfo.py:69
+msgid "Design assistant changed to "
+msgstr ""
+
+#: GUI/einsteinMain.py:405
+msgid "Message log"
+msgstr ""
+
+#: GUI/einsteinMain.py:421
+msgid "einstein started"
+msgstr ""
+
+#: GUI/einsteinMain.py:461
+msgid "Error"
+msgstr ""
+
+#: GUI/einsteinMain.py:468
+msgid "Warning"
+msgstr ""
+
+#: GUI/einsteinMain.py:475
+msgid "Info"
+msgstr ""
+
+#: GUI/einsteinMain.py:482
+msgid "Confirm"
+msgstr ""
+
+#: GUI/einsteinMain.py:539
+msgid "Welcome to ..."
+msgstr ""
+
+#: GUI/einsteinMain.py:590
+msgid "Do you really want to exit?"
+msgstr ""
+
+#: GUI/einsteinMain.py:663
+msgid "Any changes will be in effect next time you restart Einstein"
+msgstr ""
+
+#: GUI/einsteinMain.py:766
+msgid "Cannot open this action"
+msgstr ""
+
+#: GUI/einsteinMain.py:791 GUI/einsteinMain.py:1456 modules/project.py:953
+msgid "Edit Industry Data"
+msgstr ""
+
+#: GUI/einsteinMain.py:797 GUI/einsteinMain.py:1457 GUI/panelQ5.py:113
+#: GUI/panelQ8.py:108 GUI/panelQ8.py:118 modules/project.py:966
+msgid "General data"
+msgstr ""
+
+#: GUI/einsteinMain.py:807 GUI/einsteinMain.py:1458 modules/project.py:982
+msgid "Energy consumption"
+msgstr ""
+
+#: GUI/einsteinMain.py:817 GUI/einsteinMain.py:1459 modules/project.py:983
+msgid "Processes data"
+msgstr ""
+
+#: GUI/einsteinMain.py:823 GUI/einsteinMain.py:1460 modules/project.py:984
+msgid "Generation of heat and cold"
+msgstr ""
+
+#: GUI/einsteinMain.py:829 GUI/einsteinMain.py:1461 modules/project.py:985
+msgid "Distribution of heat and cold"
+msgstr ""
+
+#: GUI/einsteinMain.py:835 GUI/einsteinMain.py:1462 modules/project.py:986
+msgid "Heat recovery"
+msgstr ""
+
+#: GUI/einsteinMain.py:844 GUI/einsteinMain.py:1463 modules/project.py:987
+msgid "Renewable energies"
+msgstr ""
+
+#: GUI/einsteinMain.py:847
+msgid "city / country"
+msgstr ""
+
+#: GUI/einsteinMain.py:863 GUI/einsteinMain.py:1465 modules/project.py:989
+msgid "Economic parameters"
+msgstr ""
+
+#: GUI/einsteinMain.py:872 GUI/einsteinMain.py:1467 modules/project.py:998
+msgid "Consistency Check"
+msgstr ""
+
+#: GUI/einsteinMain.py:879 GUI/einsteinMain.py:1472 modules/project.py:1011
+msgid "Energy statistics"
+msgstr ""
+
+#: GUI/einsteinMain.py:891 GUI/einsteinMain.py:1478 modules/project.py:1017
+msgid "Final energy by fuels"
+msgstr ""
+
+#: GUI/einsteinMain.py:896 GUI/einsteinMain.py:1479 modules/project.py:1018
+msgid "Final energy by equipment"
+msgstr ""
+
+#: GUI/einsteinMain.py:901 GUI/einsteinMain.py:1480
+msgid "Heat demand (proc.)"
+msgstr ""
+
+#: GUI/einsteinMain.py:906 GUI/einsteinMain.py:1481
+msgid "Heat demand (temp.)"
+msgstr ""
+
+#: GUI/einsteinMain.py:911 GUI/einsteinMain.py:1482
+msgid "Heat demand (time)"
+msgstr ""
+
+#: GUI/einsteinMain.py:943 GUI/einsteinMain.py:1492 modules/project.py:1030
+msgid "Benchmark check"
+msgstr ""
+
+#: GUI/einsteinMain.py:969 GUI/einsteinMain.py:1507 modules/project.py:1035
+msgid "Alternative proposals"
+msgstr ""
+
+#: GUI/einsteinMain.py:975 GUI/einsteinMain.py:1512 modules/project.py:1047
+msgid "Process optimisation"
+msgstr ""
+
+#: GUI/einsteinMain.py:1023 GUI/einsteinMain.py:1514
+#: GUI/panelTCAInvestment.py:188 GUI/panelTCAOpTabpage.py:120
+#: modules/project.py:1055
+msgid "HX network"
+msgstr ""
+
+#: GUI/einsteinMain.py:1037 GUI/einsteinMain.py:1539
+msgid "Total Cost Assessment"
+msgstr ""
+
+#: GUI/einsteinMain.py:1043 GUI/einsteinMain.py:1540
+msgid "Investment"
+msgstr ""
+
+#: GUI/einsteinMain.py:1049 GUI/einsteinMain.py:1541
+msgid "Energy and operating costs"
+msgstr ""
+
+#: GUI/einsteinMain.py:1055 GUI/einsteinMain.py:1542 GUI/panelTCACont.py:56
+msgid "Contingencies"
+msgstr ""
+
+#: GUI/einsteinMain.py:1061 GUI/einsteinMain.py:1543
+msgid "Non reocurring costs"
+msgstr ""
+
+#: GUI/einsteinMain.py:1067 GUI/einsteinMain.py:1549
+msgid "Comp.study: Primary energy"
+msgstr ""
+
+#: GUI/einsteinMain.py:1072 GUI/einsteinMain.py:1551
+msgid "Comp.study: Process & supply heat"
+msgstr ""
+
+#: GUI/einsteinMain.py:1077 GUI/einsteinMain.py:1553
+msgid "Comp.study: Environmental  impact"
+msgstr ""
+
+#: GUI/einsteinMain.py:1082 GUI/einsteinMain.py:1555
+msgid "Comp.study: Investment cost"
+msgstr ""
+
+#: GUI/einsteinMain.py:1087 GUI/einsteinMain.py:1557
+msgid "Comp.study: Annual cost"
+msgstr ""
+
+#: GUI/einsteinMain.py:1092 GUI/einsteinMain.py:1559
+msgid "Comp.study: Additional cost per saved energy"
+msgstr ""
+
+#: GUI/einsteinMain.py:1097 GUI/einsteinMain.py:1561
+msgid "Comp.study: Internal rate of return"
+msgstr ""
+
+#: GUI/einsteinMain.py:1101 GUI/einsteinMain.py:1563 modules/project.py:1082
+msgid "Report"
+msgstr ""
+
+#: GUI/einsteinMain.py:1321
+msgid "full report"
+msgstr ""
+
+#: GUI/einsteinMain.py:1322
+msgid "questionnaire"
+msgstr ""
+
+#: GUI/einsteinMain.py:1324
+msgid "&New Project"
+msgstr ""
+
+#: GUI/einsteinMain.py:1325
+msgid "&Open Project"
+msgstr ""
+
+#: GUI/einsteinMain.py:1326
+msgid "&Import Project"
+msgstr ""
+
+#: GUI/einsteinMain.py:1327
+msgid "&Export Project"
+msgstr ""
+
+#: GUI/einsteinMain.py:1329
+msgid "Import &Questionnaire"
+msgstr ""
+
+#: GUI/einsteinMain.py:1331
+msgid "Import data"
+msgstr ""
+
+#: GUI/einsteinMain.py:1332
+msgid "Export data"
+msgstr ""
+
+#: GUI/einsteinMain.py:1334
+msgid "&Print"
+msgstr ""
+
+#: GUI/einsteinMain.py:1336
+msgid "E&xit"
+msgstr ""
+
+#: GUI/einsteinMain.py:1338 GUI/einsteinMain.py:1365
+msgid "&CHP"
+msgstr ""
+
+#: GUI/einsteinMain.py:1339 GUI/einsteinMain.py:1366
+msgid "&Heat pumps"
+msgstr ""
+
+#: GUI/einsteinMain.py:1340 GUI/einsteinMain.py:1367
+msgid "&Chillers"
+msgstr ""
+
+#: GUI/einsteinMain.py:1341 GUI/einsteinMain.py:1368
+msgid "B&oilers"
+msgstr ""
+
+#: GUI/einsteinMain.py:1342 GUI/einsteinMain.py:1369
+msgid "Stora&ge"
+msgstr ""
+
+#: GUI/einsteinMain.py:1343 GUI/einsteinMain.py:1370
+msgid "&Solar Collectors"
+msgstr ""
+
+#: GUI/einsteinMain.py:1345 GUI/einsteinMain.py:1357
+msgid "Equipments"
+msgstr ""
+
+#: GUI/einsteinMain.py:1346 GUI/einsteinMain.py:1358
+msgid "Fue&ls"
+msgstr ""
+
+#: GUI/einsteinMain.py:1347 GUI/einsteinMain.py:1359
+msgid "Flui&ds"
+msgstr ""
+
+#: GUI/einsteinMain.py:1348 GUI/einsteinMain.py:1360
+msgid "Electricity mix"
+msgstr ""
+
+#: GUI/einsteinMain.py:1349 GUI/einsteinMain.py:1361
+msgid "&Benchmarks"
+msgstr ""
+
+#: GUI/einsteinMain.py:1353
+msgid "&Nace code"
+msgstr ""
+
+#: GUI/einsteinMain.py:1354
+msgid "&Unit operation"
+msgstr ""
+
+#: GUI/einsteinMain.py:1356
+msgid "all data bases"
+msgstr ""
+
+#: GUI/einsteinMain.py:1364
+msgid "all equipment data bases"
+msgstr ""
+
+#: GUI/einsteinMain.py:1382
+msgid "User interaction &level"
+msgstr ""
+
+#: GUI/einsteinMain.py:1383
+msgid "&Preferences"
+msgstr ""
+
+#: GUI/einsteinMain.py:1384
+msgid "C&lassification"
+msgstr ""
+
+#: GUI/einsteinMain.py:1385
+msgid "Language"
+msgstr ""
+
+#: GUI/einsteinMain.py:1388
+msgid "View message log"
+msgstr ""
+
+#: GUI/einsteinMain.py:1390
+msgid "Fonts"
+msgstr ""
+
+#: GUI/einsteinMain.py:1393
+msgid "&Documentation"
+msgstr ""
+
+#: GUI/einsteinMain.py:1395
+msgid "&About"
+msgstr ""
+
+#: GUI/einsteinMain.py:1397
+msgid "&File"
+msgstr ""
+
+#: GUI/einsteinMain.py:1400
+msgid "Database"
+msgstr ""
+
+#: GUI/einsteinMain.py:1401
+msgid "&Settings"
+msgstr ""
+
+#: GUI/einsteinMain.py:1402
+msgid "&Help"
+msgstr ""
+
+#: GUI/einsteinMain.py:1421 GUI/einsteinMain.py:1424 GUI/einsteinMain.py:1429
+msgid "View"
+msgstr ""
+
+#: GUI/einsteinMain.py:1473 modules/project.py:1012
+msgid "Annual data"
+msgstr ""
+
+#: GUI/einsteinMain.py:1474 modules/project.py:1013
+msgid "Monthly data"
+msgstr ""
+
+#: GUI/einsteinMain.py:1475
+msgid "Hourly performance data"
+msgstr ""
+
+#: GUI/einsteinMain.py:1485 modules/project.py:1023
+msgid "Monthly demand"
+msgstr ""
+
+#: GUI/einsteinMain.py:1486 modules/project.py:1024
+msgid "Monthly supply"
+msgstr ""
+
+#: GUI/einsteinMain.py:1488 modules/project.py:1026
+msgid "Hourly demand"
+msgstr ""
+
+#: GUI/einsteinMain.py:1489 modules/project.py:1027
+msgid "Hourly supply"
+msgstr ""
+
+#: GUI/einsteinMain.py:1493 modules/project.py:1031
+msgid "Global energy intensity"
+msgstr ""
+
+#: GUI/einsteinMain.py:1495 modules/project.py:1033
+msgid "SEC by process"
+msgstr ""
+
+#: GUI/einsteinMain.py:1510 modules/project.py:1045
+msgid "Design"
+msgstr ""
+
+#: GUI/einsteinMain.py:1516 modules/project.py:1056
+msgid "H&C Supply"
+msgstr ""
+
+#: GUI/einsteinMain.py:1518 GUI/panelTCAInvestment.py:181
+#: GUI/panelTCAOpTabpage.py:113 modules/project.py:1057
+msgid "H&C Storage"
+msgstr ""
+
+#: GUI/einsteinMain.py:1520 GUI/panelTCAInvestment.py:182
+#: GUI/panelTCAOpTabpage.py:114 modules/project.py:1058
+msgid "CHP"
+msgstr ""
+
+#: GUI/einsteinMain.py:1522 modules/project.py:1059
+msgid "Solar Thermal"
+msgstr ""
+
+#: GUI/einsteinMain.py:1524 modules/project.py:1060
+msgid "Heat Pumps"
+msgstr ""
+
+#: GUI/einsteinMain.py:1528 GUI/panelTCAInvestment.py:186
+#: GUI/panelTCAOpTabpage.py:118 modules/project.py:1062
+msgid "Chillers"
+msgstr ""
+
+#: GUI/einsteinMain.py:1530 modules/project.py:1063
+msgid "Boilers & burners"
+msgstr ""
+
+#: GUI/einsteinMain.py:1533 modules/project.py:1065
+msgid "H&C Distribution"
+msgstr ""
+
+#: GUI/einsteinMain.py:1536 modules/project.py:1067
+msgid "Energy performance"
+msgstr ""
+
+#: GUI/einsteinMain.py:1547 modules/project.py:1080
+msgid "Comparative study"
+msgstr ""
+
+#: GUI/einsteinMain.py:1564 GUI/panelReport.py:102 modules/project.py:1083
+msgid "Report generation"
+msgstr ""
+
+#: GUI/panelPO.py:71
+msgid "REFERENCE TECHNOLOGIES AND MEASURES:"
+msgstr ""
+
+#: GUI/panelPO.py:76
+msgid "PROPOSED ENERGY EFFICIENCY MEASURES:"
+msgstr ""
+
+#: GUI/panelPO.py:120
+msgid "PO"
+msgstr ""
+
+#: GUI/panelQ0.py:74
+msgid "Projects in the database"
+msgstr ""
+
+#: GUI/panelQ0.py:92
+msgid "open project"
+msgstr ""
+
+#: GUI/panelQ0.py:102
+msgid "copy project"
+msgstr ""
+
+#: GUI/panelQ0.py:112
+msgid "new project"
+msgstr ""
+
+#: GUI/panelQ0.py:122
+msgid "delete project"
+msgstr ""
+
+#: GUI/panelQ0.py:134
+msgid "Selected project"
+msgstr ""
+
+#: GUI/panelQ0.py:148
+msgid "run EINSTEIN audit procedure"
+msgstr ""
+
+#: GUI/panelQ0.py:197
+msgid "(copy)"
+msgstr ""
+
+#: GUI/panelQ0.py:198
+msgid "new project copied from "
+msgstr ""
+
+#: GUI/panelQ0.py:202 GUI/panelQ0.py:264
+msgid "PanelP - OK"
+msgstr ""
+
+#: GUI/panelQ0.py:237
+#, python-format
+msgid "Delete project %s ?"
+msgstr ""
+
+#: GUI/panelQ0.py:238
+msgid "PanelQ0 (ButtonDelete): deleting "
+msgstr ""
+
+#: GUI/panelQ0.py:259
+msgid "New Project"
+msgstr ""
+
+#: GUI/panelQ0.py:260
+msgid "give here a short description of your project"
+msgstr ""
+
+#: GUI/panelQ1.py:128 GUI/panelQ1.py:147
+msgid "General information"
+msgstr ""
+
+#: GUI/panelQ1.py:133 GUI/panelQ1.py:151
+msgid "Statistical and economical data"
+msgstr ""
+
+#: GUI/panelQ1.py:138 GUI/panelQ1.py:155
+msgid "Period of operation"
+msgstr ""
+
+#: GUI/panelQ1.py:143 GUI/panelQ1.py:159
+msgid "Information on products"
+msgstr ""
+
+#: GUI/panelQ1.py:163
+msgid "Energy consumption by product"
+msgstr ""
+
+#: GUI/panelQ1.py:167
+msgid "Product list"
+msgstr ""
+
+#: GUI/panelQ1.py:172
+msgid "Principal periods of holidays or stops for maintenance"
+msgstr ""
+
+#: GUI/panelQ1.py:202
+msgid "Name of the company"
+msgstr ""
+
+#: GUI/panelQ1.py:203
+msgid "Legal name of the company"
+msgstr ""
+
+#: GUI/panelQ1.py:206
+msgid "City / Country"
+msgstr ""
+
+#: GUI/panelQ1.py:207
+msgid "City where production is located"
+msgstr ""
+
+#: GUI/panelQ1.py:210
+msgid "Name of contact person"
+msgstr ""
+
+#: GUI/panelQ1.py:214
+msgid "Position of contact person in the company"
+msgstr ""
+
+#: GUI/panelQ1.py:218
+msgid "Address"
+msgstr ""
+
+#: GUI/panelQ1.py:222
+msgid "Telephone No"
+msgstr ""
+
+#: GUI/panelQ1.py:226 modules/ccheck/parameterList.py:25
+msgid "Fax No"
+msgstr ""
+
+#: GUI/panelQ1.py:230 modules/ccheck/parameterList.py:26
+msgid "E-mail"
+msgstr ""
+
+#: GUI/panelQ1.py:234
+msgid "Description of the industry"
+msgstr ""
+
+#: GUI/panelQ1.py:238
+msgid "Branch"
+msgstr ""
+
+#: GUI/panelQ1.py:242
+msgid "Sub-branch"
+msgstr ""
+
+#: GUI/panelQ1.py:250 modules/ccheck/parameterList.py:18
+msgid "NACE code branch"
+msgstr ""
+
+#: GUI/panelQ1.py:255 modules/ccheck/parameterList.py:19
+msgid "NACE code sub-branch"
+msgstr ""
+
+#: GUI/panelQ1.py:271
+msgid "Number of employees"
+msgstr ""
+
+#: GUI/panelQ1.py:277
+msgid "Annual turnover"
+msgstr ""
+
+#: GUI/panelQ1.py:278
+msgid "Million of euro per year"
+msgstr ""
+
+#: GUI/panelQ1.py:283
+msgid "Annual production cost"
+msgstr ""
+
+#: GUI/panelQ1.py:284
+msgid "Specify total factor inputs for production"
+msgstr ""
+
+#: GUI/panelQ1.py:289
+msgid "Base year for economic data"
+msgstr ""
+
+#: GUI/panelQ1.py:290
+msgid "Specify the reference year for economic parameters"
+msgstr ""
+
+#: GUI/panelQ1.py:295
+msgid ""
+"Growth rate of the production volume foreseen for the next 5 years [%/year]"
+msgstr ""
+
+#: GUI/panelQ1.py:300
+msgid "Is the company independent?"
+msgstr ""
+
+#: GUI/panelQ1.py:306
+msgid "Yearly O&M heat & cold"
+msgstr ""
+
+#: GUI/panelQ1.py:312
+msgid "Yearly O&M electrical"
+msgstr ""
+
+#: GUI/panelQ1.py:318 modules/ccheck/parameterList.py:163
+msgid "Percentage of fuel cost on overall production cost"
+msgstr ""
+
+#: GUI/panelQ1.py:324 modules/ccheck/parameterList.py:162
+msgid "Percentage of electricity cost on overall production cost"
+msgstr ""
+
+#: GUI/panelQ1.py:334
+msgid "Total hours of operation per working day"
+msgstr ""
+
+#: GUI/panelQ1.py:340
+msgid "Number of shifts"
+msgstr ""
+
+#: GUI/panelQ1.py:346
+msgid "Days of production / operation per year"
+msgstr ""
+
+#: GUI/panelQ1.py:351
+msgid "Period of holidays No. 1 - start date"
+msgstr ""
+
+#: GUI/panelQ1.py:356
+msgid "Period of holidays No. 1 - stop date"
+msgstr ""
+
+#: GUI/panelQ1.py:361
+msgid "Period of holidays No. 2 - start date"
+msgstr ""
+
+#: GUI/panelQ1.py:366
+msgid "Period of holidays No. 2 - stop date"
+msgstr ""
+
+#: GUI/panelQ1.py:371
+msgid "Period of holidays No. 3 - start date"
+msgstr ""
+
+#: GUI/panelQ1.py:376
+msgid "Period of holidays No. 3 - stop date"
+msgstr ""
+
+#: GUI/panelQ1.py:392
+msgid "Type of product"
+msgstr ""
+
+#: GUI/panelQ1.py:397
+msgid "Product code"
+msgstr ""
+
+#: GUI/panelQ1.py:403
+msgid "Quantity of product(s) per year [product-units/year]"
+msgstr ""
+
+#: GUI/panelQ1.py:407
+msgid ""
+"Measurement unit for\n"
+"product quantity"
+msgstr ""
+
+#: GUI/panelQ1.py:413
+msgid "Annual turnover per product"
+msgstr ""
+
+#: GUI/panelQ1.py:421 modules/ccheck/parameterList.py:166
+msgid "Electricity consumption per product"
+msgstr ""
+
+#: GUI/panelQ1.py:427
+msgid "Fuel consumption per product(LCV)"
+msgstr ""
+
+#: GUI/panelQ1.py:428
+msgid "Specify energy content of fuels in LCV "
+msgstr ""
+
+#: GUI/panelQ1.py:433
+msgid "Add product"
+msgstr ""
+
+#: GUI/panelQ1.py:438
+msgid "Delete product"
+msgstr ""
+
+#: GUI/panelQ1.py:582 GUI/panelQ1.py:643
+msgid "Name has to be an unique value!"
+msgstr ""
+
+#: GUI/panelQ1.py:705
+msgid "Product must be an unique value!"
+msgstr ""
+
+#: GUI/panelQ2.py:131
+msgid "Fuel consumption and cost"
+msgstr ""
+
+#: GUI/panelQ2.py:132
+msgid "Electricity consumption and cost"
+msgstr ""
+
+#: GUI/panelQ2.py:134
+msgid "Fuels list"
+msgstr ""
+
+#: GUI/panelQ2.py:138
+msgid "Fuel consumption data"
+msgstr ""
+
+#: GUI/panelQ2.py:164
+msgid "Remove from list"
+msgstr ""
+
+#: GUI/panelQ2.py:169
+msgid "Add fuel"
+msgstr ""
+
+#: GUI/panelQ2.py:176 modules/ccheck/parameterList.py:107
+msgid "Fuels used"
+msgstr ""
+
+#: GUI/panelQ2.py:182
+msgid "Annual consumption (fuel units)"
+msgstr ""
+
+#: GUI/panelQ2.py:183
+msgid ""
+"If possible, provide the monthly data in separate sheet and/or the fuel "
+"bills. Specify the energy equivalent in base of LCV (lower calorific value)"
+msgstr ""
+
+#: GUI/panelQ2.py:188
+msgid "Annual consumption (LCV)"
+msgstr ""
+
+#: GUI/panelQ2.py:194
+msgid "Fuel price(LCV)"
+msgstr ""
+
+#: GUI/panelQ2.py:195
+msgid "Specify expenditures without VAT"
+msgstr ""
+
+#: GUI/panelQ2.py:200
+msgid "Annual energy cost"
+msgstr ""
+
+#: GUI/panelQ2.py:201
+msgid "Total cost"
+msgstr ""
+
+#: GUI/panelQ2.py:260 modules/ccheck/parameterList.py:123
+msgid "Peak"
+msgstr ""
+
+#: GUI/panelQ2.py:261 modules/ccheck/parameterList.py:124
+msgid "Standard"
+msgstr ""
+
+#: GUI/panelQ2.py:262 modules/ccheck/parameterList.py:125
+msgid "Valley"
+msgstr ""
+
+#: GUI/panelQ2.py:263 modules/ccheck/parameterList.py:126
+msgid "TOTAL"
+msgstr ""
+
+#: GUI/panelQ2.py:264
+msgid "Self-generation"
+msgstr ""
+
+#: GUI/panelQ2.py:265
+msgid "Sales to grid"
+msgstr ""
+
+#: GUI/panelQ2.py:267 GUI/panelQ2.py:275
+msgid "Annual consumption [MWh]"
+msgstr ""
+
+#: GUI/panelQ2.py:268
+msgid "Contracted power [kW]"
+msgstr ""
+
+#: GUI/panelQ2.py:269
+msgid "Tariff type"
+msgstr ""
+
+#: GUI/panelQ2.py:270
+msgid "Tariff installed power [EUR/kW.month]"
+msgstr ""
+
+#: GUI/panelQ2.py:271
+msgid "Tariff on consumption [EUR/kWh]"
+msgstr ""
+
+#: GUI/panelQ2.py:272
+msgid "Annual electricity cost [EUR]"
+msgstr ""
+
+#: GUI/panelQ2.py:273
+msgid "Electric consumption -"
+msgstr ""
+
+#: GUI/panelQ2.py:274
+msgid "according type of use"
+msgstr ""
+
+#: GUI/panelQ2.py:284 modules/ccheck/parameterList.py:128
+msgid "Electricity for thermal uses"
+msgstr ""
+
+#: GUI/panelQ2.py:285 modules/ccheck/parameterList.py:129
+msgid "Electricity for non-thermal uses"
+msgstr ""
+
+#: GUI/panelQ2.py:286 modules/ccheck/parameterList.py:130
+msgid "Refrigeration"
+msgstr ""
+
+#: GUI/panelQ2.py:287 modules/ccheck/parameterList.py:132
+msgid "Air Conditioning"
+msgstr ""
+
+#: GUI/panelQ2.py:288 modules/ccheck/parameterList.py:134
+msgid "Other uses"
+msgstr ""
+
+#: GUI/panelQ2.py:289
+msgid "Motor and machines"
+msgstr ""
+
+#: GUI/panelQ2.py:290 modules/ccheck/parameterList.py:138
+msgid "Electro-chemics"
+msgstr ""
+
+#: GUI/panelQ2.py:291
+msgid "Lighting"
+msgstr ""
+
+#: GUI/panelQ2.py:644 GUI/panelQ3.py:737
+msgid "In the present version of EINSTEIN it is not allowed to modify\n"
+msgstr ""
+
+#: GUI/panelQ2.py:645
+msgid ""
+"fuel consumption in the checked state or alternative proposals. This is a "
+"RESULT of calculation\n"
+msgstr ""
+
+#: GUI/panelQ2.py:646
+msgid ""
+"Workaround for studying fuel substitution: add all fuels You want to "
+"consider already in the original state\n"
+msgstr ""
+
+#: GUI/panelQ2.py:647
+msgid "and set original consumption of these additional fuels to 0"
+msgstr ""
+
+#: GUI/panelQ3.py:118
+msgid "Process list"
+msgstr ""
+
+#: GUI/panelQ3.py:122
+msgid "Processes description"
+msgstr ""
+
+#: GUI/panelQ3.py:126 GUI/panelQ4.py:141 GUI/panelQ4.py:159 GUI/panelQ6.py:135
+#: modules/ccheck/parameterList.py:275
+msgid "Schedule"
+msgstr ""
+
+#: GUI/panelQ3.py:130
+msgid "Waste heat (heat available for recovery)"
+msgstr ""
+
+#: GUI/panelQ3.py:134
+msgid "Waste heat recovery for this process"
+msgstr ""
+
+#: GUI/panelQ3.py:139
+msgid "Data of existing heat (or cold) supply to the process"
+msgstr ""
+
+#: GUI/panelQ3.py:184
+msgid "Process short name"
+msgstr ""
+
+#: GUI/panelQ3.py:185
+msgid ""
+"Give an organizational diagram of the production process (e.g. the flux of "
+"crude milk in chease production or the the flux of car chasis in the "
+"automobile industry)"
+msgstr ""
+
+#: GUI/panelQ3.py:188
+msgid "Give a short description of the process"
+msgstr ""
+
+#: GUI/panelQ3.py:192
+msgid "Process type"
+msgstr ""
+
+#: GUI/panelQ3.py:193
+msgid ""
+"Give a brief description of the process or the unitary operation, and "
+"specify if it is continuous or batch"
+msgstr ""
+
+#: GUI/panelQ3.py:197
+msgid "Unit operation type"
+msgstr ""
+
+#: GUI/panelQ3.py:198 GUI/panelQ5.py:250
+msgid "Select from predefined list"
+msgstr ""
+
+#: GUI/panelQ3.py:202
+msgid "Product or process medium"
+msgstr ""
+
+#: GUI/panelQ3.py:203
+msgid ""
+"The medium that is in direct contact with the treated product, e.g. air for "
+"drying, lye or water for washing, etc..."
+msgstr ""
+
+#: GUI/panelQ3.py:208
+msgid "Typical (final) temperature of the  process medium during operation"
+msgstr ""
+
+#: GUI/panelQ3.py:209
+msgid ""
+"Give the temperature of the process medium and not that of the heat "
+"supplying medium."
+msgstr ""
+
+#: GUI/panelQ3.py:215
+msgid "Inlet temperature of the process medium (before heat recovery)"
+msgstr ""
+
+#: GUI/panelQ3.py:216
+msgid "Inlet temperature of the process medium before heat recovery"
+msgstr ""
+
+#: GUI/panelQ3.py:222
+msgid "Start-up temperature of process medium (after breaks)"
+msgstr ""
+
+#: GUI/panelQ3.py:223
+msgid ""
+"Temperature of the process equipment before heating up when process start-up "
+"begins"
+msgstr ""
+
+#: GUI/panelQ3.py:230
+msgid "Daily inflow of process medium"
+msgstr ""
+
+#: GUI/panelQ3.py:231
+msgid ""
+"Continuous process: Fluid flow rate times hours of circulation. Batch "
+"process with fluid renewal: volume times No. of batches."
+msgstr ""
+
+#: GUI/panelQ3.py:237
+msgid "Volume of the process medium within the equipment or storage"
+msgstr ""
+
+#: GUI/panelQ3.py:238
+msgid "e.g. volume of liquid in a bottle for cleaning"
+msgstr ""
+
+#: GUI/panelQ3.py:243 modules/ccheck/parameterList.py:58
+msgid "Power requirement of the process in operation"
+msgstr ""
+
+#: GUI/panelQ3.py:244
+msgid ""
+"Power requierment during operation at steady state (thermal losses, "
+"evapoartion, endogenous chemical recations; without heating of circulating "
+"fluid)"
+msgstr ""
+
+#: GUI/panelQ3.py:251
+msgid "Hours of process operation per day"
+msgstr ""
+
+#: GUI/panelQ3.py:252 GUI/panelQ3.py:257 GUI/panelQ3.py:263 GUI/panelQ3.py:268
+msgid ""
+"For batch processes: specify the total duration of process, e.g. 3 batches/"
+"day x 2 hrs/batch = 6 hrs. If possible, specify daily program."
+msgstr ""
+
+#: GUI/panelQ3.py:256 GUI/panelQ6.py:326
+msgid "Number of batches per day"
+msgstr ""
+
+#: GUI/panelQ3.py:262 GUI/panelQ6.py:332
+msgid "Duration of 1 batch"
+msgstr ""
+
+#: GUI/panelQ3.py:267
+msgid "Days of process operation per year"
+msgstr ""
+
+#: GUI/panelQ3.py:282
+msgid "Medium of outgoing waste heat flows"
+msgstr ""
+
+#: GUI/panelQ3.py:283
+msgid "Specify media of waste heat flows (up to 3)"
+msgstr ""
+
+#: GUI/panelQ3.py:287
+msgid "Temperature of outgoing (waste) heat flows"
+msgstr ""
+
+#: GUI/panelQ3.py:288
+msgid ""
+"Temperature of the outgoing waste heat flow (e.g. water or hot humid air at "
+"the outlet of a drying process)"
+msgstr ""
+
+#: GUI/panelQ3.py:293
+msgid "Specific enthalpy of outgoing (waste) heat flows"
+msgstr ""
+
+#: GUI/panelQ3.py:294
+msgid ""
+"Enthalpy of the outgoing waste heat flow (e.g. water or hot humid air at the "
+"outlet of a drying process)"
+msgstr ""
+
+#: GUI/panelQ3.py:299
+msgid "Final  temperature of outgoing (waste) heat flows"
+msgstr ""
+
+#: GUI/panelQ3.py:300
+msgid ""
+"Minimum temperature to which the waste heat flow can be cooled. If there is "
+"no limit specify 0"
+msgstr ""
+
+#: GUI/panelQ3.py:305
+msgid "Daily outflow of process medium"
+msgstr ""
+
+#: GUI/panelQ3.py:306
+msgid ""
+"Can be different from the incoming flow if e.g. there is evaporation or some "
+"chemical reaction."
+msgstr ""
+
+#: GUI/panelQ3.py:310
+msgid "Can heat be recovered from the outflowing medium?"
+msgstr ""
+
+#: GUI/panelQ3.py:311
+msgid ""
+"If NO, specify why: e.g. contamination with substances which can affect the "
+"heat exchanger,..."
+msgstr ""
+
+#: GUI/panelQ3.py:317
+msgid "Exists heat from heat  recovery for the process?"
+msgstr ""
+
+#: GUI/panelQ3.py:318
+msgid "If affirmative, give some brief description of the heat recovery system"
+msgstr ""
+
+#: GUI/panelQ3.py:323
+msgid "Source of waste heat"
+msgstr ""
+
+#: GUI/panelQ3.py:324
+msgid ""
+"Specify the heat source (e.g. heat lossed from process X, flue gases from  "
+"boiler Y, etc)"
+msgstr ""
+
+#: GUI/panelQ3.py:329
+msgid "Inlet temperature of the process medium  (after heat recovery)"
+msgstr ""
+
+#: GUI/panelQ3.py:330
+msgid ""
+"Inlet temperature (towards the system) of the process medium after the heat "
+"recovery"
+msgstr ""
+
+#: GUI/panelQ3.py:338 modules/ccheck/parameterList.py:74
+msgid "Medium supplying heat or cold to the process (water, steam, air)"
+msgstr ""
+
+#: GUI/panelQ3.py:339
+msgid "Medium supplying heat or cold to the process (up to 3)"
+msgstr ""
+
+#: GUI/panelQ3.py:344
+msgid "Heat or cold supply to the process from distribution line / branch No."
+msgstr ""
+
+#: GUI/panelQ3.py:345
+msgid ""
+"Specify the distribution(supply) line of heat/cold feeding the process, "
+"using the nomenclature of the hydraulic scheme"
+msgstr ""
+
+#: GUI/panelQ3.py:350
+msgid ""
+"Temperature of the incoming medium supplying heat or cold to the process/"
+"heat exchanger"
+msgstr ""
+
+#: GUI/panelQ3.py:351
+msgid "Temperature of the supplying medium at heat exchangers inlet"
+msgstr ""
+
+#: GUI/panelQ3.py:357
+msgid "Flow rate of the heat supply medium (close to process)"
+msgstr ""
+
+#: GUI/panelQ3.py:358
+msgid "Mass flow of the heat/cold supplyind medium"
+msgstr ""
+
+#: GUI/panelQ3.py:363 modules/ccheck/parameterList.py:78
+msgid "Total yearly process heat consumption"
+msgstr ""
+
+#: GUI/panelQ3.py:364
+msgid "Only for the process"
+msgstr ""
+
+#: GUI/panelQ3.py:367
+msgid "Add process"
+msgstr ""
+
+#: GUI/panelQ3.py:372
+msgid "Delete process"
+msgstr ""
+
+#: GUI/panelQ3.py:470
+msgid "Process data"
+msgstr ""
+
+#: GUI/panelQ3.py:471
+msgid "Heat supply and waste heat"
+msgstr ""
+
+#: GUI/panelQ3.py:738
+msgid ""
+"processes in the checked state or alternative proposals. Go to the original "
+"data view\n"
+msgstr ""
+
+#: GUI/panelQ3.py:739
+msgid ""
+"Workaround for studying process optimisation: create a copy of your project\n"
+"and modify on this copy in original state"
+msgstr ""
+
+#: GUI/panelQ4.py:132 GUI/panelQ4.py:143
+msgid "Descriptive data"
+msgstr ""
+
+#: GUI/panelQ4.py:135 GUI/panelQ4.py:151
+msgid "Technical data"
+msgstr ""
+
+#: GUI/panelQ4.py:138 GUI/panelQ4.py:155 GUI/panelQ6.py:120
+msgid "Heat source / sink"
+msgstr ""
+
+#: GUI/panelQ4.py:147
+msgid "Equipment list"
+msgstr ""
+
+#: GUI/panelQ4.py:192 modules/ccheck/parameterList.py:202
+msgid "Short name of equipment"
+msgstr ""
+
+#: GUI/panelQ4.py:193
+msgid "Give some brief name of the equipments to identify them in the reports"
+msgstr ""
+
+#: GUI/panelQ4.py:197
+msgid "Attach the technical data if available"
+msgstr ""
+
+#: GUI/panelQ4.py:201
+msgid ""
+"Year of  manufacturing\n"
+"or/and installation?"
+msgstr ""
+
+#: GUI/panelQ4.py:202
+msgid "Year of manufacturing or installation"
+msgstr ""
+
+#: GUI/panelQ4.py:206
+msgid "Model according manufacturer nomenclature"
+msgstr ""
+
+#: GUI/panelQ4.py:213
+msgid "e.g. boiler / burner / chiller / compressor / CHP motor"
+msgstr ""
+
+#: GUI/panelQ4.py:217 modules/ccheck/parameterList.py:207
+msgid "Number of units of the same type"
+msgstr ""
+
+#: GUI/panelQ4.py:218
+msgid "Specify how many units of this type exist"
+msgstr ""
+
+#: GUI/panelQ4.py:230 modules/ccheck/parameterList.py:209
+msgid "Nominal power (heat or cold, output)"
+msgstr ""
+
+#: GUI/panelQ4.py:231
+msgid "Power at manufacturer nominal conditions"
+msgstr ""
+
+#: GUI/panelQ4.py:236
+msgid "Select fuel type from predefined list"
+msgstr ""
+
+#: GUI/panelQ4.py:241 modules/ccheck/parameterList.py:210
+msgid "Fuel consumption (nominal)"
+msgstr ""
+
+#: GUI/panelQ4.py:242
+msgid "Specify the units below"
+msgstr ""
+
+#: GUI/panelQ4.py:247 modules/ccheck/parameterList.py:212
+msgid "Electrical power input"
+msgstr ""
+
+#: GUI/panelQ4.py:248
+msgid ""
+"Electrical power, incl. auxiliary components, such as water pumps, "
+"control,..."
+msgstr ""
+
+#: GUI/panelQ4.py:253 modules/ccheck/parameterList.py:213
+msgid "Mean overall thermal conversion efficiency"
+msgstr ""
+
+#: GUI/panelQ4.py:254
+msgid "Specify the efficiency of boiler or EER(COP) for cold generation"
+msgstr ""
+
+#: GUI/panelQ4.py:259 modules/ccheck/parameterList.py:216
+msgid "Mean utilisation factor (full capacity = 100%)"
+msgstr ""
+
+#: GUI/panelQ4.py:260
+msgid ""
+"Specify the mean supplied power of the boiler/cooler/etc. with respect to "
+"its nominal power"
+msgstr ""
+
+#: GUI/panelQ4.py:266
+msgid ""
+"Temperature of exhaust gas at standard operation conditions (boilers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:267 GUI/panelQ4.py:272
+msgid "Only for boilers and CHP"
+msgstr ""
+
+#: GUI/panelQ4.py:271
+msgid "Excess air ratio (boilers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:277
+msgid "Electricity production (CHP only)"
+msgstr ""
+
+#: GUI/panelQ4.py:278 GUI/panelQ4.py:283
+msgid "Only for CHP"
+msgstr ""
+
+#: GUI/panelQ4.py:282
+msgid "Electrical conversion efficiency (CHP only)"
+msgstr ""
+
+#: GUI/panelQ4.py:287
+msgid "Refrigerant (HP or Chiller only)"
+msgstr ""
+
+#: GUI/panelQ4.py:288
+msgid "Refrigerant or working fluid (HP or Chiller only)"
+msgstr ""
+
+#: GUI/panelQ4.py:296
+msgid ""
+"Heat or cold supplied to the distribution line / branch\n"
+"(piping or duct) no."
+msgstr ""
+
+#: GUI/panelQ4.py:297
+msgid "Specify the pipe(s) or duct(s) receiving heat from the equipment\n"
+msgstr ""
+
+#: GUI/panelQ4.py:298
+msgid ""
+"Pipes and ducts are defined in the panel 'distribution of heat and cold'"
+msgstr ""
+
+#: GUI/panelQ4.py:302 modules/ccheck/parameterList.py:225
+msgid "Low temperature heat source"
+msgstr ""
+
+#: GUI/panelQ4.py:303
+msgid ""
+"If waste heat is used, indicate the process or equipment from which waste "
+"heat originates\n"
+msgstr ""
+
+#: GUI/panelQ4.py:304
+msgid ""
+"(e.g.feed-water or combustion air pre-heating, heat source for heat pumps, "
+"etc.)"
+msgstr ""
+
+#: GUI/panelQ4.py:310
+msgid "Temperature of low temp. heat source"
+msgstr ""
+
+#: GUI/panelQ4.py:311
+msgid "Temperature of the medium entering the evaporator"
+msgstr ""
+
+#: GUI/panelQ4.py:317
+msgid "Thermal power input high temp. (thermal HP and chillers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:318
+msgid "Power applied to the generator of a thermal heat pump or chiller"
+msgstr ""
+
+#: GUI/panelQ4.py:324
+msgid "Driving temperature (thermal HP and chillers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:325
+msgid "Temperature of heat supply fluid entering the generator"
+msgstr ""
+
+#: GUI/panelQ4.py:330
+msgid "High temperature heat source (thermal HP and chillers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:331
+msgid ""
+"Indicate if the circuit of the heat supply to generator is closed or opened "
+"(waste heat released to ambient)"
+msgstr ""
+
+#: GUI/panelQ4.py:336
+msgid "Destination of waste heat (chillers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:337
+msgid "If applies, specify heat exchanger where waste heat is used"
+msgstr ""
+
+#: GUI/panelQ4.py:342
+msgid "Temperature of re-cooling (chillers only)"
+msgstr ""
+
+#: GUI/panelQ4.py:343
+msgid "Outlet temperature of cooling water or hot air stream"
+msgstr ""
+
+#: GUI/panelQ4.py:354 modules/ccheck/parameterList.py:217
+msgid "Hours of operation per day"
+msgstr ""
+
+#: GUI/panelQ4.py:355 GUI/panelQ4.py:360
+msgid "Specify representative mean values"
+msgstr ""
+
+#: GUI/panelQ4.py:359 GUI/panelQ6.py:337 modules/ccheck/parameterList.py:218
+msgid "Days of operation per year"
+msgstr ""
+
+#: GUI/panelQ4.py:365
+msgid "Delete equipment"
+msgstr ""
+
+#: GUI/panelQ4.py:370
+msgid "Add equipment"
+msgstr ""
+
+#: GUI/panelQ5.py:111
+msgid "Distribution list"
+msgstr ""
+
+#: GUI/panelQ5.py:112
+msgid "Distribution of heat/cold"
+msgstr ""
+
+#: GUI/panelQ5.py:114
+msgid "Temperatures, pressures and flow rates"
+msgstr ""
+
+#: GUI/panelQ5.py:115
+msgid "Piping specifications"
+msgstr ""
+
+#: GUI/panelQ5.py:153
+msgid "Name of the branch / distribution system"
+msgstr ""
+
+#: GUI/panelQ5.py:154
+msgid ""
+"Give some brief name or number of the distribution tube consistent with the "
+"hydraulic scheme"
+msgstr ""
+
+#: GUI/panelQ5.py:159
+msgid "Heat or cold distribution medium"
+msgstr ""
+
+#: GUI/panelQ5.py:160
+msgid "e.g. air for drying process, vapour, hot water, refrigerant,..."
+msgstr ""
+
+#: GUI/panelQ5.py:170
+msgid "Nominal production or circulation rate (specify units)"
+msgstr ""
+
+#: GUI/panelQ5.py:177
+msgid "Outlet temperature (to distribution)"
+msgstr ""
+
+#: GUI/panelQ5.py:178
+msgid "Temperature of supply medium from equipment"
+msgstr ""
+
+#: GUI/panelQ5.py:183
+msgid "Return temperature"
+msgstr ""
+
+#: GUI/panelQ5.py:184
+msgid ""
+"Temperature of return of the supply medium from distribution (e.g. return "
+"temperature of condensate in a vapour system)"
+msgstr ""
+
+#: GUI/panelQ5.py:189
+msgid "Rate of recirculation"
+msgstr ""
+
+#: GUI/panelQ5.py:190
+msgid ""
+"Specify the rate of recirculation of the heat/cold supply medium (100% = "
+"totally closed circuit)"
+msgstr ""
+
+#: GUI/panelQ5.py:196
+msgid "Temperature of feed-up in open circuit"
+msgstr ""
+
+#: GUI/panelQ5.py:197
+msgid ""
+"Temperature of medium of distribution of heat/cold entering in open circuit "
+"(e.g. temperature of water entering from network...)"
+msgstr ""
+
+#: GUI/panelQ5.py:202
+msgid "Pressure of heat or cold distribution medium"
+msgstr ""
+
+#: GUI/panelQ5.py:203
+msgid "Working pressure for the heat/cold supply medium"
+msgstr ""
+
+#: GUI/panelQ5.py:210
+msgid "Total length of distribution piping or ducts (one way)"
+msgstr ""
+
+#: GUI/panelQ5.py:211
+msgid "Only distance one way"
+msgstr ""
+
+#: GUI/panelQ5.py:216
+msgid "Total coefficient of heat losses for piping or ducts"
+msgstr ""
+
+#: GUI/panelQ5.py:217
+msgid "For the whole duct: go and return"
+msgstr ""
+
+#: GUI/panelQ5.py:222
+msgid "Mean pipe diameter"
+msgstr ""
+
+#: GUI/panelQ5.py:228
+msgid "Insulation thickness"
+msgstr ""
+
+#: GUI/panelQ5.py:238
+msgid "Number of storage units"
+msgstr ""
+
+#: GUI/panelQ5.py:239
+msgid "Specify the number of storage units of the same type"
+msgstr ""
+
+#: GUI/panelQ5.py:244
+msgid "Volume of one storage unit"
+msgstr ""
+
+#: GUI/panelQ5.py:245
+msgid "Volume of the storage medium of a single single storage unit"
+msgstr ""
+
+#: GUI/panelQ5.py:249
+msgid "Type of heat storage"
+msgstr ""
+
+#: GUI/panelQ5.py:255
+msgid "Pressure of heat storage medium"
+msgstr ""
+
+#: GUI/panelQ5.py:256
+msgid ""
+"Pressure of the process medium entering the storage unit if different from "
+"storage medium"
+msgstr ""
+
+#: GUI/panelQ5.py:261
+msgid "Maximum temperature of the storage"
+msgstr ""
+
+#: GUI/panelQ5.py:262
+msgid "The maximum temperature to which storage unit can be operated"
+msgstr ""
+
+#: GUI/panelQ5.py:273
+msgid "Delete distribution"
+msgstr ""
+
+#: GUI/panelQ5.py:278
+msgid "Add distribution"
+msgstr ""
+
+#: GUI/panelQ5.py:337
+msgid "Distribution"
+msgstr ""
+
+#: GUI/panelQ5.py:338
+msgid "Storage"
+msgstr ""
+
+#: GUI/panelQ5.py:414
+msgid "PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"
+msgstr ""
+
+#: GUI/panelQ6.py:106
+msgid "Heat recovery from thermal equipment"
+msgstr ""
+
+#: GUI/panelQ6.py:109
+msgid "Heat recovery from electrical equipment"
+msgstr ""
+
+#: GUI/panelQ6.py:111
+msgid "Heat exchangers list"
+msgstr ""
+
+#: GUI/panelQ6.py:115
+msgid "Heat exchanger data"
+msgstr ""
+
+#: GUI/panelQ6.py:125
+msgid "Electrical equipment list"
+msgstr ""
+
+#: GUI/panelQ6.py:130
+msgid "Equipment data"
+msgstr ""
+
+#: GUI/panelQ6.py:176 modules/ccheck/parameterList.py:254
+msgid "Short name of heat exchanger"
+msgstr ""
+
+#: GUI/panelQ6.py:177 GUI/panelQ6.py:275
+msgid "Give a short name of the equipment"
+msgstr ""
+
+#: GUI/panelQ6.py:181 modules/ccheck/parameterList.py:255
+msgid "Heat exchanger type"
+msgstr ""
+
+#: GUI/panelQ6.py:182
+msgid ""
+"Specify the type of heat exchanger, e.g. shell-and-tube, plate, fin-and-"
+"tube, ..."
+msgstr ""
+
+#: GUI/panelQ6.py:188 modules/ccheck/parameterList.py:256
+msgid "Heat transfer rate"
+msgstr ""
+
+#: GUI/panelQ6.py:189
+msgid "Heat transfer rate for the specific working conditions"
+msgstr ""
+
+#: GUI/panelQ6.py:194 modules/ccheck/parameterList.py:257
+msgid "Log. Mean Temperature Diff. (LMTD)"
+msgstr ""
+
+#: GUI/panelQ6.py:195
+msgid "Between the fluids in the heat exchanger"
+msgstr ""
+
+#: GUI/panelQ6.py:200 modules/ccheck/parameterList.py:258
+msgid "Total heat transfered"
+msgstr ""
+
+#: GUI/panelQ6.py:201
+msgid "Total heat transferred per year"
+msgstr ""
+
+#: GUI/panelQ6.py:207
+msgid ""
+"Heat source (process [+outflow no.],\n"
+"equipment, ...)"
+msgstr ""
+
+#: GUI/panelQ6.py:208
+msgid ""
+"Indicate: Process, Equipment, Distribution line, Compressor, Electric motor, "
+"together with its number"
+msgstr ""
+
+#: GUI/panelQ6.py:213 modules/ccheck/parameterList.py:260
+msgid "Inlet temperature (source)"
+msgstr ""
+
+#: GUI/panelQ6.py:214
+msgid "Inlet temperature of the hot fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:219 modules/ccheck/parameterList.py:261
+msgid "Inlet specific enthalpy (source)"
+msgstr ""
+
+#: GUI/panelQ6.py:220
+msgid "Inlet enthalpy of the hot fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:225 modules/ccheck/parameterList.py:262
+msgid "Outlet temperature (source)"
+msgstr ""
+
+#: GUI/panelQ6.py:226
+msgid "Outlet temperature of hot fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:231 modules/ccheck/parameterList.py:263
+msgid "Outlet specific enthalpy (source)"
+msgstr ""
+
+#: GUI/panelQ6.py:232
+msgid "Outlet enthalpy of the hot fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:237 modules/ccheck/parameterList.py:264
+msgid "Heat sink (process, pipe/duct)"
+msgstr ""
+
+#: GUI/panelQ6.py:238
+msgid ""
+"Indicate: Process or Distribution line and number. If heat exchange is via "
+"storage, it should be defined in the distribution line"
+msgstr ""
+
+#: GUI/panelQ6.py:244 modules/ccheck/parameterList.py:265
+msgid "Inlet temperature (sink)"
+msgstr ""
+
+#: GUI/panelQ6.py:245
+msgid "Inlet temperature of the cold fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:250 modules/ccheck/parameterList.py:266
+msgid "Outlet temperature (sink)"
+msgstr ""
+
+#: GUI/panelQ6.py:251
+msgid "Inlet enthalpy of the cold fluid"
+msgstr ""
+
+#: GUI/panelQ6.py:274 modules/ccheck/parameterList.py:267
+msgid "Short name of electrical equipment"
+msgstr ""
+
+#: GUI/panelQ6.py:279 modules/ccheck/parameterList.py:268
+msgid "Equipment type"
+msgstr ""
+
+#: GUI/panelQ6.py:280
+msgid "specify type of equipment, e.g. compressor, electric motor,..."
+msgstr ""
+
+#: GUI/panelQ6.py:284 modules/ccheck/parameterList.py:269
+msgid "Waste heat type"
+msgstr ""
+
+#: GUI/panelQ6.py:285
+msgid ""
+"Specify type of waste heat (e.g. Recooling of compressed air, cooling water "
+"of motor/compressor, ...)"
+msgstr ""
+
+#: GUI/panelQ6.py:290 modules/ccheck/parameterList.py:270
+msgid "Available waste heat"
+msgstr ""
+
+#: GUI/panelQ6.py:291
+msgid "Estimated quantity"
+msgstr ""
+
+#: GUI/panelQ6.py:295 modules/ccheck/parameterList.py:271
+msgid "Medium"
+msgstr ""
+
+#: GUI/panelQ6.py:296
+msgid "Waste heat carrying medium (fluid)"
+msgstr ""
+
+#: GUI/panelQ6.py:301 modules/ccheck/parameterList.py:272
+msgid "Flow rate"
+msgstr ""
+
+#: GUI/panelQ6.py:302
+msgid "Specify the flow rate of the waste heat carrying medium"
+msgstr ""
+
+#: GUI/panelQ6.py:307
+msgid "Waste heat temperature"
+msgstr ""
+
+#: GUI/panelQ6.py:308
+msgid "Specify the temperature of the waste heat medium at the outlet"
+msgstr ""
+
+#: GUI/panelQ6.py:313
+msgid "Present use of waste heat"
+msgstr ""
+
+#: GUI/panelQ6.py:314
+msgid ""
+"If yes, specify distribution pipe / duct or heat exchanger where waste heat "
+"is used at present"
+msgstr ""
+
+#: GUI/panelQ6.py:321
+msgid "Hours of  operation per day"
+msgstr ""
+
+#: GUI/panelQ7.py:110
+msgid "Solar energy surfaces"
+msgstr ""
+
+#: GUI/panelQ7.py:114
+msgid "Surface  data"
+msgstr ""
+
+#: GUI/panelQ7.py:183
+msgid "Short name of the available area"
+msgstr ""
+
+#: GUI/panelQ7.py:184
+msgid ""
+"Define a short name for each surface area available for installation in "
+"order to clearly identify them"
+msgstr ""
+
+#: GUI/panelQ7.py:188
+msgid "Available area"
+msgstr ""
+
+#: GUI/panelQ7.py:189
+msgid ""
+"If there are different surfaces available, give the measure of each surface "
+"area"
+msgstr ""
+
+#: GUI/panelQ7.py:194
+msgid "Inclination of the area"
+msgstr ""
+
+#: GUI/panelQ7.py:195
+msgid "Positioning of the area (inclination in degrees)"
+msgstr ""
+
+#: GUI/panelQ7.py:200
+msgid ""
+"Orientation of the roof, ground,\n"
+"wall area (to south)"
+msgstr ""
+
+#: GUI/panelQ7.py:201
+msgid ""
+"Give the surface  inclination with respect to the  horizontal ( i.e. tilt "
+"angle, in degrees only)"
+msgstr ""
+
+#: GUI/panelQ7.py:205
+msgid "Shading problems?"
+msgstr ""
+
+#: GUI/panelQ7.py:206
+msgid ""
+"Consider shadows due to other buildings, trees, obstacles all over the year, "
+"in winter time or in early morning/late afternoon"
+msgstr ""
+
+#: GUI/panelQ7.py:211
+msgid ""
+"Distance between the roof, ground, wall area(s) and the technical room or "
+"process"
+msgstr ""
+
+#: GUI/panelQ7.py:212
+msgid ""
+"Estimate the piping length (single way) from  the roof, ground,wall area to "
+"the technical room or to the process"
+msgstr ""
+
+#: GUI/panelQ7.py:216
+msgid "Type of roof"
+msgstr ""
+
+#: GUI/panelQ7.py:217
+msgid "Specify the type of roof, e.g. composite sandwich panels, etc..."
+msgstr ""
+
+#: GUI/panelQ7.py:222
+msgid "Static load capacity of the roof"
+msgstr ""
+
+#: GUI/panelQ7.py:223
+msgid "The additional weight of a solar collector field is about 25-30 kg/m²"
+msgstr ""
+
+#: GUI/panelQ7.py:227
+msgid ""
+"Is a plant/drawing of building(s)\n"
+"and surface(s) available?"
+msgstr ""
+
+#: GUI/panelQ7.py:228
+msgid "Enclose the plant of the building(s) and/or a drawing of the surface(s)"
+msgstr ""
+
+#: GUI/panelQ7.py:233
+msgid "Geographic latitude"
+msgstr ""
+
+#: GUI/panelQ7.py:234
+msgid "Insert the latitude in degree only. E.g.  Rome's latitude is 41,90°"
+msgstr ""
+
+#: GUI/panelQ7.py:237
+msgid "Solar radiation on horizontal"
+msgstr ""
+
+#: GUI/panelQ7.py:238
+msgid "Annual total solar radiation on horizontal"
+msgstr ""
+
+#: GUI/panelQ7.py:241 GUI/panelQ7.py:242
+msgid "Yearly average ambient temperature"
+msgstr ""
+
+#: GUI/panelQ7.py:258 modules/ccheck/parameterList.py:345
+msgid "Type of biomass available from processes"
+msgstr ""
+
+#: GUI/panelQ7.py:259 GUI/panelQ7.py:264 GUI/panelQ7.py:269 GUI/panelQ7.py:316
+#: GUI/panelQ7.py:321
+msgid ""
+"Specify if the availability is continuous or during some specific season of "
+"the year"
+msgstr ""
+
+#: GUI/panelQ7.py:263 GUI/panelQ7.py:315
+msgid "Start of period of year the biomass is available"
+msgstr ""
+
+#: GUI/panelQ7.py:268 GUI/panelQ7.py:320
+msgid "Stop of period of year the biomass is available"
+msgstr ""
+
+#: GUI/panelQ7.py:275 GUI/panelQ7.py:326 modules/ccheck/parameterList.py:348
+msgid "Number of days biomass is produced"
+msgstr ""
+
+#: GUI/panelQ7.py:281 modules/ccheck/parameterList.py:349
+msgid "Daily quantity of biomass"
+msgstr ""
+
+#: GUI/panelQ7.py:288 modules/ccheck/parameterList.py:350
+msgid "Space availability to stock biomass?"
+msgstr ""
+
+#: GUI/panelQ7.py:289
+msgid "Specify the volume"
+msgstr ""
+
+#: GUI/panelQ7.py:294 modules/ccheck/parameterList.py:351
+msgid "LCV biomass"
+msgstr ""
+
+#: GUI/panelQ7.py:300 modules/ccheck/parameterList.py:352
+msgid "Humidity"
+msgstr ""
+
+#: GUI/panelQ7.py:301
+msgid "Specify the percentage of humidity in biomass"
+msgstr ""
+
+#: GUI/panelQ7.py:304 modules/ccheck/parameterList.py:353
+msgid "Type of biomass available"
+msgstr ""
+
+#: GUI/panelQ7.py:310 modules/ccheck/parameterList.py:354
+msgid "Unit price of biomass"
+msgstr ""
+
+#: GUI/panelQ7.py:329
+msgid "Add surface"
+msgstr ""
+
+#: GUI/panelQ7.py:334
+msgid "Delete surface"
+msgstr ""
+
+#: GUI/panelQ8.py:111
+msgid "Occupation"
+msgstr ""
+
+#: GUI/panelQ8.py:113
+msgid "Building list"
+msgstr ""
+
+#: GUI/panelQ8.py:126
+msgid "Period of occupation"
+msgstr ""
+
+#: GUI/panelQ8.py:161 modules/ccheck/parameterList.py:309
+msgid "Building short name"
+msgstr ""
+
+#: GUI/panelQ8.py:162
+msgid "Give some brief name of the buildings to identify them in the reports"
+msgstr ""
+
+#: GUI/panelQ8.py:167 modules/ccheck/parameterList.py:310
+msgid "Constructed surface"
+msgstr ""
+
+#: GUI/panelQ8.py:168
+msgid "Surface limited by building's perimeter multiplied by number of floors"
+msgstr ""
+
+#: GUI/panelQ8.py:172 modules/ccheck/parameterList.py:311
+msgid "Useful surface"
+msgstr ""
+
+#: GUI/panelQ8.py:173
+msgid "Total useful surface of building (excluding walls)"
+msgstr ""
+
+#: GUI/panelQ8.py:176 modules/ccheck/parameterList.py:312
+msgid "Use of the building"
+msgstr ""
+
+#: GUI/panelQ8.py:177
+msgid "Specify use, e.g. offices, production, storage,..."
+msgstr ""
+
+#: GUI/panelQ8.py:184 modules/ccheck/parameterList.py:314
+msgid "Maximum heating power"
+msgstr ""
+
+#: GUI/panelQ8.py:185
+msgid ""
+"Maximum heating power (without including the security coefficient of the "
+"equipment)"
+msgstr ""
+
+#: GUI/panelQ8.py:189 modules/ccheck/parameterList.py:315
+msgid "Maximum cooling power"
+msgstr ""
+
+#: GUI/panelQ8.py:194 modules/ccheck/parameterList.py:316
+msgid "Annual heating demand"
+msgstr ""
+
+#: GUI/panelQ8.py:195
+msgid ""
+"Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate "
+"table (if available)"
+msgstr ""
+
+#: GUI/panelQ8.py:199 modules/ccheck/parameterList.py:317
+msgid "Annual demand of air conditioning"
+msgstr ""
+
+#: GUI/panelQ8.py:204 modules/ccheck/parameterList.py:318
+msgid "Daily consumption of  DHW"
+msgstr ""
+
+#: GUI/panelQ8.py:205
+msgid "Only consumption of hot water that is not included yet in 'Processes'"
+msgstr ""
+
+#: GUI/panelQ8.py:217 modules/ccheck/parameterList.py:319
+msgid "Hours of occupation"
+msgstr ""
+
+#: GUI/panelQ8.py:218
+msgid ""
+"Hours of occupation of the building, during which heating and air "
+"conditionning is active"
+msgstr ""
+
+#: GUI/panelQ8.py:222 modules/ccheck/parameterList.py:320
+msgid "Days of use per year"
+msgstr ""
+
+#: GUI/panelQ8.py:226
+msgid "Start holiday period 1"
+msgstr ""
+
+#: GUI/panelQ8.py:227 GUI/panelQ8.py:231 GUI/panelQ8.py:235 GUI/panelQ8.py:239
+#: GUI/panelQ8.py:243 GUI/panelQ8.py:247
+msgid "Period of year that the building is not used"
+msgstr ""
+
+#: GUI/panelQ8.py:230
+msgid "Stop holiday period 1"
+msgstr ""
+
+#: GUI/panelQ8.py:234
+msgid "Start holiday period 2"
+msgstr ""
+
+#: GUI/panelQ8.py:238
+msgid "Stop holiday period 2"
+msgstr ""
+
+#: GUI/panelQ8.py:242
+msgid "Start holiday period 3"
+msgstr ""
+
+#: GUI/panelQ8.py:246
+msgid "Stop holiday period 3"
+msgstr ""
+
+#: GUI/panelQ8.py:251
+msgid "Start of heating period"
+msgstr ""
+
+#: GUI/panelQ8.py:255
+msgid "Stop of heating period"
+msgstr ""
+
+#: GUI/panelQ8.py:260
+msgid ""
+"Start of air\n"
+"conditioning period"
+msgstr ""
+
+#: GUI/panelQ8.py:264
+msgid ""
+"Stop of air\n"
+"conditioning period"
+msgstr ""
+
+#: GUI/panelQ8.py:270
+msgid "Delete building"
+msgstr ""
+
+#: GUI/panelQ8.py:275
+msgid "Add building"
+msgstr ""
+
+#: GUI/panelQ8.py:484
+msgid ""
+"You can fill in data if you are happy with this, but building H&C demand is "
+"not yet considered in this version of EINSTEIN"
+msgstr ""
+
+#: GUI/panelQ9.py:108
+msgid "Parameters and management"
+msgstr ""
+
+#: GUI/panelQ9.py:111
+msgid "Operation and maintenance"
+msgstr ""
+
+#: GUI/panelQ9.py:115
+msgid "Management of energetic services"
+msgstr ""
+
+#: GUI/panelQ9.py:119
+msgid ""
+"Parameters used in the economic and comparative analysis of the possible "
+"alternatives"
+msgstr ""
+
+#: GUI/panelQ9.py:123
+msgid "Yearly operation and maintenance costs"
+msgstr ""
+
+#: GUI/panelQ9.py:129
+msgid ""
+"Public funding for energy\n"
+"saving measures"
+msgstr ""
+
+#: GUI/panelQ9.py:130 modules/ccheck/parameterList.py:363
+msgid "Type (credit, subvention)"
+msgstr ""
+
+#: GUI/panelQ9.py:133
+msgid ""
+"Total costs\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelQ9.py:134
+msgid ""
+"Utilities and\n"
+"operating materials\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelQ9.py:135
+msgid ""
+"Labour costs\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelQ9.py:136
+msgid ""
+"External costs\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelQ9.py:137
+msgid ""
+"Regulatory compliance,\n"
+"insurance and\n"
+"future liability costs\n"
+"[EUR]"
+msgstr ""
+
+#: GUI/panelQ9.py:170 modules/ccheck/parameterList.py:358
+#: modules/ccheck/parameterList.py:398
+msgid "General inflation rate"
+msgstr ""
+
+#: GUI/panelQ9.py:171 GUI/panelQ9.py:176 GUI/panelQ9.py:181
+msgid ""
+"Specify the rate of prices variation estimated for the useful life of the "
+"installations (e.g. in the next 15-20 years)"
+msgstr ""
+
+#: GUI/panelQ9.py:175 modules/ccheck/parameterList.py:359
+msgid "Rate of increment of energy prices"
+msgstr ""
+
+#: GUI/panelQ9.py:180 modules/ccheck/parameterList.py:360
+msgid "Nominal rate of interest for external financing of installations"
+msgstr ""
+
+#: GUI/panelQ9.py:185 modules/ccheck/parameterList.py:361
+msgid "Percentage of external financing for installations"
+msgstr ""
+
+#: GUI/panelQ9.py:186
+msgid "Percentage of the external financing for the inversions"
+msgstr ""
+
+#: GUI/panelQ9.py:190 GUI/panelTCA.py:72
+msgid "Company specific discount rate"
+msgstr ""
+
+#: GUI/panelQ9.py:194
+msgid "Time for economic amortization of installations"
+msgstr ""
+
+#: GUI/panelQ9.py:195
+msgid "Amortization time"
+msgstr ""
+
+#: GUI/panelQ9.py:214
+msgid "An energy management system is already implemented"
+msgstr ""
+
+#: GUI/panelQ9.py:217
+msgid "The energy management is externalized"
+msgstr ""
+
+#: GUI/panelQ9.py:230
+msgid "General maintenance"
+msgstr ""
+
+#: GUI/panelQ9.py:244
+msgid "Machines and equipment for processes"
+msgstr ""
+
+#: GUI/panelQ9.py:251
+msgid "Generation and distribution of heat and cold"
+msgstr ""
+
+#: GUI/panelReport.py:107
+msgid "Select report"
+msgstr ""
+
+#: GUI/panelReport.py:129
+msgid "Choose a master report file"
+msgstr ""
+
+#: GUI/panelReport.py:166
+#, python-format
+msgid "Error creating report %s. You have probably another version opened:%s"
+msgstr ""
+
+#: GUI/panelReport.py:191
+msgid "Report generation is finished\n"
+msgstr ""
+
+#: GUI/panelST.py:199
+msgid "Collector model"
+msgstr ""
+
+#: GUI/panelST.py:200
+msgid "Collector type"
+msgstr ""
+
+#: GUI/panelST.py:201
+msgid "c0"
+msgstr ""
+
+#: GUI/panelST.py:202
+msgid "c1"
+msgstr ""
+
+#: GUI/panelST.py:203
+msgid "c2"
+msgstr ""
+
+#: GUI/panelST.py:204
+msgid ""
+"K(50º)\n"
+"(longitudinal)"
+msgstr ""
+
+#: GUI/panelST.py:205
+msgid ""
+"K(50º)\n"
+"(tranversal)"
+msgstr ""
+
+#: GUI/panelST.py:234
+msgid "Temperature dependent heat demand with and w/o solar system"
+msgstr ""
+
+#: GUI/panelST.py:248
+msgid "Solar collector"
+msgstr ""
+
+#: GUI/panelST.py:276
+msgid "choose solar collector"
+msgstr ""
+
+#: GUI/panelST.py:286
+msgid "Lay-out of solar thermal system"
+msgstr ""
+
+#: GUI/panelST.py:293
+msgid "Installed capacity [kW]"
+msgstr ""
+
+#: GUI/panelST.py:306
+msgid "Efficiency of heat storage and distribution [-]"
+msgstr ""
+
+#: GUI/panelST.py:319
+msgid "Solar buffer storage volume [m3]"
+msgstr ""
+
+#: GUI/panelST.py:346
+msgid "Target solar fraction [%]"
+msgstr ""
+
+#: GUI/panelST.py:365
+msgid "Solar collector type"
+msgstr ""
+
+#: GUI/panelST.py:379
+msgid "Minimum annual energy yield [kWh/kW.a]"
+msgstr ""
+
+#: GUI/panelST.py:397
+msgid "Gross surface area suitable for installation [m2]"
+msgstr ""
+
+#: GUI/panelST.py:406
+msgid "Maximum possible solar thermal capacity [kW]"
+msgstr ""
+
+#: GUI/panelST.py:415
+msgid "Solar fraction (up to 200°C) [%]"
+msgstr ""
+
+#: GUI/panelST.py:424
+msgid "Annual energy yield [kWh/kW.a]"
+msgstr ""
+
+#: GUI/panelST.py:433
+msgid "Average system efficiency [%]"
+msgstr ""
+
+#: GUI/panelST.py:442
+msgid "Average operating temperature (coll.) [°C]"
+msgstr ""
+
+#: GUI/panelST.py:524
+msgid "--any--"
+msgstr ""
+
+#: GUI/panelST.py:524
+msgid "--preselected collector--"
+msgstr ""
+
+#: GUI/panelST.py:583
+msgid "Select solar collector"
+msgstr ""
+
+#: GUI/panelST.py:609
+msgid "PanelST (OnGridLeftDclick) - OK"
+msgstr ""
+
+#: GUI/panelST.py:628
+msgid "do you really want to eliminate the solar system ?"
+msgstr ""
+
+#: GUI/panelTCA.py:63
+msgid "General Economic Data"
+msgstr ""
+
+#: GUI/panelTCA.py:67
+msgid "Nominal interest rate of external financing"
+msgstr ""
+
+#: GUI/panelTCA.py:91
+msgid ""
+"This timeframe will be applied to each equipment of all proposals\n"
+"If you think there would be some maintainance or re-investment\n"
+"caused by this time frame, please fill in the Contingencies"
+msgstr ""
+
+#: GUI/panelTCA.py:98
+msgid "Development of energy prices"
+msgstr ""
+
+#: GUI/panelTCA.py:103
+msgid "Time frame for economic analysis"
+msgstr ""
+
+#: GUI/panelTCA.py:131
+#, python-format
+msgid "% of the current energy price (including Grid fee, excluding VAT)"
+msgstr ""
+
+#: GUI/panelTCA.py:136
+msgid "years"
+msgstr ""
+
+#: GUI/panelTCA.py:140
+msgid "Results"
+msgstr ""
+
+#: GUI/panelTCA.py:144
+msgid "Reset TCA data"
+msgstr ""
+
+#: GUI/panelTCA.py:150
+msgid "Go through TCA data"
+msgstr ""
+
+#: GUI/panelTCA.py:196
+msgid "Values"
+msgstr ""
+
+#: GUI/panelTCA.py:200
+msgid "Diagram"
+msgstr ""
+
+#: GUI/panelTCA.py:208
+msgid "TCA"
+msgstr ""
+
+#: GUI/panelTCA.py:231
+msgid "Nominal Interest rate: value between 0 and 100 expected."
+msgstr ""
+
+#: GUI/panelTCA.py:241
+msgid "Company specific discount rate: value between 0 and 100 expected."
+msgstr ""
+
+#: GUI/panelTCA.py:251
+msgid "Time frame: value between 1 and 1000 expected."
+msgstr ""
+
+#: GUI/panelTCA.py:261
+msgid "Development of energy prices: value between 0 and 100 expected."
+msgstr ""
+
+#: GUI/panelTCA.py:272
+msgid "Inflation rate: value between 0 and 100 expected."
+msgstr ""
+
+#: GUI/panelTCACont.py:60
+msgid ""
+"Do you expect future costs for perpetuating use of the current energy source "
+"in the process?"
+msgstr ""
+
+#: GUI/panelTCACont.py:79
+msgid "time frame (in X years from now, X=0 for current year)"
+msgstr ""
+
+#: GUI/panelTCACont.py:86 GUI/panelTCAEnergy.py:97
+#: GUI/panelTCAInvestment.py:81 GUI/panelTCANon.py:79
+#: GUI/panelTCAOpTabpage.py:69 GUI/panelTCAResultTabpage2.py:149
+msgid "Add"
+msgstr ""
+
+#: GUI/panelTCACont.py:92 GUI/panelTCAEnergy.py:92
+#: GUI/panelTCAInvestment.py:88 GUI/panelTCANon.py:85
+#: GUI/panelTCAOpTabpage.py:76 GUI/panelTCAResultTabpage2.py:156
+msgid "Remove"
+msgstr ""
+
+#: GUI/panelTCACont.py:98 GUI/panelTCAEnergy.py:104 GUI/panelTCAEnergy.py:115
+#: GUI/panelTCAInvestment.py:148 GUI/panelTCAInvestment.py:164
+#: GUI/panelTCANon.py:92 GUI/panelTCAOpTabpage.py:82
+msgid "Help"
+msgstr ""
+
+#: GUI/panelTCACont.py:104 GUI/panelTCAInvestment.py:96 GUI/panelTCANon.py:98
+msgid "<enter custom description or choose from list>"
+msgstr ""
+
+#: GUI/panelTCACont.py:107
+msgid "Save and go to main page"
+msgstr ""
+
+#: GUI/panelTCACont.py:113
+msgid "Save and go to the next page >>>"
+msgstr ""
+
+#: GUI/panelTCACont.py:142
+msgid "EUR/Year"
+msgstr ""
+
+#: GUI/panelTCACont.py:143
+msgid "time frame"
+msgstr ""
+
+#: GUI/panelTCACont.py:147
+msgid "tax disadvantages (other than energy tax)"
+msgstr ""
+
+#: GUI/panelTCACont.py:148
+msgid "obligatory provisions"
+msgstr ""
+
+#: GUI/panelTCACont.py:149
+msgid "costs for remediation activities"
+msgstr ""
+
+#: GUI/panelTCACont.py:150
+msgid "cost for compliance with legislation"
+msgstr ""
+
+#: GUI/panelTCACont.py:151
+msgid "negative impacts on market share"
+msgstr ""
+
+#: GUI/panelTCACont.py:152
+msgid "deterioration of company image"
+msgstr ""
+
+#: GUI/panelTCACont.py:153
+msgid "affection by CO2-emission trading directive"
+msgstr ""
+
+#: GUI/panelTCACont.py:163 GUI/panelTCANon.py:160
+msgid "TCAContingencies"
+msgstr ""
+
+#: GUI/panelTCACont.py:226 GUI/panelTCAEnergy.py:284
+#: GUI/panelTCAInvestment.py:278 GUI/panelTCANon.py:227
+#: GUI/panelTCAOpTabpage.py:166
+msgid "Reconsider values."
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:60
+msgid "Energy cost"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:64
+msgid "Operating and maintenance cost"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:77
+msgid "<Enter custom description or choose from list>"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:108
+msgid ""
+"The values come from the audit questionnaire\n"
+"If you would like to make any changes, please edit them"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:127
+msgid ""
+"Total operating and\n"
+"maintenance cost"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:132
+msgid "EUR/a"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:136
+msgid "Detailed operating cost calculation..."
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:144
+msgid ""
+"The value is the total of the operating and maintenance costs given in the "
+"questionaire. If you would like \n"
+"to change this value, please go back to the questionnaire module"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:151
+msgid "Save and go to next page >>>"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:158
+msgid "Save and go back to main page"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:189
+msgid ""
+"Energy demand\n"
+"[kWh/a]"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:190
+msgid ""
+"Energy price\n"
+"[EUR/kWh]"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:191
+msgid ""
+"Development of \n"
+"energy price [%/a]"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:193
+msgid "Electicity"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:195
+msgid "Liquid Petroleum gas"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:196
+msgid "Heavy fuel oil"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:197
+msgid "Butane"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:198
+msgid "Propane"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:199
+msgid "Gas oil"
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:206
+msgid ""
+"The values come from the audit questionnaire and Einstein database.\n"
+"If you would like to make any change on them, please edit the values."
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:207
+msgid ""
+"If you would like to calculate the operating costs in details, please choose "
+"\"Detailed operating cost calculation\""
+msgstr ""
+
+#: GUI/panelTCAEnergy.py:214
+msgid "TCAEnergy"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:63
+msgid "Total investment and fundings of the new equipments"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:99
+msgid ""
+"The values of investment are suggested by the program.(The default funding "
+"for equipment is 30%) \n"
+"If this do not apply to your process, please indicate your own values"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:122
+msgid ""
+"If you think there would be revenue from sale of replaced equipments, please "
+"indicate the possible value"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:137
+msgid "Estimate the renenue..."
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:152
+msgid "Save and go to the main page"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:159
+msgid "Revenue from sale of replaced equipments"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:168
+msgid "Save an go to the next page >>>"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:183 GUI/panelTCAOpTabpage.py:115
+msgid "Solar thermal"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:184 GUI/panelTCAOpTabpage.py:116
+msgid "Heat pump"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:187
+msgid "Boilers"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:189 GUI/panelTCAOpTabpage.py:121
+msgid "H&C distribution"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:209
+msgid ""
+"Investment\n"
+"EUR"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:210
+msgid ""
+"Funding\n"
+"%"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:211
+msgid ""
+"Additional\n"
+"fixed sum"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:231
+msgid "TCAInvestment"
+msgstr ""
+
+#: GUI/panelTCAInvestment.py:314
+msgid "Numeric value greater or equal zero expected."
+msgstr ""
+
+#: GUI/panelTCANon.py:55
+msgid "Non Re-Occuring Cost"
+msgstr ""
+
+#: GUI/panelTCANon.py:73
+msgid "year =  indicate when presumably occuring in years after investment"
+msgstr ""
+
+#: GUI/panelTCANon.py:137
+msgid "Year"
+msgstr ""
+
+#: GUI/panelTCANon.py:142
+msgid "repair works for energy equipment"
+msgstr ""
+
+#: GUI/panelTCANon.py:143
+msgid "exchange of collectors"
+msgstr ""
+
+#: GUI/panelTCANon.py:144
+msgid "irregular maintainance costs"
+msgstr ""
+
+#: GUI/panelTCANon.py:145
+msgid "permits"
+msgstr ""
+
+#: GUI/panelTCANon.py:146
+msgid "fines/penalties"
+msgstr ""
+
+#: GUI/panelTCANon.py:147
+msgid "legal costs"
+msgstr ""
+
+#: GUI/panelTCANon.py:148
+msgid "property/natural resource damage"
+msgstr ""
+
+#: GUI/panelTCANon.py:149
+msgid "remediation costs"
+msgstr ""
+
+#: GUI/panelTCANon.py:150
+msgid "clean up costs"
+msgstr ""
+
+#: GUI/panelTCANon.py:151
+msgid "revenue for marketable permits"
+msgstr ""
+
+#: GUI/panelTCANon.py:152
+msgid "other revenues"
+msgstr ""
+
+#: GUI/panelTCAOpTabpage.py:109
+msgid ""
+"Operating cost\n"
+"[EUR/a]"
+msgstr ""
+
+#: GUI/panelTCAOpTabpage.py:119
+msgid "Boilers and furnaces"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:76
+msgid "Proposal 1"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:78
+msgid "Total investment capital (EUR)"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:79
+msgid "Effective investment capital (EUR)"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:80
+msgid "Benefit cost ratio"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:81
+msgid "Payback period (years)"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:82
+msgid "MIRR at final year (%)"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:132 GUI/panelTCAResultTabpage1.py:133
+#: GUI/panelTCAResultTabpage1.py:134 GUI/panelTCAResultTabpage1.py:135
+#: GUI/panelTCAResultTabpage1.py:136
+msgid "No Result"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage1.py:139 GUI/panelTCAResultTabpage1.py:140
+#: GUI/panelTCAResultTabpage1.py:141 GUI/panelTCAResultTabpage1.py:142
+#: GUI/panelTCAResultTabpage1.py:143
+msgid "ERROR"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:96
+msgid "MIRR / EUR"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:99
+msgid "NPV / EUR"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:106 GUI/panelTCAResultTabpage2.py:109
+msgid "Year "
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:139
+msgid "Choose the proposal(s)"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:162
+msgid "Choose Figure"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:184
+msgid "Show/Hide"
+msgstr ""
+
+#: GUI/panelTCAResultTabpage2.py:257
+msgid "No result to display for proposal: "
+msgstr ""
+
+#: GUI/PreferencesFrame.py:84
+msgid "Debugging options"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:88
+msgid "Heat recovery calculation"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:97
+msgid "Debug mode for consistency check:"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:98
+msgid "This will create different volume of output for debugging:"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:102
+msgid "Method for calculation of heat exchanger network"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:103
+msgid "estimate is based on HR potential and does not account for real HXs"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:143
+msgid "debug options"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:144
+msgid "calculation tools"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:154
+msgid "exit settings"
+msgstr ""
+
+#: GUI/PreferencesFrame.py:154
+msgid "do you want to exit without saving ?"
+msgstr ""
+
+#: GUI/units.py:375
+#, python-format
+msgid "Units (conversionFactor): unknown unit <%s>"
+msgstr ""
+
+#: modules/boiler/moduleBB.py:1094
+msgid ""
+"In the present version only Natural Gas boilers has been collected in the DB"
+msgstr ""
+
+#: modules/ccheck/checkFETel.py:152 modules/energyStats/moduleEA.py:311
+msgid ""
+"WARNING: No data available for electricity consumption for non-thermal uses. "
+"Set to 0 !!!"
+msgstr ""
+
+#: modules/ccheck/checkProc.py:251
+#, python-format
+msgid ""
+"Possibility of heat recovery for process no. %s (%s)is not specified.\n"
+"YES is assumed."
+msgstr ""
+
+#: modules/ccheck/checkProc.py:272
+#, python-format
+msgid "Process No. %s: no final temperature specified for outflowing medium. "
+msgstr ""
+
+#: modules/ccheck/checkProc.py:273
+msgid "zero assumed !"
+msgstr ""
+
+#: modules/ccheck/moduleCC.py:131
+msgid "Calculations w/o this are nonsense !!!"
+msgstr ""
+
+#: modules/ccheck/moduleCC.py:133
+msgid "Value required for detail analysis !!!"
+msgstr ""
+
+#: modules/ccheck/moduleCC.py:135
+msgid "not strictly necessary"
+msgstr ""
+
+#: modules/ccheck/moduleCC.py:172
+msgid "CONGRATULATION: data set is sufficiently complete !!!"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:4
+msgid "Date of creation of the project in EINSTEIN"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:5
+msgid "Date of finalisation of the project"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:6
+msgid "Date of last modification"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:7
+msgid "Id of auditor who carryied out the audit"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:8
+msgid ""
+"Original ProjectID (maybe different of actual ProjectID for imported "
+"projects)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:9
+msgid ""
+"Description of framework in which the audit was carried out (audit campaign "
+"or project)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:10
+msgid "Level of confidentiality"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:11
+msgid "Version of EINSTEIN software tool"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:12
+msgid "name of the company"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:13
+msgid "city"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:14
+msgid "country"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:15
+msgid "description of the industry"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:16
+msgid "branch"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:17
+msgid "sub-branch"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:20
+msgid "ID of NACE Code in data base"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:21
+msgid "name of contact person"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:22
+msgid "position of contact person in the company"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:23
+msgid "address"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:24
+msgid "Telephone  No"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:27
+msgid "number of employees"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:28
+msgid "annual turnover"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:29
+msgid "annual production cost"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:30
+msgid "base year for economic data"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:31
+msgid "growth rate of the production volume foreseen for the next 5 years"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:32
+msgid "Is the company independent ?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:33
+msgid "yearly O&M heat & cold"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:34
+msgid "yearly O&M electrical"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:35
+msgid "total hours of operation per working day"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:36
+msgid "number of shifts"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:37
+msgid "days of production / operation per year"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:38
+msgid "principal period of holidays or stops for maintenance - start date"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:39
+msgid "principal period of holidays or stops for maintenance - end date"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:40
+msgid "type of product"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:41
+msgid "product's code"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:42
+msgid "quantity of product(s) per year"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:43
+msgid "measurement unit for product quantity"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:44
+msgid "annual turnover per product"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:45
+msgid "Number of products"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:46
+msgid "Total yearly working hours in industry"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:47
+msgid "process short name"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:49
+msgid "unit operation type"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:50
+msgid "process type"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:51
+msgid "product or process medium (water, oil, air, ...)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:52
+msgid "typical (final) temperature of the  process medium during operation"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:53
+msgid "inlet temperature of the process medium (before heat recovery)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:54
+msgid "maximum allowed temperature for external preheating"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:55
+msgid "start-up temperature of process medium (after breaks)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:56
+msgid "daily inflow of process medium"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:57
+msgid "volume of the process medium within the equipment or storage"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:59
+msgid "hours of process operation per day"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:60 modules/ccheck/parameterList.py:277
+msgid "number of batches per day"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:61 modules/ccheck/parameterList.py:278
+msgid "duration of 1 batch"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:62 modules/ccheck/parameterList.py:279
+msgid "days of process operation per year"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:63
+msgid "medium of outgoing waste heat flows"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:64
+msgid "temperature of outgoing (waste) heat flows after heat recovery"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:65
+msgid "temperature of outgoing (waste) heat flows"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:66
+msgid "specific enthalpy of outgoing (waste) heat flows"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:67
+msgid "final  temperature of outgoing (waste) heat flows"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:68
+msgid "daily outflow of process medium"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:69
+msgid "can heat be recovered from the outflowing medium ?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:70
+msgid "Exists heat from heat  recovery for the process ?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:71
+msgid "source of waste heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:72
+msgid "inlet temperature of the process medium  (after heat recovery)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:73
+msgid "Enclosing Flowchart of HC supply system"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:75
+msgid "heat or cold supply to the process from distribution line / branch No."
+msgstr ""
+
+#: modules/ccheck/parameterList.py:76
+msgid ""
+"temperature of the incoming medium supplying heat or cold to the process/"
+"heat exchanger"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:77
+msgid "flow rate of the heat supply medium (close to process)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:80
+msgid "External heat supply to the process"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:81
+msgid "UPH - circulation / renovation"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:82
+msgid "UPH - maintenance"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:83
+msgid "UPH - preheating at start-up"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:84 modules/ccheck/parameterList.py:85
+msgid "available waste heat from processes"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:86
+msgid "preheating from waste heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:87
+msgid "minimum required heat demand with heat recovery"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:88
+msgid "Heating (1) or Cooling (-1)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:89
+msgid "total process cooling demand"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:90
+msgid "total process cooling demand after heat recovery"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:91
+msgid "measurement unit for process medium (pmu)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:92
+msgid "yearly quantity of medimum processed"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:93 modules/ccheck/parameterList.py:192
+msgid "Specific energy consumption (primary energy)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:94 modules/ccheck/parameterList.py:190
+msgid "Specific energy consumption (electricity)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:95
+msgid "Specific energy consumption (UPH)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:96
+msgid ""
+"Temperature of the process environment for calculation of heat losses under "
+"operation"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:97
+msgid "thermal heat loss coefficient of the process"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:98
+msgid ""
+"Power requirement for evaporation or endothermal chemical reactions "
+"(negative for condensation or exothermal reactions)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:99
+msgid "Number of thermal processes"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:100
+msgid "circulation / renovation"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:101
+msgid "maintenance"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:102
+msgid "preheating at start-up"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:103
+msgid "waste heat recovery"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:104
+msgid "Yearly operating hours of process=HPerDayProc*NDaysProc"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:105
+msgid ""
+"Heat recovered internally in each process via internal heat excanges (e.g. "
+"Pasteurisation)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:106
+msgid "UPHc Gross (before internal heat recovery: only circulation!)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:108
+msgid "unit"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:109 modules/ccheck/parameterList.py:117
+msgid "annual consumption"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:110 modules/ccheck/parameterList.py:172
+#: modules/ccheck/parameterList.py:173
+msgid "total own fuel consumption (LCV)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:111
+msgid "fuel price"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:112
+msgid "annual energy cost"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:113
+msgid "contracted power"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:114
+msgid "Contracted power standard"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:115
+msgid "Contracted power peak"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:116
+msgid "Contracted power valley"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:118
+msgid "Annual consumption peak"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:119
+msgid "Annual consumption standard"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:120
+msgid "Annual consumption valley"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:121
+msgid "self-generation (co-generation)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:122
+msgid "sales to grid (co-generation)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:127
+msgid "Electric consumption according type of use"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:131
+msgid "Electricity for refrigeration"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:133
+msgid "Electricity for air conditioning"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:135
+msgid "Electricity for other thermal uses"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:136
+msgid "Motors and machines"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:137
+msgid "Electricity for motors"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:139
+msgid "Electricity for electro-chemical processes"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:140
+msgid "Lightning"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:141
+msgid "Electricity for lightning"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:142
+msgid "Tariff type / class (total)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:143
+msgid "Tariff type / class (standard)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:144
+msgid "Tariff type / class (peak)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:145
+msgid "Tariff type / class (valley)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:146
+msgid "Tariff type / class (CHP)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:147
+msgid "Tariff on installed power (total)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:148
+msgid "Tariff on installed power (standard)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:149
+msgid "Tariff on installed power (peak)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:150
+msgid "Tariff on installed power (valley)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:151
+msgid "Tariff on installed power (CHP)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:152
+msgid "Tariff on consumption (total)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:153
+msgid "Tariff on consumption (standard)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:154
+msgid "Tariff on consumption (peak)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:155
+msgid "Tariff on consumption (valley)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:156
+msgid "Tariff sales of CHP (without feedin-tariff)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:157
+msgid "Annual electricity cost total"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:158
+msgid "Annual electricity cost standard"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:159
+msgid "Annual electricity cost peak"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:160
+msgid "Annual electricity cost valley"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:161
+msgid "Annual electricity sales CHP"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:164
+msgid "Enclosing monthly fuel bills?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:165
+msgid "Enclosing monthly electricity bills?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:167
+msgid "Fuel consumption per product"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:168
+msgid "Final energy consumptioin total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:169
+msgid "FET total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:170
+msgid "FEO total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:174
+msgid "Total electricity consumed by the factory"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:175
+msgid "Electricity for thermal use (total industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:176
+msgid "Electricity for non thermal use (total industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:177
+msgid "Primary energy consumptioin total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:178
+msgid "PET total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:179
+msgid "PEO total (for the analysed industry)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:180
+msgid "Total Primary Energy per all fuels used in industry"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:181
+msgid "Total Primary Energy per all fuels thermal use"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:182
+msgid "Total Primary Energy per all electricity used in industry"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:183
+msgid "Total Primary Energy per all electricity thermal use"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:184
+msgid ""
+"Total own electricity consumption extrapolated to growth of production volume"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:185
+msgid "Total own fuel consumption extrapolated to growth of production volume"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:186
+msgid ""
+"Total primary energy consumption extrapolated to growth of production volume"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:187
+msgid "Intensity of fuel consumption (LCV) on turnover"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:188
+msgid "Specific energy consumption (fuel)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:189
+msgid "Intensity of electricity consumption on turnover"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:191
+msgid "Primary energy intensity (turnover)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:194
+msgid "Number of fuels"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:195
+msgid "Electricity by type of use"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:196 modules/ccheck/parameterList.py:198
+msgid "Conversion to primary energy of fuel mix"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:197 modules/ccheck/parameterList.py:199
+msgid "Specific CO2 emission of fuel mix"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:200
+msgid "Mean tariff of the fuel mix"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:201
+msgid "Fuel tariff for CHP"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:204
+msgid "Year of  manufacturing or/and installation?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:211
+msgid "Units (fuel consumption)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:214
+msgid "Temperature of exhaust gas at standard operation conditions"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:215
+msgid "Excess air ratio"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:219
+msgid "Useful Supply Heat from questionnaire"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:220
+msgid ""
+"Heat or cold supplyed to the distribution line / branch (piping or duct) no."
+msgstr ""
+
+#: modules/ccheck/parameterList.py:222
+msgid "Electricity production"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:223
+msgid "Electrical conversion efficiency"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:224 modules/ccheck/parameterList.py:227
+msgid "Heat pumps only:"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:226
+msgid "Temperature of heat source"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:228
+msgid "Thermal power input  (thermal heat pumps only)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:229
+msgid "Driving temperature (thermal heat pumps only)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:230
+msgid "Origin of high temperature heat source (thermal heat pumps only)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:232
+msgid "Refrigerant"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:233
+msgid "Thermal power input"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:234
+msgid "Driving temperature"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:235
+msgid " Origin of high temperature heat source"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:236
+msgid "Destination of waste heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:237
+msgid "Temperature of re-cooling"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:238
+msgid "Only for cooling: type of cooling tower: dry/wet ?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:239
+msgid "Number of supply equipments"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:240
+msgid "Useful Supply Heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:241
+msgid "Useful Supply Heat by equipment"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:242
+msgid "Useful Supply Heat added by conversion equipment"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:243
+msgid "Final Energy consumption for Thermal use for industry (total)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:244
+msgid "Final energy consumed by the equipment"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:245
+msgid "Useful Supply Heat for industry (total)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:246
+msgid "Waste heat input (equipment)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:247
+msgid "Waste heat output (exhaust gas, waste heat fr. heat pumps, ...)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:248
+msgid "Average conversion efficiency from final energy to useful supply heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:249
+msgid "Exhaust gas flow rate"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:250
+msgid "Energy content in exhaust gas"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:251
+msgid "Yearly operating hours of equipment = HperDayEq*NDaysEq"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:252
+msgid "Consecutive numbering of equipments in the system"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:253
+msgid "Index of equipment in heat supply cascade"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:259
+msgid "Heat source (process [+outflow no.], equipment, ...)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:273
+msgid "waste heat temperature"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:274
+msgid "present use of waste heat"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:276
+msgid "hours of  operation per day"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:280 modules/ccheck/parameterList.py:301
+msgid "name of the branch / distribution system"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:281
+msgid "heat or cold supply comes from (HX or equipment) No.:"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:282
+msgid "heat or cold distribution medium"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:283
+msgid "nominal production or circulation rate (specify units)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:284
+msgid "Units (of nominal production or circulation rate)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:285
+msgid "outlet temperature (to distribution)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:286
+msgid "return temperature (from distribution)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:287
+msgid "Percentage of recirculation"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:288
+msgid "feed-up in open circuit"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:289
+msgid "pressure of heat or cold distribution medium"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:290
+msgid "total length of distribution piping or ducts (one way)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:291
+msgid "total coefficient of heat losses for piping or ducts"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:292
+msgid "mean pipe diameter"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:293
+msgid "insulation thickness"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:294
+msgid "number of the storage units"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:295
+msgid "volume of the storage"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:296
+msgid "type of heat storage"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:297
+msgid "pressure of heat storage medium"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:298
+msgid "maximum temperature of the storage"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:299
+msgid "Enclosing flowchart of the heat supply and distribution system?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:300
+msgid "Number of pipes or ducts"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:302
+msgid "Average distribution efficiency"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:303
+msgid "Waste heat input to the pipe"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:304
+msgid "Waste heat output from circuit (E.g. Not directrly returned condensate)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:305
+msgid "Useful heat supply from equipment to pipe"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:306
+msgid "Useful heat supply from pipe to process"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:307
+msgid ""
+"Annual hours of operation of the pipe (relevant time for calculation of "
+"thermal losses)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:313
+msgid "Global data on energy demand"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:321
+msgid "Holidays period"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:322
+msgid "Heating period"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:323
+msgid "Air conditioning period"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:324
+msgid "Enclosing building drawing or sketch?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:325
+msgid "Main motivation for renewable energy use"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:326
+msgid ""
+"Are you interested in the use of renweable energy? (solar thermal/biomass)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:327
+msgid "If affirmative, please specify the principal reasons:"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:328
+msgid " possibility of saving fuel cost"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:329
+msgid " contribution to a more ecologic energy supply"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:330
+msgid "using solar energy helps for a better marketing of your products"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:331
+msgid "others:"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:332
+msgid "Available roof area"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:333
+msgid "Available ground area"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:334
+msgid "Positioning of the roof area"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:335
+msgid "Positioning of the ground area"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:336
+msgid "Orientation of roof (to south)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:337
+msgid "Orientation of ground (to south)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:338
+msgid "shading of roof"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:339
+msgid "shading of ground"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:340
+msgid "Distance between roof and process"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:341
+msgid "Distance between ground and process"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:342
+msgid "type of roof"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:343
+msgid "static load capacity of the roof(s)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:344
+msgid "Enclosing of drawing or scheme of building?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:346 modules/ccheck/parameterList.py:355
+msgid "Period of year the biomass is available - start"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:347 modules/ccheck/parameterList.py:356
+msgid "Period of year the biomass is available - stop"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:357
+msgid "Number of days the biomass is produced"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:362
+msgid "Time for economic amortisation of installations"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:364
+msgid "General maintenance - total costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:365
+msgid "General maintenance - own personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:366
+msgid "General maintenance - external personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:367
+msgid "General maintenance - fungible assets"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:368
+msgid "Buildings - total costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:369
+msgid "Buildings - own personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:370
+msgid "Buildings - external personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:371
+msgid "Buildings - fungible assets"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:372
+msgid "Machines and equipment - total costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:373
+msgid "Machines and equipment - own personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:374
+msgid "Machines and equipment  - external personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:375
+msgid "Machines and equipment  - fungible assets"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:376
+msgid "Generation and distribution of heat and cold - total costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:377
+msgid "Generation and distribution of heat and cold - own personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:378
+msgid "Generation and distribution of heat and cold  - external personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:379
+msgid "Generation and Distribution of heat and cold  - fungible assets"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:380
+msgid "Total - total costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:381
+msgid "Total - own personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:382
+msgid "Total - external personnel"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:383
+msgid "Total - fungible assets"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:384
+msgid "Is there any energy menagement system implemented?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:385
+msgid "Is the energy menagent externalized?"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:387
+msgid "Conversion to primary energy of electricity"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:388
+msgid "Specific CO2 emission of electricity"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:389
+msgid "Specific investment cost for heat recovery system"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:390
+msgid "Specific annual O&M cost for heat recovery system"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:391
+msgid "Feedin Tariff for CHP Electricity"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:392
+msgid "Specific turn-key installation cost large systems ( > 1 MW)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:393
+msgid "Specific turn-key installation cost small systems (< 10 kW)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:394
+msgid "specific yearly O&M costs"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:395
+msgid "Percentage of public funding"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:396
+msgid "Specifc solar useful heat production"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:399
+msgid "Foreseen rise of fuel prices"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:400
+msgid "Interest rate for external financing"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:401
+msgid "Percentage of external financing"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:402
+msgid "Economic depreciation period"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:403
+msgid "Annuity of investment"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:404
+msgid "Public funding for energy saving measures"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:405 modules/ccheck/parameterList.py:409
+#: modules/ccheck/parameterList.py:413 modules/ccheck/parameterList.py:417
+#: modules/ccheck/parameterList.py:421 modules/ccheck/parameterList.py:425
+#: modules/ccheck/parameterList.py:429 modules/ccheck/parameterList.py:433
+#: modules/ccheck/parameterList.py:437
+msgid "benchmark (lower limit)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:406 modules/ccheck/parameterList.py:410
+#: modules/ccheck/parameterList.py:414 modules/ccheck/parameterList.py:418
+#: modules/ccheck/parameterList.py:422 modules/ccheck/parameterList.py:426
+#: modules/ccheck/parameterList.py:430 modules/ccheck/parameterList.py:434
+#: modules/ccheck/parameterList.py:438
+msgid "benchmark (upper limit)"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:407 modules/ccheck/parameterList.py:411
+#: modules/ccheck/parameterList.py:415 modules/ccheck/parameterList.py:419
+#: modules/ccheck/parameterList.py:423 modules/ccheck/parameterList.py:427
+#: modules/ccheck/parameterList.py:431 modules/ccheck/parameterList.py:435
+#: modules/ccheck/parameterList.py:439
+msgid "target"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:408 modules/ccheck/parameterList.py:412
+#: modules/ccheck/parameterList.py:416 modules/ccheck/parameterList.py:420
+#: modules/ccheck/parameterList.py:424 modules/ccheck/parameterList.py:428
+#: modules/ccheck/parameterList.py:432 modules/ccheck/parameterList.py:436
+#: modules/ccheck/parameterList.py:440
+msgid "reference code selected benchmark and target"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:441 modules/ccheck/parameterList.py:443
+#: modules/ccheck/parameterList.py:445
+msgid "evaluation of energy intensity"
+msgstr ""
+
+#: modules/ccheck/parameterList.py:442 modules/ccheck/parameterList.py:444
+#: modules/ccheck/parameterList.py:446
+msgid "comment on evaluation of energy intensity"
+msgstr ""
+
+#: modules/chp/moduleCHP.py:577
+msgid "There is no appropriate CHP available in DB for this application"
+msgstr ""
+
+#: modules/chp/moduleCHP.py:578
+#, python-format
+msgid ""
+"\n"
+"(thermal power approx) %s kW"
+msgstr ""
+
+#: modules/constants.py:75
+msgid "January"
+msgstr ""
+
+#: modules/constants.py:76
+msgid "February"
+msgstr ""
+
+#: modules/constants.py:77
+msgid "March"
+msgstr ""
+
+#: modules/constants.py:78
+msgid "April"
+msgstr ""
+
+#: modules/constants.py:79
+msgid "May"
+msgstr ""
+
+#: modules/constants.py:80
+msgid "June"
+msgstr ""
+
+#: modules/constants.py:81
+msgid "July"
+msgstr ""
+
+#: modules/constants.py:82
+msgid "August"
+msgstr ""
+
+#: modules/constants.py:83
+msgid "September"
+msgstr ""
+
+#: modules/constants.py:84
+msgid "October"
+msgstr ""
+
+#: modules/constants.py:85
+msgid "November"
+msgstr ""
+
+#: modules/constants.py:86
+msgid "December"
+msgstr ""
+
+#: modules/constants.py:127
+msgid "compression heat pump"
+msgstr ""
+
+#: modules/constants.py:128
+msgid "thermal heat pump"
+msgstr ""
+
+#: modules/constants.py:129 modules/constants.py:153
+msgid "steam boiler"
+msgstr ""
+
+#: modules/constants.py:130 modules/constants.py:154
+msgid "condensing boiler"
+msgstr ""
+
+#: modules/constants.py:131 modules/constants.py:155
+msgid "hot water boiler"
+msgstr ""
+
+#: modules/constants.py:132 modules/constants.py:156
+msgid "burner (direct heating)"
+msgstr ""
+
+#: modules/constants.py:133 modules/constants.py:157
+msgid "burner (indirect heating)"
+msgstr ""
+
+#: modules/constants.py:134 modules/constants.py:162
+msgid "compression chiller"
+msgstr ""
+
+#: modules/constants.py:135 modules/constants.py:163
+msgid "thermal chiller"
+msgstr ""
+
+#: modules/constants.py:136
+msgid "solar thermal (flat-plate)"
+msgstr ""
+
+#: modules/constants.py:137
+msgid "solar thermal (evacuated tubes)"
+msgstr ""
+
+#: modules/constants.py:138
+msgid "solar thermal (concentrating solar systems)"
+msgstr ""
+
+#: modules/constants.py:139 modules/constants.py:197
+msgid "CHP engine"
+msgstr ""
+
+#: modules/constants.py:140 modules/constants.py:198
+msgid "CHP steam turbine"
+msgstr ""
+
+#: modules/constants.py:141 modules/constants.py:199
+msgid "CHP gas turbine"
+msgstr ""
+
+#: modules/constants.py:142 modules/constants.py:200
+msgid "CHP fuel cell"
+msgstr ""
+
+#: modules/constants.py:169
+msgid "compression"
+msgstr ""
+
+#: modules/constants.py:170
+msgid "thermal"
+msgstr ""
+
+#: modules/constants.py:176
+msgid "Flat-plate collector"
+msgstr ""
+
+#: modules/constants.py:177
+msgid "Evacuated tube collector"
+msgstr ""
+
+#: modules/constants.py:178
+msgid "Concentrating collector"
+msgstr ""
+
+#: modules/constants.py:185
+msgid "plate HX (liquid-liquid)"
+msgstr ""
+
+#: modules/constants.py:186
+msgid "plate HX (air-air)"
+msgstr ""
+
+#: modules/constants.py:187
+msgid "shell&tube HX (liquid-liquid)"
+msgstr ""
+
+#: modules/constants.py:188
+msgid "finned tubes (liquid-air)"
+msgstr ""
+
+#: modules/constants.py:272
+msgid "continuous"
+msgstr ""
+
+#: modules/constants.py:273
+msgid "batch"
+msgstr ""
+
+#: modules/constants.py:277
+msgid "yes"
+msgstr ""
+
+#: modules/constants.py:277
+msgid "no"
+msgstr ""
+
+#: modules/constants.py:282
+msgid "sensible"
+msgstr ""
+
+#: modules/constants.py:283
+msgid "latent"
+msgstr ""
+
+#: modules/constants.py:288
+msgid "electric motor"
+msgstr ""
+
+#: modules/constants.py:289
+msgid "compressor"
+msgstr ""
+
+#: modules/constants.py:290
+msgid "other"
+msgstr ""
+
+#: modules/constants.py:296
+msgid "cooling water"
+msgstr ""
+
+#: modules/constants.py:297
+msgid "intercooler"
+msgstr ""
+
+#: modules/constants.py:298
+msgid "cooling air"
+msgstr ""
+
+#: modules/constants.py:303
+msgid "ambient air"
+msgstr ""
+
+#: modules/constants.py:304 modules/constants.py:310
+msgid "ground heat exchanger"
+msgstr ""
+
+#: modules/constants.py:309
+msgid "cooling tower"
+msgstr ""
+
+#: modules/constants.py:314
+msgid "S"
+msgstr ""
+
+#: modules/constants.py:315
+msgid "SE"
+msgstr ""
+
+#: modules/constants.py:316
+msgid "SW"
+msgstr ""
+
+#: modules/constants.py:317
+msgid "E"
+msgstr ""
+
+#: modules/constants.py:318
+msgid "W"
+msgstr ""
+
+#: modules/constants.py:319
+msgid "NE"
+msgstr ""
+
+#: modules/constants.py:320
+msgid "NW"
+msgstr ""
+
+#: modules/constants.py:321
+msgid "N"
+msgstr ""
+
+#: modules/constants.py:332
+msgid "No"
+msgstr ""
+
+#: modules/constants.py:333
+msgid "Yes,partially shaded"
+msgstr ""
+
+#: modules/constants.py:334
+msgid "Yes,fully shaded"
+msgstr ""
+
+#: modules/constants.py:336
+msgid "Corrugated metal roof"
+msgstr ""
+
+#: modules/constants.py:337
+msgid "Composite sandwich panels"
+msgstr ""
+
+#: modules/constants.py:338
+msgid "Concrete roof"
+msgstr ""
+
+#: modules/constants.py:339
+msgid "Tiled roof"
+msgstr ""
+
+#: modules/constants.py:340
+msgid "Other"
+msgstr ""
+
+#: modules/constants.py:342
+msgid "ZZ000: other products"
+msgstr ""
+
+#: modules/constants.py:343
+msgid "DA010: milk products"
+msgstr ""
+
+#: modules/constants.py:344
+msgid "DA020: fruits/vegetables/herbs"
+msgstr ""
+
+#: modules/constants.py:345
+msgid "DA030: sugar"
+msgstr ""
+
+#: modules/constants.py:346
+msgid "DA040: beer"
+msgstr ""
+
+#: modules/constants.py:347
+msgid "DA050: fats/oils"
+msgstr ""
+
+#: modules/constants.py:348
+msgid "DA060: chocolate/cacao/coffee"
+msgstr ""
+
+#: modules/constants.py:349
+msgid "DA070: starch/potatoes/grain mill products"
+msgstr ""
+
+#: modules/constants.py:350
+msgid "DA080: wine/beverage"
+msgstr ""
+
+#: modules/constants.py:351
+msgid "DA090: meat"
+msgstr ""
+
+#: modules/constants.py:352
+msgid "DA100: fish"
+msgstr ""
+
+#: modules/constants.py:353
+msgid "DA110: aroma"
+msgstr ""
+
+#: modules/control.py:239
+#, python-format
+msgid "Control (autoRun): %s possible HP models found"
+msgstr ""
+
+#: modules/control.py:242
+msgid "Control (autoRun): no heat pump application possible"
+msgstr ""
+
+#: modules/dataHR.py:90
+msgid "Error writing new HX into database."
+msgstr ""
+
+#: modules/dataHR.py:119
+msgid "Deleting HX from database failed"
+msgstr ""
+
+#: modules/dataHR.py:142
+msgid "Generating new streams failed."
+msgstr ""
+
+#: modules/dataHR.py:159
+msgid "Generating streams for hidden HX failed"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:69
+msgid "EINSTEIN running system simulation for updating energy balances"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:70
+msgid "This may take a while. please be patient ..."
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:73
+msgid "EINSTEIN now updating annual energy balances"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:290
+msgid ""
+"ModuleEA (calcEq.En.Bal): check your input data.\n"
+"calculated distribution efficiency is less than 50 %"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:306
+msgid ""
+"No conversion factor electricity - primary energy was specified.\\default "
+"value 3.0 assumed"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:319
+msgid ""
+"No conversion factor electricity - CO2 emission was specified.\\default "
+"value 0.5 t/MWh assumed"
+msgstr ""
+
+#: modules/energyStats/moduleEA.py:325
+msgid ""
+"No conversion factor electricity - HR nuclear waste was specified.\\default "
+"value 5.0 g/MWh assumed (15 % nuclear)"
+msgstr ""
+
+#: modules/exportdata.py:652
+#, python-format
+msgid ""
+"Project with name %s already exists in database\n"
+"Project renamed to: IMPORTED PROJECT"
+msgstr ""
+
+#: modules/exportdata.py:684
+#, python-format
+msgid "Fluid %s already in database. Data from imported file will be ignored"
+msgstr ""
+
+#: modules/exportdata.py:691
+#, python-format
+msgid "Fuel %s already in database. Data from imported file will be ignored"
+msgstr ""
+
+#: modules/exportdata.py:697
+#, python-format
+msgid "Auditor %s already in database. Data from imported file will be ignored"
+msgstr ""
+
+#: modules/exportdata.py:875
+msgid "import data"
+msgstr ""
+
+#: modules/exportdata.py:876
+msgid ""
+"This will modify your databases\n"
+"If You are sure, specify what to do with duplicate data"
+msgstr ""
+
+#: modules/exportdata.py:877
+msgid ""
+"\n"
+"Else press CANCEL"
+msgstr ""
+
+#: modules/exportdata.py:1019
+msgid " already in database. Data from imported file will be ignored"
+msgstr ""
+
+#: modules/fluids.py:59
+#, python-format
+msgid "Severe error in your fluid data for fluid %s: density %s"
+msgstr ""
+
+#: modules/fluids.py:65
+#, python-format
+msgid "Severe error in your fluid data for fluid %s: cp %s"
+msgstr ""
+
+#: modules/fluids.py:77
+#, python-format
+msgid "Fluid (init): cannot find fluid with ID = %s"
+msgstr ""
+
+#: modules/fluids.py:110
+#, python-format
+msgid "Severe error in your fuel data for fuel %s: some parameters are missing"
+msgstr ""
+
+#: modules/fluids.py:125
+#, python-format
+msgid "Fluid (init): cannot find fuel with ID = %s"
+msgstr ""
+
+#: modules/importHR.py:255
+msgid "Importing failed."
+msgstr ""
+
+#: modules/moduleBM.py:387
+#, python-format
+msgid ""
+"Error in benchmark database has been detected (id %s): NACE Code %s not "
+"found. Update your database"
+msgstr ""
+
+#: modules/moduleHR.py:146
+msgid "Redesigning HX network. This may take some time. (Tool: PE2)"
+msgstr ""
+
+#: modules/moduleHR.py:149
+msgid "Recalculating HX network. This may take some time.(Tool: PE2)"
+msgstr ""
+
+#: modules/moduleHR.py:159
+msgid "External program returned: "
+msgstr ""
+
+#: modules/moduleHR.py:163
+msgid "Error in external program (ProcessEngineering.exe)"
+msgstr ""
+
+#: modules/moduleHR.py:395
+msgid "Could not delete HEX"
+msgstr ""
+
+#: modules/moduleHR.py:401
+msgid "Recalculation failed."
+msgstr ""
+
+#: modules/moduleHR.py:423
+msgid "SteamStatusSink/StreamStatusSource not defined. Can't do recalculation"
+msgstr ""
+
+#: modules/moduleHR.py:540
+msgid "Recalculation of HEX failed."
+msgstr ""
+
+#: modules/moduleTCA.py:120
+#, python-format
+msgid "TCA: No result for %s"
+msgstr ""
+
+#: modules/processes.py:128
+msgid ""
+"Processes (createAggregateDemand): Creating time and temperature dependent "
+"heat demand"
+msgstr ""
+
+#: modules/project.py:160
+#, python-format
+msgid ""
+"Project (cleanUpSQLRows): entry with ANo %s > maxANo %s deleted -> \n"
+"%s"
+msgstr ""
+
+#: modules/project.py:273
+#, python-format
+msgid ""
+"ERROR: possibly corrupt project data\n"
+" cannot copy alternative (PId: %s ANo: %s)"
+msgstr ""
+
+#: modules/project.py:285
+#, python-format
+msgid "Project (deleteAlternative) - project %s, cannot delete alternative %s"
+msgstr ""
+
+#: modules/project.py:357
+msgid "Present State (original)"
+msgstr ""
+
+#: modules/project.py:358
+msgid "original data as delivered in questionnaire"
+msgstr ""
+
+#: modules/project.py:360 modules/project.py:465
+msgid "Present State (checked)"
+msgstr ""
+
+#: modules/project.py:361
+msgid ""
+"complete data set for present state after\n"
+"cross-checking and data estimation"
+msgstr ""
+
+#: modules/project.py:397
+#, python-format
+msgid "Corrupt data in data base. no entry in cgeneraldata for ANo = %s"
+msgstr ""
+
+#: modules/project.py:403
+#, python-format
+msgid "Corrupt data in data base. no entry in salternative for ANo = %s"
+msgstr ""
+
+#: modules/project.py:466
+msgid ""
+"complete data set for present state after\n"
+" cross-checking and data estimation"
+msgstr ""
+
+#: modules/project.py:606
+msgid "present state (original)"
+msgstr ""
+
+#: modules/project.py:607
+msgid "original data as submitted by industry"
+msgstr ""
+
+#: modules/project.py:804
+#, python-format
+msgid "Project (deleteProject) -deleting project %s (%s)"
+msgstr ""
+
+#: modules/project.py:874
+#, python-format
+msgid "Project (reconnect equipes): pipe ID %s was not in old pipe table"
+msgstr ""
+
+#: modules/project.py:895
+#, python-format
+msgid "New session of tool starting with ProjectID %s"
+msgstr ""
+
+#: modules/project.py:960
+msgid ""
+"Data have already been confirmed as consistent. First unblock before "
+"modifying"
+msgstr ""
+
+#: modules/project.py:964
+msgid "Cannot access this function. First select a project"
+msgstr ""
+
+#: modules/project.py:976
+msgid ""
+"Data have already been confirmed as consistent. First unblock before "
+"modifying data of present state"
+msgstr ""
+
+#: modules/project.py:980
+msgid ""
+"Cannot access this function. First open or define a new project and enter "
+"general data"
+msgstr ""
+
+#: modules/project.py:996
+msgid "Cannot access this function. First open or define a new project"
+msgstr ""
+
+#: modules/project.py:1007
+msgid "Cannot display statistics for raw data. change view to checked version"
+msgstr ""
+
+#: modules/project.py:1009 modules/project.py:1078
+msgid "Cannot access this function. First check the data for consistency"
+msgstr ""
+
+#: modules/project.py:1014
+msgid ""
+"Hourly performance\n"
+"data"
+msgstr ""
+
+#: modules/project.py:1019
+msgid "Process heat"
+msgstr ""
+
+#: modules/project.py:1021
+msgid "Environmental Impact"
+msgstr ""
+
+#: modules/project.py:1043
+msgid ""
+"Cannot access this function for the present state of the industry.\n"
+"First define a new alternative !"
+msgstr ""
+
+#: modules/project.py:1048
+msgid "Process optimisation interface 1"
+msgstr ""
+
+#: modules/project.py:1049
+msgid "Process optimisation interface 2"
+msgstr ""
+
+#: modules/project.py:1051
+msgid "Pinch analysis"
+msgstr ""
+
+#: modules/project.py:1052
+msgid "Pinch interface 1"
+msgstr ""
+
+#: modules/project.py:1053
+msgid "Pinch interface 2"
+msgstr ""
+
+#: modules/project.py:1068
+msgid "Economic analysis"
+msgstr ""
+
+#: modules/project.py:1069
+msgid "Economics 1"
+msgstr ""
+
+#: modules/project.py:1070
+msgid "Economics 2"
+msgstr ""
+
+#: modules/project.py:1108
+msgid ""
+"Project (getStatus): could not find project table of last opened project"
+msgstr ""
+
+#: modules/project.py:2183
+#, python-format
+msgid ""
+"Project (getAuditorID): Corrupt entry for project no. %s: table sproject not "
+"found"
+msgstr ""
+
+#: modules/solar/moduleST.py:488
+msgid "pay attenction more than one solar system"
+msgstr ""
+
+#: modules/solar/moduleST.py:548
+msgid "You are changing the current solar system."
+msgstr ""
+
+#: modules/solar/moduleST.py:578
+msgid ""
+"The power of the solar system has been reduced because the suitable surfaces "
+"are too small to supply the required one."
+msgstr ""
+
+#: modules/solar/moduleST.py:740
+msgid ""
+"The heat storage volume is very small. For internal calculation it has been "
+"set to 0.01 m^3/kW"
+msgstr ""
+
+#: modules/solar/moduleST.py:1005
+#, python-format
+msgid ""
+"The yearly incident solar radiation has not been defined. \n"
+"Value calculated from default correlation: H [kWh/m2] = %s"
+msgstr ""
+
+#: modules/solar/moduleST.py:1022
+msgid ""
+"The geographic latitude has not been defined. \n"
+"45º North (Central Europe) assumed as default"
+msgstr ""
+
+#: modules/solar/moduleST.py:1046
+#, python-format
+msgid ""
+"The yearly mean ambient temperature has not been defined. \n"
+"Value calculated from default correlation: TAmb [ºC] = %s"
+msgstr ""
+
+#: modules/solar/moduleST.py:1133
+#, python-format
+msgid "Surface %s: no inclination specified. 0º assumed"
+msgstr ""
+
+#: modules/solar/moduleST.py:1139
+#, python-format
+msgid "Surface %s: no azimuth specified. South orientation assumed"
+msgstr ""
+
+#: modules/solar/moduleST.py:1165
+#, python-format
+msgid "In '%s' the surface available for the collectors mounting is too small."
+msgstr ""
+
+#: modules/solar/moduleST.py:1177
+#, python-format
+msgid ""
+"Distance between the solar field'%s' and the technical room or process is "
+"too long"
+msgstr ""
+
+#: modules/solar/moduleST.py:1192
+#, python-format
+msgid "Area '%s' oriented to North:not suitable."
+msgstr ""
+
+#: modules/solar/moduleST.py:1205
+#, python-format
+msgid "Area '%s' shaded: not suitable for collectors mounting."
+msgstr ""
+
+#: modules/solar/moduleST.py:1222
+#, python-format
+msgid ""
+"Check the static load capacity of the roof '%s'and the collectors mounting "
+"feasibility."
+msgstr ""
+
+#: modules/solar/moduleST.py:1255
+#, python-format
+msgid "Check surface '%s' inclination: out of range."
+msgstr ""
+
+#: modules/solar/moduleST.py:1275
+msgid "The surface available for the collectors mounting is quite small."
+msgstr ""
+
+#: modules/solar/moduleST.py:1281
+#, python-format
+msgid "The surfaces have a total area of '%s' and a usable (net) area of '%s'"
+msgstr ""
+
+#: modules/solar/moduleST.py:1318
+msgid ""
+"When a particular collector has been selected in the database the collector "
+"type should be setted as 'preselected'"
+msgstr ""
+
+#: modules/solar/moduleST.py:1444
+msgid ""
+"A solar thermal system is in use! in order to design a new one you should "
+"delete the existent."
+msgstr ""
+
+#: modules/solar/moduleST.py:1583
+msgid ""
+"The suitable surfaces are quite small. Einstein suggests not to install a "
+"solar system"
+msgstr ""
