@@ -12,11 +12,14 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.02
 #	Created by: 	    Hans Schweiger  12/09/2008
 #       Revised by:         
+#                           Hans Schweiger  14/10/2008
 #
 #       Changes to previous version:
+#
+#       14/10/08: HS    Status.HRTool saved in sproject
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -155,9 +158,13 @@ class PreferencesFrame(wx.Dialog):
         if confirm.ShowModal() == wx.ID_OK: self.EndModal(wx.ID_CANCEL)
 
     def OnButtonOK(self, event):
-        Status.HRTool = copy.deepcopy(self.par2_1.GetValue(text="True"))
+        Status.HRTool = self.par2_1.GetValue(text="True")
         Status.HRToolNo = self.par2_1.GetValue()
         print "Preferences (ButtonOK): HRTool = ",Status.HRTool,Status.HRToolNo
+        sprojects = Status.DB.sproject.ProjectID[Status.PId]
+        if len(sprojects) > 0:
+            sprojects[0].HRTool = check(Status.HRTool)
+            
         self.EndModal(wx.ID_OK)
 
     def fillPage(self):

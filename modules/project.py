@@ -1159,6 +1159,10 @@ class Project(object):
             else:
                 sproject.StatusCC = EINSTEIN_NOTOK
                 Status.StatusCC = EINSTEIN_NOTOK
+
+            if sproject.HRTool is not None: Status.HRTool = sproject.HRTool
+            else: Status.HRTool = "PE2"
+            
         else:
             logTrack("Project (getStatus): could not find project table of last opened project")
 #XXX -> getStatus is called BEFORE GUI is built -> logError not yet available !!!

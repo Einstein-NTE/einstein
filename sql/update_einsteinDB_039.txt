@@ -1,0 +1,14 @@
+-- update einstein database: 14.10.2008
+USE energyxperts;
+
+ALTER TABLE sproject ADD COLUMN HRTool VarChar(45) COMMENT 'Heat recovery calculation tool' AFTER Summary;
+
+
+
+
+
+
+
+
+
+

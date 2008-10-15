@@ -44,11 +44,13 @@
 import wx
 import pSQL
 from status import Status
+from units import *
 from displayClasses import *
 #from einstein.modules.constants import HXTYPES
 from GUITools import *
-from units import *
 from fonts import *
+
+ENCODING = "latin-1"
 
 # constants that control the default sizes
 # 1. font sizes
@@ -188,7 +190,7 @@ class PanelQ6(wx.Panel):
 
         
         self.tc3 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='POWER',
                               label=_U("Heat transfer rate"),
                               tip=_U("Heat transfer rate for the specific working conditions"))
@@ -200,7 +202,7 @@ class PanelQ6(wx.Panel):
                               tip=_U("Between the fluids in the heat exchanger"))
 
         self.tc5 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=999., value=0.,
+                              decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='ENERGY',
                               label=_U("Total heat transfered"),
                               tip=_U("Total heat transferred per year"))
@@ -290,7 +292,7 @@ class PanelQ6(wx.Panel):
                                  tip=_U("Specify type of waste heat (e.g. Recooling of compressed air, cooling water of motor/compressor, ...)"))
         
         self.tc104 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=999., value=0.,
+                                decimals=1, minval=0., maxval=1.e+10, value=0.,
                                 unitdict='POWER',
                                 label=_U("Available waste heat"),
                                 tip=_U("Estimated quantity"))
@@ -301,7 +303,7 @@ class PanelQ6(wx.Panel):
                                  tip=_U("Waste heat carrying medium (fluid)"))
 
         self.tc106 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=999., value=0.,
+                                decimals=1, minval=0., maxval=1.e+10, value=0.,
                                 unitdict='MASSORVOLUMEFLOW',
                                 label=_U("Flow rate"),
                                 tip=_U("Specify the flow rate of the waste heat carrying medium"))
@@ -327,18 +329,18 @@ class PanelQ6(wx.Panel):
                                 tip=_U(" "))
 
         self.tc111 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=999., value=0.,
+                                decimals=1, minval=0., maxval=99., value=0.,
                                 label=_U("Number of batches per day"),
                                 tip=_U(" "))
 
         self.tc112 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=999., value=0.,
+                                decimals=1, minval=0., maxval=24., value=0.,
                                 unitdict='TIME',
                                 label=_U("Duration of 1 batch"),
                                 tip=_U(" "))
 
         self.tc113 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=999., value=0.,
+                                decimals=1, minval=0., maxval=365., value=0.,
                                 label=_U("Days of operation per year"),
                                 tip=_U(" "))
 
@@ -480,7 +482,8 @@ class PanelQ6(wx.Panel):
 
 
     def OnListBoxHXListboxClick(self, event):
-        self.HXName = str(self.listBoxHX.GetStringSelection())
+#        self.HXName = unicode(self.listBoxHX.GetStringSelection(),ENCODING)
+        self.HXName = self.listBoxHX.GetStringSelection()
         if self.HXName in self.HXList:
             self.HXNo = self.HXList.index(self.HXName)+1
         else:
@@ -494,7 +497,7 @@ class PanelQ6(wx.Panel):
             q = hxes[0]
             self.HXID = q.QHeatExchanger_ID
             
-            self.tc1.SetValue(str(q.HXName))
+            self.tc1.SetValue(q.HXName)
             
             if str(q.HXType) in TRANSHXTYPES.keys():
                 self.tc2.SetValue(TRANSHXTYPES[str(q.HXType)])
@@ -502,12 +505,12 @@ class PanelQ6(wx.Panel):
             self.tc3.SetValue(str(q.QdotHX))
             self.tc4.SetValue(str(q.HXLMTD))
             self.tc5.SetValue(str(q.QHX))
-            if str(q.HXSource) in self.sourceList: self.tc6.SetValue(str(q.HXSource))          
+            if q.HXSource in self.sourceList: self.tc6.SetValue(q.HXSource)          
             self.tc7.SetValue(str(q.HXTSourceInlet))
             self.tc8.SetValue(str(q.HXhSourceInlet))
             self.tc9.SetValue(str(q.HXTSourceOutlet))
             self.tc10.SetValue(str(q.HXhSourceOutlet))
-            if str(q.HXSink) in self.sinkList: self.tc11.SetValue(str(q.HXSink))          
+            if q.HXSink in self.sinkList: self.tc11.SetValue(q.HXSink)          
             self.tc12.SetValue(str(q.HXTSinkInlet))
             self.tc13.SetValue(str(q.HXTSinkOutlet))
 
@@ -590,6 +593,8 @@ class PanelQ6(wx.Panel):
             else:
                 self.tc105.SetValue("None")
                 
+            setUnitsFluidDensity(q.WHEEMedium)
+                
             self.tc106.SetValue(str(q.WHEEFlow))
             self.tc107.SetValue(str(q.WHEETOutlet))
             
@@ -655,7 +660,7 @@ class PanelQ6(wx.Panel):
 
         self.listBoxHX.Clear()
         for hx in self.HXList:
-            self.listBoxHX.Append(str(hx))
+            self.listBoxHX.Append(hx)
 
         self.WHEEList = Status.prj.getWHEEList("WHEEName")
 

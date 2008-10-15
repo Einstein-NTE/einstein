@@ -120,6 +120,7 @@ def prepareDataForReport():
 
     for ANo in range(1,(Status.NoOfAlternatives+1)):
         Status.prj.setActiveAlternative(ANo)
+        Status.mod.moduleHR.initPanel()
         Status.mod.moduleHC.updatePanel()
 
         Status.mod.moduleEA.update()    #calculate for update of CS plots
@@ -164,7 +165,10 @@ def prepareDataForReport():
 
 #Chap. 5
 
-    Status.mod.moduleTCA.updatePanel()
+    try:
+        Status.mod.moduleTCA.runTCAModule()
+    except:
+        logTrack("prepareDataForReport: error in TCA module")
 
 #Chap. 6.1 - 6.3
     modEA1 = ModuleEA1(['EA1'])

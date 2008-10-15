@@ -15,13 +15,14 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.06
+#   Version No.: 0.07
 #   Created by:         Hans Schweiger  10/06/2008
 #   Last revised by:
 #                       Florian Joebstl 04/09/2008
 #                       Hans Schweiger  05/09/2008
 #                       Hans Schweiger  12/09/2008
 #                       Florian Jöbstl  29/09/2008
+#                       Hans Schweiger  15/10/2008
 #
 #
 #   Changes to previous version:
@@ -36,6 +37,7 @@
 #   29/09/2008: FJ  split into runHRModule and runHRDesign, some renaming,
 #                   changed every other method to privat
 #                   changed the delete HX functionality to Show/Hide HX
+#   15/10/2008: HS  function updateReportData added to updatePanel
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -91,6 +93,7 @@ class ModuleHR(object):
         if (self.data!=None):
             self.data.loadDatabaseData()  
             self.__updateGridData()
+            self.__updateReportData()
             self.__updateCurveData()
 
 
@@ -116,6 +119,51 @@ class ModuleHR(object):
             Status.int.setGraphicsData(self.keys[0], data)
         except:
             logDebug("(moduleHR.py) UpdateGridData: Create rows failed")        
+        
+    def __updateReportData(self): 
+        try:     
+            qTotal = 0.0
+            qdotTotal = 0.0
+            for hx in self.data.hexers:
+                q = hx["QHX"]
+                if q is not None:
+                    qTotal += q
+
+                qdot = hx["QdotHX"]
+                if qdot is not None:
+                    qdotTotal += qdot
+
+            dataListReport = []  
+            index = 0
+            
+            for hx in self.data.hexers:
+                
+                q = hx["QHX"]
+                if qTotal > 0 and q is not None: qhxperc = 100.0*q/qTotal
+                else: qhxperc = "---"
+                
+                row = [hx["HXName"],hx["QdotHX"],hx["HXSource"],hx["HXSink"],hx["QHX"],qhxperc]
+                if index < 20:
+                    dataListReport.append(noneFilter(row))
+                elif index == 20:
+                    logDebug("More than 20 HX in the system. Do not fit into the report")
+                index+=1
+
+            for i in range(index,20):
+                row = [" "," "," "," "," "," "]
+                dataListReport.append(row)
+
+            row = [_("Total"),qdotTotal," "," ",qTotal,100.0]
+            dataListReport.append(row)
+            
+            dataReport = array(dataListReport)
+
+            key = "HX%02d"%Status.ANo
+            print "%s\n"%key,dataReport
+            Status.int.setGraphicsData(key, dataReport)
+            
+        except:
+            logDebug("(moduleHR.py) UpdateReportData: Create rows failed")        
         
     def __updateCurveData(self):                 
         # stores data for mathplot in panelHR         

@@ -605,6 +605,7 @@ class ImportProject(object):
 # => to be changed in the future ...
 
         dummyID = Status.DB.questionnaire.insert({"Name":"dummy"})
+        Status.SQL.commit()
         cursor.execute('SELECT MAX(Questionnaire_id) AS n FROM questionnaire')
 
         nrows = cursor.rowcount
@@ -614,6 +615,7 @@ class ImportProject(object):
             field = cursor.fetchone()
             # new pid for this project
             self.newpid = int(field['n']) + 1
+        logDebug("ExportData (importProject): dummyID = %s newpid = %s"%(dummyID,self.newpid))
 
         dummyRows = Status.DB.questionnaire.Questionnaire_ID[dummyID]
         if len(dummyRows) > 0:
