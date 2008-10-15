@@ -120,11 +120,11 @@ def prepareDataForReport():
 
     for ANo in range(1,(Status.NoOfAlternatives+1)):
         Status.prj.setActiveAlternative(ANo)
-        Status.mod.moduleHR.initPanel()
-        Status.mod.moduleHC.updatePanel()
 
         Status.mod.moduleEA.update()    #calculate for update of CS plots
 
+        Status.mod.moduleHR.initPanel()
+        Status.mod.moduleHC.updatePanel()
 
         dlg.update(50 + 20.0 * ANo / Status.NoOfAlternatives)
     dlg.update(70)
