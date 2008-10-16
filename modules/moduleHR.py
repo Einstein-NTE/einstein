@@ -38,6 +38,7 @@
 #                   changed every other method to privat
 #                   changed the delete HX functionality to Show/Hide HX
 #   15/10/2008: HS  function updateReportData added to updatePanel
+#                   new function doPostProcessing + auxiliary functions
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -248,40 +249,79 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
 # starts all (internal) calculations
 #------------------------------------------------------------------------------        
-        self.__calcQD_T()
-        self.__calcQA_T()
-        self.__calcQD_Tt()
-        self.__calcQA_Tt()
 
-#------------------------------------------------------------------------------
-#   HS: From here on necessary functions of the original simulateHR
-#------------------------------------------------------------------------------
+#   calculate aggregate heat demand and waste heat availability
         if Status.processData.outOfDate == True:
             Status.processData.createAggregateDemand()
-            return ###????
             
-# Arrays that need to be calculated (output for further processing)
-
-        QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
-        UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes
-        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
-        QWHAmb_Tt = Status.int.createQ_Tt()     # remaining waste heat that currently is dissipated
-
-# Results imported from previous calculations (in calculateAggregateDemand)
-
         UPH_Tt = Status.int.UPHTotal_Tt
         UPHw_Tt = Status.int.UPHwTotal_Tt
 
-#..............................................................................
-# importation of PE results on heat recovery
+# Arrays that need to be calculated (output for further processing)
 
-#HS: Florian - the order of temperature and time index in our arrays are changed
-# maybe all this can be quite simplified ...
+        QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
+        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
+
+        UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
+        QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw. will be reduced by QHX
+        
+#..............................................................................
+# read in PE2 result - remaining yearly demand and calculate QHX_T by difference
+
+        QHX_T_res = Status.int.createQ_T()   
+
+        self.__calcQD_T()
 
         for iT in range(Status.NT+2):
+            QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
+
+        print "ModuleHR (__doPostProcessing): PE2 results UPH %s QD %s QHX %s"%\
+              (Status.int.UPHTotal_T[Status.NT+1],self.data.QD_T[Status.NT+1],QHX_T_res[Status.NT+1])
+
+#..............................................................................
+# now distribute QHX_T to the time intervals
+
+        dQHX_Tt = Status.int.createQ_Tt()    # fraction of QHX corresponding to a given time shift
+        dQHX_T =Status.int.createQ_T()   
+            
+        for timeShift in range(0,25):  # maximum one day time shift ... if that's not enough send error message !!!
+            dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
+
+            dQHX_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
+
+            for iT in range(Status.NT+2):
+                if QHX_T_res[iT] > 0:
+                    fR = min(dQHX_T[iT]/QHX_T_res[iT],1.0)
+                else:
+                    fR = 0.0
+                    
+                for it in range(Status.Nt):
+                    dQHX_Tt[iT][it] *= fR #correction real vs. theoretical (maximum) heat recovery
+                    QHXProc_Tt[iT][it] += dQHX_Tt[iT][it]
+                    UPHProc_Tt[iT][it] -= dQHX_Tt[iT][it]
+
+            dQHX_T = Status.int.calcQ_T(dQHX_Tt)    # real heat recovery corresponding to this time shift
+
+# substract exchanged heat from 
+            for iT in range(Status.NT+2):
+                QHX_T_res[iT] -= dQHX_T[iT]
+                QHX_T_res[iT] = max(QHX_T_res[iT],0.0)
+
             for it in range(Status.Nt):
-                UPHProc_Tt[iT][it] = self.data.QD_Tt[it][iT]/3.6    # heat supplied externally to processes
-                QWHAmb_Tt[iT][it] = self.data.QA_Tt[it][iT]/3.6      # remaining waste heat that currently is dissipated
+
+                itw = (it + Status.Nt - timeShift)%Status.Nt
+                
+                for iT in range(2,Status.NT+2):
+                    QWHAmb_Tt[iT][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT-2][it])
+
+            print "ModuleHR (__doPostProcessing): dt = %s QHXres = %s"%(timeShift,QHX_T_res[Status.NT+1])
+
+            if QHX_T_res[Status.NT+1] < 1.e-3:
+                break
+
+            elif timeShift == 25:
+                logDebug("ModuleHR (__doPostProcessing): time shift of 168 hours not enough for realising PE2 HR potential")
+            
 #..............................................................................
 # settings of the conversion UPH -> USH
 
@@ -297,15 +337,12 @@ class ModuleHR(object):
 #..............................................................................
 #..............................................................................
 #..............................................................................
-
-# calculating QHXProc by difference: UPH = UPHProc + QHXProc
-        for it in range(Status.Nt):
-            for iT in range(Status.NT+2):
-                QHXProc_Tt[iT][it] = UPH_Tt[iT][it] - UPHProc_Tt[iT][it]
                            
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
 
+        for it in range(Status.Nt):
+            
             USH_Tt[0][it] = 0
             USH_Tt[1][it] = 0
             for iT in range(2,Status.NT+2):
@@ -326,16 +363,60 @@ class ModuleHR(object):
         Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
+            
+
+#------------------------------------------------------------------------------
+    def __maxHRPotential(self,UPH_Tt,QWH_Tt,timeShift):
+#------------------------------------------------------------------------------
+#       returns a vector with the maximum heat recovery potential
+#       for a given time and temperature shift
+#       for simplicity at the moment temperature shift = fix:
+#       10 K (2 temperature intervals)
+#------------------------------------------------------------------------------
+
+        QHX_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
         
+#..............................................................................
+#..............................................................................
+#..............................................................................
+
+        for it in range(Status.Nt):
+
+            itw = (it + Status.Nt - timeShift)%Status.Nt
+
+#..............................................................................
+
+#first invert UPHw curve and shift 2 temperature intervals (DTmin)
+
+            UPHw_max = QWH_Tt[2][itw]   
+            
+            for iT in range(Status.NT):
+                QHX_Tt[iT][it] = (UPHw_max - QWH_Tt[iT+2][itw])  #maximum available energy
+            QHX_Tt[Status.NT][it]   = QHX_Tt[Status.NT-1][it]         #includes shift by DTmin
+            QHX_Tt[Status.NT+1][it] = QHX_Tt[Status.NT-1][it]
+
+#then shift so that QHX always < UPH -> = Hot Composite Curve
+            shift = 0.0
+            for iT in range(Status.NT+2):
+                shift = max(shift,QHX_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
+
+            for iT in range(Status.NT+2):
+                QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)                                        # = shift of HCC in Q
+            
+        return QHX_Tt        
+
 #------------------------------------------------------------------------------
 # Matrix and List calculation
 #------------------------------------------------------------------------------    
     def __calcQD_T(self): 
+
         streams = self.data.streams[:]
         hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
         for stream in hidden:
             streams.append(stream)
            
+        print "calcQD: number of streams = %s"%len(streams)
+
         QD_T = []
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
@@ -343,8 +424,15 @@ class ModuleHR(object):
     
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
-            for stream in streams:                
-                if (stream.HotColdType == "cold"):
+            for stream in streams:
+
+#=========================================================================================================
+#HS2008-10-16 SUBSTITUTED FOR TESTING BY THE FOLLOWING                if (stream.HotColdType == "cold"):
+# ELIMINATE ARTIFICIALLY STREAMS WITH STARTTEMP < 40 ºC
+
+                print "Stream %s -> %s"%(stream.StartTemp,stream.EndTemp)
+                if (stream.HotColdType == "cold" and stream.StartTemp > 39.9):
+#=========================================================================================================
                     if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):  
                         if (temperature <= stream.EndTemp):                                                                                                                                  
                             QD_T[temperature / temperature_step] += stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours
@@ -611,6 +699,47 @@ class ModuleHR(object):
             logError(_("Recalculation of HEX failed."))         
 
 
+
+#------------------------------------------------------------------------------
+    def __maxHRPotential(self,UPH_Tt,UPHw_Tt,timeShift):
+#------------------------------------------------------------------------------
+#       returns a vector with the maximum heat recovery potential
+#       for a given time and temperature shift
+#       for simplicity at the moment temperature shift = fix:
+#       10 K (2 temperature intervals)
+#------------------------------------------------------------------------------
+
+        QHX_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
+        
+#..............................................................................
+#..............................................................................
+#..............................................................................
+
+        for it in range(Status.Nt):
+
+            itw = (it - timeShift)%Status.Nt
+
+#..............................................................................
+
+#first invert UPHw curve and shift 2 temperature intervals (DTmin)
+
+            UPHw_max = UPHw_Tt[2][itw]   
+            
+            for iT in range(Status.NT):
+                QHX_Tt[iT][it] = (UPHw_max - UPHw_Tt[iT+2][itw])  #maximum available energy
+            QHX_Tt[Status.NT][it]   = QHX_Tt[Status.NT-1][it]         #includes shift by DTmin
+            QHX_Tt[Status.NT+1][it] = QHX_Tt[Status.NT-1][it]
+
+#then shift so that QHXProc always < UPH -> = Hot Composite Curve
+            shift = 0.0
+            for iT in range(Status.NT+2):
+                shift = max(shift,QHX_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
+
+            for iT in range(Status.NT+2):
+                QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)                                        # = shift of HCC in Q
+            
+        return QHX_Tt        
+
         
 #------------------------------------------------------------------------------
     def __estimativMethod(self):
@@ -700,6 +829,102 @@ class ModuleHR(object):
 #..............................................................................
 #..............................................................................
                 
+        Status.int.USHTotal_Tt = USH_Tt
+        Status.int.UPHProcTotal_Tt = UPHProc_Tt
+        Status.int.QHXProcTotal_Tt = QHXProc_Tt
+        Status.int.QWHAmb_Tt = QWHAmb_Tt
+
+        Status.int.USHTotal_T = Status.int.calcQ_T(USH_Tt)
+        Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
+        Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
+        Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
+        
+#------------------------------------------------------------------------------
+    def __doPostProcessing_OldStuff(self):
+#------------------------------------------------------------------------------
+# starts all (internal) calculations
+#------------------------------------------------------------------------------        
+        self.__calcQD_T()
+        self.__calcQA_T()
+        self.__calcQD_Tt()
+        self.__calcQA_Tt()
+
+#------------------------------------------------------------------------------
+#   HS: From here on necessary functions of the original simulateHR
+#------------------------------------------------------------------------------
+        if Status.processData.outOfDate == True:
+            Status.processData.createAggregateDemand()
+            return ###????
+            
+# Arrays that need to be calculated (output for further processing)
+
+        QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
+        UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes
+        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
+        QWHAmb_Tt = Status.int.createQ_Tt()     # remaining waste heat that currently is dissipated
+
+# Results imported from previous calculations (in calculateAggregateDemand)
+
+        UPH_Tt = Status.int.UPHTotal_Tt
+        UPHw_Tt = Status.int.UPHwTotal_Tt
+
+#..............................................................................
+# importation of PE results on heat recovery
+
+#HS: Florian - the order of temperature and time index in our arrays are changed
+# maybe all this can be quite simplified ...
+
+        QDInData = 0.0
+        QAInData = 0.0
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt):
+                UPHProc_Tt[iT][it] = self.data.QD_Tt[it][iT]    # heat supplied externally to processes
+                QWHAmb_Tt[iT][it] = self.data.QA_Tt[it][iT]      # remaining waste heat that currently is dissipated
+
+                print ("[%2d][%4d] QD %s QA %s "%(iT,it,self.data.QD_Tt[it][iT],self.data.QA_Tt[it][iT]))
+
+                if iT == (Status.NT+1):
+                    QDInData += self.data.QD_Tt[it][iT]
+
+                if iT == 0:
+                    QAInData += self.data.QA_Tt[it][iT]
+                
+        print "ModuleHR (doPostProcessing): QD %s QA %s "%(QDInData/1000,QAInData/1000)
+#..............................................................................
+# settings of the conversion UPH -> USH
+
+        (projectData,generalData) = Status.prj.getProjectData()
+        if generalData is not None:
+            DistributionEfficiency = generalData.HDEffAvg
+        else:
+            logDebug("SimulateHR: error reading distribution efficiency from cgeneraldata")
+            DistributionEfficiency = 0.9
+            
+        fDist = 1./max(DistributionEfficiency,0.1)  #distribution efficiency < 10% doesn't make much sense
+        
+#..............................................................................
+#..............................................................................
+#..............................................................................
+
+# calculating QHXProc by difference: UPH = UPHProc + QHXProc
+        for it in range(Status.Nt):
+            for iT in range(Status.NT+2):
+                QHXProc_Tt[iT][it] = UPH_Tt[iT][it] - UPHProc_Tt[iT][it]
+                           
+#..............................................................................
+# from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
+
+            USH_Tt[0][it] = 0
+            USH_Tt[1][it] = 0
+            for iT in range(2,Status.NT+2):
+                USH_Tt[iT][it] = UPHProc_Tt[iT-2][it]*fDist
+
+#..............................................................................
+#..............................................................................
+#..............................................................................
+
+# Assignment to global arrays in Interfaces
+
         Status.int.USHTotal_Tt = USH_Tt
         Status.int.UPHProcTotal_Tt = UPHProc_Tt
         Status.int.QHXProcTotal_Tt = QHXProc_Tt
