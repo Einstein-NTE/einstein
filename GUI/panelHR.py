@@ -153,7 +153,7 @@ class HRPlotPanelYED (PlotPanel):
         # initiate plotter
         PlotPanel.__init__( self, parent, **kwargs )
         self.SetColor( (255,255,255) )
-        Status.HRTool = "estimate"
+        #Status.HRTool = "estimate"
 
     def draw( self ):
         """Draw data."""
@@ -517,9 +517,9 @@ class PanelHR(wx.Panel):
     def OnBtnCalculateButton(self, event):
         print _("PanelHR (OnBtnCalculateButton)")      
         if (self.mod.redesign):
-            self.mod.runHRDesign()  
+            self.mod.runHRDesign(exhx = self.cbExHX.GetValue())  
         else:
-            self.mod.runHRModule()            
+            self.mod.runHRModule(exhx = self.cbExHX.GetValue())            
         self.enableButtons(False)
         self.display()        
         event.Skip()
@@ -543,7 +543,7 @@ class PanelHR(wx.Panel):
         event.Skip()
 
     def OnCbExHXCheckbox(self, event):
-        self.mod.ExHX = self.cbExHX.GetValue()
+        #self.mod.ExHX = self.cbExHX.GetValue()
         #print self.mod.ExHX
         event.Skip()
 

@@ -40,7 +40,6 @@ class DialogGauge(wx.Dialog):
         self.update(0)
 
     def update(self,f):
-        print "DialogGauge (update): %6.2f"%f
         if f >= 100:
             self.Destroy()
         else:

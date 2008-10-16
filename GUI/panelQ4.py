@@ -517,7 +517,7 @@ class PanelQ4(wx.Panel):
 
         if self.tc6.GetValue() > 1:
             showMessage("Number of Equipments > 1 not yet supported\nWorkaround: multiply nominal power by N")
-            
+        
         tmp = {
             "Equipment":check(self.tc1.GetValue()),
             "Manufact":check(self.tc2.GetValue()),
@@ -541,7 +541,7 @@ class PanelQ4(wx.Panel):
             "ThermalConsum":check(self.tc34.GetValue()),
             "THeatSourceHT":check(self.tc33.GetValue()),
             "HeatSourceHT":check(findKey(pipeDict,self.tc32.GetValue(text=True))),
-            "Refrigerant":check(self.tc102.GetValue(text=True)),
+            "Refrigerant":check(findKey(fluidDict,self.tc102.GetValue(text=True))),
             "DestinationWasteHeat":check(self.tc35.GetValue(text=True)),
             "TemperatureReCooling":check(self.tc36.GetValue()),
             "HPerDayEq":check(self.tc18.GetValue()),
@@ -581,6 +581,7 @@ class PanelQ4(wx.Panel):
 
         pipeDict = Status.prj.getPipeDict()
         fuelDict = Status.prj.getFuelDict()
+        fluidDict = Status.prj.getFluidDict()
         
         if q is not None:
             self.tc1.SetValue(str(q.Equipment))
@@ -608,18 +609,21 @@ class PanelQ4(wx.Panel):
 
 
             self.tc20.SetSelection(self.getPipeNames(q.PipeDuctEquip))
-#            self.tc20.SetSelection(['ein','zwei','drei'])
             
             self.tc30.SetValue(str(q.HeatSourceLT))
+                
             self.tc31.SetValue(str(q.THeatSourceLT))
-            
+                        
             if q.HeatSourceHT in pipeDict.keys():
-                self.tc32.SetValue(pipeDict[q.HeatSourceHT])
+                self.tc32.SetValue(pipeDict[str(long(q.HeatSourceHT))])
                 
             self.tc33.SetValue(str(q.THeatSourceHT))
             self.tc34.SetValue(str(q.ThermalConsum))
-    #        self.tc35.SetValue(str(q.))
-    #        self.tc36.SetValue(str(q.))
+            self.tc35.SetValue(str(q.DestinationWasteHeat))
+            self.tc36.SetValue(str(q.TemperatureReCooling))
+
+            if q.Refrigerant in fluidDict.keys():
+                self.tc102.SetValue(fluidDict[q.Refrigerant])
 
             self.turnKeyPrice = q.TurnKeyPrice
             if self.turnKeyPrice is None: self.turnKeyPrice = 0.0
@@ -649,10 +653,10 @@ class PanelQ4(wx.Panel):
         
         self.tc30.SetValue('')
         self.tc31.SetValue('')
-        self.tc32.SetValue('')
+#        self.tc32.SetValue('')
         self.tc33.SetValue('')
         self.tc34.SetValue('')
-        self.tc35.SetValue('')
+#        self.tc35.SetValue('')
         self.tc36.SetValue('')
 
         self.turnKeyPrice = 0.0

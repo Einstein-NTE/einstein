@@ -75,7 +75,6 @@ class ModuleHR(object):
 
     def __init__(self, keys):
         self.keys = keys # the key to the data is sent by the panel
-        self.ExHX = False
         self.ConCondensation = False
         self.HiddenHX = []
         self.data = HRData(Status.PId,Status.ANo)
@@ -174,9 +173,9 @@ class ModuleHR(object):
 # Public Methodes
 #----------------------------------------------------------------------------------------------------   
                          
-    def runHRDesign(self):        
+    def runHRDesign(self,exhx = True):        
         dlg = DialogGauge(Status.main,_("EINSTEIN heat recovery module"),_("calculating"))
-        self.__runPE2(redesign = True,concondensation = self.ConCondensation)
+        self.__runPE2(redesign = True,concondensation = self.ConCondensation, exhx = exhx)
         dlg.update(50.0)
         
         self.__doPostProcessing()
@@ -186,7 +185,7 @@ class ModuleHR(object):
                       
         dlg.Destroy()
 
-    def runHRModule(self):
+    def runHRModule(self,exhx = True):
         dlg = DialogGauge(Status.main,_("EINSTEIN heat recovery module"),_("calculating"))
         redesign_network_flag = None
         if Status.HRTool == "estimate":
@@ -207,7 +206,7 @@ class ModuleHR(object):
 # Internal Calculations
 #----------------------------------------------------------------------------------------------------  
 
-    def __runPE2(self,redesign = True, concondensation = False):        
+    def __runPE2(self,redesign = True, concondensation = False , exhx = True):        
         if (redesign):
             logWarning(_("Redesigning HX network. This may take some time. (Tool: PE2)"))
             redesign_network_flag = "t"
@@ -223,7 +222,7 @@ class ModuleHR(object):
         if Status.schedules.outOfDate == True:
             Status.schedules.create()   #creates the process and equipment schedules
                          
-        XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,self.ExHX)
+        XMLExportHRModule.export("inputHR.xml",Status.PId, Status.ANo,exhx)
         
         try:
             args = ['..\PE\ProcessEngineering.exe',"..\GUI\inputHR.xml","..\GUI\export.xml",redesign_network_flag,con_condensation_flag]
@@ -271,6 +270,7 @@ class ModuleHR(object):
         QHX_T_res = Status.int.createQ_T()   
 
         self.__calcQD_T()
+        self.__calcQA_T()
 
         for iT in range(Status.NT+2):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
@@ -425,14 +425,7 @@ class ModuleHR(object):
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
             for stream in streams:
-
-#=========================================================================================================
-#HS2008-10-16 SUBSTITUTED FOR TESTING BY THE FOLLOWING                if (stream.HotColdType == "cold"):
-# ELIMINATE ARTIFICIALLY STREAMS WITH STARTTEMP < 40 ºC
-
-                print "Stream %s -> %s"%(stream.StartTemp,stream.EndTemp)
-                if (stream.HotColdType == "cold" and stream.StartTemp > 39.9):
-#=========================================================================================================
+                if (stream.HotColdType == "cold"):
                     if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):  
                         if (temperature <= stream.EndTemp):                                                                                                                                  
                             QD_T[temperature / temperature_step] += stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours

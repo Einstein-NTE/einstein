@@ -93,7 +93,7 @@ from dialogGauge import DialogGauge
 #
 COLUMNS     ='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 PREFIX      ='KEY_'
-NEWREPORT   = 'report.ods'
+NEWREPORT   = 'New_EINSTEIN_Report.ods'
 TMPFILE     = "./workfile"
 CONTENTFILE = 'content.xml'
 

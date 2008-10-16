@@ -51,7 +51,7 @@ ALTER TABLE questionnaire DROP COLUMN OMTotalExtenal;
 
 
 
---==================================================================================================================
+-- ==================================================================================================================
 
 
 ALTER TABLE cgeneraldata ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount Rate' AFTER InterestExtFinancing;

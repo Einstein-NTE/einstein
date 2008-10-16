@@ -859,7 +859,6 @@ class FloatEntry(wx.Panel):
             # convert to user units
             try:
                 f = self.entry.toFloat(iValue)
-                print "f= ",f
                 if f is not None:
                     dValue = units.displayValue(f,self.defaultDisplayUnit,self.unitdict)
                     self.entry.SetValue(dValue)

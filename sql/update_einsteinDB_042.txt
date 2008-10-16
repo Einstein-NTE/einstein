@@ -1,0 +1,7 @@
+USE einstein;
+
+ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceLT HeatSourceLT VARCHAR(200) COMMENT '' AFTER ExcessAirRatio;
+ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceHT HeatSourceHT VARCHAR(200) COMMENT '' AFTER HeatSourceLT;
+ALTER TABLE qgenerationhc CHANGE COLUMN DestinationWasteHeat DestinationWasteHeat VARCHAR(200) COMMENT '' AFTER Refrigerant;
+
+ALTER TABLE qgenerationhc CHANGE COLUMN Refrigerant Refrigerant INTEGER COMMENT '' AFTER THeatSourceHT;
