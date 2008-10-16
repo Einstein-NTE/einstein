@@ -748,7 +748,7 @@ class ModuleHP():
         if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
             logDebug("ModuleHP (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
             Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
-            Status.int.extendCascadeArrays(cascadeIndex)
+        Status.int.extendCascadeArrays(cascadeIndex)
 
         if cascadeIndex > 0 and cascadeIndex <= Status.NEquipe:
             logTrack("ModuleHP (calculateEnergyFlows): starting (cascade no: %s)"%cascadeIndex)

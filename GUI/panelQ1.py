@@ -596,18 +596,9 @@ class PanelQ1(wx.Panel):
                 else:
                     subBranch = None
 
-                print "ButtonOK"
-                try:
-                    self.main.logMessage("new city = %s"%check(self.tc2.GetValue()))
-                except:
-                    print "error in logMessage"
-                print "Could execute log command"
-                print "condition direct <> = ",(self.tc2.GetValue()<>"")
-
                 tmp = {
                     "Name":check(self.tc1.GetValue()),
                     "City":check(self.tc2.GetValue()),
-#                    "City":"hä",
                     "DescripIndustry":check(self.tc9.GetValue()),
                     "Branch":check(branch),
                     "SubBranch":check(subBranch),

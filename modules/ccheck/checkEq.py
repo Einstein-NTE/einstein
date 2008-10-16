@@ -198,9 +198,11 @@ class CheckEq():
                 if fuel_number <= 0 or fuel_number is None:
                     self.mainSource = "Electricity"
                     self.FuelLCV = 0.0
-                    self.OffgasHeatCapacity.setValue(0) #
+                    self.OffgasHeatCapacity = 1.0 #
                     self.CombAir = 0.0 #
-                    self.FuelConsum.setValue(0)
+                    self.FuelConsum.setValue(0.0)
+                    self.TExhaustGas.setValue(15.0, err=0.0)          #
+
                     self.ElectriConsum.setValue(qgenerationhc.ElectriConsum)
                     self.ExcessAirRatio.val = 1.0
                 else:
@@ -466,6 +468,7 @@ class CheckEq():
         self.DTExhaustGas.show()#
         self.DTExhaustGas1.show()# 
         self.QExhaustGasdot.show()#
+        self.QExhaustGasdot1.show()#
         self.QExhaustGas.show()#
         self.QExhaustGas1.show()#
 

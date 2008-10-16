@@ -211,6 +211,8 @@ class ModuleEnergy(object):
 #   dummy function for calculation of energy flows in any equipment
 #------------------------------------------------------------------------------
 
+        Status.int.extendCascadeArrays(cascadeIndex)
+
         PNom = equipe.HCGPnom
         if PNom is None:
             logTrack("ModuleEnergy (cEF-dummy): no equipment capacity specified")

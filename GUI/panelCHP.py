@@ -76,7 +76,10 @@ MAXROWS = 50
 TABLECOLS = 6
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 TYPELIST = CHPTYPES
 FUELLIST = [_U("Natural Gas"),\
@@ -360,7 +363,7 @@ class PanelCHP(wx.Panel):
 
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELCHPSTINFO2A,
-              label=_U('Temperature [\xbaC]'), name='stInfo3', parent=self,
+              label=_U('Temperature [\x00baC]'), name='stInfo3', parent=self,
               pos=wx.Point(504, 392), style=0)
         self.stInfo2b = wx.StaticText(id=-1, label=_U('Demand at min. op. hours [kW]'),
               name='stInfo2b', parent=self, pos=wx.Point(616, 392), style=0)

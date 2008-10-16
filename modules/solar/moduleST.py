@@ -177,11 +177,11 @@ class SolarCostFunction():
     #   Previous checks if curve is reasonable:
 
         if c30 < c300 or c300 < c3000:
-            print "cost figures not reasonable"
+            logTrack("ModuleST: cost figures not reasonable")
             return (c300,0,300.0)
 
         if c3000/c300 < c300/c30:
-            print "warning, unrealistic case, not in consistence with correlation"
+            logTrack("ModuleST: warning, unrealistic case, not in consistence with correlation")
             c300 = pow(c30*c3000,0.5)
 
     #..............................................................................
@@ -214,16 +214,16 @@ class SolarCostFunction():
             diff = (C0p  - C0)/C0
             C0 += alpha *(C0p-C0)
 
-            print "C0: %s C1: %s xi: %s diff: %s "%(C0,C1,xi,diff)
+#            print "C0: %s C1: %s xi: %s diff: %s "%(C0,C1,xi,diff)
             if diff < 1.e-6:
                 break
 
         Pref = -300.0/log(xi)
-        print "C0: %s C1: %s Pref: %s "%(C0,C1,Pref)
+#        print "C0: %s C1: %s Pref: %s "%(C0,C1,Pref)
 
-        print "C30 = %s"%(C0+C1*exp(-30.0/Pref))
-        print "C300 = %s"%(C0+C1*exp(-300.0/Pref))
-        print "C3000 = %s"%(C0+C1*exp(-3000.0/Pref))
+#        print "C30 = %s"%(C0+C1*exp(-30.0/Pref))
+#        print "C300 = %s"%(C0+C1*exp(-300.0/Pref))
+#        print "C3000 = %s"%(C0+C1*exp(-3000.0/Pref))
 
         self.FixCost = C0
         self.AddCost = C1
@@ -287,7 +287,7 @@ class ModuleST(object):
 #        data = array(collectors)
 
         Status.int.setGraphicsData('ST Table',data)
-        print "ST Table data:\n",data
+#        print "ST Table data:\n",data
 #............................................................................................
 # 2. Preparing data
 
@@ -470,7 +470,7 @@ class ModuleST(object):
         self.equipeIDs=[]
         self.cascadeIndex = 0
         for equipe in equipments:
-            print "Equipment: ",equipe.EquipType,getEquipmentClass(equipe.EquipType)
+#            print "Equipment: ",equipe.EquipType,getEquipmentClass(equipe.EquipType)
             if getEquipmentClass(equipe.EquipType) == "ST":
                 collectorTable = [equipe.Model,
                                   equipe.EquipType,
@@ -600,8 +600,6 @@ class ModuleST(object):
 #   the equipment data base
 #------------------------------------------------------------------------------
 
-        print "ModuleST (setEquipmentFromDB): modelID = ",modelID
-        
         models = Status.DB.dbsolarthermal.DBSolarThermal_ID[modelID]
         if len(models) > 0:
             model = models[0]
@@ -674,6 +672,7 @@ class ModuleST(object):
         if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
             logDebug("ModuleBB (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
             Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
+        Status.int.extendCascadeArrays(cascadeIndex)
 
 #..............................................................................
 # get equipment data from equipment list in SQL
