@@ -585,7 +585,12 @@ class ModuleCS(object):
 ##                    FuelCost.append(qfuel[i].FuelCostYear)
 
 
-                EnergyCost.append(ElCost[i-1]+FuelCost[i-1])#to i-1 (list from 0 to ANo)
+#                EnergyCost.append(ElCost[i-1]+FuelCost[i-1])#to i-1 (list from 0 to ANo)
+        
+                if generalData[i].EnergySystemCost is None:
+                    EnergyCost.append(0.0)
+                else:
+                    EnergyCost.append(generalData[i].EnergySystemCost)
                 
                 if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
                     dAmortization = generalData[i].Amortization

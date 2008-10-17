@@ -421,7 +421,7 @@ class ModuleST(object):
         u = urows[0]
 
         try:
-            u.STSolFra = config[0]/100.0
+            u.STSolFra = float(config[0])/100.0
         except:
             u.STSolFra = 0.5
         u.STCollType = config[1]

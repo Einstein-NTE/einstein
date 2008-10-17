@@ -90,8 +90,8 @@ class DlgManageUO(wx.Dialog):
             self.uos = []
     
     def addUO(self,name,code):
-        query = """INSERT INTO pounitoperation (Name) VALUES (\"%s\",\"%s\")"""
-        query = query % name,code
+        query = """INSERT INTO pounitoperation (Name,Code) VALUES (\"%s\",\"%s\")"""
+        query = query % (name,code)
         Status.DB.sql_query(query)
     
     def deleteUO(self,index):

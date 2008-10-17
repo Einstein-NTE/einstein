@@ -303,7 +303,11 @@ class ModuleEA(object):
 
         if generalData.PEConvEl is None:
             generalData.PEConvEl = 3.0
-            showWarning(_("No conversion factor electricity - primary energy was specified.\default value 3.0 assumed"))
+            logWarning(_("No conversion factor electricity - primary energy was specified.\default value 3.0 assumed"))
+
+        if generalData.FETel is None:
+            logWarning(_("WARNING: No data available for electricity consumption for thermal uses. Set to 0 !!!"))
+            generalData.FETel = 0.0
 
         generalData.PETel = generalData.FETel * generalData.PEConvEl
 
@@ -316,13 +320,13 @@ class ModuleEA(object):
 
         if generalData.CO2ConvEl is None:
             generalData.CO2ConvEl = 0.5
-            showWarning(_("No conversion factor electricity - CO2 emission was specified.\default value 0.5 t/MWh assumed"))
+            logWarning(_("No conversion factor electricity - CO2 emission was specified.\default value 0.5 t/MWh assumed"))
 
         generalData.ProdCO2el = generalData.FECel * generalData.CO2ConvEl
 
         if generalData.NoNukesConvEl is None:
             generalData.NoNukesConvEl = 5.00
-            showWarning(_("No conversion factor electricity - HR nuclear waste was specified.\default value 5.0 g/MWh assumed (15 % nuclear)"))
+            logWarning(_("No conversion factor electricity - HR nuclear waste was specified.\default value 5.0 g/MWh assumed (15 % nuclear)"))
 
         generalData.ProdNoNukesEl = generalData.FECel * generalData.NoNukesConvEl
 
@@ -335,6 +339,16 @@ class ModuleEA(object):
             i = fuel.FuelNo - 1
             f = Fuel(fuel.DBFuel_id)
             
+            if fuel.FETFuel is None:
+                logWarning(_("WARNING: No data available for fuel consumption for thermal uses (fuel no. %s). Set to 0 !!!")
+                           %(i+1))
+                fuel.FETFuel = 0.0
+
+            if fuel.FECFuel is None:
+                logWarning(_("WARNING: No data available for total fuel consumption (fuel no. %s). Set to 0 !!!")
+                           %(i+1))
+                fuel.FECFuel = 0.0
+
             dPET = fuel.FETFuel * f.PEConv
             dFEC = fuel.FECFuel
             dPEC = fuel.FECFuel * f.PEConv

@@ -6,6 +6,8 @@ USE einstein;
 ALTER DATABASE einstein DEFAULT CHARACTER SET 'utf8';
 
 ALTER TABLE cgeneraldata ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount rate' AFTER InterestExtFinancing;
+ALTER TABLE cgeneraldata ADD COLUMN PayBack DOUBLE COMMENT '' AFTER BCR;
+ALTER TABLE cgeneraldata ADD COLUMN EnergySystemCost DOUBLE COMMENT 'Energy cost including OM and annuity' AFTER EnergyCost;
 
 ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceLT HeatSourceLT VARCHAR(200);
 ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceHT HeatSourceHT VARCHAR(200);
@@ -532,5 +534,125 @@ CREATE TABLE IF NOT EXISTS `pounitoperation` (
 ) ENGINE=MyISAM;
 
 
+-- Delete Table:
+DROP TABLE IF EXISTS `posubsector_to_uo`;
+
+
+--
+-- Datenbank: `einstein`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `poefficiencymeasure`
+--
+
+DROP TABLE IF EXISTS `poefficiencymeasure`;
+CREATE TABLE IF NOT EXISTS `poefficiencymeasure` (
+  `IDEfficiencyMeasure` int(11) NOT NULL auto_increment,
+  `ShortDescription` varchar(300) NOT NULL,
+  `Text` text NOT NULL,
+  PRIMARY KEY  (`IDEfficiencyMeasure`)
+) ENGINE=MyISAM  AUTO_INCREMENT=7 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `poemlist`
+--
+
+DROP TABLE IF EXISTS `poemlist`;
+CREATE TABLE IF NOT EXISTS `poemlist` (
+  `IDEMList` int(11) NOT NULL auto_increment,
+  `SubsectorID` int(11) NOT NULL,
+  `UnitOperationID` int(11) NOT NULL,
+  `TechnologyID` int(11) NOT NULL,
+  `TypicalProcessID` int(11) NOT NULL,
+  PRIMARY KEY  (`IDEMList`)
+) ENGINE=MyISAM  AUTO_INCREMENT=22 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `poemlistentry`
+--
+
+DROP TABLE IF EXISTS `poemlistentry`;
+CREATE TABLE IF NOT EXISTS `poemlistentry` (
+  `EMListID` int(11) NOT NULL,
+  `EfficiencyMeasureID` int(11) NOT NULL
+) ENGINE=MyISAM ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `posector`
+--
+
+DROP TABLE IF EXISTS `posector`;
+CREATE TABLE IF NOT EXISTS `posector` (
+  `IDsector` int(11) NOT NULL auto_increment,
+  `Name` varchar(300) NOT NULL,
+  `NACE` varchar(20) NOT NULL,
+  PRIMARY KEY  (`IDsector`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `posubsector`
+--
+
+DROP TABLE IF EXISTS `posubsector`;
+CREATE TABLE IF NOT EXISTS `posubsector` (
+  `IDSubsector` int(11) NOT NULL auto_increment,
+  `SectorID` int(11) NOT NULL,
+  `Name` varchar(300) NOT NULL,
+  `NACE` varchar(20) NOT NULL,
+  PRIMARY KEY  (`IDSubsector`)
+) ENGINE=MyISAM AUTO_INCREMENT=19 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `potech`
+--
+
+DROP TABLE IF EXISTS `potech`;
+CREATE TABLE IF NOT EXISTS `potech` (
+  `IDTechnology` int(11) NOT NULL auto_increment,
+  `Name` varchar(300) NOT NULL,
+  `Code` varchar(20) NOT NULL,
+  PRIMARY KEY  (`IDTechnology`)
+) ENGINE=MyISAM  AUTO_INCREMENT=6 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `potypicalprocess`
+--
+
+DROP TABLE IF EXISTS `potypicalprocess`;
+CREATE TABLE IF NOT EXISTS `potypicalprocess` (
+  `IDTypicalProcess` int(11) NOT NULL auto_increment,
+  `Name` varchar(300) NOT NULL,
+  `Code` varchar(20) NOT NULL,
+  PRIMARY KEY  (`IDTypicalProcess`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `pounitoperation`
+--
+
+DROP TABLE IF EXISTS `pounitoperation`;
+CREATE TABLE IF NOT EXISTS `pounitoperation` (
+  `IDUnitOperation` int(11) NOT NULL auto_increment,
+  `Name` varchar(300) NOT NULL,
+  `Code` varchar(20) NOT NULL,
+  PRIMARY KEY  (`IDUnitOperation`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 ;
 
 

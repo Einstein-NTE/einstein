@@ -266,7 +266,16 @@ from einstein.GUI.status import Status #processing status of the tool
 
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+    
+def U(text):
+    try:
+        return unicode((text),"utf-8")
+    except:
+        return (text)
     
 #----- Constants
 qPageSize = (800, 600)
@@ -324,7 +333,7 @@ class EinsteinFrame(wx.Frame):
             try:
                 cursor = conn.cursor(MySQLdb.cursors.DictCursor)
                 cursor.execute("SET NAMES '%s'" % self.MySQLEncoding)
-                self.doLog.LogThis('Encoding %s' % self.MySQLEncoding)
+                self.doLog.LogThis('EinsteinMain: Encoding %s' % self.MySQLEncoding)
             except MySQLdb.Error, e:
                 self.doLog.LogThis('Could not set encoding %s: %s' % (self.MySQLEncoding,str(e)))
 
@@ -492,28 +501,28 @@ class EinsteinFrame(wx.Frame):
 
     def showError(self, text):
         self.logError(text)
-        dlg = wx.MessageDialog(None, text, _U("Error"), wx.OK | wx.ICON_ERROR)
+        dlg = wx.MessageDialog(None, U(text), _U("Error"), wx.OK | wx.ICON_ERROR)
         ret = dlg.ShowModal()
         dlg.Destroy()
-        self.doLog.LogThis('Error: '+text)
+        self.doLog.LogThis('Error: '+ text)
 
     def showWarning(self, text):
         self.logWarning(text)
-        dlg = wx.MessageDialog(None, text, _U("Warning"), wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(None, U(text), _U("Warning"), wx.OK | wx.ICON_EXCLAMATION)
         ret = dlg.ShowModal()
         #dlg.Destroy()
         self.doLog.LogThis('Warning: '+text)
 
     def showInfo(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, text, _U("Info"), wx.OK | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(None, U(text), _U("Info"), wx.OK | wx.ICON_INFORMATION)
         ret = dlg.ShowModal()
         dlg.Destroy()
         self.doLog.LogThis('Info: '+text)
 
     def askConfirmation(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, text, _U("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, U(text), _U("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
         ret = dlg.ShowModal()
         dlg.Destroy()
         self.doLog.LogThis('Confirm: '+text+'. Answer='+str(ret))
@@ -960,21 +969,29 @@ class EinsteinFrame(wx.Frame):
             self.panelEA5.display()
         #qEM1 'Energy performance - Monthly'
         elif select == _U('Monthly demand'):
+            self.showWarning(_("Sorry. This function is not yet available. Coming soon !"))
+            return
             self.hidePages()
             self.panelEM1 = PanelEM1(parent=self.leftpanel2)
             self.panelEM1.display()
         #qEM2 'Heat supply - Monthly'
         elif select == _U('Monthly supply'):
+            self.showWarning(_("Sorry. This function is not yet available. Coming soon !"))
+            return
             self.hidePages()
             self.panelEM2 = PanelEM2(parent=self.leftpanel2)
             self.panelEM2.display()
         #qEH1 'Energy performance - Hourly'
         elif select == _U('Hourly demand'):
+            self.logWarning(_("Sorry. This function is not yet available. Coming soon !"))
+            return
             self.hidePages()
             #self.panelEH1 = PanelEH1(parent=self.leftpanel2)
             #self.panelEH1.Show()
         #qEH2 'Heat supply - Hourly'
         elif select == _U('Hourly supply'):
+            self.logWarning(_("Sorry. This function is not yet available. Coming soon !"))
+            return
             self.hidePages()
             #self.panelEH2 = PanelEH2(parent=self.leftpanel2)
             #self.panelEH2.Show()
@@ -1021,6 +1038,8 @@ class EinsteinFrame(wx.Frame):
 
         #panelCHP
         elif select == _U("CHP"):
+            self.logWarning(_("Sorry. This function is not yet available. Coming soon !"))
+            return
             self.hidePages()
             self.panelCHP = PanelCHP(id=-1, name='panelCHP', parent=self.leftpanel2,
                                    main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),

@@ -1,0 +1,4 @@
+USE einstein;
+
+ALTER TABLE cgeneraldata ADD COLUMN PayBack DOUBLE COMMENT '' AFTER BCR;
+ALTER TABLE cgeneraldata ADD COLUMN EnergySystemCost DOUBLE COMMENT 'Energy cost including OM and annuity' AFTER EnergyCost;

@@ -107,13 +107,13 @@ class ModulePO(object):
                    WHERE unit.IDUnitOperation = list.UnitOperationID AND list.SubsectorID = %s
                    GROUP BY IDUnitOperation"""
         subsector = self.subsectors[ssindex]
-        query = query % subsector[0]         
+        query = query % subsector[0]                 
         results = Status.DB.sql_query(query)  
         
         if len(results)>0:
             if (type(results[0])!=type(())):
                 results = [ results ]
-                self.unitoperations = results 
+            self.unitoperations = results 
         else:
             self.unitoperations = []
     

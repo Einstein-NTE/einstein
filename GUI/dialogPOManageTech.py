@@ -77,7 +77,7 @@ class DlgManageTech(wx.Dialog):
             self.techs = []
     
     def addTech(self,name,code):
-        query = """INSERT INTO potech (Name,Code) VALUES (\"%s\")"""
+        query = """INSERT INTO potech (Name,Code) VALUES (\"%s\",\"%s\")"""
         query = query % (name,code)
         Status.DB.sql_query(query)
     
