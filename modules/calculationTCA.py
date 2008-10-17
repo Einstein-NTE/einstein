@@ -99,6 +99,8 @@ def NPV(cf_new, cf_old, rate):
     return npv[:]
 
 def NPVcf(cf, rate):
+    print "cf-------"
+    print cf
     '''NPV -- net present value
     http://en.wikipedia.org/wiki/Net_present_value
     
@@ -228,6 +230,15 @@ def ANNUITY(I0,r,N):
     #print "a=%s" % (a)
     #print "A=%s" % (A)
     return A
+
+def ADDCOST(Add1,Add2,Add3,Add4,Add5):
+    addcost = Add1+Add2+Add3-Add4-Add5
+    return addcost
+
+#def ADDCOSTPERSAVEPE(PE1,PE2,PE3):
+    #addcostpersavepe = PE1/(PE2-PE3)
+    #return addcostpersavepe
+
 
 
 #################

@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinDataBase dbname="dbheatpump">
+<table name="dbheatpump">
+<row n="1">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="10.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.8" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.411" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.258" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="1670.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="8.6" />
+<element name="HPCoolCOP" type="double" auto="" value="2.24" />
+</row>
+<row n="2">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="15.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.85" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.419" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.262" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="2390.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="12.9" />
+<element name="HPCoolCOP" type="double" auto="" value="2.28" />
+</row>
+<row n="3">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="20.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.9" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.426" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.267" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="4" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="3100.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="17.2" />
+<element name="HPCoolCOP" type="double" auto="" value="2.32" />
+</row>
+<row n="4">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="30.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.95" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.433" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.272" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="4415.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="25.8" />
+<element name="HPCoolCOP" type="double" auto="" value="2.36" />
+</row>
+<row n="5">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="50.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.0" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.441" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.276" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="6" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="6940.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="43.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.4" />
+</row>
+<row n="6">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="100.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.03" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.445" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.279" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="7" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="12824.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="86.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.42" />
+</row>
+<row n="7">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="150.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.06" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.449" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.282" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="8" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="18366.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="129.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.45" />
+</row>
+<row n="8">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="200.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.1" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.455" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.285" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="9" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="23700.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="172.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.48" />
+</row>
+<row n="9">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="300.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.13" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.46" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.288" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="10" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="33950.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="258.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.5" />
+</row>
+<row n="10">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="500.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.16" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.464" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.291" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="11" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="53370.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="430.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.53" />
+</row>
+<row n="11">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="800.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.19" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.469" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.294" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="12" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="80940.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="688.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.55" />
+</row>
+<row n="12">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="1000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.22" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.473" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.297" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="13" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="98630.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="860.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.58" />
+</row>
+<row n="13">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="1500.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.25" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.477" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.299" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="14" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="141264.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="1290.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.6" />
+</row>
+<row n="14">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="2000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.28" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.482" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.302" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="15" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="182274.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="1720.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.62" />
+</row>
+<row n="15">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="3000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.3" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.485" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.304" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="16" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="261063.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="2580.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.64" />
+</row>
+<row n="16">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="5000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.33" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.489" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.307" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="17" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="410490.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="4300.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.66" />
+</row>
+<row n="17">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="8000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.36" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.494" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.309" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="18" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="622518.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="6880.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.69" />
+</row>
+<row n="18">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="10000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.4" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.499" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.313" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="19" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="758602.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="8600.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.72" />
+</row>
+<row n="19">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="12000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.45" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.507" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.318" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="20" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="899083.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="10320.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.76" />
+</row>
+<row n="20">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="15000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.5" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.514" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.322" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="21" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="1086504.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="12900.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.8" />
+</row>
+</table>
+</EinsteinDataBase>

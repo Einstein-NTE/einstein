@@ -466,7 +466,7 @@ class ModuleBB(object):
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
 
-        if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
+        if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":model.BoilerTurnKeyPrice})
         else:
             logDebug("ModuleBB: turn key price of boiler model %s not specified"%equipe.Model)
             equipe.update({"TurnKeyPrice":0.0})

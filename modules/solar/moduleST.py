@@ -72,6 +72,8 @@ import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 from sunday import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.dialogGauge import DialogGauge
+
 
 PARASITIC_ELECTRICITY = 0.01
 
@@ -711,6 +713,8 @@ class ModuleST(object):
 #..............................................................................
 # Start hourly loop
 
+        dlg = DialogGauge(Status.main,_("EINSTEIN system simulation"),_("simulating %s")%(_("solar system")))
+
 # update surface calculations if necessary
 
         if self.atmosfericFlag != 1:
@@ -935,6 +939,8 @@ class ModuleST(object):
                 USHj_Tt[iT][it] = min(USHj_t,QD_Tt[iT][it])
                 QD_Tt[iT][it] -= USHj_Tt[iT][it]
 
+            if it%100 == 0:
+                dlg.update(100.0*it/Status.Nt)
 #.............................................................................
 #.............................................................................
 #.............................................................................
@@ -942,6 +948,8 @@ class ModuleST(object):
 #.............................................................................
 # end of the year reached. now some final calculations
 
+        dlg.Destroy()
+        
         self.TavCollMean = QTavColl/max(QavColl,0.000000001)
 
 #........................................................................
@@ -1237,6 +1245,9 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
 #   checks static load capacity of the roof
 #------------------------------------------------------------------------------
+
+        MINSTATICROOF = 25 
+
         if self.surfaces[i]["roofStaticLoadCap"] ==None:
             f5=1
             if self.surfaces[i]["roofType"] in ["Corrugated metal roof","Composite sandwich panels","Other"]:
@@ -1261,7 +1272,7 @@ class ModuleST(object):
         MAXINCLINATION = 90
         self.MINTOTNETSURFAREA = 40
         NetSurfAreaFactorSloped=1.2
-        MINSTATICROOF= 25 
+
         self.allShaded=1
         self.usableSurfacesArea=0
         self.usableSurfaces=[]

@@ -48,6 +48,7 @@ import copy
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
+from einstein.GUI.GUITools import check
 
 class ModuleCS(object):
 
@@ -79,6 +80,10 @@ class ModuleCS(object):
 
         sqlQuery = "Questionnaire_id = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId)
         qelectricity = Status.DB.qelectricity.sql_select(sqlQuery)
+
+######XXX TEST TEST TEST TEST TEST ###########################################3
+        Status.StatusECO = 1
+        logDebug("ModuleCS: WARNING -- StatusECO always set to 1 !!!!")
 
 
         PEC = []
@@ -431,6 +436,7 @@ class ModuleCS(object):
             Subsidies0 = 0
 
             for ANo in range(len(generalData)-1):
+                    
                 i = ANo+1
 
                 if salternatives[i].ShortName is None:
@@ -454,42 +460,42 @@ class ModuleCS(object):
                     Subsidies.append(generalData[i].Subsidies)
 
                 
-                if salternatives[i].StatusECO > 0:
-                    dTotalCost = generalData[i].TotalInvCost
-                    if dTotalCost is None:
-                        dTotalCost = 0.0
-                        dTotalCost_Table = "---"
-                    else:
-                        dTotalCost_Table = dTotalCost
-
-                    dOwnCost = generalData[i].OwnInvCost
-                    if dOwnCost is None:
-                        dOwnCost = 0.0
-                        dOwnCost_Table = "---"
-                    else:
-                        dOwnCost_Table = dOwnCost
-
-                    dSubsidies = generalData[i].Subsidies
-                    if dSubsidies is None:
-                        dSubsidies = 0.0
-                        dSubsidies_Table = "---"
-                    else:
-                        dSubsidies_Table = dSubsidies
-            
-                    if ANo == 0:
-                        TotalCost0 = dTotalCost
-                        OwnCost0 = dOwnCost
-                        Subsidies0 = dSubsidies
-
-
-                else:
+#                if salternatives[i].StatusECO > 0:
+                dTotalCost = generalData[i].TotalInvCost
+                if dTotalCost is None:
                     dTotalCost = 0.0
-                    dOwnCost = 0.0
-                    dSubsidies = 0.0
                     dTotalCost_Table = "---"
+                else:
+                    dTotalCost_Table = dTotalCost
+
+                dOwnCost = generalData[i].OwnInvCost
+                if dOwnCost is None:
+                    dOwnCost = 0.0
                     dOwnCost_Table = "---"
-                    dSubsidies_Table = "---"  
-                    
+                else:
+                    dOwnCost_Table = dOwnCost
+
+                dSubsidies = generalData[i].Subsidies
+                if dSubsidies is None:
+                    dSubsidies = 0.0
+                    dSubsidies_Table = "---"
+                else:
+                    dSubsidies_Table = dSubsidies
+        
+                if ANo == 0:
+                    TotalCost0 = dTotalCost
+                    OwnCost0 = dOwnCost
+                    Subsidies0 = dSubsidies
+
+
+#            else:
+#                dTotalCost = 0.0
+#                dOwnCost = 0.0
+#                dSubsidies = 0.0
+#                dTotalCost_Table = "---"
+#                dOwnCost_Table = "---"
+#                dSubsidies_Table = "---"  
+                
 
                 tableEntry = noneFilter([str(salternatives[i].ShortName),
                                          dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
@@ -505,7 +511,6 @@ class ModuleCS(object):
                               
             Status.int.setGraphicsData("CS4_Table", data1)
 
-            matrix2 = transpose(CS4Plot)
             data2 = array(CS4Plot)
 
             Status.int.setGraphicsData("CS4_Plot", data2)
@@ -523,6 +528,7 @@ class ModuleCS(object):
 # Panel CS5: Annual cost
         elif self.keys[0] == "CS5_Plot":
 
+            print "CS5"
 #............................................................................
 # charge data from SQL
 
@@ -530,20 +536,6 @@ class ModuleCS(object):
             ElCost = []
 
             FuelCost = [] # holds the fuels EnergyCost from ANo=0 to the ANo=last (all fuels)
-            for i in range(1,len(generalData)):
-                sumcost = 0.0
-                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%\
-                           (Status.PId,generalData[i].AlternativeProposalNo)
-                fuelsByANo = Status.DB.qfuel.sql_select(sqlQuery)
-                for fuel in fuelsByANo:
-                    fuelcost = fuel['FuelCostYear']
-                    if fuelcost is None:
-                        fuelcost = 0.0
-                    else:
-                        pass                       
-                    sumcost += fuelcost
-                FuelCost.append(sumcost)
-#            print 'FuelCost =', FuelCost 
 
             EnergyCost = []
             OMCost = []
@@ -569,65 +561,88 @@ class ModuleCS(object):
                 else:
                     Amortization.append(generalData[i].Amortization)
 
+##### 2B CHECKED ... AT THE MOMENT OMTHERMAL FOR ANo = 0 IS IN QUESTIONNAIRE !!!
+                if ANo == 0:
+                    qq = Status.DB.questionnaire.Questionnaire_ID[Status.PId]
+                    if len(qq) > 0:
+                        generalData[i].OMThermal = check(qq[0].OMThermal)
+                    
                 if generalData[i].OMThermal is None: #here O&M costs for heat/cold generation and dist. considered
+                    if ANo == 0:
+                        logWarning(_("No OandM cost specified for present state"))
                     OMCost.append(0.0)
                 else:
                     OMCost.append(generalData[i].OMThermal)
 
                 if qelectricity[i].ElCostYearTot is None:
+                    if ANo == 0:
+                        logWarning(_("No electricity cost specified for present state"))
+                        
                     ElCost.append(0.0)
                 else:
                     ElCost.append(qelectricity[i].ElCostYearTot)
 
-##                if qfuel[i].FuelCostYear is None:
-##                    FuelCost.append(0.0)
-##                else:
-##                    FuelCost.append(qfuel[i].FuelCostYear)
+                sumcost = 0.0
+                sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s'"%\
+                           (Status.PId,ANo)
+                fuelsByANo = Status.DB.qfuel.sql_select(sqlQuery)
+                for fuel in fuelsByANo:
+                    fuelcost = fuel['FuelCostYear']
+                    if fuelcost is not None:
+                        sumcost += fuelcost
+                    else:
+                        if ANo == 0:
+                            logWarning(_("No fuel cost specified for  for present state for fuel no. %s ")%fuel.FuelNo)
+                FuelCost.append(sumcost)
 
+                if ANo == 0:
+                    EnergyCost.append(ElCost[i-1]
+                                      +FuelCost[i-1])
 
-#                EnergyCost.append(ElCost[i-1]+FuelCost[i-1])#to i-1 (list from 0 to ANo)
-        
-                if generalData[i].EnergySystemCost is None:
-                    EnergyCost.append(0.0)
                 else:
-                    EnergyCost.append(generalData[i].EnergySystemCost)
+                    if generalData[i].EnergyCost is None:
+                        EnergyCost.append(0.0)
+                    else:
+                        EnergyCost.append(generalData[i].EnergyCost)
                 
-                if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
-                    dAmortization = generalData[i].Amortization
-                    if dAmortization is None:
-                        dAmortization = 0.0
-                        dAmortization_Table = "---"
-                    else:
-                        dAmortization_Table = dAmortization
-
-                    dOMCost = generalData[i].OMThermal
-                    if dOMCost is None:
-                        dOMCost = 0.0
-                        dOMCost_Table = "---"
-                    else:
-                        dOMCost_Table = dOMCost
-
-                    dEnergyCost = EnergyCost[i-1]#to i-1 (list from 0 to ANo)
-                    if dEnergyCost == 0.0:
-                        dEnergyCost_Table = "--"
-                    else:
-                        dEnergyCost_Table = dEnergyCost
-  
-                    if ANo == 0:
-                        Amortization0 = dAmortization
-                        OMCost0 = dOMCost
-                        EnergyCost0 = dEnergyCost
-
-
-                else:
+#                if salternatives[i].StatusECO > 0: #SD: changed control 13/07/2008
+                dAmortization = generalData[i].Amortization
+                if dAmortization is None:
                     dAmortization = 0.0
-                    dOMCost = 0.0
-                    dEnergyCost = 0.0
                     dAmortization_Table = "---"
-                    dOMCost_Table = "---"
-                    dEnergyCost_Table = "---"  
-                    
+                else:
+                    dAmortization_Table = dAmortization
 
+                dOMCost = OMCost[ANo]
+                if dOMCost is None:
+                    dOMCost = 0.0
+                    dOMCost_Table = "---"
+                else:
+                    dOMCost_Table = dOMCost
+                print "dOMCost = ",dOMCost,dOMCost_Table
+
+                dEnergyCost = EnergyCost[ANo]#to i-1 (list from 0 to ANo)
+                if dEnergyCost == 0.0:
+                    dEnergyCost_Table = "--"
+                else:
+                    dEnergyCost_Table = dEnergyCost
+
+                if ANo == 0:
+                    Amortization0 = dAmortization
+                    OMCost0 = dOMCost
+                    EnergyCost0 = dEnergyCost
+
+
+#            else:
+#                dAmortization = 0.0
+#                dOMCost = 0.0
+#                dEnergyCost = 0.0
+#                dAmortization_Table = "---"
+#                dOMCost_Table = "---"
+#                dEnergyCost_Table = "---"  
+                
+
+            
                 tableEntry = noneFilter([str(salternatives[i].ShortName),
                                          dAmortization_Table,dEnergyCost_Table,dOMCost_Table])
 
@@ -660,12 +675,12 @@ class ModuleCS(object):
 #............................................................................
 # charge data from SQL
 
-            EnergyCost = []
+            EnergySystemCost = []
             PEC = []
-            AdditCost = []
-            AdditCost_Table = []
-            AdditCostSavedPEC = []#SD check
-            AdditCostSavedPEC_Table = []#SD check
+            AddedCost = []
+            AddedCost_Table = []
+            AddedCostSavedPEC = []#SD check
+            AddedCostSavedPEC_Table = []#SD check
             SavedPEC = []
             Alternative = []
 
@@ -674,7 +689,7 @@ class ModuleCS(object):
 
 
             PEC0 = 0.0
-            EnergyCost0 = 0.0
+            EnergySystemCost0 = 0.0
 
             for ANo in range(len(generalData)-1):
                 i = ANo+1
@@ -684,36 +699,36 @@ class ModuleCS(object):
                 else:
                     Alternative.append(str(salternatives[i].ShortName))
 
-                if generalData[i].EnergyCost is None: #protection against None
-                    EnergyCost.append(0.0)
+                if generalData[i].EnergySystemCost is None: #protection against None
+                    EnergySystemCost.append(0.0)
                 else:
-                    EnergyCost.append(generalData[i].EnergyCost)
+                    EnergySystemCost.append(generalData[i].EnergySystemCost)
 
-                if salternatives[i].StatusEnergy > 0 and salternatives[i].StatusECO > 0:
-                    print 'ANo = "%s"  PEC = "%s"',(generalData[i].AlternativeProposalNo,generalData[i].PEC)
+#                if salternatives[i].StatusEnergy > 0 and salternatives[i].StatusECO > 0:
+                if salternatives[i].StatusEnergy > 0:
                     dPEC = generalData[i].PEC                
                     if dPEC is None:
                         dPEC = 0.0
                     else:
                         dPEC /= 1000.0  #conversion kWh -> MWh
 
-                    dEnergyCost = generalData[i].EnergyCost
-                    if dEnergyCost is None:
-                        dEnergyCost = 0.0
-                        dEnergyCost_Table = "---"
+                    dEnergySystemCost = generalData[i].EnergySystemCost
+                    if dEnergySystemCost is None:
+                        dEnergySystemCost = 0.0
+                        dEnergySystemCost_Table = "---"
                     else:
-                        dEnergyCost_Table = dEnergyCost
+                        dEnergySystemCost_Table = dEnergySystemCost
                     
                     if ANo == 0:
                         PEC0 = dPEC
-                        EnergyCost0 = dEnergyCost
+                        EnergySystemCost0 = dEnergySystemCost
 
 
                     PECSaving = PEC0 - dPEC
 
        
-                    AddCost = dEnergyCost - EnergyCost0
-                    if dEnergyCost_Table == "---":
+                    AddCost = dEnergySystemCost - EnergySystemCost0
+                    if dEnergySystemCost_Table == "---":
                         AddCost_Table = "---"
                     else:
                         AddCost_Table = AddCost
@@ -730,23 +745,23 @@ class ModuleCS(object):
                 else:
                     dPEC = 0.0
                     PECSaving = 0.0
-                    dEnergyCost = 0.0
+                    dEnergySystemCost = 0.0
                     AddCost = 0.0
                     AddCostSavedPEC = 0.0
-                    dEnergyCost_Table = "---"
+                    dEnergySystemCost_Table = "---"
                     AddCost_Table = "---"
                     AddCostSavedPEC_Table = "---"
                         
                 PEC.append(dPEC)
                 SavedPEC.append(PECSaving)
-                AdditCost.append(AddCost)
-                AdditCost_Table.append(AddCost_Table)#SD check
+                AddedCost.append(AddCost)
+                AddedCost_Table.append(AddCost_Table)#SD check
 
-                AdditCostSavedPEC.append(AddCostSavedPEC)#SD check
+                AddedCostSavedPEC.append(AddCostSavedPEC)#SD check
 
 
                 tableEntry = noneFilter([str(salternatives[i].ShortName),
-                                         dEnergyCost_Table,AddCost_Table,AddCostSavedPEC_Table])
+                                         dEnergySystemCost_Table,AddCost_Table,AddCostSavedPEC_Table])
 
                 plotEntry = noneFilter([str(salternatives[i].ShortName),AddCostSavedPEC])
                
@@ -754,14 +769,14 @@ class ModuleCS(object):
                 CS6Plot.append(plotEntry)
 #..............................................................................
 # then send everything to the GUI
-            print 'AdditCost_Table =', AdditCost_Table
-            print 'PEC =', PEC
-            print 'AdditCostSavedPEC_Table =', AdditCostSavedPEC_Table
-            print '\n'
-            print 'AdditCost =', AdditCost
-            print 'SavedPEC =', SavedPEC
-            print 'PEC =', PEC
-            print 'AdditCostSavedPEC =', AdditCostSavedPEC          
+#            print 'AddedCost_Table =', AddedCost_Table
+#            print 'PEC =', PEC
+#            print 'AddedCostSavedPEC_Table =', AddedCostSavedPEC_Table
+#            print '\n'
+#            print 'AddedCost =', AddedCost
+#            print 'SavedPEC =', SavedPEC
+#            print 'PEC =', PEC
+#            print 'AddedCostSavedPEC =', AddedCostSavedPEC          
 
             data1 = array(CS6Table)
                               

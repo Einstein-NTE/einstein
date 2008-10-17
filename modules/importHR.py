@@ -132,7 +132,7 @@ class HexData(DataBaseClass):
             else:
                 str_values = str_values + ",'" + value + "'"
         
-        sqlQuery = "INSERT INTO `qheatexchanger` VALUES" + str_values + ");"
+        sqlQuery = "INSERT INTO qheatexchanger VALUES" + str_values + ");"
         return sqlQuery
     
 class StreamData(DataBaseClass):

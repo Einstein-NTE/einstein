@@ -262,7 +262,10 @@ class ModuleHR(object):
         USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
 
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
+        UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
+
         QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw. will be reduced by QHX
+        QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
         
 #..............................................................................
 # read in PE2 result - remaining yearly demand and calculate QHX_T by difference
@@ -274,32 +277,38 @@ class ModuleHR(object):
 
         for iT in range(Status.NT+2):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
-
-        print "ModuleHR (__doPostProcessing): PE2 results UPH %s QD %s QHX %s"%\
-              (Status.int.UPHTotal_T[Status.NT+1],self.data.QD_T[Status.NT+1],QHX_T_res[Status.NT+1])
-
+            QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T)     #necessary, because waste heat from
+                                                            #exhaust gas not available ...
+       
 #..............................................................................
 # now distribute QHX_T to the time intervals
 
-        dQHX_Tt = Status.int.createQ_Tt()    # fraction of QHX corresponding to a given time shift
-        dQHX_T =Status.int.createQ_T()   
+        dQHX_T =Status.int.createQ_T()   #exchanged heat correspon
             
-        for timeShift in range(0,25):  # maximum one day time shift ... if that's not enough send error message !!!
+        for timeShift in range(0,169):  # maximum one day time shift ... if that's not enough send error message !!!
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
-            dQHX_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
+            dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
 
-            for iT in range(Status.NT+2):
-                if QHX_T_res[iT] > 0:
-                    fR = min(dQHX_T[iT]/QHX_T_res[iT],1.0)
+            dQHX_T[0] = 0
+
+            for iT in range(1,Status.NT+2):
+                dQHX_T[iT] = min(dQHXmax_T[iT],QHX_T_res[iT])
+                maxSlope = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
+                dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlope)
+
+                if dQHXmax_T[iT] > 0:
+                    fR = dQHX_T[iT]/dQHXmax_T[iT]
                 else:
                     fR = 0.0
-                    
+
                 for it in range(Status.Nt):
                     dQHX_Tt[iT][it] *= fR #correction real vs. theoretical (maximum) heat recovery
                     QHXProc_Tt[iT][it] += dQHX_Tt[iT][it]
                     UPHProc_Tt[iT][it] -= dQHX_Tt[iT][it]
 
+
+            UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
             dQHX_T = Status.int.calcQ_T(dQHX_Tt)    # real heat recovery corresponding to this time shift
 
 # substract exchanged heat from 
@@ -314,12 +323,10 @@ class ModuleHR(object):
                 for iT in range(2,Status.NT+2):
                     QWHAmb_Tt[iT][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT-2][it])
 
-            print "ModuleHR (__doPostProcessing): dt = %s QHXres = %s"%(timeShift,QHX_T_res[Status.NT+1])
-
             if QHX_T_res[Status.NT+1] < 1.e-3:
                 break
 
-            elif timeShift == 25:
+            elif timeShift == 168:
                 logDebug("ModuleHR (__doPostProcessing): time shift of 168 hours not enough for realising PE2 HR potential")
             
 #..............................................................................

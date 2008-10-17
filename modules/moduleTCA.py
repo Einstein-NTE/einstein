@@ -83,10 +83,12 @@ class ModuleTCA(object):
         #get cashflow for the current process
         data = TCAData(Status.PId,0)                
         data.loadTCAData()
+        DataOfCurrentProcess=data                        #SET DATA OF CURRENT PROCESS
         
         #set parameters
         InterestRate = data.NIR - data.Inflation
         DiscountRate = data.CSDR - data.Inflation
+        #PrimaryEnergyDemand = data.PETel + data.PETFuels
         ProjectLifetime = data.TimeFrame
           
         data = self.calculateCashFlow(data)
@@ -111,7 +113,8 @@ class ModuleTCA(object):
                 name = ano[1]  
                 #load data for alternative
                 data = TCAData(Status.PId,ano[0])              
-                data.loadTCAData() 
+                data.loadTCAData()
+		    #newdata = data
                 #calculate cashflow for alternative
                 data = self.calculateCashFlow(data)
                 current = data.cashflow
@@ -142,10 +145,22 @@ class ModuleTCA(object):
                   
                 annuity = ANNUITY(current.TotalInvestmentCapital,InterestRate,ProjectLifetime)              
                 pp = payback_period(npv)
+
+                energycostCurrentProcess =  DataOfCurrentProcess.getTotalEnergyCost()
+                energycostNewProcess     =  data.getTotalEnergyCost()
+                opcostCurrentProcess     =  DataOfCurrentProcess.totalopcost
+                opcostNewProcess         =  data.totalopcost
+                energydemandCurrentProcess = DataOfCurrentProcess.getTotalEnergyDemand()
+                energydemandNewProcess = data.getTotalEnergyDemand()
+                additionalcost = ADDCOST(annuity,opcostNewProcess,energycostNewProcess,opcostCurrentProcess,energycostCurrentProcess)           
+                additionalcostpersavePE = additionalcost/(energydemandNewProcess-energydemandCurrentProcess)
+                print additionalcost
+
                 #set the results in data, store data in result list
-                data.setResult(name,npv,mirr,bcr,annuity,pp,display)                                
+                data.setResult(name,npv,mirr,bcr,annuity,pp,additionalcost,additionalcostpersavePE,display)                                
                 self.result.append(data)
                 data.storeResultToCGeneralData()
+                
             except Exception, inst:
                 print type(inst)
                 print inst.args
@@ -154,6 +169,7 @@ class ModuleTCA(object):
                 self.result.append(data)
                 logWarning((_("TCA: No result for %s") % ano[1]))
                 logWarning(str(type(inst)))
+          
 
         self.__setDataForReport()           
             
@@ -295,7 +311,7 @@ class ModuleTCA(object):
         data.append(bestAlternative.totalfunding)   
         data.append(bestAlternative.revenue)  
         data.append(bestAlternative.annuity)
-        data.append(bestAlternative.totalenergycost)
+        data.append(bestAlternative.energycost)
         data.append(bestAlternative.totalopcost)
         data.append(bestAlternative.contingencies)
         data.append(bestAlternative.nonreoccuringcosts)

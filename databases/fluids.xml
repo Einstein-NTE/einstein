@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinDataBase dbname="dbfluid">
+<table name="dbfluid">
+<row n="1">
+<element name="FluidName" type="varchar(45)" auto="" value="Water" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="4.19" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="TCond" type="double" auto="" value="999.0" />
+<element name="LatentHeat" type="double" auto="" value="0.0" />
+</row>
+<row n="2">
+<element name="FluidName" type="varchar(45)" auto="" value="Steam_7bar" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="20.05" />
+<element name="SensibleHeat" type="double" auto="" value="700.0" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="TCond" type="double" auto="" value="999.0" />
+<element name="LatentHeat" type="double" auto="" value="2067.0" />
+</row>
+<row n="3">
+<element name="FluidName" type="varchar(45)" auto="" value="Air" />
+<element name="FluidDensity" type="double" auto="" value="1.012" />
+<element name="FluidCp" type="double" auto="" value="1.2" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+</row>
+<row n="4">
+<element name="FluidName" type="varchar(45)" auto="" value="Thermal Oil" />
+<element name="FluidDensity" type="double" auto="" value="850.0" />
+<element name="FluidCp" type="double" auto="" value="2.0" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="4" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Einstein default" />
+</row>
+<row n="5">
+<element name="FluidName" type="varchar(45)" auto="" value="R134a" />
+<element name="FluidCp" type="double" auto="" value="1.136" />
+<element name="SensibleHeat" type="double" auto="" value="26.94" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="SpecificMassFlow" type="double" auto="" value="0.0071" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: JR 2008/07" />
+<element name="THighP" type="double" auto="" value="68.7" />
+<element name="TCond" type="double" auto="" value="45.0" />
+<element name="RefrigerantCode" type="varchar(6)" auto="" value="R134a" />
+<element name="LatentHeat" type="double" auto="" value="157.52" />
+</row>
+<row n="6">
+<element name="FluidName" type="varchar(45)" auto="" value="R717" />
+<element name="FluidCp" type="double" auto="" value="2.705" />
+<element name="SensibleHeat" type="double" auto="" value="229.95" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="6" />
+<element name="SpecificMassFlow" type="double" auto="" value="0.00087" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: JR 2008/07" />
+<element name="THighP" type="double" auto="" value="115.0" />
+<element name="TCond" type="double" auto="" value="30.0" />
+<element name="RefrigerantCode" type="varchar(6)" auto="" value="R717" />
+<element name="LatentHeat" type="double" auto="" value="1143.16" />
+</row>
+<row n="7">
+<element name="FluidName" type="varchar(45)" auto="" value="R404a" />
+<element name="FluidCp" type="double" auto="" value="1.39" />
+<element name="SensibleHeat" type="double" auto="" value="27.8" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="7" />
+<element name="SpecificMassFlow" type="double" auto="" value="0.00939" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: JR 2008/07" />
+<element name="THighP" type="double" auto="" value="65.0" />
+<element name="TCond" type="double" auto="" value="45.0" />
+<element name="RefrigerantCode" type="varchar(6)" auto="" value="R404a" />
+<element name="LatentHeat" type="double" auto="" value="113.35" />
+</row>
+<row n="8">
+<element name="FluidName" type="varchar(45)" auto="" value="R22" />
+<element name="FluidCp" type="double" auto="" value="0.904" />
+<element name="SensibleHeat" type="double" auto="" value="51.5" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="8" />
+<element name="SpecificMassFlow" type="double" auto="" value="0.00625" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: JR 2008/07" />
+<element name="THighP" type="double" auto="" value="102.0" />
+<element name="TCond" type="double" auto="" value="45.0" />
+<element name="RefrigerantCode" type="varchar(6)" auto="" value="R22" />
+<element name="LatentHeat" type="double" auto="" value="161.43" />
+</row>
+<row n="9">
+<element name="FluidName" type="varchar(45)" auto="" value="Milk" />
+<element name="FluidDensity" type="double" auto="" value="1035.0" />
+<element name="FluidCp" type="double" auto="" value="3.935" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="9" />
+<element name="FluidComment" type="varchar(200)" auto="" value="Source: Uni Roma August 2008" />
+</row>
+<row n="10">
+<element name="FluidName" type="varchar(45)" auto="" value="Steam_2bar" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="4.19" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="10" />
+<element name="TCond" type="double" auto="" value="115.0" />
+<element name="LatentHeat" type="double" auto="" value="2067.0" />
+</row>
+<row n="11">
+<element name="FluidName" type="varchar(45)" auto="" value="aqueous cleaning chemical" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="4.18" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="11" />
+</row>
+<row n="12">
+<element name="FluidName" type="varchar(45)" auto="" value="Steam" />
+<element name="FluidDensity" type="double" auto="" value="1000.0" />
+<element name="FluidCp" type="double" auto="" value="20.0" />
+<element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="12" />
+</row>
+</table>
+</EinsteinDataBase>

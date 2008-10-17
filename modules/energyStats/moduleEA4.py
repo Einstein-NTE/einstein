@@ -177,8 +177,10 @@ class ModuleEA4(object):
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4a_REPORT", reportData1)
+                print "EA4a_REPORT",reportData1
             elif Status.ANo == Status.FinalAlternative:
                 Status.int.setGraphicsData("EA4a_REPORT_F", reportData1)
+                print "EA4a_REPORT_F",reportData1
 
 #..............................................................................
 # Data for Panel EA4b: temperature dependent plots
@@ -329,8 +331,11 @@ class ModuleEA4(object):
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4b_PLOT_REPORT",array(transpose(dataList)))
+                print "EA4b_PLOT_REPORT",array(transpose(dataList))
+
             elif Status.ANo == Status.FinalAlternative:
                 Status.int.setGraphicsData("EA4b_PLOT_REPORT_F",array(transpose(dataList)))
+                print "EA4b_PLOT_REPORT_F",array(transpose(dataList))
                 
 
 #..............................................................................

@@ -177,8 +177,8 @@ class ModuleEnergy(object):
                         USHj_sum[j] += USHj_sum[j-1]  #sum one above the other
 
                     for j in range(NEquipe):
-                        USHj_weekly[j].append(USHj_sum[j])  #append twice, for
-                        USHj_weekly[j].append(USHj_sum[j])  #start and stop time of the week
+                        USHj_weekly[j].append(USHj_sum[j]*Status.EXTRAPOLATE_TO_YEAR)  #append twice, for
+                        USHj_weekly[j].append(USHj_sum[j]*Status.EXTRAPOLATE_TO_YEAR)  #start and stop time of the week
                         USHj_sum[j] = 0.0                   #reset sum
 
                     weeks.append(nweek)

@@ -335,7 +335,7 @@ class Interfaces(object):
         self.FETHeat_j.pop(NEquipe-1)
         self.HPerYearEq.pop(NEquipe-1)
 
-        self.cascadeSize += 1
+        self.cascadeSize -= 1
         
 #------------------------------------------------------------------------------		
     def printCascade(self,):

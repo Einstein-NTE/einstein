@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinDataBase dbname="dbfuel">
+<table name="dbfuel">
+<row n="1">
+<element name="Offgas" type="double" auto="" value="17.66" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="NG" />
+<element name="Humidity" type="double" auto="" value="0.1225" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.12719" />
+<element name="FuelName" type="varchar(45)" auto="" value="Natural gas" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="FuelLCV" type="double" auto="" value="12.425" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool; Offgas and ComAir data: Joints;  to be reviewed !!!" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.23483" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="0.8" />
+</row>
+<row n="2">
+<element name="Offgas" type="double" auto="" value="17.66" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="LPG" />
+<element name="Humidity" type="double" auto="" value="0.1" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Liquid petroleum gas" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="FuelLCV" type="double" auto="" value="12.56" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.0" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="850.0" />
+</row>
+<row n="3">
+<element name="Offgas" type="double" auto="" value="17.6" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="HFO" />
+<element name="Humidity" type="double" auto="" value="0.1" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Heavy fuel oil" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="FuelLCV" type="double" auto="" value="11.0" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.0" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="850.0" />
+</row>
+<row n="4">
+<element name="Offgas" type="double" auto="" value="17.66" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="BUT" />
+<element name="Humidity" type="double" auto="" value="0.1" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Butane" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="4" />
+<element name="FuelLCV" type="double" auto="" value="12.5" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.0" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="1.0" />
+</row>
+<row n="5">
+<element name="Offgas" type="double" auto="" value="17.66" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="PRO" />
+<element name="Humidity" type="double" auto="" value="0.1" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Propane" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="FuelLCV" type="double" auto="" value="12.5" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.0" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="1.0" />
+</row>
+<row n="6">
+<element name="Offgas" type="double" auto="" value="17.66" />
+<element name="CombAir" type="double" auto="" value="16.7" />
+<element name="FuelCode" type="varchar(45)" auto="" value="GO" />
+<element name="Humidity" type="double" auto="" value="0.1" />
+<element name="CO2ConvFuel" type="double" auto="" value="0.25" />
+<element name="OffgasHeatCapacity" type="double" auto="" value="1.23" />
+<element name="FuelName" type="varchar(45)" auto="" value="Gas oil" />
+<element name="DBFuelUnit" type="varchar(45)" auto="" value="kg" />
+<element name="DBFuel_ID" type="int(10) unsigned" auto="auto_increment" value="6" />
+<element name="FuelLCV" type="double" auto="" value="11.0" />
+<element name="FuelDataSource" type="varchar(200)" auto="" value="Poship tool" />
+<element name="FuelHCV" type="double" auto="" value="0.0" />
+<element name="PEConvFuel" type="double" auto="" value="1.1" />
+<element name="OffgasDensity" type="double" auto="" value="1.0" />
+<element name="FuelComment" type="varchar(200)" auto="" value="Density to be checked" />
+<element name="FuelDensity" type="double" auto="" value="850.0" />
+</row>
+</table>
+</EinsteinDataBase>

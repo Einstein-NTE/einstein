@@ -242,7 +242,7 @@ class PanelQ4(wx.Panel):
 
         self.tc9 = FloatEntry(self.page1,
                               ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
-                              unitdict='MASSORVOLUME',
+                              unitdict='MASSORVOLUMEFLOW',
                               label=_U("Fuel consumption (nominal)"),
                               tip=_U("Specify the units below"))
 

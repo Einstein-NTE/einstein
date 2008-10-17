@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinDataBase dbname="dbsolarthermal">
+<table name="dbsolarthermal">
+<row n="1">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="620.0" />
+<element name="STMassFlowRate" type="double" auto="" value="300.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.78" />
+<element name="STc1" type="double" auto="" value="3.2" />
+<element name="STc2" type="double" auto="" value="0.015" />
+<element name="STWeightFactor" type="double" auto="" value="30.0" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="200.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="3.57" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="815.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="450.0" />
+<element name="STModel" type="varchar(20)" auto="" value="FPCEinsteinSelective" />
+<element name="K50L" type="double" auto="" value="0.93" />
+<element name="STType" type="varchar(45)" auto="" value="Flat-plate collector" />
+<element name="K50T" type="double" auto="" value="0.93" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+<row n="2">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="690.0" />
+<element name="STMassFlowRate" type="double" auto="" value="200.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.76" />
+<element name="STc1" type="double" auto="" value="1.2" />
+<element name="STc2" type="double" auto="" value="0.008" />
+<element name="STWeightFactor" type="double" auto="" value="22.0" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="230.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="3.57" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="910.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="500.0" />
+<element name="STModel" type="varchar(20)" auto="" value="ETCEinstein" />
+<element name="K50L" type="double" auto="" value="0.94" />
+<element name="STType" type="varchar(45)" auto="" value="Evacuated tube collector" />
+<element name="K50T" type="double" auto="" value="1.1" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+<row n="3">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="655.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.7" />
+<element name="STc1" type="double" auto="" value="0.2" />
+<element name="STc2" type="double" auto="" value="0.001" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="220.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="7.14" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="950.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="400.0" />
+<element name="STModel" type="varchar(20)" auto="" value="CCEinstein" />
+<element name="K50L" type="double" auto="" value="0.96" />
+<element name="STType" type="varchar(45)" auto="" value="Concentrating collector" />
+<element name="K50T" type="double" auto="" value="0.95" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+</table>
+</EinsteinDataBase>

@@ -229,8 +229,12 @@ class ModuleEA(object):
                 else:
                     equipe.HCGTEffReal = 0.0
 
-                if equipe.HCGPnom > 0:
-                    equipe.PartLoad = Status.int.USHj[jc]/equipe.HCGPnom
+                if equipe.HPerYearEq is not None and equipe.HCGPnom is not None:
+                    USHmax = equipe.HPerYearEq*equipe.HCGPnom 
+                    if USHmax > 0:
+                        equipe.PartLoad = Status.int.USHj[jc]/USHmax
+                    else:
+                        equipe.PartLoad = 0.0
                 else:
                     equipe.PartLoad = 0.0
 

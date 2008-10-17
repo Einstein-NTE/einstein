@@ -216,7 +216,7 @@ class PanelPO(wx.Panel):
                 self.lbTech.Check(index,True)
                 
     def __updateMeasures(self):
-        TEXT = "<center> <img src = \"einstein_em.png\"><br>"
+        TEXT = "<center> <img src = \"img/einstein_em.png\"><br>"
         TEXT +=self.cbSector.GetStringSelection()+"<br>"
         TEXT +=self.cbSubsector.GetStringSelection()+"</center>"
         TEXT +="<hr><b>Unit Operation: </b>"+self.cbUnit.GetStringSelection()+"<br>"

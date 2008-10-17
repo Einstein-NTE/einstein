@@ -1,0 +1,6 @@
+USE einstein;
+
+
+ALTER TABLE cgeneraldata ADD COLUMN AddCost DOUBLE COMMENT 'Additional Cost' AFTER EnergySystemCost;
+ALTER TABLE cgeneraldata ADD COLUMN AddCostperSavedPE DOUBLE COMMENT 'Additional Cost per saved primary energy' AFTER AddCost;
+ALTER TABLE cgeneraldata ADD COLUMN RevenueSaleEquipment DOUBLE COMMENT '' AFTER Subsidies;

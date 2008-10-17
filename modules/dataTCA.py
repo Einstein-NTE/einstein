@@ -114,7 +114,7 @@ class TCAData(object):
         
                        
           
-    def setResult(self,name,npv,mirr,bcr,annuity,paybackperiod,display):
+    def setResult(self,name,npv,mirr,bcr,annuity,paybackperiod,additionalcost,additionalcostpersavePE,display):
         try:
             self.name = name
             self.npv = npv[:]
@@ -126,7 +126,15 @@ class TCAData(object):
             self.EIC = self.cashflow.EffectiveInvestmentCapital  
             self.PP  = paybackperiod 
             self.totalfunding = self.cashflow.TotalFundings
-            self.totalenergycost = self.__getTotalEnergyCost()
+            self.energycost = self.getTotalEnergyCost()
+            self.totalenergydemand = self.getTotalEnergyDemand()
+            self.additionalcost = additionalcost
+            self.additionalcostpersavePE = additionalcostpersavePE
+            
+            #TODO - calc this
+            self.thermal = self.__gettotalopcost()
+            
+            self.totaleinergycost = self.energycost + self.annuity + self.thermal
             self.ResultPresent = True
         except Exception, inst:
             print type(inst)
@@ -143,11 +151,12 @@ class TCAData(object):
         try:
             if (self.ResultPresent):
                 #mirr = self.mirr[int(math.ceil(self.PP))] #mirr at payback period
-                mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year
+                mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year 
+                bcr = self.bcr[len(self.mirr)-1]          
                 query = """UPDATE cgeneraldata 
-                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, Amortization  = %s
-                           WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
-                query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,self.pid,self.ano)
+                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, PayBack  = %s, BCR  = %s, EnergyCost = %s, OMThermal = %s, Amortization = %s, EnergySystemCost=%s, AddCost=%s, AddCostperSavedPE=%s                             WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+                query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,bcr,self.energycost,self.thermal,self.annuity,self.totaleinergycost,self.additionalcost,self.additionalcostpersavePE,self.pid,self.ano)
+                print query
                 Status.DB.sql_query(query)
         except Exception, inst:
             print "storeResultToCGeneral"
@@ -205,7 +214,7 @@ class TCAData(object):
         
     def __getTCAGeneralData(self):
         #print "Get Data (General)"        
-        query = """SELECT IDTca, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue 
+        query = """SELECT IDTca, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue
                    FROM tcageneraldata 
                    WHERE ProjectID=%s AND AlternativeProposalNo=%s;""" 
         query = query % (self.pid,self.ano)
@@ -222,6 +231,8 @@ class TCAData(object):
             self.TimeFrame = result[5]
             self.totalopcost = result[6]
             self.revenue     = result[7]
+		#self.PETFuels = result[8]
+		#self.PETel = result[9]
             return True
         
     def __storeTCAGeneralDataEntry(self):
@@ -413,8 +424,7 @@ class TCAData(object):
                 if not((ElTariffCTot==None)or(ElTariffPowTot==None)or(PowerContrTot==None)):
                     Tariff = ElTariffCTot 
                     if (FECel > 0):
-                        Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel
-                        
+                        Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel                      
                 self.energycosts.append(["Electricity",FECel,Tariff,self.DEP]) 
             
                 
@@ -447,12 +457,18 @@ class TCAData(object):
             Status.DB.sql_query(query)  
             
     
-    def __getTotalEnergyCost(self):
+    def getTotalEnergyCost(self):
         totalenergycost = 0.0
         for energycost in self.energycosts:
             totalenergycost+=energycost[1]*energycost[2]
         return totalenergycost
-    
+
+    def getTotalEnergyDemand(self):
+        totalenergydemand = 0.0
+        for energycost in self.energycosts:
+            totalenergydemand+=energycost[1]
+        return totalenergydemand
+  
     def __getTCAEnergyData(self):
         #print "Get Data (Energy)"
         query = """SELECT Description, EnergyDemand, EnergyPrice, DevelopmentOfEnergyPrice
@@ -652,6 +668,10 @@ class TCAData(object):
         self.totalopcost+= total                                       
         #except:        
         #    self.detailedopcost = [[],[],[],[],[],[],[]] 
+
+    def __gettotalopcost(self):
+        totaloperatingcost = self.totalopcost
+        return totaloperatingcost
                 
     def __storeTCADetailedOpCostDataEntry(self):
         #print "Store Data (Detailed operting cost)"
@@ -662,6 +682,9 @@ class TCAData(object):
                 query = query %(self.tcaid,opcost[0],opcost[1],i)
                 Status.DB.sql_query(query)                          
     
+
+    
+
     def __getTCADetailedOpCostData(self):
         #print "Get Data (Detailed operting cost)"
         self.detailedopcost = [[],[],[],[],[],[],[]] 
@@ -726,4 +749,5 @@ class TCAData(object):
         query = """DELETE FROM tcadetailedrevenue
                    WHERE TcaID = %s"""
         query = query % (self.tcaid)
-        result = Status.DB.sql_query(query)            
+        result = Status.DB.sql_query(query)   
+         

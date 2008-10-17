@@ -1,0 +1,1358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EinsteinDataBase dbname="all equipments">
+<table name="dbboiler">
+<row n="1">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="45" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="136.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="8162.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-136" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="2">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="46" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="204.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="9672.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-204" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="3">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="6793.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="151000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-100" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="190800.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="4">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="6793.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="173780.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-100" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="220500.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="5">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="4" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="8151.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="169000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-120" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="214600.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="6">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="8151.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="192800.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-120" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="244860.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="7">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="6" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="10190.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="190700.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-150" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="242200.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="8">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="7" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="10190.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="214850.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-150" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="272850.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="9">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="8" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="11547.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="222000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-170" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="281950.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="10">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="9" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="11547.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="248500.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-170" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="315600.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="11">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="10" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="13585.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="249000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-200" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="316250.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="12">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="11" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="13585.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="276880.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-200" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="351500.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="13">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="12" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="16981.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="284500.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-250" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="361950.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="14">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="13" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="18340.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="313000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-A-270" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="397500.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="15">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="14" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="18340.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="341900.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWR-AE-270" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="434200.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="16">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="15" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2050.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="61560.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-B30" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="78200.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="17">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="16" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2734.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="74760.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-C40" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="94950.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="18">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="17" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2734.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.93" />
+<element name="BoilerPrice" type="double" auto="" value="88760.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-E-C40" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="111700.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="19">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="18" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="3418.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="86380.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-D50" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="109700.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="20">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="19" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="4786.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="99190.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-E70" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="126000.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="21">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="20" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="4786.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.93" />
+<element name="BoilerPrice" type="double" auto="" value="114500.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-E-E70" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="145500.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="22">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="21" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="5470.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="104000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-E80" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="132100.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="23">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="22" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="6793.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.89" />
+<element name="BoilerPrice" type="double" auto="" value="132000.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-F100" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="167650.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="24">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="23" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="6793.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.93" />
+<element name="BoilerPrice" type="double" auto="" value="148400.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWS-E-F100" />
+<element name="Economiser" type="varchar(45)" auto="" value="yes" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="188450.0" />
+<element name="BoilerTemp" type="double" auto="" value="207.0" />
+</row>
+<row n="25">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="24" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="703.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="39570.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWB-100" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="50250.0" />
+<element name="BoilerTemp" type="double" auto="" value="198.0" />
+</row>
+<row n="26">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="25" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="1054.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.88" />
+<element name="BoilerPrice" type="double" auto="" value="43720.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWB-150" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="55500.0" />
+<element name="BoilerTemp" type="double" auto="" value="198.0" />
+</row>
+<row n="27">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="26" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="1757.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.88" />
+<element name="BoilerPrice" type="double" auto="" value="54130.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWB-250" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="68745.0" />
+<element name="BoilerTemp" type="double" auto="" value="198.0" />
+</row>
+<row n="28">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="27" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2108.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.9" />
+<element name="BoilerPrice" type="double" auto="" value="61680.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="BWB-300" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="78300.0" />
+<element name="BoilerTemp" type="double" auto="" value="198.0" />
+</row>
+<row n="29">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="28" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="698.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="24400.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-1000" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="31000.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="30">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="30" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="870.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="27500.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-1500" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="34900.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="31">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="31" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="1396.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="29950.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-2000" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="38000.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="32">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="32" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="1744.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="42370.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-HP-2500" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="53800.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="33">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="33" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2093.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="43850.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-HP-3000" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="5820.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="34">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="34" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="2791.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerPrice" type="double" auto="" value="50230.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Eurosteam-HP-4000" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="63790.0" />
+<element name="BoilerTemp" type="double" auto="" value="180.0" />
+</row>
+<row n="35">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="35" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="112.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.85" />
+<element name="BoilerPrice" type="double" auto="" value="12700.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="VAP-Standard-150" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="16130.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="36">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="36" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="188.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.85" />
+<element name="BoilerPrice" type="double" auto="" value="13700.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="VAP-Standard-250" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="17400.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="37">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="37" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="300.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.85" />
+<element name="BoilerPrice" type="double" auto="" value="15300.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="VAP-Standard-400" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="19400.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="38">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="38" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="698.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.85" />
+<element name="BoilerPrice" type="double" auto="" value="20700.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="VAP-Standard-900" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="26300.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="39">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="39" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="1047.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.87" />
+<element name="BoilerPrice" type="double" auto="" value="25860.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="VAP-Standard-1500" />
+<element name="BoilerTurnKeyPrice" type="double" auto="" value="32850.0" />
+<element name="BoilerTemp" type="double" auto="" value="187.0" />
+</row>
+<row n="40">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="40" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Ferroli" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="108.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="1754.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="F-108" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="41">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="41" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Ferroli" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="126.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="1948.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="F-126" />
+<element name="Economiser" type="varchar(45)" auto="" value="" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="42">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="42" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Ferroli" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="144.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="2142.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="F-144" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="43">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="43" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Ferroli" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="198.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="2725.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="F-198" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="44">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="44" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Ferroli" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="650.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="8926.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="F-650" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="45">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="47" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="275.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="11482.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-275" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="46">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="48" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="340.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="13058.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-340" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="47">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="49" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="380.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="15770.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-380" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="48">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="50" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="ADISA" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="472.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="19580.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="ADISA-472" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="49">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="51" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Buderus" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="170.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="7890.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Logano GE 315" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="50">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="52" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Buderus" />
+<element name="BoilerType" type="varchar(45)" auto="" value="hot water boiler" />
+<element name="BBPnom" type="double" auto="" value="170.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.95" />
+<element name="BoilerPrice" type="double" auto="" value="9345.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Logano SE 425" />
+<element name="BoilerTemp" type="double" auto="" value="90.0" />
+</row>
+<row n="51">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="53" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Hoval" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="80.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerPrice" type="double" auto="" value="9673.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="H-80" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="52">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="54" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Hoval" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="100.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerPrice" type="double" auto="" value="10438.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="H-100" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="53">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="56" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Hoval" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="200.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerPrice" type="double" auto="" value="15669.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="H-200" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="54">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="57" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Hoval" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="300.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerPrice" type="double" auto="" value="20854.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="H-300" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="55">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="58" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Hoval" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="350.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerPrice" type="double" auto="" value="22815.0" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="H-350" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="56">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="59" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="1000.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try1" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="57">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="60" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="5000.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try2" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="58">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="61" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="10000.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try3" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="59">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="62" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="condensing boiler" />
+<element name="BBPnom" type="double" auto="" value="20000.0" />
+<element name="BBEfficiency" type="double" auto="" value="1.13" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try4" />
+<element name="BoilerTemp" type="double" auto="" value="80.0" />
+</row>
+<row n="60">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="63" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="150.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try5" />
+<element name="BoilerTemp" type="double" auto="" value="140.0" />
+</row>
+<row n="61">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="64" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="800.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try6" />
+<element name="BoilerTemp" type="double" auto="" value="140.0" />
+</row>
+<row n="62">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="65" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="4000.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try7" />
+<element name="BoilerTemp" type="double" auto="" value="140.0" />
+</row>
+<row n="63">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="66" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="10000.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try8" />
+<element name="BoilerTemp" type="double" auto="" value="140.0" />
+</row>
+<row n="64">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="67" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="23000.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.91" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try9" />
+<element name="BoilerTemp" type="double" auto="" value="140.0" />
+</row>
+<row n="65">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="68" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="600.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.83" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try10" />
+<element name="BoilerTemp" type="double" auto="" value="400.0" />
+</row>
+<row n="66">
+<element name="DBBoiler_ID" type="int(10) unsigned" auto="auto_increment" value="69" />
+<element name="BoilerManufacturer" type="varchar(45)" auto="" value="Einstein" />
+<element name="BoilerType" type="varchar(45)" auto="" value="steam boiler" />
+<element name="BBPnom" type="double" auto="" value="6000.0" />
+<element name="BBEfficiency" type="double" auto="" value="0.83" />
+<element name="BoilerModel" type="varchar(45)" auto="" value="Try11" />
+<element name="BoilerTemp" type="double" auto="" value="400.0" />
+</row>
+</table>
+<table name="dbchp">
+<row n="1">
+<element name="DBCHP_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="CHPPt" type="double" auto="" value="900.0" />
+<element name="CHPequip" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="Eta_e" type="double" auto="" value="0.45" />
+<element name="FuelConsum" type="double" auto="" value="1000.0" />
+<element name="CHPPe" type="double" auto="" value="900.0" />
+<element name="Eta_t" type="double" auto="" value="0.45" />
+</row>
+</table>
+<table name="dbheatpump">
+<row n="1">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="10.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.8" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.411" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.258" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="1670.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="8.6" />
+<element name="HPCoolCOP" type="double" auto="" value="2.24" />
+</row>
+<row n="2">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="15.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.85" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.419" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.262" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="2390.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="12.9" />
+<element name="HPCoolCOP" type="double" auto="" value="2.28" />
+</row>
+<row n="3">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="20.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.9" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.426" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.267" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="4" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="3100.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="17.2" />
+<element name="HPCoolCOP" type="double" auto="" value="2.32" />
+</row>
+<row n="4">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="30.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="2.95" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.433" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.272" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="5" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="4415.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="25.8" />
+<element name="HPCoolCOP" type="double" auto="" value="2.36" />
+</row>
+<row n="5">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="50.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.0" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.441" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.276" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="6" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="6940.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="43.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.4" />
+</row>
+<row n="6">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="100.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.03" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.445" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.279" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="7" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="12824.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="86.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.42" />
+</row>
+<row n="7">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="150.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.06" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.449" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.282" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="8" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="18366.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="129.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.45" />
+</row>
+<row n="8">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="200.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.1" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.455" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.285" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="9" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="23700.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="172.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.48" />
+</row>
+<row n="9">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="300.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.13" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.46" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.288" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="10" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="33950.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="258.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.5" />
+</row>
+<row n="10">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="500.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.16" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.464" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.291" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="11" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="53370.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="430.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.53" />
+</row>
+<row n="11">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="800.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.19" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.469" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.294" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="12" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="80940.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="688.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.55" />
+</row>
+<row n="12">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="1000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.22" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.473" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.297" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="13" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="98630.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="860.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.58" />
+</row>
+<row n="13">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="1500.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.25" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.477" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.299" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="14" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="141264.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="1290.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.6" />
+</row>
+<row n="14">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="2000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.28" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.482" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.302" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="15" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="182274.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="1720.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.62" />
+</row>
+<row n="15">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="3000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.3" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.485" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.304" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="16" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="261063.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="2580.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.64" />
+</row>
+<row n="16">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="5000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.33" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.489" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.307" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="17" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="410490.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="4300.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.66" />
+</row>
+<row n="17">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="8000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.36" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.494" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.309" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="18" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="622518.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="6880.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.69" />
+</row>
+<row n="18">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="10000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.4" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.499" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.313" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="19" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="758602.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="8600.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.72" />
+</row>
+<row n="19">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="12000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.45" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.507" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.318" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="20" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="899083.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="10320.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.76" />
+</row>
+<row n="20">
+<element name="HPLimDT" type="double" auto="" value="65.0" />
+<element name="HPHeatCap" type="double" auto="" value="15000.0" />
+<element name="HPConstExHeatCOP" type="double" auto="" value="20.0" />
+<element name="HPThCoolCOP" type="double" auto="" value="8.69" />
+<element name="HPManufacturer" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPType" type="varchar(45)" auto="" value="compression" />
+<element name="HPConstExCoolCOP" type="double" auto="" value="20.0" />
+<element name="HPModel" type="varchar(45)" auto="" value="EINSTEIN" />
+<element name="HPEvapTinC" type="double" auto="" value="12.0" />
+<element name="HPHeatCOP" type="double" auto="" value="3.5" />
+<element name="HPExHeatCOP" type="double" auto="" value="0.514" />
+<element name="HPEvapTinH" type="double" auto="" value="7.0" />
+<element name="HPExCoolCOP" type="double" auto="" value="0.322" />
+<element name="DBHeatPump_ID" type="int(10) unsigned" auto="auto_increment" value="21" />
+<element name="HPCondTinC" type="double" auto="" value="30.0" />
+<element name="HPThHeatCOP" type="double" auto="" value="6.81" />
+<element name="HPManData" type="varchar(45)" auto="" value="HC" />
+<element name="HPCondTinH" type="double" auto="" value="40.0" />
+<element name="HPYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="HPPrice" type="double" auto="" value="1086504.0" />
+<element name="HPWorkFluid" type="varchar(45)" auto="" value="R407C" />
+<element name="HPEvapTmin" type="double" auto="" value="-18.0" />
+<element name="HPCondTmax" type="double" auto="" value="52.0" />
+<element name="HPSubType" type="varchar(45)" auto="" value="water-water" />
+<element name="HPCoolCap" type="double" auto="" value="12900.0" />
+<element name="HPCoolCOP" type="double" auto="" value="2.8" />
+</row>
+</table>
+<table name="dbsolarthermal">
+<row n="1">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="1" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="620.0" />
+<element name="STMassFlowRate" type="double" auto="" value="300.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.78" />
+<element name="STc1" type="double" auto="" value="3.2" />
+<element name="STc2" type="double" auto="" value="0.015" />
+<element name="STWeightFactor" type="double" auto="" value="30.0" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="200.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="3.57" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="815.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="450.0" />
+<element name="STModel" type="varchar(20)" auto="" value="FPCEinsteinSelective" />
+<element name="K50L" type="double" auto="" value="0.93" />
+<element name="STType" type="varchar(45)" auto="" value="Flat-plate collector" />
+<element name="K50T" type="double" auto="" value="0.93" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+<row n="2">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="2" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="690.0" />
+<element name="STMassFlowRate" type="double" auto="" value="200.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.76" />
+<element name="STc1" type="double" auto="" value="1.2" />
+<element name="STc2" type="double" auto="" value="0.008" />
+<element name="STWeightFactor" type="double" auto="" value="22.0" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="230.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="3.57" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="910.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="500.0" />
+<element name="STModel" type="varchar(20)" auto="" value="ETCEinstein" />
+<element name="K50L" type="double" auto="" value="0.94" />
+<element name="STType" type="varchar(45)" auto="" value="Evacuated tube collector" />
+<element name="K50T" type="double" auto="" value="1.1" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+<row n="3">
+<element name="DBSolarThermal_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
+<element name="STUnitTurnKeyPrice300kW" type="double" auto="" value="655.0" />
+<element name="STAreaFactor" type="double" auto="" value="1.0" />
+<element name="STLengthAper" type="double" auto="" value="1.0" />
+<element name="STc0" type="double" auto="" value="0.7" />
+<element name="STc1" type="double" auto="" value="0.2" />
+<element name="STc2" type="double" auto="" value="0.001" />
+<element name="STHeightAper" type="double" auto="" value="1.0" />
+<element name="STUnitPrice300kW" type="double" auto="" value="220.0" />
+<element name="STAreaGross" type="double" auto="" value="1.0" />
+<element name="STOMUnitFix" type="double" auto="" value="7.14" />
+<element name="STManufacturer" type="varchar(20)" auto="" value="Einstein" />
+<element name="STPnomColl" type="double" auto="" value="0.7" />
+<element name="STYearUpdate" type="int(11)" auto="" value="2008" />
+<element name="STLengthGross" type="double" auto="" value="1.0" />
+<element name="STHeightGross" type="double" auto="" value="1.0" />
+<element name="STUnitTurnKeyPrice30kW" type="double" auto="" value="950.0" />
+<element name="STUnitTurnKeyPrice3000kW" type="double" auto="" value="400.0" />
+<element name="STModel" type="varchar(20)" auto="" value="CCEinstein" />
+<element name="K50L" type="double" auto="" value="0.96" />
+<element name="STType" type="varchar(45)" auto="" value="Concentrating collector" />
+<element name="K50T" type="double" auto="" value="0.95" />
+<element name="STReference" type="varchar(200)" auto="" value="IEE Project Einstein" />
+<element name="STAreaAper" type="double" auto="" value="1.0" />
+</row>
+</table>
+</EinsteinDataBase>

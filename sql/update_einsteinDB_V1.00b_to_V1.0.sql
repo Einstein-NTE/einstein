@@ -8,6 +8,9 @@ ALTER DATABASE einstein DEFAULT CHARACTER SET 'utf8';
 ALTER TABLE cgeneraldata ADD COLUMN CompSpecificDiscountRate DOUBLE COMMENT 'Company Specific Discount rate' AFTER InterestExtFinancing;
 ALTER TABLE cgeneraldata ADD COLUMN PayBack DOUBLE COMMENT '' AFTER BCR;
 ALTER TABLE cgeneraldata ADD COLUMN EnergySystemCost DOUBLE COMMENT 'Energy cost including OM and annuity' AFTER EnergyCost;
+ALTER TABLE cgeneraldata ADD COLUMN AddCost DOUBLE COMMENT 'Additional Cost' AFTER EnergySystemCost;
+ALTER TABLE cgeneraldata ADD COLUMN AddCostperSavedPE DOUBLE COMMENT 'Additional Cost per saved primary energy' AFTER AddCost;
+ALTER TABLE cgeneraldata ADD COLUMN RevenueSaleEquipment DOUBLE COMMENT '' AFTER Subsidies;
 
 ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceLT HeatSourceLT VARCHAR(200);
 ALTER TABLE qgenerationhc CHANGE COLUMN HeatSourceHT HeatSourceHT VARCHAR(200);
@@ -23,8 +26,12 @@ ALTER TABLE qheatexchanger ADD COLUMN StreamStatusSink VARCHAR(200) AFTER Stream
 ALTER TABLE qheatexchanger ADD COLUMN StreamTypeSink VARCHAR(200) AFTER StreamStatusSink;
 ALTER TABLE qheatexchanger DROP COLUMN StreamStatus;
 ALTER TABLE qheatexchanger DROP COLUMN StreamType;
-ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSource StreamStatusSource VARCHAR(200) AFTER StreamStatusSink;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSource StreamStatusSource VARCHAR(200) AFTER StorageSize;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSink StreamStatusSink VARCHAR(200) AFTER StreamStatusSource;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamTypeSink StreamTypeSink VARCHAR(200) AFTER StreamStatusSink;
 ALTER TABLE qheatexchanger CHANGE COLUMN StreamTypeSource StreamTypeSource VARCHAR(200) AFTER StreamTypeSink;
+
+
 
 ALTER TABLE questionnaire ADD COLUMN OMGenUtilities DOUBLE COMMENT 'General maintenance - Utilities and operating materials costs' AFTER OMGenTot;
 ALTER TABLE questionnaire ADD COLUMN OMGenLabour DOUBLE COMMENT 'General maintenance - Labour costs' AFTER OMGenUtilities;
