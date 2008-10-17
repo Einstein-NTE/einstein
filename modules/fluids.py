@@ -120,6 +120,19 @@ class Fuel():
                 logError(_("Severe error in your fuel data for fuel %s: erroneous value for density = %s")%\
                            (fuels[0].FuelName,self.rho))
                 self.rho = 1.0
+
+            if self.Offgas is None:
+                logDebug("Missing fuel parameter OffGas in fuel %s. Default assumed"%self.name)
+                self.Offgas = 17.6
+            if self.CombAir is None:
+                logDebug("Missing fuel parameter CombAir in fuel %s. Default assumed"%self.name)
+                self.CombAir = 16.6
+            if self.Humidity is None:
+                logDebug("Missing fuel parameter Humidity in fuel %s. Default assumed"%self.name)
+                self.Humidity = 0.12
+            if self.OffgasDensity is None:
+                logDebug("Missing fuel parameter OffgasDensity in fuel %s. Default assumed"%self.name)
+                self.OffgasDensity = 1.23
             
         else:
             self.LCV = 10.0
@@ -130,6 +143,7 @@ class Fuel():
             self.CombAir = 16.6     #approximate values of natural gas as default
             self.OffgasHeatCapacity = 1.13/3600.0
             self.Offgas = 17.6
+            self.CombAir = 16.6
             self.OffgasDensity = 1.23
             self.Humidity = 0.12
             self.name = "dummy fuel"

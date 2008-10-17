@@ -4,9 +4,9 @@ USE einstein;
 ALTER TABLE qheatexchanger DROP COLUMN StreamStatus;
 ALTER TABLE qheatexchanger DROP COLUMN StreamType;
 
-ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSink StreamStatusSink VARCHAR(200) AFTER StorageSize;
-ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSource StreamStatusSource VARCHAR(200) AFTER StreamStatusSink;
-ALTER TABLE qheatexchanger CHANGE COLUMN StreamTypeSink StreamTypeSink VARCHAR(200) AFTER StreamStatusSource;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSource StreamStatusSource VARCHAR(200) AFTER StorageSize;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamStatusSink StreamStatusSink VARCHAR(200) AFTER StreamStatusSource;
+ALTER TABLE qheatexchanger CHANGE COLUMN StreamTypeSink StreamTypeSink VARCHAR(200) AFTER StreamStatusSink;
 ALTER TABLE qheatexchanger CHANGE COLUMN StreamTypeSource StreamTypeSource VARCHAR(200) AFTER StreamTypeSink;
 
 

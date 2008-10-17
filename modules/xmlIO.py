@@ -891,7 +891,7 @@ class ImportDB(object):
         else:
             return
 
-        print "ImportDB in mode ",mode
+        logTrack("ImportDB in mode %s"%mode)
 
         # create a dom and import in it the xml project file
         self.document = xml.dom.minidom.parse(infile)
@@ -1031,6 +1031,12 @@ class ImportDB(object):
 
                         if mode == "overwrite":
                             existingRows[0].update(newdict)
+                            logWarning("%s: %s%s%s"%(tablename,rowName,par1,par2)+\
+                                       _(" already in database. Data from imported file will be updated"))
+                        else:
+                            logWarning("%s: %s%s%s"%(tablename,rowName,par1,par2)+\
+                                       _(" already in database. Data from imported file will be ignored"))
+                            
                                              
                     else:
                         # create sql sentence and update database

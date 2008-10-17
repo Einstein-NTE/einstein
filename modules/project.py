@@ -449,9 +449,13 @@ class Project(object):
 
                 try:
                     Status.main.panelinfo.update()
+                except:
+                    print "problems updating panelinfo"
+
+                try:
                     Status.main.showMainMenuAlternatives()
                 except:
-                    print "problems updating main menu and panelinfo"
+                    print "problems updating main menu alternatives"
             else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
                 Status.StatusCC = None
