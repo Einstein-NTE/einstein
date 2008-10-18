@@ -23,6 +23,7 @@
 #                       Hans Schweiger  12/09/2008
 #                       Florian Jöbstl  29/09/2008
 #                       Hans Schweiger  15/10/2008
+#                       Hans Schweiger  18/10/2008
 #
 #
 #   Changes to previous version:
@@ -39,6 +40,9 @@
 #                   changed the delete HX functionality to Show/Hide HX
 #   15/10/2008: HS  function updateReportData added to updatePanel
 #                   new function doPostProcessing + auxiliary functions
+#   18/10/2008: HS  some bug-fixing in doPostProcessing and features for avoiding
+#                   non-monotonous heat demand curves and excessive calculation
+#                   times.
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -277,15 +281,16 @@ class ModuleHR(object):
 
         for iT in range(Status.NT+2):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
-            QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T)     #necessary, because waste heat from
-                                                            #exhaust gas not available ...
-       
+            iTw = min(iT+2,Status.NT+1)
+            QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T[2])     #necessary, because waste heat from
+                                                                #exhaust gas not available ...       
 #..............................................................................
 # now distribute QHX_T to the time intervals
 
         dQHX_T =Status.int.createQ_T()   #exchanged heat correspon
-            
-        for timeShift in range(0,169):  # maximum one day time shift ... if that's not enough send error message !!!
+                
+        for timeShift in range(0,25):  # maximum one day time shift ... if that's not enough send error message !!!
+
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
             dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
@@ -319,14 +324,21 @@ class ModuleHR(object):
             for it in range(Status.Nt):
 
                 itw = (it + Status.Nt - timeShift)%Status.Nt
+                iTw = min(iT+2,Status.NT+1)
                 
                 for iT in range(2,Status.NT+2):
-                    QWHAmb_Tt[iT][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT-2][it])
+                    QWHAmb_Tt[iTw][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT-2][it])
 
-            if QHX_T_res[Status.NT+1] < 1.e-3:
+########## HS2008-10-18: restrict number of iterations (timeShifts)as otherwise calculation time
+# gets unnecessarily long
+# there are small numeric errors between PE2 and Einstein, and Exhaust Gas is not yet in EINSTEIN's
+# internal waste heat treatment, so ... in order to survive for the moment ...
+# XXX XXX 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 
+
+            if QHX_T_res[Status.NT+1] < 0.01*UPHProc_T[Status.NT+1]:
                 break
 
-            elif timeShift == 168:
+            elif timeShift == 24:
                 logDebug("ModuleHR (__doPostProcessing): time shift of 168 hours not enough for realising PE2 HR potential")
             
 #..............................................................................
@@ -371,7 +383,6 @@ class ModuleHR(object):
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
             
-
 #------------------------------------------------------------------------------
     def __maxHRPotential(self,UPH_Tt,QWH_Tt,timeShift):
 #------------------------------------------------------------------------------
@@ -408,7 +419,7 @@ class ModuleHR(object):
                 shift = max(shift,QHX_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
 
             for iT in range(Status.NT+2):
-                QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)                                        # = shift of HCC in Q
+                QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)          # = shift of HCC in Q
             
         return QHX_Tt        
 
@@ -422,8 +433,6 @@ class ModuleHR(object):
         for stream in hidden:
             streams.append(stream)
            
-        print "calcQD: number of streams = %s"%len(streams)
-
         QD_T = []
         temperature_step = 5;
         for temperature in xrange(0, 406, temperature_step):
