@@ -206,7 +206,7 @@ class ModuleBB(object):
                 bb = bbs[0]
                 index = bb.CascadeIndex
 
-        QD80C = Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval+0.5)]
+        QD80C = copy.deepcopy(Status.int.QD_Tt_mod[index-1][int(80/Status.TemperatureInterval+0.5)])
         QD80C.sort(reverse=True)
 
 #        if self.maxTemp>160: # the minimum temperature difference is now setted at 20°C but could even be a parameter
@@ -216,13 +216,13 @@ class ModuleBB(object):
 #            QD140C=[]
 #            for i in range(len(QD80C)):
 #                QD140C.append(0)
-        QD140C=Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)]
+        QD140C=copy.deepcopy(Status.int.QD_Tt_mod[index-1][int(140/Status.TemperatureInterval)])
         QD140C.sort(reverse=True)
         
         iT_maxTemp = int(self.maxTemp/Status.TemperatureInterval)
-        QDmaxTemp=Status.int.QD_Tt_mod[index-1][iT_maxTemp]
+        QDmaxTemp=copy.deepcopy(Status.int.QD_Tt_mod[index-1][iT_maxTemp])
         QDmaxTemp.sort(reverse=True)
-        QResidualMaxTemp=Status.int.QD_Tt_mod[self.cascadeIndex][iT_maxTemp]
+        QResidualMaxTemp=copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex][iT_maxTemp])
 #        QResidualMaxTemp=Status.int.QD_Tt_mod[self.cascadeIndex][iT_maxTemp]- Status.int.QD_Tt_mod[self.cascadeIndex][int(140/Status.TemperatureInterval+0.5)]
         QResidualMaxTemp.sort(reverse=True)
 
@@ -589,6 +589,7 @@ class ModuleBB(object):
         Status.int.USHj_Tt[cascadeIndex-1] = USHj_Tt
         Status.int.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
         Status.int.USHj_t[cascadeIndex-1] = copy.deepcopy(USHj_Tt[Status.NT+1])
+        print "ModuleBB: USHj_t\n",Status.int.USHj_t[cascadeIndex-1]
 
 # waste heat absorbed by present equipment
 
@@ -1242,7 +1243,7 @@ class ModuleBB(object):
 
 #............................................................................................
         iT_maxTemp= int((self.maxTemp/Status.TemperatureInterval)+0.5)
-        self.QDhmaxTemp = Status.int.QD_Tt_mod[self.cascadeIndex][iT_maxTemp]
+        self.QDhmaxTemp = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex][iT_maxTemp])
         self.QDhmaxTemp.sort(reverse=True)
         if self.QDhmaxTemp[0]>0:
             self.designBBmaxTemp()

@@ -302,7 +302,7 @@ UNITS = {
 # conversion to internal unit: [¤/kWh]
     'ENERGYTARIFF': {
         '%s/kWh'%CURRENCY : (1.0,0.0),
-        '%s/MWh'%CURRENCY : (1000.0,0.0),
+        '%s/MWh'%CURRENCY : (0.001,0.0),
         '%s/kJ'%CURRENCY: (3600.0,0),
         '%s/MJ'%CURRENCY: (3.6,0.0),
         '%s/GJ'%CURRENCY: (3.6e-3,0.0),
