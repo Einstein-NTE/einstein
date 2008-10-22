@@ -589,7 +589,6 @@ class ModuleBB(object):
         Status.int.USHj_Tt[cascadeIndex-1] = USHj_Tt
         Status.int.USHj_T[cascadeIndex-1] = Status.int.calcQ_T(USHj_Tt)
         Status.int.USHj_t[cascadeIndex-1] = copy.deepcopy(USHj_Tt[Status.NT+1])
-        print "ModuleBB: USHj_t\n",Status.int.USHj_t[cascadeIndex-1]
 
 # waste heat absorbed by present equipment
 
