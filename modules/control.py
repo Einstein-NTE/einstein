@@ -47,6 +47,7 @@ from einstein.modules.energyStats.moduleEA5 import *
 from einstein.modules.moduleCS import *
 
 from numpy import *
+import wx #only needed for the constans ID_OK /ID_CANCEL !!!
 
 #------------------------------------------------------------------------------		
 def prepareDataForReport():
@@ -326,7 +327,7 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a solar system (Alternative 2)\n")
 
-    if ret == wx.ID_Cancel:
+    if ret == wx.ID_CANCEL:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
         if ret == wx.ID_OK:
             return
@@ -361,7 +362,7 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a heat pump (Alternative 3)\n")
     
-    if ret == wx.ID_Cancel:
+    if ret == wx.ID_CANCEL:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
         if ret == wx.ID_OK:
             return
@@ -403,7 +404,7 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a new boiler cascade (Alternative 4)\n")
     
-    if ret == wx.ID_Cancel:
+    if ret == wx.ID_CANCEL:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
         if ret == wx.ID_OK:
             return
@@ -432,7 +433,7 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to combine everything (Alternative 5)\n")
     
-    if ret == wx.ID_Cancel:
+    if ret == wx.ID_CANCEL:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
         if ret == wx.ID_OK:
             return
