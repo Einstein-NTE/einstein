@@ -310,7 +310,10 @@ def autoRun(parent):
         
     Status.prj.createNewAlternative(basedOn,shortName,description)
 
-    Status.mod.moduleHR.runHRModule()
+    if Status.HRTool == "PE2":
+        Status.mod.moduleHR.runHRDesign()
+    else:
+        Status.mod.moduleHR.runHRModule()
 
 # Finally check the boiler dimensioning for the remaining heat demand
 #    Status.mod.moduleBB.designAssistant()
@@ -321,7 +324,12 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 2: Heat recovery + solar system
 
-    showMessage("Now let's try to install a solar system (Alternative 2)\n")
+    ret = askConfirmation("Now let's try to install a solar system (Alternative 2)\n")
+
+    if ret == wx.ID_Cancel:
+        ret = askConfirmation("Do You want to interrupt the auto-design ?")
+        if ret == wx.ID_OK:
+            return
     
     shortName = "Solar thermal"
     description = "EINSTEIN default design of a solar thermal system"
@@ -351,8 +359,13 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 3: Heat recovery + heat pump
 
-    showMessage("Now let's try to install a heat pump (Alternative 3)\n")
+    ret = askConfirmation("Now let's try to install a heat pump (Alternative 3)\n")
     
+    if ret == wx.ID_Cancel:
+        ret = askConfirmation("Do You want to interrupt the auto-design ?")
+        if ret == wx.ID_OK:
+            return
+
     shortName = "Heat pump"
     description = "EINSTEIN default design of a heat pump based system"
     basedOn = 1
@@ -388,8 +401,13 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 4: New boiler cascade
 
-    showMessage("Now let's try to install a new boiler cascade (Alternative 4)\n")
+    ret = askConfirmation("Now let's try to install a new boiler cascade (Alternative 4)\n")
     
+    if ret == wx.ID_Cancel:
+        ret = askConfirmation("Do You want to interrupt the auto-design ?")
+        if ret == wx.ID_OK:
+            return
+
     shortName = "Boiler cascade"
     description = "EINSTEIN default design of a new boiler cascade"
     basedOn = 1
@@ -412,8 +430,13 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 5: And now lets mix up everything
 
-    showMessage("Now let's try to combine everything (Alternative 5)\n")
+    ret = askConfirmation("Now let's try to combine everything (Alternative 5)\n")
     
+    if ret == wx.ID_Cancel:
+        ret = askConfirmation("Do You want to interrupt the auto-design ?")
+        if ret == wx.ID_OK:
+            return
+
     shortName = "EINSTEIN Super Mix"
     description = "EINSTEIN default design of a new boiler cascade"
     basedOn = 3

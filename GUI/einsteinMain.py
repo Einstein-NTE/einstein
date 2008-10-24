@@ -501,31 +501,38 @@ class EinsteinFrame(wx.Frame):
 
     def showError(self, text):
         self.logError(text)
-        dlg = wx.MessageDialog(None, U(text), _U("Error"), wx.OK | wx.ICON_ERROR)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
+        if Status.UserInteractionLevel <> "automatic":
+            dlg = wx.MessageDialog(None, U(text), _U("Error"), wx.OK | wx.ICON_ERROR)
+            ret = dlg.ShowModal()
+            dlg.Destroy()
         self.doLog.LogThis('Error: '+ text)
 
     def showWarning(self, text):
         self.logWarning(text)
-        dlg = wx.MessageDialog(None, U(text), _U("Warning"), wx.OK | wx.ICON_EXCLAMATION)
-        ret = dlg.ShowModal()
+
+        if Status.UserInteractionLevel <> "automatic":
+            dlg = wx.MessageDialog(None, U(text), _U("Warning"), wx.OK | wx.ICON_EXCLAMATION)
+            ret = dlg.ShowModal()
         #dlg.Destroy()
         self.doLog.LogThis('Warning: '+text)
 
     def showInfo(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, U(text), _U("Info"), wx.OK | wx.ICON_INFORMATION)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
+        if Status.UserInteractionLevel <> "automatic":
+            dlg = wx.MessageDialog(None, U(text), _U("Info"), wx.OK | wx.ICON_INFORMATION)
+            ret = dlg.ShowModal()
+            dlg.Destroy()
         self.doLog.LogThis('Info: '+text)
 
     def askConfirmation(self, text):
         self.logMessage(text)
-        dlg = wx.MessageDialog(None, U(text), _U("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
-        ret = dlg.ShowModal()
-        dlg.Destroy()
-        self.doLog.LogThis('Confirm: '+text+'. Answer='+str(ret))
+        if Status.UserInteractionLevel <> "automatic":
+            dlg = wx.MessageDialog(None, U(text), _U("Confirm"), wx.YES_NO | wx.ICON_QUESTION)
+            ret = dlg.ShowModal()
+            dlg.Destroy()
+            self.doLog.LogThis('Confirm: '+text+'. Answer='+str(ret))
+        else:
+            ret = wx.ID_OK
         return ret
 
 #------------------------------------------------------------------------------
@@ -1038,8 +1045,8 @@ class EinsteinFrame(wx.Frame):
 
         #panelCHP
         elif select == _U("CHP"):
-            self.logWarning(_("Sorry. This function is not yet available. Coming soon !"))
-            return
+#            self.logWarning(_("Sorry. This function is not yet available. Coming soon !"))
+#            return
             self.hidePages()
             self.panelCHP = PanelCHP(id=-1, name='panelCHP', parent=self.leftpanel2,
                                    main=self,pos=wx.Point(0, 0), size=wx.Size(800, 600),

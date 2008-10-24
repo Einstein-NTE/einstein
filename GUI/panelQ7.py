@@ -571,6 +571,10 @@ class PanelQ7(wx.Panel):
     def clear(self):
 #------------------------------------------------------------------------------
 
+        self.tc1_21.Clear()
+        self.tc1_22.Clear()
+        self.tc1_23.Clear()
+        
 #        self.checkBox1.SetValue(False)
 #        self.checkBox2.SetValue(False)
 #        self.checkBox3.SetValue(False)

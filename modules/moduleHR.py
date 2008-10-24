@@ -7,42 +7,27 @@
 #
 #------------------------------------------------------------------------------
 #
-#   ModuleHC (Heat and Cold Supply)
+#   ModuleHR (Heat Recovery)
 #           
 #------------------------------------------------------------------------------
 #           
-#   Module for design of HC Supply cascade
+#   Module for heat recovery calculations
 #
 #==============================================================================
 #
-#   Version No.: 0.07
-#   Created by:         Hans Schweiger  10/06/2008
-#   Last revised by:
-#                       Florian Joebstl 04/09/2008
-#                       Hans Schweiger  05/09/2008
-#                       Hans Schweiger  12/09/2008
-#                       Florian Jöbstl  29/09/2008
-#                       Hans Schweiger  15/10/2008
-#                       Hans Schweiger  18/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Florian Joebstl, Hans Schweiger
+#                       04/09/2008 - 18/10/2008
 #
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger          21/10/2008
 #
 #   Changes to previous version:
 #
-#   23/06/2008: HS  Query of fluids and fuels used in export XML
-#   02/07/2008: HS  Function getHXData added -> obtains Fluid ID's in HX
-#   04/09/2008: FJ  Redone the entire module, still not completely functional
-#   05/09/2008: HS  Adaptation of simulateHRnew to general program
-#   12/09/2008: HS  bug-fix in function simulateHR() -> completely rewritten
-#                   selection of calculation mode by Status.HRTool in function
-#                   runHRModule (is set in preferences).
-#   29/09/2008: FJ  split into runHRModule and runHRDesign, some renaming,
-#                   changed every other method to privat
-#                   changed the delete HX functionality to Show/Hide HX
-#   15/10/2008: HS  function updateReportData added to updatePanel
-#                   new function doPostProcessing + auxiliary functions
-#   18/10/2008: HS  some bug-fixing in doPostProcessing and features for avoiding
-#                   non-monotonous heat demand curves and excessive calculation
-#                   times.
+#   21/10/2008: HS  calculation of QD/QA and update of cascadeUpdateLevel
+#                   in HX Design
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -186,6 +171,25 @@ class ModuleHR(object):
         dlg.update(99.0)
 
         self.__updatePanel()
+
+### HS2008-10-21: this block is necessary in order to update global demand
+# arrays that will be used in the system simulation
+        Status.int.QD_Tt = Status.int.createQ_Tt()   
+        Status.int.QA_Tt = Status.int.createQ_Tt()
+
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt):
+                Status.int.QD_Tt[iT][it] = Status.int.USHTotal_Tt[iT][it]
+                Status.int.QA_Tt[iT][it] = Status.int.QWHAmb_Tt[iT][it]
+
+        Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
+        Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
+
+        logTrack("Aggregate demand = %s"%str(Status.int.QD_T))
+
+        Status.int.initCascadeArrays(0) #start
+
+### HS2008-10-21: END BLOCK
                       
         dlg.Destroy()
 
@@ -256,6 +260,7 @@ class ModuleHR(object):
 #   calculate aggregate heat demand and waste heat availability
         if Status.processData.outOfDate == True:
             Status.processData.createAggregateDemand()
+            return #HR module is called again 
             
         UPH_Tt = Status.int.UPHTotal_Tt
         UPHw_Tt = Status.int.UPHwTotal_Tt
@@ -299,7 +304,13 @@ class ModuleHR(object):
 
             for iT in range(1,Status.NT+2):
                 dQHX_T[iT] = min(dQHXmax_T[iT],QHX_T_res[iT])
-                maxSlope = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
+                maxSlopeD = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
+                iTw = iT+2
+                if iTw <= Status.NT+1:
+                    maxSlopeA = max(QWHAmb_T[iTw-1] - QWHAmb_T[iTw],0.0)
+                else:
+                    maxSlopeA = 0.0
+                maxSlope = min(maxSlopeA,maxSlopeD)
                 dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlope)
 
                 if dQHXmax_T[iT] > 0:
@@ -324,10 +335,12 @@ class ModuleHR(object):
             for it in range(Status.Nt):
 
                 itw = (it + Status.Nt - timeShift)%Status.Nt
-                iTw = min(iT+2,Status.NT+1)
                 
-                for iT in range(2,Status.NT+2):
-                    QWHAmb_Tt[iTw][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT-2][it])
+                for iTw in range(Status.NT+2):
+                    iT = max(iTw-2,0)
+                    QWHAmb_Tt[iTw][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT][it])
+
+            QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
 
 ########## HS2008-10-18: restrict number of iterations (timeShifts)as otherwise calculation time
 # gets unnecessarily long
@@ -382,6 +395,9 @@ class ModuleHR(object):
         Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
+
+        print "ModuleHR (__doPostProc.): USHTotal_T = ",Status.int.USHTotal_T
+        print "ModuleHR (__doPostProc.): QWHAmb_T = ",Status.int.QWHAmb_T
             
 #------------------------------------------------------------------------------
     def __maxHRPotential(self,UPH_Tt,QWH_Tt,timeShift):
@@ -710,47 +726,6 @@ class ModuleHR(object):
 
 
 #------------------------------------------------------------------------------
-    def __maxHRPotential(self,UPH_Tt,UPHw_Tt,timeShift):
-#------------------------------------------------------------------------------
-#       returns a vector with the maximum heat recovery potential
-#       for a given time and temperature shift
-#       for simplicity at the moment temperature shift = fix:
-#       10 K (2 temperature intervals)
-#------------------------------------------------------------------------------
-
-        QHX_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
-        
-#..............................................................................
-#..............................................................................
-#..............................................................................
-
-        for it in range(Status.Nt):
-
-            itw = (it - timeShift)%Status.Nt
-
-#..............................................................................
-
-#first invert UPHw curve and shift 2 temperature intervals (DTmin)
-
-            UPHw_max = UPHw_Tt[2][itw]   
-            
-            for iT in range(Status.NT):
-                QHX_Tt[iT][it] = (UPHw_max - UPHw_Tt[iT+2][itw])  #maximum available energy
-            QHX_Tt[Status.NT][it]   = QHX_Tt[Status.NT-1][it]         #includes shift by DTmin
-            QHX_Tt[Status.NT+1][it] = QHX_Tt[Status.NT-1][it]
-
-#then shift so that QHXProc always < UPH -> = Hot Composite Curve
-            shift = 0.0
-            for iT in range(Status.NT+2):
-                shift = max(shift,QHX_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
-
-            for iT in range(Status.NT+2):
-                QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)                                        # = shift of HCC in Q
-            
-        return QHX_Tt        
-
-        
-#------------------------------------------------------------------------------
     def __estimativMethod(self):
 #------------------------------------------------------------------------------
 #       simulates the action of the HR module while the module is not yet
@@ -762,7 +737,7 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------
         if Status.processData.outOfDate == True:
             Status.processData.createAggregateDemand()
-            return ###????
+            return
             
         QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
         UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes

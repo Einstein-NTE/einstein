@@ -129,7 +129,7 @@ def showMessage(text):
     Status.main.showInfo(text)
         
 #------------------------------------------------------------------------------		
-def askConfirmation(self, text):
+def askConfirmation(text):
 #------------------------------------------------------------------------------		
 #   like showMessage, but returns the answer of the user (wx.YES_NO)
 #------------------------------------------------------------------------------		
