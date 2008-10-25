@@ -102,6 +102,7 @@ from math import *
 from numpy import *
 import copy
 
+from einstein.modules.fluids import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
@@ -465,7 +466,7 @@ class ModuleBB(object):
         if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
         if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
-
+        equipe.update({"ExcessAirRatio":1.1})
         if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":model.BoilerTurnKeyPrice})
         else:
             logDebug("ModuleBB: turn key price of boiler model %s not specified"%equipe.Model)
@@ -629,7 +630,33 @@ class ModuleBB(object):
 #                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
 
         self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+#........................................................................23/10/2008
+        fuel_number = equipe.DBFuel_id   #IMPORT from the fuelDB
+        eq_fuel = Fuel(fuel_number)
+        self.FuelLCV = eq_fuel.LCV
+        self.OffgasHeatCapacity = eq_fuel.OffgasHeatCapacity
+        self.CombAir= eq_fuel.CombAir
+        self.ExcessAirRatio= equipe.ExcessAirRatio
+        if self.ExcessAirRatio== None:
+            self.ExcessAirRatio= 1.1
+        self.LossFactEq = 0.01  
+        self.TenvEq= 15
+        MFuelYear = USHj/(self.FuelLCV * COPh_nom) # yearly fluid mass flow
+        print 'ModuleBB: calculateEnergyFlow. the excessairRatio, CombAir the  and the MFuel are', self.ExcessAirRatio , self.CombAir , MFuelYear
+        MAirYear = self.ExcessAirRatio * self.CombAir * MFuelYear   # yearly air mass flow
+        QLossj = self.LossFactEq * USHj
+        QWHEqj = max (0,FETel_j - USHj*(1+self.LossFactEq))   # not considering the latent heat(condensing water)
+        QExhaustGasj=QWHEqj
+        FlowExhaustGas = MAirYear + MFuelYear  # yearly flow
+        print 'ModuleBB: calculateEnergyFlow. QExhaustGasj , FlowExhaustGas , self.OffgasHeatCapacity', QExhaustGasj , FlowExhaustGas , self.OffgasHeatCapacity
+        if FlowExhaustGas >0:
+            self.TExhaustGas = QExhaustGasj/(FlowExhaustGas * self.OffgasHeatCapacity)
+        else:
+            self.TExhaustGas = self.TenvEq
+        mFuel = equipe.HCGPnom/(self.FuelLCV * COPh_nom)
         
+        
+#........................................................................       
         return USHj    
 
 
@@ -845,8 +872,21 @@ class ModuleBB(object):
                     selected[i] = bj
                     selected[j] = bi
 
+        i=0
+        goodEf=False
+        while i<len(selected) and goodEf == False:
+            if selected[i].BBEfficiency >= self.minEff:
+                goodEf = True
+            i= i+1
+        if goodEf == True:
+            modelID =selected[(i-1)].DBBoiler_ID
+        else:
+            modelID =selected[0].DBBoiler_ID
+            showWarning(_("in the database no boiler with the desired efficiency has be found")) 
+                          
+
         
-        modelID =selected[0].DBBoiler_ID
+#        modelID =selected[0].DBBoiler_ID
         print "selectBB: the requested power is:", Pow 
         print "selectBB: the selected boiler ID is:", modelID
 #        print "selectBB: the list of boiler is:"
@@ -1095,24 +1135,28 @@ class ModuleBB(object):
             self.securityMargin = 1+DA.BBSafety/100  
         except:
             self.securityMargin = 1.2
+        print "ModuleBB (design assistant): securityMargin =", self.securityMargin
         if DA.BBMaintain != None:
             self.Maintain= DA.BBMaintain
         else:
             self.Maintain = 1
+        print "ModuleBB (design assistant): maintain =", self.Maintain
         if DA.BBRedundancy!= None:
             self.redund= DA.BBRedundancy
         else:
             self.redund= 0
+        print "ModuleBB (design assistant): redoundancy =", self.redund
         if DA.BBPmin!= None:
             self.minPow = DA.BBPmin
         else:
             self.minPow = 200
+        print "ModuleBB (design assistant): minPow =", self.minPow
 
         if DA.BBHOp!= None:
             self.minOpTime = DA.BBHOp
         else:
             self.minOpTime = 100
-
+        print "ModuleBB (design assistant): minOpTime =", self.minOpTime
         if DA.BBEff != None:
             self.minEff= DA.BBEff/100
         else:

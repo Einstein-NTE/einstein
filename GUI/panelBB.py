@@ -566,7 +566,13 @@ class PanelBB(wx.Panel):
                             False)                     # database table can be edited in DBEditFrame?
 
         if pu1.ShowModal() == wx.ID_OK:
+
             print 'PanelBB AddEquipment accepted. Id='+str(pu1.theId)
+            print 'PanelBB AddEquipment pu1.theId is', pu1.theId
+            if pu1.theId <= 0:
+               self.mod.deleteEquipment(None)
+            else:
+                print 'PanelBB AddEquipment accepted. Id='+str(pu1.theId)
         else:
             self.mod.deleteEquipment(None)
         self.display()
