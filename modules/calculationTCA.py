@@ -7,6 +7,7 @@
 #   Andreas Hirczy <ahi@itp.tugraz.at>, 2008
 
 import sys
+from einstein.modules.messageLogger import *
 
 class CashFlow:
     def __init__(self, maxYears, interestRate, energyPrizeRate):
@@ -99,8 +100,8 @@ def NPV(cf_new, cf_old, rate):
     return npv[:]
 
 def NPVcf(cf, rate):
-    print "cf-------"
-    print cf
+    #print "cf-------"
+    #print cf
     '''NPV -- net present value
     http://en.wikipedia.org/wiki/Net_present_value
     
@@ -122,11 +123,14 @@ def payback_period(npv):
     input:   npv -- net present value (array, one entry for every year)
     returns: payback period (scalar)'''
     frac=0;
-    # find interval where sign changes and interpolate linear
+    i=0.0;
+    # find interval where sign changes and interpolate linear    
     for i in xrange(0,len(npv)-1):
         if 0.0 >= npv[i]*npv[i+1]:
             try: frac = abs(npv[i])/abs(npv[i+1]-npv[i])
-            except ZeroDivisionError: frac=0
+            except ZeroDivisionError: 
+                frac=0
+                logWarning(_("Could not calculate payback period. NPV is zero."))
             break
     return i+frac
 
@@ -141,11 +145,11 @@ def MIRR(cf_new, cf_old, financeRate, reinvestRate):
     input:   financeRate (scalar, percent)
     input:   reinvestRate (scalar, percent)
     returns: mirr (array, one entry for every year)'''
-    print "mirr calculation-----"
-    print cf_new
-    print cf_old
-    print financeRate
-    print reinvestRate
+    #print "mirr calculation-----"
+    #print cf_new
+    #print cf_old
+    #print financeRate
+    #print reinvestRate
     assert len(cf_new) == len(cf_old)    
     cf_pos = [0.0] * (len(cf_new))
     cf_neg = [0.0] * (len(cf_new))
@@ -162,10 +166,10 @@ def MIRR(cf_new, cf_old, financeRate, reinvestRate):
             cf_pos[i] = cFlow
         else:
             cf_neg[i] = cFlow
-    print "CF possitive:  "
-    print cf_pos
-    print "CF negative:   "
-    print cf_neg
+    #print "CF possitive:  "
+    #print cf_pos
+    #print "CF negative:   "
+    #print cf_neg
         
     # calculate their future value and net present valuse
     for i in xrange(1, len(cf_new)):
@@ -209,7 +213,9 @@ def BCR(cf_new, cf_old, interest):
         sum_old += cf_old[i] * pow(1.0 + interest, -i)
         sum_new += cf_new[i] * pow(1.0 + interest, -i)
         try: bcr[i] = -sum_old / sum_new
-        except ZeroDivisionError: bcr[i] = 1e300000
+        except ZeroDivisionError: 
+            bcr[i] = 1e300000
+            logWarning(_("Could not calculate BCR."))
     return bcr
         
 
@@ -223,21 +229,19 @@ def ANNUITY(I0,r,N):
     r = r / 100.0
     #print "ANNUITY I0=%s r=%s N=%s" %(I0,r,N)
     sum = 0
-    for i in xrange(1,N+1):
-        sum+=1.0/pow(1+r,i)
-    a = 1.0 / sum
-    A = a * I0
+    try:
+        for i in xrange(1,N+1):
+            sum+=1.0/pow(1+r,i)
+        a = 1.0 / sum
+        A = a * I0
+    except ZeroDivisionError:
+        logWarning(_("Could not calculate annuity period."))
+        return 0.0
     #print "a=%s" % (a)
     #print "A=%s" % (A)
     return A
 
-def ADDCOST(Add1,Add2,Add3,Add4,Add5):
-    addcost = Add1+Add2+Add3-Add4-Add5
-    return addcost
 
-#def ADDCOSTPERSAVEPE(PE1,PE2,PE3):
-    #addcostpersavepe = PE1/(PE2-PE3)
-    #return addcostpersavepe
 
 
 

@@ -81,25 +81,25 @@ class ModuleTCA(object):
         self.result = []
                         
         #get cashflow for the current process
-        data = TCAData(Status.PId,0)                
-        data.loadTCAData()
-        DataOfCurrentProcess=data                        #SET DATA OF CURRENT PROCESS
-        
+        DataOfCurrentProcess = TCAData(Status.PId,0)                
+        DataOfCurrentProcess.loadTCAData()     
+                                  
         #set parameters
-        InterestRate = data.NIR - data.Inflation
-        DiscountRate = data.CSDR - data.Inflation
+        InterestRate = DataOfCurrentProcess.NIR - DataOfCurrentProcess.Inflation
+        DiscountRate = DataOfCurrentProcess.CSDR - DataOfCurrentProcess.Inflation
         #PrimaryEnergyDemand = data.PETel + data.PETFuels
-        ProjectLifetime = data.TimeFrame
+        ProjectLifetime = DataOfCurrentProcess.TimeFrame
           
-        data = self.calculateCashFlow(data)
-        old = data.cashflow
+        DataOfCurrentProcess = self.calculateCashFlow(DataOfCurrentProcess)
+        DataOfCurrentProcess.storeCurrentProcessInformationToCGeneral()
+        old = DataOfCurrentProcess.cashflow
         
-        print "current"
-        print old.CF()
+        #print "current"
+        #print old.CF()
         
         #get all proposal numbers and names
         query = """SELECT AlternativeProposalNo,ShortName FROM salternatives WHERE ProjectID = %s"""
-        query = query % (self.data.pid)    
+        query = query % (Status.PId)    
         results = Status.DB.sql_query(query)
         self.anos = []              
                   
@@ -114,47 +114,47 @@ class ModuleTCA(object):
                 #load data for alternative
                 data = TCAData(Status.PId,ano[0])              
                 data.loadTCAData()
-		    #newdata = data
+		        #newdata = data
                 #calculate cashflow for alternative
                 data = self.calculateCashFlow(data)
                 current = data.cashflow
                 
-                print name
-                print current.CF()
+                #print name
+                #print current.CF()
                 
-                #set display option to 1 only for the current proposal
-                display = 0
-                
-                #The currently selected proposal
+                #set the default display option (1=display)
+                display = 1                
+                #set for the current proposal
                 if (Status.ANo == ano[0]):
                     display = 1
                 
-                #calculate the results                                
-                                
+                #calculate the results  
+                                   
                 npv = NPV(current.CF(), old.CF(), InterestRate)
-                print "npv--------------------------------"
-                print npv
+                #print "npv--------------------------------"
+                #print npv
 
                 mirr = MIRR(current.CF(), old.CF(), InterestRate, DiscountRate)
-                print "mirr--------------------------------"
-                print mirr
+                #print "mirr--------------------------------"
+                #print mirr
 
                 bcr = BCR(current.CF(), old.CF(), InterestRate)  
-                print "bcr--------------------------------"
-                print bcr
-                  
+                #print "bcr--------------------------------"
+                #print bcr               
                 annuity = ANNUITY(current.TotalInvestmentCapital,InterestRate,ProjectLifetime)              
                 pp = payback_period(npv)
-
+               
                 energycostCurrentProcess =  DataOfCurrentProcess.getTotalEnergyCost()
                 energycostNewProcess     =  data.getTotalEnergyCost()
                 opcostCurrentProcess     =  DataOfCurrentProcess.totalopcost
                 opcostNewProcess         =  data.totalopcost
                 energydemandCurrentProcess = DataOfCurrentProcess.getTotalEnergyDemand()
                 energydemandNewProcess = data.getTotalEnergyDemand()
-                additionalcost = ADDCOST(annuity,opcostNewProcess,energycostNewProcess,opcostCurrentProcess,energycostCurrentProcess)           
-                additionalcostpersavePE = additionalcost/(energydemandNewProcess-energydemandCurrentProcess)
-                print additionalcost
+                
+                additionalcost = annuity+opcostNewProcess+energycostNewProcess-opcostCurrentProcess-energycostCurrentProcess         
+                try: additionalcostpersavePE = additionalcost/(energydemandNewProcess-energydemandCurrentProcess)
+                except: additionalcostpersavePE = 0.0
+                #print additionalcost
 
                 #set the results in data, store data in result list
                 data.setResult(name,npv,mirr,bcr,annuity,pp,additionalcost,additionalcostpersavePE,display)                                
@@ -168,9 +168,8 @@ class ModuleTCA(object):
                 data.setResultInvalid(name,display)
                 self.result.append(data)
                 logWarning((_("TCA: No result for %s") % ano[1]))
-                logWarning(str(type(inst)))
+                #logWarning(str(type(inst)))
           
-
         self.__setDataForReport()           
             
         
@@ -324,6 +323,9 @@ class ModuleTCA(object):
 
     
     def calculateTotalOpCostFromDetailedOpcost(self):
+        if (self.data.ano<=0): #dont calculate opcost from detailed-opcost for current process
+            return
+        
         cost = 0
         for category in self.data.detailedopcost:
             for entry in category:

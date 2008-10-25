@@ -24,6 +24,7 @@
 #                           Hans Schweiger  07/07/2008
 #                           Hans Schweiger  17/09/2008
 #                           Stoyan Danov    13/10/2008
+#                           Florian Jöbstl  24/10/2008
 #
 #       Changes to previous version:
 #       06/05/2008      Changed display logic
@@ -37,6 +38,8 @@
 #                       (compatibility with Tom's new FloatEntry)
 #       17/09/2008: HS  adaptation to new nomenclature of TCA
 #       13/10/2008: SD  change _() to _U()
+#       24/10/2008: FJ  added updateOM() - function to sum fields and check
+#                                          value consistency 
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,7 +57,7 @@ from GUITools import *
 from displayClasses import *
 from units import *
 from fonts import *
-
+from einstein.modules.messageLogger import *
 # constants that control the default sizes
 # 1. font sizes
 TYPE_SIZE_NORMAL        =   9
@@ -367,6 +370,8 @@ class PanelQ9(wx.Panel):
         event.Skip()
         
     def OnButtonOK(self, event):
+        self.updateOM()
+        
         if Status.PId <> 0 and \
 		len(Status.DB.questionnaire.Questionnaire_ID[Status.PId]) == 1:
             tmp = {
@@ -415,6 +420,7 @@ class PanelQ9(wx.Panel):
     def display(self):
         self.clear()
         self.fillPage()
+        self.updateOM()
         self.Show()
 
     def clear(self):
@@ -500,5 +506,53 @@ class PanelQ9(wx.Panel):
 	else:
 	    self.checkBox7.SetValue(bool(q.EnergyManagExternal))
 
+    
+    def __getValueSecure(self,obj):
+    # reads value from a textfield and returns it as float 
+    # if value is not a float 0.0 is returned
+        str = obj.GetValue()        
+        try: return float(str)
+        except: return 0.0    
+        
 
+    def __checkFields(self,fields,override_if_not_match_total = False):
+    # fields = [<name>,<totalfield>,[<listofsubfields>]]
+    # override_if_not_match_total : if TRUE the value from the totalfield will be
+    #                               overridden by the calculated sum     
+        for category in fields:
+            name        = category[0]  
+            totalField  = category[1]
+            valueFields = category[2]            
+            sum = 0.0
+            for valueField in valueFields:
+                sum += self.__getValueSecure(valueField)
+            totalValue = self.__getValueSecure(totalField)
+            if (totalValue != sum):
+                logWarning(_("Yearly OM: total from database does not match sum from values for: "+name))
+            if (override_if_not_match_total):
+                totalField.SetValue(str(sum))
+
+    def updateOM(self):
+    #1) checks if all subtotals are consistent and gives a warning if not
+    #2) checks if all totals are constistent, overrides the total if not and gives a warning
+    
+        fields = []
+        #               NAME                                          TOTAL FIELD  SUBFIELDS
+        fields.append(["General maintenance"                         ,self.tc10_1,[self.tc10_2,self.tc10_3,self.tc10_4,self.tc10_5]])
+        fields.append(["Buildings"                                   ,self.tc11_1,[self.tc11_2,self.tc11_3,self.tc11_4,self.tc11_5]])
+        fields.append(["Machines and equipment for processes"        ,self.tc12_1,[self.tc12_2,self.tc12_3,self.tc12_4,self.tc12_5]])
+        fields.append(["Generation and distribution of heat and cold",self.tc13_1,[self.tc13_2,self.tc13_3,self.tc13_4,self.tc13_5]])      
+        #check subtotals ; Total costs
+        self.__checkFields(fields,override_if_not_match_total = False)
+  
+        fields = []
+        #               NAME                              TOTAL FIELD  SUBFIELDS
+        fields.append(["Total Costs"                      ,self.tc14_1,[self.tc10_1,self.tc11_1,self.tc12_1,self.tc13_1]])
+        fields.append(["Utilities and operating materials",self.tc14_2,[self.tc10_2,self.tc11_2,self.tc12_2,self.tc13_2]])
+        fields.append(["Labour costs"                     ,self.tc14_3,[self.tc10_3,self.tc11_3,self.tc12_3,self.tc13_3]])
+        fields.append(["External costs"                   ,self.tc14_4,[self.tc10_4,self.tc11_4,self.tc12_4,self.tc13_4]])
+        fields.append(["Regulatory"                       ,self.tc14_5,[self.tc10_5,self.tc11_5,self.tc12_5,self.tc13_5]])
+        #check totals ; Total of Total costs
+        self.__checkFields(fields,override_if_not_match_total = True)    
+      
 

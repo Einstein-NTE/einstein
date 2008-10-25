@@ -141,8 +141,8 @@ class PanelTCA(wx.Panel):
               pos=wx.Point(8, 168), size=wx.Size(760, 384), style=0)
 
         self.btnResetData = wx.Button(id=wxID_PANELTCABTNRESETDATA,
-              label=_(u'Reset TCA data'), name=u'btnResetData', parent=self,
-              pos=wx.Point(8, 560), size=wx.Size(96, 23), style=0)
+              label=_(u'Reset TCA data for current proposal'), name=u'btnResetData', parent=self,
+              pos=wx.Point(8, 560), size=wx.Size(200, 23), style=0)
         self.btnResetData.Bind(wx.EVT_BUTTON, self.OnBtnResetDataButton,
               id=wxID_PANELTCABTNRESETDATA)
 
@@ -188,8 +188,8 @@ class PanelTCA(wx.Panel):
               108), size=wx.Size(11, 13), style=0)
 
         self.btnResetAll = wx.Button(id=wxID_PANELTCABTNRESETALL,
-              label=u'Reset all', name=u'btnResetAll', parent=self,
-              pos=wx.Point(112, 560), size=wx.Size(96, 23), style=0)
+              label=u'Reset TCA for all proposals', name=u'btnResetAll', parent=self,
+              pos=wx.Point(220, 560), size=wx.Size(200, 23), style=0)
         self.btnResetAll.Bind(wx.EVT_BUTTON, self.OnBtnResetAllButton,
               id=wxID_PANELTCABTNRESETALL)
 

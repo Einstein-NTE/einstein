@@ -19,15 +19,17 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
+#                       Bettina Slawitsch       24/10/2008
 #
 #   Changes to previous version:
 #
 #   21/10/2008: HS  calculation of QD/QA and update of cascadeUpdateLevel
 #                   in HX Design
+#   24/10/2008: BS  update of HEX cost correlations and material properties
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -101,7 +103,12 @@ class ModuleHR(object):
                 if (index in self.HiddenHX):
                     name=name+" (hidden)"
                 
-                row = [name,hx["QdotHX"],hx["StorageSize"],hx["HXSource"],hx["HXTSourceInlet"],hx["HXTSourceOutlet"],hx["HXSink"],hx["HXTSinkInlet"],hx["HXTSinkOutlet"],hx["Area"],hx["TurnKeyPrice"],opcost_str]
+                StorageSize = "%.2f" % float(hx["StorageSize"])
+                Surface = "%.2f" % float(hx["Area"])
+                TurnKeyPrice = "%.0f" % float(hx["TurnKeyPrice"])
+                opcost_str = "%.2f" % float(opcost_str)
+                
+                row = [name,hx["QdotHX"],StorageSize,hx["HXSource"],hx["HXTSourceInlet"],hx["HXTSourceOutlet"],hx["HXSink"],hx["HXTSinkInlet"],hx["HXTSinkOutlet"],Surface,TurnKeyPrice,opcost_str]
                 dataList.append(noneFilter(row))
                 index+=1
             data = array(dataList)
@@ -627,12 +634,10 @@ class ModuleHR(object):
                 cold = Stream()
                 cold.generateColdStreamFromHEX(hx)
                 
-                deltas = [ [10, 15, 7.5 ],[15,20,12.5],[7.5,12.5,5]]   #0=liquid, 1=gas, 2=cont
+                deltas = [ [10.0, 15.0, 7.5 ],[15.0,20.0,12.5],[7.5,12.5,5.0]]   #0=liquid, 1=gas, 2=cont
                 alphas = [AlphaL,AlphaG,AlphaC]                        #0=liquid, 1=gas, 2=cont                                                      
                 alpha_hot_stream  = alphas[hoti]
-                alpha_cold_stream = alphas[coldi]
-                                
-                delta_t_min = deltas[hoti][coldi]
+                alpha_cold_stream = alphas[coldi]                                              
                 
                 delta_T_in  = abs(hot.StartTemp - cold.EndTemp)   
                 delta_T_out = abs(hot.EndTemp   - cold.StartTemp)                 
@@ -648,6 +653,7 @@ class ModuleHR(object):
                 hxtype = dlg.HXType(hoti,coldi)
                 
                 if (hxtype == HXConsts.HX_TYPE_P):
+#                    print "PLATE"
                     K1 =  4.6656
                     K2 = -0.1557
                     K3 =  0.1547
@@ -655,19 +661,19 @@ class ModuleHR(object):
                     C2 =  0
                     C3 =  0
                     B1 =  0.96
-                    B2 =  1.21
-                    
+                    B2 =  1.21       
                     material_factor = 0
-                    if (dlg.MaterialType == HXConsts.MAT_TYPE_SS):
-                        material_factor = 2.45                
-                    if (dlg.MaterialType == HXConsts.MAT_TYPE_CS):
+                    if (material_type == "SS"):
+                        material_factor = 2.45                                    
+                    if (material_type == HXConsts.MAT_TYPE_CS):
                         material_factor = 1.00
-                    if (dlg.MaterialType == HXConsts.MAT_TYPE_NI):
+                    if (material_type == HXConsts.MAT_TYPE_NI):
                         material_factor = 2.68             
-                    if (dlg.MaterialType == HXConsts.MAT_TYPE_CU):
+                    if (material_type == HXConsts.MAT_TYPE_CU):
                         material_factor = 1.35 
                                 
-                if (hxtype == HXConsts.HX_TYPE_S):                
+                elif (hxtype == HXConsts.HX_TYPE_S):  
+#                    print "SHELL"              
                     K1 =  3.9912
                     K2 =  0.0668
                     K3 =  0.243
@@ -678,7 +684,7 @@ class ModuleHR(object):
                     B2 =  1.55
                     
                     material_factor = 0
-                    if (material_type == HXConsts.MAT_TYPE_SS):
+                    if (material_type == "SS"):                      
                         material_factor = 2.73                
                     if (material_type == HXConsts.MAT_TYPE_CS):
                         material_factor = 1.00
@@ -686,41 +692,57 @@ class ModuleHR(object):
                         material_factor = 3.73             
                     if (material_type == HXConsts.MAT_TYPE_CU):
                         material_factor = 1.69  
+                 
                 
-                
-                purchased_cost = pow(10,K1 + K2 * log10(area_value)+ K3 * log10(area_value*area_value))
+                purchased_cost = pow(10,K1 + K2 * log10(area_value)+ K3 * log10(area_value)*log10(area_value))
                 pressure_value  = dlg.PressureValue()
-                pressure_factor = pow(10,C1 + C2*log10(pressure_value) + C3*log10(pressure_value*pressure_value))
+                pressure_factor = pow(10,C1 + C2*log10(pressure_value) + C3*log10(pressure_value)*log10(pressure_value))
                 
                 bare_module_factor = B1 + B2 * material_factor * pressure_factor
                 cepci_2001 = 394.3
                 cepci_2008 = 539.7
-                EUR_USD_ratio = 1.55
+                USD_EUR_ratio = 1.55
                 
                 v2001_USD_cost = purchased_cost*bare_module_factor
                 v2008_USD_cost = v2001_USD_cost * cepci_2008 / cepci_2001
-                v2008_EUR_cost = v2008_USD_cost * EUR_USD_ratio 
+                v2008_EUR_cost = v2008_USD_cost / USD_EUR_ratio 
                                                 
                 add_perc_cost = dlg.AdditionalCostPercent()
-                v2008_EUR_cost_new = v2008_EUR_cost - 0.22*v2008_EUR_cost + (0.22+add_perc_cost/100.0) * v2008_EUR_cost          
-                HEX_OMcost = v2008_EUR_cost_new / 15 + 0.004*v2008_EUR_cost_new + 0.01*v2008_EUR_cost_new
+                v2008_EUR_cost_new = v2008_EUR_cost - 0.22*v2008_EUR_cost + (0.22+add_perc_cost/100.0) * v2008_EUR_cost
+
+                if (v2008_EUR_cost_new / area_value > 5000):                    
+                    x = area_value/50000.0
+                    v2008_EUR_cost_new = v2008_EUR_cost_new * 0.4 * exp(-x)
+                if (area_value < 10):
+                    v2008_EUR_cost_new = area_value * 2000;                        
+                if (area_value < 1):                    
+                    v2008_EUR_cost_new = area_value * 10000;
+
+                HEX_OMcost = v2008_EUR_cost_new / 15 \
+                             + 0.004*v2008_EUR_cost_new \
+                             + 0.01*v2008_EUR_cost_new
                 
-                print "pressure_factor:" + str(pressure_factor)
-                print "pressure_value:" + str(pressure_value)
-                print "purcase_cost:" + str(purchased_cost)
-                print "bare_module_factor: " + str(bare_module_factor)
-                print "2008_EUR_cost: "+str(v2008_EUR_cost)
-                print "2008_EUR_cost_new (TurnKeyPrice): "+str(v2008_EUR_cost_new)  
-                print "OMFix[EUR]:"+str(HEX_OMcost)
+#                print "pressure_factor:" + str(pressure_factor)
+#                print "pressure_value:" + str(pressure_value)
+#                print "purcase_cost:" + str(purchased_cost)
+#                print "bare_module_factor: " + str(bare_module_factor)
+#                print "2008_EUR_cost: "+str(v2008_EUR_cost)
+#                print "2008_EUR_cost_new (TurnKeyPrice): "+str(v2008_EUR_cost_new)  
+#                print "OMFix[EUR]:"+str(HEX_OMcost)
              
                 #store new information in Database
-                query = "UPDATE qheatexchanger SET HXType='%s', TurnKeyPrice=%s, OMFix=%s " % (hxtype,v2008_EUR_cost_new,HEX_OMcost)
+                query = "UPDATE qheatexchanger SET HXType='%s', TurnKeyPrice=%s, OMFix=%s, Area=%s" % (hxtype,v2008_EUR_cost_new,HEX_OMcost,area_value)
                 query +="WHERE QHeatExchanger_ID=%s;" % (hx["QHeatExchanger_ID"])
                 Status.DB.sql_query(query)
                 
                 #updateInformation in panel                                                                           
                 self.__updatePanel()
-        except:
+
+        except Exception, inst:
+            logTrack("error in HEX recalculation")
+            logTrack(type(inst))
+            logTrack(inst.args)
+            logTrack(inst)
             logError(_("Recalculation of HEX failed."))         
 
 

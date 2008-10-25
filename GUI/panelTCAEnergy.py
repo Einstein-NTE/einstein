@@ -260,6 +260,7 @@ class PanelTCAEnergy(wx.Panel):
                 #ENDFIX
                 self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
         #Update opcost
+        self.mod.calculateTotalOpCostFromDetailedOpcost()
         opcost = "%.0f" % self.mod.data.totalopcost
         self.tbTotalOpCost.SetValue(opcost)
     

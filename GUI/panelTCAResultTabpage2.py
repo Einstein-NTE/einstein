@@ -39,6 +39,7 @@ from einstein.modules.plotPanel import PlotPanel
 from pylab import *
 import wx
 #from matplotlib.ticker import MaxNLocator
+from einstein.modules.messageLogger import *
 
 class TCAPlotPanel (PlotPanel):
     """Plots several lines in distinct colors."""
@@ -49,15 +50,17 @@ class TCAPlotPanel (PlotPanel):
         self.SetColor( (255,255,255) )
 
     def draw( self ):
-        """Draw data."""
-        if not hasattr( self, 'subplot' ):
-            self.subplot = self.figure.add_subplot( 111 )
-            
-        if (Status.mod.moduleTCA.result != None): 
-            if (Status.mod.moduleTCA.displayPlot == 0):  
-                self.plot("npv")
-            else:            
-                self.plot("mirr")   
+        try:
+            if not hasattr( self, 'subplot' ):
+                self.subplot = self.figure.add_subplot( 111 )
+                
+            if (Status.mod.moduleTCA.result != None): 
+                if (Status.mod.moduleTCA.displayPlot == 0):  
+                    self.plot("npv")
+                else:            
+                    self.plot("mirr")
+        except:
+            logWarning(_("Could not plot TCA result."))
                                                                        
     def plot(self,mode):                                  
         results = Status.mod.moduleTCA.result
@@ -91,12 +94,15 @@ class TCAPlotPanel (PlotPanel):
         
         for result in results:                       
             if (result.display == 1)and(result.ResultPresent):
+                labelname = ""
                 if (mode=="mirr"):
                     original_data = result.mirr
                     self.subplot.set_ylabel(_('MIRR / EUR')) 
+                    labelname = "MIRR"
                 else:
                     original_data = result.npv
-                    self.subplot.set_ylabel(_('NPV / EUR'))                                              
+                    self.subplot.set_ylabel(_('NPV / EUR'))  
+                    labelname = "NPV"                                            
                 data = [0.0] * (size)                      
                 index = 0
                 for i in xrange(0, timeFrame+1):                                                       
@@ -108,7 +114,7 @@ class TCAPlotPanel (PlotPanel):
                 if (add_last_year):
                     ticklabls.append(_("Year ")+str(timeFrame))
                     data[len(data)-1] = (original_data[timeFrame-1])
-                self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = "MIRR - "+str(result.name))                        
+                self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = str(labelname)+" - "+str(result.name))                        
                 count+=1  
             colorcount+=1
         

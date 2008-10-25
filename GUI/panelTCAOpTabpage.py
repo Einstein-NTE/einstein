@@ -35,11 +35,11 @@ import wx.grid
 from GUITools import *
 
 [wxID_PANELTCAOPTABPAGE, wxID_PANELTCAOPTABPAGEBTNADD, 
- wxID_PANELTCAOPTABPAGEBTNREMOVE, wxID_PANELTCAOPTABPAGECBNAME, 
- wxID_PANELTCAOPTABPAGEGRID, wxID_PANELTCAOPTABPAGESTATICBOX1, 
- wxID_PANELTCAOPTABPAGESTATICTEXT1, wxID_PANELTCAOPTABPAGETBVALUE, 
- wxID_PANELTCAOPTABPAGETHELP, 
-] = [wx.NewId() for _init_ctrls in range(9)]
+ wxID_PANELTCAOPTABPAGEBTNCHANGE, wxID_PANELTCAOPTABPAGEBTNREMOVE, 
+ wxID_PANELTCAOPTABPAGECBNAME, wxID_PANELTCAOPTABPAGEGRID, 
+ wxID_PANELTCAOPTABPAGESTATICBOX1, wxID_PANELTCAOPTABPAGESTATICTEXT1, 
+ wxID_PANELTCAOPTABPAGETBVALUE, wxID_PANELTCAOPTABPAGETHELP, 
+] = [wx.NewId() for _init_ctrls in range(10)]
 
 class panelTCAOpTabpage(wx.Panel):
     def _init_ctrls(self, prnt):
@@ -73,8 +73,8 @@ class panelTCAOpTabpage(wx.Panel):
               id=wxID_PANELTCAOPTABPAGEBTNADD)
 
         self.btnRemove = wx.Button(id=wxID_PANELTCAOPTABPAGEBTNREMOVE,
-              label=_('Remove'), name=u'btnRemove', parent=self, pos=wx.Point(504,
-              296), size=wx.Size(64, 23), style=0)
+              label=_('Remove'), name=u'btnRemove', parent=self,
+              pos=wx.Point(504, 296), size=wx.Size(64, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_PANELTCAOPTABPAGEBTNREMOVE)
 
@@ -150,8 +150,17 @@ class panelTCAOpTabpage(wx.Panel):
                 self.grid.SetCellValue(r, c, str(self.items[r][c]))
 
     def OnGridGridCellLeftClick(self, event):
-        self.selectedRow = event.GetRow() 
-        event.Skip()
+        self.selectedRow = event.GetRow()  
+        if (self.selectedRow < len(self.items)):
+            entry = self.items[self.selectedRow]
+            if self.cbName.FindString(str(entry[0]))<0: #create choice if not exists
+                self.cbName.Append(str(entry[0]))
+            self.cbName.SetStringSelection(str(entry[0]))                                 
+            self.tbValue.SetValue(str(entry[1]))        
+            self.btnAdd.SetLabel("Change")
+        else:
+            self.btnAdd.SetLabel("Add")
+        event.Skip()  
 
     def OnBtnAddButton(self, event):
         try:
@@ -160,8 +169,15 @@ class panelTCAOpTabpage(wx.Panel):
                       
             if (value<0):
                 raise            
-                        
-            self.items.append([name,value])                
+            
+            try:                    
+                if (self.selectedRow < len(self.items)):
+                    self.items[self.selectedRow] = [name,value]
+                else:           
+                    self.items.append([name,value])                  
+            except:
+                self.items.append([name,value])            
+                          
         except:
             wx.MessageBox(_("Reconsider values."))
         event.Skip()
@@ -175,3 +191,6 @@ class panelTCAOpTabpage(wx.Panel):
             pass  
         event.Skip()
         self.display()    
+
+    def OnBtnChangeButton(self, event):
+        event.Skip()

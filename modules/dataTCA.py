@@ -132,9 +132,9 @@ class TCAData(object):
             self.additionalcostpersavePE = additionalcostpersavePE
             
             #TODO - calc this
-            self.thermal = self.__gettotalopcost()
+            self.totalopcost = self.__gettotalopcost()
             
-            self.totaleinergycost = self.energycost + self.annuity + self.thermal
+            self.totaleinergycost = self.energycost + self.annuity + self.totalopcost
             self.ResultPresent = True
         except Exception, inst:
             print type(inst)
@@ -147,16 +147,30 @@ class TCAData(object):
         self.display = display
         self.ResultPresent = False
         
+    def storeCurrentProcessInformationToCGeneral(self):
+        #Store function for the current process
+        
+        self.energycost = self.getTotalEnergyCost()
+        query = """UPDATE cgeneraldata 
+                   SET EnergyCost = %s, OMThermal = %s                            
+                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+        query = query % (self.energycost,self.totalopcost,self.pid,self.ano)
+        #print query                
+        Status.DB.sql_query(query)
+        
+        
     def storeResultToCGeneralData(self):
+        #store function for proposals
         try:
             if (self.ResultPresent):
                 #mirr = self.mirr[int(math.ceil(self.PP))] #mirr at payback period
                 mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year 
                 bcr = self.bcr[len(self.mirr)-1]          
                 query = """UPDATE cgeneraldata 
-                           SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , IRR  = %s, PayBack  = %s, BCR  = %s, EnergyCost = %s, OMThermal = %s, Amortization = %s, EnergySystemCost=%s, AddCost=%s, AddCostperSavedPE=%s                             WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
-                query = query % (self.TIC,self.EIC,self.totalfunding,mirr,self.PP,bcr,self.energycost,self.thermal,self.annuity,self.totaleinergycost,self.additionalcost,self.additionalcostpersavePE,self.pid,self.ano)
-                print query
+                   SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , RevenueReplaceEquipment = %s, IRR  = %s, PayBack  = %s, BCR  = %s, EnergyCost = %s, OMThermal = %s, Amortization = %s, EnergySystemCost=%s, AddCost=%s, AddCostperSavedPE=%s                              
+                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+                query = query % (self.TIC,self.EIC,self.totalfunding,self.revenue,mirr,self.PP,bcr,self.energycost,self.totalopcost,self.annuity,self.totaleinergycost,self.additionalcost,self.additionalcostpersavePE,self.pid,self.ano)
+                #print query
                 Status.DB.sql_query(query)
         except Exception, inst:
             print "storeResultToCGeneral"
@@ -238,19 +252,6 @@ class TCAData(object):
     def __storeTCAGeneralDataEntry(self):
         #print "Store Data (General)"
         if (self.tcaid == None):            
-            #query = """SELECT `InflationRate`,`NominalInterestRate`,`CompSpecificDiscountRate`,`FulePriceRate`,`AmotisationTime` FROM `tcageneraldata` WHERE ProjectID=%s"""
-            #query = query % (self.pid)
-            #result = Status.DB.sql_query(query)
-            #if (len(result)>0):               
-            #    if (type(result[0])==type(())):
-            #        result = result[0]
-            #        
-            #    self.Inflation = result[0]
-            #    self.NIR       = result[1]
-            #    self.CSDR      = result[2]
-            #    self.DEP       = result[3] 
-            #    self.TimeFrame = result[4]
-            
             query = """INSERT INTO tcageneraldata (ProjectID,AlternativeProposalNo, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue)
                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
             query = query %(self.pid,self.ano,self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue)
@@ -262,7 +263,8 @@ class TCAData(object):
                        WHERE ProjectID = %s"""
             query = query %(self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.pid)
             Status.DB.sql_query(query)
-            #Update for current proposal only
+            #Set for current ano only - will be replaced after concrete calculation
+            #e.g. storeDetailedOpCost
             query = """UPDATE tcageneraldata 
                        SET TotalOperatingCost = %s, TotalRevenue = %s
                        WHERE ProjectID = %s AND AlternativeProposalNo=%s"""
@@ -308,7 +310,7 @@ class TCAData(object):
     def __setDefaultEquipmentInvestment(self):
         keys = []
         dict = {}
-        query = """SELECT Equipment, EquipType, TurnKeyPrice, OandMvar,OandMfix FROM `qgenerationhc` WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
+        query = """SELECT Equipment, EquipType, TurnKeyPrice, Price FROM `qgenerationhc` WHERE `Questionnaire_id`=%s AND `AlternativeProposalNo`=%s"""
         query = query % (self.pid,self.ano)
         results = Status.DB.sql_query(query)  
         if len(results)>0:
@@ -318,13 +320,17 @@ class TCAData(object):
             for result in results:
                 EquipType = result[1]
                 Investment = result[2]
+                InvestmentBasedOnPrice = result[3]   
                                    
                 if (EquipType != None):              
                     if not(EquipType in keys):
                         keys.append(EquipType)
                         dict[EquipType] = 0
                     if Investment == None:
-                        Investment = 0
+                        if InvestmentBasedOnPrice != None:
+                            Investment = InvestmentBasedOnPrice * 1.2
+                        else:
+                            Investment = 0
                     dict[EquipType] +=  Investment 
                 
         for key in keys:
@@ -341,8 +347,8 @@ class TCAData(object):
                 results = [ results ]
             #XXX Constants should come from database! 
             #fixed cepci bad.... 
-            CEPCI1976= 192.1
-            CEPCI2008=539.7
+            CEPCI1976 = 192.1
+            CEPCI2008 = 539.7
             EUR_USD_ratio = 1.55
             m3_ft3_ratio = 0.0283
             ratio = (CEPCI2008/CEPCI1976)/EUR_USD_ratio
@@ -421,8 +427,9 @@ class TCAData(object):
                 ElTariffPowTot = result[1]
                 PowerContrTot = result[2]
                 Tariff = 0.0
-                if not((ElTariffCTot==None)or(ElTariffPowTot==None)or(PowerContrTot==None)):
+                if not(ElTariffCTot==None):
                     Tariff = ElTariffCTot 
+                if not((ElTariffPowTot==None)or(PowerContrTot==None)):                    
                     if (FECel > 0):
                         Tariff+=(ElTariffPowTot*PowerContrTot*12)/FECel                      
                 self.energycosts.append(["Electricity",FECel,Tariff,self.DEP]) 
@@ -670,8 +677,15 @@ class TCAData(object):
         #    self.detailedopcost = [[],[],[],[],[],[],[]] 
 
     def __gettotalopcost(self):
-        totaloperatingcost = self.totalopcost
-        return totaloperatingcost
+        if (self.ano<=0): #dont calculate opcost from detailed-opcost for current process
+            return self.totalopcost
+        
+        cost = 0
+        for category in self.detailedopcost:
+            for entry in category:
+                cost+=entry[1]
+                
+        return cost
                 
     def __storeTCADetailedOpCostDataEntry(self):
         #print "Store Data (Detailed operting cost)"
@@ -680,7 +694,13 @@ class TCAData(object):
                 query = """INSERT INTO tcadetailedopcost (TcaID, Description, Value, Category)
                            VALUES(%s,\"%s\",%s,%s)"""
                 query = query %(self.tcaid,opcost[0],opcost[1],i)
-                Status.DB.sql_query(query)                          
+                Status.DB.sql_query(query) 
+        
+        query = """UPDATE tcageneraldata 
+                SET TotalOperatingCost = %s
+                WHERE IDTca=%s"""
+        query = query %(self.totalopcost,self.tcaid)
+        Status.DB.sql_query(query)                                       
     
 
     
