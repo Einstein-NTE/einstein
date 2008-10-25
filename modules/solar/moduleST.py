@@ -15,40 +15,24 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.13
-#	Created by: 	    Hans Schweiger	25/06/2008
-#                           (based on ModuleST from Enrico Facci)
-#	Last revised by:    Enrico Facci &      05/07/2008
-#                           Claudia Vannoni
-#                           (...)
-#                           Hans Schweiger      23/07/2008
-#                           Enrico Facci        23/07/2008
-#                           Hans Schweiger      24/07/2008
-#                           Enrico Facci        (...)
-#                           Hans Schweiger      01/08/2008
-#                           Hans Schweiger      13/09/2008
-#                           Hans Schweiger      03/10/2008
-#                           Enrico Facci        12/10/2008
+#
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger
+#                       25/06/2008 - 12/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger          24/10/2008
 #
 #       Changes to previous version:
 #
-#       05/07/2008  Changed nearly everything
-#       09/07/2008: HS  changes in:
-#                       - deleteEquipment
+#       24/10/2008: HS  General adaptation to changes in GUI functionality
+#                       Most important functions changed:
 #                       - addEquipmentDummy
 #                       - setEquipmentFromDB
-#                       - deleteFromCascade (-> function completely eliminated,
-#                               no longer necessary)
-#       23/07/2008: HS  update adapting to corrections in "sunday"
-#       24/07/2008: HS  biaxial incidence angle modifier
-#       01/08/2008: HS  qrenewables only function of PId, not of ANo
-#                       conversion kWh -> MWh in plot
-#                       clean-up of the following functions:
-#                       - calculateEnergyFlows (cEF)
-#       13/09/2008: HS  bug-fix in display of desired solar fraction
-#                       temporary change in selectST: factor 0.8 for concentrating collectors
-#       03/10/2008: HS  calculateOM added
-#       12/10/2008: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
+#                       - setSolarSystemPars
+#                       Change in calculation of TavCollector in cEF                      
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -76,6 +60,8 @@ from einstein.GUI.dialogGauge import DialogGauge
 
 
 PARASITIC_ELECTRICITY = 0.01
+DEFAULT_SYSTEM_EFFICIENCY = 0.90    # default value for solar system efficiency
+MIN_SYSTEM_EFFICIENCY = 0.50        # minimum allowed value for solar system efficiency
 
 sunOnH = Intensity()
 sunOnT = Intensity()
@@ -260,6 +246,7 @@ class ModuleST(object):
 #   the first time. the rest should be done in "updatePanel"
 #------------------------------------------------------------------------------
         self.manualChoosenColl = None
+        self.selectedCollID = None
         self.avAreaFactor=1.1
         self.generalData()
         self.screenSurfaces()
@@ -284,12 +271,25 @@ class ModuleST(object):
 #............................................................................................
 # 1. List of equipments
 
-        data = array(collectorList)
-#        collectors = [["Buderus XY 007","flat plate collector",0.8,3.0,0.01,0.93]]
-#        data = array(collectors)
+        if len(collectorList) == 0 and self.selectedCollID is not None:
+            data = array([])
+            if self.selectedCollID is not None:
+                models = Status.DB.dbsolarthermal.DBSolarThermal_ID[self.selectedCollID]
+                if len(models) > 0:
+                    model = models[0]
+                    data = array(noneFilter([[model.STModel,
+                                             model.STType,
+                                             model.STc0,
+                                             model.STc1,
+                                             model.STc2,
+                                             model.K50L,
+                                             model.K50T]]))
+                    
+        else:
+            data = array(collectorList)
 
         Status.int.setGraphicsData('ST Table',data)
-#        print "ST Table data:\n",data
+
 #............................................................................................
 # 2. Preparing data
 
@@ -303,7 +303,7 @@ class ModuleST(object):
         QD_plot = []
         USH_plot = []
                            
-        if len(STList)>0:
+        if len(STList)>0:   
             for i in range(iTmax):
                 QD_plot.append(Status.int.QD_T_mod[index][i]/1000.0)
                 USH_plot.append(Status.int.USHj_T[index][i]/1000.0)
@@ -356,6 +356,10 @@ class ModuleST(object):
                 TC = "--"
         
         info= [self.usableSurfacesArea,maxCapacity,sf,yi,SEff,TC,0]
+        if self.NSurfaces == 0:
+            info[0] = "---"
+            info[1] = "---"
+            
         Status.int.setGraphicsData('ST Info',info)
 
 #............................................................................................
@@ -431,32 +435,6 @@ class ModuleST(object):
 
         Status.SQL.commit()
 
-#------------------------------------------------------------------------------
-    def setSolarSystemPars(self):
-#------------------------------------------------------------------------------
-
-        sysPars = Status.int.GData['ST SysPars']
-
-        equipments = Status.DB.qgenerationhc.\
-                      Questionnaire_id[Status.PId].\
-                      AlternativeProposalNo[Status.ANo].\
-                      CascadeIndex[self.cascadeIndex]
-        (STList,collectorList) = self.screenEquipments()
-        if len (STList)>0:
-            if len(equipments) > 0:
-                equipe = equipments[0]
-                equipe.HCGPnom = sysPars[0]
-                equipe.ST_SysEff = sysPars[1]        
-                equipe.ST_Volume = sysPars[2]
-
-        else:
-            self.guiSysPars[0] = sysPars[0]
-            self.guiSysPars[1] = sysPars[1]
-            self.guiSysPars[2] = sysPars[2]
-            
-        Status.int.changeInCascade(self.cascadeIndex)
-       
-        Status.SQL.commit()
 
 #------------------------------------------------------------------------------
     def screenEquipments(self):
@@ -487,6 +465,7 @@ class ModuleST(object):
                                equipe.ST_SysEff,
                                equipe.ST_Volume]
                 self.equipeIDs.append(equipe.QGenerationHC_ID)
+                if equipe.EquipIDFromDB is not None: self.selectedCollID = equipe.EquipIDFromDB # none-check avoids overwriting by addEquipmentDummy !!
                 STList.append(systemTable)
                 collectorList.append(collectorTable)
                 self.cascadeIndex = equipe.CascadeIndex
@@ -533,6 +512,7 @@ class ModuleST(object):
         self.avAreaFactor=1.1
         
         self.manualChoosenColl = None   ####E.F. 28/07
+        self.selectedCollID = None
 
 #------------------------------------------------------------------------------
     def addEquipmentDummy(self):
@@ -559,7 +539,7 @@ class ModuleST(object):
 
         self.equipe = Status.prj.addEquipmentDummy()
         self.dummyEqId = self.equipe.QGenerationHC_ID
-        if self.equipe.CascadeIndex >1:
+        if self.equipe.CascadeIndex > 1:
             Status.mod.moduleHC.cascadeMoveToTop(self.equipe.CascadeIndex) 
         
         self.equipe = Status.prj.getEquipe(self.dummyEqId) #after having moved, the equipe - table has to be updated !!!
@@ -572,19 +552,6 @@ class ModuleST(object):
                                                                 # should be updated in setEquipmentFromDB
         self.equipe.update(equipeData)
         Status.SQL.commit()
-
-        
-        self.setSolarSystemPars()
-
-        sysPars = Status.int.GData['ST SysPars']
-        if sysPars[0]==None:
-            power=self.SurfAreaSol*0.7
-        elif sysPars[0]> self.TotNetSurfArea*0.7:
-            power=self.TotNetSurfArea*0.7
-            showWarning(_("The power of the solar system has been reduced because the suitable surfaces are too small to supply the required one.")) 
-        else:
-            power=sysPars[0]
-        self.equipe.HCGPnom = power
         
         Status.SQL.commit()
 
@@ -605,64 +572,150 @@ class ModuleST(object):
         models = Status.DB.dbsolarthermal.DBSolarThermal_ID[modelID]
         if len(models) > 0:
             model = models[0]
+            self.selectedCollID = modelID
         else:
             logTrack("ModuleST: selected model ID %s not in database"%modelID)
+            return
             
-        logTrack("ModuleST: setting equipment from DB")
-#        logTrack("ModuleST: Pnom %s Eff: %s "%((self.SurfAreaSol*0.7),self.etaSelected))
-
-#        equipe.update({"HCGPnom":(self.SurfAreaSol*0.7)})        
-#        equipe.update({"HCGTEfficiency":self.etaSelected})
-
         if model.STManufacturer != None: equipe.update({"Manufact":model.STManufacturer})
         if model.STModel != None: equipe.update({"Model":model.STModel})
         logTrack("ModuleST: setting equipment type from %s"%model.STType)
-        logTrack("ModuleST: setting equipment type to %s"%getEquipmentType("ST",model.STType))
         
         equipe.update({"EquipType":getEquipmentType("ST",model.STType)})
-        
         equipe.update({"NumEquipUnits":1})
-        logTrack("ModuleST: selected model = %s"%str(model))
-        logTrack("ModuleST: model type = %s"%str(model.STType))
         
-        logTrack("ModuleST: dummy equipe = %s"%str(equipe))
-        
+        if model.DBSolarThermal_ID != None: equipe.update({"EquipIDFromDB":model.DBSolarThermal_ID})
         if model.STType != None: equipe.update({"EquipTypeFromDB":str(model.STType)})
+        
         if model.STc0 != None: equipe.update({"ST_C0":model.STc0})
         if model.STc1 != None: equipe.update({"ST_C1":model.STc1})
         if model.STc2 != None: equipe.update({"ST_C2":model.STc2})
+
         if model.K50L != None: equipe.update({"ST_K50L":model.K50L})
+        else:
+            logTrack("No longitudinal incidence angle modifier defined for collector ID %s. 1.1 assumed"%modelID)
+            equipe.update({"ST_K50L":0.95})
+            
         if model.K50T != None: equipe.update({"ST_K50T":model.K50T})
-        if model.DBSolarThermal_ID != None: equipe.update({"EquipIDFromDB":model.DBSolarThermal_ID})
-        if model.STAreaFactor != None: equipe.update({"STAreaFactor":model.STAreaFactor})           ### E.F. 28/07
-#        if model.STAreaGross != None and model.STAreaAper != None:
-#            self.avAreaFactor = model.STAreaGross/model.STAreaAper
+        else:
+            logTrack("No transversal incidence angle modifier defined for collector ID %s. 1.1 assumed"%modelID)
+            equipe.update({"ST_K50T":0.95})
 
-#        if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
-#        else:
-        logDebug("ModuleST: turn key price of solar system type %s not specified"%equipe.Model)
-        equipe.update({"TurnKeyPrice":0.0})
+        if model.STAreaFactor != None: equipe.update({"STAreaFactor":model.STAreaFactor})
+        else:
+            logTrack("No surface area factor defined for collector ID %s. 1.1 assumed"%modelID)
+            equipe.update({"STAreaFactor":1.1})
+            ### E.F. 28/07
 
-###### E.F. 12/10
         if model.STOMUnitFix is not None: equipe.update({"OandMfix":model.STOMUnitFix})
         else:
             logDebug("ModuleST: fix costs for O and M of the solar sistem %s not specified"%equipe.Model)
             equipe.update({"OandMfix":0.0})
         equipe.update({"OandMvar":0.0})
-######
-        
-        
+                
         Status.SQL.commit()
-        logTrack("ModuleST: dummy equipe after commit of everything %s"%str(equipe))
-
-
+        
         
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def setSolarSystemPars(self):
+#------------------------------------------------------------------------------
+
+        sysPars = Status.int.GData['ST SysPars']
+
+        (STList,collectorList) = self.screenEquipments()
+
+        createNewSSY = False
+        
+        if len (STList) > 0:
+            changeInEq = False
+                
+            equipments = Status.DB.qgenerationhc.\
+                          Questionnaire_id[Status.PId].\
+                          AlternativeProposalNo[Status.ANo].\
+                          CascadeIndex[self.cascadeIndex]
+            if len(equipments) > 0:
+                equipe = equipments[0]
+                
+                if equipe.HCGPnom is not None:
+                    if fabs(float(sysPars[0]) - equipe.HCGPnom) > 1.e-6:
+                        changeInEq = True
+                else:
+                    changeInEq = True
+                
+                equipe.HCGPnom = float(sysPars[0])
+
+                if equipe.ST_SysEff is not None:
+                    if fabs(float(sysPars[1]) - equipe.ST_SysEff) > 1.e-6:
+                        changeInEq = True
+                else:
+                    changeInEq = True
+
+                equipe.ST_SysEff = float(sysPars[1])       
+                if equipe.ST_SysEff is None or not (MIN_SYSTEM_EFFICIENCY <= equipe.ST_SysEff <= 1.0):
+                    logWarning(_("Invalid specification of system efficiency (value should be from 0.5 - 1.0). eta = %s assumed")%0.9)
+                    equipe.ST_SysEff = DEFAULT_SYSTEM_EFFICIENCY
+
+                if equipe.ST_Volume is not None:
+                    if fabs(float(sysPars[2]) - equipe.ST_Volume) > 1.e-6:
+                        changeInEq = True
+                else:
+                    changeInEq = True
+
+                equipe.ST_Volume = float(sysPars[2])
+
+                Status.SQL.commit()
+
+            else:
+                logDebug("ModuleST (setSolarSystemPars): STList > 0 but equipment not found")
+                
+            if changeInEq == True: 
+                Status.int.changeInCascade(self.cascadeIndex)
+
+            self.calculateCostParameters(equipe,self.selectedCollID)
+                
+#        elif self.selectedCollID is not None:
+#            createNewSSY = True
+#            print "ModuleST (setSolarSystemPars): mode 2 selectedCollID = ",self.selectedCollID
+#            equipe = self.addEquipmentDummy()
+#            self.setEquipmentFromDB(equipe,self.selectedCollID)
+#            self.setSolarSystemPars()
+            
+        else:
+            try:
+                self.guiSysPars[0] = float(sysPars[0])
+            except:
+                self.guiSysPars[0] = None
+                pass
+                
+            try:
+                self.guiSysPars[1] = float(sysPars[1])
+            except:
+                self.guiSysPars[1] = None
+                
+            try:
+                self.guiSysPars[2] = float(sysPars[2])
+            except:
+                self.guiSysPars[2] = None
+                
+
+            if self.guiSysPars[0] > 0:
+                createNewSSY = True
+
+                if self.NSurfaces <= 0:
+                    logWarning(_("No information on available surfaces is given !\n")+\
+                               _("Is is assumed that there is no constraint due to limited space"))
+            
+        if createNewSSY and self.selectedCollID is None:
+            showMessage(_("Please select a solar collector"))
+
+        return createNewSSY
 #------------------------------------------------------------------------------
     def setManualSelection(self,theId):   ##### E.F. 28/07
 #        self.manualChoosenColl = theId
         self.manualChoosenColl = Status.DB.dbsolarthermal.DBSolarThermal_ID[theId][0]
-
+        self.selectedCollID = theId
+            
 #------------------------------------------------------------------------------
     def calculateEnergyFlows(self,equipe,cascadeIndex):
 #------------------------------------------------------------------------------
@@ -700,6 +753,15 @@ class ModuleST(object):
 
         QD_Tt = copy.deepcopy(Status.int.QD_Tt_mod[cascadeIndex-1])
         QA_Tt = copy.deepcopy(Status.int.QA_Tt_mod[cascadeIndex-1])
+
+        QD = Status.int.calcQ_T(QD_Tt)
+
+#        print "Demand seen by solar system: "
+#        print QD
+#        print "Global demand (QD_T) "
+#        print Status.int.QD_T
+#        print "Global demand cascade index 1(QD_T_mod[0]) "
+#        print Status.int.QD_T_mod[0]        
         
         USHj_Tt = Status.int.createQ_Tt()
         USHj_T = Status.int.createQ_T()
@@ -729,11 +791,11 @@ class ModuleST(object):
 #   Solar system parameters
 
         SurfAreaSol = PNom/0.7
-        if equipe.ST_SysEff != None and 0< equipe.ST_SysEff <1:
+        if equipe.ST_SysEff != None and MIN_SYSTEM_EFFICIENCY <= equipe.ST_SysEff <= 1.0:
             systemEfficiency = equipe.ST_SysEff
         else:
-            logTrack("ModuleST (cEF): invalid specification of system efficiency. eta = 0.9 assumed")
-            systemEfficiency = 0.90
+            logDebug(_("ModuleST (cEF): invalid specification of system efficiency (should be from 0.5 - 1.0). eta = %s assumed")%0.9)
+            systemEfficiency = DEFAULT_SYSTEM_EFFICIENCY
 
 #   Solar collector parameters
 
@@ -757,10 +819,10 @@ class ModuleST(object):
                                         #HS2008-08-02. initial temperature changed to 60 ºC
         TStorageMax = 250.0             #maximum allowed temperature in the storage
         
-        if equipe.ST_Volume != None:
+        if equipe.ST_Volume is not None:
             if equipe.ST_Volume < 0.01* equipe.HCGPnom:
                 storageVolume = 0.01* equipe.HCGPnom
-                showWarning(_("The heat storage volume is very small. For internal calculation it has been set to 0.01 m^3/kW"))
+                logWarning(_("The heat storage volume is very small. For internal calculation it has been set to 0.01 m3/kW"))
             else:
                 storageVolume = equipe.ST_Volume
         else:
@@ -889,13 +951,19 @@ class ModuleST(object):
 #   the minimum temperature of demand indicates to what temperature the storage can be cooled down.
 #   if we have heat demand only above e.g. 60ºC, we cannot cool down the storage lower than this,
 #   as heat can not be transferred from cold to hot (at least not yet, maybe EINSTEIN succeeds to do it)
-            iTmax = (int(floor(Tmax/Status.TemperatureInterval+0.5)))
+
+            Tmax_it = min(Tmax,TStorage)    #in the present time step, the maximum temperature
+                                            #that can be supplied corresponds to the storage temperature
+            
+            iTmax = (int(floor(Tmax_it/Status.TemperatureInterval+0.5)))
             dotQDemand = QD_Tt[iTmax][it]/Status.TimeStep
 
             iTmin = NT+1
-            for i in range(NT+1):
-                if QD_Tt[i][it] > 0:
-                    iTmin = i
+            iTsol = NT+1
+
+            for iT in range(NT+1):
+                if QD_Tt[iT][it] > 0:
+                    iTmin = iT
                     break
 
             TMinDemand = iTmin*Status.TemperatureInterval
@@ -920,6 +988,8 @@ class ModuleST(object):
             QStorage += (dotQuSolar - dotQuSupply)*TIMESTEP
 
             if dotQuSolar > 0:
+                print "ModuleST (cEF): it %s dotQuSolar %s TavColl %s TStorage %s TMinDemand %s "%\
+                      (it,dotQuSolar,TavCollector,TStorage,TMinDemand)
                 HPerYear += Status.TimeStep
                 
             USHj_t = dotQuSupply*TIMESTEP
@@ -1045,16 +1115,16 @@ class ModuleST(object):
 #........................................................................
 # read in latitude (set to default if no reasonable value)
 
-        if len (renTable)>0 and renTable[0].Latitude!=None:
-            self.latitude=renTable[0].Latitude
+        if len (renTable)>0 and renTable[0].Latitude is not None:
+            self.latitude = renTable[0].Latitude
         else:
-            logWarning(_("The geographic latitude has not been defined. \n45º North (Central Europe) assumed as default"))
-            self.latitude=45.0
+            logWarning(_("The geographic latitude has not been defined. \n45 deg North (Southern Europe) assumed as default"))
+            self.latitude = 40.0
 
 #........................................................................
 # read in yearly solar radiation on horizontal (set to default if no reasonable value)
 
-        if len (renTable)> 0 and renTable[0].ST_I != None:
+        if len (renTable)> 0 and renTable[0].ST_I is not None:
             if 100.0 < renTable[0].ST_I < 3000.0:
                 self.ST_IDefault = renTable[0].ST_I
             else:
@@ -1072,13 +1142,14 @@ class ModuleST(object):
             self.TAmb = renTable[0].TAmb
         else:
             self.TAmb = -0.0143*pow(self.latitude,2.0) + 0.4668*self.latitude + 20.5
-            logWarning(_("The yearly mean ambient temperature has not been defined. \nValue calculated from default correlation: TAmb [ºC] = %s")%\
+            logWarning(_("The yearly mean ambient temperature has not been defined. \nValue calculated from default correlation: TAmb [C] = %s")%\
                    self.TAmb)
             
 #..............................................................................
 # surface area factor (-> based on default inclination and collector row separation)
 
-        self.surfAreaFactorDef = 0.0042*pow(self.latitude,2.0)-0.3044*self.latitude+8
+        print "ModuleST (generalData): latitude = ",self.latitude
+        self.surfAreaFactorDef = 0.0042*pow(self.latitude,2.0) - 0.3044*self.latitude + 8.0
         
 #..............................................................................
 # finally set Flag
@@ -1123,17 +1194,6 @@ class ModuleST(object):
 #   screens the available surfaces for their aptitude for solar energy use
 #------------------------------------------------------------------------------
 
-        sqlQuery = "Questionnaire_id = '%s'"%(Status.PId)
-        self.renewablesTable = Status.DB.qrenewables.sql_select(sqlQuery)  
-
-        if len(self.renewablesTable) > 0:               #XXXENRICO -> isn't this in conflict/redundancy with "generalData" ???
-            self.renewables = self.renewablesTable[0]
-            self.latitude = self.renewables.Latitude
-            self.radiation = self.renewables.ST_I
-            
-        else:
-            logDebug("ModuleST (screenSurfaces): no entry in qrenewables")
-
 # screen existing surfaces and add to self.surfaces
 
         sqlQuery = "ProjectId = '%s'"%(Status.PId)
@@ -1167,7 +1227,7 @@ class ModuleST(object):
                 self.surfaces[i]["azimuthClass"] = "S"
                 logWarning(_("Surface %s: no azimuth specified. South orientation assumed")%(i+1))
                                   
-        self.NSurfaces= len(self.surfaces)
+        self.NSurfaces = len(self.surfaces)
         
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -1176,11 +1236,11 @@ class ModuleST(object):
 #   ???
 #------------------------------------------------------------------------------
         NetSurfAreaFactorSloped=1.2
-        if self.surfaces[i]["azimuthClass"]=="S" and  self.surfaces[i]["inclination"]>MININCLINATION:
+        if self.surfaces[i]["azimuthClass"]=="S" and  self.surfaces[i]["inclination"]> MININCLINATION:
             self.NetSurfAreaFactor=NetSurfAreaFactorSloped
         else:
-            self.NetSurfAreaFactor=0.0042*pow(self.latitude,2.0)-0.3044*self.latitude+8
-#        print "moduleST; calcNetSurfAreaFactor: the surfAreaFactor is:",self.NetSurfAreaFactor
+            logTrack("ModuleST (calcNetSAF): latitude = %s"%self.latitude)
+            self.NetSurfAreaFactor=0.0042*pow(self.latitude,2.0) -0.3044*self.latitude + 8.0
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------        
     def checkNetSurfArea(self,i):
@@ -1303,14 +1363,14 @@ class ModuleST(object):
                 self.usableSurfacesData.append({"NetSurfAreaFactor":self.NetSurfAreaFactor,"NetSurfAreaPartial":NetSurfAreaPartial})
         avAreaFactor=self.avAreaFactor
         self.TotNetSurfArea=self.grossSurfArea/avAreaFactor
-        if self.TotNetSurfArea < self.MINTOTNETSURFAREA:
+
+        if self.TotNetSurfArea < self.MINTOTNETSURFAREA and self.NSurfaces > 0:
             showWarning(_("The surface available for the collectors mounting is quite small."))
             enoughSurface= "No"
         else:
             enoughSurface= "Yes"
-        logDebug ("The list of aveilable surfaces is:'%s'"% self.surfaces)
-        logDebug ("The list of usable surfaces is:'%s'"% self.usableSurfaces)
-        logMessage(_("The surfaces have a total area of '%s' and a usable (net) area of '%s'"% (self.TotAvailSurfArea,self.TotNetSurfArea)))
+
+        logTrack(_("The surfaces have a total area of '%s' and a usable (net) area of '%s'"% (self.TotAvailSurfArea,self.TotNetSurfArea)))
         return enoughSurface
 
                 
@@ -1344,24 +1404,26 @@ class ModuleST(object):
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
         config = noneFilter(self.getUserDefinedPars())
-        if self.manualChoosenColl != None:   #E.F. 28/07
-            selectedCollector = self.manualChoosenColl    #E.F. 28/07
-            if config[1] != "preselected":   #E.F. 28/07
-                showWarning (_("When a particular collector has been selected in the database the collector type should be setted as 'preselected'"))  #E.F. 28/07
-        else:
-            if config[1] in ("Flat-plate collector", "Evacuated tube collector", "Concentrating collector"):
-                if config[1] =="Flat-plate collector":
-                    sqlQuery="STManufacturer = '%s' AND STType = '%s'"%("Einstein","Flat-plate collector")
-                    possibleCollector = Status.DB.dbsolarthermal.sql_select(sqlQuery)
-                if config[1] =="Evacuated tube collector":
-                    sqlQuery="STManufacturer = '%s' AND STType = '%s'"%("Einstein","Evacuated tube collector")
-                    possibleCollector = Status.DB.dbsolarthermal.sql_select(sqlQuery)
-                if config[1] =="Concentrating collector":
-                    sqlQuery="STManufacturer = '%s' AND STType = '%s'"%("Einstein","Concentrating collector")
-                    possibleCollector = Status.DB.dbsolarthermal.sql_select(sqlQuery)
+        selectedCollector = None
+
+# if a preselected collector is available and selection is set to --preselected-- then use the selected one
+        if self.manualChoosenColl is not None:   #E.F. 28/07
+            if config[1] == "preselected":   #E.F. 28/07
+                selectedCollector = self.manualChoosenColl    #E.F. 28/07
+            else:
+                logWarning (_("When a particular collector has been selected in the database the collector type should be setted as 'preselected'"))  #E.F. 28/07
+
+# otherwise apply search criteria
+
+        if selectedCollector == None:
+            if config[1] in STTYPES:
+                sqlQuery="STManufacturer = '%s' AND STType = '%s'"%("Einstein",config[1])
+                possibleCollector = Status.DB.dbsolarthermal.sql_select(sqlQuery)
+
             else:
                 sqlQuery="STManufacturer = '%s'"%("Einstein")
                 possibleCollector = Status.DB.dbsolarthermal.sql_select(sqlQuery)
+
 #------------------------------------------------------------------------------
             self.a=0
             STc0=possibleCollector[0].STc0
@@ -1380,10 +1442,12 @@ class ModuleST(object):
                     self.etaSelected=etaCollector
                     self.a=i
             selectedCollector=possibleCollector[self.a]
+
         if selectedCollector.STAreaFactor != None:
             self.avAreaFactor = selectedCollector.STAreaFactor
         else:
            self.avAreaFactor = 1.1 
+
         return selectedCollector
         
 #==============================================================================
@@ -1418,7 +1482,7 @@ class ModuleST(object):
 #        print ("The temperature corresponding to half of the demand at 200°C is:",self.Tav)
         USHSolTot= QDTav
         self.SurfAreaSol=USHSolTot /QuSolarUnitary
-        if self.TotNetSurfArea/self.SurfAreaSol<1:
+        if self.TotNetSurfArea/self.SurfAreaSol<1 and self.NSurfaces > 0:   # limit SSY size by available area only if surfaces are defined
             self.SurfAreaSol=self.TotNetSurfArea
             self.QDT=self.SurfAreaSol*QuSolarUnitary/SolFra
             QDTav=self.QDT*SolFra
@@ -1428,8 +1492,12 @@ class ModuleST(object):
             self.Tav= i*Status.TemperatureInterval
 
         else:
-            self.QDT=self.QD_Tmax
+            self.QDT = self.QD_Tmax
+
         self.TavCollector= self.Tav + deltaT_Primary
+
+        logTrack("ModuleST (predimensioning): Area %s TavColl %s QDT %s"%\
+                 (self.SurfAreaSol,self.TavCollector,self.QDT))
 
 # NB       if da userDefinedPars arriva una potenza più picola ridurre direttamente qui la superficie...
 #        print ("The solar area is:",self.SurfAreaSol)
@@ -1445,6 +1513,10 @@ class ModuleST(object):
 
         logTrack("ModuleST (designAssistant1): starting")
         
+        if self.NSurfaces <= 0:
+            logWarning(_("No information on available surfaces is given !\n")+\
+                       _("Is is assumed that there is no constraint due to limited space"))
+
         index=self.findIndex()   # Index = cascadeIndex-1
 
 #........................................................................
@@ -1475,109 +1547,114 @@ class ModuleST(object):
         if self.STExistance==1 and self.manualChoosenColl == None: #E.F. 28/07
             showWarning(_("A solar thermal system is in use! in order to design a new one you should delete the existent."))
         else:
-            enoughSurface=self.calcSurfArea()
-            logDebug ("ModuleST designAssistant: reached pointA")
-            if enoughSurface=="Yes":
+            enoughSurface = self.calcSurfArea()
 
+            if enoughSurface == "Yes":
 
 #........................................................................
 # if everything's ok, start assisted design
 
-                logDebug ("ModuleST designAssistant: reached pointB")
                 self.preDimensioning()
 
                 GT=800
                 dT=self.Tav-self.TAmb    
                 selectedCollector=self.selectST(GT,dT)
-                if self.STExistance==1: ####E.F. 28/07
+
+                if self.STExistance == 1: ####E.F. 28/07
                     equipe = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].CascadeIndex[index+1][0]   ####E.F. 28/07
                 else: ######E.F. 28/07
-                    equipe=self.addEquipmentDummy()
-                modelID=selectedCollector.DBSolarThermal_ID
+                    equipe = self.addEquipmentDummy()
+                    
+                modelID = selectedCollector.DBSolarThermal_ID
                 self.setEquipmentFromDB(equipe,modelID)
+                
                 equipe.HCGPnom = self.SurfAreaSol*0.7
                 equipe.ST_Volume = self.SurfAreaSol*0.05
-                equipe.ST_SysEff = 0.9
+                equipe.ST_SysEff = DEFAULT_SYSTEM_EFFICIENCY
+                
                 Status.SQL.commit()
-#                Status.mod.moduleHC.cascadeMoveToTop(self.NEquipe+1)
 
-                USHj=self.calculateEnergyFlows(equipe,1)
+                USHj = self.calculateEnergyFlows(equipe,1)
 
 
                 SolFraCalc=USHj/self.QD_Tmax
-                logDebug ("ModuleST designAssistant: reached pointC")
-                if self.manualChoosenColl == None:                    ########## E.F. 28/07
-                    while abs (self.TavCollMean -self.Tav)>10 :
-                        logTrack ("ModuleST designAssistant: reached pointD")
-                        self.Tav=self.TavCollMean
+
+                logTrack("ModuleST (designAssistant1): estimated average op. temp.: %s"%(self.TavCollMean))
+
+                if self.manualChoosenColl is None:                    ########## E.F. 28/07
+                    while abs (self.TavCollMean - self.Tav) > 10:
+                        self.Tav = self.TavCollMean
                         GT=800
-                        dT=self.Tav-self.TAmb
-                        selectedCollector=self.selectST(GT,dT)
-                        modelID=selectedCollector.DBSolarThermal_ID
+                        dT = self.Tav - self.TAmb
+                        
+                        selectedCollector = self.selectST(GT,dT)
+                        modelID = selectedCollector.DBSolarThermal_ID
 
                         self.setEquipmentFromDB(equipe,modelID)
                         USHj=self.calculateEnergyFlows(equipe,1)
                 
                     SolFraCalc=USHj/self.QD_Tmax
-                logDebug ("ModuleST designAssistant: reached pointE")
 
-                nMaxiter=3
-                n=1
-                while n< nMaxiter:
-                    logDebug ("ModuleST designAssistant: reached pointF")
+                logTrack("ModuleST (designAssistant1): selected collector type: %s"%modelID)
+
+                nMaxiter=5
+                for n in range(nMaxiter):
+
                     USHj=self.calculateEnergyFlows(equipe,1)
-                    logDebug ("The total energy supplyed by the solar system is:'%s'" % USHj)
-                    logDebug ("At the averege temperature of:'%s'" % self.TavCollMean)
+
                     SolFraCalc=USHj/self.QD_Tmax
                     A=equipe.HCGPnom/0.7
-                    logTrack ("The aperture area is:'%s'" % A)
-                    QuSolarUnitary=USHj/A
-                    logTrack ("The QuSolarUnitary is:'%s'" % QuSolarUnitary)
+                    QuSolarUnitary = USHj/A
+
+                    logTrack("ModuleST (designAssistant1): size adjustment cycle %s. P: %s qu %s "%\
+                             ((n+1),equipe.HCGPnom,QuSolarUnitary))
+
                     if QuSolarUnitary < self.QuSolarUnitaryMin:
-                        logDebug ("ModuleST designAssistant: reached pointG")
+                        
                         A=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
                         A=max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
-                        logTrack ("The new aperture area is:'%s'" % A)
+                        
                         equipe.HCGPnom = A*0.7
                         equipe.ST_Volume = A*0.05
                         Status.SQL.commit()
-                        n +=1
-                        if A == self.MINTOTNETSURFAREA/self.avAreaFactor : pass
-                        continue
-                    else:
-#                        test2=A*QuSolarUnitary/(self.QuSolarUnitaryMin*1.02)
-                        if abs(SolFraCalc-self.desiredSolarFraction) > 0.05:   #  In this way we reduce the solar fraction when it exceed 0.5: even if the QuSolarUnitary is good enough
-                            logDebug("ModuleST designAssistant: reached pointH")
-                            logTrack ("ModuleST designAssistant: SolFraCalc= '%s' self.desiredSolarFraction='%s'" %(SolFraCalc,self.desiredSolarFraction))
-                            A1 = A*QuSolarUnitary/self.QuSolarUnitaryMin
-                            A2 = A*self.desiredSolarFraction/SolFraCalc
-                            k=0.8
-                            A3 = k*A2+(1-k)*A
-                            A4= min (A3,self.TotNetSurfArea)
-                            A5= selectedCollector.STAreaAper * int((A4/selectedCollector.STAreaAper)+0.5)
-#                            if A4/selectedCollector.STAreaAper - int(A4/selectedCollector.STAreaAper) >0.5:
-#                                A5 = selectedCollector.STAreaGross*int(A4/selectedCollector.STAreaAper)
-#                            else:
-#                                A5 = selectedCollector.STAreaGross*(int(A4/selectedCollector.STAreaAper)+1)
-                            A = min(A1,A5)
-                            A = max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
-                            equipe.HCGPnom = A*0.7
-                            Status.SQL.commit()
-                            n +=1
-                            if A==self.MINTOTNETSURFAREA/self.avAreaFactor: pass
-                            continue
-                        else:
-                            break
 
-                    n +=1
+                    elif abs(SolFraCalc-self.desiredSolarFraction) > 0.03:   #  In this way we reduce the solar fraction when it exceed 0.5: even if the QuSolarUnitary is good enough
+                        logTrack ("ModuleST designAssistant: SolFraCalc= '%s' self.desiredSolarFraction='%s'" %(SolFraCalc,self.desiredSolarFraction))
+
+# linear extrapolation to desired solar fraction, with subrelaxation factor for assuring convergence
+                        A2 = A*self.desiredSolarFraction/SolFraCalc
+                        k=0.8
+                        A3 = k*A2+(1-k)*A
+
+# limit to available surface and round to integer number of collectors
+                        if self.NSurfaces > 0:
+                            A4= min (A3,self.TotNetSurfArea)
+                        else:
+                            A4 = A3
+                        A5= selectedCollector.STAreaAper * int((A4/selectedCollector.STAreaAper)+0.5)
+
+# linear extrapolation to minimum unit solar gains
+                        A1 = A*QuSolarUnitary/self.QuSolarUnitaryMin
+                        A = min(A1,A5)
+                            
+                    else:
+                        break
+# finally constrain by lower limit for reasonable system size
+
+                    A = max(A,self.MINTOTNETSURFAREA/self.avAreaFactor)
+
+                    equipe.HCGPnom = A*0.7
+                    equipe.ST_Volume = A*0.05
+                    Status.SQL.commit()
+
+                        
                 
-                logDebug("ModuleST designAssistant: reached pointI")
                 A=equipe.HCGPnom/0.7
                 NColl=int((A/selectedCollector.STAreaAper)+0.1)
                 equipe.HCGPnom = NColl*selectedCollector.STAreaAper*0.7
                 Status.SQL.commit()
                 USHj=self.calculateEnergyFlows(equipe,1)
-                logDebug ("ModuleST designAssistant: reached pointL")
+                logTrack("ModuleST (designAssistant1): final selection. P: %s qu %s "%(equipe.HCGPnom,QuSolarUnitary))
 #------------------------------------------------------------------------------
 #   Here all the data to be displayed or registered are calculated.
 
@@ -1610,7 +1687,6 @@ class ModuleST(object):
 #                print "Its efficiency is:", eta
                 storVol = equipe.ST_Volume
 #                print "The volume of the solar storage is:", storVol
-                logTrack ("ModuleST designAssistant: reached pointN")
             else:
                 showWarning(_("The suitable surfaces are quite small. Einstein suggests not to install a solar system"))
 
@@ -1631,7 +1707,32 @@ class ModuleST(object):
 
         Status.SQL.commit()
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def calculateCostParameters(self,equipe,modelID):
+#------------------------------------------------------------------------------
+#   calculates the cost parameters of a given equipment (depending on size)
+#   from the model
+#------------------------------------------------------------------------------
 
+        models = Status.DB.dbsolarthermal.DBSolarThermal_ID[modelID]
+
+        if len(models) > 0:
+            model = models[0]
+            try:
+                k30 = model.STUnitTurnKeyPrice30kW
+                k300 = model.STUnitTurnKeyPrice300kW
+                k3000 = model.STUnitTurnKeyPrice3000kW
+                unitPrice300 = model.STUnitPrice300kW
+                OM = model.STOMUnitFix
+                scf = SolarCostFunction(k30,k300,k3000,unitPrice300,OM)
+                (equipe.TurnKeyPrice,equipe.Price,equipe.OandMfix) = scf.calculate(equipe.HCGPnom)
+            except:
+                logWarning(_("No valid cost parameters available for solar collector model no. %s")%modelID)
+                (equipe.TurnKeyPrice,equipe.Price,equipe.OandMfix) = (0.0,0.0,0.0)
+                
+        else:
+            logWarning(_("No valid cost parameters available for solar collector model no. %s")%modelID)
+            (equipe.TurnKeyPrice,equipe.Price,equipe.OandMfix) = (0.0,0.0,0.0)
 #==============================================================================
                                   
 #==============================================================================

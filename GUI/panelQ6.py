@@ -91,6 +91,9 @@ class PanelQ6(wx.Panel):
         self.HXID = None
         self.WHEEID = None
 
+        self.HXNo = None
+        self.WHEENo = None
+
         self.fillPage()
 
     def _init_ctrls(self, parent):
@@ -532,8 +535,7 @@ class PanelQ6(wx.Panel):
         elif hxName <> 'NULL' and len(hxes) == 1:
             hx = hxes[0]
         else:
-#	    self.showError("HX name has to be a uniqe value!")
-	    print "HX name has to be a uniqe value!"
+	    showError("HX name has to be a uniqe value!")
 	    return
                         
         tmp = {
@@ -623,8 +625,7 @@ class PanelQ6(wx.Panel):
         elif wheeName <> 'NULL' and len(whees) == 1:
             whee = whees[0]
         else:
-	    self.main.showError("HX name has to be a uniqe value!")
-#	    print "WHEE name has to be a uniqe value!"
+	    showError("HX name has to be a uniqe value!")
 	    return
 	
         fluidDict = Status.prj.getFluidDict()
@@ -662,11 +663,15 @@ class PanelQ6(wx.Panel):
         for hx in self.HXList:
             self.listBoxHX.Append(hx)
 
+        if self.HXNo is not None: self.listBoxHX.SetSelection(self.HXNo-1)
+
         self.WHEEList = Status.prj.getWHEEList("WHEEName")
 
         self.listBoxWHEE.Clear()
         for whee in self.WHEEList:
             self.listBoxWHEE.Append(str(whee))
+
+        if self.WHEENo is not None: self.listBoxWHEE.SetSelection(self.WHEENo-1)
 
         fillChoice(self.tc2.entry,TRANSHXTYPES)
 

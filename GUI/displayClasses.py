@@ -44,6 +44,7 @@ import wx.lib.stattext
 #import wx.lib.masked
 import wx.calendar
 from einstein.GUI.status import Status
+from einstein.modules.messageLogger import *
 import units
 from fonts import FontProperties
 
@@ -1124,13 +1125,14 @@ class TextEntry(wx.Panel):
         self.SetValue('')
 
     def SetValue(self, value):
-#        print "DisplayClasses - TextEntry - SetValue. printing value"
-#        print value
         try:
             self.entry.SetValue(unicode(value,"utf-8"))
         except:
-            self.entry.SetValue(unicode(value,ENCODING))
-    
+            try:
+                self.entry.SetValue(unicode(value,ENCODING))
+            except:
+                self.entry.SetValue(value)
+        
     def getUnit(self):
         # this method is just for compatibility
         return None
@@ -1403,7 +1405,7 @@ class MultipleChoiceEntry(wx.Panel):
                         self.entry.AddItem(item)
                 self.SetSelection(thing[0])
         except:
-            print 'Bad SetValue %s' % thing
+            print 'DisplayClasses (MultipleChoiceEntry): Bad SetValue %s' % thing
 
     
     def getUnit(self):

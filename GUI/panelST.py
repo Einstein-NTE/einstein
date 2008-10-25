@@ -19,21 +19,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
-#	Created by: 	    Hans Schweiger	    25/06/2008
-#                           (based on PanelHP and PanelBB)
-#	Revised by:
-#                           Hans Schweiger          23/07/2008
-#                           Enrico Facci            23/07/2008
-#                           Hans Schweiger          24/07/2008
-#                           Stoyan Danov    13/10/2008
-#       
-#       Changes to previous version:
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger,
+#                       Stoyan Danov
+#                       25/06/2008 - 13/10/2008
 #
-#       23/07/2008: HS  convertDoubleToString introduced
-#       24/07/2008: HS  KT and KL introduced in table
-#                       - bug-fix in setSelection of choice of ST Type
-#       13/10/2008: SD  change _() to _U()
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger          24/10/2008
+#
+#   Changes to previous version:
+#
+#   24/10/2008: HS  change of functionality in GUI
+#                   - button select collector entry of system parameters
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -167,6 +166,9 @@ class PanelST(wx.Panel):
 
         self.prnt = parent
         self.main = main
+
+        self.selectedCollector = None
+        self.blockTextEnter = False
           
         self._init_ctrls(parent)
 #        self.__do_layout()
@@ -239,14 +241,14 @@ class PanelST(wx.Panel):
 # Figure to be plotted
 
         self.staticBox1 = wx.StaticBox(id=-1,
-              label=_U('Temperature dependent heat demand with and w/o solar system'),
+              label=_U('Heat demand and solar contribution'),
               name='staticBox1', parent=self, pos=wx.Point(450, 130),
-              size=wx.Size(340, 260), style=0)
+              size=wx.Size(340, 250), style=0)
         self.staticBox1.SetForegroundColour(TITLE_COLOR)
         self.staticBox1.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.panelFig = wx.Panel(id=wxID_PANELFIG, name='panelFigure', parent=self,
-              pos=wx.Point(460, 160), size=wx.Size(320, 220),
+              pos=wx.Point(460, 150), size=wx.Size(320, 220),
               style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
 
 #..............................................................................
@@ -401,49 +403,56 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 
 
+        self.boxInfo = wx.StaticBox(id=-1,
+              label=_U('System performance'),
+              name='boxTable', parent=self, pos=wx.Point(450, 390),
+              size=wx.Size(340, 160), style=0)
+        self.boxInfo.SetForegroundColour(TITLE_COLOR)
+        self.boxInfo.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+
         self.stInfo1 = wx.StaticText(id=-1,
               label=_U('Gross surface area suitable for installation [m2]'), name='stInfo1',
-              parent=self, pos=wx.Point(460, 400), style=0)
-
-        self.stInfo1val = wx.StaticText(id=-1,
-              label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 400), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
-
-
-        self.stInfo2 = wx.StaticText(id=-1,
-              label=_U('Maximum possible solar thermal capacity [kW]'), name='stInfo2',
               parent=self, pos=wx.Point(460, 420), style=0)
 
-        self.stInfo2val = wx.StaticText(id=-1,
+        self.stInfo1val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
               parent=self, pos=wx.Point(700, 420), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
+        self.stInfo2 = wx.StaticText(id=-1,
+              label=_U('Maximum possible solar thermal capacity [kW]'), name='stInfo2',
+              parent=self, pos=wx.Point(460, 440), style=0)
+
+        self.stInfo2val = wx.StaticText(id=-1,
+              label="-", name='stInfo1',
+              parent=self, pos=wx.Point(700, 440), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+
+
         self.stInfo3 = wx.StaticText(id=-1,
               label=_U('Solar fraction (up to 200°C) [%]'), name='stInfo3',
-              parent=self, pos=wx.Point(460, 450), style=0)
+              parent=self, pos=wx.Point(460, 470), style=0)
 
         self.stInfo3val = wx.StaticText(id=-1,
               label="-", name='stInfo1',
-              parent=self, pos=wx.Point(700, 450), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+              parent=self, pos=wx.Point(700, 470), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo4 = wx.StaticText(id=-1,
               label=_U('Annual energy yield [kWh/kW.a]'), name='stInfo4',
-              parent=self, pos=wx.Point(460, 470), style=0)
+              parent=self, pos=wx.Point(460, 490), style=0)
 
         self.stInfo4val = wx.StaticText(id=-1,
               label="", name='stInfo4val',
-              parent=self, pos=wx.Point(700, 470), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+              parent=self, pos=wx.Point(700, 490), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo5 = wx.StaticText(id=-1,
               label=_U('Average system efficiency [%]'), name='stInfo5',
-              parent=self, pos=wx.Point(460, 490), style=0)
+              parent=self, pos=wx.Point(460, 510), style=0)
 
         self.stInfo5val = wx.StaticText(id=-1,
               label="", name='stInfo4val',
-              parent=self, pos=wx.Point(700, 490), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+              parent=self, pos=wx.Point(700, 510), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
         self.stInfo6 = wx.StaticText(id=-1,
@@ -460,16 +469,16 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 
         self.buttonOk = wx.Button(id=wx.ID_OK, label=_U('OK'),
-              name='buttonOk', parent=self, pos=wx.Point(528, 560),
+              name='buttonOk', parent=self, pos=wx.Point(540, 560),
               size=wx.Size(75, 20), style=0)
 
         self.buttonCancel = wx.Button(id=wx.ID_CANCEL, label=_U('Cancel'),
-              name='buttonCancel', parent=self, pos=wx.Point(616,
+              name='buttonCancel', parent=self, pos=wx.Point(630,
               560), size=wx.Size(75, 20), style=0)
 
         self.buttonFwd = wx.Button(id=wxID_PANELBUTTONFWD,
               label='>>>', name='buttonFwd', parent=self,
-              pos=wx.Point(704, 560), size=wx.Size(75, 20), style=0)
+              pos=wx.Point(720, 560), size=wx.Size(75, 20), style=0)
 
         self.buttonFwd.Bind(wx.EVT_BUTTON,
               self.OnButtonFwdButton,
@@ -477,7 +486,7 @@ class PanelST(wx.Panel):
 
         self.buttonBack = wx.Button(id=wxID_PANELBUTTONBACK,
               label='<<<', name='buttonBack', parent=self,
-              pos=wx.Point(440, 560), size=wx.Size(75, 20), style=0)
+              pos=wx.Point(450, 560), size=wx.Size(75, 20), style=0)
 
         self.buttonBack.Bind(wx.EVT_BUTTON,
               self.OnButtonBackButton,
@@ -514,6 +523,7 @@ class PanelST(wx.Panel):
                 try:
                     self.grid.SetCellValue(r, c, convertDoubleToString(data[r][c],3))
                 except:
+                    print "PanelST (display): exception in CDTS",r,c
                     pass
 
         for r in range(rows,MAXROWS):
@@ -588,19 +598,9 @@ class PanelST(wx.Panel):
 #   adds an equipment to the list
 #------------------------------------------------------------------------------		
 
-        self.dbe = DBEditFrame(self, _U("Select solar collector"), "dbsolarthermal", 0, False)
-        if self.dbe.ShowModal() == wx.ID_OK:
-	    self.theId = self.dbe.theId
-            self.mod.setManualSelection(self.theId)
-            if self.sysPars[0] > 0:
-                self.equipe = self.mod.addEquipmentDummy()
-                try:
-                    self.mod.setEquipmentFromDB(self.equipe, self.theId)
-                except:
-                    self.mod.deleteEquipment(None)
-                    logDebug('PanelST (choose collector): setEquipmentFromDB from module did not execute')
-
-                self.display()
+        self.selectCollector()
+        self.display()
+        event.Skip()
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -651,7 +651,11 @@ class PanelST(wx.Panel):
         self.mod.setUserDefinedPars()
 
     def OnChoiceConfig2Choice(self, event):
-        self.config[1] = self.choiceConfig2.GetStringSelection()
+
+        TRANSCOLLTYPES = copy.deepcopy(TRANSSTTYPES)
+        TRANSCOLLTYPES.update({"any":_U("--any--"),"preselected":_U("--preselected collector--")})
+        
+        self.config[1] = findKey(TRANSCOLLTYPES,self.choiceConfig2.GetStringSelection())
         Status.int.GData["ST Config"] = self.config
         self.mod.setUserDefinedPars()
 
@@ -661,12 +665,30 @@ class PanelST(wx.Panel):
         self.mod.setUserDefinedPars()
 
     def OnTcSysTextEnter(self, event):
-        self.sysPars[0] = self.tcSys1.GetValue()
-        self.sysPars[1] = self.tcSys2.GetValue()
-        self.sysPars[2] = self.tcSys3.GetValue()
-        Status.int.GData["ST SysPars"] = self.sysPars
-        self.mod.setSolarSystemPars()
+        
+        if self.blockTextEnter:
+            return
+        
+        self.blockTextEnter = True
+        
+        self.readInSysPars()
+
+        if self.createNewSSY == True:
+            if self.mod.selectedCollID is not None: # a collector type had already been preselected
+                if self.sysPars[0] > 0:
+                    equipe = self.mod.addEquipmentDummy()
+                    self.mod.setEquipmentFromDB(equipe,self.mod.selectedCollID)
+                    self.mod.setSolarSystemPars()
+                    self.selectedCollector = self.mod.selectedCollID
+                
+            else: # open dialog for manual selection of collector
+                self.selectCollector()
+
         self.display()
+
+        self.blockTextEnter = False
+
+        event.Skip()
 
 #------------------------------------------------------------------------------		
 #   Default event handlers: FWD / BACK / OK / Cancel - Buttons
@@ -692,5 +714,52 @@ class PanelST(wx.Panel):
 
 #============================================================================== 				
 
+#------------------------------------------------------------------------------		
+    def readInSysPars(self):
+        self.createNewSSY = True
+        try:
+            self.sysPars[0] = float(self.tcSys1.GetValue())
+        except:
+            self.createNewSSY = False
+            
+        try:
+            self.sysPars[1] = float(self.tcSys2.GetValue())
+        except:
+            self.createNewSSY = False
+
+        try:
+            self.sysPars[2] = float(self.tcSys3.GetValue())
+        except:
+            self.createNewSSY = False
+
+        if self.createNewSSY == True:
+            Status.int.GData["ST SysPars"] = self.sysPars
+            self.createNewSSY = self.mod.setSolarSystemPars()
+        else:
+            logDebug("PanelST (readInSysPars): exception reading syspars %s"%self.sysPars)
+
+#------------------------------------------------------------------------------		
+    def selectCollector(self):
+#------------------------------------------------------------------------------		
+#   opens the dialog for manual selection of a collector
+#------------------------------------------------------------------------------		
+        self.dbe = DBEditFrame(self, _U("Select solar collector"), "dbsolarthermal", 0, False)
+        if self.dbe.ShowModal() == wx.ID_OK:
+            self.theId = self.dbe.theId
+            self.selectedCollector = self.theId
+            
+            self.mod.setManualSelection(self.theId)
+            if self.sysPars[0] > 0:
+                self.equipe = self.mod.addEquipmentDummy()
+                try:
+                    self.mod.setEquipmentFromDB(self.equipe, self.theId)
+                    self.mod.setSolarSystemPars()
+                except:
+                    self.mod.deleteEquipment(None)
+                    logDebug('PanelST (selectCollector): setEquipmentFromDB from module did not execute')
+            else:
+                self.mod.selectedCollID = self.theId
         
+#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------		
 

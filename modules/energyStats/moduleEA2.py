@@ -114,10 +114,10 @@ class ModuleEA2(object):
             TotalFETi += dFET
             FETi.append(dFET)
 
-        try: FECel = generalData[0].FECel / 1000.0
+        try: FECel = generalData.FECel / 1000.0
         except: FECel = 0.0
         
-        try: FETel = generalData[0].FETel / 1000.0
+        try: FETel = generalData.FETel / 1000.0
         except: FETel = 0.0
         
         if FECel is not None:
@@ -125,14 +125,14 @@ class ModuleEA2(object):
             FEC.append(FECel) #SD: check if OK here
         else:
             TotalFEC += 0.0
-            FEC.append(-1) #SD: check if OK here
+            FEC.append(0.0) #SD: check if OK here
 
         if FETel is not None:
             TotalFETi += FETel
             FETi.append(FETel) #SD: check if OK here
         else:
             TotalFETi += 0.0
-            FETi.append(-1) #SD: check if OK here
+            FETi.append(0.0) #SD: check if OK here
             
         fuelNames.append("Electricity")
 
@@ -144,6 +144,7 @@ class ModuleEA2(object):
                 FECPercentage.append(FEC[i]*100.0/TotalFEC)
             else:
                 FECPercentage.append(0.0)
+                
             if TotalFETi > 0.0: #SD avoid division by zero
                 FETPercentage.append(FETi[i]*100.0/TotalFETi)
             else:
