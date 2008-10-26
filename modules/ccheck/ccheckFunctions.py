@@ -131,6 +131,9 @@ class CCPar():
             self.valMax = MAXTEMP
         elif parType =="X":
             self.valMax = 1.0
+        elif parType =="S":
+            self.valMin = -INFINITE
+            self.valMax = INFINITE
         else:
             self.valMax = INFINITE
 
@@ -141,7 +144,7 @@ class CCPar():
 #------------------------------------------------------------------------------
 #   calculates sqDev from sqErr and value
 #------------------------------------------------------------------------------
-        if self.val > NUMERIC_ERR:
+        if (self.val > NUMERIC_ERR or self.val < - NUMERIC_ERR) and self.val is not None:
             if self.sqerr == INFINITE:
                 self.sqdev = INFINITE
             else:
@@ -162,8 +165,8 @@ class CCPar():
 #------------------------------------------------------------------------------
 #   calculates sqErr from sqDev and value
 #------------------------------------------------------------------------------
-        if self.val > NUMERIC_ERR:
-            if self.sqdev == INFINITE:
+        if (self.val > NUMERIC_ERR or self.val < - NUMERIC_ERR) and self.val is not None:
+            if self.sqdev >= 1.e-20*INFINITE:
                 self.sqerr = INFINITE
             else:
                 self.sqerr = self.sqdev/pow(self.val,2.)
@@ -266,7 +269,7 @@ class CCPar():
 #.............................................................................
 # general control: min/max values between [0,INFINITE] and min < max
 
-        self.valMin = max(self.valMin,0)
+        if self.parType <> "S": self.valMin = max(self.valMin,0)
         self.valMax = min(self.valMax,INFINITE)
             
         if self.val is not None:
@@ -277,7 +280,7 @@ class CCPar():
 # first set absolute constraint of the value to reasonable limits around its
 # actual value - in function of the specified error margins
 
-                if self.sqerr < INFINITE:
+                if self.sqerr < INFINITE and self.parType <> "S":
                     errMax = CONFIDENCE*pow(self.sqerr,0.5)
 
                     self.valMin = max(self.valMin,self.val*max(1-errMax,0))
@@ -292,6 +295,12 @@ class CCPar():
             elif self.val==0 and self.sqerr==0:
                 self.valMin = 0.0
                 self.valMax = 0.0
+
+#.............................................................................
+# special parameters that allow negative values
+
+            elif self.val < - MINIMUM_VALUE and self.parType == "S":
+                pass
 
 #.............................................................................
 # special case: unallowed negative values
@@ -311,7 +320,7 @@ class CCPar():
 #.............................................................................
 # consider that the error can not be larger than [maxVal - minVal]
 
-            if self.val > 0:
+            if self.val <> 0:
                 
                 try:    #helps to avoid crash for very large errors
                     newErr = max(pow((self.valMax-self.val)/self.val,2.0),\
@@ -329,7 +338,7 @@ class CCPar():
 # check for all values larger than 0 !!!
 # if constrain in between min/max works, and min> 0, the following should be unnecessary
 
-            if self.val < 0:
+            if self.val < 0 and self.parType <> "S":
                 print "======================================================"
                 print "======================================================"
                 print "%s.CONSTRAIN: SEVERE ERROR - VALUE < 0 !!!! "%self.name
@@ -725,11 +734,11 @@ def calcProdC(yname,a,x1,x2):
     return y  
 
 #------------------------------------------------------------------------------
-def calcSum(yname,x1,x2):
+def calcSum(yname,x1,x2,parType=None):
 #------------------------------------------------------------------------------
 #   Default function for calculating the product of two values
 #------------------------------------------------------------------------------
-    y = CCPar(yname)
+    y = CCPar(yname,parType=parType)
     if (x1.val ==None or x2.val==None):
         y.val = None
         y.sqerr = INFINITE
@@ -743,6 +752,14 @@ def calcSum(yname,x1,x2):
 
     y.valMin = min(INFINITE,x1.valMin + x2.valMin)
     y.valMax = min(INFINITE,x1.valMax + x2.valMax)
+
+    if DEBUG in ["ALL","CALC"]:
+        print "CalcSum(x1,x2)_(before constrain)__________________"
+        print "x1+x2 = "
+        y.show()
+        print "parType = ",y.parType
+        print "___________________________________________________"
+
     y.constrain()
 
     if y.val is not None:
@@ -862,12 +879,12 @@ def calcRowSum(name,row,m):
     
 
 #------------------------------------------------------------------------------
-def calcDiff(yname,x1,x2):
+def calcDiff(yname,x1,x2,parType=None):
 #------------------------------------------------------------------------------
 #   Default function for calculating the difference of two values
 #------------------------------------------------------------------------------
 
-    y = CCPar(yname)
+    y = CCPar(yname,parType=parType)
     if (x1.val is None or x2.val is None):
         y.val = None
         y.sqerr = INFINITE
@@ -885,8 +902,15 @@ def calcDiff(yname,x1,x2):
         else:
             y.sqerr = INFINITE
 
-    y.valMin = max(x1.valMin - x2.valMax,0)
-    y.valMax = max(x1.valMax - x2.valMin,0)
+    y.valMin = x1.valMin - x2.valMax
+    y.valMax = x1.valMax - x2.valMin
+
+    if y.parType <> "S":
+        y.valMin = max(y.valMin,0)
+        y.valMax = max(y.valMax,0)
+    else:
+        print "CalcDiff: parameter with parType S"
+        y.show()
 
     y.constrain()
     
@@ -1425,7 +1449,7 @@ def adjustSum(y,x1,x2):
             x2.dev = y.dev + x1.dev
             x2.sqdev = pow(x2.dev,2.0)
 
-            if (x2.val > 0):
+            if (x2.val <> 0):
                 x2.calcErr()
             else:
                 x2.sqerr = INFINITE
@@ -1437,19 +1461,28 @@ def adjustSum(y,x1,x2):
             x1.dev = y.dev + x2.dev
             x1.sqdev = pow(x1.dev,2.0)
 
-            if (x1.val > 0):
+            if (x1.val <> 0):
                 x1.calcErr()
             else:
                 x1.sqerr = INFINITE
     
-    newMin = max(y.valMin-x2.valMax,0)
-    newMax = max(y.valMax-x2.valMin,0)
+    newMin = y.valMin-x2.valMax
+    newMax = y.valMax-x2.valMin
 
-    x2.valMin = max(y.valMin-x1.valMax,0)
-    x2.valMax = max(y.valMax-x1.valMin,0)
+    x2.valMin = y.valMin-x1.valMax
+    x2.valMax = y.valMax-x1.valMin
 
     x1.valMin = newMin
     x1.valMax = newMax
+
+    if x2.parType <> "S":
+        x2.valMin = max(x2.valMin,0.0)
+        x2.valMax = max(x2.valMax,0.0)
+
+    if x1.parType <> "S":
+        x1.valMin = max(x1.valMin,0.0)
+        x1.valMax = max(x1.valMax,0.0)
+        
 
     if DEBUG in ["ALL","ADJUST"]:
         print "adjustSum before constraints",x1.name,x2.name
@@ -1802,8 +1835,12 @@ def adjustDiff(y,x1,x2,GTZero=False):
     newMin = min(y.valMin+x2.valMin,INFINITE)
     newMax = min(y.valMax+x2.valMax,INFINITE)
 
-    x2.valMin = max(x1.valMin-y.valMax,0)
-    x2.valMax = max(x1.valMax-y.valMin,0)
+    x2.valMin = x1.valMin-y.valMax
+    x2.valMax = x1.valMax-y.valMin
+
+    if x2.parType <> "S":
+        x2.valMin = max(x2.valMin,0)
+        x2.valMax = max(x2.valMax,0)
 
     x1.valMin = newMin
     x1.valMax = newMax
@@ -1946,7 +1983,7 @@ def ccheck1(y0,y1):
         y1.show()
         print "________________________________Mode = ",CHECKMODE
 
-    y = CCPar("CCheck1")
+    y = CCPar("CCheck1",parType=y0.parType)
     
     if (y0.val == None and y1.val == None): #Case 1: Nothing to do
         y.update(y0)
@@ -1972,6 +2009,11 @@ def ccheck1(y0,y1):
 #..............................................................................
 # Updating values
    
+    if DEBUG in ["ALL","CHECK"]:
+        print "CCheck1_(... before constrain ...)_________________"
+        y.show()
+        print "___________________________________________________"
+
     y.constrain()
     
     y0.update(y)
@@ -2002,7 +2044,7 @@ def ccheck2(y0,y1,y2):
         print "________________________________Mode = ",CHECKMODE
 
     row = CCRow("ccheck2-row",3)
-    y = CCPar("ccheck2-y")
+    y = CCPar("ccheck2-y",parType=y0.parType)
     
     row[0] = y0
     row[1] = y1
@@ -2206,7 +2248,7 @@ def ccheck4(y0,y1,y2,y3,y4):
     cycle.checkBalance([y0.val,y1.val,y2.val,y3.val,y4.val])
 
     row = CCRow("ccheck4-row",5)
-    y = CCPar("ccheck4-y")
+    y = CCPar("ccheck4-y",parType=y0.parType)
     
     row[0] = y0
     row[1] = y1
@@ -2237,8 +2279,8 @@ def ccheck5(y0,y1,y2,y3,y4,y5):
 
     cycle.checkBalance([y0.val,y1.val,y2.val,y3.val,y4.val,y5.val])
 
-    row = CCRow("ccheck4-row",6)
-    y = CCPar("ccheck4-y")
+    row = CCRow("ccheck5-row",6)
+    y = CCPar("ccheck5-y",parType=y0.parType)
     
     row[0] = y0
     row[1] = y1
@@ -2270,7 +2312,7 @@ def checkIfConflict(y1,y2):
 
     if y1.val is not None and y2.val is not None:
         dif=abs(y1.val-y2.val)
-        maxDif = max(y1.val,y2.val)* \
+        maxDif = max(abs(y1.val),abs(y2.val))* \
                  max(pow(y1.sqerr+y2.sqerr,0.5)*CONFIDENCE,NUMERIC_ERR)
         
         if dif > maxDif + NUMERIC_ERR:
@@ -2348,6 +2390,10 @@ def bestOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
+    print "BestOf: starting"
+    y1.show()
+    y2.show()
+
     checkIfConflict(y1,y2)
 
     if (y1.sqerr < y2.sqerr):
@@ -2363,7 +2409,12 @@ def bestOf(y1,y2):
         
     best.valMin = max(y1.valMin,y2.valMin)
     best.valMax = min(y1.valMax,y2.valMax)
+
+    print "BestOf: before constrain"
+    best.show()
     best.constrain()
+    print "BestOf: after constrain"
+    best.show()
 
     return best   
 
@@ -2394,7 +2445,7 @@ def bestOfRow(row,m):
                 if row[j].val is not None:
                     checkIfConflict(row[i],row[j])
 
-    best = CCPar("")
+    best = CCPar("",parType=row[0].parType)
     best.val = 1.0
     
     for i in range(m):
@@ -2410,7 +2461,7 @@ def meanValueOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
-    mean = CCPar("meanValueOf")
+    mean = CCPar("meanValueOf",parType=y1.parType)
     mean.update(bestOf(y1,y2))
 
 #    mean.track = trackBestOf(y1,y2)
@@ -2470,7 +2521,7 @@ def meanValueOf3(y1,y2,y3):
     checkIfConflict(y1,y3)
     checkIfConflict(y2,y3)
 
-    mean = CCPar("meanValueOf3")
+    mean = CCPar("meanValueOf3",parType=y1.parType)
     mean.track = trackBestOf3(y1,y2,y3) #assure that best comes first
     mean.track.extend(y1.track)
     mean.track.extend(y2.track)
@@ -2555,7 +2606,7 @@ def meanOfRow(row,m):
                 if row[j].val is not None:
                     checkIfConflict(row[i],row[j])
 
-    mean = CCPar("meanOfRow")
+    mean = CCPar("meanOfRow",parType=row[0].parType)
     mean.track = trackBestOfRow(row,m)  #assure that best comes first
     for i in range(m):
         mean.track.extend(row[i].track)

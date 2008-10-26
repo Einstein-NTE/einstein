@@ -149,6 +149,7 @@ class CheckProc():
         self.NDaysProc1 = CCPar("NDaysProc1")
         self.NDaysProc2 = CCPar("NDaysProc2")
         self.NDaysProc3 = CCPar("NDaysProc3")
+        self.NDaysProc4 = CCPar("NDaysProc4")
         self.NBatchPerYear1 = CCPar("NBatchPerYear1")
         self.NBatchPerYear2 = CCPar("NBatchPerYear2")
         self.NBatchPerYear = CCPar("NBatchPerYear")
@@ -344,6 +345,7 @@ class CheckProc():
         self.UPHm1.show()
         self.UPHs.show()
         self.UPHw.show()
+        self.UPHw1.show()
         self.UPHs1.show()
         self.UPHsdot.show()
         self.UPHsdot1.show()
@@ -359,6 +361,8 @@ class CheckProc():
         self.UPHcdotGross.show()
         self.UPHcdotGross1.show()#For convention UPH and UPHc are net!
         self.UPHcGross.show()
+        self.UPHw_dot.show()
+        self.UPHw_dot1.show()
         self.QHXProcInt.show()
         self.DTUPHcGross.show()
         self.QOpProc.show()
@@ -386,6 +390,7 @@ class CheckProc():
         self.PTInFlowRec1.show()
         self.PTOutFlow.show()
         self.PTStartUp.show()
+        self.PTFinal.show()
         self.PTOutFlowRec.show()
         self.NBatch.show()
         self.UAProc.show()
@@ -624,7 +629,7 @@ class CheckProc():
             else:
                 self.UPHw_dot1.setValue(0.0)
                 
-            self.UPHw1 = calcProd("UPHw1",self.UPHw_dot,self.NBatchPerYear)
+            self.UPHw1 = calcProd("UPHw1",self.UPHw_dot,self.NDaysProc3)
                         
             if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
@@ -652,7 +657,7 @@ class CheckProc():
                 self.PTFinal.update(self.PTOutFlow) #for security (link with HR module): -> zero UPHw !!!
                 self.PTFinal1.update(self.PTOutFlow) #avoid conflicts !!!
                 
-            adjustProd(self.UPHw1,self.UPHw_dot,self.NBatchPerYear)
+            adjustProd(self.UPHw1,self.UPHw_dot,self.NDaysProc3)
 
             if self.internalHR == True:
                 adjustDiff(self.DTCrossHXHT,self.PTOutFlowRec,self.PTInFlowRec)
@@ -740,7 +745,7 @@ class CheckProc():
         ccheck2(self.UPHcdot,self.UPHcdot1,self.UPHcdot2)
         ccheck1(self.UPHc,self.UPHc1)
         ccheck1(self.UPHsdot,self.UPHsdot1)
-        ccheck3(self.NDaysProc,self.NDaysProc1,self.NDaysProc2,self.NDaysProc3)
+        ccheck4(self.NDaysProc,self.NDaysProc1,self.NDaysProc2,self.NDaysProc3,self.NDaysProc4)
         ccheck2(self.NBatchPerYear,self.NBatchPerYear1,self.NBatchPerYear2)
         ccheck1(self.UPHs,self.UPHs1)
         ccheck1(self.UPHProc,self.UPHProc1)

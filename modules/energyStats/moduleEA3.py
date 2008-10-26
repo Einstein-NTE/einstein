@@ -110,6 +110,11 @@ class ModuleEA3(object):
                     FuelName = dbfuel.DBFuel_ID[DBFuel_id][0].FuelName
                 except:
                     FuelName = 'not available'
+
+            equipmentClass = getEquipmentClass(equipe.EquipType)
+            if equipmentClass == "CHP":
+                FuelName += "(- gen.elect.)"
+                
             FuelType.append(FuelName)
 
 #.................................................................................           

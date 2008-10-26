@@ -144,6 +144,7 @@ class Interfaces(object):
 
     FETFuel_j = []
     FETel_j = []
+    ElGen_j = []
     FETHeat_j = []
     QWHj = []
     HPerYearEq = []
@@ -302,6 +303,7 @@ class Interfaces(object):
         self.QHXj.append(0.0)
         self.FETFuel_j.append(0.0)
         self.FETel_j.append(0.0)
+        self.ElGen_j.append(0.0)
         self.FETHeat_j.append(0.0)
         self.HPerYearEq.append(0.0)
 
@@ -332,6 +334,7 @@ class Interfaces(object):
         self.QHXj.pop(NEquipe-1)
         self.FETFuel_j.pop(NEquipe-1)
         self.FETel_j.pop(NEquipe-1)
+        self.ElGen_j.pop(NEquipe-1)
         self.FETHeat_j.pop(NEquipe-1)
         self.HPerYearEq.pop(NEquipe-1)
 

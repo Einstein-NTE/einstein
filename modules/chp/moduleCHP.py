@@ -86,6 +86,7 @@ class ModuleCHP(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
+        print "ModuleCHP: updatePanel"
 #............................................................................................
 # get list of equipments and boilers in the system
 # and update the energetic calculation up to the level needed for representation
@@ -95,6 +96,7 @@ class ModuleCHP(object):
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
             Status.mod.moduleEnergy.runSimulation(self.cascadeIndex)
 
+        print "ModuleCHP: after cascade update"
 #............................................................................................
 # 1. List of equipments
 
@@ -105,36 +107,54 @@ class ModuleCHP(object):
         data = array(matrix)
 
         Status.int.setGraphicsData('CHP Table',data)
+
+        print "ModuleCHP: equipmentlist OK"
 #............................................................................................
 # 2a. Preparing data
 
-        QCHP = copy.deepcopy(Status.int.USHj_Tt[self.cascadeIndex-1][Status.NT+1])
-        QCHP.sort(reverse=True)
+        if len(self.CHPList) > 0:
+            QCHP = copy.deepcopy(Status.int.USHj_Tt[self.cascadeIndex-1][Status.NT+1])
+            QCHP.sort(reverse=True)
+        else:
+            QCHP = []
+            for iT in range(Status.Nt):
+                QCHP.append(0.0)
 
+        print "ModuleCHP: QCHP OK"
+        
         QD80C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(80/Status.TemperatureInterval+0.5)])
         QD80C.sort(reverse=True)
 
+        print "ModuleCHP: QD80 OK"
+        
         QD120C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(120/Status.TemperatureInterval)])
         QD120C.sort(reverse=True)
+
+        print "ModuleCHP: QD120 OK"
 
         QD250C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(250/Status.TemperatureInterval)])
         QD250C.sort(reverse=True)
 
+        print "ModuleCHP: QD250 OK"
+
         QDTot = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][Status.NT+1])
         QDTot.sort(reverse=True)
 
+        print "ModuleCHP: QD400 OK"
 #............................................................................................
 # 2b. XY Plot
         TimeIntervals=[]
         for it in range(Status.Nt+1):
             TimeIntervals.append(Status.TimeStep*(it+1)*Status.EXTRAPOLATE_TO_YEAR)
 
-            Status.int.setGraphicsData('CHP Plot',[TimeIntervals,
-                                                            QCHP,
-                                                            QD80C,
-                                                            QD120C,
-                                                            QD250C,
-                                                            QDTot])
+        Status.int.setGraphicsData('CHP Plot',[TimeIntervals,
+                                                        QCHP,
+                                                        QD80C,
+                                                        QD120C,
+                                                        QD250C,
+                                                        QDTot])
+
+        print "ModuleCHP: XY plot OK"
 
 #............................................................................................
 # 3. Configuration design assistant
@@ -142,6 +162,7 @@ class ModuleCHP(object):
         config = self.getUserDefinedPars()
         Status.int.setGraphicsData('CHP Config',config)
         
+        print "ModuleCHP: user pars OK"
 #............................................................................................
 # 4. additional information (Info field right side of panel)
 
@@ -165,6 +186,7 @@ class ModuleCHP(object):
 
         Status.int.setGraphicsData('CHP Info',info)
 
+        print "ModuleCHP: info field OK"
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def getUserDefinedPars(self):
@@ -253,7 +275,7 @@ class ModuleCHP(object):
             for j in range(len(CHPTableDataList[i])):
                 if CHPTableDataList[i][j] == None:
                     CHPTableDataList[i][j] = 'not available'        
-        print"ModuleCHP;screenEquipments: the list of bb is:",self.CHPList
+        print"ModuleCHP (screenEquipments): the list of CHPs is:",self.CHPList
         return (self.CHPList,CHPTableDataList)
         
 
@@ -295,6 +317,12 @@ class ModuleCHP(object):
         self.equipe = Status.prj.addEquipmentDummy()
         self.dummyEqId = self.equipe.QGenerationHC_ID
 
+        if self.equipe.CascadeIndex > 1:
+            Status.mod.moduleHC.cascadeMoveToTop(self.equipe.CascadeIndex) 
+        
+        self.equipe = Status.prj.getEquipe(self.dummyEqId) #after having moved, the equipe - table has to be updated !!!
+        self.cascadeIndex = self.equipe.CascadeIndex
+
         self.neweqs += 1 #No of last equip added
         NewEquipmentName = "New CHP %s"%(self.neweqs)
 
@@ -303,7 +331,6 @@ class ModuleCHP(object):
         Status.SQL.commit()
 
         self.screenEquipments()
-        self.cascadeIndex = self.NEquipe
         
         return(self.equipe)
 
@@ -316,9 +343,12 @@ class ModuleCHP(object):
 #------------------------------------------------------------------------------
         model = self.DB.dbchp.DBCHP_ID[modelID][0]
 
-        if model.CHPPt != None: equipe.update({"HCGPnom":model.CHPPt})
+        if model.CHPPt is not None: equipe.update({"HCGPnom":model.CHPPt})
+        if model.CHPPe is not None: equipe.update({"ElectriProduction":model.CHPPe})
+        equipe.update({"ElectriConsum":0.0})
+        if model.FuelConsum is not None: equipe.update({"FuelConsum":model.FuelConsum})
         
-        if model.Eta_t != None:
+        if model.Eta_t is not None:
             if model.Eta_t > 1.0 and model.Eta_t < 100.0:
                 logTrack("ModuleCHP: Efficiency data should be stored internally as fractions of 1")
                 eff = model.Eta_t/100.0
@@ -336,20 +366,23 @@ class ModuleCHP(object):
                 eff = model.Eta_e
             equipe.update({"HCGEEfficiency":eff})
             
-#        if model.BoilerTemp != None: equipe.update({"TMaxSupply":model.BoilerTemp})
-#        if model.BoilerManufacturer != None: equipe.update({"Manufact":model.BoilerManufacturer})
-        if model.CHPequip != None: equipe.update({"Model":model.CHPequip})
-        equipe.update({"EquipType":getEquipmentType("CHP",model.CHPequip)})
+        equipe.update({"TMaxSupply":95.0})
+        
+        equipe.update({"Manufact":"EINSTEIN"})
+        equipe.update({"EquipType":getEquipmentType("CHP","CHP engine")})
         equipe.update({"NumEquipUnits":1})
-        if model.CHPequip != None: equipe.update({"EquipTypeFromDB":model.CHPequip})
+        equipe.update({"EquipTypeFromDB":"engine"})
         if model.DBCHP_ID != None: equipe.update({"EquipIDFromDB":model.DBCHP_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
 
-#        if model.CHPTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelBoilerTurnKeyPrice})
-#        else:
-        logDebug("ModuleCHP: turn key price of CHP equipment model %s not specified"%equipe.Model)
-        equipe.update({"TurnKeyPrice":0.0})
-###### E.F. 12/10
+        if model.InvRate is not None:
+            try:
+                turnKeyPrice = model.InvRate*model.CHPPe
+            except:
+                logDebug("ModuleCHP: turn key price of CHP equipment model %s not specified"%equipe.Model)
+                turnKeyPrice = 0.0
+            equipe.update({"TurnKeyPrice":turnKeyPrice})
+
         if model.OMRateFix is not None: equipe.update({"OandMfix":model.OMRateFix})
         else:
             logDebug("ModuleCHP: fix costs for O and M of CHP model %s not specified"%equipe.Model)
@@ -358,7 +391,6 @@ class ModuleCHP(object):
         else:
             logDebug("ModuleCHP: variable costs for O and M of CHP model %s not specified"%equipe.Model)
             equipe.update({"OandMvar":0.0})
-######
 
 
         Status.SQL.commit()
@@ -389,11 +421,25 @@ class ModuleCHP(object):
 
         CHPModel = equipe.Model
         CHPType = equipe.EquipType
+        CHPSubType = getEquipmentSubClass(CHPType)
+        print "ModuleCHP (cEF): type %s subtype: %s"%(CHPType,CHPSubType)
         PNom = equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
-        COPe = equipe.HCTEEfficiency
+        COPe = equipe.HCGEEfficiency
+
+        if COPh_nom > 0:
+            ElHeatRatio = COPe/COPh_nom
+        else:
+            ElHeatRatio = 0.0
+            
         TMax = equipe.TMaxSupply
         EquipmentNo = equipe.EqNo
+
+        print "ModuleCHP (cEF): equipment data"
+        print equipe
+        print "Tmax = ",TMax
+        print "Pnom = ",PNom
+        print "COP el/th = ",COPh_nom,COPe
 
         if PNom is None:
             PNom = 0.0
@@ -427,41 +473,111 @@ class ModuleCHP(object):
         QHXj_T = Status.int.createQ_T()
 
 #..............................................................................
+# define temperature profile of heat that can be supplied, depending on the subtype
+
+        dUSHMax_T = Status.int.createQ_T()
+
+        QStorageMax_T = Status.int.createQ_T()
+        QStorage_T = Status.int.createQ_T()
+        QDStorage_T = Status.int.createQ_T()
+
+        if CHPSubType   == "CHP engine":
+            TMin = TMax - 20
+        elif CHPSubType == "CHP steam turbine":
+            TMin = min(TMax,80)
+        elif CHPSubType == "CHP gas turbine":
+            TMin = min(TMax,80)
+        elif CHPSubType == "CHP fuel cell":
+            TMin = min(TMax,80)
+        else:
+            TMin = min(TMax,80)
+
+        tauStorage = 4.0    #default: 4 hours of storage supposed
+        
+        DT = max(TMax-TMin,1.e-10)  #security: avoid division by zero
+        dQMax = PNom * Status.TimeStep
+            
+        for iT in range(Status.NT+2):
+            T = iT*Status.TemperatureInterval
+            if T < TMin:
+                dUSHMax_T[iT] = 0.0
+            elif T <= TMax:
+                f = (T-TMin)/DT
+                dUSHMax_T[iT] = f*dQMax
+            else:
+                dUSHMax_T[iT] = dQMax
+
+            QStorageMax_T[iT] = PNom*tauStorage*min(T/TMax,1.0)
+            QStorage_T[iT] = 1.0*QStorageMax_T[iT]
+            QDStorage_T[iT] = 0.0*QStorageMax_T[iT]
+                
+
+
+#..............................................................................
 # Start hourly loop
 
         USHj = 0
         QHXj = 0
+        ElGen = 0
         HPerYear = 0
         QD = 0
 
+        QDeff_T = Status.int.createQ_T()
+        dUSHeff_T = Status.int.createQ_T()
+        dUSHact_T = Status.int.createQ_T() #actual power of CHP
+
         for it in range(Status.Nt):
+
+            print "it: %s=============================================="%it
 
 #..............................................................................
 # Calculate heat delivered by the given equipment for each time interval
 
             for iT in range (Status.NT+2):
-                QHXj_Tt[iT][it] = 0     #for the moment no waste heat considered
+                QDeff_T[iT] = QD_Tt[iT][it] + QDStorage_T[iT]
+                dUSHeff_T[iT] = dUSHMax_T[iT] + QStorage_T[iT]
+
+#            print "QD: %s QDStorage %s QDeff %s"%(QDeff_T[Status.NT+1],QDStorage_T[Status.NT+1],QD_Tt[Status.NT+1][it])
+#            print "dUSH: %s QStorage %s dUSHeff %s"%(dUSHMax_T[Status.NT+1],QStorage_T[Status.NT+1],dUSHeff_T[Status.NT+1])
+            
+            shift = 0.0 # first determine pinch shift for present time step
+            for iT in range (Status.NT+2):
+                shift = max(shift,dUSHeff_T[iT] - QDeff_T[iT])
+#                print "calculating shift: iT %s dUSHeff %s QD %s shift %s"%\
+#                       (iT,dUSHeff_T[iT],QDeff_T[iT],shift)
                 
-                if TMax >= Status.int.T[iT] :   #TMax is the max operating temperature of the boiler 
-                    USHj_Tt[iT][it] = min(QD_Tt[iT][it],PNom*Status.TimeStep)     #from low to high T
-                    
-                else:
-                    if (iT > 0):
-                        USHj_Tt[iT][it] = USHj_Tt[iT-1][it]     #no additional heat supply at high temp.
-                    else:
-                        USHj_Tt[iT][it] = 0
-                        
+            for iT in range (Status.NT+2):                
+                dUSHeff_T[iT] = min(QDeff_T[iT],max(dUSHeff_T[iT]-shift,0.0)) 
+            
+            shift = 0.0
+            for iT in range (Status.NT+2):
+                shift = max(shift,dUSHeff_T[iT] - QD_Tt[iT][it])
+
+            for iT in range (Status.NT+2):
+
+                USHj_Tt[iT][it] = min(QD_Tt[iT][it],max(dUSHeff_T[iT] - shift,0.0)) # direct supply to demand
+
+                dUSHact_T[iT] = min(dUSHeff_T[iT],dUSHMax_T[iT])
+                dQStorage = dUSHact_T[iT] - USHj_Tt[iT][it]             # production to storage
+                QStorage_T[iT] += dQStorage                                 # negative if storage discharge
+                QDStorage_T[iT] -= dQStorage
+                
                 QD_Tt[iT][it]= QD_Tt[iT][it]- USHj_Tt[iT][it]
                 
+                QHXj_Tt[iT][it] = 0     #for the moment no waste heat considered
+
+#            print "USH: %s dUSHact: %s dQStorage %s"%(USHj_Tt[Status.NT+1][it],dUSHact_T[Status.NT+1],dQStorage)
+                
             USHj += USHj_Tt[Status.NT+1][it]
-            if USHj_Tt[Status.NT+1][it]>0:
+            
+            if dUSHact_T[Status.NT+1] > 0:
                 HPerYear += Status.TimeStep
 
             QD += QD_Tt[Status.NT+1][it]
 
 #..............................................................................
 # End of year reached. Store results in interfaces
-       
+        
 # remaining heat demand and availability for next equipment in cascade
         Status.int.QD_Tt_mod[cascadeIndex] = QD_Tt
         Status.int.QD_T_mod[cascadeIndex] = Status.int.calcQ_T(QD_Tt)
@@ -480,20 +596,21 @@ class ModuleCHP(object):
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
         Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
-        logTrack("ModuleCHP (calculateEnergyFlows): Total energy supplied by equipment %s MWh"%(USHj*Status.EXTRAPOLATE_TO_YEAR))
-        logTrack("ModuleCHP (calculateEnergyFlows): Total waste heat input  %s MWh"%(QHXj*Status.EXTRAPOLATE_TO_YEAR))
-
         Status.int.cascadeUpdateLevel = cascadeIndex
 
 #........................................................................
 # Global results (annual energy flows)
 
-        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
+        QD *= Status.EXTRAPOLATE_TO_YEAR
+        USHj *= Status.EXTRAPOLATE_TO_YEAR
+        HPerYear *= Status.EXTRAPOLATE_TO_YEAR
+        
+        Status.int.USHj[cascadeIndex-1] = USHj
 
         if COPh_nom > 0:
-            FETFuel_j = USHj*Status.EXTRAPOLATE_TO_YEAR/COPh_nom
-            print "ModuelCHP (cEF): converting USH [%s] to FET [%s]"%\
-                  (USHj*Status.EXTRAPOLATE_TO_YEAR,FETFuel_j*Status.EXTRAPOLATE_TO_YEAR)
+            FETFuel_j = USHj/COPh_nom
+#            print "ModuelCHP (cEF): converting USH [%s] to FET [%s]"%\
+#                  (USHj,FETFuel_j)
         else:
             FETFuel_j = 0.0
             showWarning("Strange boiler with COP = 0.0")
@@ -502,17 +619,17 @@ class ModuleCHP(object):
         
         Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j
         Status.int.FETel_j[cascadeIndex-1] = FETel_j
-        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
         
-        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
+        logTrack("CHP: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
                    (equipe.EqNo,\
-                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    FETFuel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+                    USHj/1000.0,\
+                    FETFuel_j/1000.0,\
+                    FETel_j/1000.0,\
+                    QD/1000.0,\
+                    HPerYear/1000.0))
 
-        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        self.calculateOM(equipe,USHj)
         
         return USHj    
 

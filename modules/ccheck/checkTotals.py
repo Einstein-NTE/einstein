@@ -95,20 +95,9 @@ class CheckTotals():
         
 #..............................................................................
 # reading data from table "cgeneraldata"
-        try:
-            cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
-            if len(cgeneraldataTable) > 0:
-                cgeneraldata = cgeneraldataTable[0]
-
-#                self.FEO.setValue(cgeneraldata.FEO)
-#                self.FEC.setValue(cgeneraldata.FEC)
-#                self.FET.setValue(cgeneraldata.FET)
-#                self.USH.setValue(cgeneraldata.USH)
-#                self.UPH.setValue(cgeneraldata.UPH)
-                
-        except:
-            print "CheckTotals (importData): error reading data from cgeneraldata"
-            pass
+        cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
+        if len(cgeneraldataTable) > 0:
+            cgeneraldata = cgeneraldataTable[0]
 
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -137,6 +126,7 @@ class CheckTotals():
                 
             else:
                 logDebug("CheckTotals (exportData): error writing data to cgeneraldata")
+
 
 #------------------------------------------------------------------------------        
     def showAll(self):
@@ -217,7 +207,7 @@ class CheckTotals():
 
                 print "Step 4: second cross checking"
                
-            #self.ccheckAll()    #not necessary while adjust is not implemented
+            self.ccheckAll()    #not necessary while adjust is not implemented
                           
             if DEBUG in ["ALL"]:
                 self.showAll()

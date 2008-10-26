@@ -291,13 +291,16 @@ class ModuleCC(object):
 # import data on fuel and electricity consumption (FET)
 
         self.NFET = Status.NFET
-        NI = self.NFET
-        self.FETi = CCRow("FETi",NI)
+        NI = self.NFET-1
+        
+        self.FETFuel_i = CCRow("FETi",NI)
         self.FECi = CCRow("FETi",NI)
+        self.ElGenera = CCPar("ElGenera")
 
-        self.ccFET.append(CheckFETel())     
-        for i in range(1,NI):      
-            self.ccFET.append(CheckFETfuel(i))
+        self.ccFETel = CheckFETel()
+        
+        for i in range(NI):      
+            self.ccFET.append(CheckFETfuel(i+1))
 
 #..............................................................................
 # import data on existing equipment 
@@ -307,10 +310,16 @@ class ModuleCC(object):
         self.USHj = CCRow("USHj",NJ)     #note: this is a ROW of USH values, and not identical with the USHj variable within checkEq !!!
         self.FETj = CCRow("FETj",NJ)     #creates the space for intermediate storge towards matrix
         self.FETFuel_j = CCRow("FETFuel_j",NJ)     #creates the space for intermediate storge towards matrix
-        self.FETel_j = CCRow("FETel_j",NJ)     #creates the space for intermediate storge towards matrix
+        self.FETel_c_j = CCRow("FETel_c_j",NJ)     #creates the space for intermediate storge towards matrix
+        self.FETel_c = CCPar("FETel_c")     #creates the space for intermediate storge towards matrix
+        self.ElGen_j = CCRow("ElGen_j",NJ)
+        self.ElGen = CCPar("ElGen")     #creates the space for intermediate storge towards matrix
+
         self.QHXEq = CCRow("QHXEq",NJ)      # incoming waste heat from heat recovery
         self.QWHEq = CCRow("QWHEq",NJ)    # outgoing waste heat to be recovered
 
+        self.ElGen_j = CCRow("ElGen_j",NJ)
+        
         for j in range(NJ):
             self.ccEq.append(CheckEq(j))     # añade un objeto checkEq con todas las variables necesarias a la lista
 
@@ -365,8 +374,9 @@ class ModuleCC(object):
 #..............................................................................
 # import data on link of fuels and equipment
 
-        self.FETFuelMatrix = CheckMatrix("FETFuel",self.FETi[1:NI+1],self.FETFuel_j,Status.FETFuelLink)
-        self.FETelMatrix = CheckMatrix("FETel",self.FETi[0:1],self.FETel_j,Status.FETelLink)
+        self.FETFuelMatrix = CheckMatrix("FETFuel",self.FETFuel_i,self.FETFuel_j,Status.FETFuelLink)
+        self.FETel_cMatrix = CheckMatrix("FETel_c",[self.FETel_c],self.FETel_c_j,Status.FETelLink)
+        self.ElGenMatrix = CheckMatrix("ElGen",[self.ElGen],self.ElGen_j,Status.FETelLink)
 
 #..............................................................................
 # import data on link of equipment and pipes
@@ -394,8 +404,7 @@ class ModuleCC(object):
 # import data on existing totals
 
         self.UPHk = CCRow("UPHk",NK) 
-        self.totals = CheckTotals("Totals",self.FECi,self.FETi,self.USHj,self.UPHk) # añade un objeto checkProc con todas las variables necesarias a la listac
-
+        self.totals = CheckTotals("Totals",self.FECi,self.FETFuel_i,self.USHj,self.UPHk)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -464,24 +473,27 @@ class ModuleCC(object):
                 print "ModuleCC: checking fuels (FET)"
                 print "===================================================="
 
-            NI = self.NFET
+            NI = self.NFET-1
             
             if DEBUG in ["ALL"]:
                 print "checking electricity consumption"
 
             conflict.setDataGroup("Electricity","-")
-            self.ccFET[0].check()
-            self.FETi[0].update(self.ccFET[0].FETel)
-            self.FECi[0].update(self.ccFET[0].FECel)
+            
+            self.ccFETel.check()
+            
+            self.FETel_c.update(self.ccFETel.FETel_c)
+            self.ElGenera.update(self.ccFETel.ElectricityGen)
 
-            for i in range(1,NI):       #then check all the Nfuels = NI-1 fuels
+            for i in range(NI):       #then check all the Nfuels = NI-1 fuels
 
                 if DEBUG in ["ALL"]:
-                    print "checking fuel no. %s"%i
+                    print "checking fuel no. %s"%(i+1)
 
                 conflict.setDataGroup("Fuel",i)
+                
                 self.ccFET[i].check()
-                self.FETi[i].update(self.ccFET[i].FETFuel)
+                self.FETFuel_i[i].update(self.ccFET[i].FETFuel)
                 self.FECi[i].update(self.ccFET[i].FECFuel)
             
 #..............................................................................
@@ -504,9 +516,10 @@ class ModuleCC(object):
                 self.USHj[j].update(self.ccEq[j].USHj)      #obtain results 
                 self.FETj[j].update(self.ccEq[j].FETj)
                 self.FETFuel_j[j].update(self.ccEq[j].FETFuel_j)
-                self.FETel_j[j].update(self.ccEq[j].FETel_j)
                 
-
+                self.FETel_c_j[j].update(self.ccEq[j].FETel_c_j)
+                self.ElGen_j[j].update(self.ccEq[j].ElGen_j)
+                
                 self.QHXEq[j].update(self.ccEq[j].QHXEq)
                 self.QWHEq[j].update(self.ccEq[j].QWHEq)
 
@@ -629,16 +642,19 @@ class ModuleCC(object):
 
 #                self.FETMatrix.check()
                 self.FETFuelMatrix.check()
-                self.FETelMatrix.check()
+                self.FETel_cMatrix.check()
+                self.ElGenMatrix.check()
 
-                self.ccFET[0].FETel.update(self.FETi[0])
-                for i in range(1,NI):
-                    self.ccFET[i].FETFuel.update(self.FETi[i])
+                self.ccFETel.FETel_c.update(self.FETel_c)
+                self.ccFETel.ElectricityGen.update(self.ElGen)
+                for i in range(NI):
+                    self.ccFET[i].FETFuel.update(self.FETFuel_i[i])
 
                 for j in range(NJ):
 #                    self.ccEq[j].FETj.update(self.FETj[j])
                     self.ccEq[j].FETFuel_j.update(self.FETFuel_j[j])
-                    self.ccEq[j].FETel_j.update(self.FETel_j[j])
+                    self.ccEq[j].FETel_c_j.update(self.FETel_c_j[j])
+                    self.ccEq[j].ElGen_j.update(self.ElGen_j[j])
 
 #..............................................................................
 # If any matrix conflict appears, break immediately.
@@ -772,8 +788,11 @@ class ModuleCC(object):
 
         screen.reset()
 
+        screen.setDataGroup("FETel",0)
+        self.ccFETel.screen()
+        
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
-            screen.setDataGroup("FET",i)
+            screen.setDataGroup("FET",i+1)
             self.ccFET[i].screen()
         for j in range(NJ):       
             screen.setDataGroup("Eq.",j+1)
@@ -804,6 +823,7 @@ class ModuleCC(object):
         logTrack("ModuleCC (basicCheck): exporting results to SQL")
         print NI,NJ,NK,NM,NH,NN
         
+        self.ccFETel.exportData()
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
             self.ccFET[i].exportData()
         for j in range(NJ):       
@@ -829,12 +849,13 @@ class ModuleCC(object):
 #   calls the functions "estimate()" of all the checkers ...
 #------------------------------------------------------------------------------
 
-        NI = self.NFET
+#       self.ccFETel.estimate()
+        NI = self.NFET-1
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
 #            self.ccFET[i].estimate()
             pass
-        screen.setDataGroup("FET",0)
-        self.ccFET[0].estimate() #for the moment estimate implemented only in
+        screen.setDataGroup("FETel",0)
+        self.ccFETel.estimate() #for the moment estimate implemented only in
                                     #FETel as an example
         
         NJ = self.NEquipe

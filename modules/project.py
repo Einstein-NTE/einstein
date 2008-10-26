@@ -371,6 +371,8 @@ class Project(object):
                             "-","---","---","---"]]
 
         alternativeList = []
+        if Status.PId is None or Status.PId <= 0:
+            return alternativeList
         
         for ANo in range(-1,Status.NoOfAlternatives+1):
             aa = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[ANo]
@@ -588,6 +590,7 @@ class Project(object):
             Status.ActiveProjectName = "---"
             Status.ActiveProjectDescription = "---"
             self.setFinalAlternative(None)
+            Status.NoOfAlternatives = -1
             
             logTrack("Project (setActiveProject): no project selected")
 

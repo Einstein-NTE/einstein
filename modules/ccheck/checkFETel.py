@@ -63,8 +63,12 @@ class CheckFETel():
         self.ElectricityNet1 = CCPar("ElectricityNet1")
         
         self.ElectricityGen1 = CCPar("ElectricityGen1")
+        self.ElectricityGen2 = CCPar("ElectricityGen2")
+        self.ElectricityGen3 = CCPar("ElectricityGen3")
+        
         self.ElectricitySales1 = CCPar("ElectricitySales1")
         self.ElectricityTotYear1 = CCPar("ElectricityTotYear1")
+        self.ElectricityTotYear2 = CCPar("ElectricityTotYear2")
 
         self.ElectricityMotors1 = CCPar("ElectricityMotors1")
         self.ElectricityChem1 = CCPar("ElectricityChem1")
@@ -73,13 +77,20 @@ class CheckFETel():
         self.ElectricityAC1 = CCPar("ElectricityAC1")
         self.ElectricityThOther1 = CCPar("ElectricityThOther1")
 
-        self.FECel1 = CCPar("FECel1")
-        self.FECel = CCPar("FECel",priority=1)
+        self.FECel_c1 = CCPar("FECel_c1")
+        self.FECel_c = CCPar("FECel_c",priority=1)
+        self.FECel = CCPar("FECel",priority=1,parType="S")
+        self.FECel1 = CCPar("FECel1",parType="S")
         self.FEOel1 = CCPar("FEOel1")
         self.FEOel = CCPar("FEOel")
-        self.FETel1 = CCPar("FETel1")
-        self.FETel2 = CCPar("FETel2")
-        self.FETel = CCPar("FETel",priority=1)
+        
+        self.FETel_c1 = CCPar("FETel_c1")
+        self.FETel_c2 = CCPar("FETel_c2")
+        self.FETel_c3 = CCPar("FETel_c3")
+        self.FETel_c = CCPar("FETel_c",priority=1)
+
+        self.FETel = CCPar("FETel",priority=1,parType="S")
+        self.FETel1 = CCPar("FETel1",parType="S")
         
         self.importData(0)
 
@@ -218,6 +229,8 @@ class CheckFETel():
         self.ElectricityTotYear.show()
         self.FECel1.show()
         self.FECel.show()
+        self.FECel_c1.show()
+        self.FECel_c.show()
         self.ElectricityMotors.show()
         self.ElectricityChem.show()
         self.ElectricityLight.show()
@@ -226,8 +239,10 @@ class CheckFETel():
         self.ElectricityThOther.show()
         self.FEOel1.show()
         self.FEOel.show()
+        self.FETel_c1.show()
+        self.FETel_c2.show()
+        self.FETel_c.show()
         self.FETel1.show()
-        self.FETel2.show()
         self.FETel.show()
                   
         print "====================="
@@ -273,18 +288,20 @@ class CheckFETel():
         
 # Step 1: Call all calculation routines in a given sequence
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 print "Step 1: calculating from left to right (CALC)"
             
             self.ElectricityNet1 = calcDiff("ElectricityNet1",self.ElectricityGen,self.ElectricitySales)
-            self.FECel1 = calcSum("FECel1",self.ElectricityNet,self.ElectricityTotYear)
+            self.FECel_c1 = calcSum("FECel1",self.ElectricityNet,self.ElectricityTotYear)
+            self.FECel = calcDiff("FECel",self.ElectricityTotYear,self.ElectricityGen,parType="S")
 
             self.FEOel1 = calcSum3("FEOel1",self.ElectricityMotors,self.ElectricityChem,self.ElectricityLight)
-            self.FETel1 = calcDiff("FETel1",self.FECel,self.FEOel)
-            self.FETel2 = calcSum3("FETel2",self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
+            self.FETel_c1 = calcDiff("FETel_c1",self.FECel_c,self.FEOel)
+            self.FETel_c2 = calcSum3("FETel_c2",self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
+            self.FETel1 = calcDiff("FETel",self.FETel_c,self.ElectricityGen,parType="S")
 
                       
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllFETel()
 
 # Step 2: Cross check the variables
@@ -293,22 +310,24 @@ class CheckFETel():
 
             self.ccheckAll()
 
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllFETel()
 
 # Step 3: Adjust the variables (inverse of calculation routines)
 
                 print "Step 3: calculating from right to left (ADJUST)"
 
-            adjustSum3(self.FETel2,self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
-            adjustDiff(self.FETel1,self.FECel,self.FEOel)
+            adjustDiff(self.FETel1,self.FETel_c2,self.ElectricityGen3)
+            adjustSum3(self.FETel_c2,self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
+            adjustDiff(self.FETel_c1,self.FECel_c,self.FEOel)
             adjustSum3(self.FEOel1,self.ElectricityMotors,self.ElectricityChem,self.ElectricityLight)
             
-            adjustSum(self.FECel1,self.ElectricityNet,self.ElectricityTotYear)
+            adjustDiff(self.FECel,self.ElectricityTotYear2,self.ElectricityGen2)
+            adjustSum(self.FECel_c1,self.ElectricityNet,self.ElectricityTotYear)
             adjustDiff(self.ElectricityNet1,self.ElectricityGen,self.ElectricitySales)
 
                         
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllFETel()
 
 # Step 4: second cross check the variables
@@ -317,7 +336,7 @@ class CheckFETel():
                
             self.ccheckAll()
             
-            if DEBUG in ["ALL"]:
+            if DEBUG in ["ALL","MAIN"]:
                 self.showAllFETel()
         
 
@@ -333,8 +352,8 @@ class CheckFETel():
 #   ccheck block
 #------------------------------------------------------------------------------
         ccheck1(self.ElectricityNet,self.ElectricityNet1)
-        ccheck1(self.ElectricityTotYear,self.ElectricityTotYear1)
-        ccheck1(self.ElectricityGen,self.ElectricityGen1)
+        ccheck2(self.ElectricityTotYear,self.ElectricityTotYear1,self.ElectricityTotYear2)
+        ccheck2(self.ElectricityGen,self.ElectricityGen1,self.ElectricityGen2)
         ccheck1(self.ElectricitySales,self.ElectricitySales1)
 
         ccheck1(self.ElectricityMotors,self.ElectricityMotors1)
@@ -344,9 +363,11 @@ class CheckFETel():
         ccheck1(self.ElectricityAC,self.ElectricityAC1)
         ccheck1(self.ElectricityThOther,self.ElectricityThOther1)
 
+        ccheck1(self.FECel_c,self.FECel_c1)
         ccheck1(self.FECel,self.FECel1)
         ccheck1(self.FEOel,self.FEOel1)
-        ccheck2(self.FETel,self.FETel1,self.FETel2)
+        ccheck2(self.FETel_c,self.FETel_c1,self.FETel_c2)
+        ccheck1(self.FETel,self.FETel1)
                           
 #------------------------------------------------------------------------------
     def estimate(self):  

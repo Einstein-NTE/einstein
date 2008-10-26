@@ -343,7 +343,7 @@ UNITSYSTEM = {
                 'HEATTRANSFERCOEF':'kW/K',
                 'ANGLE':'º',
                 'FRACTION':'-',
-                'GROWTHRATE':'%/a',
+                'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/GJ'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
@@ -371,7 +371,7 @@ UNITSYSTEM = {
                 'HEATTRANSFERCOEF':'kW/K',
                 'ANGLE':'º',
                 'FRACTION':'-',
-                'GROWTHRATE':'%/a',
+                'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/MWh'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 },
@@ -399,7 +399,7 @@ UNITSYSTEM = {
                 'HEATTRANSFERCOEF':'btu/hºF',
                 'ANGLE':'º',
                 'FRACTION':'-',
-                'GROWTHRATE':'%/a',
+                'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,
                 'PRICE':'%s'%CURRENCY
                 }

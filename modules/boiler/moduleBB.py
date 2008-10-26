@@ -37,6 +37,7 @@
 #                           Hans Schweiger      16/09/2008
 #                           Hans Schweiger      03/10/2008
 #                           Enrico Facci        12/10/2008
+#                           Enrico Facci        26/10/2008
 #
 #       Changes to previous version:
 #       2008-3-15 Added graphics functionality
@@ -86,6 +87,8 @@
 #       16/09/2008: HS  change in function findmaxTemp: -> attempt to eliminate rounding errors ...
 #       03/10/2008: HS  calculateOM added
 #       12/10/08: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
+#       16/10/08: EF    changes in designBB80 and designBB140 to avoid the add of unusefull boilers.
+#                       changes in calculateEnergyFlows: Calulation of QWHEqj and TExhaustGas added.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -910,8 +913,8 @@ class ModuleBB(object):
                 print "point AB reached"
                 if self.QDh80[0]*self.securityMargin>=2*self.minPow:
                     print "point AC reached"
-                    if self.QDh80[0]*self.securityMargin < self.QDh80[int(self.minOpTime)]*1.3 \
-                       or (self.QDh80[0]*self.securityMargin - self.QDh80[int(self.minOpTime)]) < self.minPow:
+                    if self.QDh80[0]*self.securityMargin < self.QDh80[int((self.minOpTime)*Status.Nt/8760)]*1.3 \
+                       or (self.QDh80[0]*self.securityMargin - self.QDh80[int((self.minOpTime)*Status.Nt/8760)]) < self.minPow:
                         print "point A reached"
                         modelID = self.selectBB((self.QDh80[0]*self.securityMargin),80)  #select the right bb from the database.                        
 #HS line not valid code                        selectBB((QDh_descending[0]*securityMargin),...)  #select the right bb from the database.
@@ -919,16 +922,18 @@ class ModuleBB(object):
                         self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 #HS: elif requires a condition !!!                    elif:
                     else:
-                        if self.QDh80[int(self.minOpTime)]>self.bigger80:
-                            for i in range (int(self.QDh80[int(self.minOpTime)]/self.bigger80)):
+                        if self.QDh80[int((self.minOpTime)*Status.Nt/8760)]>self.bigger80:
+                            for i in range (int(self.QDh80[int((self.minOpTime)*Status.Nt/8760)]/self.bigger80)):
                                 print "point B reached"
                                 modelID =self.selectBB(self.bigger80,80)
                                 equipe = self.addEquipmentDummy()
                                 self.setEquipmentFromDB(equipe,modelID)
-                            added += int(self.QDh80[int(self.minOpTime)]/self.bigger80)*self.bigger80
+                            added += int(self.QDh80[int((self.minOpTime)*Status.Nt/8760)]/self.bigger80)*self.bigger80
                         else:
-                            print "point C reached"
-                            modelID =self.selectBB(self.QDh80[int(self.minOpTime)],80) #aggiungere condizione sul rendimento
+                            print "point C reached; the demand at 1000hours, at the minOpTime and the minOpTime itself are:", self.QDh80[1000],\
+                                  self.QDh80[int((self.minOpTime)*Status.Nt/8760)], self.minOpTime
+                            print "point CC reached; the length of self.QDh80 is: ", len(self.QDh80)
+                            modelID =self.selectBB(self.QDh80[int((self.minOpTime)*Status.Nt/8760)],80) #aggiungere condizione sul rendimento
                             equipe = self.addEquipmentDummy()
                             self.setEquipmentFromDB(equipe,modelID)
                             added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom
@@ -955,10 +960,11 @@ class ModuleBB(object):
                                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                         else:
 #HS: elif requires a condition !!!                        elif:
-                            print "point G reached"
-                            modelID=self.selectBB((self.QDh80[0]*self.securityMargin - added),80)
-                            equipe = self.addEquipmentDummy()
-                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                            print "point G reached; added and self.QDh80[0]*self.securityMargin are: ",added , self.QDh80[0]*self.securityMargin
+                            if added < self.QDh80[0]*self.securityMargin:                                                       #EF 26/10/2008
+                                modelID=self.selectBB(min((self.QDh80[0]*self.securityMargin - added),self.minPow),80)          #EF 26/10/2008
+                                equipe = self.addEquipmentDummy()
+                                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                 else:
 #HS: elif requires a condition !!!                elif:
                     print "point H reached"
@@ -987,8 +993,8 @@ class ModuleBB(object):
                 print "point A2 reached"
                 if self.QDh140[0]*self.securityMargin>=2*self.minPow:
                     print "point A3 reached"
-                    if self.QDh140[0]*self.securityMargin < self.QDh140[int(self.minOpTime)]*1.3 or \
-                    self.QDh140[0]*self.securityMargin -self.QDh140[int(self.minOpTime)]<self.minPow:
+                    if self.QDh140[0]*self.securityMargin < self.QDh140[int((self.minOpTime)*Status.Nt/8760)]*1.3 or \
+                    self.QDh140[0]*self.securityMargin -self.QDh140[int((self.minOpTime)*Status.Nt/8760)]<self.minPow:
                         print "point A4 reached"
                     
 #HS TAKE CARE !!!! methods of the same class have to be called with the "self." before
@@ -1000,16 +1006,16 @@ class ModuleBB(object):
 
                     else:
 #HS: elif requires a condition !!!                    elif:
-                        if self.QDh140[int(self.minOpTime)]>self.bigger140:
-                            for i in range (int(self.QDh140[int(self.minOpTime)]/self.bigger140)):
+                        if self.QDh140[int((self.minOpTime)*Status.Nt/8760)]>self.bigger140:
+                            for i in range (int(self.QDh140[int((self.minOpTime)*Status.Nt/8760)]/self.bigger140)):
                                 print "point B1 reached"
                                 modelID =self.selectBB(self.bigger140,140)
                                 equipe = self.addEquipmentDummy()
                                 self.setEquipmentFromDB(equipe,modelID)
-                            added += int(self.QDh140[int(self.minOpTime)]/self.bigger140)*self.bigger140
+                            added += int(self.QDh140[int((self.minOpTime)*Status.Nt/8760)]/self.bigger140)*self.bigger140
                         else:
                             print "point C1 reached"
-                            modelID =self.selectBB(self.QDh140[int(self.minOpTime)],140)  #  select the base load boiler from DB
+                            modelID =self.selectBB(self.QDh140[int((self.minOpTime)*Status.Nt/8760)],140)  #  select the base load boiler from DB
                             equipe = self.addEquipmentDummy()
                             self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                             added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom
@@ -1037,9 +1043,11 @@ class ModuleBB(object):
                             
                         else:
                             print "point G1 reached"
-                            self.selectBB((self.QDh140[0]*self.securityMargin - added),140)
-                            equipe = self.addEquipmentDummy()
-                            self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                            if added < self.QDh140[0]*self.securityMargin:                                                 #EF 26/10/2008     
+                                modelID=self.selectBB(min((self.QDh140[0]*self.securityMargin - added),self.minPow),140)    #EF 26/10/2008
+                                equipe = self.addEquipmentDummy()
+                                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+
 
                 else:
                     print "point H1 reached"
@@ -1057,21 +1065,21 @@ class ModuleBB(object):
         print "moduleBB starting function 'designBBmaxTemp'"
         added=0
         if self.QDhmaxTemp[0]*self.securityMargin>=2*self.minPow:
-            if self.QDhmaxTemp[0]*self.securityMargin < self.QDhmaxTemp[int(self.minOpTime)]*1.3 \
-               or (self.QDhmaxTemp[0]*self.securityMargin - self.QDhmaxTemp[int(self.minOpTime)]) < self.minPow:
+            if self.QDhmaxTemp[0]*self.securityMargin < self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)]*1.3 \
+               or (self.QDhmaxTemp[0]*self.securityMargin - self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)]) < self.minPow:
                 modelID = self.selectBB(max((self.QDhmaxTemp[0]*self.securityMargin),self.minPow),self.maxTemp) #HS....,...)  #select the right bb from the database.
                 equipe = self.addEquipmentDummy()
                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
 
             else:
-                if self.QDhmaxTemp[int(self.minOpTime)]>self.biggermaxTemp:
-                    for i in range (int(self.QDhmaxTemp[int(self.minOpTime)]/self.biggermaxTemp)):
+                if self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)]>self.biggermaxTemp:
+                    for i in range (int(self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)]/self.biggermaxTemp)):
                         modelID =self.selectBB(self.biggermaxTemp,self.maxTemp)
                         equipe = self.addEquipmentDummy()
                         self.setEquipmentFromDB(equipe,modelID)
-                    added += int(self.QDhmaxTemp[int(self.minOpTime)]/self.biggermaxTemp)*self.biggermaxTemp
+                    added += int(self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)]/self.biggermaxTemp)*self.biggermaxTemp
                 else:
-                    modelID =self.selectBB(max(self.QDhmaxTemp[int(self.minOpTime)],self.minPow),self.maxTemp)
+                    modelID =self.selectBB(max(self.QDhmaxTemp[int((self.minOpTime)*Status.Nt/8760)],self.minPow),self.maxTemp)
                     equipe = self.addEquipmentDummy()
                     self.setEquipmentFromDB(equipe,modelID)
                     added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom
@@ -1220,12 +1228,15 @@ class ModuleBB(object):
         b=max((QDmax  - exBP),0)
         b1= max(((QDmax  * self.securityMargin) - exBP),0) #   minimum power of the new boilers at 80°C
         c=[]
+        print "moduleBB, design assistant: the length of Status.Nt is: ", Status.Nt
         for it in range (Status.Nt):
             c.append ( min (b, Status.int.QD_Tt_mod[self.firstBB][iT80][it]))
 
         self.QDh80=c  # demand to be supplied by new boilers at 80°C
 
         self.QDh80.sort(reverse=True)
+        print 'moduleBB, design assistant: QDmax, b, self.QDh80[0], exBP are:', QDmax, b, self.QDh80[0], exBP
+        print "moduleBB, design assistant: the length of self.QDh80 is: ", len(self.QDh80)
         if self.QDh80[0]>0:
             self.designBB80()
 

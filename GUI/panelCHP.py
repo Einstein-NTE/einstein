@@ -508,6 +508,9 @@ class PanelCHP(wx.Panel):
 #..............................................................................
 # Step 1 design assistant: gets a preselected list of possible heat pumps
 
+        showWarning("Sorry: the auto-design for CHP is not yet available. Coming soon")
+        return
+    
         (mode,CHPList) = self.mod.designAssistant1()
         logTrack("PanelHP: preselected heat pumps %s"%CHPList)
         

@@ -75,6 +75,7 @@ class CheckEq():
         self.HPerYearEqNom1 = CCPar("HPerYearEqNom1")
         self.HPerYearEqNom2 = CCPar("HPerYearEqNom2")
         self.HPerYearEqNom3 = CCPar("HPerYearEqNom3")#
+        self.HPerYearEqNom4 = CCPar("HPerYearEqNom4")#
         self.HPerDayEq1 = CCPar("HPerDayEq1")
         
         self.HCGPnom1 = CCPar("HCGPnom1")
@@ -88,8 +89,13 @@ class CheckEq():
         self.HCGTEfficiency1 = CCPar("HCGTEfficiency1")
         self.HCGTEfficiency2 = CCPar("HCGTEfficiency2")
         self.HCGTEfficiency3 = CCPar("HCGTEfficiency3")
+
+        self.HCGEEfficiency1 = CCPar("HCGEEfficiency1")
+        self.HCGEEfficiency2 = CCPar("HCGEEfficiency2")
+
         self.ConvLoss = CCPar("ConvLoss")
         self.ConvLoss1 = CCPar("ConvLoss1")
+        self.ConvLoss2 = CCPar("ConvLoss2")
         self.LossFactEq1 = CCPar("LossFactEq1")
         self.QConvLoss = CCPar("QConvLoss")
         self.QConvLoss1 = CCPar("QConvLoss1")
@@ -100,16 +106,28 @@ class CheckEq():
         self.FETj2 = CCPar("FETj2")
         self.FETj3 = CCPar("FETj3")
 
-        self.FETel_j1 = CCPar("FETel_j1") 
-        self.FETel_j2 = CCPar("FETel_j2") 
+        self.FETel_c_j1 = CCPar("FETel_c_j1") 
+        self.FETel_c_j2 = CCPar("FETel_c_j2")
+        self.FETel_c_j3 = CCPar("FETel_c_j3")
+
+        self.FETel_j1 = CCPar("FETel_j1",parType="S")
+        self.FETel_j2 = CCPar("FETel_j2",parType="S")
+        
         self.FETFuel_j1 = CCPar("FETFuel_j1") 
         self.FETFuel_j2 = CCPar("FETFuel_j2")
+        self.FETFuel_j3 = CCPar("FETFuel_j3")
+
+        self.ElGen_j1 = CCPar("ElGen_j1")
+        self.ElGen_j2 = CCPar("ElGen_j2")
+        self.ElGen_j3 = CCPar("ElGen_j3")
         
         self.FuelConsum1 = CCPar("FuelConsum1")
         self.FuelConsum2 = CCPar("FuelConsum2")#
         self.FuelConsum3 = CCPar("FuelConsum3")#
+        self.FuelConsum4 = CCPar("FuelConsum4")#
         self.ElectriConsum1 = CCPar("ElectriConsum1")
         self.ElectriConsum2 = CCPar("ElectriConsum2")
+        self.ElectriProduction1 = CCPar("ElectriProduction1")
 
         self.QHXEq1 = CCPar("QHXEq1")
         self.QHXEq2 = CCPar("QHXEq2")
@@ -163,12 +181,15 @@ class CheckEq():
 
         
         self.HCGPnom = CCPar("HCGPnom",priority=2)
+        self.ElectriProduction = CCPar("ElectriProduction",priority=2)
+        
         self.FuelConsum = CCPar("FuelConsum")
         self.ElectriConsum = CCPar("ElectriConsum")
         self.NDaysEq = CCPar("NDaysEq")
         self.HPerDayEq = CCPar("HPerDayEq")
         self.PartLoad = CCPar("PartLoad",parType="X")
         self.HCGTEfficiency = CCPar("HCGTEfficiency")
+        self.HCGEEfficiency = CCPar("HCGEEfficiency")
 
         self.TExhaustGas = CCPar("TExhaustGas", parType="T")#
         self.ExcessAirRatio = CCPar("ExcessAirRatio")#
@@ -176,8 +197,12 @@ class CheckEq():
         self.ExcessAirRatio.valMax = 2.0
 
         self.FETj = CCPar("FETj",priority=2)   # from/to the FET matrix
-        self.FETel_j = CCPar("FETel_j") 
-        self.FETFuel_j = CCPar("FETFuel_j") 
+        self.FETel_c_j = CCPar("FETel_c_j")
+        self.FETel_j = CCPar("FETel_j",priority=2,parType="S")
+        self.ElGen_j = CCPar("ElGen_j")
+
+        self.FETFuel_j = CCPar("FETFuel_j")
+        
         self.QHXEq = CCPar("QHXEq",priority=2 ) #from/to the heat recovery matrix
         self.QWHEq = CCPar("QWHEq",priority=2)  #from/to the heat recovery matrix  #
 
@@ -223,7 +248,10 @@ class CheckEq():
                     if (qgenerationhc.ExcessAirRatio is None) and (qgenerationhc.TExhaustGas is None):
                         self.ExcessAirRatio.setValue(1.05,err = 0.0)
                     else:
+                        if qgenerationhc.ExcessAirRatio is not None: #extend limits if necessary, for direct combustion burners !!!!
+                            self.ExcessAirRatio.valMax = max(qgenerationhc.ExcessAirRatio,self.ExcessAirRatio.valMax)
                         self.ExcessAirRatio.setValue (qgenerationhc.ExcessAirRatio)
+                        
 
                 self.HCGPnom.setValue(qgenerationhc.HCGPnom,err = 0.0)  #if specified, take as fixed
                 self.NDaysEq.setValue(qgenerationhc.NDaysEq, err=0.0) #integer -> 0 error
@@ -237,8 +265,8 @@ class CheckEq():
                 self.LossFactEq.valMax = 0.02
 
 #correct maximum value of efficiency for chillers and heat pumps
-                self.EquipeType = qgenerationhc.EquipType
-                self.EquipeClass = getEquipmentClass(self.EquipeType)
+                self.EquipType = qgenerationhc.EquipType
+                self.EquipeClass = getEquipmentClass(self.EquipType)
                 if self.EquipeClass in ["CH","HP"]:
                     self.HCGTEfficiency.valMax = 20.0
                 elif self.EquipeClass in ["BB"]:
@@ -249,6 +277,18 @@ class CheckEq():
                     self.HCGTEfficiency.valMax = INFINITE
                 else:
                     self.HCGTEfficiency.valMax = 1.0
+
+                if self.EquipeClass == "CHP":
+                    self.HCGEEfficiency.setValue(qgenerationhc.HCGEEfficiency)
+                    self.ElectriProduction.setValue(qgenerationhc.ElectriProduction)
+#                    self.ElGen_j.setValue(qgenerationhc.STAreaFactor)
+                else:
+                    self.HCGEEfficiency.setValue(0.0)
+                    self.ElectriProduction.setValue(0.0)
+                    self.ElGen_j.setValue(0.0)
+
+                    self.FETj.parType = None
+                    self.FETel_j.parType = None
             else:
                 logTrack("CheckEq(importData): didn't find table entry in qgenerationhc for EqNo = %s"%self.EqNo)
                 
@@ -274,10 +314,13 @@ class CheckEq():
                 qgenerationhc.HCGPnom = check(self.HCGPnom.val)
                 qgenerationhc.FuelConsum = check(self.FuelConsum.val)
                 qgenerationhc.ElectriConsum = check(self.ElectriConsum.val)
+                qgenerationhc.ElectriProduction = check(self.ElectriProduction.val)
                 qgenerationhc.NDaysEq = check(self.NDaysEq.val)
                 qgenerationhc.HPerDayEq = check(self.HPerDayEq.val)
                 qgenerationhc.PartLoad = check(self.PartLoad.val)
+                
                 qgenerationhc.HCGTEfficiency = check(self.HCGTEfficiency.val)
+                qgenerationhc.HCGEEfficiency = check(self.HCGEEfficiency.val)
 
                 qgenerationhc.HPerYearEq = check(self.HPerYearEq.val)        
                 qgenerationhc.USHj = check(self.USHj.val)        
@@ -293,126 +336,13 @@ class CheckEq():
                 qgenerationhc.FlowExhaustGas = check(self.FlowExhaustGas.val)#       
                 qgenerationhc.QExhaustGas = check(self.QExhaustGas.val)#
 
+                if self.EquipeClass == "CHP":
+                    qgenerationhc.STAreaFactor = check(self.ElGen_j.val)
 
             # self.USHBoiler not into the qgenerationhc and not exported yet   
 
                 Status.SQL.commit()
                 
-    def importTestData(self,j):  #later on should import data from SQL. now simply sets to some value
-
-        if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.FuelLCV = 50 #IMPORT this parameter from the fuelDB 
-            
-            self.HCGPnom = CCPar("HCGPnom")
-            self.HCGPnom.val = 1000
-            self.HCGPnom.sqerr = 0.0   #example: nominal power is exactly given (manufacturer parameter !)€
-            
-            self.FuelConsum = CCPar("FuelConsum")
-            self.FuelConsum.val = 1300
-            self.FuelConsum.sqerr = 0.1   #
-            
-            self.NDaysEq = CCPar("NDaysEq")
-            self.NDaysEq.val = 260 # 5 days/week
-            self.NDaysEq.sqerr = 0.0  #example: big uncertainty in operating hours
-
-            self.HPerDayEq = CCPar("HPerDayEq")
-            self.HPerDayEq.val = 10
-            self.HPerDayEq.sqerr = 0.  #example: uncertainty in operating hours
-            
-            self.PartLoad = CCPar("PartLoad")
-            self.PartLoad.val = 0.5
-            self.PartLoad.sqerr = 0.5  #example: big uncertainty in operating hours
-
-            self.HCGTEfficiency = CCPar("HCGTEfficiency")
-            self.HCGTEfficiency.val = 0.8
-            self.HCGTEfficiency.sqerr = 0.03    #efficiency rather well known ...
-
-            self.FETj = CCPar("FETj")
-            self.FETj.val = None
-            self.FETj.sqerr = INFINITE    
-
-            self.QHXEq = CCPar("QHXEq")
-            self.QHXEq.val = 1.e+6
-            self.QHXEq.sqerr = 0.01
-
-        elif TESTCASE == 3:       #global checking of algorithm
-
-            if (j==0):
-                self.FuelLCV = 10 #IMPORT this parameter from the fuelDB 
-                
-                self.HCGPnom = CCPar("HCGPnom")
-                self.HCGPnom.val = 2.0
-                self.HCGPnom.sqerr = 0.001   #example: nominal power is exactly given (manufacturer parameter !)€
-                
-                self.FuelConsum = CCPar("FuelConsum")
-                self.FuelConsum.val = None
-                self.FuelConsum.sqerr = INFINITE  #
-                
-                self.NDaysEq = CCPar("NDaysEq")
-                self.NDaysEq.val = 250 # 5 days/week
-                self.NDaysEq.sqerr = 0.001  #example: big uncertainty in operating hours
-
-                self.HPerDayEq = CCPar("HPerDayEq")
-                self.HPerDayEq.val = 16
-                self.HPerDayEq.sqerr = 0.001  #example: uncertainty in operating hours
-                
-                self.PartLoad = CCPar("PartLoad")
-                self.PartLoad.val = None
-                self.PartLoad.sqerr = INFINITE  #example: big uncertainty in operating hours
-                               
-                self.HCGTEfficiency = CCPar("HCGTEfficiency")
-                self.HCGTEfficiency.val = 0.8
-                self.HCGTEfficiency.sqerr = 0.001    #efficiency rather well known ...
-                
-                self.FETj = CCPar("FETj")
-                self.FETj.val = None
-                self.FETj.sqerr = INFINITE
-                
-                self.QHXEq = CCPar("QHXEq")
-                self.QHXEq.val = 0
-                self.QHXEq.sqerr = 0
-                
-            elif (j==1):
-                self.FuelLCV = 10 #IMPORT this parameter from the fuelDB 
-                
-                self.HCGPnom = CCPar("HCGPnom")
-                self.HCGPnom.val = 2.0
-                self.HCGPnom.sqerr = 0.0   #example: nominal power is exactly given (manufacturer parameter !)€
-                
-                self.FuelConsum = CCPar("FuelConsum")
-                self.FuelConsum.val = None
-                self.FuelConsum.sqerr = INFINITE  #
-                
-                self.NDaysEq = CCPar("NDaysEq")
-                self.NDaysEq.val = 250 # 5 days/week
-                self.NDaysEq.sqerr = 0.0  #example: big uncertainty in operating hours
-
-                self.HPerDayEq = CCPar("HPerDayEq")
-                self.HPerDayEq.val = 16
-                self.HPerDayEq.sqerr = 0.0  #example: uncertainty in operating hours
-                
-                self.PartLoad = CCPar("PartLoad")
-                self.PartLoad.val = None
-                self.PartLoad.sqerr = INFINITE  #example: big uncertainty in operating hours
-
-                self.HCGTEfficiency = CCPar("HCGTEfficiency")
-                self.HCGTEfficiency.val = 0.8
-                self.HCGTEfficiency.sqerr = 0.001    #efficiency rather well known ...
-                
-                self.FETj = CCPar("FETj")
-                self.FETj.val = None
-                self.FETj.sqerr = INFINITE
-                
-                self.QHXEq = CCPar("QHXEq") 
-                self.QHXEq.val = 0
-                self.QHXEq.sqerr = 0.01
-
-        else:
-            print "CheckUSH: WARNING - don't have input data for this test case no. ",TESTCASE
-
-        if DEBUG in ["ALL"]:
-            self.showAllUSH()
-
     def showAllUSH(self):
         
         print "====================="
@@ -433,6 +363,8 @@ class CheckEq():
         self.PartLoad.show()
         self.HCGTEfficiency.show()
         self.ConvLoss.show()
+        self.ConvLoss1.show()
+        self.ConvLoss2.show()
         self.LossFactEq.show()
         self.USHj.show()
         self.USHj1.show()#
@@ -454,12 +386,24 @@ class CheckEq():
         self.FETel_j.show()#
         self.FETel_j1.show() #
         self.FETel_j2.show() #
+
+        self.FETel_c_j.show()#
+        self.FETel_c_j1.show() #
+        self.FETel_c_j2.show() #
         self.FETFuel_j.show()# 
         self.FETFuel_j1.show()#
         self.FETFuel_j2.show()#
+        self.FETFuel_j3.show()#
                 
         self.ElectriConsum1.show()#
         self.ElectriConsum2.show()#
+
+        self.ElectriProduction.show()#
+        self.ElectriProduction1.show()#
+
+        self.ElGen_j.show()#
+        self.ElGen_j1.show()#
+        self.ElGen_j2.show()#
 
         self.FlowCombAir1.show()#
         self.FlowCombAir.show()#
@@ -555,7 +499,8 @@ class CheckEq():
             self.HPerYearEq1 = calcProd("HPerYearEq1",self.HPerDayEq,self.NDaysEq)
             self.HPerYearEqNom1 = calcProd("HPerYearEqNom1",self.HPerYearEq,self.PartLoad)
             self.USHBoiler1 = calcProd("USHBoiler1",self.HCGPnom,self.HPerYearEqNom)
-            self.FETel_j1 = calcProd("FETel_j",self.ElectriConsum2,self.HPerYearEqNom2)
+            self.FETel_c_j1 = calcProd("FETel_c_j1",self.ElectriConsum2,self.HPerYearEqNom2)
+            self.FETel_j1 = calcDiff("FETel_j1",self.FETel_c_j,self.ElGen_j,parType="S")
             self.QExhaustGas1 = calcProd("QExhaustGas1",self.QExhaustGasdot,self.HPerYearEqNom3)#
             
             if self.mainSource == "Fuel":
@@ -563,11 +508,11 @@ class CheckEq():
                 self.USHBoiler2 = calcProd("USHBoiler2",self.FETFuel_j,self.HCGTEfficiency1)
                 self.HCGPnom1 = calcProdC("HCGPnom1",self.FuelLCV,self.FuelConsum2,self.HCGTEfficiency)#
             else:
-                self.USHBoiler2 = calcProd("USHBoiler2",self.FETel_j,self.HCGTEfficiency1)
+                self.USHBoiler2 = calcProd("USHBoiler2",self.FETel_c_j,self.HCGTEfficiency1)
                 self.HCGPnom1 = calcProd("HCGPnom1",self.ElectriConsum,self.HCGTEfficiency)
                 
             self.USHj1 = calcSum("USH1",self.USHBoiler,self.QHXEq)
-            self.FETj1 = calcSum("FETj1",self.FETFuel_j,self.FETel_j)
+            self.FETj1 = calcSum("FETj1",self.FETFuel_j,self.FETel_j,parType="S")
 
             self.QLossEq1= calcProd("QLossEq1",self.LossFactEq,self.USHj2)#
             self.QOutEq1 = calcSum("QOutEq1",self.QLossEq,self.USHj3)#
@@ -578,6 +523,11 @@ class CheckEq():
                 print "checkEq in mode BB"
                 self.QConvLoss1 = calcProd("QConvLoss1",self.ConvLoss,self.FETj3)
                 self.QWHEq2 = calcDiff("QWHEq2",self.QConvLoss,self.QLossEq2)#
+
+            elif self.EquipeClass == "CHP":
+                self.ElGen_j1 = calcProd("ElGen_j1",self.ElectriProduction,self.HPerYearEqNom)
+                self.ElGen_j2 = calcProd("ElGen_j2",self.FETFuel_j,self.HCGEEfficiency)
+                self.ElectriProduction1 = calcProdC("ElectriProduction1",self.FuelLCV,self.FuelConsum2,self.HCGEEfficiency)
                    
 
             if DEBUG in ["ALL","MAIN"]:
@@ -597,9 +547,10 @@ class CheckEq():
                 print "Step 3: calculating from right to left (ADJUST)"
             
             if self.EquipeClass in ["BB"]:
+                print "adjust in mode BB"
                 adjustDiff(self.QWHEq2,self.QConvLoss,self.QLossEq2)#
                 adjustProd(self.QConvLoss1,self.ConvLoss,self.FETj3)
-                adjustSum(self.One,self.HCGTEfficiency2,self.ConvLoss)
+                adjustSum(self.One,self.HCGTEfficiency2,self.ConvLoss2)
 
             adjustDiff(self.QWHEq1,self.QInputEq,self.QOutEq) #
             adjustSum(self.QInputEq1,self.FETj2,self.QHXEq1)#
@@ -612,20 +563,27 @@ class CheckEq():
 
             if self.mainSource == "Fuel":
                 adjustProd(self.USHBoiler2,self.FETFuel_j2,self.HCGTEfficiency1)
-                adjustProdC(self.HCGPnom1,self.FuelLCV,self.FuelConsum2,self.HCGTEfficiency)#
+                adjustProdC(self.HCGPnom1,self.FuelLCV,self.FuelConsum4,self.HCGTEfficiency)#
             else:
-                adjustProd(self.USHBoiler2,self.FETel_j2,self.HCGTEfficiency1)
+                adjustProd(self.USHBoiler2,self.FETel_c_j2,self.HCGTEfficiency1)
                 adjustProd(self.HCGPnom1,self.ElectriConsum,self.HCGTEfficiency)
                 
             adjustProd(self.QExhaustGas1,self.QExhaustGasdot,self.HPerYearEqNom3)#
-            adjustProd(self.FETel_j1,self.ElectriConsum2,self.HPerYearEqNom2)
+            adjustDiff(self.FETel_j1,self.FETel_c_j3,self.ElGen_j)
+            adjustProd(self.FETel_c_j1,self.ElectriConsum2,self.HPerYearEqNom2)
             adjustProd(self.HPerYearEqNom1,self.HPerYearEq,self.PartLoad)
             adjustProd(self.HPerYearEq1,self.HPerDayEq,self.NDaysEq)
 
             adjustFlow(self.QExhaustGasdot1,self.OffgasHeatCapacity,self.FlowExhaustGas,self.TExhaustGas1,
                                             self.TEnvEq,self.DTExhaustGas,self.DTExhaustGas1)#
-            adjustSum(self.FlowExhaustGas1,self.FlowCombAir,self.FuelConsum1)#
+            adjustSum(self.FlowExhaustGas1,self.FlowCombAir,self.FuelConsum3)#
             adjustProdC(self.FlowCombAir1,self.CombAir,self.FuelConsum,self.ExcessAirRatio)
+
+            if self.EquipeClass == "CHP":
+                adjustProd(self.ElGen_j1,self.ElectriProduction,self.HPerYearEqNom4)
+                adjustProd(self.ElGen_j2,self.FETFuel_j3,self.HCGEEfficiency)
+                adjustProdC(self.ElectriProduction1,self.FuelLCV,self.FuelConsum2,self.HCGEEfficiency2)
+
             
 
             if DEBUG in ["ALL","MAIN"]:
@@ -648,7 +606,8 @@ class CheckEq():
 #------------------------------------------------------------------------------
 
             ccheck3(self.HCGTEfficiency,self.HCGTEfficiency1,self.HCGTEfficiency2,self.HCGTEfficiency3)
-            ccheck1(self.ConvLoss,self.ConvLoss1)#
+            ccheck2(self.HCGEEfficiency,self.HCGEEfficiency1,self.HCGEEfficiency2)
+            ccheck2(self.ConvLoss,self.ConvLoss1,self.ConvLoss2)#
             
             ccheck1(self.FlowCombAir,self.FlowCombAir1)#
             ccheck1(self.ExcessAirRatio,self.ExcessAirRatio1)#
@@ -658,12 +617,13 @@ class CheckEq():
             ccheck1(self.TEnvEq,self.TEnvEq1)#
             ccheck1(self.HPerYearEq,self.HPerYearEq1)
             ccheck1(self.HPerDayEq,self.HPerDayEq1)
-            ccheck3(self.HPerYearEqNom,self.HPerYearEqNom1,self.HPerYearEqNom2,self.HPerYearEqNom3)
+            ccheck4(self.HPerYearEqNom,self.HPerYearEqNom1,self.HPerYearEqNom2,self.HPerYearEqNom3,self.HPerYearEqNom4)
             ccheck1(self.HCGPnom,self.HCGPnom1)
             ccheck3(self.FETj,self.FETj1,self.FETj2,self.FETj3)#
-            ccheck2(self.FETFuel_j,self.FETFuel_j1,self.FETFuel_j2)
+            ccheck3(self.FETFuel_j,self.FETFuel_j1,self.FETFuel_j2,self.FETFuel_j3)
+            ccheck3(self.FETel_c_j,self.FETel_c_j1,self.FETel_c_j2,self.FETel_c_j3)
             ccheck2(self.FETel_j,self.FETel_j1,self.FETel_j2)
-            ccheck3(self.FuelConsum,self.FuelConsum1,self.FuelConsum2,self.FuelConsum3)#
+            ccheck4(self.FuelConsum,self.FuelConsum1,self.FuelConsum2,self.FuelConsum3,self.FuelConsum4)#
             ccheck2(self.ElectriConsum,self.ElectriConsum1,self.ElectriConsum2)
             ccheck2(self.USHBoiler,self.USHBoiler1,self.USHBoiler2)
             ccheck2(self.QHXEq,self.QHXEq1,self.QHXEq2)#
@@ -676,6 +636,9 @@ class CheckEq():
             ccheck4(self.QWHEq,self.QWHEq1,self.QWHEq2,self.QExhaustGas,self.QExhaustGas1)#It is done provisional. It is supposed the 2parameters to be same.To be modified
             ccheck1(self.PartLoad,self.PartLoad1)#
 
+            ccheck1(self.ElectriProduction,self.ElectriProduction1)
+            ccheck3(self.ElGen_j,self.ElGen_j1,self.ElGen_j2,self.ElGen_j3)
+
 #------------------------------------------------------------------------------
     def estimate(self):  
 #------------------------------------------------------------------------------
@@ -687,9 +650,12 @@ class CheckEq():
         if self.EquipeClass in ["BB"]:
             self.HCGTEfficiency.setEstimate(0.85,limits=(0.7,0.95))        
         elif self.EquipeClass in ["CH"]:
-            self.HCGEEfficiency.setEstimate(3.5,limits=(2.5,5.0))        
+            self.HCGTEfficiency.setEstimate(3.5,limits=(2.5,5.0))        
         elif self.EquipeClass in ["HP"]:
             self.HCGTEfficiency.setEstimate(5.0,limits=(2.0,8.0))
+        elif self.EquipeClass in ["CHP"]:
+            self.HCGTEfficiency.setEstimate(0.55,limits=(0.4,0.9))
+            self.HCGEEfficiency.setEstimate(0.35,limits=(0.1,0.6))
 
         self.PartLoad.setEstimate(0.5,limits=(0.1,0.9))
 
