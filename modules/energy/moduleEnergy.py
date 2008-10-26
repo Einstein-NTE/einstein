@@ -372,6 +372,9 @@ class ModuleEnergy(object):
             elif equipeClass == "ST":
                 Status.mod.moduleST.calculateEnergyFlows(equipe,cascadeIndex)
                 
+            elif equipeClass == "CHP":
+                Status.mod.moduleCHP.calculateEnergyFlows(equipe,cascadeIndex)
+                
             else:
                 logTrack("WARNING: equipment type not yet forseen in system simulation module")
                 logTrack("running calculateEnergyFlows-dummy")

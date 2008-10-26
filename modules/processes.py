@@ -215,9 +215,7 @@ class Processes(object):
         Status.mod.moduleHR.runHRModule()
 
 #..............................................................................
-# to be improved here. pass from demand in terms of UPH to demand in terms of USHm
-# for the moment just set identical ...
-                           
+# copying USH/QWHAmb to QD/QA copied into runHRModule                           
         Status.int.QD_Tt = Status.int.createQ_Tt()   
         Status.int.QA_Tt = Status.int.createQ_Tt()
 

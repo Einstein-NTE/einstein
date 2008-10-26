@@ -130,16 +130,16 @@ class AddEquipment(wx.Dialog):
 	    #   to give it back to the calling panel
 	    # this should be cleaned somewhat
 	    self.theId = self.dbe.theId
-	    print "addEquipment popup (Database button): ", self.theId
-	    print "addEquipment popup (Database button): equipe = ",self.prnt.equipe.Equipment
+#	    print "addEquipment popup (Database button): ", self.theId
+#	    print "addEquipment popup (Database button): equipe = ",self.prnt.equipe.Equipment
 
 	    try:
-                print "trying to set equipment row in DB "
-		self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
-		self.prnt.mode = "DB"
-		print _("addEquipment popup (Database button): equipment added to Q/C")
+#            print "trying to set equipment row in DB "
+                self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
+                self.prnt.mode = "DB"
+#            print _("addEquipment popup (Database button): equipment added to Q/C")
 	    except:
-		print _('addEquipment popup (Database button): setEquipmentFromDB from module did not execute')
+		logTrack('addEquipment popup (Database button): setEquipmentFromDB from module did not execute')
 
 	    # close this dialog
 	    self.EndModal(wx.ID_OK)
@@ -152,10 +152,9 @@ class AddEquipment(wx.Dialog):
 #   Manual entry selected
 #------------------------------------------------------------------------------		
         self.prnt.mode = "Manual"
-        print _("AddEquipment_popup (Manual Button): adding equipe ID"), self.prnt.equipe.QGenerationHC_ID
+        logTrack("AddEquipment_popup (Manual Button): adding equipe ID %s"%(self.prnt.equipe.QGenerationHC_ID))
 	self.dMan = ManualAddDialog(self, self.prnt.equipe.QGenerationHC_ID)
         if self.dMan.ShowModal() == wx.ID_OK:
-            print _("AddEquipment_popup (Manual Button): OK")
 	    self.EndModal(wx.ID_OK)
 	else:
             print _("AddEquipment_popup (Manual Button): Cancelled")

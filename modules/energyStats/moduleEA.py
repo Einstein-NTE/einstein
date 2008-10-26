@@ -159,6 +159,7 @@ class ModuleEA(object):
                 
             FETiUnKnown = 0.0
             FETel = 0.0
+            ElGen = 0.0
             FETFuel = 0.0
             FETHeat = 0.0
             FET = 0.0
@@ -182,7 +183,14 @@ class ModuleEA(object):
                     logDebug("ModuleEA (cEEB): FETel of equipment %s (cascadeIndex = %s) is None"%\
                              (equipe.EqNo,equipe.CascadeIndex))
                     dFETel = 0.0
-                    
+
+                if equipe.HCGEEfficiency > 0:
+                    dElGen = Status.int.ElGen_j[jc]
+                else:
+                    dElGen = 0.0
+                if dElGen is None:
+                    dElGen = 0.0
+                
                 dFETHeat = 0.0  #to be added once needed
                 dUSH = Status.int.USHj[jc]
                 dQHX = Status.int.QHXj[jc]
@@ -190,12 +198,19 @@ class ModuleEA(object):
 
                 equipe.FETFuel_j = dFETFuel
                 equipe.FETel_j = dFETel
+                
+                if equipe.HCGEEfficiency > 0:
+                    equipe.STAreaFactor = dElGen   #XXXXXXtemporarily STAreaFactor used as storage for ElGen
+                    
                 equipe.FETHeat_j = dFETHeat
                 equipe.FETj = dFETel + dFETFuel + dFETHeat #simple sum of fuel + electricity. doesn't make very much sense, but ... 
 
                 equipe.USHj = dUSH
                 equipe.QHXj = dQHX       
+                equipe.QHXEq = dQHX    #redundancy in nomenclature ... should be unified ... !!!
                 equipe.QWHj = dQWH
+                equipe.QWHEq = dQWH
+                equipe.QExhaustGas = dQWH
 
                 FET += dFETFuel + dFETel
                 FETFuel += dFETFuel
@@ -212,7 +227,7 @@ class ModuleEA(object):
                     FETi[i] += dFETFuel
                 else:
                     FETiUnKnown += dFETFuel
-                    print "WARNING: fuel type for equipe %s is not known"
+                    logWarning("Fuel type for equipe %s is not known"%equipe.Equipment)
 
 #..............................................................................
 # calculate derived quantities and store in equipment table
@@ -220,6 +235,7 @@ class ModuleEA(object):
             for equipe in equipments:
                 jc = equipe.CascadeIndex -  1
 
+# average thermal conversion efficiency
                 if equipe.FETFuel_j > 0:
                     equipe.HCGTEffReal = Status.int.USHj[jc] / equipe.FETFuel_j
                 elif equipe.FETHeat_j > 0:
@@ -229,19 +245,29 @@ class ModuleEA(object):
                 else:
                     equipe.HCGTEffReal = 0.0
 
-                if equipe.HPerYearEq is not None and equipe.HCGPnom is not None:
-                    USHmax = equipe.HPerYearEq*equipe.HCGPnom 
-                    if USHmax > 0:
-                        equipe.PartLoad = Status.int.USHj[jc]/USHmax
+# real operating hours
+                equipe.HPerYearEq = Status.int.HPerYearEq[jc]
+                
+# part load factor
+                if equipe.HCGPnom is not None:
+                    if equipe.HPerYearEq is not None:
+                        USHmax = equipe.HPerYearEq*equipe.HCGPnom 
+                        if USHmax > 0:
+                            equipe.PartLoad = Status.int.USHj[jc]/USHmax
+                        else:
+                            equipe.PartLoad = 0.0
                     else:
-                        equipe.PartLoad = 0.0
+                        equipe.PartLoad = 1.0
+                        if equipe.HCGPnom > 0:
+                            equipe.HPerYearEq = Status.int.USHj[jc]/equipe.HCGPnom
+                        else:
+                            equipe.HPerYearEq = 0.0
                 else:
                     equipe.PartLoad = 0.0
 
+
+# part load factor
             #HCGEEff -> only for CHP ??? or also for electrically driven chillers ???
-
-
-            #TExhaustGas ????
 
     ##### TAKE CARE: here HCGTEfficiency is both an input and a result ... for equipments with
     ##### variable COP depending on temperature / ... this may lead to confusions.
@@ -265,6 +291,11 @@ class ModuleEA(object):
                     fuel.FEOFuel = 0.0
                     logDebug("ModuleEA (calculateEqEnergyBalances): no entry found for FEOFuel of fuel no. %s"%(i+1))
 
+                if fuel.FECFuel is not None and fuel.QFuel_ID in fuelList:
+                    fuelData = Fuel(fuel.QFuel_ID)
+                    if fuelData.LCV is not None and fuelData.LCV > 0:
+                        fuel.MFuelYear = fuel.FECFuel/fuelData.LCV
+                        
             generalData.FETel = FETel
             
             if generalData.FEOel is not None:
@@ -440,7 +471,7 @@ class ModuleEA(object):
             except:
                 quantity = 1.0
                 
-            if quantity > 0 and quantity is not None: process.UPH_SEC = UPH/quantity
+            if quantity > 0 and quantity is not None and UPH is not None: process.UPH_SEC = UPH/quantity
             else: process.UPH_SEC = 0.0
             process.PE_SEC = 0.0
             process.EL_SEC = 0.0

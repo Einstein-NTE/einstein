@@ -52,6 +52,7 @@ import copy
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
+from einstein.modules.fluids import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 from sunday import *
@@ -607,6 +608,11 @@ class ModuleST(object):
             equipe.update({"STAreaFactor":1.1})
             ### E.F. 28/07
 
+        equipe.FuelConsum = 0.0
+        equipe.FlowExhaustGas = 0.0
+        equipe.TExhaustGas = 0.0
+
+
         if model.STOMUnitFix is not None: equipe.update({"OandMfix":model.STOMUnitFix})
         else:
             logDebug("ModuleST: fix costs for O and M of the solar sistem %s not specified"%equipe.Model)
@@ -644,6 +650,9 @@ class ModuleST(object):
                     changeInEq = True
                 
                 equipe.HCGPnom = float(sysPars[0])
+
+                if equipe.HCGPnom is not None:
+                    equipe.ElectriConsum = PARASITIC_ELECTRICITY*equipe.HCGPnom
 
                 if equipe.ST_SysEff is not None:
                     if fabs(float(sysPars[1]) - equipe.ST_SysEff) > 1.e-6:
@@ -1052,25 +1061,33 @@ class ModuleST(object):
 #........................................................................
 # Global results (annual energy flows)
 
-        equipe.update({"HTilted":HTilted*Status.EXTRAPOLATE_TO_YEAR})       #### E.F. 28/07
+        HTilted *= Status.EXTRAPOLATE_TO_YEAR
+        equipe.update({"HTilted":HTilted})                                  #### E.F. 28/07
         Status.SQL.commit()                                                 #### E.F. 28/07
 
+
+        USHj *= Status.EXTRAPOLATE_TO_YEAR
+        HPerYear *= Status.EXTRAPOLATE_TO_YEAR
+        
         FETFuel_j = 0.0
-        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
-        Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j*Status.EXTRAPOLATE_TO_YEAR
-        Status.int.FETel_j[cascadeIndex-1] = PARASITIC_ELECTRICITY*USHj*Status.EXTRAPOLATE_TO_YEAR   
-        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.USHj[cascadeIndex-1] = USHj
+        Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j
+        Status.int.FETel_j[cascadeIndex-1] = PARASITIC_ELECTRICITY*USHj   
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
+        
+        Status.int.QWHj[cascadeIndex-1] = 0.0   # not considering the latent heat(condensing water)
+        Status.int.QHXj[cascadeIndex-1] = 0.0
 
         if DEBUG in ["ALL","BASIC"]:
             print "ModuleST (cEF): USH: %s HT: %s HbT: %s HdT: %s"%\
-                  (USHj*Status.EXTRAPOLATE_TO_YEAR,
-                   HTilted*Status.EXTRAPOLATE_TO_YEAR,
-                   annualGbT*Status.EXTRAPOLATE_TO_YEAR,
-                   annualGdT*Status.EXTRAPOLATE_TO_YEAR)
+                  (USHj,
+                   HTilted,
+                   annualGbT,
+                   annualGdT)
 
-        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        self.calculateOM(equipe,USHj)
         
-        return USHj*Status.EXTRAPOLATE_TO_YEAR    
+        return USHj    
 
 #==============================================================================
 #==============================================================================
@@ -1261,12 +1278,15 @@ class ModuleST(object):
         DISTANCECONSTRAINT= 1500
         DistanceFactor=(-2*0.0000001*pow(self.surfaces[i]["surfArea"],2))+(0.0022*self.surfaces[i]["surfArea"])+0.3938
         MaxDistance=self.surfaces[i]["surfArea"]/(DistanceFactor*self.NetSurfAreaFactor)
-        if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > min(DISTANCECONSTRAINT , MaxDistance):
-            f2=0
+        if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > 1.1*min(DISTANCECONSTRAINT , MaxDistance):
+            # f2=0
+            f2=1
             logWarning(_("Distance between the solar field'%s' and the technical room or process is too long")%\
                        (self.surfaces[i]["surfAreaName"]))
         else:
             f2=1
+          
+        
         return (f2)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -1362,8 +1382,7 @@ class ModuleST(object):
                 self.usableSurfaces.append(self.surfaces[i])
                 self.usableSurfacesData.append({"NetSurfAreaFactor":self.NetSurfAreaFactor,"NetSurfAreaPartial":NetSurfAreaPartial})
         avAreaFactor=self.avAreaFactor
-        self.TotNetSurfArea=self.grossSurfArea/avAreaFactor
-
+        self.TotNetSurfArea=self.grossSurfArea/avAreaFactor        
         if self.TotNetSurfArea < self.MINTOTNETSURFAREA and self.NSurfaces > 0:
             showWarning(_("The surface available for the collectors mounting is quite small."))
             enoughSurface= "No"

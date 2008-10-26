@@ -461,19 +461,51 @@ class ModuleBB(object):
                 eff = model.BBEfficiency
             equipe.update({"HCGTEfficiency":eff})
             
-        if model.BoilerTemp != None: equipe.update({"TMaxSupply":model.BoilerTemp})
+        if model.BoilerTemp is not None: equipe.update({"TMaxSupply":model.BoilerTemp})
         if model.BoilerManufacturer != None: equipe.update({"Manufact":model.BoilerManufacturer})
-        if model.BoilerModel != None: equipe.update({"Model":model.BoilerModel})
+        if model.BoilerModel is not None: equipe.update({"Model":model.BoilerModel})
         equipe.update({"EquipType":getEquipmentType("BB",model.BoilerType)})
         equipe.update({"NumEquipUnits":1})
-        if model.BoilerType != None: equipe.update({"EquipTypeFromDB":model.BoilerType})
-        if model.DBBoiler_ID != None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
+        if model.BoilerType is not None: equipe.update({"EquipTypeFromDB":model.BoilerType})
+        if model.DBBoiler_ID is not None: equipe.update({"EquipIDFromDB":model.DBBoiler_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
         equipe.update({"ExcessAirRatio":1.1})
         if model.BoilerTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":model.BoilerTurnKeyPrice})
         else:
             logDebug("ModuleBB: turn key price of boiler model %s not specified"%equipe.Model)
             equipe.update({"TurnKeyPrice":0.0})
+
+#HS 2008-10-25: equipment parameters that are set defined by default if not specified
+        fuel_number = equipe.DBFuel_id   #IMPORT from the fuelDB
+        eq_fuel = Fuel(fuel_number)
+
+        try:
+            equipe.FuelConsum = equipe.HCGPnom/(eq_fuel.LCV * equipe.HCGTEfficiency)
+        except:
+            pass
+
+        try:
+            equipe.FlowExhaustGas = equipe.FuelConsum*(1.0 + eq_fuel.CombAir*equipe.ExcessAirRatio)
+        except:
+            pass
+
+        try:
+            equipe.ElectriConsum = 0.01*equipe.HCGPnom
+        except:
+            pass
+
+        try:
+            LossFactEq = 0.01
+            TExhaustGas = eq_fuel.LCV*(1.0 - equipe.HCGTEfficiency - LossFactEq) \
+                          /((1.0 + eq_fuel.CombAir) * equipe.ExcessAirRatio * eq_fuel.OffgasHeatCapacity)
+            equipe.TExhaustGas = TExhaustGas
+        except:
+            pass
+
+        print "ModuleBB (setEqFromDB): FuelConsum %s ElectriConsum %s FlowExhaustGas %s TExhaustGas %s"% \
+              (equipe.FuelConsum,equipe.ElectriConsum,equipe.FlowExhaustGas,equipe.TExhaustGas)
+
+
 
 ###### E.F. 12/10
         if model.BoilerOandMfix is not None: equipe.update({"OandMfix":model.BoilerOandMfix})
@@ -516,6 +548,7 @@ class ModuleBB(object):
         BBModel = equipe.Model
         BBType = equipe.EquipType
         PNom = equipe.HCGPnom
+        PEl = equipe.ElectriConsum
         COPh_nom = equipe.HCGTEfficiency
         TMax = equipe.TMaxSupply
         EquipmentNo = equipe.EqNo
@@ -523,6 +556,11 @@ class ModuleBB(object):
         if PNom is None:
             PNom = 0.0
             logWarning("ModuleBB (calculateEnergyFlows): No nominal power specified for equipe no. %s"%\
+                 (EquipmentNo))
+
+        if PEl is None:
+            PEl = 0.01 * PNom
+            logWarning("ModuleBB (calculateEnergyFlows): No electrical consumption specified for equipe no. %s"%\
                  (EquipmentNo))
 
         if TMax is None:
@@ -608,22 +646,29 @@ class ModuleBB(object):
 #........................................................................
 # Global results (annual energy flows)
 
-        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
+        USHj *= Status.EXTRAPOLATE_TO_YEAR
+        HPerYear *= Status.EXTRAPOLATE_TO_YEAR
+        Status.int.USHj[cascadeIndex-1] = USHj
 
         if COPh_nom > 0:
-            FETFuel_j = USHj*Status.EXTRAPOLATE_TO_YEAR/COPh_nom
-            print "ModuelBB (cEF): converting USH [%s] to FET [%s]"%\
-                  (USHj*Status.EXTRAPOLATE_TO_YEAR,FETFuel_j*Status.EXTRAPOLATE_TO_YEAR)
+            FETFuel_j = USHj/COPh_nom
         else:
             FETFuel_j = 0.0
             showWarning("Strange boiler with COP = 0.0")
 
-        FETel_j = 0.0
+        if PNom > 0:
+            FETel_j = FETFuel_j*PEl/PNom
+        else:
+            FETel_j = 0
         
         Status.int.FETFuel_j[cascadeIndex-1] = FETFuel_j
         Status.int.FETel_j[cascadeIndex-1] = FETel_j
-        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
         
+        LossFactEq = 0.01
+        Status.int.QWHj[cascadeIndex-1] = FETFuel_j * max (0,1. - COPh_nom -  LossFactEq)   # not considering the latent heat(condensing water)
+        Status.int.QHXj[cascadeIndex-1] = 0.0
+
 #        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
 #                   (equipe.EqNo,\
 #                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
@@ -632,32 +677,7 @@ class ModuleBB(object):
 #                    QD*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
 #                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
 
-        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
-#........................................................................23/10/2008
-        fuel_number = equipe.DBFuel_id   #IMPORT from the fuelDB
-        eq_fuel = Fuel(fuel_number)
-        self.FuelLCV = eq_fuel.LCV
-        self.OffgasHeatCapacity = eq_fuel.OffgasHeatCapacity
-        self.CombAir= eq_fuel.CombAir
-        self.ExcessAirRatio= equipe.ExcessAirRatio
-        if self.ExcessAirRatio== None:
-            self.ExcessAirRatio= 1.1
-        self.LossFactEq = 0.01  
-        self.TenvEq= 15
-        MFuelYear = USHj/(self.FuelLCV * COPh_nom) # yearly fluid mass flow
-        print 'ModuleBB: calculateEnergyFlow. the excessairRatio, CombAir the  and the MFuel are', self.ExcessAirRatio , self.CombAir , MFuelYear
-        MAirYear = self.ExcessAirRatio * self.CombAir * MFuelYear   # yearly air mass flow
-        QLossj = self.LossFactEq * USHj
-        QWHEqj = max (0,FETel_j - USHj*(1+self.LossFactEq))   # not considering the latent heat(condensing water)
-        QExhaustGasj=QWHEqj
-        FlowExhaustGas = MAirYear + MFuelYear  # yearly flow
-        print 'ModuleBB: calculateEnergyFlow. QExhaustGasj , FlowExhaustGas , self.OffgasHeatCapacity', QExhaustGasj , FlowExhaustGas , self.OffgasHeatCapacity
-        if FlowExhaustGas >0:
-            self.TExhaustGas = QExhaustGasj/(FlowExhaustGas * self.OffgasHeatCapacity)
-        else:
-            self.TExhaustGas = self.TenvEq
-        mFuel = equipe.HCGPnom/(self.FuelLCV * COPh_nom)
-        
+        self.calculateOM(equipe,USHj)
         
 #........................................................................       
         return USHj    

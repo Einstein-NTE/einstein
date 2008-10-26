@@ -554,13 +554,13 @@ class PanelCHP(wx.Panel):
 	self.equipe = self.mod.addEquipmentDummy() #SD change 30/04/2008, delete equipeC
         pu1 =  AddEquipment(self,                      # pointer to this panel
                             self.mod,                # pointer to the associated module
-                            'Add boiler equipment', # title for the dialogs
+                            'Add CHP equipment', # title for the dialogs
                             'dbchp',              # database table
                             0,                         # column to be returned
                             False)                     # database table can be edited in DBEditFrame?
 
         if pu1.ShowModal() == wx.ID_OK:
-            print 'PanelCHP AddEquipment accepted. Id='+str(pu1.theId)
+            logTrack('PanelCHP AddEquipment accepted. Id= %s'%(str(pu1.theId)))
         else:
             self.mod.deleteEquipment(None)
         self.display()

@@ -97,7 +97,7 @@ class TCAPlotPanel (PlotPanel):
                 labelname = ""
                 if (mode=="mirr"):
                     original_data = result.mirr
-                    self.subplot.set_ylabel(_('MIRR [%]')) 
+                    self.subplot.set_ylabel(_('MIRR / EUR')) 
                     labelname = "MIRR"
                 else:
                     original_data = result.npv

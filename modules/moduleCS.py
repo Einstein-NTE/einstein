@@ -95,8 +95,15 @@ class ModuleCS(object):
         if self.keys[0] == "CS1_Plot":
             
             PEC0 = 0.0
+
+            presentAlternative = Status.ANo
+                    
             for ANo in range(len(generalData)-1):
                 i = ANo+1
+
+                if salternatives[i].StatusEnergy == 0:
+                    Status.prj.setActiveAlternative(ANo)
+                    Status.mod.moduleEA.update()
 
                 if salternatives[i].StatusEnergy > 0:
                     dPEC = generalData[i].PEC                
@@ -134,6 +141,8 @@ class ModuleCS(object):
                 PECTable.append(tableEntry)
                 PECPlot.append(plotEntry)
                             
+            if Status.ANo <> presentAlternative:
+                Status.prj.setActiveAlternative(presentAlternative)
 #..............................................................................
 # then send everything to the GUI
 

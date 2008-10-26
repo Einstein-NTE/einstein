@@ -18,83 +18,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.20
-#	Created by: 	    Stoyan Danov	    31/01/2008
-#	Revised by:         Hans Schweiger          22/03/2008
-#                           Stoyan Danov            27/03/2008
-#                           Stoyan Danov            01/04/2008
-#                           Hans Schweiger          02/04/2008
-#                           Hans Schweiger          03/04/2008
-#                           Stoyan Danov            03/04/2008
-#                           Stoyan Danov            04/04/2008
-#                           Hans Schweiger          07/04/2008
-#                           Stoyan Danov            09/04/2008
-#                           Stoyan Danov            10/04/2008
-#                           Hans Schweiger          13/04/2008
-#                           Stoyan Danov            16/04/2008
-#                           Hans Schweiger          18/04/2008
-#                           Stoyan Danov            18/04/2008
-#                           Stoyan Danov            22/04/2008
-#                           Stoyan Danov            24/04/2008
-#                           Hans Schweiger          29/04/2008
-#                           Stoyan Danov            30/04/2008
-#                           Hans Schweiger          30/04/2008
-#                           Stoyan Danov            05/05/2008
-#                           Stoyan Danov            06/05/2008
-#                           Stoyan Danov            16/05/2008
-#                           Hans Schweiger          28/06/2008
-#                           Hans Schweiger          02/08/2008
-#                           Hans Schweiger          03/10/2008
-#                           Enrico Facci            12/10/2008
+#	EINSTEIN Version No.: 1.0
+#	Created by: 	    Stoyan Danov, Hans Schweiger
+#                           31/01/2008 - 12/10/2008
 #
+#       Update No. 001
+#
+#	Since Version 1.0 revised by:
+#                           Hans Schweiger          21/10/2008
 #
 #       Changes to previous version:
-#       22/03/2008 general restructuring and clean-up
-#       27/03/2008 screenEquipments(), initPanel(),initUserDefinedParamHP(), getUserDefinedParamHP()
-#       01/04/2008 deleteE() - to be finished
-#       02/04/2008  __init__: connnetion to sql/DB corrected
-#                   initPanel: adaptation to new panel structure
-#       03/04/2008 receives moduleEnergy from Modules
-#       03/04/2008 SD: addEquipmentDummy, setEquipmentFromDB
-#       04/04/2008 SD: initPanel - graphics to interfaces, screenEquipments add:if..or..or
-#       07/04/2008 HS: adaptación init_panel / update_panel
-#       09/04/2008 SD: screenEquipments, updatePanel: changes HPList-HPTableDataList - data shown in table, setEquipmentFromDB: new adds
-#       10/04/2008 SD: setEquipmentFromDB - new parameters added (the commented are still missing in sql, to be added)
-#       10/04/2008 SD: def setUserDefinedParamHP() - writes the user-defined parameters in UheatPump
-#       13/04/2008 HS: getEqId added.
-#                      deleteEquipment: rowNo as input instead of Id.
-#                      cascadeIndex -> unified from 1...N
-#       16/04/2008 SD: deleteFromCascade: activated sql.commit()
-#                      designAssistant1: control (in Automatic preselection: if self.preselection ==[]: delete dummy equip added)
-#       18/04/2008 HS/SD: Cancel mode passed to panel in design assitant 1
-#                      changes in deleteEquipment + addEquipmentDummy (temporary
-#                       storing of dummyEqId for posterior undo
-#                      changes in DA1 (selection of panel mode) and DA2 (delete of dummy)
-#                      introduction of default Equipment and HP Types in CONSTANTS
-#                      use of functions getEquipmentClass and getEquipmentSubClass (defined in constants.py)
-#                      some unused functions deleted (housekeeping)
-#                      interfaces - instance imported from Status
-#       18/04/2008 SD: getUserDefinedParamHP: control query added, avoid reference to empty list member
-#       22/04/2008 SD: define: calcTPinchAndTGap() and call it in updatePanel() - fills HP Info fields in panel
-#       24/04/2008 SD: screenEquipment(): changes in HPTableDataList - table data shown in panel
-#                       setEquipmentFromDB(): activate updates, more controls
-#                       calculateEnergyFlows(): assignment of exergetic COP from DB
-#       29/04/2008 HS: call to initPanel and updatePanel eliminated in __init__
-#       30/04/2008 SD: eliminating reference to C tables and related, functions affected:
-#                       deleteEquipment,deleteFromCascade,addEquipmentDummy,setEquipmentFromDB,
-#                       designAssistant1,designAssistant2,calculateEnergyFlows
-#                   HS: some security featers added (setUserDefined)
-#       05/05/2008 SD:  query added in initPanel (PId,ANo); activated initUserDefinedParamHP (__init__)
-#                       bug corrected in line 852 -> there was put 'C' instead of 'Status.TimeStep' !!!
-#       06/05/2008 SD:  addEquipmentDummy: equipType insearted change;
-#                       desidnAssistant1: raise error added in checks, corrected: dotQh0 = Qh0/YEAR; other option: dotQh0 = Qh0/DA.UHPMinHop
-#                                                               -> preselect different HPs: [9,8] and [15,14] respectively -> to analyze!!!
-#                       getTminD, getTmaxA: corrected +-1 to assume linear change in the last sector of the curve
-#       16/05/2008 SD:  some prints added in designAssistant1, calculateEnergyFlows; runSimulation activated in DA2 ->problems here, see prints
-#       28/06/2008: HS  new modality of runSimulation(first=xy,last=xy) implemented. Some clean-up.
-#       02/08/2008: HS  conversion kWh - MWh in panel
-#       03/10/2008: HS  calculateOM added
-#       12/10/2008: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
+#       21/10/2008: HS  TMaxSupply added in setEquipmentData
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -114,6 +48,7 @@ import copy
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
+from einstein.modules.fluids import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
 from einstein.GUI.GUITools import *
@@ -496,8 +431,14 @@ class ModuleHP():
         equipe.update({"DatabaseNameSelection":"DBHeatPump"})
         if model.HPType != None: equipe.update({"EquipTypeFromDB":model.HPType})
         equipe.update({"EquipIDFromDB":model.DBHeatPump_ID})
+        if model.HPCondTmax != None: equipe.update({"TMaxSupply":model.HPCondTmax})
+        
+#HS 2008-10-25: equipment parameters that are set defined by default if not specified
+        
+        equipe.FlowExhaustGas = 0.0
+        equipe.TExhaustGas = 0.0
 
-        if model.HPTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":modelHPTurnKeyPrice})
+        if model.HPTurnKeyPrice is not None: equipe.update({"TurnKeyPrice":model.HPTurnKeyPrice})
         else:
             logDebug("ModuleHP: turn key price of heat pump model %s not specified"%equipe.Model)
             equipe.update({"TurnKeyPrice":0.0})
@@ -573,6 +514,8 @@ class ModuleHP():
 #   Looks for the minimum temperature in heat demand
 #------------------------------------------------------------------------------
         iT = lastNonZero(Q_T) + 1       #find the index, SD: +1: assume linear change in the last interval,06/05/2008
+        print "ModuleHP: getTMaxA Q_T = ",Q_T
+        print "iT = ",iT
         return(Status.int.T[iT])        #find the T corresponding to index
         
 #------------------------------------------------------------------------------
@@ -615,14 +558,28 @@ class ModuleHP():
         uTable = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(uTable) > 0:
             DA = uTable[0]
+            DA_UHPType = DA.UHPType
+            if DA_UHPType is None:
+                DA_UHPType = HPTYPES[0]
+
+            DA_UHPMinHop = DA.UHPMinHop
+            if DA_UHPMinHop is None or DA_UHPMinHop <= 0.0:
+                DA_UHPMinHop = 1500.0
+
+            DA_UHPmaxT = DA.UHPmaxT
+            if DA_UHPmaxT is None or DA_UHPmaxT <= 0.0:
+                DA_UHPmaxT = 100.0
         else:
             logDebug("ModuleHP (DA1): no u-Table found")
             return("CANCEL",[])
         
         if DA.UHPMinHop > YEAR:        #check of user input
             logWarning('ModuleHP (DA1): Required working hours are greater than the hours of the year!')               
-                        
-        (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA.UHPType)  #get the sorted list of available heat pumps
+            DA_UHPType = HPTYPES[0]
+            DA_UHPMinHop = 1500.0
+            DA_UHPmaxT = 100.0
+                       
+        (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA_UHPType)  #get the sorted list of available heat pumps
 
         print "ModuleHP (DA1): HPListPNom = ",HPListPNom
 #............................................................................................
@@ -643,14 +600,14 @@ class ModuleHP():
 
         else:  #in the case heat pump application is possible: calculate all this...
 
-            if DA.UHPmaxT > TCondMaxInList:
+            if DA_UHPmaxT > TCondMaxInList:
                 logTrack('ModuleHP (designAssistant1): UHPmaxT = %s is higher than TCondMaxInList = %s'%\
-                         (DA.UHPmaxT,TCondMaxInList))
+                         (DA_UHPmaxT,TCondMaxInList))
                 logTrack('ModuleHP (designAssistant1): The value of TCondMaxInList = %s will be used as initial estimate of Th0'%\
                          TCondMaxInList)
             
             #Start temperature for calculation Th0 = to the user-defined temperature
-            Th0 = min(DA.UHPmaxT,TCondMaxInList)
+            Th0 = min(DA_UHPmaxT,TCondMaxInList)
 
             if Th0 is None:
                 logDebug("ModuleHP (designAssistant1): WARNING -> Th0 = None was obtained")
@@ -661,7 +618,7 @@ class ModuleHP():
 # From the annual Heat demand curve (QDa): calculate the necesary heating capacity (starting value)
 
             Qh0 = interpolateList(Th0/Status.TemperatureInterval,Status.int.QD_T_mod[self.cascadeIndex-1]) #calculates the annual energy demand for the Th_o from QDa
-            dotQh0 = Qh0/DA.UHPMinHop #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
+            dotQh0 = Qh0/DA_UHPMinHop #the initial heat capacity of the heat pump is obtained dividing by the hours of year #SD: *10 deleted,06/05/2008
             
             listIndex = findInListASC(dotQh0,HPListPNom)
 
@@ -685,7 +642,7 @@ class ModuleHP():
                 print "ModuleHP (DA1): USH %s HOp %s"%\
                       (USHj,HOp)
                
-                if HOp >= DA.UHPMinHop:    #correction factor for simulations < 1 year
+                if HOp >= DA_UHPMinHop:    #correction factor for simulations < 1 year
                     self.preselection.append(modelID)
                     PNomMax = max(PNomMax,equipe.HCGPnom)
                 if equipe.HCGPnom < POWERRANGE*PNomMax:
@@ -940,22 +897,31 @@ class ModuleHP():
 #........................................................................
 # Global results (annual energy flows)
 
-        Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
+        USHj *= Status.EXTRAPOLATE_TO_YEAR
+        QHXj *= Status.EXTRAPOLATE_TO_YEAR
+        FETel_j *= Status.EXTRAPOLATE_TO_YEAR
+        HPerYear *= Status.EXTRAPOLATE_TO_YEAR
 
+        
+        Status.int.USHj[cascadeIndex-1] = USHj
+        Status.int.QWHj[cascadeIndex-1] = 0.0   # not considering the latent heat(condensing water)
+        Status.int.QHXj[cascadeIndex-1] = QHXj
+        
         Status.int.FETFuel_j[cascadeIndex-1] = 0.0
-        Status.int.FETel_j[cascadeIndex-1] = FETel_j*Status.EXTRAPOLATE_TO_YEAR
-        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.FETel_j[cascadeIndex-1] = FETel_j
+
+        Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
 
         logMessage("ModuleHP: eq.no.:%s USH: %s [MWh] FETFuel: %s [MWh] FETel: %s [MWh] HPerYear: %s [h]"%\
                    (equipe.EqNo,\
-                    USHj*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
+                    USHj/1000.0,\
                     0.0,\
-                    FETel_j*Status.EXTRAPOLATE_TO_YEAR/1000.0,\
-                    HPerYear*Status.EXTRAPOLATE_TO_YEAR/1000.0))
+                    FETel_j/1000.0,\
+                    HPerYear/1000.0))
                    
-        self.calculateOM(equipe,USHj*Status.EXTRAPOLATE_TO_YEAR)
+        self.calculateOM(equipe,USHj)
         
-        return USHj*Status.EXTRAPOLATE_TO_YEAR    
+        return USHj   
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------

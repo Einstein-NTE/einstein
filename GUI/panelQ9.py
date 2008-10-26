@@ -420,7 +420,7 @@ class PanelQ9(wx.Panel):
     def display(self):
         self.clear()
         self.fillPage()
-        self.updateOM(doWarnings = True)
+        self.updateOM()
         self.Show()
 
     def clear(self):
@@ -506,10 +506,6 @@ class PanelQ9(wx.Panel):
 	else:
 	    self.checkBox7.SetValue(bool(q.EnergyManagExternal))
 
-
-    def __lockFields(self,fields):
-        for field in fields:
-            field.Enabled = False
     
     def __getValueSecure(self,obj):
     # reads value from a textfield and returns it as float 
@@ -519,7 +515,7 @@ class PanelQ9(wx.Panel):
         except: return 0.0    
         
 
-    def __checkFields(self,fields,override_if_not_match_total = False,doWarnings = False):
+    def __checkFields(self,fields,override_if_not_match_total = False):
     # fields = [<name>,<totalfield>,[<listofsubfields>]]
     # override_if_not_match_total : if TRUE the value from the totalfield will be
     #                               overridden by the calculated sum     
@@ -531,16 +527,15 @@ class PanelQ9(wx.Panel):
             for valueField in valueFields:
                 sum += self.__getValueSecure(valueField)
             totalValue = self.__getValueSecure(totalField)
-            if (totalValue != sum)and(doWarnings):
+            if (totalValue != sum):
                 logWarning(_("Yearly OM: total from database does not match sum from values for: "+name))
             if (override_if_not_match_total):
                 totalField.SetValue(str(sum))
 
-    def updateOM(self,doWarnings = False):
-        
-        fields = [self.tc10_1,self.tc11_1,self.tc12_1,self.tc13_1,self.tc14_1,self.tc14_2,self.tc14_3,self.tc14_4,self.tc14_5]
-        self.__lockFields(fields)
-        
+    def updateOM(self):
+    #1) checks if all subtotals are consistent and gives a warning if not
+    #2) checks if all totals are constistent, overrides the total if not and gives a warning
+    
         fields = []
         #               NAME                                          TOTAL FIELD  SUBFIELDS
         fields.append(["General maintenance"                         ,self.tc10_1,[self.tc10_2,self.tc10_3,self.tc10_4,self.tc10_5]])
@@ -548,7 +543,7 @@ class PanelQ9(wx.Panel):
         fields.append(["Machines and equipment for processes"        ,self.tc12_1,[self.tc12_2,self.tc12_3,self.tc12_4,self.tc12_5]])
         fields.append(["Generation and distribution of heat and cold",self.tc13_1,[self.tc13_2,self.tc13_3,self.tc13_4,self.tc13_5]])      
         #check subtotals ; Total costs
-        self.__checkFields(fields,override_if_not_match_total = True,doWarnings = doWarnings)
+        self.__checkFields(fields,override_if_not_match_total = False)
   
         fields = []
         #               NAME                              TOTAL FIELD  SUBFIELDS
@@ -558,6 +553,6 @@ class PanelQ9(wx.Panel):
         fields.append(["External costs"                   ,self.tc14_4,[self.tc10_4,self.tc11_4,self.tc12_4,self.tc13_4]])
         fields.append(["Regulatory"                       ,self.tc14_5,[self.tc10_5,self.tc11_5,self.tc12_5,self.tc13_5]])
         #check totals ; Total of Total costs
-        self.__checkFields(fields,override_if_not_match_total = True,doWarnings = doWarnings)    
+        self.__checkFields(fields,override_if_not_match_total = True)    
       
 

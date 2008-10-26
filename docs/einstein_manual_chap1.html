@@ -240,7 +240,40 @@ should NOT carry out the database installation, as this will overwrite
 existing data !!!<br>
 <br>
 For updating your database STRUCTURE to Version 1.0 without losing data
-you can run the file "<span style="font-weight: bold;">update_einsteinDB.bat</span>"<br>
+you can do it by several ways:<br>
+<br>
+a) run the file "<span style="font-weight: bold;">update_einsteinDB.bat</span>"<br>
+<br>
+or<br>
+<br>
+b) by hand:<br>
+<br>
+Open the MS-DOS command shell on your computer.<br>
+<br>
+enter in the folder<br>
+&lt;MyEinstein&gt;\einstein\sql<br>
+<br>
+Type the following<br>
+<br>
+mysql ----host=localhost --user=&lt;username&gt;
+--password=&lt;password&gt; &lt; update_einsteinDB_V1.00b_to_V1.0.sql<br>
+(if you have a password specified on mysql)<br>
+<br>
+or<br>
+mysql ----host=localhost --user=&lt;username&gt;&nbsp; &lt;
+update_einsteinDB_V1.00b_to_V1.0.sql<br>
+(without password)<br>
+<br>
+where<br>
+&lt;username&gt; is your username on the mysql server (by default: root)<br>
+&lt;password&gt; is your password on mysql<br>
+<br>
+if you get the error message "mysql not found", then you have first to
+add MySQL to the PATH on your computer:<br>
+<br>
+set PATH = PATH; "C:\&lt;path to your mysql
+installation&gt;\MySQL\MySQL Server5.1\bin"<br>
+<br>
 <br>
 Step 4: Now have a try -&gt; Run EINSTEIN<br>
 <br>

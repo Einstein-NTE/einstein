@@ -45,6 +45,7 @@ import copy
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
+from einstein.modules.fluids import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
@@ -86,7 +87,7 @@ class ModuleCHP(object):
 #       Here all the information should be prepared so that it can be plotted on the panel
 #------------------------------------------------------------------------------
 
-        print "ModuleCHP: updatePanel"
+        logTrack("ModuleCHP: updatePanel")
 #............................................................................................
 # get list of equipments and boilers in the system
 # and update the energetic calculation up to the level needed for representation
@@ -96,7 +97,6 @@ class ModuleCHP(object):
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
             Status.mod.moduleEnergy.runSimulation(self.cascadeIndex)
 
-        print "ModuleCHP: after cascade update"
 #............................................................................................
 # 1. List of equipments
 
@@ -108,7 +108,6 @@ class ModuleCHP(object):
 
         Status.int.setGraphicsData('CHP Table',data)
 
-        print "ModuleCHP: equipmentlist OK"
 #............................................................................................
 # 2a. Preparing data
 
@@ -120,27 +119,20 @@ class ModuleCHP(object):
             for iT in range(Status.Nt):
                 QCHP.append(0.0)
 
-        print "ModuleCHP: QCHP OK"
         
         QD80C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(80/Status.TemperatureInterval+0.5)])
         QD80C.sort(reverse=True)
 
-        print "ModuleCHP: QD80 OK"
         
         QD120C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(120/Status.TemperatureInterval)])
         QD120C.sort(reverse=True)
 
-        print "ModuleCHP: QD120 OK"
-
         QD250C = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][int(250/Status.TemperatureInterval)])
         QD250C.sort(reverse=True)
-
-        print "ModuleCHP: QD250 OK"
 
         QDTot = copy.deepcopy(Status.int.QD_Tt_mod[self.cascadeIndex-1][Status.NT+1])
         QDTot.sort(reverse=True)
 
-        print "ModuleCHP: QD400 OK"
 #............................................................................................
 # 2b. XY Plot
         TimeIntervals=[]
@@ -154,7 +146,6 @@ class ModuleCHP(object):
                                                         QD250C,
                                                         QDTot])
 
-        print "ModuleCHP: XY plot OK"
 
 #............................................................................................
 # 3. Configuration design assistant
@@ -162,7 +153,6 @@ class ModuleCHP(object):
         config = self.getUserDefinedPars()
         Status.int.setGraphicsData('CHP Config',config)
         
-        print "ModuleCHP: user pars OK"
 #............................................................................................
 # 4. additional information (Info field right side of panel)
 
@@ -186,7 +176,6 @@ class ModuleCHP(object):
 
         Status.int.setGraphicsData('CHP Info',info)
 
-        print "ModuleCHP: info field OK"
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def getUserDefinedPars(self):
@@ -248,7 +237,6 @@ class ModuleCHP(object):
 #------------------------------------------------------------------------------
 #       screens existing equipment, whether there are already heat pumps
 #------------------------------------------------------------------------------
-        print "moduleCHP starting function 'screenEquipments'"
         self.equipments = Status.prj.getEquipments()
         Status.int.getEquipmentCascade()
         self.NEquipe = len(self.equipments)
@@ -275,7 +263,7 @@ class ModuleCHP(object):
             for j in range(len(CHPTableDataList[i])):
                 if CHPTableDataList[i][j] == None:
                     CHPTableDataList[i][j] = 'not available'        
-        print"ModuleCHP (screenEquipments): the list of CHPs is:",self.CHPList
+#        print"ModuleCHP (screenEquipments): the list of CHPs is:",self.CHPList
         return (self.CHPList,CHPTableDataList)
         
 
@@ -375,8 +363,42 @@ class ModuleCHP(object):
         if model.DBCHP_ID != None: equipe.update({"EquipIDFromDB":model.DBCHP_ID})
         equipe.update({"DBFuel_id":1})  #use Natural Gas as default -> should later on be adjusted to type of equipment
 
+
+#HS 2008-10-25: equipment parameters that are set defined by default if not specified
+        fuel_number = equipe.DBFuel_id   #IMPORT from the fuelDB
+        eq_fuel = Fuel(fuel_number)
+
+        try:
+            equipe.FuelConsum = equipe.HCGPnom/(eq_fuel.LCV * equipe.HCGTEfficiency)
+        except:
+            pass
+
+        try:
+#            equipe.FlowExhaustGas = equipe.FuelConsum*(1.0 + eq_fuel.CombAir*equipe.ExcessAirRatio)
+            equipe.FlowExhaustGas = 0.0
+        except:
+            pass
+
+        try:
+            equipe.ElectriConsum = 0.0*equipe.HCGPnom
+        except:
+            pass
+
+        try:
+            LossFactEq = 0.01
+#            TExhaustGas = eq_fuel.LCV*(1.0 - equipe.HCGTEfficiency - equipe.HCGEEfficiency - LossFactEq) \
+#                          /((1.0 + eq_fuel.CombAir) * equipe.ExcessAirRatio * eq_fuel.OffgasHeatCapacity)
+#            equipe.TExhaustGas = TExhaustGas
+            equipe.TExhaustGas = 0.0
+        except:
+            pass
+
+
+        print "ModuleCHP (setEqFromDB): Trying to obtain economic parameters"
         if model.InvRate is not None:
             try:
+                print "ModuleCHP (setEqFromDB): InvRate %s CHPPe %s"% \
+                      (model.InvRate,model.CHPPe)
                 turnKeyPrice = model.InvRate*model.CHPPe
             except:
                 logDebug("ModuleCHP: turn key price of CHP equipment model %s not specified"%equipe.Model)
@@ -392,11 +414,12 @@ class ModuleCHP(object):
             logDebug("ModuleCHP: variable costs for O and M of CHP model %s not specified"%equipe.Model)
             equipe.update({"OandMvar":0.0})
 
+        print equipe
 
         Status.SQL.commit()
-        logTrack("moduleCHP (setEquipmentFromDB): boiler added:'%s',type:'%s',Pow:'%s',T'%s'"%\
+        logTrack("moduleCHP (setEquipmentFromDB): CHP system added:'%s',type:'%s',Pow:'%s',T'%s'"%\
                  ("---",model.CHPequip,model.CHPPt,-1.0))
-        self.calculateEnergyFlows(equipe,self.cascadeIndex)
+#        self.calculateEnergyFlows(equipe,self.cascadeIndex)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -422,7 +445,7 @@ class ModuleCHP(object):
         CHPModel = equipe.Model
         CHPType = equipe.EquipType
         CHPSubType = getEquipmentSubClass(CHPType)
-        print "ModuleCHP (cEF): type %s subtype: %s"%(CHPType,CHPSubType)
+
         PNom = equipe.HCGPnom
         COPh_nom = equipe.HCGTEfficiency
         COPe = equipe.HCGEEfficiency
@@ -435,11 +458,11 @@ class ModuleCHP(object):
         TMax = equipe.TMaxSupply
         EquipmentNo = equipe.EqNo
 
-        print "ModuleCHP (cEF): equipment data"
-        print equipe
-        print "Tmax = ",TMax
-        print "Pnom = ",PNom
-        print "COP el/th = ",COPh_nom,COPe
+#        print "ModuleCHP (cEF): equipment data"
+#        print equipe
+#        print "Tmax = ",TMax
+#        print "Pnom = ",PNom
+#        print "COP el/th = ",COPh_nom,COPe
 
         if PNom is None:
             PNom = 0.0
@@ -528,7 +551,7 @@ class ModuleCHP(object):
 
         for it in range(Status.Nt):
 
-            print "it: %s=============================================="%it
+#            print "it: %s=============================================="%it
 
 #..............................................................................
 # Calculate heat delivered by the given equipment for each time interval
@@ -621,6 +644,10 @@ class ModuleCHP(object):
         Status.int.FETel_j[cascadeIndex-1] = FETel_j
         Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
         
+        LossFactEq = 0.01
+        Status.int.QWHj[cascadeIndex-1] = 0.0   # not considering the latent heat(condensing water)
+        Status.int.QHXj[cascadeIndex-1] = 0.0
+
         logTrack("CHP: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
                    (equipe.EqNo,\
                     USHj/1000.0,\
@@ -633,7 +660,6 @@ class ModuleCHP(object):
         
         return USHj    
 
-
 #==============================================================================
 
  
@@ -645,7 +671,6 @@ class ModuleCHP(object):
 
 #............................................................................................
 # getting configuration parameters of DA
-        print "moduleCHP starting function 'designAssistant'"
 
         DATable = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(DATable) > 0:
