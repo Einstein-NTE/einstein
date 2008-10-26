@@ -1263,7 +1263,7 @@ class ModuleST(object):
         MaxDistance=self.surfaces[i]["surfArea"]/(DistanceFactor*self.NetSurfAreaFactor)
         if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > min(DISTANCECONSTRAINT , MaxDistance):
             f2=0
-            logMessage(_("Distance between the solar field'%s' and the technical room or process is too long")%\
+            logWarning(_("Distance between the solar field'%s' and the technical room or process is too long")%\
                        (self.surfaces[i]["surfAreaName"]))
         else:
             f2=1

@@ -94,6 +94,9 @@ class PanelQ6(wx.Panel):
         self.HXNo = None
         self.WHEENo = None
 
+        self.HXName = None
+        self.WHEEName = None
+
         self.fillPage()
 
     def _init_ctrls(self, parent):
@@ -492,31 +495,7 @@ class PanelQ6(wx.Panel):
         else:
             self.HXNo = None
 
-        self.fillPage()
-
-        hxes = Status.DB.qheatexchanger.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].HXName[self.HXName]
-
-        if len(hxes) <>0:
-            q = hxes[0]
-            self.HXID = q.QHeatExchanger_ID
-            
-            self.tc1.SetValue(q.HXName)
-            
-            if str(q.HXType) in TRANSHXTYPES.keys():
-                self.tc2.SetValue(TRANSHXTYPES[str(q.HXType)])
-                
-            self.tc3.SetValue(str(q.QdotHX))
-            self.tc4.SetValue(str(q.HXLMTD))
-            self.tc5.SetValue(str(q.QHX))
-            if q.HXSource in self.sourceList: self.tc6.SetValue(q.HXSource)          
-            self.tc7.SetValue(str(q.HXTSourceInlet))
-            self.tc8.SetValue(str(q.HXhSourceInlet))
-            self.tc9.SetValue(str(q.HXTSourceOutlet))
-            self.tc10.SetValue(str(q.HXhSourceOutlet))
-            if q.HXSink in self.sinkList: self.tc11.SetValue(q.HXSink)          
-            self.tc12.SetValue(str(q.HXTSinkInlet))
-            self.tc13.SetValue(str(q.HXTSinkOutlet))
-
+        self.display()
 
     def OnButtonHXAdd(self, event):
         self.clearHX()
@@ -532,6 +511,7 @@ class PanelQ6(wx.Panel):
         hxes = Status.DB.qheatexchanger.HXName[hxName].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
 	if hxName <> 'NULL' and len(hxes) == 0:
             hx = Status.prj.addHXDummy()
+            self.HXName = hxName
         elif hxName <> 'NULL' and len(hxes) == 1:
             hx = hxes[0]
         else:
@@ -557,7 +537,7 @@ class PanelQ6(wx.Panel):
         hx.update(tmp)
         
         Status.SQL.commit()
-        self.fillPage()
+        self.display()
 
                           
 #------------------------------------------------------------------------------
@@ -571,6 +551,125 @@ class PanelQ6(wx.Panel):
             self.WHEENo = self.WHEEList.index(self.WHEEName)+1
         else:
             self.WHEENo = None
+
+        self.display()
+        
+    def OnButtonWHEEAdd(self, event):
+        self.clearWHEE()
+
+    def OnButtonWHEEDelete(self, event):
+        Status.prj.deleteWHEE(self.WHEEID)
+        self.clearWHEE()
+        self.fillPage()
+        event.Skip()
+
+    def OnButtonWHEEOK(self, event):
+        wheeName = check(self.tc101.GetValue())
+        whees = Status.DB.qwasteheatelequip.WHEEName[wheeName].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
+	if wheeName <> 'NULL' and len(whees) == 0:
+            whee = Status.prj.addWHEEDummy()
+            self.WHEEName = wheeName
+        elif wheeName <> 'NULL' and len(whees) == 1:
+            whee = whees[0]
+        else:
+	    showError("HX name has to be a uniqe value!")
+	    return
+	
+        fluidDict = Status.prj.getFluidDict()
+                        
+        tmp = {
+            "WHEEName":check(self.tc101.GetValue()),
+            "WHEEEqType":check(findKey(TRANSWHEEEQTYPES,self.tc102.GetValue(text=True))),
+            "WHEEWasteHeatType":check(findKey(TRANSWHEEWASTEHEATTYPES,self.tc103.GetValue(text=True))),
+            "QWHEE":check(self.tc104.GetValue()), 
+            "WHEEMedium":check(findKey(fluidDict,self.tc105.GetValue(text=True))),
+            "WHEEFlow":check(self.tc106.GetValue()), 
+            "WHEETOutlet":check(self.tc107.GetValue()),
+            
+            "WHEEPresentUse":check(findKey(TRANSYESNO,self.tc108.GetValue(text=True))),
+            
+            "HPerDayWHEE":check(self.tc110.GetValue()), 
+            "NBatchWHEE":check(self.tc111.GetValue()), 
+            "HBatchWHEE":check(self.tc112.GetValue()), 
+            "NDaysWHEE":check(self.tc113.GetValue()), 
+            }
+        
+        whee.update(tmp)
+        
+        Status.SQL.commit()
+        self.display()
+
+#------------------------------------------------------------------------------
+    def fillPage(self):
+#------------------------------------------------------------------------------
+#   screens the SQL tables and fills the lists of HX's and WHEE's
+#------------------------------------------------------------------------------
+        self.HXList = Status.prj.getHXList("HXName")
+
+        self.listBoxHX.Clear()
+        for hx in self.HXList:
+            self.listBoxHX.Append(hx)
+
+        if self.HXName is not None:
+            self.listBoxHX.SetStringSelection(self.HXName)
+
+        self.WHEEList = Status.prj.getWHEEList("WHEEName")
+
+        self.listBoxWHEE.Clear()
+        for whee in self.WHEEList:
+            self.listBoxWHEE.Append(str(whee))
+
+        if self.WHEEName is not None: self.listBoxWHEE.SetStringSelection(self.WHEEName)
+
+        fillChoice(self.tc2.entry,TRANSHXTYPES)
+
+        self.sourceList = Status.prj.getEqList("Equipment")
+        self.sourceList.extend(Status.prj.getPipeList("Pipeduct"))
+        self.sourceList.extend(Status.prj.getProcessList("Process"))
+        self.sourceList.extend(Status.prj.getWHEEList("WHEEName"))
+        
+        fillChoice(self.tc6.entry,self.sourceList)
+
+        self.sinkList = Status.prj.getEqList("Equipment")
+        self.sinkList.extend(Status.prj.getPipeList("Pipeduct"))
+        self.sinkList.extend(Status.prj.getProcessList("Process"))
+        
+        fillChoice(self.tc11.entry,self.sinkList)
+
+        fluidDict = Status.prj.getFluidDict()
+        self.tc105.SetValue(fluidDict.values())
+
+
+#.............................................................................
+# heat exchanger data
+        hxes = Status.DB.qheatexchanger.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].HXName[self.HXName]
+
+        if len(hxes) <>0:
+            q = hxes[0]
+            self.HXID = q.QHeatExchanger_ID
+            
+            self.tc1.SetValue(q.HXName)
+            
+            if str(q.HXType) in TRANSHXTYPES.keys():
+                self.tc2.SetValue(TRANSHXTYPES[str(q.HXType)])
+                
+            self.tc3.SetValue(str(q.QdotHX))
+            self.tc4.SetValue(str(q.HXLMTD))
+            self.tc5.SetValue(str(q.QHX))
+
+            if q.HXSource in self.sourceList: self.tc6.SetValue(str(q.HXSource))          
+            self.tc7.SetValue(str(q.HXTSourceInlet))
+            self.tc8.SetValue(str(q.HXhSourceInlet))
+            self.tc9.SetValue(str(q.HXTSourceOutlet))
+            self.tc10.SetValue(str(q.HXhSourceOutlet))
+            
+            if q.HXSink in self.sinkList: self.tc11.SetValue(str(q.HXSink))          
+            self.tc12.SetValue(str(q.HXTSinkInlet))
+            self.tc13.SetValue(str(q.HXTSinkOutlet))
+
+
+#.............................................................................
+# WHEE data
 
         whees = Status.DB.qwasteheatelequip.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].WHEEName[self.WHEEName]
 
@@ -607,89 +706,6 @@ class PanelQ6(wx.Panel):
             self.tc111.SetValue(str(q.NBatchWHEE))
             self.tc112.SetValue(str(q.HBatchWHEE))
             self.tc113.SetValue(str(q.NDaysWHEE))
-
-    def OnButtonWHEEAdd(self, event):
-        self.clearWHEE()
-
-    def OnButtonWHEEDelete(self, event):
-        Status.prj.deleteWHEE(self.WHEEID)
-        self.clearWHEE()
-        self.fillPage()
-        event.Skip()
-
-    def OnButtonWHEEOK(self, event):
-        wheeName = check(self.tc101.GetValue())
-        whees = Status.DB.qwasteheatelequip.WHEEName[wheeName].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
-	if wheeName <> 'NULL' and len(whees) == 0:
-            whee = Status.prj.addWHEEDummy()
-        elif wheeName <> 'NULL' and len(whees) == 1:
-            whee = whees[0]
-        else:
-	    showError("HX name has to be a uniqe value!")
-	    return
-	
-        fluidDict = Status.prj.getFluidDict()
-                        
-        tmp = {
-            "WHEEName":check(self.tc101.GetValue()),
-            "WHEEEqType":check(findKey(TRANSWHEEEQTYPES,self.tc102.GetValue(text=True))),
-            "WHEEWasteHeatType":check(findKey(TRANSWHEEWASTEHEATTYPES,self.tc103.GetValue(text=True))),
-            "QWHEE":check(self.tc104.GetValue()), 
-            "WHEEMedium":check(findKey(fluidDict,self.tc105.GetValue(text=True))),
-            "WHEEFlow":check(self.tc106.GetValue()), 
-            "WHEETOutlet":check(self.tc107.GetValue()),
-            
-            "WHEEPresentUse":check(findKey(TRANSYESNO,self.tc108.GetValue(text=True))),
-            
-            "HPerDayWHEE":check(self.tc110.GetValue()), 
-            "NBatchWHEE":check(self.tc111.GetValue()), 
-            "HBatchWHEE":check(self.tc112.GetValue()), 
-            "NDaysWHEE":check(self.tc113.GetValue()), 
-            }
-        
-        whee.update(tmp)
-        
-        Status.SQL.commit()
-        self.fillPage()
-
-#------------------------------------------------------------------------------
-    def fillPage(self):
-#------------------------------------------------------------------------------
-#   screens the SQL tables and fills the lists of HX's and WHEE's
-#------------------------------------------------------------------------------
-        self.HXList = Status.prj.getHXList("HXName")
-
-        self.listBoxHX.Clear()
-        for hx in self.HXList:
-            self.listBoxHX.Append(hx)
-
-        if self.HXNo is not None: self.listBoxHX.SetSelection(self.HXNo-1)
-
-        self.WHEEList = Status.prj.getWHEEList("WHEEName")
-
-        self.listBoxWHEE.Clear()
-        for whee in self.WHEEList:
-            self.listBoxWHEE.Append(str(whee))
-
-        if self.WHEENo is not None: self.listBoxWHEE.SetSelection(self.WHEENo-1)
-
-        fillChoice(self.tc2.entry,TRANSHXTYPES)
-
-        self.sourceList = Status.prj.getEqList("Equipment")
-        self.sourceList.extend(Status.prj.getPipeList("Pipeduct"))
-        self.sourceList.extend(Status.prj.getProcessList("Process"))
-        self.sourceList.extend(Status.prj.getWHEEList("WHEEName"))
-        
-        fillChoice(self.tc6.entry,self.sourceList)
-
-        self.sinkList = Status.prj.getEqList("Equipment")
-        self.sinkList.extend(Status.prj.getPipeList("Pipeduct"))
-        self.sinkList.extend(Status.prj.getProcessList("Process"))
-        
-        fillChoice(self.tc11.entry,self.sinkList)
-
-        fluidDict = Status.prj.getFluidDict()
-        self.tc105.SetValue(fluidDict.values())
         
 #------------------------------------------------------------------------------
 
@@ -704,16 +720,16 @@ class PanelQ6(wx.Panel):
 
     def clearHX(self):
         self.tc1.SetValue('')
-        self.tc2.SetValue('')
+#        self.tc2.SetValue('')
         self.tc3.SetValue('')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
-        self.tc6.SetValue('')
+#        self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
-        self.tc11.SetValue('')
+#        self.tc11.SetValue('')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
 
@@ -722,7 +738,7 @@ class PanelQ6(wx.Panel):
 #        self.tc102.SetValue('')
 #        self.tc103.SetValue('')
         self.tc104.SetValue('')
-        self.tc105.SetValue('')
+#        self.tc105.SetValue('')
         self.tc106.SetValue('')
         self.tc107.SetValue('')
 #        self.tc108.SetValue('')

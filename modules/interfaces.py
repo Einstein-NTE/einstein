@@ -140,13 +140,17 @@ class Interfaces(object):
     QHXProcTotal_Tt = []    # heat recovered and fed directly to processes
     QHXProcTotal_T = []
 
+    QWHj_Tt = []    
+    QWHj_T = []
+    QWHj_t = []
+    QWHj = []
+
 # other required outputs from system simulation (calculateEnergyFlows)
 
     FETFuel_j = []
     FETel_j = []
     ElGen_j = []
     FETHeat_j = []
-    QWHj = []
     HPerYearEq = []
     
 # dictionary of the HC supply cascade. entries "equipeID" and "equipeNo"
@@ -295,6 +299,10 @@ class Interfaces(object):
         self.QHXj_T.append(self.createQ_T())
         self.QHXj_t.append(self.createQ_t())
 
+        self.QWHj_Tt.append(self.createQ_Tt())
+        self.QWHj_T.append(self.createQ_T())
+        self.QWHj_t.append(self.createQ_t())
+
 #..............................................................................
 # lists of annual main results
 
@@ -326,6 +334,9 @@ class Interfaces(object):
         self.QHXj_T.pop(NEquipe-1)
         self.QHXj_t.pop(NEquipe-1)
 
+        self.QWHj_Tt.pop(NEquipe-1)
+        self.QWHj_T.pop(NEquipe-1)
+        self.QWHj_t.pop(NEquipe-1)
 #..............................................................................
 # lists of annual main results
 
