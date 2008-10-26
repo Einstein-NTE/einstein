@@ -18,136 +18,14 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.103
-#   Created by:         Heiko Henning (Imsai e-soft)    February 2008
-#   Revisions:          Tom Sobota                          12/03/2008
-#                       Hans Schweiger                      22/03/2008
-#                       Tom Sobota                          23/03/2008
-#                       Hans Schweiger                      24/03/2008
-#                       Hans Schweiger                      25/03/2008
-#                       Tom Sobota                          26/03/2008
-#                       Hans Schweiger                      02/04/2008
-#                       Hans Schweiger                      03/04/2008
-#                       Tom Sobota                          06/04/2008
-#                       Hans Schweiger                      08/04/2008
-#                       Tom Sobota                          09/04/2008
-#                       Hans Schweiger                      12/04/2008
-#                       Tom Sobota                          15/04/2008
-#                       Hans Schweiger                      16/04/2008
-#                       Hans Schweiger                      18/04/2008
-#                       Tom Sobota                          19/04/2008
-#                       Tom Sobota                          20/04/2008
-#                       Hans Schweiger                      23/04/2008
-#                       Tom Sobota                          28/04/2008
-#                       Hans Schweiger                      29/04/2008
-#                       Tom Sobota                          29/04/2008
-#                       Tom Sobota                          01/05/2008
-#                       Hans Schweiger                      05/05/2008
-#                       Hans Schweiger                      07/05/2008
-#                       Tom Sobota                          07/05/2008
-#                       Tom Sobota                          10/05/2008
-#                       Tom Sobota                          15/05/2008
-#                       Tom Sobota                          17/05/2008
-#                       Hans Schweiger                      10/06/2008
-#                       Hans Schweiger                      12/06/2008
-#                       Stoyan Danov                        16/06/2008
-#                       Stoyan Danov                        18/06/2008
-#                       Tom Sobota                          18/06/2008
-#                       Tom Sobota                          21/06/2008
-#                       Hans Schweiger                      25/06/2008
-#                       Tom Sobota                          30/06/2008
-#                       Stoyan Danov                        01/07/2008
-#                       Stoyan Danov                        02/07/2008
-#                       Tom Sobota                          05/07/2008
-#                       Stoyan Danov                        10/07/2008
-#                       Tom Sobota                          30/07/2008
-#                       Hans Schweiger                      05/09/2008
-#                       Hans Schweiger                      12/09/2008
-#                       Florian Joebstl                     15/09/2008
-#                       Hans Schweiger                      25/09/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Heiko Henning, Tom Sobota, Stoyan Danov
+#                       01/02/2008 - 25/09/2008
 #
-#       Change list:
-#       12/03/2008- panel Energy added
-#       13/03/2008  Changed global refs. to DB, SQL ... to references in Status
-#                   Changed global refs to database params to locals
-#                   Deleted all references to DataBridge
-#       22/03/2008  Small changes due to changes in interface
-#       23/03/2008  Added panels EA1 - EA6, EM1. Added a subtree for Yearly, Monthly and Daily
-#                   statistics
-#       24/03/2008  Small changes in calls to PanelBB
-#       25/03/2008  Picture added in main panel
-#       26/03/2008  Suppressed actions on upper level tree items
-#       29/03/2008  Added panels EA2, EH1, EH2 (EH1, EH2 not yet functional)
-#       02/04/2008  Small changes in event handler selectQuestionnaire
-#       03/04/2008  Instance of moduleEnergy created in main
-#                   Function connectToDB out of EinsteinFrame
-#                   Second update: PanelHC and PanelA added
-#       06/04/2008  Extracted Page 4 and all related code as an external module,so it
-#                   can be called from other places
-#       08/04/2008  Panels BM1-3 added (Benchmark modules)
-#       09/04/2008  Extracted Page 1 to Page 9 and all related code as external modules.
-#       12/04/2008  Instance of class Project created
-#                   Minor changes event handlers panelQ0
-#                   Function "OnEnterHeatPump" changed
-#                   Function Show substituted by display added by opening EA-Panels
-#                   Function Show substituted by display added by opening HP-Panel
-#                   Event-handlers scroll-up "view" added
-#                   Event-handlers scroll-up "user-interaction level"
-#       15/04/2008  Upper info panel implemented.
-#                   Help and User manual logic (not the manual!) implemented
-#                   Message panel operative
-#                   General housekeeping
-#       16/04/2008  Change in call to panelA (display instead of Show())
-#                   Order of instantiation of Project() and Module() changed
-#                   Including main as argument in panels A,HC,HP,BB,Energy
-#                   Tree item qOptimisationsProposals renamed to qA
-#                   Tree item qOptiProEnergy renamed to qEnergy
-#       18/04/2008  Instance of Interfaces created as attribute of Status
-#       19/04/2008  Implemented logic for conditionally inhibiting certain branches of the
-#                   action tree
-#       20/04/2008  Implemented basis for internationalization of program
-#       21/04/2008  New askConfirmation procedure to use before deleting things
-#                   Added main menu functionality for Open/New project
-#                   Added fallback language to avoid errors on inexistent translations
-#                   and related errors
-#                   main menu 'Database Equipments' now allows the editing of tables.
-#                   View menu loads dynamically alternatives list
-#       23/04/2008  Changes in call to panelCC
-#       28/04/2008  Loading of panels is now on demand
-#       29/04/2008  method display also for panels BB,Energy and HC
-#       29/04/2008  TS: Dynamic set up of PYTHONPATH. Effective only for this run
-#        1/05/2008  TS: Images are taken from folder 'img'
-#                       Report pages are simplified to 1
-#                       panel for report generation built
-#       05/05/2008  Call to fillchoiceOfEquipment in PanelQ5 eliminated
-#       07/05/2008  Just change in nomenclature tree items qEA,qEM,qEH
-#       07/05/2008  TS fixed Interaction level, alternative.
-#       10/05/2008  TS Changed all fixed texts to gettext format for future translation.
-#       15/05/2008  TS simplified branch expansion logic.
-#       17/05/2008  TS some general refactoring, plus the beginning of work for import/export
-#                   of xml files.
-#       28/05/2008  HS assignment of tree-permissions
-#       10/06/2008  HS panelHR included
-#       12/06/2008  HS function display in PanelQ3 and PanelQ4 called
-#       16/06/2008  SD function display in PanelQ5
-#       18/06/2008  SD function display in PanelQ1,Q2,Q7,Q8,Q9
-#       18/06/2008  TS added fonts management facility
-#       21/06/2008  TS added Project Export and Import
-#       25/06/2008  HS rearrangement in tree: branches CC and BM
-#                      new panelST included
-#       30/06/2008  TS added some Database management possibilities
-#       01/07/2008  SD changed panels places EA1 and EA2 to match tree title (were crossed, lines 774-784)
-#                       -> added panelEA4b (Process heat 2) and panelEA4a (Process heat 1)
-#       01/07/2008  HS changed layout tree and title page
-#       02/07/2008  SD panelEA4 eliminated (now exist only EA4a and EA4b),panelEA6 eliminated
-#       05/07/2008  TS Electricity Mix in main menu and menu dispatch
-#       02/07/2008  SD panels CS4,CS5,CS6,CS7 added
-#       30/07/2008  TS character encoding for MySQL
-#       05/09/2008  HS PanelCHP activated
-#       12/09/2008  HS Preferences frame added
-#       15/09/2008  FJ TCA GUI added
-#       25/09/2008  HS Activation of import / export data from databases
-#                      Link to process optimisation and some clean-up in tree
+#   Update No. 000
+#
+#   Since Version 1.0 revised by:
+#                       ---                     --/--/2008
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008

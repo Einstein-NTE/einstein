@@ -20,8 +20,8 @@
 </row>
 <row n="3">
 <element name="FluidName" type="varchar(45)" auto="" value="Air" />
-<element name="FluidDensity" type="double" auto="" value="1.012" />
-<element name="FluidCp" type="double" auto="" value="1.2" />
+<element name="FluidDensity" type="double" auto="" value="1.2" />
+<element name="FluidCp" type="double" auto="" value="1.012" />
 <element name="DBFluid_ID" type="int(10) unsigned" auto="auto_increment" value="3" />
 </row>
 <row n="4">
