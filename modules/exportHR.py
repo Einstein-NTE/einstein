@@ -547,7 +547,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     
     #ListOfWasteHeatElectrical structure    
     wasteheattags   = ["WHEEName","QWHEE","WHEEMedium","WHEEFlow","WHEETOutlet","HPerDayWHEE","NDaysWHEE","FluidId","FluidCp","FluidDensity"]
-    wasteheat       = ["InputXMLWasteHeatElectrical","InputXMLWasteHeatElectrical",wasteheattags,SQLViews.SQL_WasteHeatElec,None,None]
+    wasteheat       = ["ListOfWasteHeatElectrical","InputXMLWasteHeatElectrical",wasteheattags,SQLViews.SQL_WasteHeatElec,None,None]
     
         
     #ListOfExistingHeatExchangers structure 
