@@ -20,10 +20,11 @@
 #   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger
 #                       25/06/2008 - 12/10/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          24/10/2008
+#                       Enrico Facci            04/11/2008
 #
 #       Changes to previous version:
 #
@@ -32,7 +33,8 @@
 #                       - addEquipmentDummy
 #                       - setEquipmentFromDB
 #                       - setSolarSystemPars
-#                       Change in calculation of TavCollector in cEF                      
+#                       Change in calculation of TavCollector in cEF
+#       04/11/2008:EF   Small changes in checkDistance.
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -1278,10 +1280,12 @@ class ModuleST(object):
         DISTANCECONSTRAINT= 1500
         DistanceFactor=(-2*0.0000001*pow(self.surfaces[i]["surfArea"],2))+(0.0022*self.surfaces[i]["surfArea"])+0.3938
         MaxDistance=self.surfaces[i]["surfArea"]/(DistanceFactor*self.NetSurfAreaFactor)
-        if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > 1.1*min(DISTANCECONSTRAINT , MaxDistance):
-            # f2=0
-            f2=1
-            logWarning(_("Distance between the solar field'%s' and the technical room or process is too long")%\
+        if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > min(DISTANCECONSTRAINT , MaxDistance):
+            if self.surfaces[i]["distance"]!=None and self.surfaces[i]["distance"] > 1.2*min(DISTANCECONSTRAINT , MaxDistance):
+                f2=0
+            else:
+                f2=1
+                logWarning(_("Distance between the solar field'%s' and the technical room or process is too long")%\
                        (self.surfaces[i]["surfAreaName"]))
         else:
             f2=1

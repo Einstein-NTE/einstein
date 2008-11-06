@@ -15,88 +15,25 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.18
-#	Created by: 	    Hans Schweiger	11/03/2008
-#	Last revised by:    Tom Sobota          15/03/2008
-#                           Enrico Facci /
-#                           Hans Schweiger      24/03/2008
-#                           Tom Sobota           1/04/2008
-#                           Hans Schweiger      03/04/2008
-#                           Enrico Facci        09/04/2008
-#                           Stoyan Danov        16/04/2008
-#                           Enrico Facci        24/04/2008
-#                           Enrico Facci        05/05/2008
-#                           Hans Schweiger      06/05/2008
-#                           Enrico Facci        07/05/2008
-#                           Enrico Facci        13/05/2008
-#                           Hans Schweiger      15/04/2008
-#                           Enrico Facci        26/05/2008
-#                           Enrico Facci        06/06/2008
-#                           Hans Schweiger      02/07/2008
-#                           Hans Schweiger      03/07/2008
-#                           Hans Schweiger      16/09/2008
-#                           Hans Schweiger      03/10/2008
-#                           Enrico Facci        12/10/2008
-#                           Enrico Facci        26/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger
+#                       11/03/2008 - 16/10/2008
 #
-#       Changes to previous version:
-#       2008-3-15 Added graphics functionality
-#       2008-03-24  Incorporated "calculateEnergyFlows" from Enrico Facci
-#                   - adapted __init__ and plots similar to moduleHP
-#       1/04/2008   Adapted to new graphics interfase using numpy
-#       03/04/2008  Link to modules via Modules
-#       09/04/2008  addEquipmentDummy, setEquipmentFromDB
-#       16/04/2008  setEquipmentFromDB: aranged & tested (it was indented incorrectly), 
-#                   3 functions copied from moduleHP: getEqId,deleteEquipment,deleteFromCascade ->
-#                   -> In order to activate deleteEquipment: screenEquipments should be arranged before
-#                   (BBList in alalogy with HPList), see moduleHP
-#       24/04/2008  functions added: designAssistant,automDeleteBoiler, designBB80, designBB140, designBBmaxTemp
-#                   findmaxTemp. screenEquipments arranged in analogy with moduleHP.
-#                   (HS: some clean-up of non-used functions and old comments)
-#       05/05/2008  functions added: sortBoiler, redundancy, selectBB. Changes in designAssistant and designBB.
-#       06/05/2008  Changes marked with ###HS in the text:
-#                   - elimination of table cgenerationhc (now is in qgenerationhc)
-#                   Status.int no longer used. substituted by Status.int
-#                   Functions __init__, initPanel, updatePanel and
-#                   screenEquipments modified in symmetry with moduleHP
-#                   Function "setEquipmentFromDB" modified
-#                   Bug corrections:    status.xxx -> Status.xxx
-#                                       k=o -> k=0 (sortBoiler)
-#                                       Status.ints -> Status.int (sortBoiler)
-#                                       cascade[k].equipeType -> cascade[k]["equipeType"] (sortBoiler)
-#                                       cascade[k].equipeID -> cascade[k]["equipeID"] (sortBoiler)
-#                                       self.equipment -> self.equipments (sortBoiler)
-#       07/05/2008  sortBoiler modified and tested.
-#       12/05/2008  function added: findBiggerBB. some changes in designAssistant, selectBB, designBB80 and calculateEnergyFlows.
-#       16/05/2008  some small notes marked with ###HS2008-05-16
-#                   (by the way eliminated some old comments that are no longer useful)
-#                   => changes in updatePanel
-#                   => "userDefinedPars"-Functions copied from HP (not working yet)
-#       26/05/2008 some changes in functions sortBoiler, designAssistant, redundancy                   
-#       06/06/2008 implemented function updatePannel. Some small changes in designAsssistant
-#       27/06/2008: HS small bug-fixes: - equipment screening moved from __init__ to initPanel.
-#                                       - PowerSumMaxtemp -> PowerSumTmax
-#                   Security feature: where's no table uheatpump, one is created
-#       02/07/2008: HS Calulation of FETFuel_j,FETel_j and HPerYearEq added to
-#                       calculateEnergyFlows
-#       03/07/2008ff: HS  Call to updatePanel eliminated in initPanel
-#                       change in setting of cascadeIndex in screenEquipments
-#                       some bug-fixing and clean-up
-#                       boiler efficiency set as fraction of 1
-#                       introduction of several security items and bug-fixes
-#       16/09/2008: HS  change in function findmaxTemp: -> attempt to eliminate rounding errors ...
-#       03/10/2008: HS  calculateOM added
-#       12/10/08: EF    changes in setEquipmentsFromDB:  values for OM copied into the qgenerationhc DB.
-#       16/10/08: EF    changes in designBB80 and designBB140 to avoid the add of unusefull boilers.
-#                       changes in calculateEnergyFlows: Calulation of QWHEqj and TExhaustGas added.
+#   Update No. 002
+#
+#   Since Version 1.0 revised by:
+#                       Enrico Facci        26/10/2008
+#                       Enrico Facci        04/11/2008
+#
+#   04/11/08: EF    small change in SelectBB and some bugs fixed
 #
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
-#	www.energyxperts.net / info@energyxperts.net
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   www.energyxperts.net / info@energyxperts.net
 #
-#	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
-#	Software Foundation (www.gnu.org).
+#   This program is free software: you can redistribute it or modify it under
+#   the terms of the GNU general public license as published by the Free
+#   Software Foundation (www.gnu.org).
 #
 #============================================================================== 
 
@@ -885,7 +822,8 @@ class ModuleBB(object):
 #  element of the list
 #------------------------------------------------------------------------------
         print "moduleBB: entered selectBB function"
-        sqlQuery="BoilerTemp >= '%s'AND BBPnom >= '%s' ORDER BY BBPnom ASC" %(Top,Pow)       
+        Power = max(self.minPow,Pow)
+        sqlQuery="BoilerTemp >= '%s'AND BBPnom >= '%s' ORDER BY BBPnom ASC" %(Top,Power)       
         selected = Status.DB.dbboiler.sql_select(sqlQuery)
         for i in range(len(selected)):
             for j in range(i,len(selected)):
@@ -1116,7 +1054,7 @@ class ModuleBB(object):
                         equipe = self.addEquipmentDummy()
                         self.setEquipmentFromDB(equipe,modelID)
                     else:
-                        modelID=self.selectBB(max(((self.QDhmaxTemp[0]*self.securityMargin - added)/2),self.minPow),maxTemp)
+                        modelID=self.selectBB(max(((self.QDhmaxTemp[0]*self.securityMargin - added)/2),self.minPow),self.maxTemp)
                         equipe = self.addEquipmentDummy()
                         self.setEquipmentFromDB(equipe,modelID)
                         equipe = self.addEquipmentDummy()
