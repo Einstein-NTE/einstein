@@ -3,6 +3,13 @@
 import wx
 from einstein.GUI.status import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
+
 def create(parent):
     return DlgManageEM(parent)
 

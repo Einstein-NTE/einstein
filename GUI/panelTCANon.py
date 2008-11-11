@@ -35,6 +35,12 @@ import wx.grid
 from einstein.GUI.status import Status
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCANON, wxID_PANELTCANONBTNADD, wxID_PANELTCANONBTNDELETE, 
  wxID_PANELTCANONBTNGOMAIN, wxID_PANELTCANONBTNNEXT, 
  wxID_PANELTCANONCBCOSTREV, wxID_PANELTCANONCBNAME, wxID_PANELTCANONGRID, 
@@ -52,7 +58,7 @@ class PanelTCANon(wx.Panel):
         self.SetClientSize(wx.Size(800, 600))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCANONSTATICBOX1,
-              label=_(u'Non Re-Occuring Cost'), name='staticBox1', parent=self,
+              label=_U('Non Re-Occuring Cost'), name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(768, 544), style=0)
 
         self.grid = wx.grid.Grid(id=wxID_PANELTCANONGRID, name='grid',
@@ -70,40 +76,40 @@ class PanelTCANon(wx.Panel):
               size=wx.Size(62, 21), style=0, value='0')
 
         self.staticText4 = wx.StaticText(id=wxID_PANELTCANONSTATICTEXT4,
-              label=_(u'year =  indicate when presumably occuring in years after investment'),
+              label=_U('year =  indicate when presumably occuring in years after investment'),
               name='staticText4', parent=self, pos=wx.Point(40, 504),
               size=wx.Size(331, 13), style=0)
         self.staticText4.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
-        self.btnAdd = wx.Button(id=wxID_PANELTCANONBTNADD, label=_('Add'),
+        self.btnAdd = wx.Button(id=wxID_PANELTCANONBTNADD, label=_U('Add'),
               name='btnAdd', parent=self, pos=wx.Point(680, 448),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELTCANONBTNADD)
 
-        self.btnDelete = wx.Button(id=wxID_PANELTCANONBTNDELETE, label=_('Remove'),
+        self.btnDelete = wx.Button(id=wxID_PANELTCANONBTNDELETE, label=_U('Remove'),
               name='btnDelete', parent=self, pos=wx.Point(680, 416),
               size=wx.Size(75, 23), style=0)
         self.btnDelete.Bind(wx.EVT_BUTTON, self.OnBtnDeleteButton,
               id=wxID_PANELTCANONBTNDELETE)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCANONSTATICBOX2,
-              label=_('Help'), name='staticBox2', parent=self, pos=wx.Point(16,
+              label=_U('Help'), name='staticBox2', parent=self, pos=wx.Point(16,
               480), size=wx.Size(752, 64), style=0)
 
         self.cbName = wx.ComboBox(choices=[], id=wxID_PANELTCANONCBNAME,
               name='cbName', parent=self, pos=wx.Point(56, 448),
               size=wx.Size(328, 21), style=0,
-              value=_('<enter custom description or choose from list>'))
+              value=_U('<enter custom description or choose from list>'))
 
         self.cbCostRev = wx.Choice(choices=["Cost", "Revenue"],
-              id=wxID_PANELTCANONCBCOSTREV, name=u'cbCostRev', parent=self,
+              id=wxID_PANELTCANONCBCOSTREV, name='cbCostRev', parent=self,
               pos=wx.Point(568, 448), size=wx.Size(98, 21), style=0)
         self.cbCostRev.SetSelection(0)
 
         self.btnNext = wx.Button(id=wxID_PANELTCANONBTNNEXT,
-              label=_('Finish'), name=u'btnNext',
+              label=_U('Finish'), name='btnNext',
               parent=self, pos=wx.Point(584, 560), size=wx.Size(192, 23),
               style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
@@ -132,24 +138,24 @@ class PanelTCANon(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("EUR"))
-        self.grid.SetColLabelValue(2, _("Year"))
-        self.grid.SetColLabelValue(3, _("Type"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("EUR"))
+        self.grid.SetColLabelValue(2, _U("Year"))
+        self.grid.SetColLabelValue(3, _U("Type"))
 
         self.updateGridAttributes()
         #choices---------------------------------------------------------------------
-        self.cbName.Append(_("repair works for energy equipment"))
-        self.cbName.Append(_("exchange of collectors"))
-        self.cbName.Append(_("irregular maintainance costs"))
-        self.cbName.Append(_("permits"))
-        self.cbName.Append(_("fines/penalties"))
-        self.cbName.Append(_("legal costs"))
-        self.cbName.Append(_("property/natural resource damage"))
-        self.cbName.Append(_("remediation costs"))
-        self.cbName.Append(_("clean up costs"))
-        self.cbName.Append(_("revenue for marketable permits"))
-        self.cbName.Append(_("other revenues"))
+        self.cbName.Append(_U("repair works for energy equipment"))
+        self.cbName.Append(_U("exchange of collectors"))
+        self.cbName.Append(_U("irregular maintainance costs"))
+        self.cbName.Append(_U("permits"))
+        self.cbName.Append(_U("fines/penalties"))
+        self.cbName.Append(_U("legal costs"))
+        self.cbName.Append(_U("property/natural resource damage"))
+        self.cbName.Append(_U("remediation costs"))
+        self.cbName.Append(_U("clean up costs"))
+        self.cbName.Append(_U("revenue for marketable permits"))
+        self.cbName.Append(_U("other revenues"))
      
         
         
@@ -157,8 +163,8 @@ class PanelTCANon(wx.Panel):
         #print "Init Non-reoccuring"       
         self.main = main
         self.mod = Status.mod.moduleTCA
-        self.shortName = _("TCAContingencies")
-        self.description = _("")   
+        self.shortName = _U("TCAContingencies")
+        self.description = _U("")   
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)             
           
@@ -236,7 +242,7 @@ class PanelTCANon(wx.Panel):
                  self.mod.data.nonreoccuringcosts.append([name,euro,year,type])                   
                             
         except:
-            wx.MessageBox(_("Reconsider values."))
+            wx.MessageBox(_U("Reconsider values."))
             
         event.Skip()
         self.display()  

@@ -34,6 +34,12 @@ import wx
 from panelTCAOpTabpage import panelTCAOpTabpage
 from einstein.GUI.status import Status
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 def create(parent):
     return dlgOpcost(parent)
 
@@ -48,21 +54,21 @@ class dlgOpcost(wx.Dialog):
         wx.Dialog.__init__(self, id=wxID_DLGOPCOST, name='', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(617, 540),
               style=wx.DEFAULT_DIALOG_STYLE,
-              title=_('Detailed operating costs calculation'))
+              title=_U('Detailed operating costs calculation'))
         self.SetClientSize(wx.Size(609, 513))
 
         self.tcNotebook = wx.Notebook(id=wxID_DLGOPCOSTTCNOTEBOOK,
-              name=u'tcNotebook', parent=self, pos=wx.Point(8, 8),
+              name='tcNotebook', parent=self, pos=wx.Point(8, 8),
               size=wx.Size(595, 464), style=0)
 
-        self.btnCancel = wx.Button(id=wxID_DLGOPCOSTBTNCANCEL, label=_('Cancel'),
-              name=u'btnCancel', parent=self, pos=wx.Point(528, 480),
+        self.btnCancel = wx.Button(id=wxID_DLGOPCOSTBTNCANCEL, label=_U('Cancel'),
+              name='btnCancel', parent=self, pos=wx.Point(528, 480),
               size=wx.Size(75, 23), style=0)
         self.btnCancel.Bind(wx.EVT_BUTTON, self.OnBtnCancelButton,
               id=wxID_DLGOPCOSTBTNCANCEL)
 
-        self.btnOk = wx.Button(id=wxID_DLGOPCOSTBTNOK, label=_('Ok'),
-              name=u'btnOk', parent=self, pos=wx.Point(440, 480),
+        self.btnOk = wx.Button(id=wxID_DLGOPCOSTBTNOK, label=_U('Ok'),
+              name='btnOk', parent=self, pos=wx.Point(440, 480),
               size=wx.Size(75, 23), style=0)
         self.btnOk.Bind(wx.EVT_BUTTON, self.OnBtnOkButton,
               id=wxID_DLGOPCOSTBTNOK)
@@ -71,31 +77,31 @@ class dlgOpcost(wx.Dialog):
         self.utilities = panelTCAOpTabpage(id=wx.NewId(), name='Utilities',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)  
-        self.utilities.tHelp.SetLabel(_("Cost for water, plant air, inert gas, refrigerant, sewerage, ..."))      
+        self.utilities.tHelp.SetLabel(_U("Cost for water, plant air, inert gas, refrigerant, sewerage, ..."))      
         self.tcNotebook.AddPage(imageId=-1, page=self.utilities, select=True, text='Utilities')
         
         self.opmaterials = panelTCAOpTabpage(id=wx.NewId(), name='Operating materials',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)
-        self.opmaterials.tHelp.SetLabel(_("chemicals e.g. for conditioning of boiler feed water, lubricants, \ncleaning materials, materials for maintenance and service)"))
+        self.opmaterials.tHelp.SetLabel(_U("chemicals e.g. for conditioning of boiler feed water, lubricants, \ncleaning materials, materials for maintenance and service)"))
         self.tcNotebook.AddPage(imageId=-1, page=self.opmaterials, select=False, text='Operating materials')
         
         self.labour = panelTCAOpTabpage(id=wx.NewId(), name='Labour',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)
-        self.labour.tHelp.SetLabel(_("labor for operating, on-site handling and storage, onsite pretreatment, hauling, supervision; \npersonnel, management personnel, maintenance personnel, energy agent, internal costs for \nanalyses and measurements, internal costs for inspection, supervision and control"))
+        self.labour.tHelp.SetLabel(_U("labor for operating, on-site handling and storage, onsite pretreatment, hauling, supervision; \npersonnel, management personnel, maintenance personnel, energy agent, internal costs for \nanalyses and measurements, internal costs for inspection, supervision and control"))
         self.tcNotebook.AddPage(imageId=-1, page=self.labour, select=False, text='Labour')
         
         self.extcost = panelTCAOpTabpage(id=wx.NewId(), name='External costs',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)
-        self.extcost.tHelp.SetLabel(_("external maintenance personnel costs, external costs for analyses and measurements, \nOff-site Treatment, Off-site Disposal"))
+        self.extcost.tHelp.SetLabel(_U("external maintenance personnel costs, external costs for analyses and measurements, \nOff-site Treatment, Off-site Disposal"))
         self.tcNotebook.AddPage(imageId=-1, page=self.extcost, select=False, text='External costs')
         
         self.compliance = panelTCAOpTabpage(id=wx.NewId(), name='Regulatory compliance costs',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)
-        self.compliance.tHelp.SetLabel(_("permits (if not in labour costs), mandatory trainings  (if not in labour costs), costs for mandatory \nmonitoring and inspection (if not in labour costs), fees/taxes, reporting (if not in labour costs)"))
+        self.compliance.tHelp.SetLabel(_U("permits (if not in labour costs), mandatory trainings  (if not in labour costs), costs for mandatory \nmonitoring and inspection (if not in labour costs), fees/taxes, reporting (if not in labour costs)"))
         self.tcNotebook.AddPage(imageId=-1, page=self.compliance, select=False, text='Regulatory compliance costs')
         
         self.insurance = panelTCAOpTabpage(id=wx.NewId(), name='Insurance cost',
@@ -107,7 +113,7 @@ class dlgOpcost(wx.Dialog):
         self.liability = panelTCAOpTabpage(id=wx.NewId(), name='Future liability',
               parent=self.tcNotebook, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)
-        self.liability.tHelp.SetLabel(_("fines/penalties, legal costs, personal injury, property/natural resource damage, \nremediationcosts, (provisions for) clean up costs, (provisions for) treatment costs "))
+        self.liability.tHelp.SetLabel(_U("fines/penalties, legal costs, personal injury, property/natural resource damage, \nremediationcosts, (provisions for) clean up costs, (provisions for) treatment costs "))
         self.tcNotebook.AddPage(imageId=-1, page=self.liability, select=False, text='Future liability')
         
     def __init_data(self):

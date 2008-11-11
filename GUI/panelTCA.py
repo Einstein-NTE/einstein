@@ -40,6 +40,12 @@ from einstein.modules.messageLogger import *
 
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCA, wxID_PANELTCABTNNEXT, wxID_PANELTCABTNNEXTMODULE, 
  wxID_PANELTCABTNPREVMODULE, wxID_PANELTCABTNRESETALL, 
  wxID_PANELTCABTNRESETDATA, wxID_PANELTCANOTEBOOK1, wxID_PANELTCASTATICBOX1, 
@@ -60,20 +66,20 @@ class PanelTCA(wx.Panel):
         self.SetClientSize(wx.Size(800, 590))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCASTATICBOX1,
-              label=_('General Economic Data'), name='staticBox1', parent=self,
+              label=_U('General Economic Data'), name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(760, 152), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELTCASTATICTEXT1,
-              label=_(u'Nominal interest rate of external financing'),
+              label=_U('Nominal interest rate of external financing'),
               name='staticText1', parent=self, pos=wx.Point(40, 60),
               size=wx.Size(202, 13), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_PANELTCASTATICTEXT2,
-              label=_(u'Company specific discount rate'), name='staticText2',
+              label=_U('Company specific discount rate'), name='staticText2',
               parent=self, pos=wx.Point(40, 108), size=wx.Size(149, 13),
               style=0)
 
-        self.tbNIR = wx.TextCtrl(id=wxID_PANELTCATBNIR, name=u'tbNIR',
+        self.tbNIR = wx.TextCtrl(id=wxID_PANELTCATBNIR, name='tbNIR',
               parent=self, pos=wx.Point(256, 56), size=wx.Size(100, 20),
               style=0, value='0')
         self.tbNIR.SetAutoLayout(False)
@@ -88,25 +94,25 @@ class PanelTCA(wx.Panel):
               id=wxID_PANELTCATBCSDRATE)
 
         self.staticText3 = wx.StaticText(id=wxID_PANELTCASTATICTEXT3,
-              label=_('This timeframe will be applied to each equipment of all proposals\nIf you think there would be some maintainance or re-investment\ncaused by this time frame, please fill in the Contingencies'),
+              label=_U('This timeframe will be applied to each equipment of all proposals\nIf you think there would be some maintainance or re-investment\ncaused by this time frame, please fill in the Contingencies'),
               name='staticText3', parent=self, pos=wx.Point(400, 120),
               size=wx.Size(267, 33), style=0)
         self.staticText3.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.staticText4 = wx.StaticText(id=wxID_PANELTCASTATICTEXT4,
-              label=_('Development of energy prices'), name='staticText4',
+              label=_U('Development of energy prices'), name='staticText4',
               parent=self, pos=wx.Point(40, 84), size=wx.Size(144, 13),
               style=0)
 
         self.staticText5 = wx.StaticText(id=wxID_PANELTCASTATICTEXT5,
-              label=_(u'Time frame for economic analysis'), name='staticText5',
+              label=_U('Time frame for economic analysis'), name='staticText5',
               parent=self, pos=wx.Point(40, 132), size=wx.Size(158, 13),
               style=0)
 
         self.tbTimeFame = wx.TextCtrl(id=wxID_PANELTCATBTIMEFAME,
               name='tbTimeFame', parent=self, pos=wx.Point(256, 128),
-              size=wx.Size(100, 21), style=0, value=u'1')
+              size=wx.Size(100, 21), style=0, value='1')
         self.tbTimeFame.Bind(wx.EVT_KILL_FOCUS, self.OnTbTimeFameKillFocus)
         self.tbTimeFame.Bind(wx.EVT_TEXT, self.OnTbTimeFameText,
               id=wxID_PANELTCATBTIMEFAME)
@@ -128,26 +134,26 @@ class PanelTCA(wx.Panel):
               size=wx.Size(11, 13), style=0)
 
         self.staticText8 = wx.StaticText(id=wxID_PANELTCASTATICTEXT8,
-              label=_('% of the current energy price (including Grid fee, excluding VAT)'),
+              label=_U('% of the current energy price (including Grid fee, excluding VAT)'),
               name='staticText8', parent=self, pos=wx.Point(360, 88),
               size=wx.Size(311, 13), style=0)
 
         self.staticText9 = wx.StaticText(id=wxID_PANELTCASTATICTEXT9,
-              label=_(u'years'), name='staticText9', parent=self,
+              label=_U('years'), name='staticText9', parent=self,
               pos=wx.Point(360, 128), size=wx.Size(27, 13), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCASTATICBOX2,
-              label=_('Results'), name='staticBox2', parent=self,
+              label=_U('Results'), name='staticBox2', parent=self,
               pos=wx.Point(8, 168), size=wx.Size(760, 384), style=0)
 
         self.btnResetData = wx.Button(id=wxID_PANELTCABTNRESETDATA,
-              label=_(u'Reset TCA data for current proposal'), name=u'btnResetData', parent=self,
+              label=_U('Reset TCA data for current proposal'), name='btnResetData', parent=self,
               pos=wx.Point(8, 560), size=wx.Size(200, 23), style=0)
         self.btnResetData.Bind(wx.EVT_BUTTON, self.OnBtnResetDataButton,
               id=wxID_PANELTCABTNRESETDATA)
 
         self.btnNext = wx.Button(id=wxID_PANELTCABTNNEXT,
-              label=_(u'Go through TCA data'), name='btnNext', parent=self,
+              label=_U('Go through TCA data'), name='btnNext', parent=self,
               pos=wx.Point(520, 560), size=wx.Size(192, 23), style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
               id=wxID_PANELTCABTNNEXT)
@@ -159,36 +165,36 @@ class PanelTCA(wx.Panel):
               self.OnNotebook1NotebookPageChanged, id=wxID_PANELTCANOTEBOOK1)
 
         self.btnPrevModule = wx.Button(id=wxID_PANELTCABTNPREVMODULE,
-              label=u'<<<', name=u'btnPrevModule', parent=self,
+              label='<<<', name='btnPrevModule', parent=self,
               pos=wx.Point(464, 560), size=wx.Size(48, 23), style=0)
-        self.btnPrevModule.SetToolTipString(u'Back to H&C Supply')
+        self.btnPrevModule.SetToolTipString('Back to H&C Supply')
         self.btnPrevModule.Bind(wx.EVT_BUTTON, self.OnBtnPrevModuleButton,
               id=wxID_PANELTCABTNPREVMODULE)
 
         self.btnNextModule = wx.Button(id=wxID_PANELTCABTNNEXTMODULE,
-              label=u'>>>', name=u'btnNextModule', parent=self,
+              label='>>>', name='btnNextModule', parent=self,
               pos=wx.Point(720, 560), size=wx.Size(48, 23), style=0)
-        self.btnNextModule.SetToolTipString(u'forward to Comperativ Study')
+        self.btnNextModule.SetToolTipString('forward to Comperativ Study')
         self.btnNextModule.Bind(wx.EVT_BUTTON, self.OnBtnNextModuleButton,
               id=wxID_PANELTCABTNNEXTMODULE)
 
         self.tbInflation = wx.TextCtrl(id=wxID_PANELTCATBINFLATION,
-              name=u'tbInflation', parent=self, pos=wx.Point(256, 32),
-              size=wx.Size(100, 21), style=0, value=u'0')
+              name='tbInflation', parent=self, pos=wx.Point(256, 32),
+              size=wx.Size(100, 21), style=0, value='0')
         self.tbInflation.Bind(wx.EVT_TEXT, self.OnTbInflationText,
               id=wxID_PANELTCATBINFLATION)
         self.tbInflation.Bind(wx.EVT_KILL_FOCUS, self.OnTbInflationKillFocus)
 
         self.staticText10 = wx.StaticText(id=wxID_PANELTCASTATICTEXT10,
-              label=u'Inflation Rate', name='staticText10', parent=self,
+              label='Inflation Rate', name='staticText10', parent=self,
               pos=wx.Point(40, 36), size=wx.Size(66, 13), style=0)
 
         self.staticText11 = wx.StaticText(id=wxID_PANELTCASTATICTEXT11,
-              label=u'%', name='staticText11', parent=self, pos=wx.Point(360,
+              label='%', name='staticText11', parent=self, pos=wx.Point(360,
               108), size=wx.Size(11, 13), style=0)
 
         self.btnResetAll = wx.Button(id=wxID_PANELTCABTNRESETALL,
-              label=u'Reset TCA for all proposals', name=u'btnResetAll', parent=self,
+              label='Reset TCA for all proposals', name='btnResetAll', parent=self,
               pos=wx.Point(220, 560), size=wx.Size(200, 23), style=0)
         self.btnResetAll.Bind(wx.EVT_BUTTON, self.OnBtnResetAllButton,
               id=wxID_PANELTCABTNRESETALL)
@@ -199,11 +205,11 @@ class PanelTCA(wx.Panel):
         self.staticBox2.SetForegroundColour(TITLE_COLOR)
         self.staticBox2.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False,'Tahoma'))
         
-        self.resultpage1 = panelResult1(id=wx.NewId(), name=_('Values'),
+        self.resultpage1 = panelResult1(id=wx.NewId(), name=_U('Values'),
               parent=self.notebook1, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)  
         self.notebook1.AddPage(imageId=-1, page=self.resultpage1, select=True, text='Value')
-        self.resultpage2 = panelResult2(id=wx.NewId(), name=_('Diagram'),
+        self.resultpage2 = panelResult2(id=wx.NewId(), name=_U('Diagram'),
               parent=self.notebook1, pos=wx.Point(0, 0), size=wx.Size(504,
               438), style=wx.TAB_TRAVERSAL)  
         self.notebook1.AddPage(imageId=-1, page=self.resultpage2, select=False, text='Diagram')        

@@ -41,6 +41,12 @@ import wx
 #from matplotlib.ticker import MaxNLocator
 from einstein.modules.messageLogger import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 class TCAPlotPanel (PlotPanel):
     """Plots several lines in distinct colors."""
     def __init__( self, parent, **kwargs ):
@@ -60,7 +66,7 @@ class TCAPlotPanel (PlotPanel):
                 else:            
                     self.plot("mirr")
         except:
-            logWarning(_("Could not plot TCA result."))
+            logWarning(_U("Could not plot TCA result."))
                                                                        
     def plot(self,mode):                                  
         results = Status.mod.moduleTCA.result
@@ -97,11 +103,11 @@ class TCAPlotPanel (PlotPanel):
                 labelname = ""
                 if (mode=="mirr"):
                     original_data = result.mirr
-                    self.subplot.set_ylabel(_('MIRR / EUR')) 
+                    self.subplot.set_ylabel(_U('MIRR / EUR')) 
                     labelname = "MIRR"
                 else:
                     original_data = result.npv
-                    self.subplot.set_ylabel(_('NPV / EUR'))  
+                    self.subplot.set_ylabel(_U('NPV / EUR'))  
                     labelname = "NPV"                                            
                 data = [0.0] * (size)                      
                 index = 0
@@ -109,10 +115,10 @@ class TCAPlotPanel (PlotPanel):
                     if (i % timeStep == 0)and(i!=0):                                
                         if original_data[i]>0:
                             data[index] = original_data[i]
-                        ticklabls.append(_("Year ")+str(i))                                                                
+                        ticklabls.append(_U("Year ")+str(i))                                                                
                         index = index+1                        
                 if (add_last_year):
-                    ticklabls.append(_("Year ")+str(timeFrame))
+                    ticklabls.append(_U("Year ")+str(timeFrame))
                     data[len(data)-1] = (original_data[timeFrame-1])
                 self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = str(labelname)+" - "+str(result.name))                        
                 count+=1  
@@ -142,7 +148,7 @@ class panelResult2(wx.Panel):
         self.SetClientSize(wx.Size(722, 323))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX1,
-              label=_(u'Choose the proposal(s)'), name='staticBox1',
+              label=_U('Choose the proposal(s)'), name='staticBox1',
               parent=self, pos=wx.Point(560, 136), size=wx.Size(160, 184),
               style=0)
 
@@ -152,49 +158,49 @@ class panelResult2(wx.Panel):
         self.choice1.Bind(wx.EVT_CHOICE, self.OnChoice1Choice,
               id=wxID_PANELRESULT2CHOICE1)
 
-        self.btnAdd = wx.Button(id=wxID_PANELRESULT2BTNADD, label=_('Add'),
-              name=u'btnAdd', parent=self, pos=wx.Point(568, 192),
+        self.btnAdd = wx.Button(id=wxID_PANELRESULT2BTNADD, label=_U('Add'),
+              name='btnAdd', parent=self, pos=wx.Point(568, 192),
               size=wx.Size(144, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELRESULT2BTNADD)
 
         self.btnRemove = wx.Button(id=wxID_PANELRESULT2BTNREMOVE,
-              label=_('Remove'), name=u'btnRemove', parent=self,
+              label=_U('Remove'), name='btnRemove', parent=self,
               pos=wx.Point(568, 224), size=wx.Size(144, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_PANELRESULT2BTNREMOVE)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX2,
-              label=_(u'Choose Figure'), name='staticBox2', parent=self,
+              label=_U('Choose Figure'), name='staticBox2', parent=self,
               pos=wx.Point(560, 0), size=wx.Size(160, 80), style=0)
 
         self.panel1 = wx.Panel(id=wxID_PANELRESULT2PANEL1, name='panel1',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(544, 312),
               style=wx.TAB_TRAVERSAL)
 
-        self.rbNPV = wx.RadioButton(id=wxID_PANELRESULT2RBNPV, label=u'NPV',
-              name=u'rbNPV', parent=self, pos=wx.Point(584, 24),
+        self.rbNPV = wx.RadioButton(id=wxID_PANELRESULT2RBNPV, label='NPV',
+              name='rbNPV', parent=self, pos=wx.Point(584, 24),
               size=wx.Size(81, 13), style=0)
         self.rbNPV.SetValue(True)
         self.rbNPV.Bind(wx.EVT_RADIOBUTTON, self.OnRbNPVRadiobutton,
               id=wxID_PANELRESULT2RBNPV)
 
-        self.rbMIRR = wx.RadioButton(id=wxID_PANELRESULT2RBMIRR, label=u'MIRR',
-              name=u'rbMIRR', parent=self, pos=wx.Point(584, 48),
+        self.rbMIRR = wx.RadioButton(id=wxID_PANELRESULT2RBMIRR, label='MIRR',
+              name='rbMIRR', parent=self, pos=wx.Point(584, 48),
               size=wx.Size(81, 13), style=0)
         self.rbMIRR.SetValue(False)
         self.rbMIRR.Bind(wx.EVT_RADIOBUTTON, self.OnRbMIRRRadiobutton,
               id=wxID_PANELRESULT2RBMIRR)
 
         self.cbShowLegend = wx.CheckBox(id=wxID_PANELRESULT2CBSHOWLEGEND,
-              label=_(u'Show/Hide'), name=u'cbShowLegend', parent=self,
+              label=_U('Show/Hide'), name='cbShowLegend', parent=self,
               pos=wx.Point(584, 104), size=wx.Size(112, 13), style=0)
         self.cbShowLegend.SetValue(True)
         self.cbShowLegend.Bind(wx.EVT_CHECKBOX, self.OnCbShowLegendCheckbox,
               id=wxID_PANELRESULT2CBSHOWLEGEND)
 
         self.staticBox3 = wx.StaticBox(id=wxID_PANELRESULT2STATICBOX3,
-              label=u'Legend', name='staticBox3', parent=self, pos=wx.Point(560,
+              label='Legend', name='staticBox3', parent=self, pos=wx.Point(560,
               80), size=wx.Size(160, 56), style=0)
 
     def __init__(self, parent, id, pos, size, style, name):
@@ -260,7 +266,7 @@ class panelResult2(wx.Panel):
                 Status.mod.moduleTCA.result[index].display = 1
             else:
                 name = Status.mod.moduleTCA.result[index].name
-                wx.MessageBox(_("No result to display for proposal: ")+name)                
+                wx.MessageBox(_U("No result to display for proposal: ")+name)                
             self.updatePanel()
         except:
             pass

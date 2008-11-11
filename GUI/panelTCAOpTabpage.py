@@ -34,6 +34,12 @@ import wx
 import wx.grid
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCAOPTABPAGE, wxID_PANELTCAOPTABPAGEBTNADD, 
  wxID_PANELTCAOPTABPAGEBTNCHANGE, wxID_PANELTCAOPTABPAGEBTNREMOVE, 
  wxID_PANELTCAOPTABPAGECBNAME, wxID_PANELTCAOPTABPAGEGRID, 
@@ -49,44 +55,44 @@ class panelTCAOpTabpage(wx.Panel):
               style=wx.TAB_TRAVERSAL)
         self.SetClientSize(wx.Size(573, 430))
 
-        self.grid = wx.grid.Grid(id=wxID_PANELTCAOPTABPAGEGRID, name=u'grid',
+        self.grid = wx.grid.Grid(id=wxID_PANELTCAOPTABPAGEGRID, name='grid',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(488, 312), style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
               self.OnGridGridCellLeftClick)
 
         self.cbName = wx.Choice(choices=[], id=wxID_PANELTCAOPTABPAGECBNAME,
-              name=u'cbName', parent=self, pos=wx.Point(48, 328),
+              name='cbName', parent=self, pos=wx.Point(48, 328),
               size=wx.Size(240, 21), style=0)
 
         self.tbValue = wx.TextCtrl(id=wxID_PANELTCAOPTABPAGETBVALUE,
-              name=u'tbValue', parent=self, pos=wx.Point(296, 328),
+              name='tbValue', parent=self, pos=wx.Point(296, 328),
               size=wx.Size(160, 21), style=0, value='0')
 
         self.staticText1 = wx.StaticText(id=wxID_PANELTCAOPTABPAGESTATICTEXT1,
-              label=u'EUR/a', name='staticText1', parent=self, pos=wx.Point(464,
+              label='EUR/a', name='staticText1', parent=self, pos=wx.Point(464,
               328), size=wx.Size(30, 13), style=0)
 
-        self.btnAdd = wx.Button(id=wxID_PANELTCAOPTABPAGEBTNADD, label=_('Add'),
-              name=u'btnAdd', parent=self, pos=wx.Point(504, 328),
+        self.btnAdd = wx.Button(id=wxID_PANELTCAOPTABPAGEBTNADD, label=_U('Add'),
+              name='btnAdd', parent=self, pos=wx.Point(504, 328),
               size=wx.Size(64, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELTCAOPTABPAGEBTNADD)
 
         self.btnRemove = wx.Button(id=wxID_PANELTCAOPTABPAGEBTNREMOVE,
-              label=_('Remove'), name=u'btnRemove', parent=self,
+              label=_U('Remove'), name='btnRemove', parent=self,
               pos=wx.Point(504, 296), size=wx.Size(64, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_PANELTCAOPTABPAGEBTNREMOVE)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCAOPTABPAGESTATICBOX1,
-              label=_('Help'), name='staticBox1', parent=self, pos=wx.Point(8,
+              label=_U('Help'), name='staticBox1', parent=self, pos=wx.Point(8,
               360), size=wx.Size(560, 64), style=0)
 
         self.tHelp = wx.StaticText(id=wxID_PANELTCAOPTABPAGETHELP,
-              label=u'HELPTEXT', name=u'tHelp', parent=self, pos=wx.Point(24,
+              label='HELPTEXT', name='tHelp', parent=self, pos=wx.Point(24,
               378), size=wx.Size(50, 13), style=0)
         self.tHelp.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL, False,
-              u'Tahoma'))
+              'Tahoma'))
 
     def __init_custom_ctrls(self, prnt):
         #Grid-------------------------------------------------------------------------
@@ -105,20 +111,20 @@ class panelTCAOpTabpage(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("Operating cost\n[EUR/a]"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("Operating cost\n[EUR/a]"))
         
         self.updateGridAttributes()
         #choices--------------------------------------------------------------------------------
-        self.cbName.Append(_("H&C Storage"))
-        self.cbName.Append(_("CHP"))
-        self.cbName.Append(_("Solar thermal"))
-        self.cbName.Append(_("Heat pump"))
-        self.cbName.Append(_("Biomass"))
-        self.cbName.Append(_("Chillers"))
-        self.cbName.Append(_("Boilers and furnaces"))
-        self.cbName.Append(_("HX network"))
-        self.cbName.Append(_("H&C distribution"))
+        self.cbName.Append(_U("H&C Storage"))
+        self.cbName.Append(_U("CHP"))
+        self.cbName.Append(_U("Solar thermal"))
+        self.cbName.Append(_U("Heat pump"))
+        self.cbName.Append(_U("Biomass"))
+        self.cbName.Append(_U("Chillers"))
+        self.cbName.Append(_U("Boilers and furnaces"))
+        self.cbName.Append(_U("HX network"))
+        self.cbName.Append(_U("H&C distribution"))
         self.cbName.SetSelection(0)
        
     def __init__(self, parent, id, pos, size, style, name):
@@ -179,7 +185,7 @@ class panelTCAOpTabpage(wx.Panel):
                 self.items.append([name,value])            
                           
         except:
-            wx.MessageBox(_("Reconsider values."))
+            wx.MessageBox(_U("Reconsider values."))
         event.Skip()
         self.display()  
 

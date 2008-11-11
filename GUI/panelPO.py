@@ -33,6 +33,13 @@ from einstein.GUI.status import Status
 from GUITools import *
 from dialogPOManageDB import DialogPOManageDB
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
+
 [wxID_PANELPO, wxID_PANELPOBTNMANAGEDB, wxID_PANELPOBTNNEXT, 
  wxID_PANELPOBTNPREV, wxID_PANELPOCBSECTOR, wxID_PANELPOCBSUBSECTOR, 
  wxID_PANELPOCBTYPICALPROCESS, wxID_PANELPOCBUNIT, wxID_PANELPOHTMLWND, 
@@ -57,86 +64,86 @@ class PanelPO(wx.Panel):
         self.SetClientSize(wx.Size(792, 589))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELPOSTATICBOX1,
-              label=u'Process Optimisation', name='staticBox1', parent=self,
+              label='Process Optimisation', name='staticBox1', parent=self,
               pos=wx.Point(8, 6), size=wx.Size(760, 546), style=0)
 
-        self.btnNext = wx.Button(id=wxID_PANELPOBTNNEXT, label=u'>>>',
-              name=u'btnNext', parent=self, pos=wx.Point(696, 560),
+        self.btnNext = wx.Button(id=wxID_PANELPOBTNNEXT, label='>>>',
+              name='btnNext', parent=self, pos=wx.Point(696, 560),
               size=wx.Size(75, 23), style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
               id=wxID_PANELPOBTNNEXT)
 
-        self.btnPrev = wx.Button(id=wxID_PANELPOBTNPREV, label=u'<<<',
-              name=u'btnPrev', parent=self, pos=wx.Point(8, 560),
+        self.btnPrev = wx.Button(id=wxID_PANELPOBTNPREV, label='<<<',
+              name='btnPrev', parent=self, pos=wx.Point(8, 560),
               size=wx.Size(75, 23), style=0)
         self.btnPrev.Bind(wx.EVT_BUTTON, self.OnBtnPrevButton,
               id=wxID_PANELPOBTNPREV)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELPOSTATICTEXT1,
-              label=_(u'Technologies:'), name='staticText1', parent=self,
+              label=_U('Technologies:'), name='staticText1', parent=self,
               pos=wx.Point(496, 184), size=wx.Size(66, 13), style=0)
 
         self.staticText3 = wx.StaticText(id=wxID_PANELPOSTATICTEXT3,
-              label=u'Sector:', name='staticText3', parent=self,
+              label='Sector:', name='staticText3', parent=self,
               pos=wx.Point(496, 24), size=wx.Size(35, 13), style=0)
 
         self.staticText4 = wx.StaticText(id=wxID_PANELPOSTATICTEXT4,
-              label=u'Subsector:', name='staticText4', parent=self,
+              label='Subsector:', name='staticText4', parent=self,
               pos=wx.Point(496, 64), size=wx.Size(52, 13), style=0)
 
         self.staticText5 = wx.StaticText(id=wxID_PANELPOSTATICTEXT5,
-              label=u'Unit Operation:', name='staticText5', parent=self,
+              label='Unit Operation:', name='staticText5', parent=self,
               pos=wx.Point(496, 104), size=wx.Size(74, 13), style=0)
 
         self.staticText6 = wx.StaticText(id=wxID_PANELPOSTATICTEXT6,
-              label=u'Typical Process:', name='staticText6', parent=self,
+              label='Typical Process:', name='staticText6', parent=self,
               pos=wx.Point(496, 144), size=wx.Size(77, 13), style=0)
 
         self.cbSector = wx.Choice(choices=[], id=wxID_PANELPOCBSECTOR,
-              name=u'cbSector', parent=self, pos=wx.Point(496, 40),
+              name='cbSector', parent=self, pos=wx.Point(496, 40),
               size=wx.Size(264, 19), style=0)
         self.cbSector.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL, False,
-              u'Tahoma'))
+              'Tahoma'))
         self.cbSector.Bind(wx.EVT_CHOICE, self.OnCbSectorChoice,
               id=wxID_PANELPOCBSECTOR)
 
         self.cbSubsector = wx.Choice(choices=[], id=wxID_PANELPOCBSUBSECTOR,
-              name=u'cbSubsector', parent=self, pos=wx.Point(496, 80),
+              name='cbSubsector', parent=self, pos=wx.Point(496, 80),
               size=wx.Size(264, 19), style=0)
         self.cbSubsector.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
         self.cbSubsector.Bind(wx.EVT_CHOICE, self.OnCbSubsectorChoice,
               id=wxID_PANELPOCBSUBSECTOR)
 
         self.cbUnit = wx.Choice(choices=[], id=wxID_PANELPOCBUNIT,
-              name=u'cbUnit', parent=self, pos=wx.Point(496, 120),
+              name='cbUnit', parent=self, pos=wx.Point(496, 120),
               size=wx.Size(264, 19), style=0)
         self.cbUnit.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL, False,
-              u'Tahoma'))
+              'Tahoma'))
         self.cbUnit.Bind(wx.EVT_CHOICE, self.OnCbUnitChoice,
               id=wxID_PANELPOCBUNIT)
 
         self.cbTypicalProcess = wx.Choice(choices=[],
-              id=wxID_PANELPOCBTYPICALPROCESS, name=u'cbTypicalProcess',
+              id=wxID_PANELPOCBTYPICALPROCESS, name='cbTypicalProcess',
               parent=self, pos=wx.Point(496, 160), size=wx.Size(264, 19),
               style=0)
         self.cbTypicalProcess.SetFont(wx.Font(7, wx.SWISS, wx.NORMAL, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
         self.cbTypicalProcess.Bind(wx.EVT_CHOICE, self.OnCbTypicalProcessChoice,
               id=wxID_PANELPOCBTYPICALPROCESS)
 
         self.btnManageDB = wx.Button(id=wxID_PANELPOBTNMANAGEDB,
-              label=_(u'Manage Database'), name=u'btnManageDB', parent=self,
+              label=_U('Manage Database'), name='btnManageDB', parent=self,
               pos=wx.Point(568, 560), size=wx.Size(120, 23), style=0)
         self.btnManageDB.Bind(wx.EVT_BUTTON, self.OnBtnManageDBButton,
               id=wxID_PANELPOBTNMANAGEDB)
 
         self.htmlWnd = wx.html.HtmlWindow(id=wxID_PANELPOHTMLWND,
-              name=u'htmlWnd', parent=self, pos=wx.Point(16, 32),
+              name='htmlWnd', parent=self, pos=wx.Point(16, 32),
               size=wx.Size(472, 512), style=wx.html.HW_SCROLLBAR_AUTO)
 
         self.lbTech = wx.CheckListBox(choices=[], id=wxID_PANELPOLBTECH,
-              name=u'lbTech', parent=self, pos=wx.Point(496, 200),
+              name='lbTech', parent=self, pos=wx.Point(496, 200),
               size=wx.Size(256, 344), style=0)
         self.lbTech.Bind(wx.EVT_CHECKLISTBOX, self.OnLbTechChecklistbox,
               id=wxID_PANELPOLBTECH)
@@ -150,8 +157,8 @@ class PanelPO(wx.Panel):
     def __init__(self, parent, main, id, pos, size, style, name):
         self.main = main
         self.mod = Status.mod.modulePO
-        self.shortName = _("PO")
-        self.description = _("")               
+        self.shortName = _U("PO")
+        self.description = _U("")               
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
 

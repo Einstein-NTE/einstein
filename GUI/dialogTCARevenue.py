@@ -34,6 +34,12 @@ import wx
 import wx.grid
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 def create(parent):
     return dlgRevenue(parent)
 
@@ -52,15 +58,15 @@ def create(parent):
 class dlgRevenue(wx.Dialog):
     def _init_ctrls(self, prnt):
         # generated method, don't edit
-        wx.Dialog.__init__(self, id=wxID_DLGREVENUE, name=u'dlgRevenue',
+        wx.Dialog.__init__(self, id=wxID_DLGREVENUE, name='dlgRevenue',
               parent=prnt, pos=wx.Point(374, 32), size=wx.Size(823, 685),
               style=wx.DEFAULT_DIALOG_STYLE,
-              title=u'Estimate revenue from the sale of replaced equipments')
+              title='Estimate revenue from the sale of replaced equipments')
         self.SetClientSize(wx.Size(815, 658))
 
         self.rbInitInvestment = wx.RadioButton(id=wxID_DLGREVENUERBINITINVESTMENT,
-              label=u'Calculate with percentage of initial investment',
-              name=u'rbInitInvestment', parent=self, pos=wx.Point(24, 32),
+              label='Calculate with percentage of initial investment',
+              name='rbInitInvestment', parent=self, pos=wx.Point(24, 32),
               size=wx.Size(256, 13), style=0)
         self.rbInitInvestment.SetValue(True)
         self.rbInitInvestment.Bind(wx.EVT_RADIOBUTTON,
@@ -68,58 +74,58 @@ class dlgRevenue(wx.Dialog):
               id=wxID_DLGREVENUERBINITINVESTMENT)
 
         self.rbBookValue = wx.RadioButton(id=wxID_DLGREVENUERBBOOKVALUE,
-              label=u'Calculate with percentage of current book value',
-              name=u'rbBookValue', parent=self, pos=wx.Point(24, 48),
+              label='Calculate with percentage of current book value',
+              name='rbBookValue', parent=self, pos=wx.Point(24, 48),
               size=wx.Size(264, 13), style=0)
         self.rbBookValue.SetValue(False)
         self.rbBookValue.Bind(wx.EVT_RADIOBUTTON, self.OnRbBookValueRadiobutton,
               id=wxID_DLGREVENUERBBOOKVALUE)
 
         self.staticBox1 = wx.StaticBox(id=wxID_DLGREVENUESTATICBOX1,
-              label=u'Choose Method', name='staticBox1', parent=self,
+              label='Choose Method', name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(800, 72), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_DLGREVENUESTATICBOX2,
-              label=u'Calculation', name='staticBox2', parent=self,
+              label='Calculation', name='staticBox2', parent=self,
               pos=wx.Point(8, 552), size=wx.Size(800, 96), style=0)
 
         self.tResult = wx.StaticText(id=wxID_DLGREVENUETRESULT,
-              label=u'1000000 EUR', name=u'tResult', parent=self,
+              label='1000000 EUR', name='tResult', parent=self,
               pos=wx.Point(88, 576), size=wx.Size(65, 13), style=0)
 
         self.staticBox3 = wx.StaticBox(id=wxID_DLGREVENUESTATICBOX3,
-              label=u'Data', name='staticBox3', parent=self, pos=wx.Point(8,
+              label='Data', name='staticBox3', parent=self, pos=wx.Point(8,
               88), size=wx.Size(800, 456), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_DLGREVENUESTATICTEXT1,
-              label=u'Percentage:', name='staticText1', parent=self,
+              label='Percentage:', name='staticText1', parent=self,
               pos=wx.Point(24, 600), size=wx.Size(59, 13), style=0)
 
         self.staticText2 = wx.StaticText(id=wxID_DLGREVENUESTATICTEXT2,
-              label=u'Value:', name='staticText2', parent=self, pos=wx.Point(24,
+              label='Value:', name='staticText2', parent=self, pos=wx.Point(24,
               576), size=wx.Size(31, 13), style=0)
 
-        self.tbPerc = wx.TextCtrl(id=wxID_DLGREVENUETBPERC, name=u'tbPerc',
+        self.tbPerc = wx.TextCtrl(id=wxID_DLGREVENUETBPERC, name='tbPerc',
               parent=self, pos=wx.Point(88, 600), size=wx.Size(24, 16), style=0,
-              value=u'5')
+              value='5')
         self.tbPerc.Bind(wx.EVT_TEXT, self.OnTbPercText,
               id=wxID_DLGREVENUETBPERC)
 
         self.staticText3 = wx.StaticText(id=wxID_DLGREVENUESTATICTEXT3,
-              label=u'%', name='staticText3', parent=self, pos=wx.Point(112,
+              label='%', name='staticText3', parent=self, pos=wx.Point(112,
               603), size=wx.Size(11, 13), style=0)
 
         self.staticText4 = wx.StaticText(id=wxID_DLGREVENUESTATICTEXT4,
-              label=u'Revenue:', name='staticText4', parent=self,
+              label='Revenue:', name='staticText4', parent=self,
               pos=wx.Point(24, 624), size=wx.Size(53, 13), style=0)
         self.staticText4.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
-              u'Tahoma'))
+              'Tahoma'))
 
         self.tRevenue = wx.StaticText(id=wxID_DLGREVENUETREVENUE,
-              label=u'50000 EUR', name=u'tRevenue', parent=self,
+              label='50000 EUR', name='tRevenue', parent=self,
               pos=wx.Point(88, 624), size=wx.Size(60, 13), style=0)
         self.tRevenue.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD, False,
-              u'Tahoma'))
+              'Tahoma'))
 
         self.grid = wx.grid.Grid(id=wxID_DLGREVENUEGRID, name='grid',
               parent=self, pos=wx.Point(24, 112), size=wx.Size(688, 392),
@@ -128,49 +134,49 @@ class dlgRevenue(wx.Dialog):
               self.OnGridGridCellLeftClick)
 
         self.btnApply = wx.Button(id=wxID_DLGREVENUEBTNAPPLY,
-              label=u'Apply result as revenue', name=u'btnApply', parent=self,
+              label='Apply result as revenue', name='btnApply', parent=self,
               pos=wx.Point(528, 616), size=wx.Size(131, 23), style=0)
         self.btnApply.Bind(wx.EVT_BUTTON, self.OnBtnApplyButton,
               id=wxID_DLGREVENUEBTNAPPLY)
 
-        self.btnCancel = wx.Button(id=wxID_DLGREVENUEBTNCANCEL, label=u'Cancel',
-              name=u'btnCancel', parent=self, pos=wx.Point(664, 616),
+        self.btnCancel = wx.Button(id=wxID_DLGREVENUEBTNCANCEL, label='Cancel',
+              name='btnCancel', parent=self, pos=wx.Point(664, 616),
               size=wx.Size(128, 23), style=0)
         self.btnCancel.Bind(wx.EVT_BUTTON, self.OnBtnCancelButton,
               id=wxID_DLGREVENUEBTNCANCEL)
 
         self.cbSubcategory = wx.ComboBox(choices=[],
-              id=wxID_DLGREVENUECBSUBCATEGORY, name=u'cbSubcategory',
+              id=wxID_DLGREVENUECBSUBCATEGORY, name='cbSubcategory',
               parent=self, pos=wx.Point(184, 512), size=wx.Size(208, 21),
-              style=0, value=u'<enter custom description or choose from list>')
-        self.cbSubcategory.SetLabel(u'<enter custom description or choose from list>')
+              style=0, value='<enter custom description or choose from list>')
+        self.cbSubcategory.SetLabel('<enter custom description or choose from list>')
 
         self.tbInitInvestment = wx.TextCtrl(id=wxID_DLGREVENUETBINITINVESTMENT,
-              name=u'tbInitInvestment', parent=self, pos=wx.Point(392, 512),
-              size=wx.Size(100, 21), style=0, value=u'0')
+              name='tbInitInvestment', parent=self, pos=wx.Point(392, 512),
+              size=wx.Size(100, 21), style=0, value='0')
 
         self.tbDepPeriod = wx.TextCtrl(id=wxID_DLGREVENUETBDEPPERIOD,
-              name=u'tbDepPeriod', parent=self, pos=wx.Point(496, 512),
-              size=wx.Size(100, 21), style=0, value=u'1')
+              name='tbDepPeriod', parent=self, pos=wx.Point(496, 512),
+              size=wx.Size(100, 21), style=0, value='1')
 
         self.tbRemPeriod = wx.TextCtrl(id=wxID_DLGREVENUETBREMPERIOD,
-              name=u'tbRemPeriod', parent=self, pos=wx.Point(600, 512),
-              size=wx.Size(100, 21), style=0, value=u'1')
+              name='tbRemPeriod', parent=self, pos=wx.Point(600, 512),
+              size=wx.Size(100, 21), style=0, value='1')
 
-        self.btnAdd = wx.Button(id=wxID_DLGREVENUEBTNADD, label=u'Add',
-              name=u'btnAdd', parent=self, pos=wx.Point(720, 512),
+        self.btnAdd = wx.Button(id=wxID_DLGREVENUEBTNADD, label='Add',
+              name='btnAdd', parent=self, pos=wx.Point(720, 512),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_DLGREVENUEBTNADD)
 
-        self.btnRemove = wx.Button(id=wxID_DLGREVENUEBTNREMOVE, label=u'Remove',
-              name=u'btnRemove', parent=self, pos=wx.Point(720, 480),
+        self.btnRemove = wx.Button(id=wxID_DLGREVENUEBTNREMOVE, label='Remove',
+              name='btnRemove', parent=self, pos=wx.Point(720, 480),
               size=wx.Size(75, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_DLGREVENUEBTNREMOVE)
 
         self.cbCategory = wx.Choice(choices=[], id=wxID_DLGREVENUECBCATEGORY,
-              name=u'cbCategory', parent=self, pos=wx.Point(56, 512),
+              name='cbCategory', parent=self, pos=wx.Point(56, 512),
               size=wx.Size(128, 21), style=0)
         self.cbCategory.Bind(wx.EVT_CHOICE, self.OnCbCategoryChoice,
               id=wxID_DLGREVENUECBCATEGORY)
@@ -202,10 +208,10 @@ class dlgRevenue(wx.Dialog):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("Initial investment\n[EUR]"))
-        self.grid.SetColLabelValue(2, _("Depreciation period\n[years]"))
-        self.grid.SetColLabelValue(3, _("Remaining period\n[years]"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("Initial investment\n[EUR]"))
+        self.grid.SetColLabelValue(2, _U("Depreciation period\n[years]"))
+        self.grid.SetColLabelValue(3, _U("Remaining period\n[years]"))
         
         self.updateGridAttributes()
             
@@ -213,9 +219,9 @@ class dlgRevenue(wx.Dialog):
         self.tbDepPeriod.Enabled = False
         self.tbRemPeriod.Enabled = False
         #choice-----------------------------------------------------------------------
-        self.cbCategory.Append(_("Purchased Equipment"))
-        self.cbCategory.Append(_("Utility Connections"))
-        self.cbCategory.Append(_("Buildings"))
+        self.cbCategory.Append(_U("Purchased Equipment"))
+        self.cbCategory.Append(_U("Utility Connections"))
+        self.cbCategory.Append(_U("Buildings"))
         self.cbCategory.SetSelection(0)
         self.updateSubcategory()
         #text--------------------------------------------------------------------------        
@@ -259,27 +265,27 @@ class dlgRevenue(wx.Dialog):
         category = self.cbCategory.GetSelection()
         self.cbSubcategory.Clear()
         if (category == 0):
-            self.cbSubcategory.Append(_("process energy generation equipment"))
-            self.cbSubcategory.Append(_("equipment for energy generation and transformation"))
-            self.cbSubcategory.Append(_("equipment for energy recovery"))
-            self.cbSubcategory.Append(_("equipment for cooling/re-cooling/closure of cooling cycles"))
-            self.cbSubcategory.Append(_("air condition for processes"))
-            self.cbSubcategory.Append(_("conduction system for energy transportation"))
-            self.cbSubcategory.Append(_("storage and materials handling equipment"))
-            self.cbSubcategory.Append(_("safety/protective equipment"))
-            self.cbSubcategory.Append(_("monitoring/control equipment"))
-            self.cbSubcategory.Append(_("laboratory/analytical equipment"))
+            self.cbSubcategory.Append(_U("process energy generation equipment"))
+            self.cbSubcategory.Append(_U("equipment for energy generation and transformation"))
+            self.cbSubcategory.Append(_U("equipment for energy recovery"))
+            self.cbSubcategory.Append(_U("equipment for cooling/re-cooling/closure of cooling cycles"))
+            self.cbSubcategory.Append(_U("air condition for processes"))
+            self.cbSubcategory.Append(_U("conduction system for energy transportation"))
+            self.cbSubcategory.Append(_U("storage and materials handling equipment"))
+            self.cbSubcategory.Append(_U("safety/protective equipment"))
+            self.cbSubcategory.Append(_U("monitoring/control equipment"))
+            self.cbSubcategory.Append(_U("laboratory/analytical equipment"))
             self.cbSubcategory.SetSelection(0)
         if (category == 1):
-            self.cbSubcategory.Append(_("electricity"))
-            self.cbSubcategory.Append(_("steam"))
-            self.cbSubcategory.Append(_("water"))
-            self.cbSubcategory.Append(_("fuel"))
-            self.cbSubcategory.Append(_("plant air"))
-            self.cbSubcategory.Append(_("inert gas"))
-            self.cbSubcategory.Append(_("refrigeration"))
-            self.cbSubcategory.Append(_("sewerage"))
-            self.cbSubcategory.Append(_("pumping"))
+            self.cbSubcategory.Append(_U("electricity"))
+            self.cbSubcategory.Append(_U("steam"))
+            self.cbSubcategory.Append(_U("water"))
+            self.cbSubcategory.Append(_U("fuel"))
+            self.cbSubcategory.Append(_U("plant air"))
+            self.cbSubcategory.Append(_U("inert gas"))
+            self.cbSubcategory.Append(_U("refrigeration"))
+            self.cbSubcategory.Append(_U("sewerage"))
+            self.cbSubcategory.Append(_U("pumping"))
             self.cbSubcategory.SetSelection(0)
                                 
     def OnRbInitInvestmentRadiobutton(self, event):

@@ -7,6 +7,13 @@ from dialogPOManageTech import DlgManageTech
 from dialogPOManageEM import DlgManageEM
 from dialogPOManageTypical import DlgManageTP
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
+
 def create(parent):
     return Dialog1(parent)
 
@@ -37,71 +44,71 @@ class DialogPOManageDB(wx.Dialog):
         wx.Dialog.__init__(self, id=wxID_DIALOGPOMANAGEDB, name='', parent=prnt,
               pos=wx.Point(0, 0), size=wx.Size(1018, 719),
               style=wx.DEFAULT_DIALOG_STYLE,
-              title=_(u'Manage Process Optimisation Database'))
+              title=_U('Manage Process Optimisation Database'))
         self.SetClientSize(wx.Size(1010, 692))
 
         self.staticBox1 = wx.StaticBox(id=wxID_DIALOGPOMANAGEDBSTATICBOX1,
-              label=u'1. Sectors', name='staticBox1', parent=self,
+              label='1. Sectors', name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(504, 296), style=0)
 
         self.lbSectors = wx.ListBox(choices=[],
-              id=wxID_DIALOGPOMANAGEDBLBSECTORS, name=u'lbSectors', parent=self,
+              id=wxID_DIALOGPOMANAGEDBLBSECTORS, name='lbSectors', parent=self,
               pos=wx.Point(16, 24), size=wx.Size(488, 208), style=0)
         self.lbSectors.Bind(wx.EVT_LISTBOX, self.OnLbSectorsListbox,
               id=wxID_DIALOGPOMANAGEDBLBSECTORS)
 
         self.btnAddSector = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNADDSECTOR,
-              label=u'Add', name=u'btnAddSector', parent=self, pos=wx.Point(320,
+              label='Add', name='btnAddSector', parent=self, pos=wx.Point(320,
               272), size=wx.Size(56, 23), style=0)
         self.btnAddSector.Bind(wx.EVT_BUTTON, self.OnBtnAddSectorButton,
               id=wxID_DIALOGPOMANAGEDBBTNADDSECTOR)
 
         self.btnRemove = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNREMOVE,
-              label=u'Remove', name=u'btnRemove', parent=self, pos=wx.Point(384,
+              label='Remove', name='btnRemove', parent=self, pos=wx.Point(384,
               272), size=wx.Size(56, 23), style=0)
         self.btnRemove.Bind(wx.EVT_BUTTON, self.OnBtnRemoveButton,
               id=wxID_DIALOGPOMANAGEDBBTNREMOVE)
 
         self.btnChange = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNCHANGE,
-              label=u'Change', name=u'btnChange', parent=self, pos=wx.Point(448,
+              label='Change', name='btnChange', parent=self, pos=wx.Point(448,
               272), size=wx.Size(56, 23), style=0)
         self.btnChange.Bind(wx.EVT_BUTTON, self.OnBtnChangeButton,
               id=wxID_DIALOGPOMANAGEDBBTNCHANGE)
 
         self.tcSectorName = wx.TextCtrl(id=wxID_DIALOGPOMANAGEDBTCSECTORNAME,
-              name=u'tcSectorName', parent=self, pos=wx.Point(128, 240),
-              size=wx.Size(376, 21), style=0, value=u'New Sector')
+              name='tcSectorName', parent=self, pos=wx.Point(128, 240),
+              size=wx.Size(376, 21), style=0, value='New Sector')
 
         self.staticBox2 = wx.StaticBox(id=wxID_DIALOGPOMANAGEDBSTATICBOX2,
-              label=u'2. Subsectors', name='staticBox2', parent=self,
+              label='2. Subsectors', name='staticBox2', parent=self,
               pos=wx.Point(520, 8), size=wx.Size(480, 296), style=0)
 
         self.lbSubsectors = wx.ListBox(choices=[],
-              id=wxID_DIALOGPOMANAGEDBLBSUBSECTORS, name=u'lbSubsectors',
+              id=wxID_DIALOGPOMANAGEDBLBSUBSECTORS, name='lbSubsectors',
               parent=self, pos=wx.Point(536, 24), size=wx.Size(456, 208),
               style=0)
         self.lbSubsectors.Bind(wx.EVT_LISTBOX, self.OnLbSubsectors,
               id=wxID_DIALOGPOMANAGEDBLBSUBSECTORS)
 
         self.tcSubsector = wx.TextCtrl(id=wxID_DIALOGPOMANAGEDBTCSUBSECTOR,
-              name=u'tcSubsector', parent=self, pos=wx.Point(648, 240),
-              size=wx.Size(344, 21), style=0, value=u'New Subsector')
+              name='tcSubsector', parent=self, pos=wx.Point(648, 240),
+              size=wx.Size(344, 21), style=0, value='New Subsector')
 
         self.btnAddSubsector = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNADDSUBSECTOR,
-              label=u'Add', name=u'btnAddSubsector', parent=self,
+              label='Add', name='btnAddSubsector', parent=self,
               pos=wx.Point(808, 272), size=wx.Size(56, 23), style=0)
         self.btnAddSubsector.Bind(wx.EVT_BUTTON, self.OnBtnAddSubsectorButton,
               id=wxID_DIALOGPOMANAGEDBBTNADDSUBSECTOR)
 
         self.btnRemoveSubsector = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNREMOVESUBSECTOR,
-              label=u'Remove', name=u'btnRemoveSubsector', parent=self,
+              label='Remove', name='btnRemoveSubsector', parent=self,
               pos=wx.Point(872, 272), size=wx.Size(56, 23), style=0)
         self.btnRemoveSubsector.Bind(wx.EVT_BUTTON,
               self.OnBtnRemoveSubsectorButton,
               id=wxID_DIALOGPOMANAGEDBBTNREMOVESUBSECTOR)
 
         self.btnChangeSubsector = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNCHANGESUBSECTOR,
-              label=u'Change', name=u'btnChangeSubsector', parent=self,
+              label='Change', name='btnChangeSubsector', parent=self,
               pos=wx.Point(936, 272), size=wx.Size(56, 23), style=0)
         self.btnChangeSubsector.Bind(wx.EVT_BUTTON,
               self.OnBtnChangeSubsectorButton,
@@ -114,114 +121,114 @@ class DialogPOManageDB(wx.Dialog):
               id=wxID_DIALOGPOMANAGEDBCBUO)
 
         self.btnManageUnitOperation = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNMANAGEUNITOPERATION,
-              label=u'Manage', name=u'btnManageUnitOperation', parent=self,
+              label='Manage', name='btnManageUnitOperation', parent=self,
               pos=wx.Point(480, 336), size=wx.Size(60, 18), style=0)
         self.btnManageUnitOperation.Bind(wx.EVT_BUTTON,
               self.OnBtnManageUnitOperationButton,
               id=wxID_DIALOGPOMANAGEDBBTNMANAGEUNITOPERATION)
 
         self.btnManageTechnologies = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNMANAGETECHNOLOGIES,
-              label=u'Manage', name=u'btnManageTechnologies', parent=self,
+              label='Manage', name='btnManageTechnologies', parent=self,
               pos=wx.Point(480, 600), size=wx.Size(60, 18), style=0)
         self.btnManageTechnologies.Bind(wx.EVT_BUTTON,
               self.OnBtnManageTechnologiesButton,
               id=wxID_DIALOGPOMANAGEDBBTNMANAGETECHNOLOGIES)
 
         self.staticBox6 = wx.StaticBox(id=wxID_DIALOGPOMANAGEDBSTATICBOX6,
-              label=u'3. Linking', name='staticBox6', parent=self,
+              label='3. Linking', name='staticBox6', parent=self,
               pos=wx.Point(8, 312), size=wx.Size(552, 368), style=0)
 
         self.cbTech = wx.Choice(choices=[], id=wxID_DIALOGPOMANAGEDBCBTECH,
-              name=u'cbTech', parent=self, pos=wx.Point(112, 600),
+              name='cbTech', parent=self, pos=wx.Point(112, 600),
               size=wx.Size(360, 21), style=0)
         self.cbTech.Bind(wx.EVT_CHOICE, self.OnCbTechChoice,
               id=wxID_DIALOGPOMANAGEDBCBTECH)
 
         self.staticText1 = wx.StaticText(id=wxID_DIALOGPOMANAGEDBSTATICTEXT1,
-              label=u'Typical Process', name='staticText1', parent=self,
+              label='Typical Process', name='staticText1', parent=self,
               pos=wx.Point(32, 576), size=wx.Size(73, 13), style=0)
 
         self.lbEMList = wx.ListBox(choices=[], id=wxID_DIALOGPOMANAGEDBLBEMLIST,
-              name=u'lbEMList', parent=self, pos=wx.Point(24, 360),
+              name='lbEMList', parent=self, pos=wx.Point(24, 360),
               size=wx.Size(520, 200), style=0)
         self.lbEMList.Bind(wx.EVT_LISTBOX, self.OnLbEMListListbox,
               id=wxID_DIALOGPOMANAGEDBLBEMLIST)
 
         self.staticText2 = wx.StaticText(id=wxID_DIALOGPOMANAGEDBSTATICTEXT2,
-              label=u'Technology', name='staticText2', parent=self,
+              label='Technology', name='staticText2', parent=self,
               pos=wx.Point(32, 600), size=wx.Size(55, 13), style=0)
 
         self.btnRemoveEMList = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNREMOVEEMLIST,
-              label=u'Remove', name=u'btnRemoveEMList', parent=self,
+              label='Remove', name='btnRemoveEMList', parent=self,
               pos=wx.Point(480, 632), size=wx.Size(59, 23), style=0)
         self.btnRemoveEMList.Bind(wx.EVT_BUTTON, self.OnBtnRemoveEMListButton,
               id=wxID_DIALOGPOMANAGEDBBTNREMOVEEMLIST)
 
         self.btnAddEMList = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNADDEMLIST,
-              label=u'Add', name=u'btnAddEMList', parent=self, pos=wx.Point(408,
+              label='Add', name='btnAddEMList', parent=self, pos=wx.Point(408,
               632), size=wx.Size(59, 23), style=0)
         self.btnAddEMList.Bind(wx.EVT_BUTTON, self.OnBtnAddEMListButton,
               id=wxID_DIALOGPOMANAGEDBBTNADDEMLIST)
 
         self.staticBox5 = wx.StaticBox(id=wxID_DIALOGPOMANAGEDBSTATICBOX5,
-              label=u'4. Measures', name='staticBox5', parent=self,
+              label='4. Measures', name='staticBox5', parent=self,
               pos=wx.Point(568, 312), size=wx.Size(432, 368), style=0)
 
         self.lbMeasure = wx.ListBox(choices=[],
-              id=wxID_DIALOGPOMANAGEDBLBMEASURE, name=u'lbMeasure', parent=self,
+              id=wxID_DIALOGPOMANAGEDBLBMEASURE, name='lbMeasure', parent=self,
               pos=wx.Point(584, 336), size=wx.Size(400, 264), style=0)
         self.lbMeasure.Bind(wx.EVT_LISTBOX, self.OnLbMeasureListbox,
               id=wxID_DIALOGPOMANAGEDBLBMEASURE)
 
         self.cbMeasure = wx.Choice(choices=[],
-              id=wxID_DIALOGPOMANAGEDBCBMEASURE, name=u'cbMeasure', parent=self,
+              id=wxID_DIALOGPOMANAGEDBCBMEASURE, name='cbMeasure', parent=self,
               pos=wx.Point(584, 608), size=wx.Size(400, 21), style=0)
 
         self.btnUnlinkMeasure = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNUNLINKMEASURE,
-              label=u'Unlink', name=u'btnUnlinkMeasure', parent=self,
+              label='Unlink', name='btnUnlinkMeasure', parent=self,
               pos=wx.Point(912, 640), size=wx.Size(75, 23), style=0)
         self.btnUnlinkMeasure.Bind(wx.EVT_BUTTON, self.OnBtnUnlinkMeasureButton,
               id=wxID_DIALOGPOMANAGEDBBTNUNLINKMEASURE)
 
         self.btnLinkMeasure = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNLINKMEASURE,
-              label=u'Link', name=u'btnLinkMeasure', parent=self,
+              label='Link', name='btnLinkMeasure', parent=self,
               pos=wx.Point(832, 640), size=wx.Size(75, 23), style=0)
         self.btnLinkMeasure.Bind(wx.EVT_BUTTON, self.OnBtnLinkMeasureButton,
               id=wxID_DIALOGPOMANAGEDBBTNLINKMEASURE)
 
         self.btnManageMeasures = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNMANAGEMEASURES,
-              label=u'Manage Measures', name=u'btnManageMeasures', parent=self,
+              label='Manage Measures', name='btnManageMeasures', parent=self,
               pos=wx.Point(584, 640), size=wx.Size(176, 23), style=0)
         self.btnManageMeasures.Bind(wx.EVT_BUTTON,
               self.OnBtnManageMeasuresButton,
               id=wxID_DIALOGPOMANAGEDBBTNMANAGEMEASURES)
 
         self.btnManageTP = wx.Button(id=wxID_DIALOGPOMANAGEDBBTNMANAGETP,
-              label=u'Manage', name=u'btnManageTP', parent=self,
+              label='Manage', name='btnManageTP', parent=self,
               pos=wx.Point(480, 576), size=wx.Size(60, 18), style=0)
         self.btnManageTP.Bind(wx.EVT_BUTTON, self.OnBtnManageTPButton,
               id=wxID_DIALOGPOMANAGEDBBTNMANAGETP)
 
         self.cbTP = wx.Choice(choices=[], id=wxID_DIALOGPOMANAGEDBCBTP,
-              name=u'cbTP', parent=self, pos=wx.Point(112, 576),
+              name='cbTP', parent=self, pos=wx.Point(112, 576),
               size=wx.Size(360, 21), style=0)
         self.cbTP.Bind(wx.EVT_CHOICE, self.OnCbTPChoice,
               id=wxID_DIALOGPOMANAGEDBCBTP)
 
         self.staticText3 = wx.StaticText(id=wxID_DIALOGPOMANAGEDBSTATICTEXT3,
-              label=u'UnitOperation', name='staticText3', parent=self,
+              label='UnitOperation', name='staticText3', parent=self,
               pos=wx.Point(24, 336), size=wx.Size(67, 13), style=0)
 
         self.tcNACESector = wx.TextCtrl(id=wxID_DIALOGPOMANAGEDBTCNACESECTOR,
-              name=u'tcNACESector', parent=self, pos=wx.Point(16, 240),
-              size=wx.Size(108, 21), style=0, value=u'NACE')
+              name='tcNACESector', parent=self, pos=wx.Point(16, 240),
+              size=wx.Size(108, 21), style=0, value='NACE')
 
         self.tcNACESubsector = wx.TextCtrl(id=wxID_DIALOGPOMANAGEDBTCNACESUBSECTOR,
-              name=u'tcNACESubsector', parent=self, pos=wx.Point(536, 240),
-              size=wx.Size(108, 21), style=0, value=u'NACE')
+              name='tcNACESubsector', parent=self, pos=wx.Point(536, 240),
+              size=wx.Size(108, 21), style=0, value='NACE')
 
         self.cbShowAll = wx.CheckBox(id=wxID_DIALOGPOMANAGEDBCBSHOWALL,
-              label=u'Show all', name=u'cbShowAll', parent=self,
+              label='Show all', name='cbShowAll', parent=self,
               pos=wx.Point(416, 336), size=wx.Size(64, 18), style=0)
         self.cbShowAll.SetValue(True)
         self.cbShowAll.Bind(wx.EVT_CHECKBOX, self.OnCbShowAllCheckbox,

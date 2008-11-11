@@ -36,6 +36,12 @@ from einstein.GUI.status import Status
 from GUITools import *
 from einstein.GUI.dialogTCADetailedOpCost import dlgOpcost
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCAENERGY, wxID_PANELTCAENERGYBTNADD, wxID_PANELTCAENERGYBTNDELETE, 
  wxID_PANELTCAENERGYBTNDETAILEDOPCOST, wxID_PANELTCAENERGYBTNGOMAIN, 
  wxID_PANELTCAENERGYBTNNEXT, wxID_PANELTCAENERGYCOMBOBOX1, 
@@ -57,15 +63,15 @@ class PanelTCAEnergy(wx.Panel):
         self.SetClientSize(wx.Size(752, 590))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCAENERGYSTATICBOX1,
-              label=_(u'Energy cost'), name='staticBox1', parent=self,
+              label=_U('Energy cost'), name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(728, 392), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCAENERGYSTATICBOX2,
-              label=_(u'Operating and maintenance cost'), name='staticBox2',
+              label=_U('Operating and maintenance cost'), name='staticBox2',
               parent=self, pos=wx.Point(8, 408), size=wx.Size(728, 144),
               style=0)
 
-        self.grid = wx.grid.Grid(id=wxID_PANELTCAENERGYGRID, name=u'grid',
+        self.grid = wx.grid.Grid(id=wxID_PANELTCAENERGYGRID, name='grid',
               parent=self, pos=wx.Point(24, 32), size=wx.Size(616, 248),
               style=0)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
@@ -74,88 +80,88 @@ class PanelTCAEnergy(wx.Panel):
         self.comboBox1 = wx.ComboBox(choices=[],
               id=wxID_PANELTCAENERGYCOMBOBOX1, name='comboBox1', parent=self,
               pos=wx.Point(40, 288), size=wx.Size(272, 21), style=0,
-              value=_('<Enter custom description or choose from list>'))
+              value=_U('<Enter custom description or choose from list>'))
 
         self.tbDemand = wx.TextCtrl(id=wxID_PANELTCAENERGYTBDEMAND,
-              name=u'tbDemand', parent=self, pos=wx.Point(320, 288),
-              size=wx.Size(100, 21), style=0, value=u'0')
+              name='tbDemand', parent=self, pos=wx.Point(320, 288),
+              size=wx.Size(100, 21), style=0, value='0')
 
         self.tbPrice = wx.TextCtrl(id=wxID_PANELTCAENERGYTBPRICE,
-              name=u'tbPrice', parent=self, pos=wx.Point(424, 288),
-              size=wx.Size(100, 21), style=0, value=u'0')
+              name='tbPrice', parent=self, pos=wx.Point(424, 288),
+              size=wx.Size(100, 21), style=0, value='0')
 
         self.tbDevelopment = wx.TextCtrl(id=wxID_PANELTCAENERGYTBDEVELOPMENT,
-              name=u'tbDevelopment', parent=self, pos=wx.Point(528, 288),
-              size=wx.Size(100, 21), style=0, value=u'0')
+              name='tbDevelopment', parent=self, pos=wx.Point(528, 288),
+              size=wx.Size(100, 21), style=0, value='0')
 
         self.btnDelete = wx.Button(id=wxID_PANELTCAENERGYBTNDELETE,
-              label=_('Remove'), name=u'btnDelete', parent=self, pos=wx.Point(648,
+              label=_U('Remove'), name='btnDelete', parent=self, pos=wx.Point(648,
               256), size=wx.Size(75, 23), style=0)
         self.btnDelete.Bind(wx.EVT_BUTTON, self.OnBtnDeleteButton,
               id=wxID_PANELTCAENERGYBTNDELETE)
 
-        self.btnAdd = wx.Button(id=wxID_PANELTCAENERGYBTNADD, label=_('Add'),
-              name=u'btnAdd', parent=self, pos=wx.Point(648, 288),
+        self.btnAdd = wx.Button(id=wxID_PANELTCAENERGYBTNADD, label=_U('Add'),
+              name='btnAdd', parent=self, pos=wx.Point(648, 288),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELTCAENERGYBTNADD)
 
         self.staticBox3 = wx.StaticBox(id=wxID_PANELTCAENERGYSTATICBOX3,
-              label=_('Help'), name='staticBox3', parent=self, pos=wx.Point(24,
+              label=_U('Help'), name='staticBox3', parent=self, pos=wx.Point(24,
               328), size=wx.Size(696, 64), style=0)
 
         self.tEnergyHelp = wx.StaticText(id=wxID_PANELTCAENERGYTENERGYHELP,
-              label=_('The values come from the audit questionnaire\nIf you would like to make any changes, please edit them'),
-              name=u'tEnergyHelp', parent=self, pos=wx.Point(40, 352),
+              label=_U('The values come from the audit questionnaire\nIf you would like to make any changes, please edit them'),
+              name='tEnergyHelp', parent=self, pos=wx.Point(40, 352),
               size=wx.Size(270, 26), style=0)
         self.tEnergyHelp.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.staticBox4 = wx.StaticBox(id=wxID_PANELTCAENERGYSTATICBOX4,
-              label=_('Help'), name='staticBox4', parent=self, pos=wx.Point(24,
+              label=_U('Help'), name='staticBox4', parent=self, pos=wx.Point(24,
               480), size=wx.Size(696, 64), style=0)
 
         self.tbTotalOpCost = wx.TextCtrl(id=wxID_PANELTCAENERGYTBTOTALOPCOST,
-              name=u'tbTotalOpCost', parent=self, pos=wx.Point(136, 440),
-              size=wx.Size(152, 21), style=0, value=u'0')
+              name='tbTotalOpCost', parent=self, pos=wx.Point(136, 440),
+              size=wx.Size(152, 21), style=0, value='0')
         self.tbTotalOpCost.Bind(wx.EVT_TEXT, self.OnTbTotalOpCostText,
               id=wxID_PANELTCAENERGYTBTOTALOPCOST)
         self.tbTotalOpCost.Bind(wx.EVT_KILL_FOCUS,
               self.OnTbTotalOpCostKillFocus)
 
         self.staticText7 = wx.StaticText(id=wxID_PANELTCAENERGYSTATICTEXT7,
-              label=_('Total operating and\nmaintenance cost'),
+              label=_U('Total operating and\nmaintenance cost'),
               name='staticText7', parent=self, pos=wx.Point(32, 440),
               size=wx.Size(94, 26), style=0)
 
         self.staticText8 = wx.StaticText(id=wxID_PANELTCAENERGYSTATICTEXT8,
-              label=_('EUR/a'), name='staticText8', parent=self, pos=wx.Point(296,
+              label=_U('EUR/a'), name='staticText8', parent=self, pos=wx.Point(296,
               443), size=wx.Size(30, 13), style=0)
 
         self.btnDetailedOpCost = wx.Button(id=wxID_PANELTCAENERGYBTNDETAILEDOPCOST,
-              label=_('Detailed operating cost calculation...'),
-              name=u'btnDetailedOpCost', parent=self, pos=wx.Point(528, 440),
+              label=_U('Detailed operating cost calculation...'),
+              name='btnDetailedOpCost', parent=self, pos=wx.Point(528, 440),
               size=wx.Size(192, 23), style=0)
         self.btnDetailedOpCost.Bind(wx.EVT_BUTTON,
               self.OnBtnDetailedOpCostButton,
               id=wxID_PANELTCAENERGYBTNDETAILEDOPCOST)
 
         self.tOpcostHep = wx.StaticText(id=wxID_PANELTCAENERGYTOPCOSTHEP,
-              label=_(u'The value is the total of the operating and maintenance costs given in the questionaire. If you would like \nto change this value, please go back to the questionnaire module'),
-              name=u'tOpcostHep', parent=self, pos=wx.Point(40, 504),
+              label=_U('The value is the total of the operating and maintenance costs given in the questionaire. If you would like \nto change this value, please go back to the questionnaire module'),
+              name='tOpcostHep', parent=self, pos=wx.Point(40, 504),
               size=wx.Size(504, 26), style=0)
         self.tOpcostHep.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.btnNext = wx.Button(id=wxID_PANELTCAENERGYBTNNEXT,
-              label=_('Save and go to next page >>>'), name=u'btnNext',
+              label=_U('Save and go to next page >>>'), name='btnNext',
               parent=self, pos=wx.Point(544, 560), size=wx.Size(192, 23),
               style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
               id=wxID_PANELTCAENERGYBTNNEXT)
 
         self.btnGoMain = wx.Button(id=wxID_PANELTCAENERGYBTNGOMAIN,
-              label=_('Save and go back to main page'), name=u'btnGoMain',
+              label=_U('Save and go back to main page'), name='btnGoMain',
               parent=self, pos=wx.Point(8, 560), size=wx.Size(192, 23),
               style=0)
         self.btnGoMain.Bind(wx.EVT_BUTTON, self.OnBtnGoMainButton,
@@ -185,18 +191,18 @@ class PanelTCAEnergy(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("Energy demand\n[kWh/a]"))
-        self.grid.SetColLabelValue(2, _("Energy price\n[EUR/kWh]"))
-        self.grid.SetColLabelValue(3, _("Development of \nenergy price [%/a]"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("Energy demand\n[kWh/a]"))
+        self.grid.SetColLabelValue(2, _U("Energy price\n[EUR/kWh]"))
+        self.grid.SetColLabelValue(3, _U("Development of \nenergy price [%/a]"))
         #choices--------------------------------------------------------------------------------
-        self.comboBox1.Append(_("Electicity"))
-        self.comboBox1.Append(_("Natural Gas"))
-        self.comboBox1.Append(_("Liquid Petroleum gas"))
-        self.comboBox1.Append(_("Heavy fuel oil"))
-        self.comboBox1.Append(_("Butane"))
-        self.comboBox1.Append(_("Propane"))
-        self.comboBox1.Append(_("Gas oil"))
+        self.comboBox1.Append(_U("Electicity"))
+        self.comboBox1.Append(_U("Natural Gas"))
+        self.comboBox1.Append(_U("Liquid Petroleum gas"))
+        self.comboBox1.Append(_U("Heavy fuel oil"))
+        self.comboBox1.Append(_U("Butane"))
+        self.comboBox1.Append(_U("Propane"))
+        self.comboBox1.Append(_U("Gas oil"))
 
         self.updateGridAttributes()
         
@@ -206,16 +212,16 @@ class PanelTCAEnergy(wx.Panel):
         #Helptext & DetailedButton
         self.btnDetailedOpCost.Enabled = False
         if (Status.ANo > 0):
-            self.tEnergyHelp.SetLabel(_("The values come from the audit questionnaire and Einstein database.\nIf you would like to make any change on them, please edit the values."))
-            self.tOpcostHep.SetLabel(_("If you would like to calculate the operating costs in details, please choose \"Detailed operating cost calculation\""))
+            self.tEnergyHelp.SetLabel(_U("The values come from the audit questionnaire and Einstein database.\nIf you would like to make any change on them, please edit the values."))
+            self.tOpcostHep.SetLabel(_U("If you would like to calculate the operating costs in details, please choose \"Detailed operating cost calculation\""))
             self.btnDetailedOpCost.Enabled = True
 
     def __init__(self, parent, main, id, pos, size, style, name):
         #print "Init Energy"      
         self.main = main
         self.mod = Status.mod.moduleTCA
-        self.shortName = _("TCAEnergy")
-        self.description = _("")
+        self.shortName = _U("TCAEnergy")
+        self.description = _U("")
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
       
@@ -303,7 +309,7 @@ class PanelTCAEnergy(wx.Panel):
             except:
                 self.mod.data.energycosts.append([name,demand,price,dev])
         except:
-            wx.MessageBox(_("Reconsider values."))
+            wx.MessageBox(_U("Reconsider values."))
                 
         event.Skip()
         self.display()  

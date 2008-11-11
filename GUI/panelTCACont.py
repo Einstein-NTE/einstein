@@ -35,6 +35,12 @@ import wx.grid
 from einstein.GUI.status import Status
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCACONTINGENCIES, wxID_PANELTCACONTINGENCIESBTNADD, 
  wxID_PANELTCACONTINGENCIESBTNDELETE, wxID_PANELTCACONTINGENCIESBTNGOMAIN, 
  wxID_PANELTCACONTINGENCIESBUTTON1, wxID_PANELTCACONTINGENCIESCBNAME, 
@@ -53,11 +59,11 @@ class PanelTCAContingencies(wx.Panel):
         self.SetClientSize(wx.Size(800, 600))
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCACONTINGENCIESSTATICBOX1,
-              label=_('Contingencies'), name='staticBox1', parent=self,
+              label=_U('Contingencies'), name='staticBox1', parent=self,
               pos=wx.Point(8, 8), size=wx.Size(696, 544), style=0)
 
         self.staticText1 = wx.StaticText(id=wxID_PANELTCACONTINGENCIESSTATICTEXT1,
-              label=_('Do you expect future costs for perpetuating use of the current energy source in the process?'),
+              label=_U('Do you expect future costs for perpetuating use of the current energy source in the process?'),
               name='staticText1', parent=self, pos=wx.Point(24, 32),
               size=wx.Size(450, 13), style=0)
 
@@ -76,41 +82,41 @@ class PanelTCAContingencies(wx.Panel):
               size=wx.Size(85, 21), style=0, value='0')
 
         self.staticText4 = wx.StaticText(id=wxID_PANELTCACONTINGENCIESSTATICTEXT4,
-              label=_(u'time frame (in X years from now, X=0 for current year)'),
+              label=_U('time frame (in X years from now, X=0 for current year)'),
               name='staticText4', parent=self, pos=wx.Point(40, 504),
               size=wx.Size(265, 13), style=0)
         self.staticText4.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.btnAdd = wx.Button(id=wxID_PANELTCACONTINGENCIESBTNADD,
-              label=_('Add'), name='btnAdd', parent=self, pos=wx.Point(616, 448),
+              label=_U('Add'), name='btnAdd', parent=self, pos=wx.Point(616, 448),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELTCACONTINGENCIESBTNADD)
 
         self.btnDelete = wx.Button(id=wxID_PANELTCACONTINGENCIESBTNDELETE,
-              label=_('Remove'), name='btnDelete', parent=self, pos=wx.Point(616,
+              label=_U('Remove'), name='btnDelete', parent=self, pos=wx.Point(616,
               416), size=wx.Size(75, 23), style=0)
         self.btnDelete.Bind(wx.EVT_BUTTON, self.OnBtnDeleteButton,
               id=wxID_PANELTCACONTINGENCIESBTNDELETE)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCACONTINGENCIESSTATICBOX2,
-              label=_('Help'), name='staticBox2', parent=self, pos=wx.Point(16,
+              label=_U('Help'), name='staticBox2', parent=self, pos=wx.Point(16,
               480), size=wx.Size(680, 64), style=0)
 
         self.cbName = wx.ComboBox(choices=[],
               id=wxID_PANELTCACONTINGENCIESCBNAME, name='cbName', parent=self,
               pos=wx.Point(56, 448), size=wx.Size(295, 21), style=0,
-              value=_('<enter custom description or choose from list>'))
+              value=_U('<enter custom description or choose from list>'))
 
         self.btnGoMain = wx.Button(id=wxID_PANELTCACONTINGENCIESBTNGOMAIN,
-              label=_('Save and go to main page'), name=u'btnGoMain', parent=self,
+              label=_U('Save and go to main page'), name='btnGoMain', parent=self,
               pos=wx.Point(8, 560), size=wx.Size(192, 23), style=0)
         self.btnGoMain.Bind(wx.EVT_BUTTON, self.OnBtnGoMainButton,
               id=wxID_PANELTCACONTINGENCIESBTNGOMAIN)
 
         self.button1 = wx.Button(id=wxID_PANELTCACONTINGENCIESBUTTON1,
-              label=_('Save and go to the next page >>>'), name='button1',
+              label=_U('Save and go to the next page >>>'), name='button1',
               parent=self, pos=wx.Point(512, 560), size=wx.Size(192, 23),
               style=0)
         self.button1.Bind(wx.EVT_BUTTON, self.OnButton1Button,
@@ -138,19 +144,19 @@ class PanelTCAContingencies(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("EUR/Year"))
-        self.grid.SetColLabelValue(2, _("time frame"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("EUR/Year"))
+        self.grid.SetColLabelValue(2, _U("time frame"))
 
         self.updateGridAttributes()
         #choices---------------------------------------------------------------------
-        self.cbName.Append(_("tax disadvantages (other than energy tax)"))
-        self.cbName.Append(_("obligatory provisions"))
-        self.cbName.Append(_("costs for remediation activities"))
-        self.cbName.Append(_("cost for compliance with legislation"))
-        self.cbName.Append(_("negative impacts on market share"))
-        self.cbName.Append(_("deterioration of company image"))
-        self.cbName.Append(_("affection by CO2-emission trading directive"))
+        self.cbName.Append(_U("tax disadvantages (other than energy tax)"))
+        self.cbName.Append(_U("obligatory provisions"))
+        self.cbName.Append(_U("costs for remediation activities"))
+        self.cbName.Append(_U("cost for compliance with legislation"))
+        self.cbName.Append(_U("negative impacts on market share"))
+        self.cbName.Append(_U("deterioration of company image"))
+        self.cbName.Append(_U("affection by CO2-emission trading directive"))
      
         
         
@@ -160,8 +166,8 @@ class PanelTCAContingencies(wx.Panel):
         self.__init_custom_ctrls(parent)
         self.main = main
         self.mod = Status.mod.moduleTCA
-        self.shortName = _("TCAContingencies")
-        self.description = _("")                
+        self.shortName = _U("TCAContingencies")
+        self.description = " "                
               
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()
@@ -234,7 +240,7 @@ class PanelTCAContingencies(wx.Panel):
             except:
                  self.mod.data.contingencies.append([name,eur_year,timeframe])                
         except:
-            wx.MessageBox(_("Reconsider values."))
+            wx.MessageBox(_U("Reconsider values."))
         event.Skip()
         self.display()  
 

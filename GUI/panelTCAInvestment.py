@@ -37,6 +37,12 @@ from einstein.GUI.status import Status
 from einstein.GUI.dialogTCARevenue import dlgRevenue
 from GUITools import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELTCAINVESTMENT, wxID_PANELTCAINVESTMENTBTNADD, 
  wxID_PANELTCAINVESTMENTBTNDELETE, wxID_PANELTCAINVESTMENTBTNESTIMATE, 
  wxID_PANELTCAINVESTMENTBTNGOMAIN, wxID_PANELTCAINVESTMENTBTNNEXT, 
@@ -60,7 +66,7 @@ class PanelTCAInvestment(wx.Panel):
         self.Bind(wx.EVT_KILL_FOCUS, self.OnPanelTCAInvestmentKillFocus)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELTCAINVESTMENTSTATICBOX1,
-              label=_(u'Total investment and fundings of the new equipments'),
+              label=_U('Total investment and fundings of the new equipments'),
               name='staticBox1', parent=self, pos=wx.Point(8, 8),
               size=wx.Size(760, 424), style=0)
 
@@ -71,21 +77,21 @@ class PanelTCAInvestment(wx.Panel):
               self.OnGridGridCellLeftClick)
 
         self.tbInvestment = wx.TextCtrl(id=wxID_PANELTCAINVESTMENTTBINVESTMENT,
-              name=u'tbInvestment', parent=self, pos=wx.Point(316, 328),
+              name='tbInvestment', parent=self, pos=wx.Point(316, 328),
               size=wx.Size(100, 21), style=0, value='0')
 
         self.tbFundingPerc = wx.TextCtrl(id=wxID_PANELTCAINVESTMENTTBFUNDINGPERC,
-              name=u'tbFundingPerc', parent=self, pos=wx.Point(456, 328),
+              name='tbFundingPerc', parent=self, pos=wx.Point(456, 328),
               size=wx.Size(56, 21), style=0, value='30')
 
-        self.btnAdd = wx.Button(id=wxID_PANELTCAINVESTMENTBTNADD, label=_('Add'),
+        self.btnAdd = wx.Button(id=wxID_PANELTCAINVESTMENTBTNADD, label=_U('Add'),
               name='btnAdd', parent=self, pos=wx.Point(680, 328),
               size=wx.Size(75, 23), style=0)
         self.btnAdd.Bind(wx.EVT_BUTTON, self.OnBtnAddButton,
               id=wxID_PANELTCAINVESTMENTBTNADD)
 
         self.btnDelete = wx.Button(id=wxID_PANELTCAINVESTMENTBTNDELETE,
-              label=_('Remove'), name='btnDelete', parent=self, pos=wx.Point(680,
+              label=_U('Remove'), name='btnDelete', parent=self, pos=wx.Point(680,
               296), size=wx.Size(75, 23), style=0)
         self.btnDelete.Bind(wx.EVT_BUTTON, self.OnBtnDeleteButton,
               id=wxID_PANELTCAINVESTMENTBTNDELETE)
@@ -93,79 +99,79 @@ class PanelTCAInvestment(wx.Panel):
         self.cbName = wx.ComboBox(choices=[], id=wxID_PANELTCAINVESTMENTCBNAME,
               name='cbName', parent=self, pos=wx.Point(56, 328),
               size=wx.Size(256, 21), style=0,
-              value=_('<enter custom description or choose from list>'))
+              value=_U('<enter custom description or choose from list>'))
 
         self.staticText3 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT3,
-              label=_(u'The values of investment are suggested by the program.(The default funding for equipment is 30%) \nIf this do not apply to your process, please indicate your own values'),
+              label=_U('The values of investment are suggested by the program.(The default funding for equipment is 30%) \nIf this do not apply to your process, please indicate your own values'),
               name='staticText3', parent=self, pos=wx.Point(40, 384),
               size=wx.Size(335, 26), style=0)
         self.staticText3.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.tbFundingFix = wx.TextCtrl(id=wxID_PANELTCAINVESTMENTTBFUNDINGFIX,
-              name=u'tbFundingFix', parent=self, pos=wx.Point(536, 328),
-              size=wx.Size(96, 21), style=0, value=u'0')
+              name='tbFundingFix', parent=self, pos=wx.Point(536, 328),
+              size=wx.Size(96, 21), style=0, value='0')
 
         self.staticText5 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT5,
-              label=_('EUR'), name='staticText5', parent=self, pos=wx.Point(424,
+              label=_U('EUR'), name='staticText5', parent=self, pos=wx.Point(424,
               328), size=wx.Size(20, 13), style=0)
 
         self.staticText6 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT6,
-              label=u'%', name='staticText6', parent=self, pos=wx.Point(515,
+              label='%', name='staticText6', parent=self, pos=wx.Point(515,
               328), size=wx.Size(11, 13), style=0)
 
         self.staticText7 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT7,
-              label=_('EUR'), name='staticText7', parent=self, pos=wx.Point(640,
+              label=_U('EUR'), name='staticText7', parent=self, pos=wx.Point(640,
               328), size=wx.Size(20, 13), style=0)
 
         self.staticText9 = wx.StaticText(id=wxID_PANELTCAINVESTMENTSTATICTEXT9,
-              label=_(u'If you think there would be revenue from sale of replaced equipments, please indicate the possible value'),
+              label=_U('If you think there would be revenue from sale of replaced equipments, please indicate the possible value'),
               name='staticText9', parent=self, pos=wx.Point(40, 518),
               size=wx.Size(502, 13), style=0)
         self.staticText9.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL,
-              False, u'Tahoma'))
+              False, 'Tahoma'))
 
         self.tbRevenueValue = wx.TextCtrl(id=wxID_PANELTCAINVESTMENTTBREVENUEVALUE,
-              name=u'tbRevenueValue', parent=self, pos=wx.Point(32, 464),
-              size=wx.Size(136, 21), style=0, value=u'0')
+              name='tbRevenueValue', parent=self, pos=wx.Point(32, 464),
+              size=wx.Size(136, 21), style=0, value='0')
         self.tbRevenueValue.Bind(wx.EVT_KILL_FOCUS,
               self.OnTbRevenueValueKillFocus)
         self.tbRevenueValue.Bind(wx.EVT_TEXT, self.OnTbRevenueValueText,
               id=wxID_PANELTCAINVESTMENTTBREVENUEVALUE)
 
         self.btnEstimate = wx.Button(id=wxID_PANELTCAINVESTMENTBTNESTIMATE,
-              label=_('Estimate the renenue...'), name=u'btnEstimate',
+              label=_U('Estimate the renenue...'), name='btnEstimate',
               parent=self, pos=wx.Point(600, 464), size=wx.Size(152, 23),
               style=0)
         self.btnEstimate.Bind(wx.EVT_BUTTON, self.OnBtnEstimateButton,
               id=wxID_PANELTCAINVESTMENTBTNESTIMATE)
 
         self.tUnit = wx.StaticText(id=wxID_PANELTCAINVESTMENTTUNIT,
-              label=_('EUR'), name=u'tUnit', parent=self, pos=wx.Point(178, 468),
+              label=_U('EUR'), name='tUnit', parent=self, pos=wx.Point(178, 468),
               size=wx.Size(20, 13), style=0)
 
         self.staticBox2 = wx.StaticBox(id=wxID_PANELTCAINVESTMENTSTATICBOX2,
-              label=_('Help'), name='staticBox2', parent=self, pos=wx.Point(24,
+              label=_U('Help'), name='staticBox2', parent=self, pos=wx.Point(24,
               360), size=wx.Size(728, 64), style=0)
 
         self.btnGoMain = wx.Button(id=wxID_PANELTCAINVESTMENTBTNGOMAIN,
-              label=_('Save and go to the main page'), name=u'btnGoMain',
+              label=_U('Save and go to the main page'), name='btnGoMain',
               parent=self, pos=wx.Point(8, 560), size=wx.Size(192, 23),
               style=0)
         self.btnGoMain.Bind(wx.EVT_BUTTON, self.OnBtnGoMainButton,
               id=wxID_PANELTCAINVESTMENTBTNGOMAIN)
 
         self.staticBox3 = wx.StaticBox(id=wxID_PANELTCAINVESTMENTSTATICBOX3,
-              label=_('Revenue from sale of replaced equipments'),
+              label=_U('Revenue from sale of replaced equipments'),
               name='staticBox3', parent=self, pos=wx.Point(8, 440),
               size=wx.Size(760, 112), style=0)
 
         self.staticBox4 = wx.StaticBox(id=wxID_PANELTCAINVESTMENTSTATICBOX4,
-              label=_('Help'), name='staticBox4', parent=self, pos=wx.Point(24,
+              label=_U('Help'), name='staticBox4', parent=self, pos=wx.Point(24,
               496), size=wx.Size(728, 48), style=0)
 
         self.btnNext = wx.Button(id=wxID_PANELTCAINVESTMENTBTNNEXT,
-              label=_('Save an go to the next page >>>'), name=u'btnNext',
+              label=_U('Save an go to the next page >>>'), name='btnNext',
               parent=self, pos=wx.Point(576, 560), size=wx.Size(192, 23),
               style=0)
         self.btnNext.Bind(wx.EVT_BUTTON, self.OnBtnNextButton,
@@ -178,15 +184,15 @@ class PanelTCAInvestment(wx.Panel):
         self.staticBox3.SetForegroundColour(TITLE_COLOR)
         self.staticBox3.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD, False,'Tahoma'))
         #choice-----------------------------------------------------------------------
-        self.cbName.Append(_("H&C Storage"))
-        self.cbName.Append(_("CHP"))
-        self.cbName.Append(_("Solar thermal"))
-        self.cbName.Append(_("Heat pump"))
-        self.cbName.Append(_("Biomass"))
-        self.cbName.Append(_("Chillers"))
-        self.cbName.Append(_("Boilers"))
-        self.cbName.Append(_("HX network"))
-        self.cbName.Append(_("H&C distribution"))
+        self.cbName.Append(_U("H&C Storage"))
+        self.cbName.Append(_U("CHP"))
+        self.cbName.Append(_U("Solar thermal"))
+        self.cbName.Append(_U("Heat pump"))
+        self.cbName.Append(_U("Biomass"))
+        self.cbName.Append(_U("Chillers"))
+        self.cbName.Append(_U("Boilers"))
+        self.cbName.Append(_U("HX network"))
+        self.cbName.Append(_U("H&C distribution"))
         #Grid-------------------------------------------------------------------------
         self.rows = 12
         self.cols = 4
@@ -205,10 +211,10 @@ class PanelTCAInvestment(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Description"))
-        self.grid.SetColLabelValue(1, _("Investment\nEUR"))
-        self.grid.SetColLabelValue(2, _("Funding\n%"))
-        self.grid.SetColLabelValue(3, _("Additional\nfixed sum"))
+        self.grid.SetColLabelValue(0, _U("Description"))
+        self.grid.SetColLabelValue(1, _U("Investment\nEUR"))
+        self.grid.SetColLabelValue(2, _U("Funding\n%"))
+        self.grid.SetColLabelValue(3, _U("Additional\nfixed sum"))
         
         self.updateGridAttributes()
         #self.grid.SetBackgroundColor("black")
@@ -228,8 +234,8 @@ class PanelTCAInvestment(wx.Panel):
         #print "Init Investment"      
         self.main = main
         self.mod = Status.mod.moduleTCA
-        self.shortName = _("TCAInvestment")
-        self.description = _("")
+        self.shortName = _U("TCAInvestment")
+        self.description = _U("")
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)       
         #self.display()              
@@ -286,7 +292,7 @@ class PanelTCAInvestment(wx.Panel):
                  self.mod.data.investment.append([name,investment,fundingperc,fundingfix])          
                                     
         except:
-            wx.MessageBox(_("Reconsider values."))
+            wx.MessageBox(_U("Reconsider values."))
             
         event.Skip()
         self.display()  
@@ -322,7 +328,7 @@ class PanelTCAInvestment(wx.Panel):
                 raise
             self.mod.data.revenue = value                                      
         except:
-            wx.MessageBox(_("Numeric value greater or equal zero expected."))
+            wx.MessageBox(_U("Numeric value greater or equal zero expected."))
                                      
         event.Skip()
 

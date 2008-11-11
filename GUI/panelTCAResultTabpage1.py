@@ -5,6 +5,12 @@ import wx.grid
 from GUITools import *
 from einstein.modules.calculationTCA import *
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 [wxID_PANELRESULT1, wxID_PANELRESULT1BTNADDPROPOSAL, 
  wxID_PANELRESULT1BTNREMOVEPROPOSAL, wxID_PANELRESULT1CBPROPOSALS, 
  wxID_PANELRESULT1GRID, wxID_PANELRESULT1STATICBOX1, 
@@ -18,31 +24,31 @@ class panelResult1(wx.Panel):
               style=wx.TAB_TRAVERSAL)
         self.SetClientSize(wx.Size(722, 323))
         
-        self.grid = wx.grid.Grid(id=wxID_PANELRESULT1GRID, name=u'grid',
+        self.grid = wx.grid.Grid(id=wxID_PANELRESULT1GRID, name='grid',
               parent=self, pos=wx.Point(8, 8), size=wx.Size(704, 170), style=0)
         self.grid.EnableEditing(False)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK,
               self.OnGridGridCellLeftClick)
 
         self.cbProposals = wx.Choice(choices=[],
-              id=wxID_PANELRESULT1CBPROPOSALS, name=u'cbProposals', parent=self,
+              id=wxID_PANELRESULT1CBPROPOSALS, name='cbProposals', parent=self,
               pos=wx.Point(24, 264), size=wx.Size(160, 21), style=0)
         self.cbProposals.Bind(wx.EVT_CHOICE, self.OnCbProposalsChoice,
               id=wxID_PANELRESULT1CBPROPOSALS)
 
         self.staticBox1 = wx.StaticBox(id=wxID_PANELRESULT1STATICBOX1,
-              label=u'Choose the proposal(s) to be additionaly displayed:',
+              label='Choose the proposal(s) to be additionaly displayed:',
               name='staticBox1', parent=self, pos=wx.Point(8, 240),
               size=wx.Size(704, 64), style=0)
 
         self.btnAddProposal = wx.Button(id=wxID_PANELRESULT1BTNADDPROPOSAL,
-              label=u'Add', name=u'btnAddProposal', parent=self,
+              label='Add', name='btnAddProposal', parent=self,
               pos=wx.Point(192, 264), size=wx.Size(75, 23), style=0)
         self.btnAddProposal.Bind(wx.EVT_BUTTON, self.OnBtnAddProposalButton,
               id=wxID_PANELRESULT1BTNADDPROPOSAL)
 
         self.btnRemoveProposal = wx.Button(id=wxID_PANELRESULT1BTNREMOVEPROPOSAL,
-              label=u'Remove', name=u'btnRemoveProposal', parent=self,
+              label='Remove', name='btnRemoveProposal', parent=self,
               pos=wx.Point(272, 264), size=wx.Size(75, 23), style=0)
         self.btnRemoveProposal.Bind(wx.EVT_BUTTON,
               self.OnBtnRemoveProposalButton,
@@ -73,13 +79,13 @@ class panelResult1(wx.Panel):
         
         self.grid.EnableEditing(False)
         self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
-        self.grid.SetColLabelValue(0, _("Proposal 1"))
+        self.grid.SetColLabelValue(0, _U("Proposal 1"))
         
-        self.grid.SetRowLabelValue(0, _("Total investment capital (EUR)"))
-        self.grid.SetRowLabelValue(1, _("Effective investment capital (EUR)"))
-        self.grid.SetRowLabelValue(2, _("Benefit cost ratio"))
-        self.grid.SetRowLabelValue(3, _("Payback period (years)"))
-        self.grid.SetRowLabelValue(4, _("MIRR at final year (%)"))
+        self.grid.SetRowLabelValue(0, _U("Total investment capital (EUR)"))
+        self.grid.SetRowLabelValue(1, _U("Effective investment capital (EUR)"))
+        self.grid.SetRowLabelValue(2, _U("Benefit cost ratio"))
+        self.grid.SetRowLabelValue(3, _U("Payback period (years)"))
+        self.grid.SetRowLabelValue(4, _U("MIRR at final year (%)"))
         
         self.grid.SetBackgroundColour(wx.Colour(255, 0, 0))
         #choices--------------------------------------------------------------------------------
@@ -129,18 +135,18 @@ class panelResult1(wx.Panel):
                             self.grid.SetCellValue(4, count, str_mirr)
                         else:
                             self.grid.SetColLabelValue(count,  str(result.name))
-                            self.grid.SetCellValue(0, count, _("No Result"))
-                            self.grid.SetCellValue(1, count, _("No Result"))
-                            self.grid.SetCellValue(2, count, _("No Result"))
-                            self.grid.SetCellValue(3, count, _("No Result"))
-                            self.grid.SetCellValue(4, count, _("No Result"))
+                            self.grid.SetCellValue(0, count, _U("No Result"))
+                            self.grid.SetCellValue(1, count, _U("No Result"))
+                            self.grid.SetCellValue(2, count, _U("No Result"))
+                            self.grid.SetCellValue(3, count, _U("No Result"))
+                            self.grid.SetCellValue(4, count, _U("No Result"))
                     except:
                             self.grid.SetColLabelValue(count,  "Invalid Proposal")
-                            self.grid.SetCellValue(0, count, _("ERROR"))
-                            self.grid.SetCellValue(1, count, _("ERROR"))
-                            self.grid.SetCellValue(2, count, _("ERROR"))
-                            self.grid.SetCellValue(3, count, _("ERROR"))
-                            self.grid.SetCellValue(4, count, _("ERROR"))
+                            self.grid.SetCellValue(0, count, _U("ERROR"))
+                            self.grid.SetCellValue(1, count, _U("ERROR"))
+                            self.grid.SetCellValue(2, count, _U("ERROR"))
+                            self.grid.SetCellValue(3, count, _U("ERROR"))
+                            self.grid.SetCellValue(4, count, _U("ERROR"))
                     count +=1  
                        
         
