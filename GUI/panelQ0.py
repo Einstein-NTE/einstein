@@ -202,7 +202,7 @@ class PanelQ0(wx.Panel):
         
         pu1 =  DialogP(self)
         if pu1.ShowModal() == wx.ID_OK:
-            logTrack("PanelP - OK %s %s"%(self.shortName,self.description))
+            logTrack("PanelP - OK %r %r"%(self.shortName,self.description))
 
             Status.prj.createNewProject(-1,self.shortName,self.description,originalName=projectName)
             self.main.panelinfo.update()
@@ -236,8 +236,8 @@ class PanelQ0(wx.Panel):
     def OnButtonDeleteProject(self, event):
 #------------------------------------------------------------------------------		
         projectName = self.listBoxProjects.GetStringSelection()
-        if self.main.askConfirmation(_U('Delete project %s ?') % (projectName,)) == wx.ID_YES:
-            logTrack("PanelQ0 (ButtonDelete): deleting %s"%projectName)
+        if self.main.askConfirmation(_U('Delete project %r ?') % (projectName,)) == wx.ID_YES:
+            logTrack("PanelQ0 (ButtonDelete): deleting %r"%projectName)
             Status.prj.deleteProject(-1,name=projectName)
             self.main.panelinfo.update()
             self.main.showMainMenuAlternatives()
@@ -263,7 +263,7 @@ class PanelQ0(wx.Panel):
         
         pu1 =  DialogP(self)
         if pu1.ShowModal() == wx.ID_OK:
-            logTrack("PanelP - OK %s %s"%(self.shortName,self.description))
+            logTrack("PanelP - OK %r %r"%(self.shortName,self.description))
 
             Status.prj.createNewProject(-1,self.shortName,self.description)
             self.fillPage()

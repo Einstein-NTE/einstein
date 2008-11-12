@@ -72,6 +72,9 @@ from processes import Processes
 from messageLogger import *
 from einstein.GUI.GUITools import check
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #------------------------------------------------------------------------------		
 def copySQLRows(table,query,keyID,keyPar,valPar):
 #------------------------------------------------------------------------------		
@@ -265,8 +268,8 @@ class Project(object):
         aa = DB.salternatives.sql_select(sqlQuery)
         if len(aa) > 0:
             a = aa[0]
-            a.ShortName = shortName
-            a.Description = description
+            a.ShortName = check(shortName)
+            a.Description = check(description)
 
             Status.SQL.commit()
             self.setActiveAlternative(ANo)
@@ -403,13 +406,19 @@ class Project(object):
                             logTrack("Project (getAlternativeList): no EnergyCost available")
                             EnergyCost = 0.0
                         
-                        alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,PEC,EnergyCost])
+                        alternativeList.append([a.AlternativeProposalNo,
+                                                unicode(a.ShortName,"utf-8"),
+                                                unicode(a.Description,"utf-8"),
+                                                stat,PEC,EnergyCost])
                     else:
                         logError(_("Corrupt data in data base. no entry in cgeneraldata for ANo = %s")%ANo)
                         if ANo in [-1,0]:
                             alternativeList.append(defaultList[ANo+1])
                 else:
-                    alternativeList.append([a.AlternativeProposalNo, a.ShortName, a.Description,stat,'---','---'])
+                    alternativeList.append([a.AlternativeProposalNo,
+                                            unicode(a.ShortName,"utf-8"),
+                                            unicode(a.Description,"utf-8"),
+                                            stat,'---','---'])
             else:
                 logError(_("Corrupt data in data base. no entry in salternative for ANo = %s")%ANo)
                 if ANo in [-1,0]:
@@ -434,7 +443,7 @@ class Project(object):
 
             salternatives = Status.DB.salternatives.ProjectID[Status.PId].AlternativeProposalNo[n]
             if len(salternatives) > 0:
-                Status.ActiveAlternativeName = salternatives[0].ShortName
+                Status.ActiveAlternativeName = unicode(salternatives[0].ShortName,"utf-8")
                 self.getStatus()
                 logTrack("Project (setActiveAlternative): PId = %s ANo = %s StatusCC = %s"%\
                   (Status.PId,Status.ANo,Status.StatusCC))
@@ -508,7 +517,7 @@ class Project(object):
             if len(aa) > 0:
                 name = aa[0].ShortName
                 if name is not None:
-                    Status.FinalAlternativeName = name
+                    Status.FinalAlternativeName = unicode(name,"utf-8")
                 else:
                     logDebug("Project (setFinalAlternative): no name specified for alternative no. [%s]"%finalANo)
                     Status.FinalAlternativeName = "---"
@@ -537,7 +546,7 @@ class Project(object):
 #------------------------------------------------------------------------------
         projectList = []
         for n in Status.DB.questionnaire.Name["%"]:
-            projectList.append(n.Name)
+            projectList.append(unicode(n.Name,"utf-8"))
         return projectList
 
 #------------------------------------------------------------------------------
@@ -566,7 +575,7 @@ class Project(object):
 #   returns the ID of a project as a function of the name
 #------------------------------------------------------------------------------
 
-        projects = Status.DB.questionnaire.Name[name]
+        projects = Status.DB.questionnaire.Name[check(name)]
         
         if len(projects) > 0:
             return projects[0].Questionnaire_ID
@@ -587,8 +596,8 @@ class Project(object):
 
         if (PId <= 0 or (PId is None)):
             Status.PId = -1
-            Status.ActiveProjectName = "---"
-            Status.ActiveProjectDescription = "---"
+            Status.ActiveProjectName = u'---'
+            Status.ActiveProjectDescription = u'---'
             self.setFinalAlternative(None)
             Status.NoOfAlternatives = -1
             
@@ -597,11 +606,12 @@ class Project(object):
         else:
 
             try:
-                Status.ActiveProjectName = Status.DB.questionnaire.Questionnaire_ID[PId][0].Name
-                Status.ActiveProjectDescription = Status.DB.questionnaire.Questionnaire_ID[PId][0].DescripIndustry
+                Status.ActiveProjectName = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].Name,"utf-8")
+                Status.ActiveProjectDescription = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].\
+                                                          DescripIndustry,"utf-8")
             except:
-                Status.ActiveProjectName = "unknown"
-                Status.ActiveProjectDescription = "unknown"
+                Status.ActiveProjectName = u'unknown'
+                Status.ActiveProjectDescription = u'unknown'
                 logTrack("Project (setActiveProject): error in table questionnaire")
                 
             try:
@@ -651,11 +661,13 @@ class Project(object):
         
         if (originalPId <= 0) and (originalName is None):
 
-            newProject = True
+            isNewProject = True
 #..............................................................................
 # start a new project from scratch (creates basic project tables)
 
-            newProject = {"Name": shortName,"DescripIndustry":description}
+            newProject = {"Name": check(shortName),"DescripIndustry":check(description)}
+
+            print "Project (createNewProject): q-update = ",newProject
             newID = questionnaires.insert(newProject)
             logTrack("Project (createNewProject): new project inserted with ID %s "%newID)
 
@@ -673,8 +685,8 @@ class Project(object):
 
             newAlternative = {"ProjectID":newID,
                               "AlternativeProposalNo":-1,
-                              "ShortName":_("present state (original)"),
-                              "Description":_("original data as submitted by industry")}
+                              "ShortName":_U("present state (original)"),
+                              "Description":_U("original data as submitted by industry")}
             salternatives.insert(newAlternative)
             
             newGeneralData = {"Questionnaire_id":newID,
@@ -725,13 +737,13 @@ class Project(object):
                         
         else:
 
-            newProject = False
+            isNewProject = False
 
             if originalName is not None:    #if a name is given, overwrite ID
                 originalPId = self.getProjectID(originalName)
                 self.cleanUpProject(originalPId)
 
-            logTrack("Project (createNewProject): copying from %s [%s]"%(originalPId,originalName))
+            logTrack("Project (createNewProject): copying from %s [%r]"%(originalPId,originalName))
 
 #..............................................................................
 # copy a project
@@ -776,15 +788,15 @@ class Project(object):
 # rename project
 
             q = DB.questionnaire.Questionnaire_ID[newID][0]
-            q.Name = shortName
-            q.DescripIndustry = description
+            q.Name = check(shortName)
+            q.DescripIndustry = check(description)
 
 
         Status.SQL.commit()
 
         self.setActiveProject(newID)
 
-        if newProject == True:
+        if isNewProject == True:
             self.setStatus("Q",0)
             self.getDefaultSetUp()
 
@@ -871,7 +883,7 @@ class Project(object):
         if name is not None:    #if a name is given, overwrite ID
             PId = self.getProjectID(name)
 
-        logMessage(_("Project (deleteProject) -deleting project %s (%s)")%(PId,name))
+        logMessage(_("Project (deleteProject) -deleting project %r (%r)")%(PId,name))
 
 #..............................................................................
 # deleting Q- and corresponding C-Tables
@@ -1210,8 +1222,8 @@ class Project(object):
 # deleting Q- and corresponding C-Tables
 
         DB = Status.DB
-        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND Product = '%s'"\
-                    %(Status.PId,Status.ANo,productName)
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND Product = '%r'"\
+                    %(Status.PId,Status.ANo,check(productName))
 
         deleteSQLRows(DB.qproduct,sqlQueryQ)
 
@@ -1240,7 +1252,10 @@ class Project(object):
         
         productList = []
         for product in products:
-            productList.append(product[key])
+            if isinstance(product[key],str) or isinstance(product[key],unicode):
+                productList.append(unicode(product[key],"utf-8"))
+            else:
+                productList.append(product[key])
 
         return productList
 
@@ -1368,7 +1383,10 @@ class Project(object):
         
         eqList = []
         for eq in eqs:
-            eqList.append(eq[key])
+            if isinstance(eq[key],str) or isinstance(eq[key],unicode):
+                eqList.append(unicode(eq[key],"utf-8"))
+            else:
+                eqList.append(eq[key])
 
         return eqList
 
@@ -1572,7 +1590,10 @@ class Project(object):
         
         pipeList = []
         for pipe in pipes:
-            pipeList.append(pipe[key])
+            if isinstance(pipe[key],str) or isinstance(pipe[key],unicode):
+                pipeList.append(unicode(pipe[key],"utf-8"))
+            else:
+                pipeList.append(pipe[key])
 
         return pipeList
     
@@ -1585,7 +1606,7 @@ class Project(object):
         pipes = self.getPipes()     
         pipeDict = {}
         for pipe in pipes:
-            pipeName = pipe["Pipeduct"]
+            pipeName = unicode(pipe["Pipeduct"],"utf-8")
             pipeID = pipe["QDistributionHC_ID"]
             pipeDict.update({pipeID:pipeName})
 
@@ -1736,7 +1757,11 @@ class Project(object):
         
         HXList = []
         for hx in hxes:
-            HXList.append(hx[key])
+            
+            if isinstance(hx[key],str) or isinstance(hx[key],unicode):
+                HXList.append(unicode(hx[key],"utf-8"))
+            else:
+                HXList.append(hx[key])
 
         return HXList
 
@@ -1823,7 +1848,10 @@ class Project(object):
         
         WHEEList = []
         for whee in whees:
-            WHEEList.append(whee[key])
+            if isinstance(whee[key],str) or isinstance(whee[key],unicode):
+                WHEEList.append(unicode(whee[key],"utf-8"))
+            else:
+                WHEEList.append(whee[key])
 
         return WHEEList
 
@@ -1899,7 +1927,10 @@ class Project(object):
         
         surfaceList = []
         for surface in surfaces:
-            surfaceList.append(surface[key])
+            if isinstance(surface[key],str) or isinstance(surface[key],unicode):
+                surfaceList.append(unicode(surface[key],"utf-8"))
+            else:
+                surfaceList.append(surface[key])
 
         return surfaceList
 
@@ -1927,7 +1958,10 @@ class Project(object):
         
         fuelList = []
         for fuel in fuels:
-            fuelList.append(fuel[key])
+            if isinstance(fuel[key],str) or isinstance(fuel[key],unicode):
+                fuelList.append(unicode(fuel[key],"utf-8"))
+            else:
+                fuelList.append(fuel[key])
 
         return fuelList
 
@@ -1956,7 +1990,10 @@ class Project(object):
         
         processList = []
         for process in processes:
-            processList.append(process[key])
+            if isinstance(process[key],str) or isinstance(process[key],unicode):
+                processList.append(unicode(process[key],"utf-8"))
+            else:
+                processList.append(process[key])
 
         return processList
 
@@ -2000,7 +2037,10 @@ class Project(object):
         
         fuelList = []
         for fuel in fuels:
-            fuelList.append(fuel[key])
+            if isinstance(fuel[key],str) or isinstance(fuel[key],unicode):
+                fuelList.append(unicode(fuel[key],"utf-8"))
+            else:
+                fuelList.append(fuel[key])
 
         return fuelList
 
@@ -2015,7 +2055,7 @@ class Project(object):
         fluids = Status.DB.dbfluid.FluidName["%"]       
         fluidDict = {}
         for fluid in fluids:
-            fluidName = fluid["FluidName"]
+            fluidName = unicode(fluid["FluidName"],"utf-8")
             fluidID = fluid["DBFluid_ID"]
             fluidDict.update({fluidID:fluidName})
 
@@ -2032,7 +2072,7 @@ class Project(object):
         fuels = Status.DB.dbfuel.FuelName["%"]       
         fuelDict = {}
         for fuel in fuels:
-            fuelName = fuel["FuelName"]
+            fuelName = unicode(fuel["FuelName"],"utf-8")
             fuelID = fuel["DBFuel_ID"]
             fuelDict.update({fuelID:fuelName})
 
@@ -2049,7 +2089,7 @@ class Project(object):
         unitOperations = Status.DB.dbunitoperation.UnitOperation["%"]       
         unitOpDict = {}
         for unitOperation in unitOperations:
-            unitOperationName = unitOperation["UnitOperation"]
+            unitOperationName = unicode(unitOperation["UnitOperation"],"utf-8")
             unitOperationID = unitOperation["DBUnitOperation_ID"]
             unitOpDict.update({unitOperationID:unitOperationName})
 
@@ -2067,8 +2107,8 @@ class Project(object):
         for entry in naceTable:
             naceCode = entry.CodeNACE
             naceSubCode = naceCode+"."+entry.CodeNACEsub
-            naceName = entry.NameNACE
-            naceSubName = entry.NameNACEsub
+            naceName = unicode(entry.NameNACE,"utf-8")
+            naceSubName = unicode(entry.NameNACEsub,"utf-8")
             naceDict.update({naceCode:naceName})
             if branch == naceName:
                 naceSubDict.update({naceSubCode:naceSubName})

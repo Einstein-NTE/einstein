@@ -363,15 +363,17 @@ class PanelQ8(wx.Panel):
 
 
     def OnListBoxBuildingListClick(self, event):
-        self.buildingName = str(self.listBoxBuildingList.GetStringSelection())
-        buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
-        q = buildings.BuildName[self.buildingName][0]
+        self.buildingName = self.listBoxBuildingList.GetStringSelection()
+        buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].\
+                    AlternativeProposalNo[Status.ANo]
+        
+        q = buildings.BuildName[check(self.buildingName)][0]
         self.buildingID = q.QBuildings_ID
 
-        self.tc1.SetValue(str(q.BuildName))
+        self.tc1.SetValue(q.BuildName)
         self.tc2.SetValue(str(q.BuildConstructSurface))
         self.tc3.SetValue(str(q.BuildUsefulSurface))
-        self.tc4.SetValue(str(q.BuildUsage))
+        self.tc4.SetValue(q.BuildUsage)
         self.tc5.SetValue(str(q.BuildMaxHP))
         self.tc6.SetValue(str(q.BuildMaxCP))
         self.tc7.SetValue(str(q.BuildAnnualHeating))
@@ -379,19 +381,20 @@ class PanelQ8(wx.Panel):
         self.tc9.SetValue(str(q.BuildDailyDHW))
         self.tc10.SetValue(str(q.BuildHoursOccup))
         self.tc11.SetValue(str(q.BuildDaysInUse))
-        self.tc12_10.SetValue(str(q.BuildHolidaysPeriodStart1))
-        self.tc12_11.SetValue(str(q.BuildHolidaysPeriodStop1))
-        self.tc12_20.SetValue(str(q.BuildHolidaysPeriodStart2))
-        self.tc12_21.SetValue(str(q.BuildHolidaysPeriodStop2))
-        self.tc12_30.SetValue(str(q.BuildHolidaysPeriodStart3))
-        self.tc12_31.SetValue(str(q.BuildHolidaysPeriodStop3))
+        self.tc12_10.SetValue(str(q.BuildHolidaysPeriodStart_1))
+        self.tc12_11.SetValue(str(q.BuildHolidaysPeriodStop_1))
+        self.tc12_20.SetValue(str(q.BuildHolidaysPeriodStart_2))
+        self.tc12_21.SetValue(str(q.BuildHolidaysPeriodStop_2))
+        self.tc12_30.SetValue(str(q.BuildHolidaysPeriodStart_3))
+        self.tc12_31.SetValue(str(q.BuildHolidaysPeriodStop_3))
         self.tc13_1.SetValue(str(q.BuildHeatingPeriodStart))
         self.tc13_2.SetValue(str(q.BuildHeatingPeriodStop))
         self.tc14_1.SetValue(str(q.BuildAirCondPeriodStart))
         self.tc14_2.SetValue(str(q.BuildAirCondPeriodStop))
         #event.Skip()
 
-    def OnButtonOK(self, event):
+    def OnButtonAddBuilding(self, event):
+        self.clear()
         event.Skip()
 
     def OnButtonCancel(self, event):
@@ -404,11 +407,14 @@ class PanelQ8(wx.Panel):
         self.fillPage()
         event.Skip()
 
-    def OnButtonAddBuilding(self, event):
+    def OnButtonOK(self, event):
         if Status.PId <> 0:
 
-            buildingName = check(self.tc1.GetValue())
-            buildings = Status.DB.qbuildings.BuildName[self.tc1.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+            buildingName = self.tc1.GetValue()
+            buildings = Status.DB.qbuildings.BuildName[check(buildingName)].\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo]
+            
             if buildingName <> 'NULL' and len(buildings) == 0:
 
                 newID = Status.prj.addBuildingDummy()
@@ -427,12 +433,12 @@ class PanelQ8(wx.Panel):
                     "BuildDailyDHW":check(self.tc9.GetValue()),
                     "BuildHoursOccup":check(self.tc10.GetValue()),
                     "BuildDaysInUse":check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart1":check(self.tc12_10.GetValue()),
-                    "BuildHolidaysPeriodStop1":check(self.tc12_11.GetValue()),
-                    "BuildHolidaysPeriodStart2":check(self.tc12_20.GetValue()),
-                    "BuildHolidaysPeriodStop2":check(self.tc12_21.GetValue()),
-                    "BuildHolidaysPeriodStart3":check(self.tc12_30.GetValue()),
-                    "BuildHolidaysPeriodStop3":check(self.tc12_31.GetValue()),
+                    "BuildHolidaysPeriodStart_1":check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop_1":check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart_2":check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop_2":check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart_3":check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop_3":check(self.tc12_31.GetValue()),
                     "BuildHeatingPeriodStart":check(self.tc13_1.GetValue()),
                     "BuildHeatingPeriodStop":check(self.tc13_2.GetValue()),
                     "BuildAirCondPeriodStart":check(self.tc14_1.GetValue()),
@@ -458,12 +464,12 @@ class PanelQ8(wx.Panel):
                     "BuildDailyDHW":check(self.tc9.GetValue()),
                     "BuildHoursOccup":check(self.tc10.GetValue()),
                     "BuildDaysInUse":check(self.tc11.GetValue()),
-                    "BuildHolidaysPeriodStart1":check(self.tc12_10.GetValue()),
-                    "BuildHolidaysPeriodStop1":check(self.tc12_11.GetValue()),
-                    "BuildHolidaysPeriodStart2":check(self.tc12_20.GetValue()),
-                    "BuildHolidaysPeriodStop2":check(self.tc12_21.GetValue()),
-                    "BuildHolidaysPeriodStart3":check(self.tc12_30.GetValue()),
-                    "BuildHolidaysPeriodStop3":check(self.tc12_31.GetValue()),
+                    "BuildHolidaysPeriodStart_1":check(self.tc12_10.GetValue()),
+                    "BuildHolidaysPeriodStop_1":check(self.tc12_11.GetValue()),
+                    "BuildHolidaysPeriodStart_2":check(self.tc12_20.GetValue()),
+                    "BuildHolidaysPeriodStop_2":check(self.tc12_21.GetValue()),
+                    "BuildHolidaysPeriodStart_3":check(self.tc12_30.GetValue()),
+                    "BuildHolidaysPeriodStop_3":check(self.tc12_31.GetValue()),
                     "BuildHeatingPeriodStart":check(self.tc13_1.GetValue()),
                     "BuildHeatingPeriodStop":check(self.tc13_2.GetValue()),
                     "BuildAirCondPeriodStart":check(self.tc14_1.GetValue()),
@@ -493,17 +499,11 @@ class PanelQ8(wx.Panel):
         buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
         if len(buildings) > 0:
             for building in buildings:
-                self.listBoxBuildingList.Append (str(building.BuildName))
+                self.listBoxBuildingList.Append(unicode(building.BuildName,"utf-8"))
 
 
     def fillPage(self):
 	self.fillBuildingList()
-
-    def check(self, value):
-        if value <> "" and value <> "None":
-            return value
-        else:
-            return 'NULL'
 
     def clear(self):
         self.tc1.SetValue('')

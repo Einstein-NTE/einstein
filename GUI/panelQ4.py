@@ -12,43 +12,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.15
-#	Created by: 	    Tom Sobota	April 2008
-#       Revised by:         Hans Schweiger  13/04/2008
-#                           Stoyan Danov    25/04/2008
-#                           Hans Schweiger  25/04/2008
-#                           Tom Sobota      04/05/2008
-#                           Hans Schweiger  05/05/2008
-#                           Tom Sobota      07/05/2008
-#                           Hans Schweiger  07/05/2008
-#                           Hans Schweiger  10/05/2008
-#                           Stoyan Danov    06/06/2008
-#                           Hans Schweiger  16/06/2008
-#                           Stoyan Danov    17/06/2008
-#                           Hans Schweiger  19/06/2008
-#                           Tom Sobota      02/07/2008
-#                           Hans Schweiger  02/07/2008
-#                           Tom Sobota      07/07/2008
-#                           Stoyan Danov    13/10/2008
+#
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       13/04/2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      12/11/2008
 #
 #       Changes to previous version:
-#       13/04/08:       Additional inputs in init: selection
-#       25/04/08:       line 50, change query, unnecessary large: there is a problem with eqId !!! (add HP manually)
-#                   HS  Alternative proposal no. introduced ...
-#       04/05/2008      Changed display logic
-#       05/05/2008  HS  Event handlers changed.
-#       07/05/2008  HS  Some security features added (Nones, ...)
-#                       Function "display" was duplicated. one deleted
-#       10/05/2008  HS  AddEquipmentDummy added
-#       06/06/2008  SD  label/tooltip, new displayClasses
-#       16/06/2008: HS  clean-up and adapt SQL-I/O to new label names/numbers
-#       17/06/2008: SD  order the parameters as in paper Q4H, unitdict, OnButtonOK
-#       19/06/2008: HS  variable hasunits eliminated
-#        2/07/2008 TS   General fields arranging
-#       02/07/2008: HS  Read/write functions for tc20 adapted to new MultipleChoiceEntry
-#                       small bug-fix (TRANSEQUIPTYPES)
-#        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
-#       13/10/2008: SD  change _() to _U()
+#       12/11/2008: HS  adaptation for full unicode support
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -462,9 +437,9 @@ class PanelQ4(wx.Panel):
 #------------------------------------------------------------------------------
 
     def OnListBoxEquipmentClick(self, event):
-        self.equipeName = str(self.listBoxEquipment.GetStringSelection())
+        self.equipeName = self.listBoxEquipment.GetStringSelection()
         equipments = Status.DB.qgenerationhc.Questionnaire_id[Status.PId].\
-                 AlternativeProposalNo[Status.ANo].Equipment[self.equipeName]
+                 AlternativeProposalNo[Status.ANo].Equipment[check(self.equipeName)]
         if len(equipments) > 0:
             equipe = equipments[0]
         else:
@@ -495,17 +470,22 @@ class PanelQ4(wx.Panel):
 
     def OnButtonOK(self, event):
 
+        print "PanelQ4 (OK): button pressed"
+        
         if Status.PId == 0:
 	    return
-        equipeName = check(self.tc1.GetValue())
-        equipments = Status.DB.qgenerationhc.Equipment[equipeName].\
+	
+        equipeName = self.tc1.GetValue()
+        print "PanelQ4 (OK): equipeName = %r"%equipeName
+        
+        equipments = Status.DB.qgenerationhc.Equipment[check(equipeName)].\
                      Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         logTrack("PanelQ4 (OK Button): data entry confirmed for equipment %s"%equipeName)
 
-	if equipeName != 'NULL' and len(equipments) == 0:
+	if equipeName <> 'NULL' and len(equipments) == 0:
             equipe = Status.prj.addEquipmentDummy()
-        elif equipeName != 'NULL' and len(equipments) == 1:
+        elif equipeName <> 'NULL' and len(equipments) == 1:
             equipe = equipments[0]
         else:
 	    showError("PanelQ4 (ButtonOK) Equipment name has to be a unique value!")
@@ -517,6 +497,9 @@ class PanelQ4(wx.Panel):
 
         if self.tc6.GetValue() > 1:
             showMessage("Number of Equipments > 1 not yet supported\nWorkaround: multiply nominal power by N")
+
+        print "PanelQ4 (OK): pipe names = ",self.tc20.GetValue()
+        print "PanelQ4 (OK): pipe id's = ",self.getPipeIDString(self.tc20.GetValue())
         
         tmp = {
             "Equipment":check(self.tc1.GetValue()),
@@ -584,11 +567,11 @@ class PanelQ4(wx.Panel):
         fluidDict = Status.prj.getFluidDict()
         
         if q is not None:
-            self.tc1.SetValue(str(q.Equipment))
-            self.tc2.SetValue(str(q.Manufact))
+            self.tc1.SetValue(q.Equipment)
+            self.tc2.SetValue(q.Manufact)
             self.tc3.SetValue(str(q.YearManufact))
-            self.tc4.SetValue(str(q.Model))
-            self.tc5.SetValue(str(q.EquipType))
+            self.tc4.SetValue(q.Model)
+            self.tc5.SetValue(q.EquipType)
             self.tc6.SetValue(str(q.NumEquipUnits))
             self.tc7.SetValue(str(q.HCGPnom))
 
@@ -607,19 +590,20 @@ class PanelQ4(wx.Panel):
             self.tc18.SetValue(str(q.HPerDayEq))
             self.tc19.SetValue(str(q.NDaysEq))
 
-
+            print "PanelQ4 (display): q.PipeDuctEquip = ",q.PipeDuctEquip
+            print "PanelQ4 (display): Pipe Names = ",self.getPipeNames(q.PipeDuctEquip)
             self.tc20.SetSelection(self.getPipeNames(q.PipeDuctEquip))
             
-            self.tc30.SetValue(str(q.HeatSourceLT))
+            self.tc30.SetValue(q.HeatSourceLT)
                 
-            self.tc31.SetValue(str(q.THeatSourceLT))
+            self.tc31.SetValue(q.THeatSourceLT)
                         
             if q.HeatSourceHT in pipeDict.keys():
                 self.tc32.SetValue(pipeDict[str(long(q.HeatSourceHT))])
                 
             self.tc33.SetValue(str(q.THeatSourceHT))
             self.tc34.SetValue(str(q.ThermalConsum))
-            self.tc35.SetValue(str(q.DestinationWasteHeat))
+            self.tc35.SetValue(q.DestinationWasteHeat)
             self.tc36.SetValue(str(q.TemperatureReCooling))
 
             if q.Refrigerant in fluidDict.keys():
@@ -665,14 +649,14 @@ class PanelQ4(wx.Panel):
         self.listBoxEquipment.Clear()
         equipments = Status.prj.getEquipments()
         for equipe in equipments:
-            self.listBoxEquipment.Append(str(equipe.Equipment))
+            self.listBoxEquipment.Append(unicode(equipe.Equipment,"utf-8"))
 	try: self.listBoxEquipment.SetStringSelection(self.equipeName)
 	except: pass
 
     def fillChoiceOfDBFuel(self):
         self.tc8.entry.Clear()
         for n in Status.DB.dbfuel.FuelName["%"]:
-            self.tc8.entry.Append (n.FuelName)
+            self.tc8.entry.Append(unicode(n.FuelName,"utf-8"))
 
     def fillChoiceOfFluid(self):
         fluidDict = Status.prj.getFluidDict()
@@ -690,10 +674,10 @@ class PanelQ4(wx.Panel):
         self.tc30.entry.Clear()
         for src in TRANSAMBIENTSOURCE.values():
             if src is not None: #super extra security feature
-                self.tc30.entry.Append(str(src))
+                self.tc30.entry.Append(src)
         for hx in hxList:
             if hx is not None:  #super extra security feature
-                self.tc30.entry.Append(str(hx))
+                self.tc30.entry.Append(hx)
 
     def fillChoiceOfHTSource(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
@@ -701,7 +685,7 @@ class PanelQ4(wx.Panel):
         if len(pipeList) == 0: self.tc32.entry.Append("---")
         for pipe in pipeList:
             if pipe is not None: #super extra security feature
-                self.tc32.entry.Append(str(pipe))
+                self.tc32.entry.Append(pipe)
 
     def fillChoiceOfLTSink(self):
         hxList = Status.prj.getHXList("HXName")
@@ -742,7 +726,7 @@ class PanelQ4(wx.Panel):
         pipeDict = Status.prj.getPipeDict()
         pipeIDs = []
         for name in nameList:
-            print "selected name: ",name
+            print "selected name: %r"%name
             pipeID = findKey(pipeDict,name)
             pipeIDs.append("%10d"%pipeID)
             

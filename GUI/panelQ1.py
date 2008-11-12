@@ -201,11 +201,11 @@ class PanelQ1(wx.Panel):
         fp.changeFont(size=TYPE_SIZE_LEFT)
 
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
-                             label=unicode(_("Name of the company"),"utf-8").encode("latin-1"),
-                             tip=_("Legal name of the company"))
+                             label=_U("Name of the company"),
+                             tip=_U("Legal name of the company"))
 
         self.tc2 = TextEntry(self.page0,maxchars=255,value='',
-                             label=unicode(_("City / Country"),"utf-8"),
+                             label=_U("City / Country"),
                              tip=_U("City where production is located"))
 
         self.tc3 = TextEntry(self.page0,maxchars=255,value='',
@@ -544,12 +544,18 @@ class PanelQ1(wx.Panel):
 #--- UI actions
 #------------------------------------------------------------------------------      
     def OnListBoxProductsListboxClick(self, event):
-        self.productName = str(self.listBoxProducts.GetStringSelection())
-        p = Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Product[str(self.listBoxProducts.GetStringSelection())][0]
-        self.tc30.SetValue(str(p.Product))
+        self.productName = self.listBoxProducts.GetStringSelection()
+        p = Status.DB.qproduct.\
+            Questionnaire_id[Status.PId].\
+            AlternativeProposalNo[Status.ANo].\
+            Product[check(self.productName)][0]
+        
+        self.tc30.SetValue(p.Product)
+        
         print "PanelQ1 (ListBoxClick): tc31 set to %s"%p.ProductCode
         if str(p.ProductCode) in PRODUCTCODES.keys():
-            self.tc31.SetValue(PRODUCTCODES[str(p.ProductCode)])
+            self.tc31.SetValue(PRODUCTCODES[p.ProductCode])
+            
         self.tc32.SetValue(str(p.QProdYear))
         self.tc33.SetValue(str(p.ProdUnit))
         self.tc34.SetValue(str(p.TurnoverProd))
@@ -655,7 +661,7 @@ class PanelQ1(wx.Panel):
 
 #            print "PanelQ1 (OK): saving product entries for product %s"%product
             
-            if check(product) <> 'NULL' and len(Status.DB.qproduct.Product[product].\
+            if check(product) <> 'NULL' and len(Status.DB.qproduct.Product[check(product)].\
                                                                   Questionnaire_id[Status.PId].\
                                                                   AlternativeProposalNo[Status.ANo]) == 0:
                 print "PanelQ1 (OK): saving data for new product"
@@ -676,7 +682,7 @@ class PanelQ1(wx.Panel):
                 Status.SQL.commit()
                 self.fillProductList()
 
-            elif check(product) <> 'NULL' and len(Status.DB.qproduct.Product[product].\
+            elif check(product) <> 'NULL' and len(Status.DB.qproduct.Product[check(product)].\
                                                                     Questionnaire_id[Status.PId].\
                                                                     AlternativeProposalNo[Status.ANo]) == 1:
                 print "PanelQ1 (OK): saving data for existing product"
@@ -694,7 +700,10 @@ class PanelQ1(wx.Panel):
 
                 print "PanelQ1: product code = %s saved to SQL"%findKey(PRODUCTCODES,self.tc31.GetValue(text=True))
 
-                q = Status.DB.qproduct.Product[self.tc30.GetValue()].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo][0]
+                q = Status.DB.qproduct.Product[check(self.tc30.GetValue())].\
+                    Questionnaire_id[Status.PId].\
+                    AlternativeProposalNo[Status.ANo][0]
+                
                 q.update(tmp)               
                 Status.SQL.commit()
                 self.fillProductList()
@@ -758,19 +767,19 @@ class PanelQ1(wx.Panel):
         self.branch = q.Branch
         naceDict,naceSubDict = self.fillChoiceOfNaceCode()
         
-        self.tc1.SetValue(str(q.Name))
+        self.tc1.SetValue(q.Name)
         print "City read from database = ",q.City
-        self.tc2.SetValue(str(q.City))
-        self.tc3.SetValue(str(q.Contact))
-        self.tc4.SetValue(str(q.Role))
-        self.tc5.SetValue(str(q.Address))
+        self.tc2.SetValue(q.City)
+        self.tc3.SetValue(q.Contact)
+        self.tc4.SetValue(q.Role)
+        self.tc5.SetValue(q.Address)
         self.tc6.SetValue(str(q.Phone))
         self.tc7.SetValue(str(q.Fax))
         self.tc8.SetValue(str(q.Email))
-        self.tc9.SetValue(str(q.DescripIndustry))
+        self.tc9.SetValue(q.DescripIndustry)
 
         print "PanelQ1 (fillPage): branch = ",q.Branch
-        self.tc10.SetValue(str(q.Branch))
+        self.tc10.SetValue(q.Branch)
         if str(q.Branch) in naceDict.values():
             string = "%s|%s"%(findKey(naceDict,str(q.Branch)),q.Branch)
             self.tc12.SetValue(string)
@@ -780,7 +789,7 @@ class PanelQ1(wx.Panel):
             print naceDict.values()
             
         print "PanelQ1 (fillPage): sub-branch = ",q.SubBranch
-        self.tc11.SetValue(str(q.SubBranch))
+        self.tc11.SetValue(q.SubBranch)
         if str(q.SubBranch) in naceSubDict.values():
             string = "%s|%s"%(findKey(naceSubDict,str(q.SubBranch)),q.SubBranch)
             self.tc13.SetValue(string)
@@ -817,7 +826,7 @@ class PanelQ1(wx.Panel):
         self.listBoxProducts.Clear()
         if len(Status.DB.qproduct.Questionnaire_id[Status.PId]) > 0:
             for n in Status.DB.qproduct.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]:
-                self.listBoxProducts.Append(n.Product)
+                self.listBoxProducts.Append(unicode(n.Product,"utf-8"))
 
     def clear(self):
         self.tc1.SetValue('')

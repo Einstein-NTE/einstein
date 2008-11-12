@@ -86,7 +86,7 @@ def fillChoice(choice,choiceList,nonePossible=True):
 #------------------------------------------------------------------------------
     choice.Clear()
     if nonePossible==True:choice.Append("None")
-    for c in choiceList:choice.Append(str(c))
+    for c in choiceList:choice.Append(c)
     choice.SetSelection(0)
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -104,7 +104,11 @@ def check(value):
 #   (should be moved some day to a separate file with sql-tools ...)
 #------------------------------------------------------------------------------
     if value <> "" and value <> "None" and value is not None:
-        return value
+        if isinstance(value,str) or isinstance(value,unicode):
+            print "GuiTools (check): string or unicode instance detected"
+            return value.encode("utf-8")
+        else:
+            return value
     else:
         return 'NULL'
 #==============================================================================

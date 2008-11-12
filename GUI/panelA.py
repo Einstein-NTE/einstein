@@ -390,7 +390,7 @@ class PanelA(wx.Panel):
                     else:
                         self.grid.SetCellValue(r, c, data[r][c])
                 except:
-                    logDebug("PanelEA4a: error writing data[%s][%s]: "%(r,c))
+                    logDebug("PanelEA4a: error writing data[%r][%r]: "%(r,c))
 
 #XXX Here better would be updating the grid and showing less rows ... ????
         for r in range(rows,MAXROWS):
@@ -420,13 +420,11 @@ class PanelA(wx.Panel):
 #   Generate new alterantive proposal
 #------------------------------------------------------------------------------		
 
-        self.shortName = "New Proposal %s"%(Status.NoOfAlternatives+1)
-        self.description = "based on present state"
+        self.shortName = _U("New Proposal %s")%(Status.NoOfAlternatives+1)
+        self.description = _U("based on present state")
         
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print "PanelA - OK",self.shortName,self.description
-            print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(0,self.shortName,self.description)
             self.display()
@@ -443,13 +441,13 @@ class PanelA(wx.Panel):
 #------------------------------------------------------------------------------		
 #   Generate new porposal copying from existing alternative
 #------------------------------------------------------------------------------		
-        self.shortName = self.grid.GetCellValue(self.selectedRow,1)+"(mod.)"
-        self.description = self.grid.GetCellValue(self.selectedRow,2)+"(modified alternative based on "+self.grid.GetCellValue(self.selectedRow,1)+")"
+        self.shortName = self.grid.GetCellValue(self.selectedRow,1)+_U('(mod.)')
+        self.description = self.grid.GetCellValue(self.selectedRow,2)+ \
+                           _U('(modified alternative based on ')+ \
+                           self.grid.GetCellValue(self.selectedRow,1)+ u')'
 
         pu1 =  DialogA(self)
         if pu1.ShowModal() == wx.ID_OK:
-            print "PanelA - OK",self.shortName,self.description
-            print "PanelA (GenerateNew-Button): calling function createNewAlternative"
 
             Status.prj.createNewAlternative(self.ANo,self.shortName,self.description)
             self.display()
@@ -483,8 +481,8 @@ class PanelA(wx.Panel):
 
         showMessage(_U("Alternative %s selected as final proposal")%self.ANo)
         Status.prj.setFinalAlternative(self.ANo)
-        self.selectedProposalName = check(Status.FinalAlternativeName)
-        logMessage("Final alternative selected = %s"%self.selectedProposalName)
+        self.selectedProposalName = Status.FinalAlternativeName
+        logMessage("Final alternative selected = %r"%self.selectedProposalName)
         self.selectedProposal.SetLabel(self.selectedProposalName)
         self.display()
         

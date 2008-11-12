@@ -1,4 +1,3 @@
-# -*- coding: iso-8859-15 -*-
 #==============================================================================
 #
 #	E I N S T E I N
@@ -1119,12 +1118,18 @@ class TextEntry(wx.Panel):
         pass
 
     def GetValue(self):
-        return self.entry.GetValue().encode(ENCODING)
+#        return self.entry.GetValue().encode(ENCODING)
+        return self.entry.GetValue()
 
     def Clear(self):
         self.SetValue('')
 
     def SetValue(self, value):
+        if value == None:
+            self.entry.SetValue('')
+            return
+        
+        print "DisplayClasses (TextEntry - SetValue): value = %r"%value
         try:
             self.entry.SetValue(unicode(value,"utf-8"))
         except:
@@ -1263,17 +1268,30 @@ class ChoiceEntry(wx.Panel):
         # if 'thing' is an integer n, the choice will show the nth element. 
         # if 'thing' is a string, the choice will show the element that contains the string
         # if 'thing' is a list, the elements of the list will be loaded in the choice.
+
+        print "DisplayClasses (SetValue): %r"%thing
+
         try:
             if isinstance(thing,int):
                 try:
                     self.entry.SetSelection(thing)
                 except:
                     self.entry.SetSelection(0)
-            elif isinstance(thing,str):
+            elif isinstance(thing,str) or isinstance(thing,unicode):
                 if thing.strip() == '':
                     # clear the choice
                     self.entry.Clear()
                     return
+                
+                print "DisplayClasses (ChoiceEntry - SetValue): value = %r"%thing
+                try:
+                    thing = unicode(thing,"utf-8")
+                except:
+                    try:
+                        thing = unicode(thing,ENCODING)
+                    except:
+                        pass
+                    
                 try:
                     self.entry.SetSelection(self.entry.FindString(thing))
                 except:
@@ -1383,10 +1401,10 @@ class MultipleChoiceEntry(wx.Panel):
         combo = self.entry.GetCombo()
         if isinstance(selection,list):
             for val in selection:
-                self.entry.SetStringValue(str(val))
+                self.entry.SetStringValue(val)
             combo.SetText(';'.join(selection))
         else:
-            self.entry.SetStringValue(str(selection))
+            self.entry.SetStringValue(selection)
             combo.SetText(selection)
         
     def SetValue(self, thing=0):

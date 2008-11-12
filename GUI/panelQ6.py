@@ -488,7 +488,6 @@ class PanelQ6(wx.Panel):
 
 
     def OnListBoxHXListboxClick(self, event):
-#        self.HXName = unicode(self.listBoxHX.GetStringSelection(),ENCODING)
         self.HXName = self.listBoxHX.GetStringSelection()
         if self.HXName in self.HXList:
             self.HXNo = self.HXList.index(self.HXName)+1
@@ -507,8 +506,8 @@ class PanelQ6(wx.Panel):
         event.Skip()
 
     def OnButtonHXOK(self, event):
-        hxName = check(self.tc1.GetValue())
-        hxes = Status.DB.qheatexchanger.HXName[hxName].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
+        hxName = self.tc1.GetValue()
+        hxes = Status.DB.qheatexchanger.HXName[check(hxName)].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
 	if hxName <> 'NULL' and len(hxes) == 0:
             hx = Status.prj.addHXDummy()
             self.HXName = hxName
@@ -546,7 +545,7 @@ class PanelQ6(wx.Panel):
 
 
     def OnListBoxWHEEListboxClick(self, event):
-        self.WHEEName = str(self.listBoxWHEE.GetStringSelection())
+        self.WHEEName = self.listBoxWHEE.GetStringSelection()
         if self.WHEEName in self.WHEEList:
             self.WHEENo = self.WHEEList.index(self.WHEEName)+1
         else:
@@ -564,8 +563,8 @@ class PanelQ6(wx.Panel):
         event.Skip()
 
     def OnButtonWHEEOK(self, event):
-        wheeName = check(self.tc101.GetValue())
-        whees = Status.DB.qwasteheatelequip.WHEEName[wheeName].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
+        wheeName = self.tc101.GetValue()
+        whees = Status.DB.qwasteheatelequip.WHEEName[check(wheeName)].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
 	if wheeName <> 'NULL' and len(whees) == 0:
             whee = Status.prj.addWHEEDummy()
             self.WHEEName = wheeName
@@ -617,7 +616,7 @@ class PanelQ6(wx.Panel):
 
         self.listBoxWHEE.Clear()
         for whee in self.WHEEList:
-            self.listBoxWHEE.Append(str(whee))
+            self.listBoxWHEE.Append(whee)
 
         if self.WHEEName is not None: self.listBoxWHEE.SetStringSelection(self.WHEEName)
 
@@ -642,7 +641,10 @@ class PanelQ6(wx.Panel):
 
 #.............................................................................
 # heat exchanger data
-        hxes = Status.DB.qheatexchanger.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].HXName[self.HXName]
+        hxes = Status.DB.qheatexchanger.\
+               ProjectID[Status.PId].\
+               AlternativeProposalNo[Status.ANo].\
+               HXName[check(self.HXName)]
 
         if len(hxes) <>0:
             q = hxes[0]
@@ -657,13 +659,19 @@ class PanelQ6(wx.Panel):
             self.tc4.SetValue(str(q.HXLMTD))
             self.tc5.SetValue(str(q.QHX))
 
-            if q.HXSource in self.sourceList: self.tc6.SetValue(str(q.HXSource))          
+            if q.HXSource is not None:
+                hxsource = unicode(q.HXSource,"utf-8")
+                if hxsource in self.sourceList: self.tc6.SetValue(hxsource)
+                
             self.tc7.SetValue(str(q.HXTSourceInlet))
             self.tc8.SetValue(str(q.HXhSourceInlet))
             self.tc9.SetValue(str(q.HXTSourceOutlet))
             self.tc10.SetValue(str(q.HXhSourceOutlet))
             
-            if q.HXSink in self.sinkList: self.tc11.SetValue(str(q.HXSink))          
+            if q.HXSink is not None:
+                hxsink = unicode(q.HXSink,"utf-8")
+                if hxsink in self.sinkList: self.tc11.SetValue(hxsink)
+                
             self.tc12.SetValue(str(q.HXTSinkInlet))
             self.tc13.SetValue(str(q.HXTSinkOutlet))
 
@@ -671,16 +679,19 @@ class PanelQ6(wx.Panel):
 #.............................................................................
 # WHEE data
 
-        whees = Status.DB.qwasteheatelequip.ProjectID[Status.PId].AlternativeProposalNo[Status.ANo].WHEEName[self.WHEEName]
+        whees = Status.DB.qwasteheatelequip.\
+                ProjectID[Status.PId].\
+                AlternativeProposalNo[Status.ANo].\
+                WHEEName[check(self.WHEEName)]
 
         if len(whees) <>0:
             q = whees[0]
             self.WHEEID = q.QWasteHeatElEquip_ID
         
-            self.tc101.SetValue(str(q.WHEEName))
+            self.tc101.SetValue(q.WHEEName)
             
             if str(q.WHEEEqType) in TRANSWHEEEQTYPES.keys():
-                self.tc102.SetValue(TRANSWHEEEQTYPES[str(q.WHEEEqType)])
+                self.tc102.SetValue(TRANSWHEEEQTYPES[q.WHEEEqType])
                 
             if str(q.WHEEWasteHeatType) in TRANSWHEEWASTEHEATTYPES.keys():
                 self.tc103.SetValue(TRANSWHEEWASTEHEATTYPES[str(q.WHEEWasteHeatType)])

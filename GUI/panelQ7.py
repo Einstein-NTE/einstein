@@ -511,9 +511,9 @@ class PanelQ7(wx.Panel):
 
             logDebug("PanelQ7 (OK button): writing surface specific data")
             
-            self.selectedSurfaceName = check(self.tc6_0.GetValue())
+            self.selectedSurfaceName = self.tc6_0.GetValue()
             surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
-                        SurfAreaName[self.selectedSurfaceName]
+                        SurfAreaName[check(self.selectedSurfaceName)]
 
             if self.selectedSurfaceName != 'NULL' and len(surfaces) == 0:
                 surface = Status.prj.addSurfaceDummy()
@@ -523,17 +523,17 @@ class PanelQ7(wx.Panel):
                 showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
                 return
 
-            orientation = findKey(ORIENTATIONS,check(self.tc8.GetValue(text=True)))
+            orientation = findKey(ORIENTATIONS,self.tc8.GetValue(text=True))
             if orientation in AZIMUTH.keys():
-                azimuth = check(AZIMUTH[orientation])
+                azimuth = AZIMUTH[orientation]
             else:
-                azimuth = check(None)
+                azimuth = None
                 
             tmp = {
                 "SurfAreaName":check(self.tc6_0.GetValue()),
                 "SurfArea":check(self.tc6.GetValue()),
                 "Inclination":check(self.tc7.GetValue()),
-                "Azimuth":azimuth,
+                "Azimuth":check(azimuth),
                 "AzimuthClass":check(orientation),
                 "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
                 "Distance":check(self.tc10.GetValue()),
@@ -622,29 +622,29 @@ class PanelQ7(wx.Panel):
 	    self.tc1_22.SetValue(str(p.ST_I))
 	    self.tc1_23.SetValue(str(p.TAmb))
 	    
-	    self.tc14.SetValue(str(p.BiomassFromProc))
-	    self.tc15_1.SetValue(str(p.PeriodBiomassProcStart))
-	    self.tc15_2.SetValue(str(p.PeriodBiomassProcStop))
+	    self.tc14.SetValue(p.BiomassFromProc)
+	    self.tc15_1.SetValue(p.PeriodBiomassProcStart)
+	    self.tc15_2.SetValue(p.PeriodBiomassProcStop)
 	    self.tc16.SetValue(str(p.NDaysBiomassProc))
 	    self.tc17.SetValue(str(p.QBiomassProcDay))
 	    self.tc18.SetValue(str(p.SpaceBiomassProc))
 	    self.tc19.SetValue(str(p.LCVBiomassProc))
 	    self.tc20.SetValue(str(p.HumidBiomassProc))
-	    self.tc21.SetValue(str(p.BiomassFromRegion))
+	    self.tc21.SetValue(p.BiomassFromRegion)
 	    self.tc22.SetValue(str(p.PriceBiomassRegion))
-	    self.tc23_1.SetValue(str(p.PeriodBiomassRegionStart))
-	    self.tc23_2.SetValue(str(p.PeriodBiomassRegionStop))
+	    self.tc23_1.SetValue(p.PeriodBiomassRegionStart)
+	    self.tc23_2.SetValue(p.PeriodBiomassRegionStop)
 	    self.tc24.SetValue(str(p.NDaysBiomassRegion))
 
         surfaceList = Status.prj.getSurfaceList("SurfAreaName")
         
         self.listBoxEnergy.Clear()
         for surface in surfaceList:
-            self.listBoxEnergy.Append(str(surface))
+            self.listBoxEnergy.Append(surface)
 
         if len(surfaceList) > 0:
             if self.selectedSurfaceName == None:
-                self.selectedSurfaceName = str(surfaceList[0])
+                self.selectedSurfaceName = surfaceList[0]
             self.listBoxEnergy.SetStringSelection(self.selectedSurfaceName)
             self.fillPageSurface()
 
@@ -653,14 +653,14 @@ class PanelQ7(wx.Panel):
 #------------------------------------------------------------------------------
 
         surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
-                    SurfAreaName[self.selectedSurfaceName]
+                    SurfAreaName[check(self.selectedSurfaceName)]
         
         if len(surfaces) > 0:
             self.selectedSurfaceID = surfaces[0].id
 
 	    p = surfaces[0]
 
-	    self.tc6_0.SetValue(str(p.SurfAreaName))
+	    self.tc6_0.SetValue(p.SurfAreaName)
 	    self.tc6.SetValue(str(p.SurfArea))
 	    self.tc7.SetValue(str(p.Inclination))
 	    if p.AzimuthClass in ORIENTATIONS.keys():

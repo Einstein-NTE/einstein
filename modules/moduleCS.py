@@ -133,10 +133,10 @@ class ModuleCS(object):
                 PEC.append(dPEC)
 
                 if ANo != 0: #SD corrected, was ==
-                    tableEntry = noneFilter([str(salternatives[i].ShortName),dPEC_Table,PECSaving,RelSaving*100])
+                    tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dPEC_Table,PECSaving,RelSaving*100])
                 else:
-                    tableEntry = noneFilter([str(salternatives[i].ShortName),dPEC_Table,"---","---"])
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dPEC])
+                    tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dPEC_Table,"---","---"])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dPEC])
                 
                 PECTable.append(tableEntry)
                 PECPlot.append(plotEntry)
@@ -188,7 +188,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if salternatives[i].StatusEnergy > 0:
                     dUSH = generalData[i].USH
@@ -250,14 +250,14 @@ class ModuleCS(object):
 
 
                 if ANo == 0:
-                    tableEntry = noneFilter([str(salternatives[i].ShortName),
+                    tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                              dUPH_Table,"---",
                                              dUSH_Table,"---"])
                 else:
-                    tableEntry = noneFilter([str(salternatives[i].ShortName),
+                    tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                              dUPH_Table,UPHSaving,
                                              dUSH_Table,USHSaving])
-                plotEntry = noneFilter([str(salternatives[i].ShortName),RatioUSH,RatioUPH]) #SD: before: dUSH, dUPH
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),RatioUSH,RatioUPH]) #SD: before: dUSH, dUPH
 
                 CS2Table.append(tableEntry)
                 CS2Plot.append(plotEntry)
@@ -311,7 +311,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if generalData[i].ProdCO2el is None: #protection against None
                     CO2El.append(0.0)
@@ -398,10 +398,10 @@ class ModuleCS(object):
                     RatioWatConsum = 0.0                    
                     
 
-                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dCO2_Table,dNucWaste_Table,dWatConsum_Table])
 
-                plotEntry = noneFilter([str(salternatives[i].ShortName),RatioCO2,RatioNucWaste,RatioWatConsum])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),RatioCO2,RatioNucWaste,RatioWatConsum])
                
                 CS3Table.append(tableEntry)
                 CS3Plot.append(plotEntry)
@@ -451,7 +451,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if generalData[i].TotalInvCost is None: #protection against None
                     TotalCost.append(0.0)
@@ -506,10 +506,10 @@ class ModuleCS(object):
 #                dSubsidies_Table = "---"  
                 
 
-                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
 
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dOwnCost,dSubsidies])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dOwnCost,dSubsidies])
                
                 CS4Table.append(tableEntry)
                 CS4Plot.append(plotEntry)
@@ -563,7 +563,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if generalData[i].Amortization is None: #protection against None
                     Amortization.append(0.0)
@@ -652,10 +652,10 @@ class ModuleCS(object):
                 
 
             
-                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dAmortization_Table,dEnergyCost_Table,dOMCost_Table])
 
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dAmortization,dEnergyCost,dOMCost])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dAmortization,dEnergyCost,dOMCost])
                
                 CS5Table.append(tableEntry)
                 CS5Plot.append(plotEntry)
@@ -706,7 +706,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if generalData[i].EnergySystemCost is None: #protection against None
                     EnergySystemCost.append(0.0)
@@ -769,10 +769,10 @@ class ModuleCS(object):
                 AddedCostSavedPEC.append(AddCostSavedPEC)#SD check
 
 
-                tableEntry = noneFilter([str(salternatives[i].ShortName),
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dEnergySystemCost_Table,AddCost_Table,AddCostSavedPEC_Table])
 
-                plotEntry = noneFilter([str(salternatives[i].ShortName),AddCostSavedPEC])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),AddCostSavedPEC])
                
                 CS6Table.append(tableEntry)
                 CS6Plot.append(plotEntry)
@@ -823,7 +823,7 @@ class ModuleCS(object):
                 if salternatives[i].ShortName is None:
                     Alternative.append('--')
                 else:
-                    Alternative.append(str(salternatives[i].ShortName))
+                    Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
                 if salternatives[i].StatusECO > 0:
                     dIRR = generalData[i].IRR                
@@ -840,9 +840,9 @@ class ModuleCS(object):
                 IRR.append(dIRR)
                 IRR_Table.append(dIRR_Table)
 
-                tableEntry = noneFilter([str(salternatives[i].ShortName),dIRR_Table])
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dIRR_Table])
 
-                plotEntry = noneFilter([str(salternatives[i].ShortName),dIRR])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dIRR])
                
                 CS7Table.append(tableEntry)
                 CS7Plot.append(plotEntry)

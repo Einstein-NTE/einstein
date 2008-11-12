@@ -12,41 +12,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.12
-#	Created by: 	    Heiko Henning February2008
-#       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger  02/05/2008
-#                           Tom Sobota      03/05/2008
-#                           Hans Schweiger  05/05/2008
-#                           Tom Sobota      30/05/2008
-#                           Stoyan Danov    10/06/2008
-#                           Stoyan Danov    16/06/2008
-#                           Stoyan Danov    17/06/2008
-#                           Hans Schweiger  21/06/2008
-#                           Tom Sobota      21/06/2008
-#                           Hans Schweiger  23/06/2008
-#                           Hans Schweiger  07/07/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       02/05/2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      12/11/2008
 #
 #       Changes to previous version:
-#       02/05/08:       AlternativeProposalNo added in queries for table qdistributionhc
-#       03/05/2008      Changed display format
-#       05/05/2008:     Event handlers changed
-#       30/05/2008      Adapted to new display and data entry classes
-#       10/06/2008      Text changes
-#       16/06/2008      SD: OnListBoxDistributionListListboxClick - rearrange,
-#                       ->changed to -> fluidName = fluidDict[int(p.HeatDistMedium)] because of key error,
-#                       but problem to delete branch if Medium ==NULL !!! to arrange
-#                           OnButtonOK, display() added, unitdict, digits values,
-#                           changed IntEntry->FloatEntry tc7,tc10,tc13,tc14
-#                           in OnButtonOK: -> VUnitStorage in turn of VtotStorage
-#       17/06/2008      SD: unitdict, staticboxes
-#       21/06/2008      HS: bug-fix -> elimination of fsize in Fieldsizes
-#       21/06/2008      TS  General beautification and font awareness.
-#       23/06/2008      HS: filling of choices
-#       07/07/2008: HS  bug-fix: substitute self.check by check
-#                       (compatibility with new FloatEntry)
-#       13/10/2008: SD  change _() to _U()
+#       12/11/2008: HS  adaptation for full unicode support
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -357,8 +333,11 @@ class PanelQ5(wx.Panel):
 
 
     def OnListBoxDistributionListListboxClick(self, event):
-        self.pipeName = str(self.listBoxDistributionList.GetStringSelection())
-        pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].Pipeduct[self.pipeName]
+        self.pipeName = self.listBoxDistributionList.GetStringSelection()
+        pipes = Status.DB.qdistributionhc.\
+                Questionnaire_id[Status.PId].\
+                AlternativeProposalNo[Status.ANo].\
+                Pipeduct[check(self.pipeName)]
 
         if len(pipes) > 0:
             p = pipes[0]
@@ -369,7 +348,7 @@ class PanelQ5(wx.Panel):
         self.pipeNo = p.PipeDuctNo
         self.pipeID = p.QDistributionHC_ID
         
-        self.tc1.SetValue(str(p.Pipeduct))
+        self.tc1.SetValue(p.Pipeduct)
 #        self.tc2.SetValue(str(p.HeatFromQGenerationHC_id)) #SD: parameter excluded)  
 
         fluidDict = Status.prj.getFluidDict()
@@ -394,7 +373,7 @@ class PanelQ5(wx.Panel):
         self.tc14.SetValue(str(p.DeltaDistPipe))		
         self.tc15.SetValue(str(p.NumStorageUnits)) 
         self.tc16.SetValue(str(p.VUnitStorage))
-        if p.TypeStorage in TRANSSTORAGETYPES: self.tc17.SetValue(TRANSSTORAGETYPES[str(p.TypeStorage)])#SD
+        if p.TypeStorage in TRANSSTORAGETYPES: self.tc17.SetValue(TRANSSTORAGETYPES[p.TypeStorage])#SD
         self.tc18.SetValue(str(p.PmaxStorage))
         self.tc19.SetValue(str(p.TmaxStorage))
 
@@ -403,8 +382,11 @@ class PanelQ5(wx.Panel):
 
         if Status.PId == 0:
 	    return
-        pipeName = check(self.tc1.GetValue())
-        pipes = Status.DB.qdistributionhc.Pipeduct[pipeName].Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        pipeName = self.tc1.GetValue()
+        pipes = Status.DB.qdistributionhc.\
+                Pipeduct[check(pipeName)].\
+                Questionnaire_id[Status.PId].\
+                AlternativeProposalNo[Status.ANo]
 
         logTrack("PanelQ5 (OK Button): data entry confirmed for pipe %s"%pipeName)
 
@@ -427,7 +409,7 @@ class PanelQ5(wx.Panel):
 
 	tmp = {
 		"Questionnaire_id":Status.PId,
-		"Pipeduct":pipeName,
+		"Pipeduct":check(pipeName),
                 
 		"HeatDistMedium":check(fluidID),                
 		"DistribCircFlow":check(massFlow), 
@@ -449,6 +431,8 @@ class PanelQ5(wx.Panel):
 	}
 	pipe.update(tmp)               
 	Status.SQL.commit()
+	
+	self.pipeName = pipeName
 	self.fillPage()
                           
     def OnButtonCancel(self, event):
@@ -488,10 +472,15 @@ class PanelQ5(wx.Panel):
 
     def fillPage(self):
         self.listBoxDistributionList.Clear()
-        pipes = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
+        pipes = Status.DB.qdistributionhc.\
+                Questionnaire_id[Status.PId].\
+                AlternativeProposalNo[Status.ANo]
+        
         if len(pipes) > 0:
             for pipe in pipes:
-                self.listBoxDistributionList.Append (str(pipe.Pipeduct))
+                self.listBoxDistributionList.Append(unicode(pipe.Pipeduct,"utf-8"))
+        if self.pipeName is not None:
+            self.listBoxDistributionList.SetStringSelection(self.pipeName)
 
     def clear(self):
         self.tc1.SetValue('')

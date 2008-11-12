@@ -70,6 +70,7 @@
 #
 #==============================================================================
 import wx
+import os
 import pSQL
 from status import Status
 from GUITools import *
@@ -91,6 +92,7 @@ LABEL_WIDTH_RIGHT  = 400
 DATA_ENTRY_WIDTH   = 100
 UNITS_WIDTH        = 100
 
+ENCODING = "latin-1"
 def _U(text):
     return unicode(_(text),"utf-8")
 
@@ -119,6 +121,7 @@ class PanelQ3(wx.Panel):
 
         self.page0 = wx.Panel(self.notebook)
         self.page1 = wx.Panel(self.notebook)
+        self.page2 = wx.Panel(self.notebook)
 
         self.sizer_5_staticbox = wx.StaticBox(self.page0, -1, _U("Process list"))
         self.sizer_5_staticbox.SetForegroundColour(TITLE_COLOR)
@@ -182,7 +185,13 @@ class PanelQ3(wx.Panel):
         self.listBoxProcesses.SetFont(fp.getFont())
         self.Bind(wx.EVT_LISTBOX, self.OnListBoxProcessesClick, self.listBoxProcesses)
 
-        #
+        p1 = wx.StaticBitmap(bitmap=wx.Bitmap(os.path.join('img','Q3.png'),
+                                             wx.BITMAP_TYPE_PNG),
+                                             id=-1,
+                                             parent=self.page2,
+                                             pos=wx.Point(0, 0),
+                                             size=wx.Size(800,600),
+                                             style=wx.SUNKEN_BORDER)
         # Processes description
         #
         self.tc1 = TextEntry(self.page0,maxchars=255,value='',
@@ -474,6 +483,7 @@ class PanelQ3(wx.Panel):
         self.page1.SetSizer(sizer_10)
         self.notebook.AddPage(self.page0, _U('Process data'))
         self.notebook.AddPage(self.page1, _U('Heat supply and waste heat'))
+        self.notebook.AddPage(self.page2, _U('Temperatures and flow rates'))
         sizer_2.Add(self.notebook, 1, wx.EXPAND, 0)
         sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL|wx.EXPAND, 2)
         sizerOKCancel.Add(self.buttonOK, 0, wx.ALL|wx.EXPAND, 2)
@@ -502,28 +512,42 @@ class PanelQ3(wx.Panel):
         self.display()
 
     def OnListBoxProcessesClick(self, event):
-        self.selectedProcessName = str(self.listBoxProcesses.GetStringSelection())
+        self.selectedProcessName = self.listBoxProcesses.GetStringSelection()
+        print "PanelQ3: selected Process Name = %r"%self.selectedProcessName
+#        self.selectedProcessName = "ätsch bätsch process"
+#        print "PanelQ3: selected Process Name = %r"%self.selectedProcessName
+#        self.selectedProcessName = u"ätsch bätsch process"
+#        print "PanelQ3: selected Process Name = %r"%self.selectedProcessName
         self.showProcess()
 
     def showProcess(self):
-        processes = Status.DB.qprocessdata.\
-                    Questionnaire_id[Status.PId].\
-                    AlternativeProposalNo[Status.ANo].\
-                    Process[self.selectedProcessName]
+
+        print "PanelQ3 (showProcess): selected Process Name = %r"%self.selectedProcessName
+        if self.selectedProcessName is not None:
+            processes = Status.DB.qprocessdata.\
+                        Questionnaire_id[Status.PId].\
+                        AlternativeProposalNo[Status.ANo].\
+                        Process[self.selectedProcessName.encode("utf-8")]
+        else:
+            processes = []
+        
         if len(processes) == 0:
+            print "PanelQ3 (showProcess): process not found in DB"
             return
         else:
             q = processes[0]
+            print "PanelQ3 (showProcess): process found in DB"
         
         self.selectedProcessID = q.QProcessData_ID
 
         fluidDict = Status.prj.getFluidDict()
         unitOpDict = Status.prj.getUnitOpDict()
 
-        self.tc1.SetValue(str(q.Process))
-        self.tc1_1.SetValue(str(q.Description))
+        print "PanelQ3 (showProcess): now writing tc1 = %r"%q.Process
+        self.tc1.SetValue(q.Process)
+        self.tc1_1.SetValue(q.Description)
         if q.ProcType in TRANSPROCTYPES.keys():
-            self.tc2.SetValue(TRANSPROCTYPES[str(q.ProcType)])
+            self.tc2.SetValue(TRANSPROCTYPES[q.ProcType])
         else:
             self.tc2.SetValue("None")
 
@@ -576,7 +600,7 @@ class PanelQ3(wx.Panel):
         else:
             self.tc19.SetValue("None")
 
-        self.tc20.SetValue(str(q.SourceWasteHeat))	
+        self.tc20.SetValue(q.SourceWasteHeat)	
         self.tc21.SetValue(str(q.PTInFlowRec))
 
         fluidDict = Status.prj.getFluidDict()        
@@ -586,7 +610,7 @@ class PanelQ3(wx.Panel):
         else:
             self.tc22.SetValue("None")
 
-        self.tc23.SetValue(str(q.PipeDuctProc))
+        self.tc23.SetValue(q.PipeDuctProc)
         self.tc24.SetValue(str(q.TSupply))
         self.tc25.SetValue(str(q.SupplyMedFlow))
         self.tc26.SetValue(str(q.UPH))
@@ -603,10 +627,12 @@ class PanelQ3(wx.Panel):
         if self.checkIfAllowed()==False:
             return
         
-        processName = check(self.tc1.GetValue())
+        processName = self.tc1.GetValue()
+        print "PanelQ3 (ok-button): adding process %r"%processName
+        
         processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].\
                     AlternativeProposalNo[Status.ANo].\
-                    Process[processName]
+                    Process[check(processName)]
 
 	if processName != 'NULL' and len(processes) == 0:
             process = Status.prj.addProcessDummy()
@@ -664,7 +690,9 @@ class PanelQ3(wx.Panel):
         }
         process.update(tmp)               
 
+        print "PanelQ3 (ok-button): process table updated with: ",tmp
         Status.SQL.commit()
+        print "PanelQ3 (ok-button): what arrived is this: ",process
 
         Status.processData.changeInProcess()
 
@@ -676,7 +704,9 @@ class PanelQ3(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def display(self):
+        print "PanelQ3 (display): filling page"
         self.fillPage()
+        print "PanelQ3 (display): showing process"
         self.showProcess()
         self.Show()
 
@@ -700,6 +730,7 @@ class PanelQ3(wx.Panel):
 
     def fillChoiceOfPipe(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
+        print "PanelQ3: pipeList = %r"%pipeList
         self.tc23.SetValue(pipeList)
 
     def fillChoiceOfHX(self):
@@ -720,10 +751,12 @@ class PanelQ3(wx.Panel):
         self.tc19.SetValue(TRANSYESNO.values())
         self.listBoxProcesses.Clear()
         processList = Status.prj.getProcessList("Process")
-        for n in processList:
-            self.listBoxProcesses.Append (str(n))
+        for process in processList:
+            self.listBoxProcesses.Append(process)
+            print "PanelQ3: adding process %r to list"%process
 	try: self.listBoxProcesses.SetStringSelection(self.selectedProcessName)
 	except: pass
+	print "PanelQ3: process List = ",processList
 
     def clear(self):
         self.tc1.SetValue('')

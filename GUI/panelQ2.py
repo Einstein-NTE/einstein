@@ -383,8 +383,8 @@ class PanelQ2(wx.Panel):
             self.storeElectricityData()
 
     def storeFuelData(self):
-        fuelName = str(self.tc1.GetValue(text=True))
-        dbfuels = Status.DB.dbfuel.FuelName[fuelName]
+        fuelName = self.tc1.GetValue(text=True)
+        dbfuels = Status.DB.dbfuel.FuelName[check(fuelName)]
         if len(dbfuels) > 0:
             dbfid = dbfuels[0].DBFuel_ID
             setUnitsFuelDensity(dbfid)
@@ -392,8 +392,6 @@ class PanelQ2(wx.Panel):
             dbfid = -1
         fuels = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[dbfid]
 
-        set
-        
         if Status.PId <> 0 and fuelName <> 'None':
             if len(fuels) == 0:
                 newID = Status.prj.addFuelDummy()
@@ -426,7 +424,7 @@ class PanelQ2(wx.Panel):
                 self.fillFuelList()
                           
             else:
-                self.main.showError("Fuel name has to be a unique value!")
+                self.main.showError(_U("Fuel name has to be a unique value!"))
 
     def storeElectricityData(self):
         if Status.PId <> 0:
@@ -497,16 +495,21 @@ class PanelQ2(wx.Panel):
                 
     def OnFuelListBoxClick(self, event):
         try:
-            self.selectedFuelName = str(self.fuelListBox.GetStringSelection())
-            self.selectedFuelID = Status.DB.dbfuel.FuelName[self.selectedFuelName][0].DBFuel_ID
+            self.selectedFuelName = self.fuelListBox.GetStringSelection()
+            self.selectedFuelID = Status.DB.dbfuel.FuelName[check(self.selectedFuelName)][0].DBFuel_ID
             setUnitsFuelDensity(self.selectedFuelID)
             
-            q = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo].DBFuel_id[self.selectedFuelID][0]
+            q = Status.DB.qfuel.\
+                Questionnaire_id[Status.PId].\
+                AlternativeProposalNo[Status.ANo].\
+                DBFuel_id[self.selectedFuelID][0]
+            
             self.tc3.SetValue(str(q.MFuelYear))
             self.tc4.SetValue(str(q.FECFuel))
             self.tc5.SetValue(str(q.FuelTariff))
             self.tc6.SetValue(str(q.FuelCostYear))
             self.tc1.SetValue(self.selectedFuelName)
+            
         except IndexError:
             self.clear()
         event.Skip()
@@ -598,7 +601,7 @@ class PanelQ2(wx.Panel):
             for n in fuels:
                 dbfid = n.DBFuel_id
                 try:
-                    fuelName = str(Status.DB.dbfuel.DBFuel_ID[n.DBFuel_id][0].FuelName)
+                    fuelName = unicode(Status.DB.dbfuel.DBFuel_ID[n.DBFuel_id][0].FuelName,"utf-8")
                 except:
                     fuelName = "unknown fuel"
                 self.fuelListBox.Append(fuelName)

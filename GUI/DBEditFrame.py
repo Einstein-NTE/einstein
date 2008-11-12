@@ -50,6 +50,7 @@ import MySQLdb
 import wx
 import einstein.GUI.pSQL as pSQL
 from einstein.GUI.status import Status
+from einstein.GUI.GUITools import check
 from DBTitles import *
 
 def _U(text):
@@ -243,7 +244,11 @@ class DBEditFrame(wx.Dialog):
             self.grid1.AppendRows(numRows=1)
             self.grid1.SetRowLabelValue(r, "%s" % (rownr))
             for col in row:
-                self.grid1.SetCellValue(r, c, "%s" % (row[c]))
+                if isinstance(row[c],str) or isinstance(row[c],unicode):
+                    self.grid1.SetCellValue(r, c, unicode(row[c],"utf-8"))
+                else:
+                    self.grid1.SetCellValue(r, c, str(row[c]))
+                    
                 if c == 0:self.grid1.SetReadOnly(r, c, isReadOnly=True)
                 c += 1
             c = 0
@@ -259,10 +264,8 @@ class DBEditFrame(wx.Dialog):
     def OnGridEditStore(self, event):
         value = self.grid1.GetCellValue(self.lastEditRow, self.lastEditCol)
         row = self.table.select({self.table.keys()[0]:self.grid1.GetCellValue(self.lastEditRow,0)})[0]
-        if value <> "" and value <> "None":
-            row[self.lastEditCol] = value
-        else:
-            row[self.lastEditCol] = 'NULL'
+        row[self.lastEditCol] = check(value)
+
         self.lastEditRow = 0
         self.lastEditCol = 0
         event.Skip()
