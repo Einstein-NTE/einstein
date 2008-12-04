@@ -81,18 +81,38 @@ installing the
 new Version !!! <br>
 Parallel installation of two different MySQL Versions
 may lead to problems.<br>
+IMPORTANT: if You already had an old version of MySQL installed, after
+uninstalling You should also delete manually the remaining files named
+"mysql" on your computer.<br>
+Those are usually the following (in WINDOWS installations):<br>
+C:\Program Files\mysql<br>
+C:\Documents and Settings\All Users\Application Data\mysql<br>
+C:\Doucments and Settings\&lt;Individual User's Name&gt;\Application
+Data\mysql<br>
 <br>
 There are two possible ways to doing MySQL installation. We recomment
 use of the installer (option (a) ), but in case of any problem you can
 try it with option (b).<br>
 <br>
 a) Run the file "install_mysql.bat" and follow the instructions given
-on the screen (NOTE: internet connection is necessary !!!)<br>
+on the screen<br>
+<br>
+VERY IMPORTANT: <br>
+Choose all the default options offered by the MySQL installer except
+the following (in the order that they appear):<br>
+- select the option Port Number 3306: "add firewall exception for this
+port"<br>
+- select the option: include bin-directory in Windows Path<br>
+- UNselect the option: modify security settings (so that You can
+install MySQL without password)<br>
 <br>
 b) go to: http://dev.mysql.com/downloads/mysql/5.1.html and download
 the Windows ZIP/Setup.EXE (x86) <br>
 (or one of the other versions, depending on your computer and operating
 system)<br>
+<br>
+Take care of activating / deactivating the MySQL configuration settings
+as specified under (a)<br>
 <br>
 CHECK OF MySQL INSTALLATION (On Windows)<br>
 <br>
@@ -122,7 +142,7 @@ use of the installer (option (a) ), but in case of any problem you can
 try it with option (b).<br>
 <br>
 a) Run the file "install_python.bat" and follow the instructions given
-on the screen (NOTE: internet connection is necessary !!!)<br>
+on the screen<br>
 <br>
 b) Go to www.python.org/download and do it yourself.<br>
 <br>
@@ -169,6 +189,16 @@ NET START mysql
 This should show a more descriptive error diagnostic.
 <br>
 <br>
+Step 6: Check Your Anti-Virus configuration<br>
+<br>
+Some Anti-Virus software, like e.g. McAfee may cause problems in
+combination with the MySQL database server.<br>
+MySQL creates some temporary files in the folder C:\Windows\Temp, and
+some antivirus software does not allow MySQL to delete these temporary
+files.<br>
+This can be solved excluding the folder C:\Windows\Temp from real-time
+scanning in the Antivirus (in McAfee: option All Processes / detection
+/ exclusions). <br>
 <br>
 <h3><a name="1.1.2._Installation_of_EINSTEIN_"></a>1.1.2. Installation
 of EINSTEIN<br>

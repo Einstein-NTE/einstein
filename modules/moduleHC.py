@@ -53,6 +53,9 @@ from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.constants import *
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 class ModuleHC(object):
@@ -106,10 +109,10 @@ class ModuleHC(object):
                     pipeID = int(i)
                     if pipeID in pipeDict.keys():
                         if idx == 0:
-                            newPipes = pipes + str(pipeDict[pipeID])
+                            newPipes = pipes + pipeDict[pipeID]
                             pipes = newPipes
                         else:
-                            newPipes = pipes+"==o\no=="+str(pipeDict[pipeID])
+                            newPipes = pipes+"==o\no=="+pipeDict[pipeID]
                             pipes = newPipes
                         idx += 1
                 except:
@@ -121,7 +124,7 @@ class ModuleHC(object):
 # getting pipe names of equipes
 
             dataList.append(noneFilter([equipe.EqNo,
-                                        equipe.Equipment,
+                                        unicode(equipe.Equipment,"utf-8"),
                                         equipe.EquipType,
                                         equipe.HCGPnom,
                                         pipes]))
@@ -131,7 +134,7 @@ class ModuleHC(object):
                     USHj = equipe.USHj/1000.
                 except:
                     USHj = " "
-                dataListReport.append(noneFilter([equipe.Equipment,
+                dataListReport.append(noneFilter([unicode(equipe.Equipment,"utf-8"),
                                                   equipe.EquipType,
                                                   pipes,
                                                   equipe.HCGPnom,
@@ -140,15 +143,15 @@ class ModuleHC(object):
 
                 if Status.ANo == Status.FinalAlternative:
                     equipmentDataReport = [[equipe.EquipType,
-                                            equipe.Manufact,
-                                            equipe.Model,
+                                            unicode(equipe.Manufact,"utf-8"),
+                                            unicode(equipe.Model,"utf-8"),
                                             equipe.HCGPnom,
                                             equipe.DBFuel_id,
                                             equipe.FuelConsum,
                                             equipe.ElectriConsum,
                                             equipe.ElectriProduction,
                                             equipe.HCGEEfficiency,
-                                            equipe.Refrigerant]]
+                                            unicode(equipe.Refrigerant,"utf-8")]]
 
                     equipeData = array(transpose(noneFilter(equipmentDataReport,substitute=" ")))
                     print "ModuleHC (updatePanel): writing data for Key %s"%("EQ%02d"%(j))
@@ -184,7 +187,7 @@ class ModuleHC(object):
             NJ = len(dataListReport)
             for j in range(NJ,10):
                 dataListReport.append([" "," "," "," "," "," "])
-            dataListReport.append([_("Total")," "," ",SumPnom,SumUSH,100.0])
+            dataListReport.append([_U("Total")," "," ",SumPnom,SumUSH,100.0])
             dataReport = array(dataListReport)
         
             print "ModuleHC (updatePanel): writing key HC%02d_REPORT"%Status.ANo

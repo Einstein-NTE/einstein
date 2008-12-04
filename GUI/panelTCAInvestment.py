@@ -16,9 +16,11 @@
 #
 #    Version No.: 0.01
 #       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
+#       Revised by:         Hans Schweiger  28/11/2008  
 #
 #       Changes to previous version:
+#
+#   28/11/2008: HS  str() functions eliminated, conversion to unicode !!!
 #
 #
 #------------------------------------------------------------------------------
@@ -237,7 +239,8 @@ class PanelTCAInvestment(wx.Panel):
         self.shortName = _U("TCAInvestment")
         self.description = _U("")
         self._init_ctrls(parent)
-        self.__init_custom_ctrls(parent)       
+        self.__init_custom_ctrls(parent)
+        self.selectedRow = None
         #self.display()              
     
     def updatePanel(self):
@@ -271,7 +274,11 @@ class PanelTCAInvestment(wx.Panel):
                     self.grid.SetCellValue(r, c, "")
             for r in range(len(self.mod.data.investment)):
                 for c in range(self.cols):
-                    self.grid.SetCellValue(r, c, str(self.mod.data.investment[r][c]))
+                    try:    #if it's already a unicode string, don't convert to string
+                        self.grid.SetCellValue(r, c, self.mod.data.investment[r][c])
+                    except:
+                        self.grid.SetCellValue(r, c, str(self.mod.data.investment[r][c]))
+                    
  
     def OnBtnAddButton(self, event):
         try:
@@ -308,7 +315,7 @@ class PanelTCAInvestment(wx.Panel):
         if (self.selectedRow < len(self.mod.data.investment)):
             entry = self.mod.data.investment[self.selectedRow]
             
-            self.cbName.SetValue(str(entry[0]))
+            self.cbName.SetValue(entry[0])
             self.tbInvestment.SetValue(str(entry[1]))
             self.tbFundingPerc.SetValue(str(entry[2]))
             self.tbFundingFix.SetValue(str(entry[3]))            

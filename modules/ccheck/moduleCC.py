@@ -66,6 +66,9 @@ from checkWHEE import *
 from checkTotals import *
 from connect import *
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class ModuleCC(object):
     
 #------------------------------------------------------------------------------
@@ -106,6 +109,7 @@ class ModuleCC(object):
 #   is called at entering the CC panel
 #------------------------------------------------------------------------------
 
+        self.parameterList = ParameterList().list
         self.updatePanel()
     
 #------------------------------------------------------------------------------
@@ -128,17 +132,20 @@ class ModuleCC(object):
             if entry[4] <= self.screen_priority:
 
                 if entry[4] == 1:
-                    action = _("Calculations w/o this are nonsense !!!")
+                    action = _U("Calculations w/o this are nonsense !!!")
                 elif entry[4] == 2:
-                    action = _("Value required for detail analysis !!!")
+                    action = _U("Value required for detail analysis !!!")
                 else:
-                    action = _("not strictly necessary")
+                    action = _U("not strictly necessary")
 
                 varName = str(entry[0])
-                if varName in ParameterList.keys():
-                    description = ParameterList[varName]
+                if varName in self.parameterList.keys():
+                    description = self.parameterList[varName]
                 else:
                     description = ""
+                print "ModuleCC (updatePanel): "
+                print self.parameterList
+                print MONTHS
 
                 if entry[1] is not None:
                     val = '%9.2f'%entry[1]
@@ -203,8 +210,8 @@ class ModuleCC(object):
                 nameParts = listedVarName.split('[')
                 if len(nameParts) > 0:
                     varName = nameParts[0]
-                    if varName in ParameterList.keys():
-                        description = ParameterList[varName]
+                    if varName in self.parameterList.keys():
+                        description = self.parameterList[varName]
                     else:
                         description = ""
                 else:

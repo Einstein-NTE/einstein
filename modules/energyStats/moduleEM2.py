@@ -43,6 +43,8 @@ from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 import copy
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 class ModuleEM2(object):
 
@@ -119,11 +121,11 @@ class ModuleEM2(object):
         #for the graphic data array
         LabelRow1 =['Process heat\nsupply']
         for equip in equipments:
-            LabelRow1.append(equip.Equipment +'\n[MWh]')
+            LabelRow1.append(unicode(equip.Equipment,"utf-8") +'\n[MWh]')
 
         #for the table data array
         LabelRow = copy.deepcopy(LabelRow1)
-        LabelRow.append('TOTAL\n[MWh]')
+        LabelRow.append(_U('TOTAL\n[MWh]'))
 
         print 'LabelRow =', LabelRow
 
@@ -144,7 +146,19 @@ class ModuleEM2(object):
 # calculating the monthly data start
 
         USHMonthly = [] #USH all equipments (matrix)
-        LabelColumn = ['Total','January','February','March','April','May','June','July','August','September','October','November','December']
+        LabelColumn = [_U('Total'),
+                       _U('January'),
+                       _U('February'),
+                       _U('March'),
+                       _U('April'),
+                       _U('May'),
+                       _U('June'),
+                       _U('July'),
+                       _U('August'),
+                       _U('September'),
+                       _U('October'),
+                       _U('November'),
+                       _U('December')]
         USHMonthly.append(LabelColumn)
 
 #.........................................................................

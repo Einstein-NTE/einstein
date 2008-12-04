@@ -152,7 +152,7 @@ def drawFigure(self):
     self.subplot.legend()
 
     self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_U('Temperature [ºC]'))
+    self.subplot.axes.set_xlabel(_U(u'Temperature [ºC]'))
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -387,7 +387,7 @@ class PanelHP(wx.Panel):
 # 4. Temperature lift
 
         self.stConfig4 = wx.StaticText(id=-1,
-              label=_U('Maximum desired temperature lift, \xbaC'),
+              label=_U(u'Maximum desired temperature lift, ºC'),
               name='stConfig4', parent=self, pos=wx.Point(40, 424),
               style=0)
 
@@ -402,7 +402,7 @@ class PanelHP(wx.Panel):
 # 5. condensing temperature
 
         self.stConfig5 = wx.StaticText(id=-1,
-              label=_U('Maximum desired condensing temperature, \xbaC'),
+              label=_U(u'Maximum desired condensing temperature, ºC'),
               name='stConfig5', parent=self, pos=wx.Point(40, 464),
               style=0)
 
@@ -417,7 +417,7 @@ class PanelHP(wx.Panel):
 # 6. evaporating temperature
 
         self.stConfig6 = wx.StaticText(id=-1,
-              label=_U('Minimum desired evaporating temperature, \xbaC'),
+              label=_U(u'Minimum desired evaporating temperature, ºC'),
               name='stConfig6', parent=self, pos=wx.Point(40, 504),
               style=0)
 
@@ -436,7 +436,7 @@ class PanelHP(wx.Panel):
               parent=self, pos=wx.Point(40, 536), style=0)
 
         self.stConfig7b = wx.StaticText(id=-1,
-              label=_U('Inlet temperature of heating fluid in generator, \xbaC'),
+              label=_U(u'Inlet temperature of heating fluid in generator, ºC'),
               name='stConfig7b', parent=self, pos=wx.Point(40, 552),
               style=0)
 
@@ -453,7 +453,7 @@ class PanelHP(wx.Panel):
 
 
         self.stInfo1 = wx.StaticText(id=-1,
-              label=_U('Pinch temperature \xb0C'), name='stInfo1',
+              label=_U(u'Pinch temperature [ºC]'), name='stInfo1',
               parent=self, pos=wx.Point(440, 460), style=0)
 
         self.tcInfo1 = wx.TextCtrl(id=-1, name='tcInfo1',
@@ -461,7 +461,7 @@ class PanelHP(wx.Panel):
               style=0, value="")
 
         self.stInfo2 = wx.StaticText(id=-1,
-              label=_U('Temperature gap \xb0K'), name='stInfo2',
+              label=_U('Temperature gap [K]'), name='stInfo2',
               parent=self, pos=wx.Point(440, 500), style=0)
 
         self.tcInfo2 = wx.TextCtrl(id=-1, name='tcInfo2',

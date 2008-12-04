@@ -51,6 +51,9 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class ModuleEA1(object):
 
     def __init__(self, keys):
@@ -116,7 +119,7 @@ class ModuleEA1(object):
 
 #..............................................................
         #finish the table columns, add total, percentage
-        Labels = ['Total fuels','Total electricity','Total (fuels + electricity)']
+        Labels = [_U('Total fuels'),_U('Total electricity'),_U('Total (fuels + electricity)')]
         PEC.append(PECTotal)
         PET.append(PETTotal)
 

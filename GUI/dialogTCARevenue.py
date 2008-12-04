@@ -258,7 +258,10 @@ class dlgRevenue(wx.Dialog):
                 self.grid.SetCellValue(r, c, "")
         for r in range(len(self.mod.data.revenues)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.data.revenues[r][c]))
+                try:
+                    self.grid.SetCellValue(r, c, self.mod.data.revenues[r][c])
+                except:
+                    self.grid.SetCellValue(r, c, str(self.mod.data.revenues[r][c]))
 
 
     def updateSubcategory(self):

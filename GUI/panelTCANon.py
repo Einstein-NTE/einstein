@@ -14,12 +14,13 @@
 #
 #==============================================================================
 #
-#    Version No.: 0.01
+#    Version No.: 0.02
 #       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
+#       Revised by:         Hans Schweiger  28/11/2008    
 #
 #       Changes to previous version:
 #
+#   28/11/08: HS    changes to unicode (str() function in grid eliminated)
 #
 #------------------------------------------------------------------------------
 #    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -166,7 +167,9 @@ class PanelTCANon(wx.Panel):
         self.shortName = _U("TCAContingencies")
         self.description = _U("")   
         self._init_ctrls(parent)
-        self.__init_custom_ctrls(parent)             
+        self.__init_custom_ctrls(parent)
+        self.selectedRow = None
+
           
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()
@@ -202,7 +205,10 @@ class PanelTCANon(wx.Panel):
                 self.grid.SetCellValue(r, c, "")
         for r in range(len(self.mod.data.nonreoccuringcosts)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.data.nonreoccuringcosts[r][c]))
+                try:
+                    self.grid.SetCellValue(r, c, self.mod.data.nonreoccuringcosts[r][c])
+                except:
+                    self.grid.SetCellValue(r, c, str(self.mod.data.nonreoccuringcosts[r][c]))
  
 
     def OnGrid1GridCellLeftClick(self, event):
@@ -211,7 +217,7 @@ class PanelTCANon(wx.Panel):
         if (self.selectedRow < len(self.mod.data.nonreoccuringcosts)):
             entry = self.mod.data.nonreoccuringcosts[self.selectedRow]
                         
-            self.cbName.SetValue(str(entry[0]))            
+            self.cbName.SetValue(entry[0])            
             self.textCtrl1.SetValue(str(entry[1]))
             self.textCtrl2.SetValue(str(entry[2]))
             self.cbCostRev.SetStringSelection(str(entry[3]))                        

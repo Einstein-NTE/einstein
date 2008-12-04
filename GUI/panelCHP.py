@@ -96,19 +96,19 @@ def drawFigure(self):
     self.subplot = self.figure.add_subplot(1,1,1)
     self.subplot.plot(Interfaces.GData['CHP Plot'][0],
                       Interfaces.GData['CHP Plot'][2],
-                      ':', color = MIDDLEGREY, label='QD [80 ºC]')
+                      ':', color = MIDDLEGREY, label=u'QD [80 ºC]')
     self.subplot.plot(Interfaces.GData['CHP Plot'][0],
                       Interfaces.GData['CHP Plot'][3],
-                      '-', color = MIDDLEGREY, label='QD [120 ºC]')
+                      '-', color = MIDDLEGREY, label=u'QD [120 ºC]')
     self.subplot.plot(Interfaces.GData['CHP Plot'][0],
                       Interfaces.GData['CHP Plot'][4],
-                      '--', color = DARKGREY, label='QD [250 ºC]')
+                      '--', color = DARKGREY, label=u'QD [250 ºC]')
     self.subplot.plot(Interfaces.GData['CHP Plot'][0],
                       Interfaces.GData['CHP Plot'][5],
-                      '-', color = BLACK, label='QD [Total]', linewidth=2)
+                      '-', color = BLACK, label=_U('QD [Total]'), linewidth=2)
     self.subplot.plot(Interfaces.GData['CHP Plot'][0],
                       Interfaces.GData['CHP Plot'][1],
-                      '-', color = ORANGE, label='CHP', linewidth=2)
+                      '-', color = ORANGE, label=_U('CHP'), linewidth=2)
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
@@ -363,7 +363,7 @@ class PanelCHP(wx.Panel):
 
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELCHPSTINFO2A,
-              label=_U('Temperature [\x00baC]'), name='stInfo3', parent=self,
+              label=_U('Temperature [ºC]'), name='stInfo3', parent=self,
               pos=wx.Point(504, 392), style=0)
         self.stInfo2b = wx.StaticText(id=-1, label=_U('Demand at min. op. hours [kW]'),
               name='stInfo2b', parent=self, pos=wx.Point(616, 392), style=0)

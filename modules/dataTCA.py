@@ -15,11 +15,15 @@
 #
 #==============================================================================
 #
-#   Version No.: 0.01
+#   Version No.: 0.03
 #   Created by:        Florian Joebstl 17/09/2008
-#   Last revised by:   Florian Joebstl 23/09/2008     
+#   Last revised by:   Florian Joebstl 23/09/2008
+#                       Hans Schweiger  28/11/2008
 #
-#   17/09/08 FJ Fixed bug in storeTCAGeneral so that no data is overwritten  
+#   17/09/08 FJ Fixed bug in storeTCAGeneral so that no data is overwritten
+#   28/11/08 HS conversion to unicode (name of energy costs)
+#               functions __getTCA... and __storeTCA adapted to unicode (description)
+#   04/12/08 HS all other __store functions changed (adaptation to unicode)
 #   
 #------------------------------------------------------------------------------
 
@@ -27,6 +31,7 @@
 from einstein.GUI.status import *
 from einstein.modules.constants import *
 from einstein.modules.messageLogger import *
+from einstein.GUI.GUITools import check
 import math
 
 class TCAData(object):
@@ -151,13 +156,18 @@ class TCAData(object):
         #Store function for the current process
         
         self.energycost = self.getTotalEnergyCost()
-        query = """UPDATE cgeneraldata 
-                   SET EnergyCost = %s, OMThermal = %s                            
-                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
-        query = query % (self.energycost,self.totalopcost,self.pid,self.ano)
-        #print query                
-        Status.DB.sql_query(query)
-        
+#        query = """UPDATE cgeneraldata 
+#                   SET EnergyCost = %s, OMThermal = %s                            
+#                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+#        query = query % (self.energycost,self.totalopcost,self.pid,self.ano)
+#        #print query                
+#        Status.DB.sql_query(query)
+# insert command subsituted by the following. -> has no problems with non-ascii characters in description !!!
+        table =  Status.DB.cgeneraldata.Questionnaire_id[self.pid].AlternativeProposalNo[self.ano]
+        if len(table) > 0:
+            table[0].update({"EnergyCost":self.energycost,
+                             "OMThermal":self.totalopcost})
+            Status.SQL.commit()        
         
     def storeResultToCGeneralData(self):
         #store function for proposals
@@ -166,12 +176,29 @@ class TCAData(object):
                 #mirr = self.mirr[int(math.ceil(self.PP))] #mirr at payback period
                 mirr = self.mirr[len(self.mirr)-1]  #mirr at the final year 
                 bcr = self.bcr[len(self.mirr)-1]          
-                query = """UPDATE cgeneraldata 
-                   SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , RevenueReplaceEquipment = %s, IRR  = %s, PayBack  = %s, BCR  = %s, EnergyCost = %s, OMThermal = %s, Amortization = %s, EnergySystemCost=%s, AddCost=%s, AddCostperSavedPE=%s                              
-                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
-                query = query % (self.TIC,self.EIC,self.totalfunding,self.revenue,mirr,self.PP,bcr,self.energycost,self.totalopcost,self.annuity,self.totaleinergycost,self.additionalcost,self.additionalcostpersavePE,self.pid,self.ano)
-                #print query
-                Status.DB.sql_query(query)
+#                query = """UPDATE cgeneraldata 
+#                   SET TotalInvCost = %s, OwnInvCost = %s , Subsidies  = %s , RevenueReplaceEquipment = %s, IRR  = %s, PayBack  = %s, BCR  = %s, EnergyCost = %s, OMThermal = %s, Amortization = %s, EnergySystemCost=%s, AddCost=%s, AddCostperSavedPE=%s                              
+#                   WHERE Questionnaire_id = %s AND AlternativeProposalNo=%s"""
+#                query = query % (self.TIC,self.EIC,self.totalfunding,self.revenue,mirr,self.PP,bcr,self.energycost,self.totalopcost,self.annuity,self.totaleinergycost,self.additionalcost,self.additionalcostpersavePE,self.pid,self.ano)
+#                #print query
+#                Status.DB.sql_query(query)
+                table =  Status.DB.cgeneraldata.Questionnaire_id[self.pid].AlternativeProposalNo[self.ano]
+                if len(table) > 0:
+                    table[0].update({"TotalInvCost": self.TIC,
+                                     "OwnInvCost": self.EIC,
+                                     "Subsidies": self.totalfunding,
+                                     "RevenueReplaceEquipment": self.revenue,
+                                     "IRR": mirr,
+                                     "PayBack": self.PP,
+                                     "BCR": bcr,
+                                     "EnergyCost": self.energycost,
+                                     "OMThermal": self.totalopcost,
+                                     "Amortization": self.annuity,
+                                     "EnergySystemCost": self.totaleinergycost,
+                                     "AddCost": self.additionalcost,
+                                     "AddCostperSavedPE": self.additionalcostpersavePE})
+                    Status.SQL.commit()        
+
         except Exception, inst:
             print "storeResultToCGeneral"
             print type(inst)
@@ -252,24 +279,53 @@ class TCAData(object):
     def __storeTCAGeneralDataEntry(self):
         #print "Store Data (General)"
         if (self.tcaid == None):            
-            query = """INSERT INTO tcageneraldata (ProjectID,AlternativeProposalNo, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue)
-                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-            query = query %(self.pid,self.ano,self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue)
-            Status.DB.sql_query(query)
+#            query = """INSERT INTO tcageneraldata (ProjectID,AlternativeProposalNo, InflationRate, NominalInterestRate, CompSpecificDiscountRate, FulePriceRate, AmotisationTime, TotalOperatingCost, TotalRevenue)
+#                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+#            query = query %(self.pid,self.ano,self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue)
+#            Status.DB.sql_query(query)
+            Stauts.DB.tcageneraldata.insert({"ProjectID": self.pid,
+                                             "AlternativeProposalNo": self.ano,
+                                             "InflationRate": self.Inflation,
+                                             "NominalInterestRate": self.NIR, 
+                                             "CompSpecificDiscountRate": self.CSDR,
+                                             "FulePriceRate": self.DEP,
+                                             "AmotisationTime": self.TimeFrame,
+                                             "TotalOperatingCost": self.totalopcost,
+                                             "TotalRevenue": self.revenue})
+            Status.SQL.commit()        
+
         else:
             #Update for all proposals
-            query = """UPDATE tcageneraldata 
-                       SET InflationRate = %s, NominalInterestRate = %s , CompSpecificDiscountRate  = %s , FulePriceRate  = %s, AmotisationTime  = %s
-                       WHERE ProjectID = %s"""
-            query = query %(self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.pid)
-            Status.DB.sql_query(query)
+ #           query = """UPDATE tcageneraldata 
+ #                      SET InflationRate = %s, NominalInterestRate = %s , CompSpecificDiscountRate  = %s , FulePriceRate  = %s, AmotisationTime  = %s
+ #                      WHERE ProjectID = %s"""
+ #           query = query %(self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.pid)
+#           Status.DB.sql_query(query)
+
+            for i in range(0,(Status.NoOfAlternatives+1)):
+                table =  Status.DB.tcageneraldata.ProjectID[self.pid].AlternativeProposalNo[i]
+                if len(table) > 0:
+                    table[0].update({"InflationRate": self.Inflation,
+                                     "NominalInterestRate": self.NIR, 
+                                     "CompSpecificDiscountRate": self.CSDR,
+                                     "FulePriceRate": self.DEP,
+                                     "AmotisationTime": self.TimeFrame})
+                    Status.SQL.commit()
+                    
             #Set for current ano only - will be replaced after concrete calculation
             #e.g. storeDetailedOpCost
-            query = """UPDATE tcageneraldata 
-                       SET TotalOperatingCost = %s, TotalRevenue = %s
-                       WHERE ProjectID = %s AND AlternativeProposalNo=%s"""
-            query = query %(self.totalopcost,self.revenue,self.pid,self.ano)
-            Status.DB.sql_query(query)                           
+                    
+#            query = """UPDATE tcageneraldata 
+#                       SET TotalOperatingCost = %s, TotalRevenue = %s
+#                       WHERE ProjectID = %s AND AlternativeProposalNo=%s"""
+#            query = query %(self.totalopcost,self.revenue,self.pid,self.ano)
+#            Status.DB.sql_query(query)                           
+
+            table =  Status.DB.tcageneraldata.ProjectID[self.pid].AlternativeProposalNo[self.ano]
+            if len(table) > 0:
+                table[0].update({"TotalOperatingCost": self.totalopcost,
+                                 "TotalRevenue": self.revenue})
+                Status.SQL.commit()        
         
     def __deleteTCAGeneralDataEntry(self):
         query = """DELETE FROM tcageneraldata
@@ -368,10 +424,19 @@ class TCAData(object):
     def __storeTCAInvestmentDataEntry(self):
         #print "Store Data (Investment)"
         for investment in self.investment:
-            query = """INSERT INTO tcainvestments (TcaID, Description, Investment, FundingPerc, FundingFix)
-                       VALUES(%s,\"%s\",%s,%s,%s)"""
-            query = query %(self.tcaid,investment[0],investment[1],investment[2],investment[3])
-            Status.DB.sql_query(query)  
+#            query = """INSERT INTO tcainvestments (TcaID, Description, Investment, FundingPerc, FundingFix)
+#                       VALUES(%s,\"%r\",%s,%s,%s)"""
+#            query = query %(self.tcaid,investment[0],investment[1],investment[2],investment[3])
+#            Status.DB.sql_query(query)
+
+# insert command subsituted by the following. -> has no problems with non-ascii characters in description !!!
+            tmp = {"TcaID":self.tcaid,
+                   "Description":check(investment[0]),
+                   "Investment":investment[1],
+                   "FundingPerc":investment[2],
+                   "FundingFix":investment[3]}
+            
+            Status.DB.tcainvestments.insert(tmp)
             
     
     def __getTCAInvestmentData(self):
@@ -388,7 +453,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]         #needed to have same behaviour if only one result
             for result in results:
-                self.investment.append([result[0],result[1],result[2],result[3]])            
+                self.investment.append([unicode(result[0],"utf-8"),result[1],result[2],result[3]])            
             return True                                                   
 
     def __deleteTCAInvestmentDataEntry(self):
@@ -446,7 +511,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]   
             for result in results:
-                Name = result[0]
+                Name = unicode(result[0],"utf-8")
                 FETFuel = result[1]
                 if (FETFuel == None):
                     FETFuel = 0.0
@@ -458,10 +523,17 @@ class TCAData(object):
     def __storeTCAEnergyDataEntry(self):
         #print "Store Data (Energy)"
         for energycost in self.energycosts:
-            query = """INSERT INTO tcaenergy (TcaID, Description, EnergyDemand, EnergyPrice, DevelopmentOfEnergyPrice)
-                       VALUES(%s,\"%s\",%s,%s,%s)"""
-            query = query %(self.tcaid,energycost[0],energycost[1],energycost[2],energycost[3])
-            Status.DB.sql_query(query)  
+#            query = """INSERT INTO tcaenergy (TcaID, Description, EnergyDemand, EnergyPrice, DevelopmentOfEnergyPrice)
+#                       VALUES(%s,\"%r\",%s,%s,%s)"""
+#            query = query %(self.tcaid,energycost[0],energycost[1],energycost[2],energycost[3])
+#            Status.DB.sql_query(query)
+
+            tmp = {"TcaID": self.tcaid,
+                   "Description": check(energycost[0]),
+                   "EnergyDemand": energycost[1],
+                   "EnergyPrice": energycost[2],
+                   "DevelopmentOfEnergyPrice": energycost[3]}
+            Status.DB.tcaenergy.insert(tmp)
             
     
     def getTotalEnergyCost(self):
@@ -490,7 +562,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]         #needed to have same behaviour if only one result
             for result in results:
-                self.energycosts.append([result[0],result[1],result[2],result[3]])            
+                self.energycosts.append([unicode(result[0],"utf-8"),result[1],result[2],result[3]])            
             return True                                                   
 
     def __deleteTCAEnergyDataEntry(self):
@@ -510,10 +582,18 @@ class TCAData(object):
     def __storeTCANonDataEntry(self):
         #print "Store Data (Non reocurring costs)"
         for cost in self.nonreoccuringcosts:
-            query = """INSERT INTO tcanonreoccuringcosts (TcaID, Description, Value, Year, Type)
-                       VALUES(%s,\"%s\",%s,%s,\"%s\")"""
-            query = query %(self.tcaid,cost[0],cost[1],cost[2],cost[3])
-            Status.DB.sql_query(query)  
+#            query = u"""INSERT INTO tcanonreoccuringcosts (TcaID, Description, Value, Year, Type)
+#                       VALUES(%s,\"%r\",%s,%s,\"%s\")"""
+#            query = query %(self.tcaid,cost[0],cost[1],cost[2],cost[3])
+#            Status.DB.sql_query(query)  
+
+            tmp = {"TcaID": self.tcaid,
+                   "Description": check(cost[0]),
+                   "Value": cost[1],
+                   "Year": cost[2],
+                   "Type": cost[3]}
+            Status.DB.tcanonreoccuringcosts.insert(tmp)
+            Status.SQL.commit()
             
     
     def __getTCANonData(self):
@@ -530,7 +610,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]         #needed to have same behaviour if only one result
             for result in results:
-                self.nonreoccuringcosts.append([result[0],result[1],result[2],result[3]])            
+                self.nonreoccuringcosts.append([unicode(result[0],"utf-8"),result[1],result[2],result[3]])            
             return True                                                   
 
     def __deleteTCANonDataEntry(self):
@@ -551,10 +631,17 @@ class TCAData(object):
     def __storeTCAContingenciesDataEntry(self):
         #print "Store Data (Contingencies)"
         for contingency in self.contingencies:
-            query = """INSERT INTO tcacontingencies (TcaID, Description, Value, TimeFrame)
-                       VALUES(%s,\"%s\",%s,%s)"""
-            query = query %(self.tcaid,contingency[0],contingency[1],contingency[2])
-            Status.DB.sql_query(query)                          
+#            query = u"""INSERT INTO tcacontingencies (TcaID, Description, Value, TimeFrame)
+#                       VALUES(%s,\"%r\",%s,%s)"""
+#            query = query %(self.tcaid,contingency[0],contingency[1],contingency[2])
+#            Status.DB.sql_query(query)                          
+
+            tmp = {"TcaID": self.tcaid,
+                   "Description": check(contingency[0]),
+                   "Value": contingency[1],
+                   "TimeFrame": contingency[2]}
+            Status.DB.tcacontingencies.insert(tmp)
+            Status.SQL.commit()
     
     def __getTCAContingenciesData(self):
         #print "Get Data (Contingencies)"
@@ -570,7 +657,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]         #needed to have same behaviour if only one result
             for result in results:                
-                self.contingencies.append([result[0],result[1],result[2]])            
+                self.contingencies.append([unicode(result[0],"utf-8"),result[1],result[2]])            
             return True
                                                                 
 
@@ -691,19 +778,24 @@ class TCAData(object):
         #print "Store Data (Detailed operting cost)"
         for i in range(0,7): #7 categorys in detailed opcost
             for opcost in self.detailedopcost[i]:
-                query = """INSERT INTO tcadetailedopcost (TcaID, Description, Value, Category)
-                           VALUES(%s,\"%s\",%s,%s)"""
-                query = query %(self.tcaid,opcost[0],opcost[1],i)
-                Status.DB.sql_query(query) 
+#                query = u"""INSERT INTO tcadetailedopcost (TcaID, Description, Value, Category)
+#                           VALUES(%s,\"%r\",%s,%s)"""
+#                query = query %(self.tcaid,opcost[0],opcost[1],i)
+#                Status.DB.sql_query(query) 
+
+                tmp = {"TcaID": self.tcaid,
+                       "Description": check(opcost[0]),
+                       "Value": opcost[1],
+                       "Category": i}
+                Status.DB.tcadetailedopcost.insert(tmp)
+                Status.SQL.commit()
         
         query = """UPDATE tcageneraldata 
                 SET TotalOperatingCost = %s
                 WHERE IDTca=%s"""
         query = query %(self.totalopcost,self.tcaid)
         Status.DB.sql_query(query)                                       
-    
 
-    
 
     def __getTCADetailedOpCostData(self):
         #print "Get Data (Detailed operting cost)"
@@ -718,7 +810,7 @@ class TCAData(object):
                 if (type(results[0])!=type(())):
                     results = [ results ]         #needed to have same behaviour if only one result
                 for result in results:                
-                    self.detailedopcost[i].append([result[0],result[1]])                                
+                    self.detailedopcost[i].append([unicode(result[0],"utf-8"),result[1]])                                
                 return True
             return False
                                                                 
@@ -741,10 +833,17 @@ class TCAData(object):
     def __storeTCARevenueDataEntry(self):
         #print "Store Data (Revenue)"
         for revenue in self.revenues:
-            query = """INSERT INTO tcadetailedrevenue (TcaID, Description, InitialInvestment, DeprecationPeriod, RemainingPeriod) 
-                       VALUES(%s,\"%s\",%s,%s,%s)"""
-            query = query %(self.tcaid,revenue[0],revenue[1],revenue[2],revenue[3])
-            Status.DB.sql_query(query)                          
+#            query = u"""INSERT INTO tcadetailedrevenue (TcaID, Description, InitialInvestment, DeprecationPeriod, RemainingPeriod) 
+#                       VALUES(%s,\"%r\",%s,%s,%s)"""
+#            query = query %(self.tcaid,revenue[0],revenue[1],revenue[2],revenue[3])
+#            Status.DB.sql_query(query)
+            tmp = {"TcaID": self.tcaid,
+                   "Description": revenue[0],
+                   "InitialInvestment": revenue[1],
+                   "DeprecationPeriod": revenue[2],
+                   "RemainingPeriod": revenue[3]}
+            Status.DB.tcadetailedrevenue.insert(tmp)
+            Status.SQL.commit()
     
     def __getTCARevenueData(self):
         #print "Get Data (Revenue)"        
@@ -760,7 +859,7 @@ class TCAData(object):
             if (type(results[0])!=type(())):
                 results = [ results ]         #needed to have same behaviour if only one result
             for result in results:
-                self.revenues.append([result[0],result[1],result[2],result[3]])            
+                self.revenues.append([unicode(result[0],"utf-8"),result[1],result[2],result[3]])            
             return True          
                                                                 
 

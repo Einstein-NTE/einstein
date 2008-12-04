@@ -112,10 +112,10 @@ def drawFigure(self):
     self.subplot = self.figure.add_subplot(1,1,1)
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][1],
-                      '--', color = MIDDLEGREY, label='QD [80ºC]')
+                      '--', color = MIDDLEGREY, label=u'QD [80ºC]')
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][2],
-                      ':', color = DARKGREY, label='QD [140ºC]')
+                      ':', color = DARKGREY, label=u'QD [140ºC]')
     self.subplot.plot(Interfaces.GData['BB Plot'][0],
                       Interfaces.GData['BB Plot'][3],
                       '-', color = ORANGE, label='QD [Tmax]', linewidth=2)

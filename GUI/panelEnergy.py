@@ -90,7 +90,7 @@ def drawFigure(self):
                           gdata[j][1:],\
                           LINETYPES[(j-1)%len(LINETYPES)],
                           color = ORANGECASCADE[(j-1)%len(ORANGECASCADE)],
-                          label=str(gdata[j][0]),
+                          label=gdata[j][0],
                           linewidth=2)
         
     self.subplot.axis(ymin = 0)

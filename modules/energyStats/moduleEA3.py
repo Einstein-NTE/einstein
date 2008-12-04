@@ -82,7 +82,7 @@ class ModuleEA3(object):
         FuelType = []
 
         for equipe in self.equipments:
-            Equipment = equipe.Equipment
+            Equipment = unicode(equipe.Equipment,"utf-8")
             EquipName.append(Equipment)
 
 
@@ -107,7 +107,7 @@ class ModuleEA3(object):
                 FuelName = 'not available'
             else:
                 try:
-                    FuelName = dbfuel.DBFuel_ID[DBFuel_id][0].FuelName
+                    FuelName = unicode(dbfuel.DBFuel_ID[DBFuel_id][0].FuelName,"utf-8")
                 except:
                     FuelName = 'not available'
 

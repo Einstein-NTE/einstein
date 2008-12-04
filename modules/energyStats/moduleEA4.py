@@ -49,6 +49,8 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import copy
 
+def _U(text):
+    return unicode(_(text),"utf-8")
 
 #============================================================================== 
 #============================================================================== 
@@ -99,7 +101,7 @@ class ModuleEA4(object):
         
         TotalUPH = 0.0
         for process in processes:
-            Process.append(process.Process)
+            Process.append(unicode(process.Process,"utf-8"))
             PT.append(process.PT)
             PST.append(process.TSupply)
             
@@ -136,7 +138,7 @@ class ModuleEA4(object):
 #..............................................................................
 # finish the table columns, add total, percentage total
 
-        Process.append('Total')
+        Process.append(_U('Total'))
         PT.append(' ')
         PST.append(' ')
         UPH.append(TotalUPH)
@@ -230,7 +232,7 @@ class ModuleEA4(object):
                       "220 - 300 C",
                       "300 - 400 C",
                       "    > 400 C",
-                      "Total"]
+                      _U("Total")]
 
             for i in range(len(TLevels)):
                 T = TLevels[i]
@@ -347,7 +349,7 @@ class ModuleEA4(object):
 
 # prepare data for table
             TLevels = [10000.0,80.0,120.0,250.0,400.0]
-            Titles = ["  Total  ",
+            Titles = [_U("  Total  "),
                       " <  80 C",
                       " < 120 C",
                       " < 250 C",

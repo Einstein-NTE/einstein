@@ -46,6 +46,9 @@ from einstein.modules.constants import *
 import einstein.modules.matPanel as mP
 import copy
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 
 class ModuleEM1(object):
 
@@ -69,13 +72,13 @@ class ModuleEM1(object):
 #........................................................................
 # filling the label row (row with 1 + NThProc + 1 entries)
         #for the graphic data array
-        LabelRow1 =['Process heat\ndemand']
+        LabelRow1 =[_U('Process heat\ndemand')]
         for process in processes:
-            LabelRow1.append(process.Process +'\n[MWh]')
+            LabelRow1.append(unicode(process.Process,"utf-8") +'\n[MWh]')
 
         #for the table data array
         LabelRow = copy.deepcopy(LabelRow1)
-        LabelRow.append('TOTAL\n[MWh]')
+        LabelRow.append(_U('TOTAL\n[MWh]'))
 
 
 #........................................................................
@@ -87,7 +90,7 @@ class ModuleEM1(object):
 # calculating the monthly data start
 
         UPHMonthly = [] #UPH all processes (matrix)
-        LabelColumn = [_('Total')]
+        LabelColumn = [_U('Total')]
         LabelColumn.extend(MONTHS)
         UPHMonthly.append(LabelColumn)
 

@@ -16,48 +16,18 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.15
-#	Created by: 	    Hans Schweiger	10/03/2008
-#	Revised by:         Hans Schweiger      13/03/2008
-#	                    Tom Sobota          17/03/2008
-#	                    Hans Schweiger      21/03/2008
-#                           Stoyan Danov        27/03/2008
-#                           Hans Schweiger      02/04/2008
-#                           Stoyan Danov        09/04/2008
-#                           Stoyan Danov        24/04/2008
-#                           Stoyan Danov        30/04/2008
-#                           Hans Schweiger      05/05/2008
-#                           Hans Schweiger      14/05/2008
-#                           Stoyan Danov        15/05/2008
-#                           Stoyan Danov        27/05/2008
-#                           Hans Schweiger      26/06/2008
-#                           Hans Schweiger      28/06/2008
-#                           Hans Schweiger      10/07/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Tom Sobota, Stoyan Danov
+#                       10/03/2008 - 10/07/2008
+#
+#   Update No. 000
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger          28/11/2008
 #
 #       Changes in last update:
-#       - new arrays QDh_mod, USHj ...
-#       - new function DefaultDemand
-#       16/3/2008 Added methods for getting and setting values.
-#       17/3/2008 Added support for getting and setting graphic values.
-#       21/3/2008 Storage space for full heat supply cascade
-#                   QDh/QAh renamed to QD_Tt, QA_Tt
-#       27/03/2008 getEquipmentCascade(self): adaptation
-#       02/04/2008 corrections in getEquipmentCascade
-#       09/04/2008 getEquipmentCascade: add filling EquipTableDataList-data fields shown in Table panel
-#       24/04/2008 getEquipmentCascade: add filling EquipTableDataList-changed
-#       30/04/2008 eliminate references to C tables, function affected: getEquipmentCascade
-#       05/05/2008  autocorrection of equipment cascade introduced
-#       14/05/2008  auxiliary function "print cascade" added for testing purposes
-#       15/05/2008 initCascadeArrays: parenthesis added in call calculateQ_Tt()...
-#                   functions added: printCascade_mod, printUSH
-#       27/05/2008  printCascade: change Interfaces.QA_Tt_mod[i][NT+1][0:23] to Interfaces.QA_Tt_mod[i][0][0:23]
-#                   initCascadeArrays: assignment of QD/QA_Tt_mod to avoid copy of the address
-#       26/06/2008: HS  USHj_t and QHX_t added in initCascadeArrays
-#       28/06/2008: HS extendCascadeArrays added for simulations from/to
-#                   cascadeLevel: level of valid entries in cascade
-#                   (calculations are updated ...)
-#                   introduced distinction between cascadeSize and NEquipe
-#       10/07/2008: all references to general class attributes Interfaces.xy changed to instance attributes self.xy
+#
+#       28/11/2008: HS conversion to UNICODE; function setDefaultDemand eliminated
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -417,9 +387,10 @@ class Interfaces(object):
 
         self.cascade = []
         for j in range(self.NEquipe):
-            self.cascade.append({"equipeID":self.equipments[j].QGenerationHC_ID,"equipeNo":self.equipments[j].EqNo,\
-                            "equipeType":self.equipments[j].EquipType,\
-                            "equipePnom":self.equipments[j].HCGPnom})
+            self.cascade.append({"equipeID":self.equipments[j].QGenerationHC_ID,\
+                                 "equipeNo":self.equipments[j].EqNo,\
+                                 "equipeType":self.equipments[j].EquipType,\
+                                 "equipePnom":self.equipments[j].HCGPnom})
             if (self.equipments[j].CascadeIndex != j+1):
                 print "self (getEquipmentCascade): error in SQL data - cascade index %s corrected to new index %s"%\
                       (self.equipments[j].CascadeIndex,j+1)
@@ -429,8 +400,12 @@ class Interfaces(object):
 
         self.EquipTableDataList = []
         for j in range(self.NEquipe):
-            self.EquipTableDataList.append([self.equipments[j].Equipment, self.equipments[j].HCGPnom, self.equipments[j].HCGTEfficiency, \
-                                            self.equipments[j].EquipType, self.equipments[j].HPerYearEq, self.equipments[j].YearManufact]) #SD change 30/04.2008
+            self.EquipTableDataList.append([unicode(self.equipments[j].Equipment,"utf-8"),
+                                            self.equipments[j].HCGPnom,
+                                            self.equipments[j].HCGTEfficiency, \
+                                            self.equipments[j].EquipType,
+                                            self.equipments[j].HPerYearEq,
+                                            self.equipments[j].YearManufact]) #SD change 30/04.2008
 
         self.extendCascadeArrays(self.NEquipe)  #security feature: assure that for all equipes there's enough space                                       
 
@@ -455,41 +430,6 @@ class Interfaces(object):
 # the data are stored in the dictionary GData under the key 'key'
 #------------------------------------------------------------------------------		
         self.GData[key] = copy.deepcopy(data)
-
-
-#------------------------------------------------------------------------------		
-    def setDefaultDemand(self):
-#------------------------------------------------------------------------------		
-# dummy fucntion for bringing in some data into the demand matrix
-#------------------------------------------------------------------------------		
-        NT = Status.NT
-        Nt = Status.Nt
-
-        self.QD_Tt = []
-        self.QA_Tt = []
-        
-        hourlyProfile = [0,0,0,0,0,0,0,1,5,2,3.3,10,4,9,2,8,7,1,0,0,0,0,0,0] 
-        Tpinch = 40.0
-        for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
-            fscaleD = max(self.T[iT]-Tpinch,0)*1e+2
-            fscaleA = max(Tpinch-self.T[iT],0)*1e+2
-
-            load = []
-            waste = []
-            hour = 0
-            for it in range(Nt+1):
-                 load.append(hourlyProfile[hour]*fscaleD)
-                 waste.append(hourlyProfile[hour]*fscaleA)
-                 
-                 hour = (hour+1) % 24
-                    
-            self.QD_Tt.append(load)
-            self.QA_Tt.append(waste)
-             
-        self.QD_T = self.calcQ_T(self.QD_Tt)    #annual values
-        self.QA_T = self.calcQ_T(self.QA_Tt)
-        print "Interfaces (set default demand): ",self.QD_T
-        print "Interfaces (set default availability): ",self.QA_T
 
 #==============================================================================
 

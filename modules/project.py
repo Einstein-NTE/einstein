@@ -488,8 +488,8 @@ class Project(object):
         n = Status.NoOfAlternatives
         for ANo in range(n,-1,-1):
             self.deleteAlternative(ANo)
-        self.createNewAlternative(-1,_("Present State (checked)"),\
-                                _("complete data set for present state after\n cross-checking and data estimation"))
+        self.createNewAlternative(-1,_U("Present State (checked)"),\
+                                _U("complete data set for present state after\n cross-checking and data estimation"))
         self.setActiveAlternative(-1)
         self.setStatus("Q")
         self.setStatus("CC",0)
@@ -1222,7 +1222,7 @@ class Project(object):
 # deleting Q- and corresponding C-Tables
 
         DB = Status.DB
-        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND Product = '%r'"\
+        sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND Product = '%s'"\
                     %(Status.PId,Status.ANo,check(productName))
 
         deleteSQLRows(DB.qproduct,sqlQueryQ)

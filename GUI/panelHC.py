@@ -101,7 +101,7 @@ class PanelHC(wx.Panel):
 
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
         self.grid.EnableGridLines(True)
-        self.grid.SetDefaultRowSize(20)
+        self.grid.SetDefaultRowSize(50)
         self.grid.SetRowLabelSize(30)
         self.grid.SetColLabelSize(40)
         self.grid.SetDefaultColSize(90)

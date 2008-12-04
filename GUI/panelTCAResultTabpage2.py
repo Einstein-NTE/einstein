@@ -15,11 +15,12 @@
 #==============================================================================
 #
 #    Version No.: 0.01
-#       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
+#       Created by:         Florian Joebstl 15/09/2008  
+#       Revised by:         Hans Schweiger 28/11/2008
 #
 #       Changes to previous version:
 #
+#   28/11/2008: HS  str() in labelname and result.name eliminated -> unicode !!!
 #
 #------------------------------------------------------------------------------
 #    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -120,7 +121,7 @@ class TCAPlotPanel (PlotPanel):
                 if (add_last_year):
                     ticklabls.append(_U("Year ")+str(timeFrame))
                     data[len(data)-1] = (original_data[timeFrame-1])
-                self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = str(labelname)+" - "+str(result.name))                        
+                self.subplot.bar(ind+width*count,data, width, color = color[colorcount], label = labelname +" - "+ result.name)                        
                 count+=1  
             colorcount+=1
         
@@ -219,7 +220,7 @@ class panelResult2(wx.Panel):
         self.choice1.Clear()
         if (Status.mod.moduleTCA.result!=None):
             for result in Status.mod.moduleTCA.result:            
-                self.choice1.Append(str(result.name))
+                self.choice1.Append(result.name)
             self.choice1.SetSelection(0)
         self.updateButtons()
 

@@ -224,6 +224,8 @@ class PanelTCAEnergy(wx.Panel):
         self.description = _U("")
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
+        self.selectedRow = None
+
       
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()
@@ -264,7 +266,10 @@ class PanelTCAEnergy(wx.Panel):
                 if c==3: 
                     self.grid.SetCellValue(r, c, str(self.mod.data.DEP))
                 #ENDFIX
-                self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
+                try:
+                    self.grid.SetCellValue(r, c, self.mod.data.energycosts[r][c])
+                except:
+                    self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
         #Update opcost
         self.mod.calculateTotalOpCostFromDetailedOpcost()
         opcost = "%.0f" % self.mod.data.totalopcost
@@ -274,7 +279,7 @@ class PanelTCAEnergy(wx.Panel):
         self.selectedRow = event.GetRow()  
         if (self.selectedRow < len(self.mod.data.energycosts)):
             entry = self.mod.data.energycosts[self.selectedRow]
-            self.comboBox1.SetValue(str(entry[0]))
+            self.comboBox1.SetValue(entry[0])
             self.tbDemand.SetValue(str(entry[1]))
             self.tbPrice.SetValue(str(entry[2]))
             self.tbDevelopment.SetValue(str(entry[3]))

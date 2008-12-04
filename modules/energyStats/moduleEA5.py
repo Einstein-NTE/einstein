@@ -44,6 +44,9 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class ModuleEA5(object):
 
     def __init__(self, keys):
@@ -98,7 +101,7 @@ class ModuleEA5(object):
         EI_values.append(self.cgeneraldata.EL_INT)
         EI_values.append(self.cgeneraldata.PE_INT)
 
-        EI_labels = ['Fuels','Electricity','Total primary energy']
+        EI_labels = [_U('Fuels'),_U('Electricity'),_U('Total primary energy')]
 
 
 #.........................................................................
@@ -120,7 +123,7 @@ class ModuleEA5(object):
         SEC_values = []
         ProductNames = []
         for row in self.qproduct:#SD
-            SECPerProduct = [row.Product]
+            SECPerProduct = [unicode(row.Product,"utf-8")]
             SECPerProduct.append(row.FUEL_SEC)
             SECPerProduct.append(row.EL_SEC)
             SECPerProduct.append(row.PE_SEC)

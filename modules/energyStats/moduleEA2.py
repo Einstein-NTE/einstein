@@ -51,6 +51,9 @@ from einstein.modules.interfaces import *
 from einstein.modules.fluids import *
 from einstein.modules.messageLogger import *
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 class ModuleEA2(object):
@@ -134,7 +137,7 @@ class ModuleEA2(object):
             TotalFETi += 0.0
             FETi.append(0.0) #SD: check if OK here
             
-        fuelNames.append("Electricity")
+        fuelNames.append(_U("Electricity"))
 
         FECPercentage = []
         FETPercentage = []
@@ -152,7 +155,7 @@ class ModuleEA2(object):
 
 #.........................................................        
         #finish the table columns, add total, sum percentage
-        fuelNames.append('Total')
+        fuelNames.append(_U('Total'))
         FEC.append(TotalFEC)
         FETi.append(TotalFETi)
 

@@ -1,3 +1,8 @@
+#   Hans Schweiger      28/11/2008
+#   Changes:
+#
+#   28/11/2008: HS  function str() in result.name eliminated -> is unicode !!!
+
 #Boa:FramePanel:panelResult1
 
 import wx
@@ -56,7 +61,9 @@ class panelResult1(wx.Panel):
 
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
-        self.__init_custom_ctrls(parent)        
+        self.__init_custom_ctrls(parent)
+        self.selectedRow = None
+
         self.display()
 
     def __init_custom_ctrls(self, prnt):
@@ -94,7 +101,7 @@ class panelResult1(wx.Panel):
         if (Status.mod.moduleTCA.result!=None):
             self.cbProposals.Clear()
             for result in Status.mod.moduleTCA.result:            
-                self.cbProposals.Append(str(result.name))
+                self.cbProposals.Append(result.name)
             self.cbProposals.SetSelection(0)
         self.updateButtons()  
         self.updateGrid()    
@@ -121,7 +128,7 @@ class panelResult1(wx.Panel):
                 if (result.display == 1):    
                     try:                
                         if (result.ResultPresent == True):
-                            self.grid.SetColLabelValue(count,  str(result.name))
+                            self.grid.SetColLabelValue(count,  result.name)
                             str_pp = "%.2f" % result.PP
                             str_mirr = "%.2f" % (result.mirr[len(result.mirr)-1]*100)
                             str_TIC = "%.0f" % result.TIC

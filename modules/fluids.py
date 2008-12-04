@@ -73,7 +73,7 @@ class Fluid():
                            (fluids[0].FluidName,self.cp))
                 self.cp = 1.16/1000.0
 
-            self.name = fluids[0].FluidName
+            self.name = unicode(fluids[0].FluidName,"utf-8")
 
         else:
             self.rho = 1000.0                   #kg/m3
@@ -103,7 +103,9 @@ class Fuel():
             self.Offgas = fuel.Offgas
             self.OffgasDensity = fuel.OffgasDensity
             self.Humidity = fuel.Humidity
-            self.name = fuel.FuelName
+            
+            self.name = unicode(fuel.FuelName,"utf-8")
+            
             if self.LCV is None or \
                self.HCV is None or \
                self.PEConv is None or \
@@ -146,7 +148,7 @@ class Fuel():
             self.CombAir = 16.6
             self.OffgasDensity = 1.23
             self.Humidity = 0.12
-            self.name = "dummy fuel"
+            self.name = u"dummy fuel"
             logError(_("Fluid (init): cannot find fuel with ID = %s")%fuelID)
            
            

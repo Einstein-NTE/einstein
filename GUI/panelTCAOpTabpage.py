@@ -129,7 +129,9 @@ class panelTCAOpTabpage(wx.Panel):
        
     def __init__(self, parent, id, pos, size, style, name):
         self._init_ctrls(parent)
-        self.__init_custom_ctrls(parent)       
+        self.__init_custom_ctrls(parent)
+        self.selectedRow = None
+
 
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()

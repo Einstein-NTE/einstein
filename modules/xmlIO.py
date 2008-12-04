@@ -59,6 +59,8 @@ import MySQLdb
 from einstein.GUI.status import Status
 from messageLogger import *
 from einstein.GUI.dialogImport import DialogImport
+from einstein.GUI.GUITools import check
+from einstein.GUI.pSQL import Table
 
 def openfilecreate(text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
     # ask for file for exporting
@@ -631,11 +633,13 @@ class ImportProject(object):
             tables = project.getElementsByTagName("table")
             tabledict = {}
             for table in tables:
-                tablename =  table.getAttribute('name')
+                tablename =  str(table.getAttribute('name'))
                 tablelist = []
                 rows = table.getElementsByTagName("row")
                 for row in rows:
                     sqlist = []
+                    sqldict = {}
+                    
                     nrow =  row.getAttribute('n')
                     elements = row.getElementsByTagName("element")
 
@@ -643,13 +647,14 @@ class ImportProject(object):
                     
                     for element in elements:
                         fieldname = element.getAttribute('name').lower()
+                        fieldnameCAPS = str(element.getAttribute('name'))
                         eltype = element.getAttribute('type')
                         elauto = element.getAttribute('auto')
                         elvalue = element.getAttribute('value')
 
                         if tablename == "questionnaire" and fieldname == "name":
                             rowName = elvalue
-                            existingRows = Status.DB.questionnaire.Name[rowName]
+                            existingRows = Status.DB.questionnaire.Name[check(rowName)]
                             if len(existingRows) > 0:
                                 showWarning(_("Project with name %s already exists in database\nProject renamed to: IMPORTED PROJECT")%rowName)
                                 elvalue = 'IMPORTED PROJECT'
@@ -667,18 +672,21 @@ class ImportProject(object):
                         # substitute invalid chars in char fields and enclose in ''
                         if eltype.startswith('char') or \
                            eltype.startswith('varchar') or \
-                           eltype.startswith('text') or \
-                           eltype.startswith('date'):
-                            
+                           eltype.startswith('text'):
+
+                            elvalue = elvalue.encode("utf-8")
+
+                        if eltype.startswith('date'):
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
                             
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':
                             # main key field
-                            oldKey = int(elvalue)
+                            oldKey = int(str(elvalue))
                             elvalue = 'NULL'
 
-                        sqlist.append("%s=%s" % (fieldname,elvalue))
+#                        sqlist.append("%s=%s" % (fieldname,elvalue))
+                        sqldict.update({fieldnameCAPS:elvalue})
 
 #......................................................................
 # before inserting new entry, check if entry with the same name exists
@@ -686,20 +694,20 @@ class ImportProject(object):
 
                     ignoreRow = False
                     if tablename == "dbfluid":
-                        existingRows = Status.DB.dbfluid.FluidName[rowName]
+                        existingRows = Status.DB.dbfluid.FluidName[check(rowName)]
                         if len(existingRows) > 0:
                             showWarning(_("Fluid %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
                             newID = existingRows[0].DBFluid_ID
 
                     elif tablename == "dbfuel":
-                        existingRows = Status.DB.dbfuel.FuelName[rowName]
+                        existingRows = Status.DB.dbfuel.FuelName[check(rowName)]
                         if len(existingRows) > 0:
                             showWarning(_("Fuel %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
                             newID = existingRows[0].DBFuel_ID
                     elif tablename == "auditor":
-                        existingRows = Status.DB.auditor.Name[rowName]
+                        existingRows = Status.DB.auditor.Name[check(rowName)]
                         if len(existingRows) > 0:
                             showWarning(_("Auditor %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
@@ -709,9 +717,13 @@ class ImportProject(object):
                                              
                     if ignoreRow == False:
                         # create sql sentence and update database
-                        sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
-                        print sql
-                        cursor.execute(sql)
+#substituted the following block by
+#                        sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
+#                        print sql
+#                        cursor.execute(sql)
+                        table = Table(Status.DB,tablename)
+                        table.insert(sqldict)
+                                       
                         # get last inserted
                         cursor.execute('SELECT LAST_INSERT_ID() AS last')
                         field = cursor.fetchone()
@@ -901,11 +913,12 @@ class ImportDB(object):
             tables = db.getElementsByTagName("table")
             tabledict = {}
             for table in tables:
-                tablename =  table.getAttribute('name')
+                tablename =  str(table.getAttribute('name'))
                 tablelist = []
                 rows = table.getElementsByTagName("row")
                 for row in rows:
                     sqlist = []
+                    sqldict = {}
                     newdict = {}
                     nrow =  row.getAttribute('n')
                     elements = row.getElementsByTagName("element")
@@ -916,6 +929,7 @@ class ImportDB(object):
                     
                     for element in elements:
                         fieldname = element.getAttribute('name').lower()
+                        fieldnameCAPS = str(element.getAttribute('name'))
                         fieldnameCapitalLetters = element.getAttribute('name')
                         eltype = element.getAttribute('type')
                         elauto = element.getAttribute('auto')
@@ -957,8 +971,10 @@ class ImportDB(object):
                         # substitute invalid chars in char fields and enclose in ''
                         if eltype.startswith('char') or \
                            eltype.startswith('varchar') or \
-                           eltype.startswith('text') or \
-                           eltype.startswith('date'):
+                           eltype.startswith('text'):
+                            elvalue = elvalue.encode("utf-8")
+
+                        if eltype.startswith('date'):
                             elvalue = "'" + self.subsIllegal(elvalue) + "'"
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':
@@ -966,7 +982,8 @@ class ImportDB(object):
                             oldKey = int(elvalue)
                             elvalue = 'NULL'
 
-                        sqlist.append("%s=%s" % (fieldname,elvalue))
+#                        sqlist.append("%s=%s" % (fieldname,elvalue))
+                        sqldict.update({fieldnameCAPS:elvalue})
 
 #......................................................................
 # before inserting new entry, check if entry with the same name exists
@@ -975,41 +992,41 @@ class ImportDB(object):
                     ignoreRow = False
                     existingRows = []
                     if tablename == "dbfluid":
-                        existingRows = Status.DB.dbfluid.FluidName[rowName]
+                        existingRows = Status.DB.dbfluid.FluidName[check(rowName)]
 
                     elif tablename == "dbfuel":
-                        existingRows = Status.DB.dbfuel.FuelName[rowName]
+                        existingRows = Status.DB.dbfuel.FuelName[check(rowName)]
 
                     elif tablename == "auditor":
-                        existingRows = Status.DB.auditor.Name[rowName]
+                        existingRows = Status.DB.auditor.Name[check(rowName)]
 
                     elif tablename == "dbelectricitymix":
                         if rowPar1 is None:
-                            existingRows = Status.DB.dbelectricitymix.Country[rowName]
+                            existingRows = Status.DB.dbelectricitymix.Country[check(rowName)]
                         else:
-                            existingRows = Status.DB.dbelectricitymix.Country[rowName].Year[rowPar1]
+                            existingRows = Status.DB.dbelectricitymix.Country[check(rowName)].Year[rowPar1]
                             
                     elif tablename == "dbboiler":
                         if rowPar1 is None:
-                            existingRows = Status.DB.dbboiler.BoilerManufacturer[rowName]
+                            existingRows = Status.DB.dbboiler.BoilerManufacturer[check(rowName)]
                         else:
-                            existingRows = Status.DB.dbboiler.BoilerManufacturer[rowName].BoilerModel[rowPar1]
+                            existingRows = Status.DB.dbboiler.BoilerManufacturer[check(rowName)].BoilerModel[check(rowPar1)]
                             
                     elif tablename == "dbchp":
-                        existingRows = Status.DB.dbchp.CHPequip[rowName]
+                        existingRows = Status.DB.dbchp.CHPequip[check(rowName)]
                             
 
                     elif tablename == "dbheatpump":
                         if rowPar1 is None:
-                            existingRows = Status.DB.dbheatpump.HPManufacturer[rowName]
+                            existingRows = Status.DB.dbheatpump.HPManufacturer[check(rowName)]
                         else:
-                            existingRows = Status.DB.dbheatpump.HPManufacturer[rowName].HPModel[rowPar1]
+                            existingRows = Status.DB.dbheatpump.HPManufacturer[check(rowName)].HPModel[check(rowPar1)]
                             
                     elif tablename == "dbsolarthermal":
                         if rowPar1 is None:
-                            existingRows = Status.DB.dbsolarthermal.STManufacturer[rowName]
+                            existingRows = Status.DB.dbsolarthermal.STManufacturer[check(rowName)]
                         else:
-                            existingRows = Status.DB.dbsolarthermal.STManufacturer[rowName].STModel[rowPar1]
+                            existingRows = Status.DB.dbsolarthermal.STManufacturer[check(rowName)].STModel[check(rowPar1)]
                             
    
                     else:
@@ -1019,29 +1036,30 @@ class ImportDB(object):
                         if rowPar2 is None:
                             par2 = ""
                         else:
-                            par2 = " "+str(rowPar2)
+                            par2 = " " + str(rowPar2)
 
                         if rowPar1 is None:
                             par1 = ""
                         else:
                             par1 = " "+str(rowPar1)
 
-                        logWarning("%s: %s%s%s"%(tablename,rowName,par1,par2)+\
-                                   _(" already in database. Data from imported file will be ignored"))
-
                         if mode == "overwrite":
                             existingRows[0].update(newdict)
-                            logWarning("%s: %s%s%s"%(tablename,rowName,par1,par2)+\
+                            logWarning("%s: %s%s%s"%(tablename,check(rowName),par1,par2)+\
                                        _(" already in database. Data from imported file will be updated"))
                         else:
-                            logWarning("%s: %s%s%s"%(tablename,rowName,par1,par2)+\
+                            logWarning("%s: %s%s%s"%(tablename,check(rowName),par1,par2)+\
                                        _(" already in database. Data from imported file will be ignored"))
                             
                                              
                     else:
                         # create sql sentence and update database
-                        sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
-                        cursor.execute(sql)
+#                        sql = 'INSERT INTO %s SET ' % (tablename,) + ', '.join(sqlist)
+#                        cursor.execute(sql)
+
+                        table = Table(Status.DB,tablename)
+                        table.insert(sqldict)
+
                         # get last inserted
                         cursor.execute('SELECT LAST_INSERT_ID() AS last')
                         field = cursor.fetchone()

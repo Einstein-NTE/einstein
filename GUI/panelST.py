@@ -121,7 +121,7 @@ def drawFigure(self):
     self.subplot.legend()
 
     self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_U('Temperature [ºC]'))
+    self.subplot.axes.set_xlabel(_U(u'Temperature [\xb0C]'))
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
@@ -456,7 +456,7 @@ class PanelST(wx.Panel):
 
 
         self.stInfo6 = wx.StaticText(id=-1,
-              label=_U('Average operating temperature (coll.) [\xb0C]'), name='stInfo6',
+              label=_U(u'Average operating temperature (coll.) [\xb0C]'), name='stInfo6',
               parent=self, pos=wx.Point(460, 510), style=0)
 
         self.stInfo6val = wx.StaticText(id=-1,

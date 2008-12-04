@@ -15,9 +15,11 @@
 #
 #    Version No.: 0.01
 #       Created by:          Florian Joebstl 15/09/2008  
-#       Revised by:       
+#       Revised by:         Hans Schweiger  28/11/2008
 #
 #       Changes to previous version:
+#
+#   28/11/08: HS    changes to unicode in tables (str() eliminated)
 #
 #
 #------------------------------------------------------------------------------
@@ -167,7 +169,9 @@ class PanelTCAContingencies(wx.Panel):
         self.main = main
         self.mod = Status.mod.moduleTCA
         self.shortName = _U("TCAContingencies")
-        self.description = " "                
+        self.description = " "
+        self.selectedRow = None
+
               
     def updateGridAttributes(self):
         attr = wx.grid.GridCellAttr()
@@ -202,7 +206,10 @@ class PanelTCAContingencies(wx.Panel):
                 self.grid.SetCellValue(r, c, "")
         for r in range(len(self.mod.data.contingencies)):
             for c in range(self.cols):
-                self.grid.SetCellValue(r, c, str(self.mod.data.contingencies[r][c]))
+                try:
+                    self.grid.SetCellValue(r, c, self.mod.data.contingencies[r][c])
+                except:
+                    self.grid.SetCellValue(r, c, str(self.mod.data.contingencies[r][c]))
  
 
     def OnGrid1GridCellLeftClick(self, event):
@@ -211,7 +218,7 @@ class PanelTCAContingencies(wx.Panel):
         if (self.selectedRow < len(self.mod.data.contingencies)):
             entry = self.mod.data.contingencies[self.selectedRow]
             
-            self.cbName.SetValue(str(entry[0]))
+            self.cbName.SetValue(entry[0])
             self.textCtrl1.SetValue(str(entry[1]))
             self.textCtrl2.SetValue(str(entry[2]))                        
             self.btnAdd.SetLabel("Change")

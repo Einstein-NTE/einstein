@@ -144,7 +144,7 @@ class ModuleEnergy(object):
 
         USHj_weekly = []
         for equipe in equipments:
-            USHj_weekly.append([str(equipe.Equipment)])
+            USHj_weekly.append([unicode(equipe.Equipment,"utf-8")])
         
 
         if Status.int.cascadeUpdateLevel < NEquipe:    #cascade not up to date -> show zero line
