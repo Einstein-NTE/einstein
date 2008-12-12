@@ -59,11 +59,12 @@ def prepareDataForReport():
     
 #Title page
     (projectData,generalData) = Status.prj.getProjectData()
-    reportTitle = projectData.Name
-    if projectData.City is not None: reportTitle += ", " + projectData.City
-    if projectData.Country is not None: reportTitle += ", " + projectData.Country
+    reportTitle = unicode(projectData.Name,"utf-8")
+    if projectData.City is not None: reportTitle += u", " + unicode(projectData.City,"utf-8")
+    if projectData.Country is not None: reportTitle += u", " + unicode(projectData.Country,"utf-8")
     Status.int.setGraphicsData("TITLE", array([[reportTitle]]))
-    print "Control (prepareDataForReport): Title = ",reportTitle
+    print "Control (prepareDataForReport): Title = %s"%(reportTitle.encode("utf-8"))
+    print "Type: ",type(reportTitle)
     print Status.int.GData["TITLE"]
     
     Status.prj.setActiveAlternative(0)  #select present state
@@ -302,9 +303,14 @@ def autoRun(parent):
 #..............................................................................
 # Alternative proposal 1: Heat recovery only
 
-    showMessage("First let's test the remaining heat recovery potential (Alternative 1)\n"+\
-                "The result will be used as base for system optimisation")
+    ret = askConfirmation("First let's test the remaining heat recovery potential (Alternative 1)\n"+\
+                          "The result will be used as base for system optimisation")
     
+    if ret == wx.ID_NO:
+        ret = askConfirmation("Do You want to interrupt the auto-design ?")
+        if ret == wx.ID_YES:
+            return
+
     shortName = "Heat recovery (HR)"
     description = "EINSTEIN default design of heat recovery system"
     basedOn = 0
@@ -327,9 +333,9 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a solar system (Alternative 2)\n")
 
-    if ret == wx.ID_CANCEL:
+    if ret == wx.ID_NO:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
-        if ret == wx.ID_OK:
+        if ret == wx.ID_YES:
             return
     
     shortName = "Solar thermal"
@@ -362,9 +368,9 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a heat pump (Alternative 3)\n")
     
-    if ret == wx.ID_CANCEL:
+    if ret == wx.ID_NO:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
-        if ret == wx.ID_OK:
+        if ret == wx.ID_YES:
             return
 
     shortName = "Heat pump"
@@ -404,9 +410,9 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to install a new boiler cascade (Alternative 4)\n")
     
-    if ret == wx.ID_CANCEL:
+    if ret == wx.ID_NO:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
-        if ret == wx.ID_OK:
+        if ret == wx.ID_YES:
             return
 
     shortName = "Boiler cascade"
@@ -433,9 +439,9 @@ def autoRun(parent):
 
     ret = askConfirmation("Now let's try to combine everything (Alternative 5)\n")
     
-    if ret == wx.ID_CANCEL:
+    if ret == wx.ID_NO:
         ret = askConfirmation("Do You want to interrupt the auto-design ?")
-        if ret == wx.ID_OK:
+        if ret == wx.ID_YES:
             return
 
     shortName = "EINSTEIN Super Mix"

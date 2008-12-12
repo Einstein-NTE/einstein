@@ -400,7 +400,7 @@ class PanelA(wx.Panel):
         self.grid.SelectRow(Status.ANo+1)
         self.ANo = Status.ANo
 
-        self.selectedProposal.SetLabel(check(Status.FinalAlternativeName))
+        self.selectedProposal.SetLabel(Status.FinalAlternativeName)
 
         self.Hide()
         self.panelAFig.draw()

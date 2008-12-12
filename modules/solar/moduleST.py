@@ -999,8 +999,8 @@ class ModuleST(object):
             QStorage += (dotQuSolar - dotQuSupply)*TIMESTEP
 
             if dotQuSolar > 0:
-                print "ModuleST (cEF): it %s dotQuSolar %s TavColl %s TStorage %s TMinDemand %s "%\
-                      (it,dotQuSolar,TavCollector,TStorage,TMinDemand)
+#                print "ModuleST (cEF): it %s dotQuSolar %s TavColl %s TStorage %s TMinDemand %s "%\
+#                      (it,dotQuSolar,TavCollector,TStorage,TMinDemand)
                 HPerYear += Status.TimeStep
                 
             USHj_t = dotQuSupply*TIMESTEP

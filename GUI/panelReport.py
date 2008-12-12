@@ -207,7 +207,7 @@ class PanelReport(wx.Panel):
 
         sprojects = Status.DB.sproject.ProjectID[Status.PId]
         if len(sprojects) > 0:
-            summary = sprojects[0].Summary
+            summary = unicode(sprojects[0].Summary,"utf-8")
 
             if summary is not None:
                 self.tc1.SetValue(summary)
@@ -229,7 +229,6 @@ class PanelReport(wx.Panel):
 
     def OnButtonOkButton(self, event):
         summary = self.tc1.GetValue()
-        print summary
 
         logMessage(_U("summary of project report updated"))
 
@@ -407,14 +406,14 @@ class PanelReport(wx.Panel):
                 thelist = cl[1]
                 ncol = thelist[0]
                 nrow = thelist[1]
-                #print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
-                #      (sheetname,thename,nrow,ncol)
+                print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
+                      (sheetname,thename,nrow,ncol)
                 try:
                     (datarows,datacols) = data.shape
                 except:
                     logDebug("PanelReport (replaceData): no data shape found for key %s"%thename)
                     continue
-                #print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
+                print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
                 self._findCellRange(sheetname,nrow,datarows,ncol,datacols,data)
                 i += 1.0/nChanges
                 dlg.update(100.0 * i / nSheets)
@@ -435,6 +434,8 @@ class PanelReport(wx.Panel):
         for sheet in worksheets:
             thissheet =  sheet.getAttribute('table:name')
             if sheetname == thissheet:
+#                print "PanelReport (_findCellRange): sheetname %s found"%sheetname
+#                print "NRow0 - Ncol0 = %s %s"%(nrow0,ncol0)
                 nrow=0
                 rowElements = sheet.getElementsByTagName("table:table-row")
                 for row in rowElements:
@@ -444,14 +445,15 @@ class PanelReport(wx.Panel):
 
                     ncol = 1
                     for element in row.childNodes:
+#                        print "NodeName(%s %s) = %s"%(nrow,ncol,element.nodeName)
                         if element.nodeName == 'table:covered-table-cell':
                             pass # looks like this doesn't count
                         elif element.nodeName == 'table:table-cell':
                             if ncol in range(ncol0,ncol0+ncols):
                                 # found the place!
                                 # replace and exit
-                                #print 'Call _changeOneCell with element=%s newval %s' %\
-                                #      (element.nodeName,newval)
+#                                print 'PanelReport (_findCellRange): Call _changeOneCell with data', \
+#                                      repr(newdata[nrow-nrow0,ncol-ncol0])
                                 self._changeOneCell(element,newdata[nrow-nrow0,ncol-ncol0])
                                 elementCounter -= 1
                                 if elementCounter == 0: return
@@ -462,6 +464,12 @@ class PanelReport(wx.Panel):
                             else:
                                 # if not, add 1
                                 ncol += 1
+
+#########HERES THE PROBLEM: 512_1 works WITH the following, the rest DOESN'T !!!!
+#                           n = element.getAttribute('table:number-columns-spanned')
+#                            if n:
+#                                # if repeated, add the value
+#                                ncol += int(n)-1
 
     def _changeOneCell(self,element,newval):
         if newval is None:
@@ -475,10 +483,10 @@ class PanelReport(wx.Panel):
             aNumber = True
         except ValueError:
             aNumber = False
-
-        newval = str(newval)
+            
         if aNumber:
-            print "PanelReport: converting -> %s as a number"%newval
+            newval = str(newval)
+#            print "PanelReport: converting -> %s as a number"%newval
         
             element.setAttribute('office:value',newval)
             ##print "Do: element.setAttribute('office:value',%s)" % (newval,)
@@ -493,13 +501,17 @@ class PanelReport(wx.Panel):
                     element.removeChild(child)
                 child = next
         else:
-            print "PanelReport: converting -> %s as text"%newval
+            if isinstance(newval,unicode):
+                pass
+            else:
+                newval = unicode(newval,"utf-8")
+
+#            print "PanelReport: converting -> %r as text"%newval
             # the value is a text element
             child = element.firstChild
             while child is not None:
                 next = child.nextSibling
                 if child.nodeType == child.ELEMENT_NODE:
-                    print 'panelReport (changeOneCell): writing data to firstChild -> %s' % (newval)
                     try:
                         child.firstChild.data = newval
                     except:
@@ -511,7 +523,6 @@ class PanelReport(wx.Panel):
             dataelement = self.document.createElement('text:p')
             # now the text with the value
             text = self.document.createTextNode(newval)
-            print 'panelReport (changeOneCell): text = self.document.createTextNode(%s) -> %s' % (newval,text)
             
             dataelement.appendChild(text)
             element.appendChild(dataelement)

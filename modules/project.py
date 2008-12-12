@@ -1275,7 +1275,8 @@ class Project(object):
             "Questionnaire_id":Status.PId,
             "AlternativeProposalNo":Status.ANo,
             "EqNo": NEquipe+1,
-            "CascadeIndex": NEquipe+1
+            "CascadeIndex": NEquipe+1,
+            "Equipment":"dummy"
             }          
         newID = Status.DB.qgenerationhc.insert(tmp)
         newEquipe = Status.DB.qgenerationhc.QGenerationHC_ID[newID][0]

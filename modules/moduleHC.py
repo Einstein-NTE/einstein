@@ -142,16 +142,31 @@ class ModuleHC(object):
                                                   0.0]))
 
                 if Status.ANo == Status.FinalAlternative:
+                    if equipe.Model is not None:
+                        model = unicode(equipe.Model,"utf-8")
+                    else:
+                        model = " "
+
+                    if equipe.Manufact is not None:
+                        manufact = unicode(equipe.Manufact,"utf-8")
+                    else:
+                        manufact = " "
+
+                    if equipe.Refrigerant is not None:
+                        refrigerant = unicode(equipe.Refrigerant,"utf-8")
+                    else:
+                        refrigerant = " "
+                        
                     equipmentDataReport = [[equipe.EquipType,
-                                            unicode(equipe.Manufact,"utf-8"),
-                                            unicode(equipe.Model,"utf-8"),
+                                            manufact,
+                                            model,
                                             equipe.HCGPnom,
                                             equipe.DBFuel_id,
                                             equipe.FuelConsum,
                                             equipe.ElectriConsum,
                                             equipe.ElectriProduction,
                                             equipe.HCGEEfficiency,
-                                            unicode(equipe.Refrigerant,"utf-8")]]
+                                            refrigerant]]
 
                     equipeData = array(transpose(noneFilter(equipmentDataReport,substitute=" ")))
                     print "ModuleHC (updatePanel): writing data for Key %s"%("EQ%02d"%(j))
