@@ -81,6 +81,12 @@ class ModuleCS(object):
         sqlQuery = "Questionnaire_id = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId)
         qelectricity = Status.DB.qelectricity.sql_select(sqlQuery)
 
+        qq = Status.DB.questionnaire.Questionnaire_ID[Status.PId]
+        if len(qq) > 0:
+            questionnaire = qq[0]
+        else:
+            questionnaire = None
+
 ######XXX TEST TEST TEST TEST TEST ###########################################3
         Status.StatusECO = 1
         logDebug("ModuleCS: WARNING -- StatusECO always set to 1 !!!!")
@@ -623,7 +629,7 @@ class ModuleCS(object):
                     dAmortization_Table = dAmortization
 
                 dOMCost = OMCost[ANo]
-                if dOMCost is None:
+                if dOMCost is None or dOMCost == 'NULL':
                     dOMCost = 0.0
                     dOMCost_Table = "---"
                 else:
@@ -659,6 +665,35 @@ class ModuleCS(object):
                
                 CS5Table.append(tableEntry)
                 CS5Plot.append(plotEntry)
+
+# economic parameters used in the analysis (for the report)
+
+            if questionnaire is not None:
+                if questionnaire.InterestExtFinancing is not None:
+                    i = questionnaire.InterestExtFinancing
+                else:
+                    i = 0.06
+                    
+                if questionnaire.AmortisationTime is not None:
+                    N = int(questionnaire.AmortisationTime)
+                else:
+                    N = 15
+            else:
+                i = 0.06
+                N = 15
+
+            sum = 0
+            for n in range(1,N+1):
+                sum += 1/pow(1.0+i,n)
+
+            if sum > 0:
+                annuity = 1./sum
+            else:
+                annuity = 1.0
+                
+            ecopars = [i*100.0,
+                       N,
+                       annuity*100.0]
 #..............................................................................
 # then send everything to the GUI
 
@@ -675,6 +710,8 @@ class ModuleCS(object):
                 CS5Report.append([" "," "," "," "])
             dataReport5 = array(CS5Report)                  
             Status.int.setGraphicsData("CS5_REPORT", dataReport5)
+
+            Status.int.setGraphicsData("CS5_REPORT_PARS", array(ecopars))
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

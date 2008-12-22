@@ -11,21 +11,22 @@
 #			
 #==============================================================================
 #
-#	Version No.: 0.04
-#	Created by: 	    Tom Sobota	30/04/2008
 #
-#       Last revised by:    Hans Schweiger  18/06/2008
-#                           Hans Schweiger  08/10/2008
-#                           Hans Schweiger  12/10/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       30/04/2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      22/12/2008
 #
 #       Changes to previous version:
 #
-#       18/06/2008: HS  Call to function prepareDataForReport() in control.py added
-#       08/10/2008: HS  Security features added for avoiding crashes
-#       12/10/2008: HS  findOneCell substituted by findCellRange ->
-#                       speed-up of about factor 10 or more in report writing
-#       13/10/2008: SD  change _() to _U()
+#       22/12/2008: HS  Full support of UTF-Characters in the report
+#                       Bug-fixing and improvement of robustness:
+#                       - detection of tag "rows-repeated"
+#                       - detection of merged cells BEFORE the marked range
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -314,7 +315,12 @@ class PanelReport(wx.Panel):
     def getDOM(self):
         return self.document
     
+#------------------------------------------------------------------------------		
     def getNameComponents(self, expr):
+#------------------------------------------------------------------------------		
+#   auxiliary function for decomposition of Open-Office cell references
+#   of the type 'Sheetname'.$A$1:$Z$99
+#------------------------------------------------------------------------------		
         result = []
         e1 = expr.replace('.','')
         e2 = e1.replace(':','')
@@ -327,20 +333,27 @@ class PanelReport(wx.Panel):
                 result.append(s)
 
         if len(result) == 5:
-            # range of cells
+            # range of cells ['Sheetname'.$A$1:$Z$99]
             return ((result[0],
                     [int(COLUMNS.find(result[1].upper())) + 1,
                      int(result[2]),
                      int(COLUMNS.find(result[3].upper())) + 1,
                      int(result[4])]))
-        if len(result) == 3:
-            # one single cell
+        elif len(result) == 6:
+            # range of cells, sheetname repeated ['Sheetname'.$A$1:'Sheetname'.$Z$99]
+            return ((result[0],
+                    [int(COLUMNS.find(result[1].upper())) + 1,
+                     int(result[2]),
+                     int(COLUMNS.find(result[4].upper())) + 1,
+                     int(result[5])]))
+        elif len(result) == 3:
+            # one single cell ['Sheetname'.$A$1]
             return ((result[0],
                     [int(COLUMNS.find(result[1].upper())) + 1,
                      int(result[2])]))
         else:
             # not recognized
-            print 'panelReport (getNameComponents): name format not recognized->'+repr(expr)
+            logTrack('panelReport (getNameComponents): name format not recognized->'+repr(expr))
             return None
 
     def createNamesTable(self):
@@ -363,6 +376,9 @@ class PanelReport(wx.Panel):
             m = self.getNameComponents(range)
             if m is not None:
                 (sheetname,itemlist) = m
+
+#                print "createNamesTable %r %r - %r"%(name,sheetname,itemlist)
+                
                 self.names[name] = [sheetname,itemlist]
                 sheetlist = []
                 if self.sheetnames.has_key(sheetname):
@@ -399,21 +415,22 @@ class PanelReport(wx.Panel):
             for cl in changesList:
                 thename = cl[0]
                 if not Interfaces.GData.has_key(thename):
+#                    print "PanelReport: no data available for key %s"%thename
                     continue
                 # found a name on this sheet
-                print "PanelReport (replaceData): Key = ",thename
+#                print "PanelReport (replaceData): Key = ",thename
                 data = Interfaces.GData[thename]
                 thelist = cl[1]
                 ncol = thelist[0]
                 nrow = thelist[1]
-                print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
-                      (sheetname,thename,nrow,ncol)
+#                print "panelReport: data block found. sheet:%s name:%s row %s col %s" %\
+#                      (sheetname,thename,nrow,ncol)
                 try:
                     (datarows,datacols) = data.shape
                 except:
                     logDebug("PanelReport (replaceData): no data shape found for key %s"%thename)
                     continue
-                print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
+#                print "panelReport: datacols %s datarows %s data %s" % (datacols,datarows,repr(data))
                 self._findCellRange(sheetname,nrow,datarows,ncol,datacols,data)
                 i += 1.0/nChanges
                 dlg.update(100.0 * i / nSheets)
@@ -439,37 +456,53 @@ class PanelReport(wx.Panel):
                 nrow=0
                 rowElements = sheet.getElementsByTagName("table:table-row")
                 for row in rowElements:
-                    nrow += 1
+                    n = row.getAttribute('table:number-rows-repeated')
+                    if n:
+                        nrow += int(n)
+#                        print "PanelReport: repeated rows found"
+
+                    else:
+                        nrow += 1
+                    
                     if nrow < nrow0 or nrow >= (nrow0+nrows):
                         continue
 
-                    ncol = 1
+                    ncol = 1        # merged cells count as one
+                    ncolGrid = 1    # merged cells count individually until ncol0, then as one
+                    
                     for element in row.childNodes:
-#                        print "NodeName(%s %s) = %s"%(nrow,ncol,element.nodeName)
+#                        print "NodeName(%s %s [%s]) = %s"%(nrow,ncol,ncolGrid,element.nodeName)
                         if element.nodeName == 'table:covered-table-cell':
                             pass # looks like this doesn't count
                         elif element.nodeName == 'table:table-cell':
-                            if ncol in range(ncol0,ncol0+ncols):
+                            if ncolGrid in range(ncol0,ncol0+ncols):
                                 # found the place!
                                 # replace and exit
 #                                print 'PanelReport (_findCellRange): Call _changeOneCell with data', \
-#                                      repr(newdata[nrow-nrow0,ncol-ncol0])
-                                self._changeOneCell(element,newdata[nrow-nrow0,ncol-ncol0])
+#                                      repr(newdata[nrow-nrow0,ncolGrid-ncol0])
+                                self._changeOneCell(element,newdata[nrow-nrow0,ncolGrid-ncol0])
                                 elementCounter -= 1
                                 if elementCounter == 0: return
                             n = element.getAttribute('table:number-columns-repeated')
                             if n:
                                 # if repeated, add the value
+
+    #                            if ncolGrid >= ncol0:
+    #                                print "PanelReport: WARNING - repeated cells in marked cell range"
+                                    
                                 ncol += int(n)
+                                ncolGrid += int(n)
+
                             else:
                                 # if not, add 1
                                 ncol += 1
+                                ncolGrid += 1
 
-#########HERES THE PROBLEM: 512_1 works WITH the following, the rest DOESN'T !!!!
-#                           n = element.getAttribute('table:number-columns-spanned')
-#                            if n:
-#                                # if repeated, add the value
-#                                ncol += int(n)-1
+                            n = element.getAttribute('table:number-columns-spanned')
+
+                            if n:
+                                # if spanned cells
+                                if ncolGrid < ncol0: ncolGrid += int(n)-1   #once within the range, merged cells count as one column
 
     def _changeOneCell(self,element,newval):
         if newval is None:
@@ -516,8 +549,11 @@ class PanelReport(wx.Panel):
                         child.firstChild.data = newval
                     except:
                         logDebug("PanelReport (_changeOneCell): error writing to child.firstchild.data)")
+#                        print "error writing to firstchild"
                     return
                 child = next
+
+#            print "creating new text element [%r]"%newval
             # if comes here, there was not a previous text node.
             # create a text child for the data
             dataelement = self.document.createElement('text:p')

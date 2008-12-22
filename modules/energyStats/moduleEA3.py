@@ -217,7 +217,7 @@ class ModuleEA3(object):
         if Status.ANo == 0:
             Status.int.setGraphicsData("EA3_USH_REPORT", reportData2)
         elif Status.ANo == Status.FinalAlternative:
-            Status.int.setGraphicsData("EA3_USH_REPORT_F", reportData1)
+            Status.int.setGraphicsData("EA3_USH_REPORT_F", reportData2)
 #------------------------------------------------------------------------------
 
 #==============================================================================
