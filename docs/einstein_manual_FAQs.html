@@ -1,29 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
-  <title>EINSTEIN Tool User Manual</title>
-</head>
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>EINSTEIN Tool User Manual</title></head>
+
 <body>
-<div style="text-align: center;"><img alt="einstein_logo"
- src="img/einstein_logo.jpg" style="width: 421px; height: 108px;"><br>
+<div style="text-align: center;"><img alt="einstein_logo" src="img/einstein_logo.jpg" style="width: 421px; height: 108px;"><br>
 </div>
 <br>
 <h1 style="text-align: center;">User Manual</h1>
 <br>
-<table style="width: 300px; text-align: left;" border="1"
- cellpadding="2" cellspacing="2">
+<table style="width: 300px; text-align: left;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: center;"><a
- href="einstein_manual.html">&lt;&lt;&lt;</a><br>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">&lt;&lt;&lt;</a><br>
       </td>
-      <td style="vertical-align: top; text-align: center;"><a
- href="einstein_manual.html">UP</a><br>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">UP</a><br>
       </td>
-      <td style="vertical-align: top; text-align: center;"><a
- href="einstein_manual.html">&gt;&gt;&gt;</a><br>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">&gt;&gt;&gt;</a><br>
       </td>
     </tr>
   </tbody>
@@ -41,8 +34,7 @@ installed with success, but doesn't start-up</a><br>
 <a href="#Where_do_You_get_help__">Where do You get help ? Where to
 report bugs ?</a><br>
 <br>
-<h2><a name="1._Problems_with_the_set-up_of_EINSTEIN"></a><span
- style="font-weight: bold;">1. Problems with the set-up of
+<h2><a name="1._Problems_with_the_set-up_of_EINSTEIN"></a><span style="font-weight: bold;">1. Problems with the set-up of
 EINSTEIN</span></h2>
 1.1. Problems with the set-up of MySQL<br>
 <br>
@@ -68,12 +60,10 @@ page.<br>
 <br>
 1.3. Problems loading the EINSTEIN database<br>
 <br>
-<span
- style="color: rgb(255, 255, 255); background-color: rgb(255, 102, 0); font-weight: bold;">Q:
+<span style="color: rgb(255, 255, 255); background-color: rgb(255, 102, 0); font-weight: bold;">Q:
 Data base connection error<br>
 <br>
-</span><span
- style="color: rgb(255, 255, 255); background-color: rgb(255, 102, 0);">The
+</span><span style="color: rgb(255, 255, 255); background-color: rgb(255, 102, 0);">The
 installation of EINSTEIN was carried out with success. EINSTEIN starts,
 but a "connection error" with the einstein database occurs</span><br>
 <br>
@@ -92,28 +82,37 @@ Use "test connection" in order to see whether EINSTEIN can connect with
 the database. If there's any problem, check the configuration
 parameters.<br>
 <br>
-<h2><a name="2._EINSTEIN_has_been_installed_with"></a><span
- style="font-weight: bold;">2. </span>EINSTEIN has been installed with
+<h2><a name="2._EINSTEIN_has_been_installed_with"></a><span style="font-weight: bold;">2. </span>EINSTEIN has been installed with
 success, but doesn't start-up</h2>
-???? <br>
+2.1. Problems with the connection to the MySQL database<br>2.1.1.&nbsp;Connection error: (1045, "Access denied for user 'root'@'localhost' 
+(using password: NO)") <br>This error usually occurs", when some wrong 
+option was chosen when installing MySQL.
+<br>
+<br>The solution: Please uninstall and reinstall MySQL again, following 
+exactly what is written in Section 1.1.1., Step 3 of the User Manual,
+<br>especially:
+<br>- make sure that when uninstalling you REMOVE MANUALLY all the remaining 
+mysql folders on your computer
+<br>- when installing again, make sure to UNCHECK the option "modify 
+security settings"
+<br>
+<br>Note also, that after having re-installed MySQL, you also have to load 
+the einstein data base again (with install_einsteinDB.bat)
+<br><br>2.2. Other problems<br>
 <br>
 <a href="#Where_do_You_get_help__">=&gt; follow the instructions for
 bug reporting</a><br>
 <br>
 <br>
-<h2><a name="Where_do_You_get_help__"></a><span
- style="font-weight: bold;"></span>Where do You get help ? Where to
+<h2><a name="Where_do_You_get_help__"></a><span style="font-weight: bold;"></span>Where do You get help ? Where to
 report bugs ?<br>
 </h2>
 <br>
 For getting help with EINSTEIN you can also subscribe and send a mail
-to the <a
- href="https://lists.sourceforge.net/lists/listinfo/einstein-users">mailing
-list of EINSTEIN users</a>: <a class="moz-txt-link-freetext"
- href="https://lists.sourceforge.net/lists/listinfo/einstein-users">https://lists.sourceforge.net/lists/listinfo/einstein-users</a><br>
+to the <a href="https://lists.sourceforge.net/lists/listinfo/einstein-users">mailing
+list of EINSTEIN users</a>: <a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/einstein-users">https://lists.sourceforge.net/lists/listinfo/einstein-users</a><br>
 <br>
-For any reporting of possible bugs and problems enter a bug report at <a
- href="http://sourceforge.net/tracker2/?func=add&amp;group_id=213015&amp;atid=1024025">http://sourceforge.net/tracker2/?func=add&amp;group_id=213015&amp;atid=1024025</a><br>
+For any reporting of possible bugs and problems enter a bug report at <a href="http://sourceforge.net/tracker2/?func=add&amp;group_id=213015&amp;atid=1024025">http://sourceforge.net/tracker2/?func=add&amp;group_id=213015&amp;atid=1024025</a><br>
 or send a mail to the <a href="info@energyxperts.net">EINSTEIN team</a>.<br>
 <br>
 Please include the
@@ -126,5 +125,4 @@ c) what was the problem<br>
 </span></h2>
 <br>
 <span style="font-style: italic;"></span><br>
-</body>
-</html>
+</body></html>
