@@ -19,11 +19,13 @@
 #   Created by:        Florian Joebstl 17/09/2008
 #   Last revised by:   Florian Joebstl 23/09/2008
 #                       Hans Schweiger  28/11/2008
+#                       Hans Schweiger 11/02/2009
 #
 #   17/09/08 FJ Fixed bug in storeTCAGeneral so that no data is overwritten
 #   28/11/08 HS conversion to unicode (name of energy costs)
 #               functions __getTCA... and __storeTCA adapted to unicode (description)
 #   04/12/08 HS all other __store functions changed (adaptation to unicode)
+#   11/02/09 HS small bug detected and corrected (Stauts -> Status)
 #   
 #------------------------------------------------------------------------------
 
@@ -283,7 +285,7 @@ class TCAData(object):
 #                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 #            query = query %(self.pid,self.ano,self.Inflation,self.NIR, self.CSDR,self.DEP,self.TimeFrame,self.totalopcost,self.revenue)
 #            Status.DB.sql_query(query)
-            Stauts.DB.tcageneraldata.insert({"ProjectID": self.pid,
+            Status.DB.tcageneraldata.insert({"ProjectID": self.pid,
                                              "AlternativeProposalNo": self.ano,
                                              "InflationRate": self.Inflation,
                                              "NominalInterestRate": self.NIR, 
