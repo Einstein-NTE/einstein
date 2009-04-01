@@ -22,10 +22,12 @@
 #   Created by: 	Hans Schweiger, Heiko Henning, Tom Sobota, Stoyan Danov
 #                       01/02/2008 - 25/09/2008
 #
-#   Update No. 000
+#   Update No. 001
 #
 #   Since Version 1.0 revised by:
-#                       ---                     --/--/2008
+#               
+#   01/04/2008  HS  MySQL encoding set fixed to utf-8 (avoids problems with
+#                   erroneous configuration files)
 #
 #------------------------------------------------------------------------------
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -198,11 +200,12 @@ class EinsteinFrame(wx.Frame):
         self.DBPass = self.conf.get('DB', 'DBPass')
         self.DBName = self.conf.get('DB', 'DBName')
         #TS20080730 read character encoding
-        try:
-            self.MySQLEncoding = self.conf.get('DB', 'ENCODING')
-        except:
-            # default encoding for MySQL
-            self.MySQLEncoding = 'Latin1'
+#        try:
+#            self.MySQLEncoding = self.conf.get('DB', 'ENCODING')
+#        except:
+#            # default encoding for MySQL
+#            self.MySQLEncoding = 'Latin1'
+        self.MySQLEncoding = 'utf8'
 
         #----- Connect to the Database
         conn = MySQLdb.connect(host=self.DBHost, user=self.DBUser, passwd=self.DBPass, db=self.DBName)
@@ -211,7 +214,7 @@ class EinsteinFrame(wx.Frame):
             try:
                 cursor = conn.cursor(MySQLdb.cursors.DictCursor)
                 cursor.execute("SET NAMES '%s'" % self.MySQLEncoding)
-                self.doLog.LogThis('EinsteinMain: Encoding %s' % self.MySQLEncoding)
+#                self.doLog.LogThis('EinsteinMain: Encoding %s' % self.MySQLEncoding)
             except MySQLdb.Error, e:
                 self.doLog.LogThis('Could not set encoding %s: %s' % (self.MySQLEncoding,str(e)))
 

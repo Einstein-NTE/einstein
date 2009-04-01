@@ -12,56 +12,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.18
-#	Created by: 	    Heiko Henning February2008
-#       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger  02/05/2008
-#                           Tom Sobota      04/05/2008
-#                           Hans Schweiger  05/05/2008
-#                           Hans Schweiger  07/05/2008
-#                           Stoyan Danov    05/06/2008
-#                           Tom Sobota      05/06/2008
-#                           Hans Schweiger  10/06/2008
-#                           Stoyan Danov    11/06/2008
-#                           Hans Schweiger  12/06/2008
-#                           Stoyan Danov    12/06/2008
-#                           Stoyan Danov    13/06/2008
-#                           Hans Schweiger  14/06/2008
-#                           Hans Schweiger  17/06/2008
-#                           Tom Sobota      21/06/2008
-#                           Hans Schweiger  23/06/2008
-#                           Hans Schweiger  18/07/2008
-#                           Hans Schweiger  15/09/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       February 2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
-#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
-#       04/05/2008      Changed display format etc.
-#       05/05/2008: HS  Event handlers changed
-#       07/05/2008: HS  Safety features added against corrupt strings or Nones
-#                       in checkboxes and fluid selectors
-#                       UPHtotQ substituted by UPH
-#                       UAProc substitutde by QOpProc
-#       05/06/2008: SD  new classes & texts
-#                   TS  adapted do_layout
-#       10/06/2008: HS  introduced example TRANSPROCTYPES for static list in choice
-#                       local function "check" eliminated (-> global check in GUITools)
-#       11/0672008: SD  arranges tc-s,unitdict,predefined lists
-#       12/06/2008: HS  some adaptation to new units.py -> to be continued
-#       12/06/2008: SD  unitdict to new units.py, add fillChoice to display()
-#       13/06/2008: SD  OnButtonOK changes
-#       14/06/2008: HS  Clean-up
-#       17/06/2008: HS  adaptation to new display_classes
-#       21/06/2008: TS  General beautification and font awareness.
-#       23/06/2008: HS  bug-fix in function display: clear() shifted to the beginning
-#       18/07/2008: HS  possibility to modify processes in checked state is blocked
-#                       fillPage substituted by display in the button-event handlers
-#       15/09/2008: HS  function fillPage moved from __init__ to display()
-#                       call to display added in OK button event handler
-#       13/10/2008: SD  change _() to _U()
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008/2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -628,15 +592,20 @@ class PanelQ3(wx.Panel):
             return
         
         processName = self.tc1.GetValue()
-        print "PanelQ3 (ok-button): adding process %r"%processName
+        logTrack("PanelQ3 (ok-button): adding process %r"%processName)
+
+# assure that a name has been entered before continuing
+        if len(processName) == 0 or processName is None:
+            showWarning(_("You have to enter a name for the new process before saving"))
+            return
         
         processes = Status.DB.qprocessdata.Questionnaire_id[Status.PId].\
                     AlternativeProposalNo[Status.ANo].\
                     Process[check(processName)]
 
-	if processName != 'NULL' and len(processes) == 0:
+	if len(processes) == 0:
             process = Status.prj.addProcessDummy()
-        elif processName != 'NULL' and len(processes) == 1:
+        elif len(processes) == 1:
             process = processes[0]
         else:
 #	    self.showError("HX name has to be a uniqe value!")

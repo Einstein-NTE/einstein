@@ -12,18 +12,19 @@
 #
 #==============================================================================
 #
-#
 #   EINSTEIN Version No.: 1.0
 #   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
 #                       13/04/2008 - 13/10/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger      12/11/2008
+#                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
 #       12/11/2008: HS  adaptation for full unicode support
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -477,15 +478,20 @@ class PanelQ4(wx.Panel):
 	
         equipeName = self.tc1.GetValue()
         print "PanelQ4 (OK): equipeName = %r"%equipeName
+
+# assure that a name has been entered before continuing
+        if len(equipeName) == 0 or equipeName is None:
+            showWarning(_("You have to enter a name for the new equipment before saving"))
+            return
         
         equipments = Status.DB.qgenerationhc.Equipment[check(equipeName)].\
                      Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         logTrack("PanelQ4 (OK Button): data entry confirmed for equipment %s"%equipeName)
 
-	if equipeName <> 'NULL' and len(equipments) == 0:
+	if len(equipments) == 0:
             equipe = Status.prj.addEquipmentDummy()
-        elif equipeName <> 'NULL' and len(equipments) == 1:
+        elif len(equipments) == 1:
             equipe = equipments[0]
         else:
 	    showError("PanelQ4 (ButtonOK) Equipment name has to be a unique value!")

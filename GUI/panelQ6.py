@@ -12,24 +12,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.05
-#	Created by: 	    Hans Schweiger
-#       Modified by
-#                           Tom Sobota 04/05/2008
-#                           Stoyan Danov June 2008 ???
-#                           Tom Sobota      02/07/2008
-#                           Hans Schweiger  03/07/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       04/05/2008 - 13/10/2008
 #
-#       Changes to previous versions:
-#       03/05/08:   Change of button functions -> new version
-#                   Several SQL listing and search functions moved to module Project
-#                   (in order to separate GUI and technical modules)
-#       04/05/2008      Changed position of OK/Quit buttons
-#        2/07/2008 TS   General fields arranging
-#       03/07/2008: HS  Reactivated list-filling in WHEE page
-#                       bug-fix in read/write functions WHEE page
-#       13/10/2008: SD  change _() to _U()
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      01/04/2009
+#
+#       Changes to previous version:
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -507,11 +500,17 @@ class PanelQ6(wx.Panel):
 
     def OnButtonHXOK(self, event):
         hxName = self.tc1.GetValue()
+
+# assure that a name has been entered before continuing
+        if len(hxName) == 0 or hxName is None:
+            showWarning(_("You have to enter a name for the new heat exchanger before saving"))
+            return
+
         hxes = Status.DB.qheatexchanger.HXName[check(hxName)].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
-	if hxName <> 'NULL' and len(hxes) == 0:
+	if len(hxes) == 0:
             hx = Status.prj.addHXDummy()
             self.HXName = hxName
-        elif hxName <> 'NULL' and len(hxes) == 1:
+        elif len(hxes) == 1:
             hx = hxes[0]
         else:
 	    showError("HX name has to be a uniqe value!")
@@ -564,14 +563,20 @@ class PanelQ6(wx.Panel):
 
     def OnButtonWHEEOK(self, event):
         wheeName = self.tc101.GetValue()
+
+# assure that a name has been entered before continuing
+        if len(wheeName) == 0 or wheeName is None:
+            showWarning(_("You have to enter a name for the new equipment before saving"))
+            return
+
         whees = Status.DB.qwasteheatelequip.WHEEName[check(wheeName)].ProjectID[Status.PId].AlternativeProposalNo[Status.ANo]
-	if wheeName <> 'NULL' and len(whees) == 0:
+	if len(whees) == 0:
             whee = Status.prj.addWHEEDummy()
             self.WHEEName = wheeName
-        elif wheeName <> 'NULL' and len(whees) == 1:
+        elif len(whees) == 1:
             whee = whees[0]
         else:
-	    showError("HX name has to be a uniqe value!")
+	    showError("Name has to be a uniqe value!")
 	    return
 	
         fluidDict = Status.prj.getFluidDict()

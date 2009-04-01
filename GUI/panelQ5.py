@@ -20,9 +20,11 @@
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger      12/11/2008
+#                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
 #       12/11/2008: HS  adaptation for full unicode support
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -383,6 +385,12 @@ class PanelQ5(wx.Panel):
         if Status.PId == 0:
 	    return
         pipeName = self.tc1.GetValue()
+
+# assure that a name has been entered before continuing
+        if len(pipeName) == 0 or pipeName is None:
+            showWarning(_("You have to enter a name for the new pipe before saving"))
+            return
+
         pipes = Status.DB.qdistributionhc.\
                 Pipeduct[check(pipeName)].\
                 Questionnaire_id[Status.PId].\
@@ -390,10 +398,10 @@ class PanelQ5(wx.Panel):
 
         logTrack("PanelQ5 (OK Button): data entry confirmed for pipe %s"%pipeName)
 
-	if pipeName != 'NULL' and len(pipes) == 0:
+	if len(pipes) == 0:
             pipe = Status.prj.addPipeDummy()     
 
-        elif pipeName != 'NULL' and len(pipes) == 1:
+        elif len(pipes) == 1:
             pipe = pipes[0]
         else:
 	    self.main.showError(_U("PanelQ5 (ButtonOK): Branch name has to be a uniqe value!"))

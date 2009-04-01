@@ -12,39 +12,24 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
-#	Created by: 	    Heiko Henning February2008
-#       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger 02/05/2008
-#                           Tom Sobota      05/05/2008
-#                           Stoyan Danov    06/06/2008
-#                           Stoyan Danov    17/06/2008
-#                           Stoyan Danov    18/06/2008
-#                           Hans Schweiger  18/06/2008
-#                           Tom Sobota      03/07/2008
-#                           Hans Schweiger  07/07/2008
-#                           Tom Sobota      07/07/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       February 2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
-#       02/05/08:       AlternativeProposalNo added in queries for table qproduct
-#       05/05/2008      Changed display logic
-#       06/06/2008      SD: new classes & texts, not functional still
-#       17/06/2008 SD   adapt to new unitdict, change tc numbers to old one + add new
-#       18/06/2008 SD   create display(), add imports
-#                   HS: bug corrections and clean-up
-#       03/07/2008 TS   general layout fix.
-#       07/07/2008: HS  bug-fix: self.check - GUITools-check
-#                       (compatibility with Tom's new FloatEntry)
-#        7/07/2008 TS   Fixed buttons AddEquipment, DeleteEquipment
-#       13/10/2008: SD  change _() to _U()
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008/2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
@@ -411,11 +396,17 @@ class PanelQ8(wx.Panel):
         if Status.PId <> 0:
 
             buildingName = self.tc1.GetValue()
+
+# assure that a name has been entered before continuing
+            if len(buildingName) == 0 or buildingName is None:
+                showWarning(_("You have to enter a name for the new building before saving"))
+                return
+
             buildings = Status.DB.qbuildings.BuildName[check(buildingName)].\
                         Questionnaire_id[Status.PId].\
                         AlternativeProposalNo[Status.ANo]
             
-            if buildingName <> 'NULL' and len(buildings) == 0:
+            if len(buildings) == 0:
 
                 newID = Status.prj.addBuildingDummy()
 
@@ -450,7 +441,7 @@ class PanelQ8(wx.Panel):
                 Status.SQL.commit()
                 self.fillBuildingList()
 
-            elif buildingName <> 'NULL' and len(buildings) == 1:
+            elif len(buildings) == 1:
 
                 tmp = {
                     "BuildName":check(self.tc1.GetValue()),

@@ -12,37 +12,24 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
-#	Created by: 	    Heiko Henning February2008
-#       Revised by:         Tom Sobota      06/05/2008
-#                           Stoyan Danov    06/06/2008
-#                           Stoyan Danov    17/06/2008
-#                           Stoyan Danov    18/06/2008
-#                           Hans Schweiger  18/06/2008
-#                           Tom Sobota      25/06/2008
-#                           Hans Schweiger  26/06/2008
-#                           Hans Schweiger  08/07/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       13/04/2008 - 13/10/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
-#       06/05/2008      Changed display logic
-#       06/06/2008      page0, page2: checkboxes changed to choices, not functional still, new classes & text
-#       17/06/2008 SD   page0, page2: adapt to new unitdict, change tc numbers to old ones, introduce DateEntry
-#       18/06/2008 SD   create display(), add imports
-#                   HS  bug corrections (reactivation of check-boxes)
-#       25/06/2008 TS   fixed (again) layout
-#       26/06/2008  HS  new event handlers for changes in ST
-#       08/07/2008: HS  bug-fixing
-#                       adding functions related with surface management
-#                       (add/delete/select ...)
-#       13/10/2008: SD  change _() to _U()
+#       01/04/2009: HS  impossibility to save entries with empty name field
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.NET (E4-Experts SL), Barcelona, Spain 2008/2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
@@ -473,81 +460,113 @@ class PanelQ7(wx.Panel):
         logDebug("PanelQ7 (OK button): confirming data")
         
         if Status.PId != 0:
+#..............................................................................
+# general data on interest in renewables
 
-            logDebug("PanelQ7 (OK button): writing general data")
-            
-            tmp = {
-                "Latitude":check(self.tc1_21.GetValue()),
-                "ST_I":check(self.tc1_22.GetValue()),
-                "TAmb":check(self.tc1_23.GetValue()),
-                "BiomassFromProc":check(self.tc14.GetValue()),
-                "PeriodBiomassProcStart":check(self.tc15_1.GetValue()),
-                "PeriodBiomassProcStop":check(self.tc15_2.GetValue()),
-                "NDaysBiomassProc":check(self.tc16.GetValue()),
-                "QBiomassProcDay":check(self.tc17.GetValue()),
-                "SpaceBiomassProc":check(self.tc18.GetValue()),
-                "LCVBiomassProc":check(self.tc19.GetValue()),
-                "HumidBiomassProc":check(self.tc20.GetValue()),
-                "BiomassFromRegion":check(self.tc21.GetValue()),
-                "PriceBiomassRegion":check(self.tc22.GetValue()),
-                "PeriodBiomassRegionStart":check(self.tc23_1.GetValue()),
-                "PeriodBiomassRegionStop":check(self.tc23_2.GetValue()),
-                "NDaysBiomassRegion":check(self.tc24.GetValue())
-                }
-
-            if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
-                # register does not exist, so store also id
-                tmp["Questionnaire_id"] = Status.PId
-                print tmp
-
-                Status.DB.qrenewables.insert(tmp)
-                Status.SQL.commit()
-
-            else:
-                # register does exist
-                q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
-                q.update(tmp)
-                Status.SQL.commit()
-
-            logDebug("PanelQ7 (OK button): writing surface specific data")
-            
-            self.selectedSurfaceName = self.tc6_0.GetValue()
-            surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
-                        SurfAreaName[check(self.selectedSurfaceName)]
-
-            if self.selectedSurfaceName != 'NULL' and len(surfaces) == 0:
-                surface = Status.prj.addSurfaceDummy()
-            elif self.selectedSurfaceName != 'NULL' and len(surfaces) == 1:
-                surface = surfaces[0]
-            else:
-                showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
-                return
-
-            orientation = findKey(ORIENTATIONS,self.tc8.GetValue(text=True))
-            if orientation in AZIMUTH.keys():
-                azimuth = AZIMUTH[orientation]
-            else:
-                azimuth = None
+            if self.notebook.GetSelection()==0:
+                logTrack("PanelQ7 (OK button): writing general and biomass data")
                 
-            tmp = {
-                "SurfAreaName":check(self.tc6_0.GetValue()),
-                "SurfArea":check(self.tc6.GetValue()),
-                "Inclination":check(self.tc7.GetValue()),
-                "Azimuth":check(azimuth),
-                "AzimuthClass":check(orientation),
-                "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
-                "Distance":check(self.tc10.GetValue()),
-                "RoofType":check(findKey(ROOFTYPES,self.tc11.GetValue(text=True))),
-                "RoofStaticLoadCap":check(self.tc12.GetValue())
-#                "EnclBuildGroundSketch":check(findKey(TRANSYESNO,self.tc13.GetValue(text=True))),
-               }
+                tmp = {
+                    "Latitude":check(self.tc1_21.GetValue()),
+                    "ST_I":check(self.tc1_22.GetValue()),
+                    "TAmb":check(self.tc1_23.GetValue()),
+                    }
 
-            surface.update(tmp)
-            Status.SQL.commit()
+                if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
+                    # register does not exist, so store also id
+                    tmp["Questionnaire_id"] = Status.PId
 
-            Status.mod.moduleST.resetST()   #surface calculation no longer up to date
-        
+                    Status.DB.qrenewables.insert(tmp)
+                    Status.SQL.commit()
 
+                else:
+                    # register does exist
+                    q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
+                    q.update(tmp)
+                    Status.SQL.commit()
+#..............................................................................
+# surface data
+
+            elif self.notebook.GetSelection()==1:
+                logTrack("PanelQ7 (OK button): writing surface specific data")
+                
+                self.selectedSurfaceName = self.tc6_0.GetValue()
+
+# assure that a name has been entered before continuing
+                if len(self.selectedSurfaceName) == 0 or self.selectedSurfaceName is None:
+                    showWarning(_("You have to enter a name for the new surface before saving"))
+                    return
+
+                surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
+                            SurfAreaName[check(self.selectedSurfaceName)]
+
+                if len(surfaces) == 0:
+                    surface = Status.prj.addSurfaceDummy()
+                elif len(surfaces) == 1:
+                    surface = surfaces[0]
+                else:
+                    showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
+                    return
+
+                orientation = findKey(ORIENTATIONS,self.tc8.GetValue(text=True))
+                if orientation in AZIMUTH.keys():
+                    azimuth = AZIMUTH[orientation]
+                else:
+                    azimuth = None
+                    
+                tmp = {
+                    "SurfAreaName":check(self.tc6_0.GetValue()),
+                    "SurfArea":check(self.tc6.GetValue()),
+                    "Inclination":check(self.tc7.GetValue()),
+                    "Azimuth":check(azimuth),
+                    "AzimuthClass":check(orientation),
+                    "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
+                    "Distance":check(self.tc10.GetValue()),
+                    "RoofType":check(findKey(ROOFTYPES,self.tc11.GetValue(text=True))),
+                    "RoofStaticLoadCap":check(self.tc12.GetValue())
+    #                "EnclBuildGroundSketch":check(findKey(TRANSYESNO,self.tc13.GetValue(text=True))),
+                   }
+
+                surface.update(tmp)
+                Status.SQL.commit()
+
+                Status.mod.moduleST.resetST()   #surface calculation no longer up to date
+
+
+#..............................................................................
+# biomass data
+
+            else:
+                logTrack("PanelQ7 (OK button): writing general and biomass data")
+                
+                tmp = {
+                    "BiomassFromProc":check(self.tc14.GetValue()),
+                    "PeriodBiomassProcStart":check(self.tc15_1.GetValue()),
+                    "PeriodBiomassProcStop":check(self.tc15_2.GetValue()),
+                    "NDaysBiomassProc":check(self.tc16.GetValue()),
+                    "QBiomassProcDay":check(self.tc17.GetValue()),
+                    "SpaceBiomassProc":check(self.tc18.GetValue()),
+                    "LCVBiomassProc":check(self.tc19.GetValue()),
+                    "HumidBiomassProc":check(self.tc20.GetValue()),
+                    "BiomassFromRegion":check(self.tc21.GetValue()),
+                    "PriceBiomassRegion":check(self.tc22.GetValue()),
+                    "PeriodBiomassRegionStart":check(self.tc23_1.GetValue()),
+                    "PeriodBiomassRegionStop":check(self.tc23_2.GetValue()),
+                    "NDaysBiomassRegion":check(self.tc24.GetValue())
+                    }
+
+                if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
+                    # register does not exist, so store also id
+                    tmp["Questionnaire_id"] = Status.PId
+
+                    Status.DB.qrenewables.insert(tmp)
+                    Status.SQL.commit()
+
+                else:
+                    # register does exist
+                    q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
+                    q.update(tmp)
+                    Status.SQL.commit()
             logDebug("PanelQ7 (OK button): now filling page again")
 
             self.fillPage()
