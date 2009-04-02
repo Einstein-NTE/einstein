@@ -267,8 +267,8 @@ class PanelQ1(wx.Panel):
         fp.changeFont(size=TYPE_SIZE_MIDDLE)
         f = FieldSizes(wHeight=HEIGHT_MIDDLE,wLabel=LABEL_WIDTH_MIDDLE)
 
-        self.tc14 = IntEntry(self.page1,
-                              minval=0, maxval=999999, value=0,
+        self.tc14 = FloatEntry(self.page1,
+                              decimals=0, minval=0, maxval=999999, value=0,
                               unitdict=None,
                               label=_U("Number of employees"),
                               tip=" ")
@@ -285,8 +285,8 @@ class PanelQ1(wx.Panel):
                               label=_U("Annual production cost"),
                               tip=_U("Specify total factor inputs for production"))
 
-        self.tc17 = IntEntry(self.page1,
-                              minval=2000, maxval=2050, value=0,
+        self.tc17 = FloatEntry(self.page1,
+                              decimals=0,minval=2000, maxval=2050, value=0,
                               unitdict=None,
                               label=_U("Base year for economic data"),
                               tip=_U("Specify the reference year for economic parameters"))
@@ -602,6 +602,14 @@ class PanelQ1(wx.Panel):
                 else:
                     subBranch = None
 
+                indie_txt = findKey(TRANSYESNO,check(self.tc19.GetValue(text=True)))
+                if indie_txt == "yes":
+                    indie_no = 1
+                elif indie_txt == "no":
+                    indie_no = 0
+                else:
+                    indie_no = None
+
                 tmp = {
                     "Name":check(self.tc1.GetValue()),
                     "City":check(self.tc2.GetValue()),
@@ -619,7 +627,7 @@ class PanelQ1(wx.Panel):
                     "ProdCost":check(self.tc16.GetValue()),
                     "BaseYear":check(self.tc17.GetValue()),
                     "Growth":check(self.tc18.GetValue()),
-                    "Independent":check(findKey(TRANSYESNO,check(self.tc19.GetValue(text=True)))),
+                    "Independent":check(indie_no),
                     "OMThermal":check(self.tc20.GetValue()),
                     "OMElectrical":check(self.tc21.GetValue()),
                     "PercentFuelTotcost":check(self.tc22.GetValue()),
@@ -803,7 +811,13 @@ class PanelQ1(wx.Panel):
         self.tc16.SetValue(str(q.ProdCost))
         self.tc17.SetValue(str(q.BaseYear))
         self.tc18.SetValue(str(q.Growth))
-        if q.Independent in TRANSYESNO.keys(): self.tc19.SetValue(TRANSYESNO[str(q.Independent)])
+        if q.Independent == 1:
+            self.tc19.SetValue(TRANSYESNO["yes"])
+        elif q.Independent == 0:
+            self.tc19.SetValue(TRANSYESNO["no"])
+        else:
+            self.tc19.SetValue("None")
+            
         self.tc20.SetValue(str(q.OMThermal))
         self.tc21.SetValue(str(q.OMElectrical))
         self.tc22.SetValue(str(q.PercentFuelTotcost))

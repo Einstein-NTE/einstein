@@ -464,9 +464,30 @@ class PanelQ7(wx.Panel):
 # general data on interest in renewables
 
             if self.notebook.GetSelection()==0:
-                logTrack("PanelQ7 (OK button): writing general and biomass data")
-                
+                logTrack("PanelQ7 (OK button): writing general data")
+
+                reason = []
+                if self.checkBox2.GetValue == True:
+                    reason.append("y")
+                else:
+                    reason.append("n")
+                if self.checkBox3.GetValue == True:
+                    reason.append("y")
+                else:
+                    reason.append("n")
+                if self.checkBox4.GetValue == True:
+                    reason.append("y")
+                else:
+                    reason.append("n")
+                if self.checkBox5.GetValue == True:
+                    reason.append("y")
+                else:
+                    reason.append("n")
+                    
                 tmp = {
+                    "REInterest": 1,
+                    "REReason": reason,
+                    "REMotivation": "that's a good question",
                     "Latitude":check(self.tc1_21.GetValue()),
                     "ST_I":check(self.tc1_22.GetValue()),
                     "TAmb":check(self.tc1_23.GetValue()),
@@ -594,11 +615,11 @@ class PanelQ7(wx.Panel):
         self.tc1_22.Clear()
         self.tc1_23.Clear()
         
-#        self.checkBox1.SetValue(False)
-#        self.checkBox2.SetValue(False)
-#        self.checkBox3.SetValue(False)
-#        self.checkBox4.SetValue(False)
-#        self.checkBox5.SetValue(False)
+        self.checkBox1.SetValue(False)
+        self.checkBox2.SetValue(False)
+        self.checkBox3.SetValue(False)
+        self.checkBox4.SetValue(False)
+        self.checkBox5.SetValue(False)
         self.tc6_0.Clear()
         self.tc6.Clear()
         self.tc7.Clear()
@@ -634,6 +655,51 @@ class PanelQ7(wx.Panel):
 	    p = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
 	    if p.REInterest is None:
 		self.checkBox1.SetValue(False)
+	    else:
+		self.checkBox1.SetValue(bool(p.REInterest))
+
+	    if p.REReason is not None:
+                if len(p.REReason) <> 4:
+                    self.checkBox2.SetValue(False)
+                    self.checkBox3.SetValue(False)
+                    self.checkBox4.SetValue(False)
+                    self.checkBox5.SetValue(False)
+                    
+                else:
+                    if p.REReason[0] == "y":
+                        self.checkBox2.SetValue(True)
+                    else:
+                        self.checkBox2.SetValue(False)
+                    if p.REReason[1] == "y":
+                        self.checkBox3.SetValue(True)
+                    else:
+                        self.checkBox3.SetValue(False)
+                    if p.REReason[2] == "y":
+                        self.checkBox4.SetValue(True)
+                    else:
+                        self.checkBox4.SetValue(False)
+                    if p.REReason[3] == "y":
+                        self.checkBox5.SetValue(True)
+                        if p.REMotivation is not None:
+                            self.tc1.SetValue(unicode(p.REMotivation,"utf-8"))
+                        else:
+                            self.tc1.SetValue("")
+                    else:
+                        self.checkBox5.SetValue(False)
+                        self.tc1.SetValue("")
+            else:
+                self.checkBox2.SetValue(False)
+                self.checkBox3.SetValue(False)
+                self.checkBox4.SetValue(False)
+                self.checkBox5.SetValue(False)
+                
+
+	    if p.REInterest is None:
+		self.checkBox1.SetValue(False)
+		self.checkBox2.SetValue(False)
+		self.checkBox3.SetValue(False)
+		self.checkBox4.SetValue(False)
+		self.checkBox5.SetValue(False)
 	    else:
 		self.checkBox1.SetValue(bool(p.REInterest))
 

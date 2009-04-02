@@ -18,41 +18,22 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.14
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Stoyan Danov
+#                       02/04/2008 - 01/08/2008
 #
-#       Created by:     Hans Schweiger      02/04/2008
-#       Revised by:     Hans Schweiger      15/04/2008
-#                       Hans Schweiger      18/04/2008
-#                       Hans Schweiger      23/04/2008
-#                       Hans Schweiger      10/06/2008
-#                       Stoyan Danov        11/06/2008
-#                       Hans Schweiger      13/06/2008
-#                       Stoyan Danov        16/06/2008
-#                       Hans Schweiger      08/07/2008
-#                       Hans Schweiger      16/07/2008
-#                       Hans Schweiger      18/07/2008
-#                       Hans Schweiger      01/08/2008
+#   Update No. 001
 #
-#       15/04/08: HS    Functions Add-, Copy-, Delete-Alternative
-#       18/04/08: HS    Functions Add-, Copy-, Delete-Project
-#                       UserInteractionLevel
-#       23/04/08: HS    Completed list of data tables to be created in
-#                       createNewProject
-#       02/05/08: HS    deleteProduct, deleteFuel, deleteProcess
-#                       and addFuel/ProcessDummy added
-#       10/06/08: HS    getFluidDict added
-#       11/06/08: SD    getFuelDict added
-#       13/06/08: HS    several functions getXY + getXYList for subsystems
-#                       creation of new entry in uheatpump added in createNewProject
-#       16/06/08: SD    addPipeDummy changed: now returning table, not ID
-#       18/06/08: HS    getNaceDict added
-#       08/07/08: HS    functions for surface managemente added
-#       16/07/08: HS    bug-fixes in CreateNewProject:
-#                           Nfuels -> NFuels
-#                           BBMaintain: -> BBMaintain
-#       18/07/08: HS    several bug-fixes. change in addEquipmentDummy
-#                       -> no longer creates cascade !!! (gives problems in PanelQ4)
-#       01/08/08: HS    qrenewables: only function of PId, not of ANo
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  01/04/2008
+#               
+#   01/04/2008  HS  Security features added for dealing with corrupt entries
+#                   in db: Equipments w/o name etc.
+#                   -> cleanUpProject called when opening project
+#                   -> cleanUpSQLRows checks mainField
+#
+#                   Bug-fix in 
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -140,9 +121,10 @@ def deleteSQLRows(table,query):
            
 
 #------------------------------------------------------------------------------		
-def cleanUpSQLRows(table,query,maxANo):
+def cleanUpSQLRows(table,query,maxANo = None,mainField = None):
 #------------------------------------------------------------------------------		
 #       auxiliary function for copying full rows in SQL Tables
+#       eliminates rows with erroneous ANO
 #------------------------------------------------------------------------------		
 
     checked = False
@@ -160,13 +142,34 @@ def cleanUpSQLRows(table,query,maxANo):
         
         n = len(rows)
         for i in range(n):
-            if rows[i].AlternativeProposalNo > maxANo or rows[0].AlternativeProposalNo < -1:
-                logDebug(_("Project (cleanUpSQLRows): entry with ANo %s > maxANo %s deleted -> \n%s")%(rows[0].AlternativeProposalNo,maxANo,rows[0]))
-                rows[i].delete()    #delete from 0 and update rows -> strange solution. see comment in deleteSQLRows
-                checked == False
-                Status.SQL.commit()
-                break
-           
+
+# check here if there are rows with an AlternativeProposalNo out of range [-1:maxANo]
+            if maxANo is not None:
+                if rows[i].AlternativeProposalNo > maxANo or rows[i].AlternativeProposalNo < -1:
+                    logDebug(_("Project (cleanUpSQLRows): entry with ANo %s > maxANo %s deleted -> \n%s")%\
+                             (rows[i].AlternativeProposalNo,maxANo,rows[i]))
+                    rows[i].delete()    #delete from 0 and update rows -> strange solution. see comment in deleteSQLRows
+                    checked == False
+                    Status.SQL.commit()
+                    break
+                
+# check here if the mandatory main entry field of the row is defined (avoid crashes due to nones in name-fields, etc.)
+
+            if mainField is not None:
+
+                print "project (cleanUpSQLRows): checking field ",mainField
+                if rows[i][mainField] is None:
+                
+                    logDebug(_("Project (cleanUpSQLRows): corrupt entry with ANo %s deleted\n%s")% \
+                             (rows[i].AlternativeProposalNo,rows[i]))
+                    rows[i].delete()    #delete from 0 and update rows -> strange solution. see comment in deleteSQLRows
+                    checked == False
+                    Status.SQL.commit()
+                    break
+
+                else:
+                    print "project (cleanUpSQLRows): value of mainField = ",rows[i][mainField]
+                    
 
 #------------------------------------------------------------------------------		
 def shiftANoInSQLRows(table,query, shift):
@@ -609,6 +612,11 @@ class Project(object):
                 Status.ActiveProjectName = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].Name,"utf-8")
                 Status.ActiveProjectDescription = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].\
                                                           DescripIndustry,"utf-8")
+
+                print "project (setActiveProject): calling cleanUpProject %s "%PId                
+                self.cleanUpProject(PId)
+
+ 
             except:
                 Status.ActiveProjectName = u'unknown'
                 Status.ActiveProjectDescription = u'unknown'
@@ -822,28 +830,28 @@ class Project(object):
             maxANo = sproject.NoOfAlternatives
 
 #..............................................................................
-# copying project data tables
+# cleanUp of project data tables: checks ANo and Nones in main entry field (name)
 
-            cleanUpSQLRows(DB.salternatives,sqlQuery,maxANo)
+            cleanUpSQLRows(DB.salternatives,sqlQuery,maxANo,"ShortName")
         
             cleanUpSQLRows(DB.cgeneraldata,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
 
-            cleanUpSQLRows(DB.qbuildings,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qdistributionhc,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qbuildings,sqlQueryQ,maxANo,"BuildName")
+            cleanUpSQLRows(DB.qdistributionhc,sqlQueryQ,maxANo,"Pipeduct")
             cleanUpSQLRows(DB.qelectricity,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qfuel,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qgenerationhc,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qheatexchanger,sqlQuery,maxANo)
-            cleanUpSQLRows(DB.qprocessdata,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qproduct,sqlQueryQ,maxANo)
+            cleanUpSQLRows(DB.qfuel,sqlQueryQ,maxANo,"FuelNo")
+            cleanUpSQLRows(DB.qgenerationhc,sqlQueryQ,maxANo,"Equipment")
+            cleanUpSQLRows(DB.qheatexchanger,sqlQuery,maxANo,"HXName")
+            cleanUpSQLRows(DB.qprocessdata,sqlQueryQ,maxANo,"Process")
+            cleanUpSQLRows(DB.qproduct,sqlQueryQ,maxANo,"Product")
 #            cleanUpSQLRows(DB.qrenewables,sqlQueryQ,maxANo)
-            cleanUpSQLRows(DB.qwasteheatelequip,sqlQuery,maxANo)
+            cleanUpSQLRows(DB.qsurfarea,sqlQuery,mainField="SurfAreaName")  #surface areas have no ANo. fixed for the project !!!!
+            cleanUpSQLRows(DB.qwasteheatelequip,sqlQuery,maxANo,"WHEEName")
             cleanUpSQLRows(DB.uheatpump,sqlQueryQ,maxANo)
 
 
 #------------------------------------------------------------------------------
-    def getDefaultSetUp(self,PId):
+    def getDefaultSetUp(self):
 #------------------------------------------------------------------------------
 #   charges the default set-up parameters for a NEW project
 #------------------------------------------------------------------------------
