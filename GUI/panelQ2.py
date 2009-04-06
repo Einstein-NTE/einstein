@@ -12,51 +12,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.17
-#	Created by: 	    Heiko Henning February2008
-#       Revised by:         Tom Sobota March/April 2008
-#                           Hans Schweiger  02/05/2008
-#                           Tom Sobota      02/05/2008
-#                           Hans Schweiger  05/05/2008
-#                           Hans Schweiger  10/05/2008
-#                           Stoyan Danov    06/06/2008
-#                           Hans Schweiger  10/06/2008
-#                           Stoyan Danov    11/06/2008
-#                           Hans Schweiger  12/06/2008
-#                           Stoyan Danov    17/06/2008
-#                           Stoyan Danov    18/06/2008
-#                           Tom Sobota      21/06/2008
-#                           Hans Schweiger  23/06/2008
-#                           Hans Schweiger  03/07/2008
-#                           Hans Schweiger  07/07/2008
-#                           Hans Schweiger  16/09/2008
-#                           Stoyan Danov    13/10/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
+#                       February 2008 - 13/10/2008
 #
-#       Changes to previous version:
-#       02/05/08:   HS  AlternativeProposalNo added in queries for table qproduct
-#                   TS  Changes in layout
-#       05/05/08:   HS  Event handlers changed; resize of grid so that it fits
-#                       into the window
-#       10/05/08:   HS  FuelOwn substituted by FECFuel
-#       06/06/2008  SD  New label/tooltips according to new displayClasses defined;
-#                       do_layout still not adapted
-#       10/06/2008: HS  Adapted size of decimal numbers in order to bring it to run ...
-#       11/06/2008: SD  changed tips, unitdict filling, tc1 - choice fuels DB arranged
-#       12/06/2008: HS  unitdict adapted to new version of units
-#       17/06/2008 SD   adapt to new unitdict
-#       18/06/2008 SD   create display()
-#                   HS  some clean-up of old comments.
-#       21/06/2008 TS   general layout beautification. Adapt to font awareness.
-#       23/06/2008  HS  small changes in eventhandlers (missing adaptations to
-#                       new ChoiceEntry ...
-#       03/07/2008: HS  adjustment of column with in table electricity; 
-#       07/07/2008: HS  bug-fix: self.check substituted by GUITools->check
-#                       the old one didn't work with Tom's new FloatEntry
-#       16/09/2008: HS  bug-fix: introduced ANo in electricity table
-#       13/10/2008: SD  change _() to _U()
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Small bug-fix: increase of maximum value for fuel cost
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008, 2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -200,7 +169,7 @@ class PanelQ2(wx.Panel):
                               tip=_U("Specify expenditures without VAT"))  
         
         self.tc6 = FloatEntry(self.page0,
-                              ipart=6, decimals=2, minval=0., maxval=99999., value=0.,
+                              ipart=6, decimals=2, minval=0., maxval=1.0e+9, value=0.,
                               unitdict='PRICE',
                               label=_U("Annual energy cost"),
                               tip=_U("Total cost"))  

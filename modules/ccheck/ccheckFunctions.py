@@ -18,60 +18,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.11
-#	Created by: 	    Hans Schweiger	08/03/2008
-#	Last revised by:    Claudia Vannoni     9/04/2008
-#                           Hans Schweiger      09/04/2008
-#                           Claudia Vannoni     16/04/2008
-#                           Claudia Vannoni     17/04/2008
-#                           Hans Schweiger      18/04/2008
-#                           Hans Schweiger      23/04/2008
-#                           Hans Schweiger      24/04/2008
-#                           Hans Schweiger      25/04/2008
-#                           Claudia Vannoni     02/05/2008
-#                           Hans Schweiger      07/05/2008
-#                           Hans Schweiger      19/06/2008
-#                           Hans Schweiger      21/06/2008ff
-#                           Hans Schweiger      18/08/2008
-#                           Hans Schweiger      02/09/2008 ff
-#                           Hans Schweiger      11/09/2008
-#                           Hans Schweiger      24/09/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       08/03/2008 - 24/09/2008
 #
-#       Changes in last update:
-#       09/04/08    Change in adjustProd ..
-#                   def init
-#       09/04/08 HS Functions meanValueOf added;
-#                   ccheck - functions adapted
-#                   adjustProd - simulataneous adjustment of both variables
-#	16/04/08 CV adjustSum3 modified, calcFlow and adjustFlow
-#       17/04/08 CV calcK and adjustcalcK
-#       18/04/08 HS valMin and valMax included in most functions
-#                   constraints actually applied (function "constrain" in CCPar)
-#                   general testing and correction of several bugs
-#       23/04/08 HS method setValue added in CCPar
-#       24/04/08 HS added method "screen" in CCPar
-#       25/04/08 HS tracking of conflicts in ccheck-functions 
-#       02/05/08 CV calcH,adjustH provisional: TO BE IMPROVED
-#       07/05/08 HS entry for process/equipe/pipe no added in conflict list
-#                   adjustProd/ProdC -> changed
-#       19/06/08 HS constraints added
-#                   introduction of "setEstimate" in function CCPar
-#       21/06/08 HS bugfix01 in calcDiff -> change in constrain: if val < 0
-#                   -> val = 0 and err = INFINITE
-#                   bugfix01 in adjustProd -> change in constrain:
-#                   assignment of 0 (+/-INF) if self.val < MINIMUM_VALUE
-#                   bugfix01 in calcSum/calcSum3/calcRowSum
-#                   -> calculation of error based on sqdev instead of sqerr
-#                   -> use of CCPar fucntions calcDev and calcErr
-#                   bugfix02 in adjustProd: sqerr(1/x) = INFINITE if
-#                   sqerr(x) >= 1 !!! (division by something very close to zero)
-#       22/06/08 HS bugfix01 in constrain, calcDev, calcErr -> separate treat-
-#                   ment of INFINITE
-#       18/08/2008 checkBalance in ccheck2-5
-#       02/09/2008  skip very bad estimates in meanValueOf - functions
-#                   latent heat added in calcH
-#       11/09/2008  linear propagation of errors in sums and diffs
-#       24/09/2008  calcDiff/adjustDiff-GTZero introduced (provisional solution)
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of prints
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -908,9 +865,9 @@ def calcDiff(yname,x1,x2,parType=None):
     if y.parType <> "S":
         y.valMin = max(y.valMin,0)
         y.valMax = max(y.valMax,0)
-    else:
-        print "CalcDiff: parameter with parType S"
-        y.show()
+#    else:
+#        print "CalcDiff: parameter with parType S"
+#        y.show()
 
     y.constrain()
     
@@ -2390,9 +2347,9 @@ def bestOf(y1,y2):
 #   Does not carry out None-check !!!!
 #------------------------------------------------------------------------------
 
-    print "BestOf: starting"
-    y1.show()
-    y2.show()
+#    print "BestOf: starting"
+#    y1.show()
+#    y2.show()
 
     checkIfConflict(y1,y2)
 
@@ -2410,11 +2367,11 @@ def bestOf(y1,y2):
     best.valMin = max(y1.valMin,y2.valMin)
     best.valMax = min(y1.valMax,y2.valMax)
 
-    print "BestOf: before constrain"
-    best.show()
+#    print "BestOf: before constrain"
+#    best.show()
     best.constrain()
-    print "BestOf: after constrain"
-    best.show()
+#    print "BestOf: after constrain"
+#    best.show()
 
     return best   
 

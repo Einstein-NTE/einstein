@@ -18,19 +18,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
-#	Created by: 	    Claudia Vannoni 	17/04/2008
-#       Revised by:         Claudia Vannoni 	25/04/2008
-#                           Claudia Vannoni 	27/04/2008
-#                           Hans Schweiger      16/09/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       17/04/2008 - 16/09/2008
 #
-#       Changes in last update:
-#                           complete export data, arrange parameters and labels
-#       16/09/2008: HS  Some adaptations to new ccheck structure
-#                       Control of Nones for FEO and components
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of some prints
 #	
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -180,7 +181,7 @@ class CheckFETel():
         if ANo == 0:
             cgeneraldataTable = Status.DB.cgeneraldata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo]
             if len(cgeneraldataTable) > 0:
-                print "exporting data to cgeneraldata"
+#                print "exporting data to cgeneraldata"
                 cgeneraldata = cgeneraldataTable[0]
 
                 cgeneraldata.ElectricityGen = check(self.ElectricityGen.val)

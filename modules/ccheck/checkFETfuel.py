@@ -18,19 +18,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
-#	Created by: 	    Claudia Vannoni	10/04/2008
-#	Last revised by:    Claudia Vannoni      17/04/2008
-#                           Claudia Vannoni      27/04/2008
-#                           Claudia Vannoni      3/07/2008
-#                           Hans Schweiger      03/09/2008
-#       Changes in last update:
-#                   v003: import from SQL, ccheck,labels
-#               3/07/2008: import from FluidDB
-#       03/09/08: HS    0 error for MFuel specified
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Stoyan Danov
+#                       10/04/2008 - 03/09/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of prints
 #	
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -59,7 +60,7 @@ class CheckFETfuel():
 
     def __init__(self,i):     #function that is called at the beginning when object is created
 
-        print "CheckFETfuel: __INIT__ running"
+#        print "CheckFETfuel: __INIT__ running"
 
 # assign a variable to all intermediate/calculated values needed
 
@@ -67,10 +68,7 @@ class CheckFETfuel():
         self.FETFuel1 = CCPar("FETFuel1") 
         self.FECFuel1 = CCPar("FECFuel1") 
         
-        if TEST==True:
-            self.importTestData(i)
-        else:
-            self.importData(i)
+        self.importData(i)
 
         if DEBUG in ["ALL","BASIC"]:
             self.showAllFETfuel()
@@ -82,7 +80,7 @@ class CheckFETfuel():
 #------------------------------------------------------------------------------
 
         self.FuelNo = i
-        print "CheckFETfuel: importing data"
+#        print "CheckFETfuel: importing data"
         ANo = -1
         
 #..............................................................................
@@ -96,10 +94,10 @@ class CheckFETfuel():
 
 #..............................................................................
 # reading data from table "qfuel"
-        print "CheckFETFuel: trying to read database"
+#        print "CheckFETFuel: trying to read database"
         try:
             qfuelTable = Status.DB.qfuel.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].FuelNo[i]
-            print "CheckFETFuel: number of fuels = ",len(qfuelTable)
+#            print "CheckFETFuel: number of fuels = ",len(qfuelTable)
             
             if len(qfuelTable) > 0:
                 qfuel = qfuelTable[0]
@@ -142,44 +140,6 @@ class CheckFETfuel():
                 
                 Status.SQL.commit()
                 
-
-    def importTestData(self,i):  #later on should import data from SQL. now simply sets to some value
-
-        if TESTCASE == 2:       #original test case Kla - first version of FECel
-            self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
-                    
-            self.FECFuel = CCPar("FECFuel")
-            self.FECFuel.val = 600
-            self.FECFuel.sqerr = 0.0101
-
-            self.MFuelYear = CCPar("MFuelYear")
-            self.MFuelYear.val = 55
-            self.MFuelYear.sqerr = 0.01
-
-            self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
-            self.FEOFuel.val = 0
-            self.FEOFuel.sqerr = 0.0
-
-        elif TESTCASE == 3:       #global checking of algorithm
-            self.FuelLCV = 10 # kWh/unit # IMPORT Constant from the FuelDB
-                    
-            self.FECFuel = CCPar("FECFuel")
-            self.FECFuel.val = 10000
-            self.FECFuel.sqerr = 0.001
-
-            self.MFuelYear = CCPar("MFuelYear")
-            self.MFuelYear.val = 1000
-            self.MFuelYear.sqerr = 0.001
-
-            self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
-            self.FEOFuel.val = 0
-            self.FEOFuel.sqerr = 0.0
-        else:
-            print "CheckFETfuel: WARNING - don't have input data for this test case no. ",TESTCASE
-
-        if DEBUG in ["ALL"]:
-            self.showAllFETfuel()
-
     def showAllFETfuel(self):
         
         print "====================="
@@ -198,7 +158,7 @@ class CheckFETfuel():
 #   screens all variables in the block
 #------------------------------------------------------------------------------
 
-        print "CheckFETFuel (screen): screening"
+#        print "CheckFETFuel (screen): screening"
         self.MFuelYear.screen()
         self.FECFuel.screen()
         self.FEOFuel.screen()
@@ -210,9 +170,9 @@ class CheckFETfuel():
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
 
-        print "CheckFETfuel: starting check with"
-        self.FECFuel.show()
-        self.MFuelYear.show()
+#        print "CheckFETfuel: starting check with"
+#        self.FECFuel.show()
+#        self.MFuelYear.show()
         
         if DEBUG in ["ALL"]:
             print "-------------------------------------------------"

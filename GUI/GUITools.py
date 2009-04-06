@@ -16,21 +16,24 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
-#	Created by: 	    Hans Schweiger      03/05/2008
-#                           Hans Schweiger      03/07/2008
-#                           Hans Schweiger      05/07/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger
+#                       03/05/2008 - 05/07/2008
 #
-#       Changes to previous versions:
-#       03/07/2008: HS  included condition "is None" in check
-#       05/07/2008: HS  colours and font sizes centralised here ...
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of prints
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
@@ -105,7 +108,7 @@ def check(value):
 #------------------------------------------------------------------------------
     if value <> "" and value <> "None" and value is not None:
         if isinstance(value,str) or isinstance(value,unicode):
-            print "GuiTools (check): string or unicode instance detected"
+            logDebug("GuiTools (check): string or unicode instance detected: %r"%value)
             return value.encode("utf-8")
         else:
             return value

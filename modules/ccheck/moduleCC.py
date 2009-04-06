@@ -15,23 +15,21 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.03
-#	Created by:         Claudia Vannoni     20/04/2008
-#                           Claudia Vannoni     02/05/2008
-#                           Hans Schweiger      13/06/2008
-#                           Hans Schweiger      3/07/2008
-#                                               30/07/2008
-#                           HS                  18/08/08
-#       Changes to previous version:
-#	v0.02 CV Add CCPipe, Add Matrix and links between matrix
-#       13/06/2008 HS   Connections between sub-systems imported from SQL
-#                       Very basic version of CheckHX added. Not yet coupled
-#                       to the rest.
-#       3/07/2008 HS    Pipe
-#       30/07/2008      Linked QWH, deleted Rec
-#         18/08/08      null
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       20/04/2008 - 18/08/2008
+#
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Calculation of pipe operating hours added
+#                   Clean-up: elimination of prints
+#
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -50,8 +48,6 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 from einstein.modules.messageLogger import *
-
-DEBUG = "ALL"
 
 from ccheckFunctions import *
 from checkMatrix import *
@@ -143,9 +139,9 @@ class ModuleCC(object):
                     description = self.parameterList[varName]
                 else:
                     description = ""
-                print "ModuleCC (updatePanel): "
-                print self.parameterList
-                print MONTHS
+#                print "ModuleCC (updatePanel): "
+#                print self.parameterList
+#                print MONTHS
 
                 if entry[1] is not None:
                     val = '%9.2f'%entry[1]
@@ -427,8 +423,8 @@ class ModuleCC(object):
 
         logTrack("ModuleCC (basicCheck): estimate = %s;continue = %s"%\
                  (estimate,continueCheck))
-        print "ModuleCC (basicCheck): estimate = %s;continue = %s"%\
-                 (estimate,continueCheck)
+#        print "ModuleCC (basicCheck): estimate = %s;continue = %s"%\
+#                 (estimate,continueCheck)
         
         if DEBUG in ["ALL","BASIC"]:
             logDebug("====================================================")
@@ -590,7 +586,9 @@ class ModuleCC(object):
             NH = self.NHX
 
             for h in range(self.NHX):
-                logDebug("checking HX no. %s"%h)
+                if DEBUG in ["ALL"]:
+                    print ("checking HX no. %s"%h)
+                    
                 conflict.setDataGroup("HX",h+1)
 
                 self.ccHX[h].check()             # ejecuta la función check para proceso k
@@ -609,7 +607,8 @@ class ModuleCC(object):
             NN = self.NWHEE
 
             for n in range(self.NWHEE):
-                print "checking WHEE no. %s"%n
+                if DEBUG in ["ALL"]:
+                    print "checking WHEE no. %s"%n
                 conflict.setDataGroup("WHEE",n+1)
 
                 self.ccWHEE[n].check()             # ejecuta la función check para proceso k
@@ -715,6 +714,31 @@ class ModuleCC(object):
                 if conflict.nConflicts > 0: break
         
 #..............................................................................
+# Check operating hours of pipes
+# Suppositions: (a) minimum hour = minimum hours of connected process with maximum
+#               duration
+#               (b) maximum hours = hours of industry operation / sum of process
+
+                for m in range(NM):
+                    hopdaymax = 0
+                    ndaymax = 0
+                    hopmin = self.ccPipe[m].HPerYearPipe.valMin
+                    for k in range(NK):
+                        if Status.UPHLink[k][m] == 1:
+                            hopmin = max(self.ccProc[k].HPerYearProc.valMin, hopmin)
+                            ndaymax = max(self.ccProc[k].NDaysProc.valMax,ndaymax)
+                            hopdaymax += self.ccProc[k].HPerDayProc.valMax
+                            
+                    hopdaymax = min(24.0,hopdaymax)
+                    ndaymax = min(365.,ndaymax)
+                    hopmax = ndaymax*hopdaymax
+
+                    self.ccPipe[m].HPerYearPipe.valMin = max(self.ccPipe[m].HPerYearPipe.valMin, hopmin)
+                    self.ccPipe[m].HPerYearPipe.valMax = min(self.ccPipe[m].HPerYearPipe.valMax, hopmax)
+                    self.ccPipe[m].HPerYearPipe.val = 0.5*(self.ccPipe[m].HPerYearPipe.valMin + self.ccPipe[m].HPerYearPipe.valMax)
+                    self.ccPipe[m].HPerYearPipe.constrain()
+
+#..............................................................................
 # link of heat exchanger with the rest
 
                 if DEBUG in ["ALL","MAIN","BASIC"]:
@@ -773,19 +797,21 @@ class ModuleCC(object):
 # END OF CYCLE: check convergence
 
             balanceCtrl = balanceCtrl + 0.5*(cycle.getMeanTotalBalance()-balanceCtrl)
-            print "GLOBAL CYCLE CONVERGENCE: %s [lagged: %s]| %s "%\
-                  (cycle.getMeanTotalBalance(),balanceCtrl,\
-                   cycle.getMaxTotalBalance())
+            if DEBUG in ["ALL","MAIN","BASIC"]:
+                print "GLOBAL CYCLE CONVERGENCE: %s [lagged: %s]| %s "%\
+                      (cycle.getMeanTotalBalance(),balanceCtrl,\
+                       cycle.getMaxTotalBalance())
 
             if ncycle%1 == 0 or balanceCtrl <= 1.e-3:
                 logMessage("Consistency check: maximum remaining balance error %6.2f percent"%(balanceCtrl*100))
 
             if balanceCtrl <= 1.e-3:
-                print "ModuleCC (basic check): convergence reached at %s cycles"%(ncycle+1)
+                logTrack("ModuleCC (basic check): convergence reached at %s cycles"%(ncycle+1))
                 break
 
             if ncycle == NCycles-1 and balanceCtrl > 5.e-3:
-                showWarning("Consistency check calculations did not converge. Data may not be fully balanced")
+                logTrack("Consistency check calculations did not converge. Data may not be fully balanced")
+#                showWarning("Consistency check calculations did not converge. Data may not be fully balanced")
 
             
 #..............................................................................
@@ -828,7 +854,7 @@ class ModuleCC(object):
 # And finally export all the data
 
         logTrack("ModuleCC (basicCheck): exporting results to SQL")
-        print NI,NJ,NK,NM,NH,NN
+#        print NI,NJ,NK,NM,NH,NN
         
         self.ccFETel.exportData()
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
@@ -838,7 +864,7 @@ class ModuleCC(object):
         for k in range(NK):       
             self.ccProc[k].exportData()
         for m in range(NM):
-            print "ModuleCC (basicCheck): exporting pipe %s data"%(m+1)
+#            print "ModuleCC (basicCheck): exporting pipe %s data"%(m+1)
             self.ccPipe[m].exportData()
         for h in range(NH):       
             self.ccHX[h].exportData()
@@ -935,7 +961,7 @@ class ModuleCC(object):
         else:
             f_Ok = 1.0
             f_Ok_min = 1.0
-        print "ModuleCC (selectMainProcesses): fraction of processes with desired accuracy on\n total heat demand = %s (%s)"%(f_Ok,f_Ok_min)
+#        print "ModuleCC (selectMainProcesses): fraction of processes with desired accuracy on\n total heat demand = %s (%s)"%(f_Ok,f_Ok_min)
 
 #..............................................................................
 # sorts the processes by UPH
@@ -953,7 +979,7 @@ class ModuleCC(object):
             UPHMax_Sum += proc[0]
             UPH_Sum += proc[1]
             k = proc[2]
-            print "ModuleCC (selectMainProcesses): k %s UPH_Sum %s UPHMax_Sum %s:"%(k,UPH_Sum,UPHMax_Sum)
+#            print "ModuleCC (selectMainProcesses): k %s UPH_Sum %s UPHMax_Sum %s:"%(k,UPH_Sum,UPHMax_Sum)
             if (UPH_Sum > 0.3*UPHTotal.val) or \
                (UPHMax_Sum > 0.4*UPHTotal.val):
                 mainProcess = True

@@ -19,26 +19,17 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.04
-#	Created by: 	    Tom Sobota	    June 2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Tom Sobota, Hans Schweiger
+#                       June 2008 - 26/09/2008
 #
-#       Last modified by:   Hans Schweiger  19/06/2008
-#                           Tom Sobota      20/06/2008
-#                           Hans Schweiger  23/06/2008
-#                           Tom Sobota      July 2008
-#                           Hans Schweiger  14/07/2008
-#                           Hans Schweiger  26/09/2008
+#   Update No. 001
 #
-#       Changes to previous version:
-#       19/06/2008: HS  ExportDataHR created based on ExportDataXML
-#       20/06/2008: TS  Compatibility changes: substituted 'information_schema'by 'show tables'
-#       23/06/2008: HS  Improvement of ExportDataHR: schedules now exported
-#                       - although not yet correctly :-(
-#       14/07/2008: HS  Call to "RestoreLinks" added in importProject
-#       26/09/2008: HS  Import/Export DB introduced
-#                       Import/Export of fluids, fuels and auditorDB in ex/im-project
-#                       Workaround in ImportProject for determination of
-#                       auto-increment value in questionnaire
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   01/04/2008  HS  Bug-fix in project import (determination of ID of new rows)
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -722,12 +713,14 @@ class ImportProject(object):
 #                        print sql
 #                        cursor.execute(sql)
                         table = Table(Status.DB,tablename)
-                        table.insert(sqldict)
+                        newKey = table.insert(sqldict)
                                        
                         # get last inserted
                         cursor.execute('SELECT LAST_INSERT_ID() AS last')
                         field = cursor.fetchone()
-                        newKey = int(field['last'])
+# 2009-04-06: line eliminated: gave 0 as result !!! substituted by direct assignment
+# of newKey (see above)
+#                        newKey = int(field['last'])
                     else:
                         newKey = newID
                     tablelist.append((oldKey,newKey))

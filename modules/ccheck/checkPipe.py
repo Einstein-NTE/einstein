@@ -18,18 +18,19 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
-#	Created by: 	    Claudia Vannoni 	30/04/2008
-#	Last revised by:    Hans Schweiger       07/05/2008 
-#                           Claudia Vannoni 	03/07/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       30/04/2008 - 03/07/2008
 #
-#       Changes in last update:
-#       07/05/2008  HS  HPerYearPipe assigned for testing
-#                       narrower constraints for T,DT and X (function of parType)
-#                       Tfeedup1 incl. ccheck1 added
-#                       Bug corrected: include hforwout2 in ccheck
-#                       Bug corrected: substitution TForwOut2 by TRetOut1
-#       03/07/2008 CV  Priority, constraints val max, parType, balances USHpipe and USHm and UPHProcm
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   01/04/2008  HS  Fix number of operating hours (4000 h) eliminated
+#                   Clean-up: elimination of prints
+#
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	www.energyxperts.net / info@energyxperts.net
@@ -319,11 +320,11 @@ class CheckPipe():
             self.FluidTCond = INFINITE
             logTrack("CheckPipe(importData): error reading data from qdistributionhc in PipeNo: %s"%self.PipeDuctNo)
             
-        print "CheckPipe: TCond = %s"%self.FluidTCond       
+#        print "CheckPipe: TCond = %s"%self.FluidTCond       
 
 #####TESTING ONLY: unknown HPerYearPipe gives problems !!!!
-        self.HPerYearPipe.setValue(4000.0,err=0.0)
-        logDebug("CheckPipe (importData): pipe operating hours fixed to 4000 h")
+#        self.HPerYearPipe.setValue(4000.0,err=0.0)
+#        logDebug("CheckPipe (importData): pipe operating hours fixed to 4000 h")
 
 #calculate dUAPipe from DDistPipe and DoPipe only if it cannot be calculated by dUA = UA/LPipe
         if (self.UAPipe.val is None) or (self.TotLengthDistPipe is None):
@@ -345,7 +346,7 @@ class CheckPipe():
 #------------------------------------------------------------------------------
 
         ANo = 0
-        print "CheckPipe (exportData): exporting data to qdistributionhc",self.PipeDuctNo
+#        print "CheckPipe (exportData): exporting data to qdistributionhc",self.PipeDuctNo
                 
         
 #..............................................................................
@@ -354,7 +355,7 @@ class CheckPipe():
         if ANo == 0:
             qdistributionhcTable = Status.DB.qdistributionhc.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].PipeDuctNo[self.PipeDuctNo]
             if len(qdistributionhcTable) > 0:
-                print "exporting data to qdistributionhc"
+#                print "exporting data to qdistributionhc"
                 qdistributionhc = qdistributionhcTable[0]
 
                 qdistributionhc.DistribCircFlow = check(self.DistribCircFlow.val)
@@ -820,9 +821,9 @@ class CheckPipe():
         if DEBUG in ["ALL","BASIC","MAIN"]:
             self.showAllPipe()
 
-        print "-------------------------------------------------"
-        print "Cycle balance: mean %s max %s "%(cycle.getMeanBalance(),cycle.getMaxBalance())
-        print "-------------------------------------------------"
+            print "-------------------------------------------------"
+            print "Cycle balance: mean %s max %s "%(cycle.getMeanBalance(),cycle.getMaxBalance())
+            print "-------------------------------------------------"
 
         return cycle.getMeanBalance()
     

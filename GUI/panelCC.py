@@ -286,8 +286,8 @@ class PanelCC(wx.Panel):
                     self.grid.SetCellValue(r, c, data[r][c])
                     
 #HS2008-07-05: WAS AN ATTEMPT TO HIGHLIGHT IMPORTANT DATA
-                if data[r][COLNO]==1:
-                    print "PanelCC: here I should highlight a row"
+#                if data[r][COLNO]==1:
+#                    print "PanelCC: here I should highlight a row"
 #                    self.grid.SetRowAttr(r,attr2)
 #                else:
 #                    self.grid.SetRowAttr(r,attr)
@@ -348,6 +348,10 @@ class PanelCC(wx.Panel):
 #------------------------------------------------------------------------------		
 #   Generate new porposal copying from existing alternative
 #------------------------------------------------------------------------------		
+        if self.checkOK == False:
+            showMessage(_U("First You have to run the basic check and eliminate possible conflicts in redundant data"))
+            return
+            
         popup =  DialogOK(self,_U("confirm data estimation"),\
                           _U("\nTake care: running data estimate will automatically estimate missing data.")+\
                           _U("\nAlternatively you can also manually add estimated data to the questionnaire and rerun basic check")+\

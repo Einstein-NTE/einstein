@@ -18,25 +18,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.08
-#	Created by: 	    Hans Schweiger	08/03/2008
-#	Last revised by:    Claudia Vannoni     7/04/2008
-#                           Claudia Vannoni     16/04/2008
-#                           Hans Schweiger      20/04/2008
-#                           Claudia Vannoni     27/04/2008
-#                           Claudia Vannoi      3/07/2008
-#                           Claudia Vannoi      30/07/2008
-#                           Hans Schweiger      03/09/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       08/03/2008 - 03/09/2008
 #
-#               Changes in last update:
-#                               sqerr NONE eliminated
-#       20/04/2008: HS  Variable HCGTEfficiency1 added. 2nd cross check
-#       26/04/2008: SQL import and export, ccheck, labels
-#	3/07/2008: parameters in screen list, priorities, import from DBFuel,constraints val max
-#       30/07/2008: Added calculations on ExhaustGas,QWHEq, all parameters with # updated
-#       03/09/2008: HS  0 error for some of the input variables
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of prints
+#
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -235,7 +230,7 @@ class CheckEq():
                     eq_fuel = Fuel(fuel_number)
                     self.FuelLCV = eq_fuel.LCV
                     self.OffgasHeatCapacity = eq_fuel.OffgasHeatCapacity #
-                    print "heat capacity = ",self.OffgasHeatCapacity
+#                    print "heat capacity = ",self.OffgasHeatCapacity
                     self.CombAir = eq_fuel.CombAir #
                     self.FuelConsum.setValue(qgenerationhc.FuelConsum)
                     if qgenerationhc.ElectriConsum is None:
@@ -468,10 +463,10 @@ class CheckEq():
 #------------------------------------------------------------------------------
 #   main function carrying out the check of the block
 #------------------------------------------------------------------------------
-        print "CheckEq - TESTPRINT TESTPRINT"
-        print "track of USHj"
-        self.USHj.show()
-        print self.USHj.track
+#        print "CheckEq - TESTPRINT TESTPRINT"
+#        print "track of USHj"
+#        self.USHj.show()
+#        print self.USHj.track
 
         if DEBUG in ["ALL","MAIN"]:
             print "-------------------------------------------------"
@@ -504,7 +499,7 @@ class CheckEq():
             self.QExhaustGas1 = calcProd("QExhaustGas1",self.QExhaustGasdot,self.HPerYearEqNom3)#
             
             if self.mainSource == "Fuel":
-                print "CheckEq (calcs): fuel as main source"
+#                print "CheckEq (calcs): fuel as main source"
                 self.USHBoiler2 = calcProd("USHBoiler2",self.FETFuel_j,self.HCGTEfficiency1)
                 self.HCGPnom1 = calcProdC("HCGPnom1",self.FuelLCV,self.FuelConsum2,self.HCGTEfficiency)#
             else:
@@ -520,7 +515,7 @@ class CheckEq():
             self.QWHEq1 = calcDiff("QWHEq1",self.QInputEq,self.QOutEq)
 
             if self.EquipeClass in ["BB"]:
-                print "checkEq in mode BB"
+#                print "checkEq in mode BB"
                 self.QConvLoss1 = calcProd("QConvLoss1",self.ConvLoss,self.FETj3)
                 self.QWHEq2 = calcDiff("QWHEq2",self.QConvLoss,self.QLossEq2)#
 
@@ -547,7 +542,7 @@ class CheckEq():
                 print "Step 3: calculating from right to left (ADJUST)"
             
             if self.EquipeClass in ["BB"]:
-                print "adjust in mode BB"
+#                print "adjust in mode BB"
                 adjustDiff(self.QWHEq2,self.QConvLoss,self.QLossEq2)#
                 adjustProd(self.QConvLoss1,self.ConvLoss,self.FETj3)
                 adjustSum(self.One,self.HCGTEfficiency2,self.ConvLoss2)

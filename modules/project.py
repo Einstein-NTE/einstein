@@ -22,18 +22,18 @@
 #   Created by: 	Hans Schweiger, Stoyan Danov
 #                       02/04/2008 - 01/08/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
 #                       Hans Schweiger  01/04/2008
+#                       Hans Schweiger  06/04/2008
 #               
 #   01/04/2008  HS  Security features added for dealing with corrupt entries
 #                   in db: Equipments w/o name etc.
 #                   -> cleanUpProject called when opening project
 #                   -> cleanUpSQLRows checks mainField
-#
-#                   Bug-fix in 
+#   06/04/2008  HS  Clean-up: elimination of prints
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -157,7 +157,6 @@ def cleanUpSQLRows(table,query,maxANo = None,mainField = None):
 
             if mainField is not None:
 
-                print "project (cleanUpSQLRows): checking field ",mainField
                 if rows[i][mainField] is None:
                 
                     logDebug(_("Project (cleanUpSQLRows): corrupt entry with ANo %s deleted\n%s")% \
@@ -165,11 +164,7 @@ def cleanUpSQLRows(table,query,maxANo = None,mainField = None):
                     rows[i].delete()    #delete from 0 and update rows -> strange solution. see comment in deleteSQLRows
                     checked == False
                     Status.SQL.commit()
-                    break
-
-                else:
-                    print "project (cleanUpSQLRows): value of mainField = ",rows[i][mainField]
-                    
+                    break                    
 
 #------------------------------------------------------------------------------		
 def shiftANoInSQLRows(table,query, shift):
@@ -464,12 +459,12 @@ class Project(object):
                 try:
                     Status.main.panelinfo.update()
                 except:
-                    print "problems updating panelinfo"
+                    logDebug("problems updating panelinfo")
 
                 try:
                     Status.main.showMainMenuAlternatives()
                 except:
-                    print "problems updating main menu alternatives"
+                    logDebug("problems updating main menu alternatives")
             else:
                 logTrack("Project (setActiveAlternative): error trying to set alternative to %s"%n)
                 Status.StatusCC = None
@@ -613,7 +608,6 @@ class Project(object):
                 Status.ActiveProjectDescription = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].\
                                                           DescripIndustry,"utf-8")
 
-                print "project (setActiveProject): calling cleanUpProject %s "%PId                
                 self.cleanUpProject(PId)
 
  
@@ -675,7 +669,6 @@ class Project(object):
 
             newProject = {"Name": check(shortName),"DescripIndustry":check(description)}
 
-            print "Project (createNewProject): q-update = ",newProject
             newID = questionnaires.insert(newProject)
             logTrack("Project (createNewProject): new project inserted with ID %s "%newID)
 
@@ -945,7 +938,7 @@ class Project(object):
                 equipe = equipes[0]
                 pipeLink = equipe["PipeDuctEquip"]
                 oldPipeLink = pipeLink
-                print "Project (reconnectEquipesToPipes): equipe ",equipe.Equipment,pipeLink
+#                print "Project (reconnectEquipesToPipes): equipe ",equipe.Equipment,pipeLink
                 pipeIDs = []
                 if pipeLink is not None:
                     pipeLinkSplit = pipeLink.split(';')
@@ -954,7 +947,7 @@ class Project(object):
                             pipeIDs.append(long(pipeLinkSplit[i]))
                         except:
                             pass
-                print "Project (reconnectEquipesToPipes): pipeIDs ",pipeIDs
+#                print "Project (reconnectEquipesToPipes): pipeIDs ",pipeIDs
        
                 newPipeIDs = []
                 for pipeID in pipeIDs:
@@ -962,10 +955,10 @@ class Project(object):
                         newPipeIDs.append("%10d"%pipeIDDict[pipeID])
                     else:
                         logDebug(_("Project (reconnect equipes): pipe ID %s was not in old pipe table")%pipeID)
-                print "Project (reconnectEquipesToPipes): pipeIDs ",newPipeIDs
+#                print "Project (reconnectEquipesToPipes): pipeIDs ",newPipeIDs
        
                 pipeLink = ';'.join(newPipeIDs)
-                print "Project (reconnectEquipesToPipes): new pipeLink ",pipeLink
+#                print "Project (reconnectEquipesToPipes): new pipeLink ",pipeLink
                 equipe["PipeDuctEquip"] = pipeLink
                 logTrack("Project (reconnect...): link of equipe %s updated from %s to %s"%(equipeID,oldPipeLink,pipeLink))
                 
@@ -1665,8 +1658,8 @@ class Project(object):
         sqlQueryQ = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QBuildings_ID = '%s'"\
                     %(Status.PId,Status.ANo,buildingID)  #query is redundant, but maintained as is for security
 
-        print "Project (deleteBuilding): query"
-        print sqlQueryQ
+#        print "Project (deleteBuilding): query"
+#        print sqlQueryQ
         
         deleteSQLRows(DB.qbuildings,sqlQueryQ)
 
@@ -2286,17 +2279,17 @@ class Project(object):
                 (oldID,newID) = fuelIDs
                 self.substituteFuelID(PId,oldID,newID)
 
-        print "Project (restoreLinks): now restoring pipe links"
-        print "projectDict: ",projectDict
+#        print "Project (restoreLinks): now restoring pipe links"
+#        print "projectDict: ",projectDict
         if u'qdistributionhc' in projectDict.keys():
             pipeIDList = projectDict[u'qdistributionhc']
-            print "pipeIDList: ",pipeIDList
+#            print "pipeIDList: ",pipeIDList
             pipeIDDict = {}
             for pipeIDs in pipeIDList:
                 (oldID,newID) = pipeIDs
                 pipeIDDict.update({oldID:newID})
                 
-            print "pipeIDDict: ",pipeIDDict
+#            print "pipeIDDict: ",pipeIDDict
             self.substitutePipeID(PId,pipeIDDict)
             
         if u'auditor' in projectDict.keys():

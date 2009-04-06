@@ -18,46 +18,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.07
-#	Created by: 	    Hans Schweiger	08/03/2008
-#	Last revised by:    Claudia Vannoni      7/04/2008
-#                           Claudia Vannoni      16/04/2008
-#                           Hans Schweiger      19/04/2008
-#                           Claudia Vannoni      25/04/2008
-#                           Claudia Vannoni      27/04/2008
-#              v0.07        Hans Schweiger      07/05/2008
-#                           Claudia Vannoni      03/07/2008
-#                           Hans Schweiger      04/07/2008
-#                           Claudia Vannoni      30/07/2008
-#                           Claudia Vannoni      13/08/2008
-#                           Claudia Vannoni      14/08/2008
-#                           Hans Schweiger      16/08/2008
-#                           Hans Schweiger      18/08/2008
-#                           Hans Schweiger      03/09/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Claudia Vannoni, Hans Schweiger
+#                       08/03/2008 - 03/09/2008
 #
-#       Changes in last update: 
-#       v004:adjustSum3
-#           Nones eliminated in initialisation of sqerr
-#       19/04/2008: HS  PT1,2,3 and PTInFlow1 added as tmp-variables
-#       v005: import from SQL, PT, ccheck of USHProc1
-#       v0.06: small changes in labels,added the connection to the DB.
-#       v0.07: importData - import of UPH instead of UPHProc
-#               PTOutFlow1, VOutFlow and VOutFLow1 added
-#               VInFlowDay3 eliminated
-#       2/07/2008: VoutFlow,parameter list in screen, change of priority, import from FluidDb,
-#                  Partype, constraints val max
-#       04/07/2008: HS  Cross DT added in heat exchangers
-#                       UPHw calculation added
-#       30/07/08: CV QHXProc updated; QWHProc added (it is teh same of UPHw at present state)
-#	13/08/08: CV TenvProc
-#       14/08/08: CV UPHProc and UPH assignement; added self.FluidRhoCp, PTOutFlowRec
-#       16/08/08: HS VInflow3 added;
-#                    bug-fix in calculation of UPHm -> HPerYear instead HPerDay
-#                    special case for QHXint = 0
-#       18/08/08: NDaysProc added ccheck 1,2,3; NBatchPerYear2
-#       03/09/08: Default error for integers (number of days, ...) = 0
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                       Hans Schweiger  06/04/2008
+#               
+#   06/04/2008  HS  Clean-up: elimination of prints
+#
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -224,18 +198,30 @@ class CheckProc():
 # reading data from table "qprocessdata"
         qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[self.ProcNo]
         
+#        print "CheckProc (importData): lengh %s ProcNo = %s"%(len(qprocessdataTable),self.ProcNo)
         if len(qprocessdataTable) > 0:
             qprocessdata = qprocessdataTable[0]
 
             fluid_number = qprocessdata.ProcMedDBFluid_id   #IMPORT from the FluidDB
             proc_fluid = Fluid(fluid_number)
+
+#            print proc_fluid
+            
             self.FluidCp = proc_fluid.cp
             self.FluidDensity = proc_fluid.rho
-            self.FluidRhoCp = self.FluidCp* self.FluidDensity
+            self.FluidRhoCp = self.FluidCp * self.FluidDensity
 
             self.PTInFlow.setValue(qprocessdata.PTInFlow)
             self.PT.setValue(qprocessdata.PT,err=0.0)   #if specified, take as fixed
             self.PTOutFlow.setValue(qprocessdata.PTOutFlow)
+
+# if no temperature for Outflow is specified, start with PT as initial estimate
+# but leave error range from 0 to infinite !!!!
+
+            if qprocessdata.PTOutFlow is None:
+                self.PTOutFlow.val = self.PT.val
+                self.PTOutFlowRec.val = self.PT.val
+                
             self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
             self.PTStartUp.setValue(qprocessdata.PTStartUp)
             self.PTFinal.setValue(qprocessdata.PTFinal)
@@ -243,7 +229,12 @@ class CheckProc():
             self.VOutFlow.setValue(qprocessdata.VOutFlow) 
             self.VolProcMed.setValue(qprocessdata.VolProcMed) 
             self.NDaysProc.setValue(qprocessdata.NDaysProc,err=0.0) #number -> exact value
-            self.HPerDayProc.setValue(qprocessdata.HPerDayProc) 
+            self.HPerDayProc.setValue(qprocessdata.HPerDayProc)
+
+#if 24.0 hours are specified, suppose that this value is exact.
+            if self.HPerDayProc.val > 23.99:
+                self.HPerDayProc.setValue(24.0,err=0.0)
+                
             self.NBatch.setValue(qprocessdata.NBatch,err=0.0) #number -> exact value
 
             if (qprocessdata.HeatRecOK == "yes"):
@@ -289,7 +280,7 @@ class CheckProc():
         if ANo == 0:
             qprocessdataTable = Status.DB.qprocessdata.Questionnaire_id[Status.PId].AlternativeProposalNo[ANo].ProcNo[self.ProcNo]
             if len(qprocessdataTable) > 0:
-                print "exporting data to qprocessdata"
+#                print "exporting data to qprocessdata"
                 qprocessdata = qprocessdataTable[0]
 
         
@@ -601,6 +592,8 @@ class CheckProc():
             else:
                 self.QHXdotProcInt1.setValue(0.0)
                 self.QHXdotProcInt2.setValue(0.0)
+                self.DTQHXOut.setValue(0.0)
+                self.DTQHXOut1.setValue(0.0)
 
                 
             self.UPHcdot1 = calcDiff("UPHcdot1",self.UPHcdotGross,self.QHXdotProcInt)
