@@ -706,7 +706,7 @@ class PanelQ4(wx.Panel):
 	    self.fillEquipmentList()
 
     def getPipeNames(self,IDString):
-        print "PanelQ4 (getPipeNames): Getting pipenames from :",IDString
+#        print "PanelQ4 (getPipeNames): Getting pipenames from :",IDString
         pipeDict = Status.prj.getPipeDict()
         if IDString is not None:
             pipeIDsSQL = IDString.split(';')
@@ -724,7 +724,7 @@ class PanelQ4(wx.Panel):
             if pipeID in pipeDict.keys():
                 pipes.append(pipeDict[pipeID])
                 
-        print "PanelQ4: Names of pipes stored in SQL :",pipes
+#        print "PanelQ4: Names of pipes stored in SQL :",pipes
         return pipes
             
     def getPipeIDString(self,nameList):

@@ -16,13 +16,14 @@
 #   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
 #                       13/04/2008 - 13/10/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger      01/04/2009
 #
 #       Changes to previous version:
 #       01/04/2009: HS  impossibility to save entries with empty name field
+#       06/04/2009: HS  separation of surface data and climate data in OK
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.NET (E4-Experts SL), Barcelona, Spain 2008/2009
@@ -488,14 +489,11 @@ class PanelQ7(wx.Panel):
                     "REInterest": 1,
                     "REReason": reason,
                     "REMotivation": "that's a good question",
-                    "Latitude":check(self.tc1_21.GetValue()),
-                    "ST_I":check(self.tc1_22.GetValue()),
-                    "TAmb":check(self.tc1_23.GetValue()),
                     }
 
                 if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
                     # register does not exist, so store also id
-                    tmp["Questionnaire_id"] = Status.PId
+                    tmp.update({"Questionnaire_id":Status.PId})
 
                     Status.DB.qrenewables.insert(tmp)
                     Status.SQL.commit()
@@ -506,53 +504,72 @@ class PanelQ7(wx.Panel):
                     q.update(tmp)
                     Status.SQL.commit()
 #..............................................................................
-# surface data
+# surface and climate data
 
             elif self.notebook.GetSelection()==1:
                 logTrack("PanelQ7 (OK button): writing surface specific data")
                 
+# - surface data
                 self.selectedSurfaceName = self.tc6_0.GetValue()
 
 # assure that a name has been entered before continuing
-                if len(self.selectedSurfaceName) == 0 or self.selectedSurfaceName is None:
-                    showWarning(_("You have to enter a name for the new surface before saving"))
-                    return
+                if len(self.selectedSurfaceName) > 0 and self.selectedSurfaceName is not None:
+                    surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
+                                SurfAreaName[check(self.selectedSurfaceName)]
 
-                surfaces = Status.DB.qsurfarea.ProjectID[Status.PId].\
-                            SurfAreaName[check(self.selectedSurfaceName)]
+                    if len(surfaces) == 0:
+                        surface = Status.prj.addSurfaceDummy()
+                    elif len(surfaces) == 1:
+                        surface = surfaces[0]
+                    else:
+                        showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
+                        surface = None
 
-                if len(surfaces) == 0:
-                    surface = Status.prj.addSurfaceDummy()
-                elif len(surfaces) == 1:
-                    surface = surfaces[0]
-                else:
-                    showWarning("PanelQ7 (ButtonOK): surface name has to be a uniqe value!")
-                    return
+                    if surface is not None:
+                        orientation = findKey(ORIENTATIONS,self.tc8.GetValue(text=True))
+                        if orientation in AZIMUTH.keys():
+                            azimuth = AZIMUTH[orientation]
+                        else:
+                            azimuth = None
+                            
+                        tmp = {
+                            "SurfAreaName":check(self.tc6_0.GetValue()),
+                            "SurfArea":check(self.tc6.GetValue()),
+                            "Inclination":check(self.tc7.GetValue()),
+                            "Azimuth":check(azimuth),
+                            "AzimuthClass":check(orientation),
+                            "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
+                            "Distance":check(self.tc10.GetValue()),
+                            "RoofType":check(findKey(ROOFTYPES,self.tc11.GetValue(text=True))),
+                            "RoofStaticLoadCap":check(self.tc12.GetValue())
+            #                "EnclBuildGroundSketch":check(findKey(TRANSYESNO,self.tc13.GetValue(text=True))),
+                           }
 
-                orientation = findKey(ORIENTATIONS,self.tc8.GetValue(text=True))
-                if orientation in AZIMUTH.keys():
-                    azimuth = AZIMUTH[orientation]
-                else:
-                    azimuth = None
-                    
+                        surface.update(tmp)
+                        Status.SQL.commit()
+
+                        Status.mod.moduleST.resetST()   #surface calculation no longer up to date
+
+
+# - climate data
                 tmp = {
-                    "SurfAreaName":check(self.tc6_0.GetValue()),
-                    "SurfArea":check(self.tc6.GetValue()),
-                    "Inclination":check(self.tc7.GetValue()),
-                    "Azimuth":check(azimuth),
-                    "AzimuthClass":check(orientation),
-                    "Shading":check(findKey(SHADINGTYPES,self.tc9.GetValue(text=True))),
-                    "Distance":check(self.tc10.GetValue()),
-                    "RoofType":check(findKey(ROOFTYPES,self.tc11.GetValue(text=True))),
-                    "RoofStaticLoadCap":check(self.tc12.GetValue())
-    #                "EnclBuildGroundSketch":check(findKey(TRANSYESNO,self.tc13.GetValue(text=True))),
-                   }
+                    "Latitude":check(self.tc1_21.GetValue()),
+                    "ST_I":check(self.tc1_22.GetValue()),
+                    "TAmb":check(self.tc1_23.GetValue()),
+                    }
 
-                surface.update(tmp)
-                Status.SQL.commit()
+                if len(Status.DB.qrenewables.Questionnaire_id[Status.PId]) == 0:
+                    # register does not exist, so store also id
+                    tmp.update({"Questionnaire_id":Status.PId})
 
-                Status.mod.moduleST.resetST()   #surface calculation no longer up to date
+                    Status.DB.qrenewables.insert(tmp)
+                    Status.SQL.commit()
 
+                else:
+                    # register does exist
+                    q = Status.DB.qrenewables.Questionnaire_id[Status.PId][0]
+                    q.update(tmp)
+                    Status.SQL.commit()
 
 #..............................................................................
 # biomass data

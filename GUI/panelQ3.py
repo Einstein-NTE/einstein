@@ -216,7 +216,7 @@ class PanelQ3(wx.Panel):
                               tip=_U("e.g. volume of liquid in a bottle for cleaning"))
 
         self.tc10 = FloatEntry(self.page0,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='POWER',
                               label=_U("Power requirement of the process in operation"),
                               tip=_U("Power requierment during operation at steady state (thermal losses, evapoartion, endogenous chemical recations; without heating of circulating fluid)"))
@@ -278,7 +278,7 @@ class PanelQ3(wx.Panel):
                               tip=_U("Minimum temperature to which the waste heat flow can be cooled. If there is no limit specify 0"))
 
         self.tc17 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+10, value=0.,
                               unitdict='VOLUME',
                               label=_U("Daily outflow of process medium"),
                               tip=_U("Can be different from the incoming flow if e.g. there is evaporation or some chemical reaction."))
@@ -292,14 +292,14 @@ class PanelQ3(wx.Panel):
 
         self.tc19 = ChoiceEntry(self.page1, 
                                values=TRANSYESNO.values(),
-                               label=_U("Exists heat from heat  recovery for the process?"),
-                               tip=_U("If affirmative, give some brief description of the heat recovery system"))
+                               label=_U("Exists internal heat  recovery for the process?"),
+                               tip=_U("If affirmative, specify the inlet temperature after heat recovery"))
         
 
-        self.tc20 = ChoiceEntry(self.page1,
-                                values=TRANSYESNO.values(),
-                               label=_U("Source of waste heat"),
-                               tip=_U("Specify the heat source (e.g. heat lossed from process X, flue gases from  boiler Y, etc)"))
+#        self.tc20 = ChoiceEntry(self.page1,
+#                                values=TRANSYESNO.values(),
+#                               label=_U("Source of waste heat"),
+#                               tip=_U("Specify the heat source (e.g. heat lossed from process X, flue gases from  boiler Y, etc)"))
 
         self.tc21 = FloatEntry(self.page1,
                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
@@ -417,19 +417,19 @@ class PanelQ3(wx.Panel):
         self.page0.SetSizer(sizer_4)
         
         # Right tab. Heat available for recovery
+        sizer_23.Add(self.tc18,   0, flagText, 1)
         sizer_23.Add(self.tc15_1, 0, flagText, 1)
         sizer_23.Add(self.tc15,   0, flagText, 1)
         sizer_23.Add(self.tc15_2, 0, flagText, 1)
         sizer_23.Add(self.tc16,   0, flagText, 1)
         sizer_23.Add(self.tc17,   0, flagText, 1)
-        sizer_23.Add(self.tc18,   0, flagText, 1)
 
         sizer_11.Add(sizer_23, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
         sizer_10.Add(sizer_11, 1, wx.EXPAND, 0)
         
         # Right tab. Recovery for this process
         sizer_24.Add(self.tc19, 0, flagText, 1)
-        sizer_24.Add(self.tc20, 0, flagText, 1)
+#        sizer_24.Add(self.tc20, 0, flagText, 1)
         sizer_24.Add(self.tc21, 0, flagText, 1)
 
         sizer_12.Add(sizer_24, 1, wx.LEFT|wx.TOP|wx.EXPAND, 10)
@@ -564,8 +564,12 @@ class PanelQ3(wx.Panel):
         else:
             self.tc19.SetValue("None")
 
-        self.tc20.SetValue(q.SourceWasteHeat)	
-        self.tc21.SetValue(str(q.PTInFlowRec))
+#        self.tc20.SetValue(q.SourceWasteHeat)
+        if q.HeatRecExist in TRANSYESNO:
+            if str(q.HeatRecExist) == "yes":
+                self.tc21.SetValue(str(q.PTInFlowRec))
+            else:
+                self.tc21.SetValue(str(q.PTInFlow))
 
         fluidDict = Status.prj.getFluidDict()        
         if q.SupplyMedDBFluid_id in fluidDict.keys():
@@ -622,7 +626,10 @@ class PanelQ3(wx.Panel):
 ### only one fluid per panel can be changed between mass/volume ...
         
         vOut = self.tc17.GetValue()
-        
+        if findKey(TRANSYESNO,self.tc19.entry.GetStringSelection()) == "no":
+            ptInflowRec = check(self.tc6.GetValue())
+        else:
+            ptInflowRec = check(self.tc21.GetValue())        
 
         tmp = {
             "Questionnaire_id":Status.PId,
@@ -649,8 +656,8 @@ class PanelQ3(wx.Panel):
             "VOutFlow":check(vOut), 
             "HeatRecOK":check(findKey(TRANSYESNO,self.tc18.entry.GetStringSelection())),
             "HeatRecExist":check(findKey(TRANSYESNO,self.tc19.entry.GetStringSelection())),
-            "SourceWasteHeat":check(findKey(TRANSYESNO,self.tc20.entry.GetStringSelection())), 	
-            "PTInFlowRec":check(self.tc21.GetValue()), 
+#            "SourceWasteHeat":check(findKey(TRANSYESNO,self.tc20.entry.GetStringSelection())), 	
+            "PTInFlowRec":ptInflowRec, 
             "SupplyMedDBFluid_id":check(findKey(fluidDict,self.tc22.entry.GetStringSelection())),
             "PipeDuctProc":check(self.tc23.GetValue(text=True)), 
             "TSupply":check(self.tc24.GetValue()), 
@@ -673,9 +680,9 @@ class PanelQ3(wx.Panel):
 #------------------------------------------------------------------------------		
 
     def display(self):
-        print "PanelQ3 (display): filling page"
+#        print "PanelQ3 (display): filling page"
         self.fillPage()
-        print "PanelQ3 (display): showing process"
+#        print "PanelQ3 (display): showing process"
         self.showProcess()
         self.Show()
 
@@ -699,12 +706,12 @@ class PanelQ3(wx.Panel):
 
     def fillChoiceOfPipe(self):
         pipeList = Status.prj.getPipeList("Pipeduct")
-        print "PanelQ3: pipeList = %r"%pipeList
+#        print "PanelQ3: pipeList = %r"%pipeList
         self.tc23.SetValue(pipeList)
 
     def fillChoiceOfHX(self):
         hxList = Status.prj.getHXList("HXName")
-        self.tc20.SetValue(hxList)
+#        self.tc20.SetValue(hxList)
 
 
     def fillPage(self):
@@ -749,7 +756,7 @@ class PanelQ3(wx.Panel):
         self.tc17.SetValue('')
         self.tc18.SetValue('')
         self.tc19.SetValue('')
-        self.tc20.SetValue('')
+#        self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
         self.tc23.SetValue('')
