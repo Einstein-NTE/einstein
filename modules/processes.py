@@ -39,6 +39,7 @@ from einstein.modules.constants import *
 from einstein.GUI.status import Status
 from einstein.modules.messageLogger import *
 from einstein.GUI.dialogGauge import DialogGauge
+import copy
 
 
 #------------------------------------------------------------------------------		
@@ -208,6 +209,63 @@ class Processes(object):
 
         Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
         Status.processData.outOfDate = False
+        
+#..............................................................................
+#   estimate equipment waste heat from annual QWHj and equipment schedules
+
+        equipments = Status.prj.getEquipments()
+
+        Status.int.QWHEqTotal_Tt = Status.int.createQ_Tt()
+        Status.int.QWHEqTotal_T = Status.int.createQ_T()
+        Status.int.QWHEqTotal_t = Status.int.createQ_t()
+        Status.int.QWHEqTotal = 0
+        
+        for equipe in equipments:
+            j = equipe.EqNo - 1
+            schedule = Status.schedules.equipmentSchedules[j]
+           
+            NT = Status.NT
+            Nt = Status.Nt
+
+# temperature distribution of waste heat. assumed as fix
+
+            TExhaustGas = equipe.TExhaustGas
+            if TExhaustGas == None:
+                logDebug("Processes: Equipment exhaust gas temperature not specified. 200 ºC assumed")
+                TExhaustGas = 200
+#            print "Process (calcAggDemand): Tgas(%s) = %s"%(j,TExhaustGas)
+
+            QWHj = equipe.QWHEq
+            if QWHj is None:
+                QWHj = 0.0
+            Status.int.QWHEqTotal += QWHj
+
+            TEnvEq = 15.0
+            dTtot = max(TExhaustGas-TEnvEq,1.e-10)
+
+            QWHj_T = Status.int.createQ_T()
+
+            for iT in range(Status.NT+2):
+                temp = Status.int.T[iT]
+                dT = max(temp - TEnvEq,0.)
+                QWHj_T[iT] = QWHj*max(0.0,1.0 - dT/dTtot)
+                Status.int.QWHEqTotal_T[iT] += QWHj_T[iT]
+                
+
+            QWHj_Tt = Status.int.createQ_Tt()
+            
+            for it in range(Nt):
+                time = Status.TimeStep*it
+                f = schedule.fav[it]
+#                print "t: %s f: %s"%(time,f)
+
+                for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
+                    QWHj_Tt[iT][it] = QWHj_T[iT]*f
+
+                    Status.int.QWHEqTotal_Tt[iT][it] += QWHj_Tt[iT][it]
+
+        Status.int.QWHEqTotal_t = copy.deepcopy(Status.int.QWHEqTotal_Tt[0])
+#        print "Process (calcAggDemand): QWHEq(t) = ",Status.int.QWHEqTotal_t
         
 #..............................................................................
 #   now run HR module for calculating heat recovery and effective demand at pipe entry
