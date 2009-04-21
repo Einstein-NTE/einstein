@@ -20,14 +20,16 @@
 #   Created by: 	Hans Schweiger, Tom Sobota, Stoyan Danov
 #                       10/03/2008 - 10/07/2008
 #
-#   Update No. 000
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          28/11/2008
+#                       Hans Schweiger          08/04/2009
 #
 #       Changes in last update:
 #
 #       28/11/2008: HS conversion to UNICODE; function setDefaultDemand eliminated
+#       08/04/2009: HS  QWHEqTotal added
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -123,6 +125,9 @@ class Interfaces(object):
     FETHeat_j = []
     HPerYearEq = []
     
+    QWHEqTotal_Tt = []    # heat recovered and fed directly to processes
+    QWHEqTotal_T = []
+
 # dictionary of the HC supply cascade. entries "equipeID" and "equipeNo"
 
     NEquipe = None
