@@ -1129,7 +1129,7 @@ class TextEntry(wx.Panel):
             self.entry.SetValue('')
             return
         
-        print "DisplayClasses (TextEntry - SetValue): value = %r"%value
+#        print "DisplayClasses (TextEntry - SetValue): value = %r"%value
         try:
             self.entry.SetValue(unicode(value,"utf-8"))
         except:
@@ -1269,7 +1269,7 @@ class ChoiceEntry(wx.Panel):
         # if 'thing' is a string, the choice will show the element that contains the string
         # if 'thing' is a list, the elements of the list will be loaded in the choice.
 
-        print "DisplayClasses (SetValue): %r"%thing
+#        print "DisplayClasses (SetValue): %r"%thing
 
         try:
             if isinstance(thing,int):
@@ -1283,7 +1283,7 @@ class ChoiceEntry(wx.Panel):
                     self.entry.Clear()
                     return
                 
-                print "DisplayClasses (ChoiceEntry - SetValue): value = %r"%thing
+#                print "DisplayClasses (ChoiceEntry - SetValue): value = %r"%thing
                 try:
                     thing = unicode(thing,"utf-8")
                 except:
@@ -1411,7 +1411,14 @@ class MultipleChoiceEntry(wx.Panel):
         try:
             if thing is None:
                 self.entry.Append(' ')
-            elif isinstance(thing,str):
+            elif isinstance(thing,str) or isinstance(thing,unicode):
+                try:
+                    thing = unicode(thing,"utf-8")
+                except:
+                    try:
+                        thing = unicode(thing,ENCODING)
+                    except:
+                        pass
                 self.entry.Append(thing)
             elif isinstance(thing,list):
                 # thing is a list of values for the control

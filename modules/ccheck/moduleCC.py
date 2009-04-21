@@ -19,14 +19,16 @@
 #   Created by: 	Claudia Vannoni, Hans Schweiger
 #                       20/04/2008 - 18/08/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
 #                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  08/04/2008
 #               
 #   06/04/2008  HS  Calculation of pipe operating hours added
 #                   Clean-up: elimination of prints
+#   08/04/2008  HS  "Congratulations" message eliminated in case of conflicts !!!
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
@@ -116,74 +118,6 @@ class ModuleCC(object):
 #------------------------------------------------------------------------------
 
 #..............................................................................
-# export screening data
-
-        logDebug("ModuleCC (updatePanel): screening with priority %s"%self.screen_priority)
-        
-        CCList = []
-        nMissingVarsOfPriority=0
-        
-        for entry in CCScreen.screenList:
-
-            if entry[4] <= self.screen_priority:
-
-                if entry[4] == 1:
-                    action = _U("Calculations w/o this are nonsense !!!")
-                elif entry[4] == 2:
-                    action = _U("Value required for detail analysis !!!")
-                else:
-                    action = _U("not strictly necessary")
-
-                varName = str(entry[0])
-                if varName in self.parameterList.keys():
-                    description = self.parameterList[varName]
-                else:
-                    description = ""
-#                print "ModuleCC (updatePanel): "
-#                print self.parameterList
-#                print MONTHS
-
-                if entry[1] is not None:
-                    val = '%9.2f'%entry[1]
-                    if entry[2] >= 1.0:
-                        err = '>100.00%'
-                    else:
-                        err = '%5.2f'%(100.0*pow(entry[2],0.5))+"%"
-                else:
-                    val = '---'
-                    err = '---'
-
-                if entry[4] == 1:
-                    highlight = 1
-                else:
-                    highlight = 0
-                    
-                row = [entry[0]+"["+entry[3]+"]",
-                       description,
-                       val,
-                       err,
-                       action,
-                       highlight]
-                
-                CCList.append(noneFilter(row))
-                nMissingVarsOfPriority+=1
-
-        if nMissingVarsOfPriority==0:
-            if CCScreen.nScreened == 0:
-                CCList.append(["","","","",""])
-            else:
-                CCList.append(["",_("CONGRATULATION: data set is sufficiently complete !!!"),"","",""])
-            
-        data = array(CCList)
-        Status.int.setGraphicsData(self.keys[0], data)  #sends the data to the GUI
-
-        nMissingVars = len(CCScreen.screenList)
-        nScreenedVars = CCScreen.nScreened
-        CCList = [nScreenedVars,"---",nMissingVarsOfPriority,self.screen_priority]
-
-        Status.int.setGraphicsData(self.keys[1], CCList)  #sends the data to the GUI
-
-#..............................................................................
 # export conflict data to panel
         
         conflictReport = []
@@ -249,6 +183,80 @@ class ModuleCC(object):
                                          
         data = array(conflictReport)
         Status.int.setGraphicsData("CC Conflict", data)  #sends the data to the GUI
+
+#..............................................................................
+# export screening data
+
+        if n == 0:  #no conflicts 
+            logDebug("ModuleCC (updatePanel): screening with priority %s"%self.screen_priority)
+            
+            CCList = []
+            nMissingVarsOfPriority=0
+            
+            for entry in CCScreen.screenList:
+
+                if entry[4] <= self.screen_priority:
+
+                    if entry[4] == 1:
+                        action = _U("Calculations w/o this are nonsense !!!")
+                    elif entry[4] == 2:
+                        action = _U("Value required for detail analysis !!!")
+                    else:
+                        action = _U("not strictly necessary")
+
+                    varName = str(entry[0])
+                    if varName in self.parameterList.keys():
+                        description = self.parameterList[varName]
+                    else:
+                        description = ""
+    #                print "ModuleCC (updatePanel): "
+    #                print self.parameterList
+    #                print MONTHS
+
+                    if entry[1] is not None:
+                        val = '%9.2f'%entry[1]
+                        if entry[2] >= 1.0:
+                            err = '>100.00%'
+                        else:
+                            err = '%5.2f'%(100.0*pow(entry[2],0.5))+"%"
+                    else:
+                        val = '---'
+                        err = '---'
+
+                    if entry[4] == 1:
+                        highlight = 1
+                    else:
+                        highlight = 0
+                        
+                    row = [entry[0]+"["+entry[3]+"]",
+                           description,
+                           val,
+                           err,
+                           action,
+                           highlight]
+                    
+                    CCList.append(noneFilter(row))
+                    nMissingVarsOfPriority+=1
+
+            if nMissingVarsOfPriority==0:
+                if CCScreen.nScreened == 0:
+                    CCList.append(["","","","",""])
+                else:
+                    CCList.append(["",_("CONGRATULATION: data set is sufficiently complete !!!"),"","",""])
+
+        else:  # in case of conflicts conflicts 
+            nMissingVarsOfPriority="---"
+            CCList = [["",_("ERROR: Your data set is not consistent"),"","",""]]
+            
+        data = array(CCList)
+        Status.int.setGraphicsData(self.keys[0], data)  #sends the data to the GUI
+
+        nMissingVars = len(CCScreen.screenList)
+        nScreenedVars = CCScreen.nScreened
+        CCList = [nScreenedVars,"---",nMissingVarsOfPriority,self.screen_priority]
+
+        Status.int.setGraphicsData(self.keys[1], CCList)  #sends the data to the GUI
+
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

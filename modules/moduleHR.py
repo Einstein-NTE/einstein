@@ -19,17 +19,20 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 002
+#   Update No. 003
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
 #                       Bettina Slawitsch       24/10/2008
+#                       Hans Schweiger          08/04/2009
 #
 #   Changes to previous version:
 #
 #   21/10/2008: HS  calculation of QD/QA and update of cascadeUpdateLevel
 #                   in HX Design
 #   24/10/2008: BS  update of HEX cost correlations and material properties
+#   08/04/2009: HS  waste heat from equipments added into calculation of
+#                   QWHAmb
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -155,7 +158,7 @@ class ModuleHR(object):
             dataReport = array(dataListReport)
 
             key = "HX%02d"%Status.ANo
-            print "%s\n"%key,dataReport
+#            print "%s\n"%key,dataReport
             Status.int.setGraphicsData(key, dataReport)
             
         except:
@@ -280,13 +283,25 @@ class ModuleHR(object):
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
         UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
 
-        QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw. will be reduced by QHX
+        QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
+#        self.__getQWHEqTotal()                  # calculates the total equipment waste heat flow
+#        QWHAmb_Tt = Status.int.createQ_Tt()
+        print "UPH_T = %r"%UPHProc_T
+
+        UPHw_T = Status.int.calcQ_T(UPHw_Tt)
+        print "UPHw_T = %r"%UPHw_T
+        
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt):
+                QWHAmb_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it]
+        
         QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
+        print "QWHAmb_T = %r"%QWHAmb_T
         
 #..............................................................................
 # read in PE2 result - remaining yearly demand and calculate QHX_T by difference
 
-        QHX_T_res = Status.int.createQ_T()   
+        QHX_T_res = Status.int.createQ_T()
 
         self.__calcQD_T()
         self.__calcQA_T()
@@ -296,6 +311,10 @@ class ModuleHR(object):
             iTw = min(iT+2,Status.NT+1)
             QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T[2])     #necessary, because waste heat from
                                                                 #exhaust gas not available ...       
+
+        print "QD_T = %r"%self.data.QD_T
+        print "QHX_T_res = %r"%QHX_T_res
+
 #..............................................................................
 # now distribute QHX_T to the time intervals
 
@@ -306,18 +325,23 @@ class ModuleHR(object):
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
             dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
+            print "dQHXmax(%s) = %r"%(timeShift,dQHXmax_T)
 
             dQHX_T[0] = 0
 
             for iT in range(1,Status.NT+2):
                 dQHX_T[iT] = min(dQHXmax_T[iT],QHX_T_res[iT])
                 maxSlopeD = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
+
                 iTw = iT+2
-                if iTw <= Status.NT+1:
-                    maxSlopeA = max(QWHAmb_T[iTw-1] - QWHAmb_T[iTw],0.0)
+
+                if iTw <= Status.NT+2:
+                    maxSlopeA = max(QWHAmb_T[iTw-1],0.0)
                 else:
                     maxSlopeA = 0.0
+                
                 maxSlope = min(maxSlopeA,maxSlopeD)
+
                 dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlope)
 
                 if dQHXmax_T[iT] > 0:
@@ -404,6 +428,8 @@ class ModuleHR(object):
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
 
         print "ModuleHR (__doPostProc.): USHTotal_T = ",Status.int.USHTotal_T
+        print "ModuleHR (__doPostProc.): UPHProcTotal_T = ",Status.int.UPHProcTotal_T
+        print "ModuleHR (__doPostProc.): QHXProcTotal_T = ",Status.int.QHXProcTotal_T
         print "ModuleHR (__doPostProc.): QWHAmb_T = ",Status.int.QWHAmb_T
             
 #------------------------------------------------------------------------------
@@ -427,12 +453,12 @@ class ModuleHR(object):
 
 #..............................................................................
 
-#first invert UPHw curve and shift 2 temperature intervals (DTmin)
+#first invert QWH curve and shift 2 temperature intervals (DTmin)
 
-            UPHw_max = QWH_Tt[2][itw]   
+            QWH_max = QWH_Tt[2][itw]   
             
             for iT in range(Status.NT):
-                QHX_Tt[iT][it] = (UPHw_max - QWH_Tt[iT+2][itw])  #maximum available energy
+                QHX_Tt[iT][it] = (QWH_max - QWH_Tt[iT+2][itw])  #maximum available energy
             QHX_Tt[Status.NT][it]   = QHX_Tt[Status.NT-1][it]         #includes shift by DTmin
             QHX_Tt[Status.NT+1][it] = QHX_Tt[Status.NT-1][it]
 
@@ -533,7 +559,7 @@ class ModuleHR(object):
                                 if (stream.HeatType == "latent")  and ((temperature - stream.StartTemp) >= 0):
                                     QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
         self.data.QD_Tt = QD_Tt     
-        #self.debugPrint("QD_Tt.csv", QD_Tt)     
+#        self.debugPrint("QD_Tt.csv", QD_Tt)     
     
     
     def __calcQA_Tt(self):
@@ -615,7 +641,7 @@ class ModuleHR(object):
                 return
         
             if (dlg.recalc):
-                print "Recalc hx:"
+#                print "Recalc hx:"
                 #calculation of hx cost             
                 wall_thickness = 0.001
                 Lambda         = 15.0
@@ -887,7 +913,7 @@ class ModuleHR(object):
                 UPHProc_Tt[iT][it] = self.data.QD_Tt[it][iT]    # heat supplied externally to processes
                 QWHAmb_Tt[iT][it] = self.data.QA_Tt[it][iT]      # remaining waste heat that currently is dissipated
 
-                print ("[%2d][%4d] QD %s QA %s "%(iT,it,self.data.QD_Tt[it][iT],self.data.QA_Tt[it][iT]))
+#                print ("[%2d][%4d] QD %s QA %s "%(iT,it,self.data.QD_Tt[it][iT],self.data.QA_Tt[it][iT]))
 
                 if iT == (Status.NT+1):
                     QDInData += self.data.QD_Tt[it][iT]
@@ -895,7 +921,7 @@ class ModuleHR(object):
                 if iT == 0:
                     QAInData += self.data.QA_Tt[it][iT]
                 
-        print "ModuleHR (doPostProcessing): QD %s QA %s "%(QDInData/1000,QAInData/1000)
+#        print "ModuleHR (doPostProcessing): QD %s QA %s "%(QDInData/1000,QAInData/1000)
 #..............................................................................
 # settings of the conversion UPH -> USH
 
@@ -941,6 +967,21 @@ class ModuleHR(object):
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
         
+#------------------------------------------------------------------------------
+    def __getQWHEqTotal(self):
+#------------------------------------------------------------------------------
+# calculates the total of waste heat for the equipments
+#------------------------------------------------------------------------------        
+
+        Status.int.QWHEqTotal_Tt = Status.int.createQ_Tt()
+        
+        for j in range(Status.NEquipe):
+            for iT in range(Status.NT+2):
+                for it in range(Status.Nt):
+                    Status.int.QWHEqTotal_Tt[iT][it] += Status.int.QWHj_Tt[j][iT][it]
+                    
+        Status.int.QWHEqTotal_T = Status.int.calcQ_T(Status.int.QWHEqTotal_Tt)
+                    
 #------------------------------------------------------------------------------
 # Helpers
 #------------------------------------------------------------------------------

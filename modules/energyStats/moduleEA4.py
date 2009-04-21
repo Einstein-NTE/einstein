@@ -47,6 +47,7 @@ from numpy import *
 from einstein.auxiliary.auxiliary import *
 from einstein.GUI.status import *
 from einstein.modules.interfaces import *
+from einstein.GUI.numCtrl import *
 import copy
 
 def _U(text):
@@ -258,6 +259,7 @@ class ModuleEA4(object):
                     dUPHProc.append(UPHProc[i]-UPHProc[i-1])
 
                 USH.append(Status.int.USHTotal_T[iT]/1000.0)
+                
                 USHPercCum.append(100*USH[i]/max(USHTotal,0.001))
                 if i == 0:
                     USHPerc.append(USHPercCum[i])
@@ -265,6 +267,8 @@ class ModuleEA4(object):
                 else:
                     USHPerc.append(USHPercCum[i] - USHPercCum[i-1])
                     dUSH.append(USH[i]-USH[i-1])
+                print "iT: %s T: %s USH %s dUSH %s"% \
+                      (iT,T,Status.int.USHTotal_T[iT]/1000.0,(USH[i]-USH[i-1]))
 
 # add last row for totals
             UPH.append(UPHTotal)
@@ -285,8 +289,23 @@ class ModuleEA4(object):
 #..............................................................................
 
 # data for EA4b table
+            print "TEST TEST TEST ModuleEA4"
+            print "dUSH = ",dUSH
+            print "data1 before array command: ",transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum])
+
+
+            for i in range(len(dUPH)):
+                dUPH[i] = convertDoubleToString(dUPH[i],nDecimals = 2)
+                UPHPerc[i] = convertDoubleToString(UPHPerc[i],nDecimals = 2)
+                UPHPercCum[i] = convertDoubleToString(UPHPercCum[i],nDecimals = 2)
+                dUSH[i] = convertDoubleToString(dUSH[i],nDecimals = 2)
+                USHPerc[i] = convertDoubleToString(USHPerc[i],nDecimals = 2)
+                USHPercCum[i] = convertDoubleToString(USHPercCum[i],nDecimals = 2)
+
             data1 = array(transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum]))
+            print "data1 = ", data1
             Status.int.setGraphicsData(self.keys[0],data1)
+
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4b_REPORT", data1)
@@ -301,14 +320,15 @@ class ModuleEA4(object):
 
             print 'iTmax =', iTmax
             print 'Status.int.T[0:iTmax] =', Status.int.T[0:iTmax]
-            print 'UPH_plot =', UPH_plot
-            print 'UPHproc_plot =', UPHproc_plot
-            print 'USH_plot =', USH_plot
             
             for iT in range(iTmax):
                 UPH_plot.append(Status.int.UPHTotal_T[iT]/1000.0)
                 UPHproc_plot.append(Status.int.UPHProcTotal_T[iT]/1000.0)
                 USH_plot.append(Status.int.USHTotal_T[iT]/1000.0)
+
+            print 'UPH_plot =', UPH_plot
+            print 'UPHproc_plot =', UPHproc_plot
+            print 'USH_plot =', USH_plot
 
             Status.int.setGraphicsData(self.keys[1],[Status.int.T[0:iTmax],
                                                      UPH_plot,

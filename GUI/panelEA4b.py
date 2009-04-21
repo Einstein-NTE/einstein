@@ -219,13 +219,15 @@ class PanelEA4b(wx.Panel):
                 self.grid1.SetRowAttr(r, attr)
                 
             for c in range(cols):
-                try:
-                    if decimals[c] >= 0: # -1 indicates text
-                        self.grid1.SetCellValue(r, c, \
-                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
-                    else:
-                        self.grid1.SetCellValue(r, c, data[r][c])
-                except: pass
+#                try:
+#                    if decimals[c] >= 0: # -1 indicates text
+#                        self.grid1.SetCellValue(r, c, \
+#                            convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+#                        print "CDTS: %r %r"%(data[r][c], \
+#                                             convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+#                    else:
+                self.grid1.SetCellValue(r, c, data[r][c])
+#                except: pass
                 if c == labels_column:
                     self.grid1.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
                 else:

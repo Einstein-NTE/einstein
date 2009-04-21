@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>EINSTEIN Tool User Manual</title></head>
+<body>
+<div style="text-align: center;"><img alt="einstein_logo" src="img/einstein_logo.jpg" style="width: 421px; height: 108px;"><br>
+</div>
+<br>
+<h1 style="text-align: center;">User Manual</h1>
+<br>
+<table style="width: 300px; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual_chap2.html">&lt;&lt;&lt;</a><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">UP</a><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual_chap7.html">&gt;&gt;&gt;</a><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h1><span style="font-weight: bold;">Chapter <span style="background-color: rgb(255, 255, 255);">5:</span> Consistency check module&nbsp;</span></h1>
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">A systematic
+analysis of the so called &#8220;status-quo&#8221; (present state (original)) is the
+starting point for the further identification of energy saving opportunities
+for a company. However, in most of the cases, this requires the acquisition of
+a rather large number of data. Besides the quantity, also the <i style="">accuracy</i> and the <i style="">consistency</i> of the available data affect significantly the
+reliability of the alternative solutions envisaged.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>In filling in
+the questionnaire for data acquisition You may face one or both of the
+following problems:</span></p>
+
+
+
+
+
+
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify; text-indent: -14.2pt;"><span lang="EN-GB"><o:p>&nbsp;</o:p></span><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><b style=""><span lang="EN-GB">Redundancy of information and possible conflicts among figures</span></b><span lang="EN-GB">. Redundancy may exist when <span style="">&nbsp;</span>two or more different ways to calculate the
+same parameter are possible. If the different ways lead to the same result, no
+problem arises. On the other hand, if results differs then You must choose the
+most reliable (which is the right one, which the wrong one ?) and &#8211; whatever
+You decide - as a consequence of the uncertainty You may still have doubts.<o:p></o:p></span></p><p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify; text-indent: -14.2pt;"><span lang="EN-GB"><o:p>&nbsp;</o:p></span><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><b style=""><span lang="EN-GB">Lack of information.</span></b><span lang="EN-GB"> You may not have all
+the information required for a detailed calculation. E.g. Both, the total and
+the most consuming process heat demand can be calculated (from the fuel
+consumption), but there may be no information on how the residual heat demand
+is spread between two other small processes.</span></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>An<span style="">&nbsp; </span>EINSTEIN basic consistency check allows to
+create a consistent data set with respect to mathematical and physical
+relationships and with respect to practical limit values given by engineering
+knowledge.&nbsp;<br>In the case of
+redundancy, conflicts are automatically detected and a list of error messages
+is produced.<br>In case of lack
+of information (and no conflict)<span style="">&nbsp; </span>the
+EINSTEIN software tool is able to calculate and to complete automatically the
+questionnaire with the missing data.&nbsp;</span></p>
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>Therefore, You
+can use the &#8220;consistency check module&#8221; in order to check:<br>a) whether the
+data gathered are consistent, or whether there are contradictions in the
+information You got (e.g. incorrect units of measurements)<br>b) whether
+relevant data are missing (and which data), so that You can ask explicitly for
+or estimate<span style="">&nbsp; </span>those figures.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>For more
+information, see also paragraph 3.6.1 of the EINSTEIN Audit Guide &#8221;Consistency
+and completeness checking of data&#8221; and<span style="">&nbsp;
+</span>paragraph 3.6.2 &#8220;Acquisition of missing information&#8221;.<o:p></o:p></span></p>
+<p style="text-align: justify;" class="MsoNormal"><span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">And now,
+let&#8217;s start.</span></p><img alt="CC Block Scheme" src="img/CC_blockscheme.jpg" height="238" width="454"><br><h2><span style="font-style: italic;"><small><small style="font-weight: normal;">Figure <span style="background-color: rgb(255, 255, 255);">5.1 </span></small></small></span><font style="font-weight: normal;" color="#000000"><font face="Arial"><font size="2"><span lang="en-GB"><i><span style="background: transparent none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;">Scheme of the basic consistency check procedure in the EINSTEIN
+software tool. &#8220;Nones&#8221; stands for unknown data (blank cells).</span></i></span></font></font></font></h2>
+<h2><b><span style="font-size: 16pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">How to get familiar with the consistency check?</span></b><span style="font-size: 16pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB"><o:p></o:p></span></h2>
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">In order to get
+familiar with the data input and the <i style="">consistency-check
+concept</i>, <span style="">&nbsp;</span>if You are a first-time
+user, it is recommended to perform first the<b style=""> example 4.2</b> (Go to the menu &#8220;Edit industry data&#8221;-&gt; Projects in
+the database and open the project &#8220;Einstein Guide 4.2 Basecase&#8221; and followings)
+according the description given into the Audit Guide, chapter 4.2.&nbsp;</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>Following a
+simple procedure for data entering may help to pass the consistency check in a
+shorter time.&nbsp;<br>In general, when
+entering data, it is recommended to enter the process&#8217; data first - and to
+check the consistency-, then the equipments&#8217; (but without any constraint such as
+e.g. the load factor) - and to check the consistency-, then the pipes&#8217; - and to
+check the consistency- and last, the overall energy consumption and to check
+the consistency of the complete data set.<br>Anyhow, take in
+mind that in order to perform the consistency check, equipments and pipes have
+to be previously created and linked each other and to the processes &#8211; but it
+can be done in the intermediates steps without adding any specific parameter
+such as the power etc. </span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">It is also
+recommended to analyse (i.e. to enter and check) sub-system by sub-system (e.g.
+enter FIRST data of equipment 1 and the related pipes and related processes
+THEN check the consistency and enter the second set of data:<span style="">&nbsp; </span>equipment 2 -&gt; related pipes -&gt; related
+processes&#8230;).</span></p>
+<h2><b><span style="font-size: 16pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">Lay-out of
+the consistency check module&nbsp;<o:p></o:p></span></b></h2>
+<p class="MsoNormal" style="text-align: justify;"><b style=""><span lang="EN-GB">In the first quadrant</span></b><span lang="EN-GB"> (top)
+&#8220;Cross checking of data&#8221;: <o:p></o:p></span></p>
+
+<ol style="margin-top: 0cm;" start="1" type="1"><li class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The <b style="">list of data calculated with insufficient accuracy</b> (max error
+     &gt; </span><span style="font-family: Symbol;" lang="EN-GB"><span style="">±</span></span><span lang="EN-GB">50%) is shown. To any parameter 5 attributes are associated :<o:p></o:p></span></li></ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify; margin-left: 38.44pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></span><span lang="EN-GB">Code<i style=""> Name</i> of the parameter.</span><br><span lang="EN-GB"></span></p><p class="MsoNormal" style="margin-left: 68.2pt; text-align: justify;"><span lang="EN-GB">Any parameter (such as FET, USH,UPH etc..) appear with a number into
+brackets. E.g. USH[1] etc.<br>In fact, to any &#8220;class of objects&#8221; used in EINSTEIN for modelling an
+energy system it is associated an index identifying a specific object within a
+class:</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">i to fuels</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">j to equipments</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">m&nbsp; to pipes</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">k to processes.<br>Moreover [0] stays for the total. E.g USH[0] is equal to the sum of
+the USH of any equipment &#8220;i&#8221; listed into the project<span style="">&nbsp; </span>equipment list:<br>USH[0] = &#931; USH (i)<br>E.g. if the number of equipments is 3 then:<br>USH[0] = USH[1] <span style="">&nbsp;</span>+ USH[2] <span style="">&nbsp;</span>+ USH[3]<br>It is clear now that any index different from 0 refers to equipment,
+fuel, process etc. number 1,2,3. E.g. UPH[1] represents the useful process heat
+of process 1 (as shown into the process list entered by the user) while e.g.
+FEC [2] is the final energy consumption of the fuel number 2, and so on.</span></p>
+
+<p class="MsoNormal" style="text-align: justify; text-indent: -14.2pt; margin-left: 68.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Description</span></i><span lang="EN-GB"> of the parameter as reported
+into the related field of the questionnaire</span></p>
+
+<p class="MsoNormal" style="margin-left: 68.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">(Numeric) <i style="">Value</i> of the parameter<span style="">&nbsp; </span>as
+calculated by the internal consistency check algorithm <o:p></o:p></span></p>
+
+<p class="MsoNormal" style="margin-left: 68.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Max</span></i><span lang="EN-GB"> (relative)<b style=""> </b><i style="">error</i><b style=""> </b>associated to the numeric value
+expressing the figure accuracy. E.g if the parameter Value = 100 and Max error
+= </span><span style="font-family: Symbol;" lang="EN-GB"><span style="">±</span></span><span lang="EN-GB">70% this means that, under the given assumptions and known data,
+acceptable values for the parameter range between 30 and 170</span></p>
+
+
+
+<p class="MsoNormal" style="margin-left: 68.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Action to be taken</span></i><span lang="EN-GB"> according the degree
+of analysis&#8217; accuracy chosen. &nbsp;</span></p>
+
+<ol style="margin-top: 0cm;" start="2" type="1"><li class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The <b style="">required accuracy</b><span style="">&nbsp;
+     </span>pop-up list (top-left) give to the user the possibility to chose
+     the level of detail and accuracy of the analysis among <i style="">Quick &amp; dirty, Standard, Detailed</i>.</span></li></ol>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>Below the first
+quadrant there are 3 buttons allowing the following functions:</span></p>
+
+<ol style="margin-top: 0cm;" start="1" type="1"><li class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The <i style="">basic check </i>(right-hand side<i style="">)</i>. Clicking on this button the user runs the consistency check
+     of the data previously entered into the electronic questionnaire </span></li><li class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The <i style="">data estimate </i>(in the middle). Clicking on this button the
+     tool estimates the new value of some of the parameters automatically calculated
+     by the system with a low accuracy. The algorithm attributes to those parameters
+     some &#8220;default&#8221; values based mainly on the engineering knowledge (e.g. an
+     estimated value for the conversion efficiency of a standard gas fired
+     boiler is 85%) </span></li><li class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">A <i style="">check list </i>(left-hand side) creation (not currently in
+     operation).</span></li></ol>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p></span><b style=""><span lang="EN-GB">In the second quadrant</span></b><span lang="EN-GB">
+(bottom) &#8220; Cross check statistics&#8221; 3 statistics are shown as soon as the
+consistency check have been run:</span></p>
+
+
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">The <i style="">number of data checked</i> by the system</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">The <i style="">number of input data fixed </i>after estimation (not currently in
+operation)</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><span lang="EN-GB">The <i style="">number of missing data </i>estimated automatically by the algorithm.</span></p><p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>Clicking on the <i style="">OK</i> button (bottom-left) user confirms
+and accepts the consistency check results, and accedes directly to the energy
+statistics modules.</span></p><p class="MsoNormal" style="text-align: justify;"><img alt="CC ScreenShotStandard" src="img/CC_screenshotstandard.bmp" height="742" width="1024"><span lang="EN-GB"></span></p><h2><span style="font-style: italic;"><small><small style="font-weight: normal;">Figure <span style="background-color: rgb(255, 255, 255);">5.2 Screen shot of the consistency check module rinnunig in a standard mode</span></small></small></span><font style="font-weight: normal;" color="#000000"><font face="Arial"><font size="2"><span lang="en-GB"><i><span style="background: transparent none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;">.</span></i></span></font></font></font></h2><span lang="EN-GB"></span><p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">Moreover, a<span style="">&nbsp; </span>windows named &#8220;Conflicts <span style="">&nbsp;</span>in parameter specifications&#8221; pops up anytime
+that there is a conflict among different values associated to one parameter. In
+this case the name and the values of the parameter are shown on the left-hand
+side, the level of accuracy in the central column while the background
+parameters into the right-hand side. The &#8220;background parameters&#8221; are those
+parameters that have been internally taken into consideration by the algorithm
+for the calculation. Based on energy balances, it is known that a variable can
+be calculated according different mathematical paths: if executing these
+different calculation paths the algorithm detects a conflict (i.e. two
+different results are obtained for the same parameter, e.g. for the final
+energy consumption of an equipment) then both figures will be shown into the
+conflicts list under the same parameter name together with the background parameters
+used for the calculations (e.g. in one case the power and the number of
+operating hours, and in the other, the fuel consumption and the conversion efficiency).
+</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>The list of the
+parameters affected by a conflict are reported together with the following
+attributes:<o:p></o:p></span></p>
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Parameters (values in conflict)</span></i><span lang="EN-GB">. Within
+this column, for each parameter the user can find 2 types of information (and 3
+data). On one hand, in the orange row it is reported the code name of the
+parameter affected by the conflict. In picture 5.3, the first row shows the
+following text (top-right): USHBoiler1[&lt;&gt;USHBoiler2]. It means that the
+parameter USHBoiler calculated according the equation 1 differs from the
+USHBoiler calculated according the equation 2. The index 1 and 2 refer to two
+different calculating ways (energy balances) run in the background by the
+consistency<span style="">&nbsp; </span>check module. For which
+boiler the conflict arises it is shown in the column <i style="">data group (accuracy) </i>where in the first orange row it is reported
+the type (Equipment) and the number of the unit ([2]). On the hand, the 2 rows
+under the orange one show two figures:<span style="">&nbsp;
+</span>they are the values of the parameter calculated respectively according
+the procedure 1 and 2.</span></p>
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Data group (accuracy)</span></i><span lang="EN-GB">. As already
+explained above, for each conflict this column gives 2 <span style="">&nbsp;</span>types of information (and 3 data): the
+reference unit (e.g. Equipment [2]) and the accuracies of the 2 values
+calculated respectively according the procedure 1 and 2. </span></p>
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify; text-indent: -14.2pt;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Description (calculated from)</span></i><span lang="EN-GB">. This
+column<span style="">&nbsp; </span>shows the background parameters
+used to calculate the values in conflicts (e.g. USHBoiler1 and USHBoiler2). Two
+list of parameters are given here e.g.:</span></p>
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify;"><span lang="EN-GB">1) HCGPnom, HPerDayEq&#8230;They mean that USHBoiler1 = HCGPnom x
+HPerDayEq x &#8230;.</span></p>
+
+
+
+<p class="MsoNormal" style="margin-left: 14.2pt; text-align: justify;"><span lang="EN-GB">2) &#8230;, HCGTEfficiency, FETFuel [4] [1], &#8230; They mean that USHBoiler2 =
+&#8230; HCGTEfficiency x FETFuel <span style="">&nbsp;</span>[4] [1]&#8230;<br>The 2 indexes refer respectively to equipment number ([4]) and to fuel
+number ([1] e.g. natural gas).</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">Concerning the &#8220;conflict
+messages&#8221;, besides the most important quantities such as FET/UPH/USH/QHX/QWH, described
+into the AUDIT GUIDE in chapter 2 and in the glossary, the following
+abbreviations/indexes/acronyms are used to compose the code name of a
+parameter:</span></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Proc</span></i><span lang="EN-GB"> for process related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Eq</span></i><span lang="EN-GB"> for equipment related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Pipe</span></i><span lang="EN-GB"> for pipe and duct related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Temp</span></i><span lang="EN-GB"> for temperature related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">PT</span></i><span lang="EN-GB"> for process temperature</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">M</span></i><span lang="EN-GB"> for mass related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Vol</span></i><span lang="EN-GB"> or <i style="">V</i> for volume related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">H</span></i><span lang="EN-GB"> per hours</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Env</span></i><span lang="EN-GB"> for environment</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Flow</span></i><span lang="EN-GB"> for (e.g.mass, medium..) flow
+related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">In/out</span></i><span lang="EN-GB"> for in/out (e.g. flows)</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">N</span></i><span lang="EN-GB"> for number (e.g. NDaysEq=Number of
+operating Days of an Equipment)</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Nom</span></i><span lang="EN-GB"> for nominal (e.g power)</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></span><i style=""><span lang="EN-GB">HCG</span></i><span lang="EN-GB"> for heat and cold generation related
+items (e.g. HCGPnom=heat or cold generation Nominal Power; HCGTEfficiency=
+Thermal Efficiency for &nbsp;&nbsp;&nbsp; Heat or Cold Generation)</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Consum</span></i><span lang="EN-GB"> for consumption</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Electr</span></i><span lang="EN-GB"> for electricity related items</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Fact</span></i><span lang="EN-GB"> for factor</span><br><!--[if !supportLists]--><span style="font-family: Symbol;" lang="EN-GB"><span style="">·<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><!--[endif]--><i style=""><span lang="EN-GB">Loss</span></i><span lang="EN-GB"> for losses related items.</span></p><p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The overall set
+of code names with the description and the translation into the project languages
+is also available as MS excel file.</span></p><p class="MsoNormal" style="text-align: justify;"><img alt="CC ScreenShotConflicts" src="img/CC_screenshotconflicts.bmp" height="720" width="1024"></p><h2><big><big><span style="font-style: italic;"><small><small><small><small style="font-weight: normal;">Figure<span style="background-color: rgb(255, 255, 255);"> 5.3 Screen shot of the "conflict" window inthe consistency check module&nbsp;</span></small></small></small></small></span></big></big></h2>
+<p class="MsoNormal" style=""><span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">&nbsp;</span><b><b><span style="font-size: 16pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">Levels of analysis in the consistency check module</span></b></b><b style=""><span lang="EN-GB"><o:p></o:p></span></b></p>
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The EINSTEIN
+methodology distinguishes between three levels of analysis with increasing
+level of detail and accuracy that are also taken into consideration for the
+consistency check (<i style="">required accuracy </i>option
+as previously described):</span><br><span style="font-family: &quot;MS Mincho&quot;;">&#10007;</span><span lang="EN-GB"> Level 1: <b style="">Quick&amp;Dirty</b> analysis.<br>For quick&amp;dirty analysis it is enough
+to know with a certain minimum accuracy (as minimum accuracy EINSTEIN considers
+an error margin of less than +/- 50 %) <span style="">&nbsp;</span>the energy consumption and the main
+temperature levels (process temperature) of the most energy consuming processes
+in the company (and also FEC/FET(0), USH(0) and (UPH (0) i.e. the totals) </span></p>
+
+
+
+
+
+
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span style="font-family: &quot;MS Mincho&quot;;">&#10007;</span><span lang="EN-GB"> Level 2:&nbsp;<b style="">Standard&nbsp;</b>analysis.<br>For the EINSTEIN
+standard level of analysis at least the following parameters should be known
+with the minimum level of accuracy:<br>- energy
+consumption of the main energy consuming processes and it's decomposition in
+heat&amp;cold demand for circulation, maintenance and start-up<br>- all
+temperature levels (inlet, process, outlet) and hours of operation of those
+processes and the corresponding
+heat &amp; cold supply equipment<br>- waste heat
+streams from the main energy consuming processes</span></p>
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span style="font-family: &quot;MS Mincho&quot;;">&#10007;</span><span lang="EN-GB"> Level 3: <b style="">Detailed </b>analysis.<br>For a detailed
+level of analysis at least the full set of information as given by the EINSTEIN
+basic&nbsp;questionnaire
+should be available with the required accuracy.</span></p>
+<span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">&nbsp;</span><b><b><span style="font-size: 16pt; font-family: &quot;Times New Roman&quot;;" lang="EN-GB">How to run the consistency check module?</span></b></b><br>
+
+
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">First, fill in
+data into the electronic questionnaire then select the consistency check option
+from the main function tree (right-hand side).<br>Chose the level of
+required accuracy and click on the basic check button.<br></span></p><p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">If the conflict window
+pops up click on the OK button (bottom &#8211; left) and go back to the questionnaire
+to modify or enter new data according the conflict messages.<br>Until when the
+conflict is not solved it is not possible to go further and to accede to the energy
+statistic module and to configure alternatives.<o:p></o:p></span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">If no conflict
+is detected, or after it is solved, <span style="">&nbsp;</span>user
+can either accept the results of the consistency check by clicking on the Ok button
+and go ahead, or he/she can go back to the questionnaire, enter manually the
+missing data and/or ask to EINSTEIN to estimate some parameters. In this case,
+before clicking on the button &#8220;estimate data&#8221;,<span style="">&nbsp;
+</span>it is necessary to pass again the consistency check.<o:p>&nbsp;</o:p></span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">In order to change
+the data entered into the questionnaire, it is necessary first to go to the
+main menu bar: click on the command &#8220;view&#8221; and select &#8220;present state
+(original)&#8221;. Any time this operation is done the consistency check has to be
+passed again.<o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">If the &#8220;present
+state (checked)&#8221; is selected after the consistency check, the user can accede
+the questionnaire<span style="">&nbsp; </span>to check the figures
+automatically calculated by the algorithm instead of &#8220;Nones&#8221; or blank
+fields.<span style="">&nbsp; </span><o:p></o:p></span></p>
+
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<br>
+<br>
+<span style="font-style: italic;"></span><br>
+</body></html>

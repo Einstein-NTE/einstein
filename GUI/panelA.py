@@ -403,7 +403,11 @@ class PanelA(wx.Panel):
         self.selectedProposal.SetLabel(Status.FinalAlternativeName)
 
         self.Hide()
-        self.panelAFig.draw()
+        
+#        self.panelAFig.draw()
+# for the moment blocked. figure not yet used. -> Problems V1.0.03 Bettina, Huyen,
+# some people in Brussels training course due to this ????
+
         self.Show()
         self.main.panelinfo.update()
         self.main.showMainMenuAlternatives()
