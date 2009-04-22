@@ -161,7 +161,7 @@ class ModuleEA4(object):
             TableColumnList1 = [Process, UPH, UPHPercentage,UPHc,UPHm,UPHs,PT,PST]
 
             matrix1 = transpose(TableColumnList1)
-            print 'moduleEA4: matrix1 =', matrix1
+#            print 'moduleEA4: matrix1 =', matrix1
             data1 = array(matrix1)
 
             Status.int.setGraphicsData("EA4a_Table", data1)
@@ -180,10 +180,10 @@ class ModuleEA4(object):
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4a_REPORT", reportData1)
-                print "EA4a_REPORT",reportData1
+#                print "EA4a_REPORT",reportData1
             elif Status.ANo == Status.FinalAlternative:
                 Status.int.setGraphicsData("EA4a_REPORT_F", reportData1)
-                print "EA4a_REPORT_F",reportData1
+#                print "EA4a_REPORT_F",reportData1
 
 #..............................................................................
 # Data for Panel EA4b: temperature dependent plots
@@ -267,8 +267,6 @@ class ModuleEA4(object):
                 else:
                     USHPerc.append(USHPercCum[i] - USHPercCum[i-1])
                     dUSH.append(USH[i]-USH[i-1])
-                print "iT: %s T: %s USH %s dUSH %s"% \
-                      (iT,T,Status.int.USHTotal_T[iT]/1000.0,(USH[i]-USH[i-1]))
 
 # add last row for totals
             UPH.append(UPHTotal)
@@ -289,10 +287,6 @@ class ModuleEA4(object):
 #..............................................................................
 
 # data for EA4b table
-            print "TEST TEST TEST ModuleEA4"
-            print "dUSH = ",dUSH
-            print "data1 before array command: ",transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum])
-
 
             for i in range(len(dUPH)):
                 dUPH[i] = convertDoubleToString(dUPH[i],nDecimals = 2)
@@ -303,7 +297,6 @@ class ModuleEA4(object):
                 USHPercCum[i] = convertDoubleToString(USHPercCum[i],nDecimals = 2)
 
             data1 = array(transpose([Titles,dUPH,UPHPerc,UPHPercCum,dUSH,USHPerc,USHPercCum]))
-            print "data1 = ", data1
             Status.int.setGraphicsData(self.keys[0],data1)
 
 
@@ -317,18 +310,11 @@ class ModuleEA4(object):
             UPH_plot = []
             UPHproc_plot = []
             USH_plot = []
-
-            print 'iTmax =', iTmax
-            print 'Status.int.T[0:iTmax] =', Status.int.T[0:iTmax]
             
             for iT in range(iTmax):
                 UPH_plot.append(Status.int.UPHTotal_T[iT]/1000.0)
                 UPHproc_plot.append(Status.int.UPHProcTotal_T[iT]/1000.0)
                 USH_plot.append(Status.int.USHTotal_T[iT]/1000.0)
-
-            print 'UPH_plot =', UPH_plot
-            print 'UPHproc_plot =', UPHproc_plot
-            print 'USH_plot =', USH_plot
 
             Status.int.setGraphicsData(self.keys[1],[Status.int.T[0:iTmax],
                                                      UPH_plot,
@@ -353,11 +339,11 @@ class ModuleEA4(object):
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4b_PLOT_REPORT",array(transpose(dataList)))
-                print "EA4b_PLOT_REPORT",array(transpose(dataList))
+#                print "EA4b_PLOT_REPORT",array(transpose(dataList))
 
             elif Status.ANo == Status.FinalAlternative:
                 Status.int.setGraphicsData("EA4b_PLOT_REPORT_F",array(transpose(dataList)))
-                print "EA4b_PLOT_REPORT_F",array(transpose(dataList))
+#                print "EA4b_PLOT_REPORT_F",array(transpose(dataList))
                 
 
 #..............................................................................
@@ -458,7 +444,7 @@ class ModuleEA4(object):
 
 # data for EA4c plot in report
 
-            print "ModuleEA4c: generating data for report"
+#            print "ModuleEA4c: generating data for report"
             timeReport = ["t"]
 
             DATAPOINTS = 100
@@ -469,8 +455,8 @@ class ModuleEA4(object):
                 it = int(step*itr)
                 timeReport.append(it*YEAR/Status.Nt)
 
-            print "step = %s itMax = %s Status.Nt = %s"%(step,itMax,Status.Nt)
-            print timeReport
+#            print "step = %s itMax = %s Status.Nt = %s"%(step,itMax,Status.Nt)
+#            print timeReport
 
             dataListReport = [timeReport]
             for i in range(len(TLevels)):
@@ -481,7 +467,7 @@ class ModuleEA4(object):
                 row.extend(USH[i][0:DATAPOINTS])
                 dataListReport.append(row)
             dataReport = array(transpose(dataListReport))
-            print "Data for EA4c_PLOT_REPORT\n",dataReport
+#            print "Data for EA4c_PLOT_REPORT\n",dataReport
 
             if Status.ANo == 0:
                 Status.int.setGraphicsData("EA4c_PLOT_REPORT",dataReport)

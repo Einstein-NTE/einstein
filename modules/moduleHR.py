@@ -19,12 +19,13 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 003
+#   Update No. 004
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
 #                       Bettina Slawitsch       24/10/2008
 #                       Hans Schweiger          08/04/2009
+#                       Hans Schweiger          22/04/2009
 #
 #   Changes to previous version:
 #
@@ -33,6 +34,8 @@
 #   24/10/2008: BS  update of HEX cost correlations and material properties
 #   08/04/2009: HS  waste heat from equipments added into calculation of
 #                   QWHAmb
+#   22/04/2009: HS  reprogramming of function doPostProcessing: bug-fixing
+#                   of translation QD_T -> UPHProc_Tt / QHXProc_Tt
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -282,21 +285,21 @@ class ModuleHR(object):
 
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
         UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
+#        print "UPH_T = %r"%UPHProc_T
 
         QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
 #        self.__getQWHEqTotal()                  # calculates the total equipment waste heat flow
 #        QWHAmb_Tt = Status.int.createQ_Tt()
-        print "UPH_T = %r"%UPHProc_T
 
         UPHw_T = Status.int.calcQ_T(UPHw_Tt)
-        print "UPHw_T = %r"%UPHw_T
+#        print "UPHw_T = %r"%UPHw_T
         
         for iT in range(Status.NT+2):
             for it in range(Status.Nt):
                 QWHAmb_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it]
         
         QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
-        print "QWHAmb_T = %r"%QWHAmb_T
+#        print "QWHAmb_T = %r"%QWHAmb_T
         
 #..............................................................................
 # read in PE2 result - remaining yearly demand and calculate QHX_T by difference
@@ -312,8 +315,8 @@ class ModuleHR(object):
             QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T[2])     #necessary, because waste heat from
                                                                 #exhaust gas not available ...       
 
-        print "QD_T = %r"%self.data.QD_T
-        print "QHX_T_res = %r"%QHX_T_res
+#        print "QD_T = %r"%self.data.QD_T
+#        print "QHX_T_res = %r"%QHX_T_res
 
 #..............................................................................
 # now distribute QHX_T to the time intervals
@@ -325,24 +328,40 @@ class ModuleHR(object):
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
             dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
-            print "dQHXmax(%s) = %r"%(timeShift,dQHXmax_T)
+#            print "dQHXmax(%s) = %r"%(timeShift,dQHXmax_T)
+
+# 1. if the actual heat recovery is less than the maximum possible, shift HCC to the left
+            QUnUsed = max(dQHXmax_T[Status.NT+1] - QHX_T_res[Status.NT+1],0.0)
+            dQHXmax = dQHXmax_T[Status.NT+1] - QUnUsed   
 
             dQHX_T[0] = 0
-
             for iT in range(1,Status.NT+2):
-                dQHX_T[iT] = min(dQHXmax_T[iT],QHX_T_res[iT])
+                
+# 2. dQHX_T = QHX_T_res; constrained by theoretical limit: dQHX_T >= dQHXmax_T
+
+                dQHX_T[iT] = max(dQHXmax_T[iT] - QUnUsed, QHX_T_res[iT])
+
+# 3. theoretical limit: dQHX <= dQHXmax
+                dQHX_T[iT] = min(dQHX_T[iT],dQHXmax)
+                
+# 4. theoretical limit: dQHX/dT <= dUPH/dT
+
                 maxSlopeD = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
 
-                iTw = iT+2
+# this should be no longer necessary, already implicit in condition QHX_T < HCC_real_T
+#                iTw = iT+2
+#
+#                if iTw <= Status.NT+2:
+#                    maxSlopeA = max(QWHAmb_T[iTw-1],0.0)
+#                else:
+#                    maxSlopeA = 0.0
+#                
+#                maxSlope = min(maxSlopeA,maxSlopeD)
 
-                if iTw <= Status.NT+2:
-                    maxSlopeA = max(QWHAmb_T[iTw-1],0.0)
-                else:
-                    maxSlopeA = 0.0
-                
-                maxSlope = min(maxSlopeA,maxSlopeD)
+                dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlopeD)
 
-                dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlope)
+#                print "ts %s iT %s dQHX %s maxSlopeD %s QHX_T_res %s dQHXmax %s QUnUsed %s"% \
+#                      (timeShift,iT,dQHX_T[iT],maxSlopeD,QHX_T_res[iT],dQHXmax_T[iT],QUnUsed)
 
                 if dQHXmax_T[iT] > 0:
                     fR = dQHX_T[iT]/dQHXmax_T[iT]
@@ -427,10 +446,10 @@ class ModuleHR(object):
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
 
-        print "ModuleHR (__doPostProc.): USHTotal_T = ",Status.int.USHTotal_T
-        print "ModuleHR (__doPostProc.): UPHProcTotal_T = ",Status.int.UPHProcTotal_T
-        print "ModuleHR (__doPostProc.): QHXProcTotal_T = ",Status.int.QHXProcTotal_T
-        print "ModuleHR (__doPostProc.): QWHAmb_T = ",Status.int.QWHAmb_T
+#        print "ModuleHR (__doPostProc.): USHTotal_T = ",Status.int.USHTotal_T
+#        print "ModuleHR (__doPostProc.): UPHProcTotal_T = ",Status.int.UPHProcTotal_T
+#        print "ModuleHR (__doPostProc.): QHXProcTotal_T = ",Status.int.QHXProcTotal_T
+#        print "ModuleHR (__doPostProc.): QWHAmb_T = ",Status.int.QWHAmb_T
             
 #------------------------------------------------------------------------------
     def __maxHRPotential(self,UPH_Tt,QWH_Tt,timeShift):
@@ -469,6 +488,9 @@ class ModuleHR(object):
 
             for iT in range(Status.NT+2):
                 QHX_Tt[iT][it] = max(0.0,QHX_Tt[iT][it]-shift)          # = shift of HCC in Q
+
+#            print "shift(%s) = %s, QWHmax: %s QHX[2] %s QHX[3] %s QHXtotal %s"% \
+#                  (it,shift,QWH_max,QHX_Tt[2][it],QHX_Tt[3][it],QHX_Tt[Status.NT+1][it])
             
         return QHX_Tt        
 
