@@ -71,4 +71,4 @@ class DialogA(wx.Dialog):
         self.EndModal(wx.ID_OK)
 
     def OnButtonCancelButton(self, event):
-        self.EndModal(wx.Cancel)
+        self.EndModal(wx.ID_CANCEL)

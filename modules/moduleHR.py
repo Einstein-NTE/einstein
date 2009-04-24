@@ -288,8 +288,7 @@ class ModuleHR(object):
 #        print "UPH_T = %r"%UPHProc_T
 
         QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
-#        self.__getQWHEqTotal()                  # calculates the total equipment waste heat flow
-#        QWHAmb_Tt = Status.int.createQ_Tt()
+
 
         UPHw_T = Status.int.calcQ_T(UPHw_Tt)
 #        print "UPHw_T = %r"%UPHw_T
@@ -322,17 +321,16 @@ class ModuleHR(object):
 # now distribute QHX_T to the time intervals
 
         dQHX_T =Status.int.createQ_T()   #exchanged heat correspon
-                
+                                
         for timeShift in range(0,25):  # maximum one day time shift ... if that's not enough send error message !!!
 
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
             dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
-#            print "dQHXmax(%s) = %r"%(timeShift,dQHXmax_T)
 
 # 1. if the actual heat recovery is less than the maximum possible, shift HCC to the left
             QUnUsed = max(dQHXmax_T[Status.NT+1] - QHX_T_res[Status.NT+1],0.0)
-            dQHXmax = dQHXmax_T[Status.NT+1] - QUnUsed   
+            dQHXmax = dQHXmax_T[Status.NT+1] - QUnUsed
 
             dQHX_T[0] = 0
             for iT in range(1,Status.NT+2):
@@ -347,29 +345,37 @@ class ModuleHR(object):
 # 4. theoretical limit: dQHX/dT <= dUPH/dT
 
                 maxSlopeD = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
+                maxSlopeRes = max(QHX_T_res[iT] - QHX_T_res[iT-1],0.0)
 
 # this should be no longer necessary, already implicit in condition QHX_T < HCC_real_T
-#                iTw = iT+2
-#
-#                if iTw <= Status.NT+2:
-#                    maxSlopeA = max(QWHAmb_T[iTw-1],0.0)
-#                else:
-#                    maxSlopeA = 0.0
-#                
-#                maxSlope = min(maxSlopeA,maxSlopeD)
+                iTw = iT+2
 
-                dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1]+maxSlopeD)
+                if iTw <= Status.NT+2:
+                    maxSlopeA = max(QWHAmb_T[iTw-1],0.0)
+                else:
+                    maxSlopeA = 0.0
+                
+                maxSlope = min(maxSlopeA,maxSlopeD)
+                maxSlope = min(maxSlopeRes,maxSlope)
+
+                dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1] + maxSlope)
 
 #                print "ts %s iT %s dQHX %s maxSlopeD %s QHX_T_res %s dQHXmax %s QUnUsed %s"% \
 #                      (timeShift,iT,dQHX_T[iT],maxSlopeD,QHX_T_res[iT],dQHXmax_T[iT],QUnUsed)
 
                 if dQHXmax_T[iT] > 0:
                     fR = dQHX_T[iT]/dQHXmax_T[iT]
-                else:
-                    fR = 0.0
+                    for it in range(Status.Nt):
+                        dQHX_Tt[iT][it] *= fR #correction real vs. theoretical (maximum) heat recovery
+                elif UPHProc_T[iT] > 0:
+                    fR = dQHX_T[iT]/UPHProc_T[iT]
+                    for it in range(Status.Nt):
+                        dQHX_Tt[iT][it] = UPHProc_Tt[iT][it]*fR #correction real vs. theoretical (maximum) heat recovery
 
+                else:
+                    pass                #if this is the case, leaved QHX_Tt = 0 !!!
+                
                 for it in range(Status.Nt):
-                    dQHX_Tt[iT][it] *= fR #correction real vs. theoretical (maximum) heat recovery
                     QHXProc_Tt[iT][it] += dQHX_Tt[iT][it]
                     UPHProc_Tt[iT][it] -= dQHX_Tt[iT][it]
 
@@ -386,17 +392,14 @@ class ModuleHR(object):
 
                 itw = (it + Status.Nt - timeShift)%Status.Nt
                 
-                for iTw in range(Status.NT+2):
+                for iTw in range(Status.NT+1):
                     iT = max(iTw-2,0)
                     QWHAmb_Tt[iTw][itw] -= (dQHX_Tt[Status.NT+1][it] - dQHX_Tt[iT][it])
+                    QWHAmb_Tt[iTw][itw] = max(QWHAmb_Tt[iTw][itw],0.0)
+                    if iTw > 0:
+                        QWHAmb_Tt[iTw][itw] = min(QWHAmb_Tt[iTw][itw],QWHAmb_Tt[iTw-1][itw])    #guarantee monotonous curve
 
             QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
-
-########## HS2008-10-18: restrict number of iterations (timeShifts)as otherwise calculation time
-# gets unnecessarily long
-# there are small numeric errors between PE2 and Einstein, and Exhaust Gas is not yet in EINSTEIN's
-# internal waste heat treatment, so ... in order to survive for the moment ...
-# XXX XXX 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 2B CHECKED 
 
             if QHX_T_res[Status.NT+1] < 0.01*UPHProc_T[Status.NT+1]:
                 break

@@ -76,7 +76,10 @@ COLNO = 6
 MAXROWS = 20
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 #------------------------------------------------------------------------------		
 def drawFigure(self):
@@ -323,7 +326,7 @@ class PanelBM1(wx.Panel):
               pos=wx.Point(448, 416), size=wx.Size(120, 13), style=0)
 
         self.stSearchCrit2Unit = wx.StaticText(id=wxID_PANELBM1STSEARCHCRIT2UNIT,
-              label=_U('[M\x80]'), name='stSearchCrit2Unit', parent=self,
+              label=_U('[M€]'), name='stSearchCrit2Unit', parent=self,
               pos=wx.Point(592, 416), size=wx.Size(22, 13), style=0)
 
         self.stSearchCrit3 = wx.StaticText(id=wxID_PANELBM1STSEARCHCRIT3,

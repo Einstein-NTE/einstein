@@ -399,6 +399,7 @@ class PanelA(wx.Panel):
 
         self.grid.SelectRow(Status.ANo+1)
         self.ANo = Status.ANo
+        self.selectedRow = self.ANo + 1
 
         self.selectedProposal.SetLabel(Status.FinalAlternativeName)
 
@@ -428,12 +429,16 @@ class PanelA(wx.Panel):
         self.description = _U("based on present state")
         
         pu1 =  DialogA(self)
-        if pu1.ShowModal() == wx.ID_OK:
+        ret = pu1.ShowModal()
+        if ret == wx.ID_OK:
 
-            Status.prj.createNewAlternative(0,self.shortName,self.description)
-            self.display()
+            if self.shortName is not None:
+                if self.description is None:
+                    self.description = "---"
+                Status.prj.createNewAlternative(0,self.shortName,self.description)
+                self.display()
 
-        elif pu1.ShowModal() == wx.ID_Cancel:
+        elif ret == wx.ID_CANCEL:
             print "PanelA - Cancel"
         else:
             print "PanelA ???"
@@ -451,12 +456,13 @@ class PanelA(wx.Panel):
                            self.grid.GetCellValue(self.selectedRow,1)+ u')'
 
         pu1 =  DialogA(self)
-        if pu1.ShowModal() == wx.ID_OK:
+        ret = pu1.ShowModal()
+        if ret == wx.ID_OK:
 
             Status.prj.createNewAlternative(self.ANo,self.shortName,self.description)
             self.display()
 
-        elif pu1.ShowModal() == wx.ID_Cancel:
+        elif ret == wx.ID_CANCEL:
             print "PanelA - Cancel"
         else:
             print "PanelA - ???"

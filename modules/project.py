@@ -267,6 +267,8 @@ class Project(object):
         if len(aa) > 0:
             a = aa[0]
             a.ShortName = check(shortName)
+            if description is None:
+                description = "---"
             a.Description = check(description)
 
             Status.SQL.commit()
@@ -404,6 +406,7 @@ class Project(object):
                             logTrack("Project (getAlternativeList): no EnergyCost available")
                             EnergyCost = 0.0
                         
+                        if a.Description is None: a.Description = "---"
                         alternativeList.append([a.AlternativeProposalNo,
                                                 unicode(a.ShortName,"utf-8"),
                                                 unicode(a.Description,"utf-8"),
@@ -413,6 +416,7 @@ class Project(object):
                         if ANo in [-1,0]:
                             alternativeList.append(defaultList[ANo+1])
                 else:
+                    if a.Description is None: a.Description = "---"
                     alternativeList.append([a.AlternativeProposalNo,
                                             unicode(a.ShortName,"utf-8"),
                                             unicode(a.Description,"utf-8"),

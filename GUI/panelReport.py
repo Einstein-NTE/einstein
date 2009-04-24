@@ -208,10 +208,10 @@ class PanelReport(wx.Panel):
 
         sprojects = Status.DB.sproject.ProjectID[Status.PId]
         if len(sprojects) > 0:
-            summary = unicode(sprojects[0].Summary,"utf-8")
-
-            if summary is not None:
+            if sprojects[0].Summary is not None:
+                summary = unicode(sprojects[0].Summary,"utf-8")
                 self.tc1.SetValue(summary)
+
         self.Show()
         
 #------------------------------------------------------------------------------		
