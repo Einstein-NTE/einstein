@@ -19,13 +19,14 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 004
+#   Update No. 005
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
 #                       Bettina Slawitsch       24/10/2008
 #                       Hans Schweiger          08/04/2009
 #                       Hans Schweiger          22/04/2009
+#                       Hans Schweiger          29/04/2009
 #
 #   Changes to previous version:
 #
@@ -36,6 +37,8 @@
 #                   QWHAmb
 #   22/04/2009: HS  reprogramming of function doPostProcessing: bug-fixing
 #                   of translation QD_T -> UPHProc_Tt / QHXProc_Tt
+#   29/04/2009: HS  additional checks of first- and second-law constraints
+#                   for UPHProc_Tt and QHXProc_Tt
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -312,10 +315,17 @@ class ModuleHR(object):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
             iTw = min(iT+2,Status.NT+1)
             QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T[2])     #necessary, because waste heat from
-                                                                #exhaust gas not available ...       
+                                                                #exhaust gas not available ...
+#            print "iT %s UPH %s QD %s QHX %s"% \
+#                  (iT,Status.int.UPHTotal_T[iT],self.data.QD_T[iT],QHX_T_res[iT])
 
-#        print "QD_T = %r"%self.data.QD_T
-#        print "QHX_T_res = %r"%QHX_T_res
+# security check. in some cases strange behaviour is obtained
+        for iT in range(Status.NT,-1,-1):
+            diff = QHX_T_res[iT] - QHX_T_res[iT+1]
+            if diff > 1.e-10:
+                logDebug("ModuleHR (doPostProcessing): Severe error corrected in PE2 results - negative slope in QHX at T = %s"% \
+                         (Status.int.T[iT]))
+            QHX_T_res[iT] = min(QHX_T_res[iT],QHX_T_res[iT+1])
 
 #..............................................................................
 # now distribute QHX_T to the time intervals
@@ -324,6 +334,8 @@ class ModuleHR(object):
                                 
         for timeShift in range(0,25):  # maximum one day time shift ... if that's not enough send error message !!!
 
+#            print "time shift = %s"%timeShift
+            
             dQHX_Tt = self.__maxHRPotential(UPHProc_Tt,QWHAmb_Tt,timeShift)
 
             dQHXmax_T = Status.int.calcQ_T(dQHX_Tt)    # maximum heat recovery as reference for calculating fR
@@ -333,15 +345,16 @@ class ModuleHR(object):
             dQHXmax = dQHXmax_T[Status.NT+1] - QUnUsed
 
             dQHX_T[0] = 0
-            for iT in range(1,Status.NT+2):
-                
+            for iT in range(1,Status.NT+2):       
+
 # 2. dQHX_T = QHX_T_res; constrained by theoretical limit: dQHX_T >= dQHXmax_T
 
                 dQHX_T[iT] = max(dQHXmax_T[iT] - QUnUsed, QHX_T_res[iT])
+                dQHX_T[iT] = max(dQHX_T[iT],dQHX_T[iT-1])
 
 # 3. theoretical limit: dQHX <= dQHXmax
                 dQHX_T[iT] = min(dQHX_T[iT],dQHXmax)
-                
+                                    
 # 4. theoretical limit: dQHX/dT <= dUPH/dT
 
                 maxSlopeD = max(UPHProc_T[iT] - UPHProc_T[iT-1],0.0)
@@ -360,30 +373,125 @@ class ModuleHR(object):
 
                 dQHX_T[iT] = min(dQHX_T[iT],dQHX_T[iT-1] + maxSlope)
 
-#                print "ts %s iT %s dQHX %s maxSlopeD %s QHX_T_res %s dQHXmax %s QUnUsed %s"% \
-#                      (timeShift,iT,dQHX_T[iT],maxSlopeD,QHX_T_res[iT],dQHXmax_T[iT],QUnUsed)
-
-                if dQHXmax_T[iT] > 0:
-                    fR = dQHX_T[iT]/dQHXmax_T[iT]
-                    for it in range(Status.Nt):
-                        dQHX_Tt[iT][it] *= fR #correction real vs. theoretical (maximum) heat recovery
-                elif UPHProc_T[iT] > 0:
+                if UPHProc_T[iT] > 0:
                     fR = dQHX_T[iT]/UPHProc_T[iT]
                     for it in range(Status.Nt):
                         dQHX_Tt[iT][it] = UPHProc_Tt[iT][it]*fR #correction real vs. theoretical (maximum) heat recovery
 
                 else:
-                    pass                #if this is the case, leaved QHX_Tt = 0 !!!
-                
+                    fR = -1.0
+                    pass                #if this is the case, leave dQHX_Tt = 0 !!!
+
+# check constraint dQHX/dT <= dUPH/dT for each time interval
+
+            for iT in range(1,Status.NT+2):       
+#                print "CHECKING constraint dQHX/dT <= dUPH/dT for instantaneous dQHX at iT = %s"%iT
+                for n in range(10):
+                    dP = 0.0
+                    nP = 0
+                    dN = 0.0
+                    nN = 0
+                    EPS = 1.e-10
+                    PList = []
+                    NList = []
+                    dQP = []
+                    for it in range(Status.Nt):
+                        ddQHX = dQHX_Tt[iT][it] - dQHX_Tt[iT-1][it]
+                        dUPHProc = UPHProc_Tt[iT][it] - UPHProc_Tt[iT-1][it]
+                        
+                        if ddQHX > (dUPHProc + EPS):
+                            dP += ddQHX - dUPHProc
+                            nP += 1
+                            PList.append(it)
+#                            print "ModuleHR (doPostProcessing): dQHX/dT too high at iT,it=[%s][%s] ddQHX %s dUPHProc %s"% \
+#                                  (iT,it,ddQHX,dUPHProc)
+                        elif ddQHX < (dUPHProc - EPS):
+                            dN += dUPHProc - ddQHX
+                            nN += 1
+                            NList.append(it)
+                            
+                        dQP.append(ddQHX - dUPHProc)
+
+#                    print "n = %s nP = %s nN = %s"%(n,nP,nN)
+                    
+                    if nP == 0:
+#                        print "dQHX_Tt check interrupted after %s iterations"%n
+                        break
+                    else:
+                        for iTp in range(iT,Status.NT+2):
+                            for it in PList:
+                                dQHX_Tt[iTp][it] -= dQP[it]
+#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                      (iTp,it,dQHX_Tt[iTp][it]+dQP[it],dQHX_Tt[iTp][it])
+                                
+                            for it in NList:
+                                dQHX_Tt[iT][it] += dP/nN
+#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                      (iTp,it,dQHX_Tt[iTp][it]-dP/nN,dQHX_Tt[iTp][it])
+
+                    if nP == 9:
+                        logDebug("ModuleHR (doPostProcessing): ERROR - dQHX_Tt check not converged for iT = %s!!!!"%iT)
+
+# check constraint dQHX_Tt/dT >= 0
+
+            for iT in range(1,Status.NT+2):       
+#                print "CHECKING constraint dQHX/dT >= 0 for instantaneous dQHX"
+                for n in range(10):
+                    dP = 0.0
+                    nP = 0
+                    dN = 0.0
+                    nN = 0
+                    EPS = 1.e-10
+                    PList = []
+                    NList = []
+                    dQP = []
+                    for it in range(Status.Nt):
+                        ddQHX = dQHX_Tt[iT][it] - dQHX_Tt[iT-1][it]
+                        
+                        if ddQHX < - EPS:
+                            dP -= ddQHX
+                            nP += 1
+                            PList.append(it)
+#                            print "ModuleHR (doPostProcessing): dQHX/dT too low at iT,it=[%s][%s] ddQHX %s"% \
+#                                  (iT,it,ddQHX)
+                        elif ddQHX > EPS:
+                            nN += 1
+                            NList.append(it)
+                            
+                        dQP.append(-ddQHX)
+
+#                    print "n = %s nP = %s nN = %s"%(n,nP,nN)
+                    
+                    if nP == 0:
+#                        print "dQHX_Tt check 2 interrupted after %s iterations"%n
+                        break
+                    else:
+                        for iTp in range(iT,Status.NT+2):
+                            for it in PList:
+                                dQHX_Tt[iTp][it] += dQP[it]
+                                
+#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                      (iTp,it,dQHX_Tt[iTp][it]-dQP[it],dQHX_Tt[iTp][it])
+                                
+                            for it in NList:
+                                dQHX_Tt[iTp][it] -= dP/nN
+                                
+#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                      (iTp,it,dQHX_Tt[iTp][it]+dP/nN,dQHX_Tt[iTp][it])
+                    
+
+# now add/subtract dQHX (for the present time shift) from QHXProc/UPHProc
+            for iT in range(1,Status.NT+2):
                 for it in range(Status.Nt):
+
                     QHXProc_Tt[iT][it] += dQHX_Tt[iT][it]
                     UPHProc_Tt[iT][it] -= dQHX_Tt[iT][it]
-
 
             UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
             dQHX_T = Status.int.calcQ_T(dQHX_Tt)    # real heat recovery corresponding to this time shift
 
-# substract exchanged heat from 
+# substract exchanged heat from residual QHX still to be allocated
+
             for iT in range(Status.NT+2):
                 QHX_T_res[iT] -= dQHX_T[iT]
                 QHX_T_res[iT] = max(QHX_T_res[iT],0.0)
@@ -820,6 +928,12 @@ class ModuleHR(object):
         UPH_Tt = Status.int.UPHTotal_Tt
         UPHw_Tt = Status.int.UPHwTotal_Tt
 
+        QWH_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt):
+                QWH_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it]
+        
+
 #..............................................................................
 # settings of the conversion
 
@@ -848,10 +962,14 @@ class ModuleHR(object):
 
 #first invert UPHw curve and shift 2 temperature intervals (DTmin)
 
-            UPHw_max = UPHw_Tt[2][it]   
+            QWH_max = QWH_Tt[2][it]   
             
             for iT in range(Status.NT):
-                QHXProc_Tt[iT][it] = fHR*(UPHw_max - UPHw_Tt[iT+2][it])  #maximum available energy
+                QHXProc_Tt[iT][it] = fHR*(QWH_max - QWH_Tt[iT+2][it])  #maximum available energy
+                if iT > 0:
+                    if QHXProc_Tt[iT][it] <= QHXProc_Tt[iT-1][it] - 0.001:
+                        print "error in slope of QWH[%s][%s]"%(iT,it)
+
             QHXProc_Tt[Status.NT][it]   = QHXProc_Tt[Status.NT-1][it]         #includes shift by DTmin
             QHXProc_Tt[Status.NT+1][it] = QHXProc_Tt[Status.NT-1][it]
 
@@ -861,18 +979,30 @@ class ModuleHR(object):
                 shift = max(shift,QHXProc_Tt[iT][it]-UPH_Tt[iT][it])      #assure that QHXProc < UPH
 
             for iT in range(Status.NT+2):
-                QHXProc_Tt[iT][it] = max(0.0,QHXProc_Tt[iT][it]-shift)                                        # = shift of HCC in Q
+                QHXProc_Tt[iT][it] = max(0.0,QHXProc_Tt[iT][it]-shift)    # = shift of HCC in Q
+
+                if iT > 0:
+                    if QHXProc_Tt[iT][it] <= QHXProc_Tt[iT-1][it] - 0.001:
+                        print "error in slope of QHXProc[%s][%s] after shift"%(iT,it)
             
 #substract recovered heat from total available waste heat -> QHWAmb
             QHXProc_max = QHXProc_Tt[Status.NT+1][it]
-            QWHAmb_Tt[0][it] = UPHw_Tt[0][it]
-            QWHAmb_Tt[1][it] = UPHw_Tt[1][it]
+            QWHAmb_Tt[0][it] = QWH_Tt[0][it]
+            QWHAmb_Tt[1][it] = QWH_Tt[1][it]
             for iT in range(2,Status.NT+2):
-                QWHAmb_Tt[iT][it] = UPHw_Tt[iT][it] - (QHXProc_max-QHXProc_Tt[iT-2][it])
-
+                QWHAmb_Tt[iT][it] = QWH_Tt[iT][it] - (QHXProc_max-QHXProc_Tt[iT-2][it])
+                
 #substract recovered heat from demand -> UPHProc
             for iT in range(Status.NT+2):
                 UPHProc_Tt[iT][it] = UPH_Tt[iT][it] - QHXProc_Tt[iT][it] 
+
+#cut "noses" in UPHProc
+            for iT in range(Status.NT,-1,-1):
+                UPHProc_Tt[iT][it] = min(UPHProc_Tt[iT+1][it],UPHProc_Tt[iT][it])
+
+                if iT > 0:
+                    if UPHProc_Tt[iT][it] <= UPHProc_Tt[iT-1][it] - 0.001:
+                        print "error in slope of UPHProc[%s][%s]"%(iT,it)
                            
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
