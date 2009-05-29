@@ -215,7 +215,7 @@ class CheckEq():
 
                 fuel_number = qgenerationhc.DBFuel_id   #IMPORT from the fuelDB
 
-                if fuel_number <= 0 or fuel_number is None:
+                if fuel_number <= 0 or fuel_number is None or qgenerationhc.FuelConsum == 0:
                     self.mainSource = "Electricity"
                     self.FuelLCV = 0.0
                     self.OffgasHeatCapacity = 1.0 #

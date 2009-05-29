@@ -49,13 +49,20 @@ class HRData:
     streams = []
     curves  = []   
     
-    def __init__(self,pid,ano):
+    def __init__(self,pid,ano):        
         self.pid = pid
         self.ano = ano
+        print "NEW HR DATA "+str(self.pid)+ " " +str(self.ano)
+        hexers  = []
+        streams = []
+        curves  = []   
         
     def loadDatabaseData(self):
         self.__loadHEX()
-          
+    
+    def loadCurves(self,doc):
+        self.__loadCurves(doc.curvedatabase)
+        
     def loadFromDocument(self,doc,overrideHX = False):
     # doc is a XMLDocHRModuleImport Document (importHR.py)
         

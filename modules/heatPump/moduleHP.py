@@ -760,11 +760,16 @@ class ModuleHP():
         QHXj_t_rem = QHXj_t
         QHXj_T = Status.int.createQ_T()
 
+        QWHj_Tt = Status.int.createQ_Tt()
+        QWHj_T = Status.int.createQ_T()
+
+
 #..............................................................................
 # Start hourly loop
 
         USHj = 0
         QHXj = 0
+        QWHj = 0
 
         HPerYear = 0
 
@@ -868,8 +873,6 @@ class ModuleHP():
                 USHj_Tt[iT][it] = min(QD_Tt[iT][it],USHj_t[it])     #from low to high T
                 QD_Tt[iT][it] -= USHj_Tt[iT][it]
 
-                
-
             for iT in range((Status.NT+1),-1,-1):
                 QHXj_Tt[iT][it] = min(QA_Tt[iT][it],QHXj_t[it])
                 QA_Tt[iT][it] -= QHXj_Tt[iT][it]
@@ -890,6 +893,12 @@ class ModuleHP():
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
         Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
+# waste heat produced by present equipment
+
+        Status.int.QWHj_Tt[cascadeIndex-1] = QWHj_Tt
+        Status.int.QWHj_T[cascadeIndex-1] = Status.int.calcQ_T(QWHj_Tt)
+        Status.int.QWHj_t[cascadeIndex-1] = copy.deepcopy(QWHj_Tt[Status.NT+1])
+
 #........................................................................
 
         Status.int.cascadeUpdateLevel = cascadeIndex
@@ -899,12 +908,13 @@ class ModuleHP():
 
         USHj *= Status.EXTRAPOLATE_TO_YEAR
         QHXj *= Status.EXTRAPOLATE_TO_YEAR
+        QWHj *= Status.EXTRAPOLATE_TO_YEAR
         FETel_j *= Status.EXTRAPOLATE_TO_YEAR
         HPerYear *= Status.EXTRAPOLATE_TO_YEAR
 
         
         Status.int.USHj[cascadeIndex-1] = USHj
-        Status.int.QWHj[cascadeIndex-1] = 0.0   # not considering the latent heat(condensing water)
+        Status.int.QWHj[cascadeIndex-1] = QWHj   # not considering the latent heat(condensing water)
         Status.int.QHXj[cascadeIndex-1] = QHXj
         
         Status.int.FETFuel_j[cascadeIndex-1] = 0.0

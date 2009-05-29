@@ -205,7 +205,7 @@ class PanelCS7(wx.Panel):
         try: (rows,cols) = data.shape
         except: (rows,cols) = (0,COLNO)
         
-        decimals = [-1,2]   #number of decimal digits for each colum
+        decimals = [-1,2,2,2]   #number of decimal digits for each colum
         labels_column = 0
         
         for r in range(rows):

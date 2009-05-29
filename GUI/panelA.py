@@ -97,7 +97,7 @@ def drawFigure(self):
         N0 = _U("present state")
         E0 = gdata[1][4]
         C0 = gdata[1][5]
-        print "PanelA (drawFigure): present state data E= %s C= %s"%(E0,C0)
+#        print "PanelA (drawFigure): present state data E= %s C= %s"%(E0,C0)
 
         self.subplot.plot([C0],
                       [E0],
@@ -505,10 +505,10 @@ class PanelA(wx.Panel):
 	self.ANo = self.selectedRow - 1
         Status.prj.setActiveAlternative(self.ANo)
 
-        print "PanelA - updating panelinfo"
+#        print "PanelA - updating panelinfo"
         self.main.panelinfo.update()
 
-        print "PanelA (GridCellLeftClick): row, ANo = ",self.selectedRow,self.ANo	    
+#        print "PanelA (GridCellLeftClick): row, ANo = ",self.selectedRow,self.ANo	    
         event.Skip()
 
 #------------------------------------------------------------------------------		
@@ -542,19 +542,20 @@ class PanelA(wx.Panel):
     def OnButtonpageAOkButton(self, event):
         self.Hide()
         self.main.tree.SelectItem(self.main.qHC, select=True)
-        print "Button exitModuleOK: now I should go back to HC"
+#        print "Button exitModuleOK: now I should go back to HC"
 
     def OnButtonpageACancelButton(self, event):
+        pass
         #warning: do you want to leave w/o saving ???
-        print "Button exitModuleCancel: now I should go back to HC"
+#        print "Button exitModuleCancel: now I should go back to HC"
 
     def OnButtonpageABackButton(self, event):
         self.Hide()
-        print "Button exitModuleBack: now I should show another window"
+#        print "Button exitModuleBack: now I should show another window"
 
     def OnButtonpageAFwdButton(self, event):
         self.Hide()
         self.main.tree.SelectItem(self.main.qHC, select=True)
-        print "Button exitModuleFwd: now I should show another window"
+#        print "Button exitModuleFwd: now I should show another window"
 
 

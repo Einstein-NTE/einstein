@@ -235,7 +235,10 @@ class CheckProc():
             if self.HPerDayProc.val > 23.99:
                 self.HPerDayProc.setValue(24.0,err=0.0)
                 
-            self.NBatch.setValue(qprocessdata.NBatch,err=0.0) #number -> exact value
+            if qprocessdata.NBatch.val is None:
+                self.NBatch.setValue(1.0,err=0.0)   # if no number is specified, suppose 1 !!!
+            else:
+                self.NBatch.setValue(qprocessdata.NBatch,err=0.0) #number -> exact value
 
             if (qprocessdata.HeatRecOK == "yes"):
                 self.HeatRecOK = True

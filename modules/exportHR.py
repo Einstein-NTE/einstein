@@ -287,9 +287,9 @@ class XMLDocHRModuleBase:
             
         #4) convert yes/no to true/false        
         if(type(value)==str):            
-            if (string.find(value.lower(),"yes")!=-1):
+            if (value.lower()=="yes"):
                 return "true"
-            if (string.find(value.lower(),"no")!=-1):
+            if (value.lower()=="no"):
                 return "false"
         
         #5) StreamStatusConversion

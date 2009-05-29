@@ -848,6 +848,11 @@ class ModuleCS(object):
 
             IRR = []
             IRR_Table = []
+            PayBack = []
+            PayBack_Table = []
+            BCR = []
+            BCR_Table = []
+            
             Alternative = []
 
             CS7Table = []
@@ -862,24 +867,54 @@ class ModuleCS(object):
                 else:
                     Alternative.append(unicode(salternatives[i].ShortName,"utf-8"))
 
+#### TEST TEST TEST TEST ###################
+                salternatives[i].StatusECO = 1
                 if salternatives[i].StatusECO > 0:
-                    dIRR = generalData[i].IRR                
+                    dIRR = generalData[i].IRR
+                    dBCR = generalData[i].BCR
+                    dPayBack = generalData[i].PayBack
                     if dIRR is None:
                         dIRR = 0.0
                         dIRR_Table = "---"
                     else:
+                        dIRR *= 100
                         dIRR_Table = dIRR
+
+                    if dPayBack is None:
+                        dPayBack = 0.0
+                        dPayBack_Table = "---"
+                    else:
+                        dPayBack_Table = dPayBack
+
+                    if dBCR is None:
+                        dBCR = 0.0
+                        dBCR_Table = "---"
+                    else:
+                        dBCR_Table = dBCR
+
 
                 else:
                     dIRR = 0.0
                     dIRR_Table = "---"
+                    dPayBack = 0.0
+                    dPayBack_Table = "---"
+                    dBCR = 0.0
+                    dBCR_Table = "---"
                         
                 IRR.append(dIRR)
                 IRR_Table.append(dIRR_Table)
 
-                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dIRR_Table])
+                PayBack.append(dPayBack)
+                PayBack_Table.append(dPayBack_Table)
 
-                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dIRR])
+                BCR.append(dBCR)
+                BCR_Table.append(dBCR_Table)
+
+                tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"), \
+                                         dIRR_Table,dPayBack_Table,dBCR_Table])
+
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"), \
+                                        dIRR])
                
                 CS7Table.append(tableEntry)
                 CS7Plot.append(plotEntry)
@@ -896,7 +931,7 @@ class ModuleCS(object):
 
             CS7Report = copy.deepcopy(CS7Table)
             for i in range(len(CS7Table),10):
-                CS7Report.append([" "," "])
+                CS7Report.append([" "," "," "," "])
             dataReport7 = array(CS7Report)                  
             Status.int.setGraphicsData("CS7_REPORT", dataReport7)
 
