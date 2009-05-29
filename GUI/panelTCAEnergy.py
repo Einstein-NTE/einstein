@@ -261,15 +261,17 @@ class PanelTCAEnergy(wx.Panel):
                 self.grid.SetCellValue(r, c, "")
         for r in range(len(self.mod.data.energycosts)):
             for c in range(self.cols):
+                try:
+                    self.grid.SetCellValue(r, c, self.mod.data.energycosts[r][c])
+                except:
+                    self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
                 #FIXXXX this should be removed when tca can handle different
                 #development of energy price!
                 if c==3: 
                     self.grid.SetCellValue(r, c, str(self.mod.data.DEP))
                 #ENDFIX
-                try:
-                    self.grid.SetCellValue(r, c, self.mod.data.energycosts[r][c])
-                except:
-                    self.grid.SetCellValue(r, c, str(self.mod.data.energycosts[r][c]))
+
+
         #Update opcost
         self.mod.calculateTotalOpCostFromDetailedOpcost()
         opcost = "%.0f" % self.mod.data.totalopcost
