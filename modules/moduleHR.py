@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 005
+#   Update No. 006
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -27,6 +27,7 @@
 #                       Hans Schweiger          08/04/2009
 #                       Hans Schweiger          22/04/2009
 #                       Hans Schweiger          29/04/2009
+#                       Hans Schweiger          30/05/2009
 #
 #   Changes to previous version:
 #
@@ -39,6 +40,8 @@
 #                   of translation QD_T -> UPHProc_Tt / QHXProc_Tt
 #   29/04/2009: HS  additional checks of first- and second-law constraints
 #                   for UPHProc_Tt and QHXProc_Tt
+#   30/05/2009: HS  attempt to introduce changes from update from Florian Joebstl
+#                   (see commments marked with HS 20090530)
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -77,25 +80,49 @@ class ModuleHR(object):
         self.keys = keys # the key to the data is sent by the panel
         self.ConCondensation = False
         self.HiddenHX = []
-        self.data = HRData(Status.PId,Status.ANo)
-        self.data.loadDatabaseData()   
+
+# HS20090530: commented out following update from JR
+#        self.data = HRData(Status.PId,Status.ANo)
+#        self.data.loadDatabaseData()   
                   
 #----------------------------------------------------------------------------------------------------
 # GUI Interaction
 #----------------------------------------------------------------------------------------------------
     def initPanel(self):                      
-        if (Status.PId != self.data.pid)or(Status.ANo!=self.data.ano):
-              self.data = HRData(Status.PId,Status.ANo)                                 
-        self.__updatePanel()
+# HS20090530: old version commented
+#        if (Status.PId != self.data.pid)or(Status.ANo!=self.data.ano):
+#              self.data = HRData(Status.PId,Status.ANo)                                 
+#        self.__updatePanel()
+
+# HS20090530: new version from JR:
+        self.updateData()        
             
 
     def __updatePanel(self):
-        if (self.data!=None):
-            self.data.loadDatabaseData()  
+
+# HS20090530: old version commented
+#        if (self.data!=None):
+#            self.data.loadDatabaseData()  
+#            self.__updateGridData()
+#            self.__updateReportData()
+#            self.__updateCurveData()
+
+# HS20090530: new version from JR:
+        if (self.data==None)or(self.data.ano != Status.ANo)or(Status.PId != self.data.pid):
+            self.updateData()
+        else:
             self.__updateGridData()
             self.__updateReportData()
             self.__updateCurveData()
 
+# HS20090530: new function added from JR:
+    def updateData(self):
+        self.data = HRData(Status.PId,Status.ANo)  
+        self.data.loadDatabaseData()  
+        self.runHRModule()
+        self.__updateGridData()
+        self.__updateReportData()
+        self.__updateCurveData()    
 
     def __updateGridData(self): 
         try:     
@@ -125,50 +152,98 @@ class ModuleHR(object):
         except:
             logDebug("(moduleHR.py) UpdateGridData: Create rows failed")        
         
+# HS20090530: function updated to JR version. some prints commented !!!
     def __updateReportData(self): 
-        try:     
-            qTotal = 0.0
-            qdotTotal = 0.0
-            for hx in self.data.hexers:
-                q = hx["QHX"]
-                if q is not None:
-                    qTotal += q
+        qTotal = 0.0
+        qdotTotal = 0.0
+        for hx in self.data.hexers:
+            q = hx["QHX"]
+            if q is not None:
+                qTotal += q
 
-                qdot = hx["QdotHX"]
-                if qdot is not None:
-                    qdotTotal += qdot
+            qdot = hx["QdotHX"]
+            if qdot is not None:
+                qdotTotal += qdot
 
-            dataListReport = []  
-            index = 0
+        dataListReport = []  
+        index = 0
+        
+        for hx in self.data.hexers:
             
-            for hx in self.data.hexers:
-                
-                q = hx["QHX"]
-                if qTotal > 0 and q is not None: qhxperc = 100.0*q/qTotal
-                else: qhxperc = "---"
-                
-                row = [hx["HXName"],hx["QdotHX"],hx["HXSource"],hx["HXSink"],hx["QHX"],qhxperc]
-                if index < 20:
-                    dataListReport.append(noneFilter(row))
-                elif index == 20:
-                    logDebug("More than 20 HX in the system. Do not fit into the report")
-                index+=1
+            q = hx["QHX"]
+            if qTotal > 0 and q is not None: qhxperc = 100.0*q/qTotal
+            else: qhxperc = "---"
+            
+            row = [hx["HXName"],hx["QdotHX"],hx["HXSource"],hx["HXSink"],hx["QHX"],qhxperc]
+            if index < 20:
+                dataListReport.append(noneFilter(row))
+            elif index == 20:
+                logDebug("More than 20 HX in the system. Do not fit into the report")
+            index+=1
 
-            for i in range(index,20):
-                row = [" "," "," "," "," "," "]
-                dataListReport.append(row)
-
-            row = [_("Total"),qdotTotal," "," ",qTotal,100.0]
+        for i in range(index,20):
+            row = [" "," "," "," "," "," "]
             dataListReport.append(row)
-            
-            dataReport = array(dataListReport)
 
-            key = "HX%02d"%Status.ANo
+        row = [_("Total"),qdotTotal," "," ",qTotal,100.0]
+        dataListReport.append(row)
+        
+        dataReport = array(dataListReport)
+
+        key = "HX%02d"%Status.ANo
 #            print "%s\n"%key,dataReport
-            Status.int.setGraphicsData(key, dataReport)
-            
-        except:
-            logDebug("(moduleHR.py) UpdateReportData: Create rows failed")        
+        Status.int.setGraphicsData(key, dataReport)
+        
+        #---------------------------------------------------------------------------
+        #REPORT GRAPHS
+        
+        key = "HX%02d_PLOT_REPORT"%Status.ANo
+        dataReport2 = []
+        doc = XMLImportHRModule.importXML("export.xml")
+        self.data.loadCurves(doc)
+        QD_T = []
+        QA_T = []
+        if (hasattr( self.data, 'QA_T' )):
+#            print "Report PE² data"
+            QD_T = self.data.QD_T
+            QA_T = self.data.QA_T
+        else:
+            if (len(Status.int.QA_T)!=0):
+#                print "Report estimated data"
+                QD_T = Status.int.QD_T   #todo: set the right data!
+                QA_T = Status.int.QA_T
+            else:
+#                print "Recalulate data"
+                self.runHRModule()
+                return
+                           
+        CCC_X_index = 0
+        CCC_Y_index = 1
+        HCC_X_index = 2
+        HCC_Y_index = 3
+        QD_index = 5
+        QA_index = 4
+        MAXROWS = 81
+#        print "start curves"
+        for i in range(0,MAXROWS):
+            row = ["","","","","",""]
+            dataReport2.append(row)
+        entryCount = len(self.data.curves[0].X)
+        for i in range(0,min(MAXROWS,entryCount)):            
+            dataReport2[i][CCC_X_index] = self.data.curves[0].X[i]
+            dataReport2[i][CCC_Y_index] = self.data.curves[0].Y[i]        
+        entryCount = len(self.data.curves[1].X)
+        for i in range(0,min(MAXROWS,entryCount)):            
+            dataReport2[i][HCC_X_index] = self.data.curves[1].X[i]
+            dataReport2[i][HCC_Y_index] = self.data.curves[1].Y[i]                              
+#        print "start qd"
+        for i in range(0,min(MAXROWS,len(QD_T))):
+            dataReport2[i][QD_index] = QD_T[i]                
+        for i in range(0,min(MAXROWS,len(QA_T))):
+            dataReport2[i][QA_index] = QA_T[i]
+#        print "end"
+#        print "%s\n"%key,dataReport2
+        Status.int.setGraphicsData(key, array(dataReport2))
         
     def __updateCurveData(self):                 
         # stores data for mathplot in panelHR         
@@ -258,6 +333,10 @@ class ModuleHR(object):
             logError(_("Error in external program (ProcessEngineering.exe)"))                      
         else:    
             doc = XMLImportHRModule.importXML("export.xml")                      
+
+# HS 20090530 line NOT commented -> gives problems if
+#           __runPE2 is called from outside of the panelHX (e.g. PanelEA4b).
+
             self.data = HRData(Status.PId,Status.ANo)
                         
             if (redesign):
@@ -288,7 +367,7 @@ class ModuleHR(object):
 
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
         UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
-#        print "UPH_T = %r"%UPHProc_T
+        print "UPH_T = %r"%UPHProc_T
 
         QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
 
@@ -310,6 +389,7 @@ class ModuleHR(object):
 
         self.__calcQD_T()
         self.__calcQA_T()
+        print "QD_T = %r"%self.data.QD_T
 
         for iT in range(Status.NT+2):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
