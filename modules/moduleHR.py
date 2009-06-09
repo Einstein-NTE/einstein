@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 006
+#   Update No. 007
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -28,6 +28,7 @@
 #                       Hans Schweiger          22/04/2009
 #                       Hans Schweiger          29/04/2009
 #                       Hans Schweiger          30/05/2009
+#                       Hans Schweiger          09/06/2009
 #
 #   Changes to previous version:
 #
@@ -42,6 +43,8 @@
 #                   for UPHProc_Tt and QHXProc_Tt
 #   30/05/2009: HS  attempt to introduce changes from update from Florian Joebstl
 #                   (see commments marked with HS 20090530)
+#   09/06/2009: HS  condition if (self.data is None ...) added before call
+#                   to HRData in __runPE2 (following mail BS/FJ from 04/06/09)
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -334,10 +337,8 @@ class ModuleHR(object):
         else:    
             doc = XMLImportHRModule.importXML("export.xml")                      
 
-# HS 20090530 line NOT commented -> gives problems if
-#           __runPE2 is called from outside of the panelHX (e.g. PanelEA4b).
-
-            self.data = HRData(Status.PId,Status.ANo)
+            if((self.data == None) or (self.data.ano != Status.ANo) or (self.data.pid != Status.PId)):
+                self.data = HRData(Status.PId,Status.ANo)
                         
             if (redesign):
                 self.data.loadFromDocument(doc,overrideHX = True)
