@@ -19,13 +19,15 @@
 #   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger
 #                       11/03/2008 - 16/10/2008
 #
-#   Update No. 002
+#   Update No. 003
 #
 #   Since Version 1.0 revised by:
 #                       Enrico Facci        26/10/2008
 #                       Enrico Facci        04/11/2008
+#                       Enrico Facci        10/06/2009
 #
 #   04/11/08: EF    small change in SelectBB and some bugs fixed
+#   10/06/09: EF    changes in BB auto-design - calculations of redundancy
 #
 #------------------------------------------------------------------------------		
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -507,6 +509,33 @@ class ModuleBB(object):
         logTrack("ModuleBB (calculateEnergyFlows): Model = %s Type = %s PNom = %s"%\
                  (BBModel,BBType,PNom))
 
+#........................................................................
+# f_QWH: proportion waste heat vs. USH
+
+        LossFactEq = 0.01
+        if COPh_nom > 0:
+            f_QWH = max (0,1. - COPh_nom -  LossFactEq)/COPh_nom
+        else:
+            f_QWH = 0
+
+# temperature distribution of waste heat. assumed as fix
+
+        TExhaustGas = equipe.TExhaustGas
+        if TExhaustGas == None:
+            logDebug("Boiler exhaust gas temperature not specified. 200 ºC assumed")
+            TExhaustGas = 200
+
+        TEnvEq = 15.0
+        dTtot = max(TExhaustGas-TEnvEq,1.e-10)
+
+        f_QWH_T = []
+
+        for iT in range(Status.NT+2):
+            
+            dT = max(iT*Status.TemperatureInterval - TEnvEq,0.)
+            f_QWH_T.append(f_QWH*min(1.0,dT/dTtot))
+            
+
 #..............................................................................
 # get demand data for CascadeIndex/EquipmentNo from Interfaces
 # and create arrays for storing heat flow in equipment
@@ -517,15 +546,18 @@ class ModuleBB(object):
         USHj_Tt = Status.int.createQ_Tt()
         USHj_T = Status.int.createQ_T()
 
-        
         QHXj_Tt = Status.int.createQ_Tt()
         QHXj_T = Status.int.createQ_T()
+
+        QWHj_Tt = Status.int.createQ_Tt()
+        QWHj_T = Status.int.createQ_T()
 
 #..............................................................................
 # Start hourly loop
 
         USHj = 0
         QHXj = 0
+        QWHj = 0
         HPerYear = 0
         QD = 0
 
@@ -554,6 +586,10 @@ class ModuleBB(object):
 
             QD += QD_Tt[Status.NT+1][it]
 
+            for iT in range(Status.NT+2):
+                QWHj_Tt[iT][it] = USHj_Tt[Status.NT+1][it]*f_QWH_T[iT]
+            QWHj += QWHj_Tt[Status.NT+1][it]
+
 #..............................................................................
 # End of year reached. Store results in interfaces
        
@@ -575,6 +611,12 @@ class ModuleBB(object):
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
         Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
+# waste heat produced by present equipment
+
+        Status.int.QWHj_Tt[cascadeIndex-1] = QWHj_Tt
+        Status.int.QWHj_T[cascadeIndex-1] = Status.int.calcQ_T(QWHj_Tt)
+        Status.int.QWHj_t[cascadeIndex-1] = copy.deepcopy(QWHj_Tt[Status.NT+1])
+
         logTrack("ModuleBB (calculateEnergyFlows): Total energy supplied by equipment %s MWh"%(USHj*Status.EXTRAPOLATE_TO_YEAR))
         logTrack("ModuleBB (calculateEnergyFlows): Total waste heat input  %s MWh"%(QHXj*Status.EXTRAPOLATE_TO_YEAR))
 
@@ -584,6 +626,7 @@ class ModuleBB(object):
 # Global results (annual energy flows)
 
         USHj *= Status.EXTRAPOLATE_TO_YEAR
+        QWHj *= Status.EXTRAPOLATE_TO_YEAR
         HPerYear *= Status.EXTRAPOLATE_TO_YEAR
         Status.int.USHj[cascadeIndex-1] = USHj
 
@@ -603,7 +646,7 @@ class ModuleBB(object):
         Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
         
         LossFactEq = 0.01
-        Status.int.QWHj[cascadeIndex-1] = FETFuel_j * max (0,1. - COPh_nom -  LossFactEq)   # not considering the latent heat(condensing water)
+        Status.int.QWHj[cascadeIndex-1] = QWHj   # not considering the latent heat(condensing water)
         Status.int.QHXj[cascadeIndex-1] = 0.0
 
 #        logMessage("Boiler: eq.no.:%s energy flows [MWh] USH: %s FETFuel: %s FETel: %s QD: %s HPerYear: %s "%\
@@ -914,8 +957,10 @@ class ModuleBB(object):
                                 modelID=self.selectBB(((self.QDh80[0]*self.securityMargin - added)/2),80)  #sempre aggiungere anche il criterio di efficienza
                                 equipe = self.addEquipmentDummy()
                                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
-                                equipe = self.addEquipmentDummy()
-                                self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
+                                added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom                                                    #EF 05/06/2009
+                                if self.QDh80[0]*self.securityMargin - added >= 0:                                                          #EF 05/06/2009
+                                    equipe = self.addEquipmentDummy()
+                                    self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
                         else:
 #HS: elif requires a condition !!!                        elif:
                             print "point G reached; added and self.QDh80[0]*self.securityMargin are: ",added , self.QDh80[0]*self.securityMargin
@@ -997,7 +1042,10 @@ class ModuleBB(object):
                                 modelID=self.selectBB(((self.QDh140[0]*self.securityMargin - added)/2),140)  #sempre aggiungere anche il criterio di efficienza
                                 equipe = self.addEquipmentDummy()
                                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list
-                                self.setEquipmentFromDB(equipe,modelID)
+                                added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom                                                    #EF 05/06/2009
+                                if self.QDh140[0]*self.securityMargin - added >= 0:                                                         #EF 05/06/2009
+                                    equipe = self.addEquipmentDummy()
+                                    self.setEquipmentFromDB(equipe,modelID)
                             
                         else:
                             print "point G1 reached"
@@ -1057,8 +1105,10 @@ class ModuleBB(object):
                         modelID=self.selectBB(max(((self.QDhmaxTemp[0]*self.securityMargin - added)/2),self.minPow),self.maxTemp)
                         equipe = self.addEquipmentDummy()
                         self.setEquipmentFromDB(equipe,modelID)
-                        equipe = self.addEquipmentDummy()
-                        self.setEquipmentFromDB(equipe,modelID)
+                        added += self.DB.dbboiler.DBBoiler_ID[modelID][0].BBPnom                                                    #EF 05/06/2009
+                        if self.QDhmaxTemp[0]*self.securityMargin - added >= 0:                                                     #EF 05/06/2009
+                            equipe = self.addEquipmentDummy()
+                            self.setEquipmentFromDB(equipe,modelID)
 
                    
                 else:
