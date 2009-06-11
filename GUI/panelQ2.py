@@ -151,13 +151,13 @@ class PanelQ2(wx.Panel):
                                tip=_U(" "))
         
         self.tc3 = FloatEntry(self.page0,
-                              ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
+                              ipart=10, decimals=2, minval=0., maxval=1.0e+12, value=0.,
                               unitdict='MASSORVOLUME',
                               label=_U("Annual consumption (fuel units)"),
                               tip=_U("If possible, provide the monthly data in separate sheet and/or the fuel bills. Specify the energy equivalent in base of LCV (lower calorific value)"))  
         
         self.tc4 = FloatEntry(self.page0,
-                              ipart=10, decimals=2, minval=0., maxval=1.0e+9, value=0.,
+                              ipart=10, decimals=2, minval=0., maxval=1.0e+12, value=0.,
                               unitdict='ENERGY',
                               label=_U("Annual consumption (LCV)"),
                               tip=_U(" "))  
@@ -169,7 +169,7 @@ class PanelQ2(wx.Panel):
                               tip=_U("Specify expenditures without VAT"))  
         
         self.tc6 = FloatEntry(self.page0,
-                              ipart=6, decimals=2, minval=0., maxval=1.0e+9, value=0.,
+                              ipart=6, decimals=2, minval=0., maxval=1.0e+12, value=0.,
                               unitdict='PRICE',
                               label=_U("Annual energy cost"),
                               tip=_U("Total cost"))  

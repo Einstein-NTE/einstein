@@ -189,7 +189,7 @@ class PanelQ6(wx.Panel):
 
         
         self.tc3 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Heat transfer rate"),
                               tip=_U("Heat transfer rate for the specific working conditions"))
@@ -201,7 +201,7 @@ class PanelQ6(wx.Panel):
                               tip=_U("Between the fluids in the heat exchanger"))
 
         self.tc5 = FloatEntry(self.page0,
-                              decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='ENERGY',
                               label=_U("Total heat transfered"),
                               tip=_U("Total heat transferred per year"))
@@ -291,7 +291,7 @@ class PanelQ6(wx.Panel):
                                  tip=_U("Specify type of waste heat (e.g. Recooling of compressed air, cooling water of motor/compressor, ...)"))
         
         self.tc104 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=1.e+10, value=0.,
+                                decimals=1, minval=0., maxval=1.e+12, value=0.,
                                 unitdict='POWER',
                                 label=_U("Available waste heat"),
                                 tip=_U("Estimated quantity"))
@@ -302,7 +302,7 @@ class PanelQ6(wx.Panel):
                                  tip=_U("Waste heat carrying medium (fluid)"))
 
         self.tc106 = FloatEntry(self.page1,
-                                decimals=1, minval=0., maxval=1.e+10, value=0.,
+                                decimals=1, minval=0., maxval=1.e+12, value=0.,
                                 unitdict='MASSORVOLUMEFLOW',
                                 label=_U("Flow rate"),
                                 tip=_U("Specify the flow rate of the waste heat carrying medium"))

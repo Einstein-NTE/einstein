@@ -169,31 +169,31 @@ class PanelQ9(wx.Panel):
 
         # tab 0 top side. parameters
 
-        self.tc1 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc1 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='GROWTHRATE',
                               label=_U("General inflation rate"),
                               tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
-        self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='GROWTHRATE',
                               label=_U("Rate of increment of energy prices"),
                               tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
-        self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='GROWTHRATE',
                               label=_U("Nominal rate of interest for external financing of installations"),
                               tip=_U("Specify the rate of prices variation estimated for the useful life of the installations (e.g. in the next 15-20 years)"))
 
-        self.tc4 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc4 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='FRACTION',
                               label=_U("Percentage of external financing for installations"),
                               tip=_U("Percentage of the external financing for the inversions"))
 
-        self.tc4b = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc4b = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='GROWTHRATE',
                               label=_U("Company specific discount rate"),
                               tip=_U(" "))
-        self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+4, value=0.,
                               unitdict='LONGTIME',
                               label=_U("Time for economic amortization of installations"),
                               tip=_U("Amortization time"))

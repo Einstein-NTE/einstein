@@ -360,6 +360,10 @@ class PanelCC(wx.Panel):
             nc = self.mod.basicCheck(estimate=True)
             self.display()
 
+            if nc > 0:
+                self.cf = conflictFrame(self)
+                self.cf.Show()
+
         event.Skip()
 #------------------------------------------------------------------------------		
     def OnCheckListButton(self, event):

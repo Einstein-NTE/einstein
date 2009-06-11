@@ -206,7 +206,7 @@ class PanelQ4(wx.Panel):
         f = FieldSizes(wHeight=HEIGHT_MIDDLE,wLabel=LABEL_WIDTH_MIDDLE)
 
         self.tc7 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Nominal power (heat or cold, output)"),
                               tip=_U("Power at manufacturer nominal conditions"))
@@ -217,13 +217,13 @@ class PanelQ4(wx.Panel):
                                tip=_U("Select fuel type from predefined list"))
 
         self.tc9 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='MASSORVOLUMEFLOW',
                               label=_U("Fuel consumption (nominal)"),
                               tip=_U("Specify the units below"))
 
         self.tc12 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Electrical power input"),
                               tip=_U("Electrical power, incl. auxiliary components, such as water pumps, control,..."))
@@ -242,18 +242,18 @@ class PanelQ4(wx.Panel):
 
 
         self.tc16 = FloatEntry(self.page1,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Temperature of exhaust gas at standard operation conditions (boilers only)"),
                               tip=_U("Only for boilers and CHP"))
 
         self.tc16_2 = FloatEntry(self.page1,
-                              ipart=2, decimals=2, minval=0., maxval=99.99, value=0.,
+                              ipart=2, decimals=2, minval=1., maxval=9999.99, value=1.,
                               label=_U("Excess air ratio (boilers only)"),
                               tip=_U("Only for boilers and CHP"))
 
         self.tc15 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Electricity production (CHP only)"),
                               tip=_U("Only for CHP"))
@@ -293,7 +293,7 @@ class PanelQ4(wx.Panel):
 
 
         self.tc34 = FloatEntry(self.page2,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Thermal power input high temp. (thermal HP and chillers only)"),
                               tip=_U("Power applied to the generator of a thermal heat pump or chiller"))
@@ -504,8 +504,8 @@ class PanelQ4(wx.Panel):
         if self.tc6.GetValue() > 1:
             showMessage("Number of Equipments > 1 not yet supported\nWorkaround: multiply nominal power by N")
 
-        print "PanelQ4 (OK): pipe names = ",self.tc20.GetValue()
-        print "PanelQ4 (OK): pipe id's = ",self.getPipeIDString(self.tc20.GetValue())
+#        print "PanelQ4 (OK): pipe names = ",self.tc20.GetValue()
+#        print "PanelQ4 (OK): pipe id's = ",self.getPipeIDString(self.tc20.GetValue())
         
         tmp = {
             "Equipment":check(self.tc1.GetValue()),
@@ -596,8 +596,8 @@ class PanelQ4(wx.Panel):
             self.tc18.SetValue(str(q.HPerDayEq))
             self.tc19.SetValue(str(q.NDaysEq))
 
-            print "PanelQ4 (display): q.PipeDuctEquip = ",q.PipeDuctEquip
-            print "PanelQ4 (display): Pipe Names = ",self.getPipeNames(q.PipeDuctEquip)
+#            print "PanelQ4 (display): q.PipeDuctEquip = ",q.PipeDuctEquip
+#            print "PanelQ4 (display): Pipe Names = ",self.getPipeNames(q.PipeDuctEquip)
             self.tc20.SetSelection(self.getPipeNames(q.PipeDuctEquip))
             
             self.tc30.SetValue(q.HeatSourceLT)
@@ -636,6 +636,7 @@ class PanelQ4(wx.Panel):
         self.tc14.SetValue('')
         self.tc15.SetValue('')
         self.tc16.SetValue('')
+        self.tc16_2.SetValue('')
         self.tc17.SetValue('')
         self.tc18.SetValue('')
         self.tc19.SetValue('')
@@ -728,16 +729,21 @@ class PanelQ4(wx.Panel):
         return pipes
             
     def getPipeIDString(self,nameList):
-        print "PanelQ4 (getPipeIDString): Getting pipeIDs from :",nameList
+#        print "PanelQ4 (getPipeIDString): Getting pipeIDs from :",nameList
         pipeDict = Status.prj.getPipeDict()
         pipeIDs = []
         for name in nameList:
             print "selected name: %r"%name
             pipeID = findKey(pipeDict,name)
-            pipeIDs.append("%10d"%pipeID)
-            
+            pipeIDs.append("%d"%pipeID)
+
         IDString = ";".join(pipeIDs)
-        print "PanelQ4: ID's of pipes stored in SQL :",IDString
+
+        if len(IDString) > 45:
+            logDebug("ERROR: pipeIDstring with length > 45 can not be stored [%s]"%IDString)
+            showWarning("Too much pipes connected to equipment")
+                     
+#        print "PanelQ4: ID's of pipes stored in SQL :",IDString
         return IDString
             
 

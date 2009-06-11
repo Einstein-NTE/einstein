@@ -152,12 +152,12 @@ class PanelQ8(wx.Panel):
                              tip=_U("Give some brief name of the buildings to identify them in the reports"))
 
 
-        self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc2 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='AREA',
                               label=_U("Constructed surface"),
                               tip=_U("Surface limited by building's perimeter multiplied by number of floors"))
 
-        self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc3 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='AREA',
                               label=_U("Useful surface"),
                               tip=_U("Total useful surface of building (excluding walls)"))
@@ -169,27 +169,27 @@ class PanelQ8(wx.Panel):
 
         # tab 0 bottom staticbox: Energy demand
         
-        self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc5 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Maximum heating power"),
                               tip=_U("Maximum heating power (without including the security coefficient of the equipment)"))
 
-        self.tc6 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc6 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Maximum cooling power"),
                               tip=_U(" "))
 
-        self.tc7 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc7 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='ENERGY',
                               label=_U("Annual heating demand"),
                               tip=_U("Thermal demand (useful heat and cold). Indicate MONTHLY data in a separate table (if available)"))
 
-        self.tc8 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc8 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='ENERGY',
                               label=_U("Annual demand of air conditioning"),
                               tip=_U(" "))
 
-        self.tc9 = FloatEntry(self.page0, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc9 = FloatEntry(self.page0, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='VOLUME',
                               label=_U("Daily consumption of  DHW"),
                               tip=_U("Only consumption of hot water that is not included yet in 'Processes'"))
@@ -202,12 +202,12 @@ class PanelQ8(wx.Panel):
                         wData=DATA_ENTRY_WIDTH_RIGHT,wUnits=UNITS_WIDTH)
 
         #SD:change type of entry?? -> time start - time stop?? or change tip: hours of occupation per day??
-        self.tc10 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc10 = FloatEntry(self.page1, decimals=1, minval=0., maxval=8760, value=0.,
                                unitdict=None,
                                label=_U("Hours of occupation"),
                                tip=_U("Hours of occupation of the building, during which heating and air conditionning is active"))
 
-        self.tc11 = FloatEntry(self.page1, decimals=1, minval=0., maxval=999., value=0.,
+        self.tc11 = FloatEntry(self.page1, decimals=1, minval=0., maxval=365., value=0.,
                                unitdict=None,
                                label=_U("Days of use per year"),
                                tip=_U(" "))
@@ -352,7 +352,12 @@ class PanelQ8(wx.Panel):
         buildings = Status.DB.qbuildings.Questionnaire_id[Status.PId].\
                     AlternativeProposalNo[Status.ANo]
         
-        q = buildings.BuildName[check(self.buildingName)][0]
+        qq = buildings.BuildName[check(self.buildingName)]
+
+        if len(qq) <= 0:
+            return
+        q = qq[0]
+        
         self.buildingID = q.QBuildings_ID
 
         self.tc1.SetValue(q.BuildName)

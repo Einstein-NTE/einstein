@@ -181,21 +181,21 @@ class PanelQ3(wx.Panel):
                                tip=_U("The medium that is in direct contact with the treated product, e.g. air for drying, lye or water for washing, etc..."))           
 
         self.tc5 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Typical (final) temperature of the  process medium during operation"),
                               tip=_U("Give the temperature of the process medium and not that of the heat supplying medium."))
 
 
         self.tc6 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Inlet temperature of the process medium (before heat recovery)"),
                               tip=_U("Inlet temperature of the process medium before heat recovery"))
 
 
         self.tc7 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Start-up temperature of process medium (after breaks)"),
                               tip=_U("Temperature of the process equipment before heating up when process start-up begins"))
@@ -203,20 +203,20 @@ class PanelQ3(wx.Panel):
 
 
         self.tc8 = FloatEntry(self.page0,
-                              ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              ipart=10, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='VOLUMEORMASS',
                               label=_U("Daily inflow of process medium"),
                               tip=_U("Continuous process: Fluid flow rate times hours of circulation. Batch process with fluid renewal: volume times No. of batches."))
 
 
         self.tc9 = FloatEntry(self.page0,
-                              ipart=10, decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              ipart=10, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='VOLUME',
                               label=_U("Volume of the process medium within the equipment or storage"),
                               tip=_U("e.g. volume of liquid in a bottle for cleaning"))
 
         self.tc10 = FloatEntry(self.page0,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='POWER',
                               label=_U("Power requirement of the process in operation"),
                               tip=_U("Power requierment during operation at steady state (thermal losses, evapoartion, endogenous chemical recations; without heating of circulating fluid)"))
@@ -260,7 +260,7 @@ class PanelQ3(wx.Panel):
                                label=_U("Medium of outgoing waste heat flows"),
                                tip=_U("Specify media of waste heat flows (up to 3)")) 
         self.tc15 = FloatEntry(self.page1,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Temperature of outgoing (waste) heat flows"),
                               tip=_U("Temperature of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
@@ -272,13 +272,13 @@ class PanelQ3(wx.Panel):
                               tip=_U("Enthalpy of the outgoing waste heat flow (e.g. water or hot humid air at the outlet of a drying process)"))
 
         self.tc16 = FloatEntry(self.page1,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Final  temperature of outgoing (waste) heat flows"),
                               tip=_U("Minimum temperature to which the waste heat flow can be cooled. If there is no limit specify 0"))
 
         self.tc17 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+10, value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='VOLUME',
                               label=_U("Daily outflow of process medium"),
                               tip=_U("Can be different from the incoming flow if e.g. there is evaporation or some chemical reaction."))
@@ -302,7 +302,7 @@ class PanelQ3(wx.Panel):
 #                               tip=_U("Specify the heat source (e.g. heat lossed from process X, flue gases from  boiler Y, etc)"))
 
         self.tc21 = FloatEntry(self.page1,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Inlet temperature of the process medium  (after heat recovery)"),
                               tip=_U("Inlet temperature (towards the system) of the process medium after the heat recovery"))
@@ -323,20 +323,20 @@ class PanelQ3(wx.Panel):
                              tip=_U("Specify the distribution(supply) line of heat/cold feeding the process, using the nomenclature of the hydraulic scheme"))
 
         self.tc24 = FloatEntry(self.page1,
-                               ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                               ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                                unitdict='TEMPERATURE',
                                label=_U("Temperature of the incoming medium supplying heat or cold to the process/heat exchanger"),
                                tip=_U("Temperature of the supplying medium at heat exchangers inlet"),
                                fontsize=TYPE_SIZE_RIGHT-1)
 
         self.tc25 = FloatEntry(self.page1,
-                               ipart=6, decimals=1, minval=0., maxval=999999., value = 0.,
+                               ipart=6, decimals=1, minval=0., maxval=1.e+12, value = 0.,
                                unitdict='MASSFLOW',
                                label=_U("Flow rate of the heat supply medium (close to process)"),
                                tip=_U("Mass flow of the heat/cold supplyind medium"))
 
         self.tc26 = FloatEntry(self.page1,
-                               ipart=10, decimals=2, minval=0., maxval=999999999., value=0.,
+                               ipart=10, decimals=2, minval=0., maxval=1.e+12, value=0.,
                                unitdict='ENERGY',
                                label=_U("Total yearly process heat consumption"),
                                tip=_U("Only for the process"))

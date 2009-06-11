@@ -176,7 +176,7 @@ class PanelQ7(wx.Panel):
                              tip=_U("Define a short name for each surface area available for installation in order to clearly identify them"))
 
         self.tc6 = FloatEntry(self.page1,
-                              decimals=0, minval=0., maxval=1e+9,
+                              decimals=0, minval=0., maxval=1e+12,
                               unitdict='AREA',label=_U("Available area"),\
                               tip=_U("If there are different surfaces available, give the measure of each surface area"))
 
@@ -268,26 +268,26 @@ class PanelQ7(wx.Panel):
                               tip=_U(" "))
 
         self.tc17 = FloatEntry(self.page2,
-                              decimals=1, minval=0., maxval=1e+9, value=0.,
+                              decimals=1, minval=0., maxval=1e+12, value=0.,
                               unitdict='MASS',
                               label=_U("Daily quantity of biomass"),
                               tip=_U(" "))
 
 
         self.tc18 = FloatEntry(self.page2,
-                              decimals=1, minval=0., maxval=1e+9, value=0.,
+                              decimals=1, minval=0., maxval=1e+12, value=0.,
                               unitdict='VOLUME',
                               label=_U("Space availability to stock biomass?"),
                               tip=_U("Specify the volume"))
 
         self.tc19 = FloatEntry(self.page2,
-                              decimals=1, minval=0., maxval=1e+9, value=0.,
+                              decimals=1, minval=0., maxval=1e+12, value=0.,
                               unitdict='ENERGY',
                               label=_U("LCV biomass"),
                               tip=_U(" "))
 
         self.tc20 = FloatEntry(self.page2,
-                              decimals=1, minval=0., maxval=1e+9, value=0.,
+                              decimals=1, minval=0., maxval=1e+12, value=0.,
                               unitdict=None,
                               label=_U("Humidity"),
                               tip=_U("Specify the percentage of humidity in biomass"))
@@ -297,7 +297,7 @@ class PanelQ7(wx.Panel):
                              tip=_U(" "))
 
         self.tc22 = FloatEntry(self.page2,
-                              decimals=1, minval=0., maxval=1e+9, value=0.,
+                              decimals=1, minval=0., maxval=1e+12, value=0.,
                               unitdict='ENERGYTARIFF',
                               label=_U("Unit price of biomass"),
                               tip=_U(" "))

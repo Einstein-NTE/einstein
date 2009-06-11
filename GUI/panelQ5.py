@@ -16,15 +16,17 @@
 #   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
 #                       02/05/2008 - 13/10/2008
 #
-#   Update No. 001
+#   Update No. 003
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger      12/11/2008
 #                       Hans Schweiger      01/04/2009
+#                       Hans Schweiger      06/04/2009
 #
 #       Changes to previous version:
 #       12/11/2008: HS  adaptation for full unicode support
 #       01/04/2009: HS  impossibility to save entries with empty name field
+#       06/04/2009: HS  pipe list sorted by PipeNo.
 #
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -154,26 +156,26 @@ class PanelQ5(wx.Panel):
 
 #In StaticBox "Temperatures and pressures" within "Distribution of heat/cold" 
         self.tc5 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Outlet temperature (to distribution)"),
                               tip=_U("Temperature of supply medium from equipment"))
 
         self.tc6 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Return temperature"),
                               tip=_U("Temperature of return of the supply medium from distribution (e.g. return temperature of condensate in a vapour system)"))
 
         self.tc7 = FloatEntry(self.page0,
-                              ipart=4, decimals=3, minval=0., maxval=1., value=0.,
+                              ipart=4, decimals=3, minval=0., maxval=100., value=0.,
                               unitdict=None,
                               label=_U("Rate of recirculation"),
                               tip=_U("Specify the rate of recirculation of the heat/cold supply medium (100% = totally closed circuit)"))
 
 
         self.tc8 = FloatEntry(self.page0,
-                              ipart=4, decimals=1, minval=0., maxval=9999., value=0.,
+                              ipart=4, decimals=1, minval=0., maxval=999., value=0.,
                               unitdict='TEMPERATURE',
                               label=_U("Temperature of feed-up in open circuit"),
                               tip=_U("Temperature of medium of distribution of heat/cold entering in open circuit (e.g. temperature of water entering from network...)"))
@@ -193,7 +195,7 @@ class PanelQ5(wx.Panel):
                               tip=_U("Only distance one way"))
 
         self.tc12 = FloatEntry(self.page0,
-                              ipart=6, decimals=2, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=2, minval=0., maxval=1.e+12, value=0.,
                               unitdict='HEATTRANSFERCOEF',
                               label=_U("Total coefficient of heat losses for piping or ducts"),
                               tip=_U("For the whole duct: go and return"))
@@ -221,7 +223,7 @@ class PanelQ5(wx.Panel):
                              tip=_U("Specify the number of storage units of the same type"))
 
         self.tc16 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=999999., value=0.,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               unitdict='VOLUME',
                               label=_U("Volume of one storage unit"),
                               tip=_U("Volume of the storage medium of a single single storage unit"))
@@ -480,13 +482,11 @@ class PanelQ5(wx.Panel):
 
     def fillPage(self):
         self.listBoxDistributionList.Clear()
-        pipes = Status.DB.qdistributionhc.\
-                Questionnaire_id[Status.PId].\
-                AlternativeProposalNo[Status.ANo]
-        
-        if len(pipes) > 0:
-            for pipe in pipes:
-                self.listBoxDistributionList.Append(unicode(pipe.Pipeduct,"utf-8"))
+
+        pipeList = Status.prj.getPipeList("Pipeduct")
+        for pipeName in pipeList:
+            self.listBoxDistributionList.Append(pipeName)
+            
         if self.pipeName is not None:
             self.listBoxDistributionList.SetStringSelection(self.pipeName)
 
