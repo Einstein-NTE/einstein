@@ -355,7 +355,9 @@ class CCPar():
                 self.valMin = max(newMin,self.valMin)
                 self.valMax = min(newMax,self.valMax)
                 
-            if newSqErr is not None: self.sqerr = min(self.sqerr,newSqErr)
+#            if newSqErr is not None: self.sqerr = min(self.sqerr,newSqErr)
+# HS 20090611 -> default error margin only applied if no limits are given !!!
+            elif newSqErr is not None: self.sqerr = min(self.sqerr,newSqErr)
             self.constrain()
 
             logMessage("Parameter %s estimated to %s [%s,%s]"%

@@ -767,15 +767,16 @@ class CheckProc():
         self.VOutFlow.setEstimate(self.VInFlowDay.val,limits=(self.VInFlowDay.valMin,self.VInFlowDay.valMax))
         self.PTInFlow.setEstimate(15.0,limits = (5.0,35.0))
 
+#        if self.internalHR == True:
         if (self.PT.val - self.PTInFlow.val > 5.0):
+
             self.DTCrossHXHT.setEstimate(10.0,limits = (5.0,999.0))
             self.DTCrossHXLT.setEstimate(10.0,limits = (5.0,999.0))
+
         else:
             self.PTInFlowRec.update(self.PTInFlow)
             self.internalHR = False
 
-# estimate of Evaporation losses
-        self.QEvapProc.setEstimate(0.0,limits = (0.0,0.0))
 
         if self.NBatch.val > 0 and (self.NBatch.val is not None):
             vol1 = self.VInFlowDay.val / self.NBatch.val
@@ -795,7 +796,19 @@ class CheckProc():
             UAmin = 0.0004 * surface * 0.1  #0.4 W/m2K well insulated vessel
             UA = 0.008 * surface
             UAmax = 0.002 * surface * 1.0   #2.0 W/m2K badly insulated equipment
+            
             self.UAProc.setEstimate(UA,limits=(UAmin,UAmax))
+
+            # estimate of Evaporation losses
+
+        QLossMax = UAmax*self.DTLoss.valMax
+        
+        if self.QOpProc.valMax <= QLossMax:    # maintenance can be fully explained by
+                                                # thermal losses
+            self.QEvapProc.setEstimate(0.0,limits = (0.0,0.0))
+            
+# WARNING: this apriori assumption can give problems in cases with evaporation !!!!
+
         
 # limits: optional and fix absolute minimum and maximum values
 # sqerr: optional input that fixes the (stochastic) relative square error
