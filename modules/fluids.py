@@ -16,24 +16,30 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
-#	Created by: 	    Hans Schweiger	22/06/2008
-#	Revised by:         
+#   EINSTEIN Version No.: 1.0
+#   Created by:     Hans Schweiger	22/06/2008
 #
-#       Changes in last update:
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#
+#                   Hans Schweiger      11/06/2009
+#
+#   11/06/09: HS    function TCondOffGas added to fuel class
 #	
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #==============================================================================
 
 from einstein.modules.messageLogger import *
 from einstein.auxiliary.auxiliary import *
+from math import log10
 
 #------------------------------------------------------------------------------		
 class Fluid():
@@ -151,5 +157,27 @@ class Fuel():
             self.name = u"dummy fuel"
             logError(_("Fluid (init): cannot find fuel with ID = %s")%fuelID)
            
+
+#...............................................................................................
+    def TCondOffGas(self):
+#...............................................................................................
+#   dew point of water in off gas
+#   WARNING: present function does not take into account the excess air ratio !!!
+        try:
+            
+            x = self.Humidity/(1. - self.Humidity)
+            p_sat = x/(18.02/28.9+x)
+            TCond = 1730.63 / (7.19621-log10(p_sat*100)) - 233.426
+            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
+                  (x,p_sat,TCond)
+            
+        except:
+            
+            TCond = 80
+            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
+                  ("-","-",TCond)
+            
+        return (TCond)
+
            
 #------------------------------------------------------------------------------		
