@@ -23,16 +23,18 @@
 #   Created by: 	Tom Sobota, Hans Schweiger
 #                       June 2008 - 26/09/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
-#                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  06/04/2009
+#                       Hans Schweiger  10/06/2009
 #               
-#   01/04/2008  HS  Bug-fix in project import (determination of ID of new rows)
+#   01/04/2009  HS  Bug-fix in project import (determination of ID of new rows)
+#   10/06/2009  HS  introduction of _U() function for text (warnings, etc.)
 #
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008, 2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -52,6 +54,12 @@ from messageLogger import *
 from einstein.GUI.dialogImport import DialogImport
 from einstein.GUI.GUITools import check
 from einstein.GUI.pSQL import Table
+
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 def openfilecreate(text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
     # ask for file for exporting
@@ -647,7 +655,7 @@ class ImportProject(object):
                             rowName = elvalue
                             existingRows = Status.DB.questionnaire.Name[check(rowName)]
                             if len(existingRows) > 0:
-                                showWarning(_("Project with name %s already exists in database\nProject renamed to: IMPORTED PROJECT")%rowName)
+                                showWarning(_U("Project with name %s already exists in database\nProject renamed to: IMPORTED PROJECT")%rowName)
                                 elvalue = 'IMPORTED PROJECT'
                         elif tablename == "dbfluid" and fieldname == "fluidname":
                             rowName = elvalue
@@ -687,20 +695,20 @@ class ImportProject(object):
                     if tablename == "dbfluid":
                         existingRows = Status.DB.dbfluid.FluidName[check(rowName)]
                         if len(existingRows) > 0:
-                            showWarning(_("Fluid %s already in database. Data from imported file will be ignored")%rowName)
+                            showWarning(_U("Fluid %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
                             newID = existingRows[0].DBFluid_ID
 
                     elif tablename == "dbfuel":
                         existingRows = Status.DB.dbfuel.FuelName[check(rowName)]
                         if len(existingRows) > 0:
-                            showWarning(_("Fuel %s already in database. Data from imported file will be ignored")%rowName)
+                            showWarning(_U("Fuel %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
                             newID = existingRows[0].DBFuel_ID
                     elif tablename == "auditor":
                         existingRows = Status.DB.auditor.Name[check(rowName)]
                         if len(existingRows) > 0:
-                            showWarning(_("Auditor %s already in database. Data from imported file will be ignored")%rowName)
+                            showWarning(_U("Auditor %s already in database. Data from imported file will be ignored")%rowName)
                             ignoreRow = True
                             newID = existingRows[0].Auditor_ID
                     else:
@@ -885,9 +893,9 @@ class ImportDB(object):
 #......................................................................
 # ask for confirmation before causing a major desaster
 
-        dialog =  DialogImport(None,_("import data"),\
-                               _("This will modify your databases\nIf You are sure, specify what to do with duplicate data")+\
-                               _("\nElse press CANCEL"))
+        dialog =  DialogImport(None,_U("import data"),\
+                               _U("This will modify your databases\nIf You are sure, specify what to do with duplicate data")+\
+                               _U("\nElse press CANCEL"))
         ret = dialog.ShowModal()
         if ret == wx.ID_OK:
             mode = "overwrite"
@@ -1039,10 +1047,10 @@ class ImportDB(object):
                         if mode == "overwrite":
                             existingRows[0].update(newdict)
                             logWarning("%s: %s%s%s"%(tablename,check(rowName),par1,par2)+\
-                                       _(" already in database. Data from imported file will be updated"))
+                                       _U(" already in database. Data from imported file will be updated"))
                         else:
                             logWarning("%s: %s%s%s"%(tablename,check(rowName),par1,par2)+\
-                                       _(" already in database. Data from imported file will be ignored"))
+                                       _U(" already in database. Data from imported file will be ignored"))
                             
                                              
                     else:

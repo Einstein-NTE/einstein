@@ -22,21 +22,24 @@
 #   Created by: 	Hans Schweiger, Stoyan Danov
 #                       02/04/2008 - 01/08/2008
 #
-#   Update No. 002
+#   Update No. 003
 #
 #   Since Version 1.0 revised by:
 #
-#                       Hans Schweiger  01/04/2008
-#                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  01/04/2009
+#                       Hans Schweiger  06/04/2009
+#                       Hans Schweiger  10/06/2009
 #               
-#   01/04/2008  HS  Security features added for dealing with corrupt entries
+#   01/04/2009  HS  Security features added for dealing with corrupt entries
 #                   in db: Equipments w/o name etc.
 #                   -> cleanUpProject called when opening project
 #                   -> cleanUpSQLRows checks mainField
-#   06/04/2008  HS  Clean-up: elimination of prints
+#   06/04/2009  HS  Clean-up: elimination of prints
+#   10/06/2009  HS  bug-fix. empty project description field led to errors in
+#                   setActiveProject
 #		
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -609,8 +612,12 @@ class Project(object):
 
             try:
                 Status.ActiveProjectName = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].Name,"utf-8")
-                Status.ActiveProjectDescription = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].\
-                                                          DescripIndustry,"utf-8")
+
+                if Status.DB.questionnaire.Questionnaire_ID[PId][0].DescripIndustry is not None:
+                    Status.ActiveProjectDescription = unicode(Status.DB.questionnaire.Questionnaire_ID[PId][0].\
+                                                              DescripIndustry,"utf-8")
+                else:
+                    Status.ActiveProjectDescription = ""
 
                 self.cleanUpProject(PId)
 

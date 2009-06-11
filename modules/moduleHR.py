@@ -83,6 +83,7 @@ class ModuleHR(object):
         self.keys = keys # the key to the data is sent by the panel
         self.ConCondensation = False
         self.HiddenHX = []
+        self.data = None
 
 # HS20090530: commented out following update from JR
 #        self.data = HRData(Status.PId,Status.ANo)
@@ -337,7 +338,9 @@ class ModuleHR(object):
         else:    
             doc = XMLImportHRModule.importXML("export.xml")                      
 
-            if((self.data == None) or (self.data.ano != Status.ANo) or (self.data.pid != Status.PId)):
+            if(self.data is None):
+                self.data = HRData(Status.PId,Status.ANo)
+            elif ((self.data.ano != Status.ANo) or (self.data.pid != Status.PId)):
                 self.data = HRData(Status.PId,Status.ANo)
                         
             if (redesign):
