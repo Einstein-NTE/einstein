@@ -18,35 +18,27 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.06
-#	Created by: 	    Hans Schweiger	    22/03/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Stoyan Danov, Claudia Vannoni
+#                       22/03/2008 - 02/08/2008
 #
-#       Last modified by:   Stoyan Danov            04/06/2008
-#                           Hans Schweiger          10/06/2008
-#                           Claudia Vannoni         02/07/2008
-#                           Hans Schweiger          03/07/2008
-#                           Hans Schweiger          02/08/2008
+#   Update No. 000
 #
-#       Changes to previous version:
-#       04/06/2008  SD: traduceable lists creation
-#       10/06/2008  HS: function findKey added
-#       02/07/2008  CV: ST parameters
-#       03/07/2008: HS  subtypes for boilers adapted to DB Boiler
-#       02/08/2008: HS  constant "DEBUG" incorporated
+#   Since Version 1.0 revised by:
 #
 #
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "V1.0.05 Revision No. 305" #Number of upload in sourceforge
+VERSION = "V1.0.05 Revision No. 311" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]

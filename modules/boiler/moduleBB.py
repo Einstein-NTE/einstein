@@ -19,22 +19,24 @@
 #   Created by: 	Claudia Vannoni, Enrico Facci, Hans Schweiger
 #                       11/03/2008 - 16/10/2008
 #
-#   Update No. 003
+#   Update No. 004
 #
 #   Since Version 1.0 revised by:
 #                       Enrico Facci        26/10/2008
 #                       Enrico Facci        04/11/2008
 #                       Enrico Facci        10/06/2009
+#                       Hans Schweiger      11/06/2009
 #
 #   04/11/08: EF    small change in SelectBB and some bugs fixed
 #   10/06/09: EF    changes in BB auto-design - calculations of redundancy
+#   11/06/09: HS    calculation of TCondOffGas added in cEF
 #
 #------------------------------------------------------------------------------		
-#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #   www.energyxperts.net / info@energyxperts.net
 #
 #   This program is free software: you can redistribute it or modify it under
-#   the terms of the GNU general public license as published by the Free
+#   the terms of the GNU general public license v3 as published by the Free
 #   Software Foundation (www.gnu.org).
 #
 #============================================================================== 
@@ -525,14 +527,15 @@ class ModuleBB(object):
             logDebug("Boiler exhaust gas temperature not specified. 200 ºC assumed")
             TExhaustGas = 200
 
-        TEnvEq = 15.0
-        dTtot = max(TExhaustGas-TEnvEq,1.e-10)
+        fuel = Fuel(equipe.DBFuel_id)
+        TMinOffGas = max(fuel.TCondOffGas(),0)
+        dTtot = max(TExhaustGas-TMinOffGas,1.e-10)
 
         f_QWH_T = []
 
         for iT in range(Status.NT+2):
             
-            dT = max(iT*Status.TemperatureInterval - TEnvEq,0.)
+            dT = max(iT*Status.TemperatureInterval - TMinOffGas,0.)
             f_QWH_T.append(f_QWH*min(1.0,dT/dTtot))
             
 
@@ -645,7 +648,6 @@ class ModuleBB(object):
         Status.int.FETel_j[cascadeIndex-1] = FETel_j
         Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
         
-        LossFactEq = 0.01
         Status.int.QWHj[cascadeIndex-1] = QWHj   # not considering the latent heat(condensing water)
         Status.int.QHXj[cascadeIndex-1] = 0.0
 
