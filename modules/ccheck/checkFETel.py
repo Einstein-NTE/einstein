@@ -22,13 +22,15 @@
 #   Created by: 	Claudia Vannoni, Hans Schweiger
 #                       17/04/2008 - 16/09/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
-#                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  06/04/2009
+#                       Hans Schweiger  11/06/2009
 #               
-#   06/04/2008  HS  Clean-up: elimination of some prints
+#   06/04/2009  HS  Clean-up: elimination of some prints
+#   11/06/2009  HS  Some checks on tariffs and costs
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
@@ -68,8 +70,11 @@ class CheckFETel():
         self.ElectricityGen3 = CCPar("ElectricityGen3")
         
         self.ElectricitySales1 = CCPar("ElectricitySales1")
+        self.ElectricitySales2 = CCPar("ElectricitySales2")
+        
         self.ElectricityTotYear1 = CCPar("ElectricityTotYear1")
         self.ElectricityTotYear2 = CCPar("ElectricityTotYear2")
+        self.ElectricityTotYear3 = CCPar("ElectricityTotYear2")
 
         self.ElectricityMotors1 = CCPar("ElectricityMotors1")
         self.ElectricityChem1 = CCPar("ElectricityChem1")
@@ -92,6 +97,12 @@ class CheckFETel():
 
         self.FETel = CCPar("FETel",priority=1,parType="S")
         self.FETel1 = CCPar("FETel1",parType="S")
+
+        self.ElTariffCTot1 = CCPar("ElTariffCTot1")
+        self.ETariffCHP1 = CCPar("ETariffCHP1")
+
+        self.ElCostYearTot1 = CCPar("ElCostYearTot1")
+        self.ElSalesYearCHP1 = CCPar("ElSalesYearCHP1")
         
         self.importData(0)
 
@@ -120,6 +131,13 @@ class CheckFETel():
         self.ElectricityRef = CCPar("ElectricityRef")
         self.ElectricityAC = CCPar("ElectricityAC")
         self.ElectricityThOther = CCPar("ElectricityThOther")
+
+        self.ElTariffCTot = CCPar("ElTariffCTot", priority = 2)
+        self.ElTariffPowTot = CCPar("ElTariffPowTot")
+        self.ETariffCHP = CCPar("ETariffCHP", priority = 2)
+
+        self.ElCostYearTot = CCPar("ElCostYearTot", priority = 1)
+        self.ElSalesYearCHP = CCPar("ElSalesYearCHP", priority = 1)
 
 #..............................................................................
 # reading data from table "cgeneraldata"
@@ -151,6 +169,14 @@ class CheckFETel():
             self.ElectricityRef.setValue(qelectricity.ElectricityRef)
             self.ElectricityAC.setValue(qelectricity.ElectricityAC)
             self.ElectricityThOther.setValue(qelectricity.ElectricityThOther)
+
+            self.ElTariffCTot.setValue(qelectricity.ElTariffCTot)
+            self.ElTariffPowTot.setValue(qelectricity.ElTariffPowTot)
+            self.ETariffCHP.setValue(qelectricity.ETariffCHP)
+
+            self.ElCostYearTot.setValue(qelectricity.ElCostYearTot)
+            self.ElSalesYearCHP.setValue(qelectricity.ElSalesYearCHP)
+
                 
 #..............................................................................
 # check if calculation of FECel is principally possible
@@ -212,6 +238,14 @@ class CheckFETel():
             qelectricity.ElectricityThOther = check(self.ElectricityThOther.val)
             qelectricity.ElGenera = check(self.ElectricityGen.val)
 
+            qelectricity.ElTariffCTot = check(self.ElTariffCTot.val)
+            qelectricity.ElTariffPowTot = check(self.ElTariffPowTot.val)
+            qelectricity.ETariffCHP = check(self.ETariffCHP.val)
+
+            qelectricity.ElCostYearTot = check(self.ElCostYearTot.val)
+            qelectricity.ElSalesYearCHP = check(self.ElSalesYearCHP.val)
+
+
             Status.SQL.commit()
                 
 
@@ -270,6 +304,11 @@ class CheckFETel():
         self.FETel.screen()
         self.FECel.screen()
 
+        self.ElTariffCTot.screen()
+
+        self.ElCostYearTot.screen()
+        self.ElSalesYearCHP.screen()
+
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
 #------------------------------------------------------------------------------
@@ -301,6 +340,11 @@ class CheckFETel():
             self.FETel_c2 = calcSum3("FETel_c2",self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
             self.FETel1 = calcDiff("FETel",self.FETel_c,self.ElectricityGen,parType="S")
 
+            self.ElCostYearTot1 = calcProd("ElCostYearTot1",self.ElTariffCTot,self.ElectricityTotYear)
+#### WARNING: power term not yet included in calculations !!!! ###
+            
+            self.ElSalesYearCHP1 = calcProd("ElSalesYearCHP1",self.ETariffCHP,self.ElectricitySales)
+
                       
             if DEBUG in ["ALL","MAIN"]:
                 self.showAllFETel()
@@ -317,6 +361,9 @@ class CheckFETel():
 # Step 3: Adjust the variables (inverse of calculation routines)
 
                 print "Step 3: calculating from right to left (ADJUST)"
+
+            adjustProd(self.ElCostYearTot1,self.ElTariffCTot,self.ElectricityTotYear)
+            adjustProd(self.ElSalesYearCHP1,self.ETariffCHP,self.ElectricitySales)
 
             adjustDiff(self.FETel1,self.FETel_c2,self.ElectricityGen3)
             adjustSum3(self.FETel_c2,self.ElectricityRef,self.ElectricityAC,self.ElectricityThOther)
@@ -353,9 +400,9 @@ class CheckFETel():
 #   ccheck block
 #------------------------------------------------------------------------------
         ccheck1(self.ElectricityNet,self.ElectricityNet1)
-        ccheck2(self.ElectricityTotYear,self.ElectricityTotYear1,self.ElectricityTotYear2)
+        ccheck3(self.ElectricityTotYear,self.ElectricityTotYear1,self.ElectricityTotYear2,self.ElectricityTotYear3)
         ccheck2(self.ElectricityGen,self.ElectricityGen1,self.ElectricityGen2)
-        ccheck1(self.ElectricitySales,self.ElectricitySales1)
+        ccheck2(self.ElectricitySales,self.ElectricitySales1,self.ElectricitySales2)
 
         ccheck1(self.ElectricityMotors,self.ElectricityMotors1)
         ccheck1(self.ElectricityChem,self.ElectricityChem1)
@@ -369,6 +416,12 @@ class CheckFETel():
         ccheck1(self.FEOel,self.FEOel1)
         ccheck2(self.FETel_c,self.FETel_c1,self.FETel_c2)
         ccheck1(self.FETel,self.FETel1)
+
+        ccheck1(self.ElTariffCTot,self.ElTariffCTot1)
+        ccheck1(self.ETariffCHP,self.ETariffCHP1)
+
+        ccheck1(self.ElCostYearTot,self.ElCostYearTot1)
+        ccheck1(self.ElSalesYearCHP,self.ElSalesYearCHP1)
                           
 #------------------------------------------------------------------------------
     def estimate(self):  
@@ -386,6 +439,9 @@ class CheckFETel():
         self.ElectricitySales.setEstimate(0,limits=(0,0))
         self.FEOel.setEstimate(0,limits=(0,0))
         
+        self.ElTariffCTot.setEstimate(0.08,limits=(0.05,0.15))
+        self.ETariffCHP.setEstimate(0.10,limits=(0.07,0.17))
+
 # limits: optional and fix absolute minimum and maximum values
 # sqerr: optional input that fixes the (stochastic) relative square error
 

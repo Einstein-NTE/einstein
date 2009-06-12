@@ -67,6 +67,10 @@ class CheckFETfuel():
         self.FETFuel = CCPar("FETFuel",priority=2)
         self.FETFuel1 = CCPar("FETFuel1") 
         self.FECFuel1 = CCPar("FECFuel1") 
+        self.FECFuel2 = CCPar("FECFuel2")
+
+        self.FuelTariff1 = CCPar("FuelTariff1")
+        self.FuelCostYear1 = CCPar("FuelCostYear1")
         
         self.importData(i)
 
@@ -88,9 +92,11 @@ class CheckFETfuel():
 
         
         self.MFuelYear = CCPar("MFuelYear") 
-        self.FECFuel = CCPar("FECFuel")
+        self.FECFuel = CCPar("FECFuel", priority = 1)
         self.FEOFuel = CCPar("FEOFuel") #FEOfuel assigned only here=0: missed in the questionnaire but present in the list of the parameters
-        
+
+        self.FuelTariff = CCPar("FuelTariff", priority = 1)
+        self.FuelCostYear = CCPar("FuelCostYear",priority = 1)
 
 #..............................................................................
 # reading data from table "qfuel"
@@ -113,6 +119,10 @@ class CheckFETfuel():
                 self.FEOFuel.val = 0
                 self.FEOFuel.sqerr = 0.0
                 logDebug("checkFuel (importData): FEO = 0.0 assumed")
+
+                self.FuelTariff.setValue(qfuel.FuelTariff)
+                self.FuelCostYear.setValue(qfuel.FuelCostYear)
+                
         except:
             self.FuelLCV = 0.0
             print "CheckFETfuel(importData): error reading data from qfuel"
@@ -137,6 +147,9 @@ class CheckFETfuel():
                 qfuel.FEOFuel = check(self.FEOFuel.val)
                 qfuel.FECFuel = check(self.FECFuel.val)
                 qfuel.FETFuel = check(self.FETFuel.val)
+
+                qfuel.FuelTariff = check(self.FuelTariff.val)
+                qfuel.FuelCostYear = check(self.FuelCostYear.val)
                 
                 Status.SQL.commit()
                 
@@ -163,6 +176,8 @@ class CheckFETfuel():
         self.FECFuel.screen()
         self.FEOFuel.screen()
         self.FETFuel.screen()
+        self.FuelCostYear.screen()
+        self.FuelTariff.screen()
 
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
@@ -193,6 +208,7 @@ class CheckFETfuel():
             
             self.FECFuel1 = calcK("FECFuel1",self.FuelLCV,self.MFuelYear)
             self.FETFuel1 = calcDiff("FETFuel1",self.FECFuel,self.FEOFuel)
+            self.FuelCostYear1 = calcProd("FuelCostYear1",self.FuelTariff,self.FECFuel)
             
             if DEBUG in ["ALL"]:          
                 self.showAllFETfuel()
@@ -203,7 +219,9 @@ class CheckFETfuel():
                 print "Step 2: cross checking"
 
             ccheck1(self.FETFuel,self.FETFuel1)
-            ccheck1(self.FECFuel,self.FECFuel1)
+            ccheck2(self.FECFuel,self.FECFuel1,self.FECFuel2)
+            ccheck1(self.FuelTariff,self.FuelTariff1)
+            ccheck1(self.FuelCostYear,self.FuelCostYear1)
                                     
             if DEBUG in ["ALL"]:
                 self.showAllFETfuel()
@@ -213,6 +231,7 @@ class CheckFETfuel():
             if DEBUG in ["ALL"]:
                 print "Step 3: calculating from right to left (ADJUST)"
 
+            adjustProd(self.FuelCostYear1,self.FuelTariff,self.FECFuel2)
             adjustDiff(self.FETFuel1,self.FECFuel,self.FEOFuel)
             adjustcalcK(self.FECFuel1,self.FuelLCV,self.MFuelYear)
                         
@@ -226,7 +245,9 @@ class CheckFETfuel():
                 print "Step 4: cross checking"
 
             ccheck1(self.FETFuel,self.FETFuel1)
-            ccheck1(self.FECFuel,self.FECFuel1)
+            ccheck2(self.FECFuel,self.FECFuel1,self.FECFuel2)
+            ccheck1(self.FuelTariff,self.FuelTariff1)
+            ccheck1(self.FuelCostYear,self.FuelCostYear1)
                                     
             if DEBUG in ["ALL"]:
                 self.showAllFETfuel()
@@ -236,6 +257,16 @@ class CheckFETfuel():
         if DEBUG in ["ALL","BASIC"]:
             self.showAllFETfuel()
 
+
+#------------------------------------------------------------------------------
+    def estimate(self):  
+#------------------------------------------------------------------------------
+#   estimates some of the data that are not sufficiently precise
+#   should be a subset of the data that are within screen
+#   (not necessarily ALL data have to be estimated)
+#------------------------------------------------------------------------------
+
+        self.FuelTariff.setEstimate(0.04,limits = (0.02,0.06))
 
 #==============================================================================
 if __name__ == "__main__":

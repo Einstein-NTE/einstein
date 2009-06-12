@@ -62,6 +62,7 @@ from checkPipe import *
 from checkHX import *
 from checkWHEE import *
 from checkTotals import *
+from checkECO import *
 from connect import *
 
 def _U(text):
@@ -124,6 +125,8 @@ class ModuleCC(object):
 
         conflictPairs = []
         n = len(conflict.conflictList)
+
+        print "ModuleCC (updatePanel): number of conflicts = ",n
         
 #        for i in range(n):
 #            index = n - i - 1
@@ -417,6 +420,7 @@ class ModuleCC(object):
         self.UPHk = CCRow("UPHk",NK) 
         self.totals = CheckTotals("Totals",self.FECi,self.FETFuel_i,self.USHj,self.UPHk)
 
+        self.ccECO = CheckECO()
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def basicCheck(self,matrixCheck = True,continueCheck = False,estimate = False):
@@ -635,6 +639,10 @@ class ModuleCC(object):
 
             self.totals.check()             # ejecuta la función check para proceso k
 
+
+            conflict.setDataGroup("ECO",0)
+
+            self.ccECO.check()
 #..............................................................................
 # Before going to matrix check, assure that there are no data conflicts
 
@@ -853,6 +861,9 @@ class ModuleCC(object):
 
         screen.setDataGroup("Totals",0)
         self.totals.screen()
+
+        screen.setDataGroup("ECO",0)
+        self.ccECO.screen()
             
         if DEBUG in ["ALL","MAIN","BASIC"]:
             screen.show()
@@ -881,6 +892,8 @@ class ModuleCC(object):
 
         self.totals.exportData()
 
+        self.ccECO.exportData()
+
         return conflict.nConflicts
 
 #==============================================================================
@@ -890,11 +903,11 @@ class ModuleCC(object):
 #   calls the functions "estimate()" of all the checkers ...
 #------------------------------------------------------------------------------
 
-#       self.ccFETel.estimate()
+        self.ccFETel.estimate()
         NI = self.NFET-1
         for i in range(NI):       #then check all the Nfuels = NI-1 fuels
-#            self.ccFET[i].estimate()
-            pass
+            self.ccFET[i].estimate()
+
         screen.setDataGroup("FETel",0)
         self.ccFETel.estimate() #for the moment estimate implemented only in
                                     #FETel as an example
@@ -923,6 +936,7 @@ class ModuleCC(object):
 #            self.ccWHEE[n].estimate()
             pass
 
+        self.ccECO.estimate()
 
 #------------------------------------------------------------------------------
     def selectMainProcesses(self):

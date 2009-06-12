@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 007
+#   Update No. 008
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -29,6 +29,7 @@
 #                       Hans Schweiger          29/04/2009
 #                       Hans Schweiger          30/05/2009
 #                       Hans Schweiger          09/06/2009
+#                       Hans Schweiger          11/06/2009
 #
 #   Changes to previous version:
 #
@@ -45,6 +46,7 @@
 #                   (see commments marked with HS 20090530)
 #   09/06/2009: HS  condition if (self.data is None ...) added before call
 #                   to HRData in __runPE2 (following mail BS/FJ from 04/06/09)
+#   11/06/2009: HS  adaptations in report generation: plot data for graphics
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -225,28 +227,45 @@ class ModuleHR(object):
         CCC_Y_index = 1
         HCC_X_index = 2
         HCC_Y_index = 3
-        QD_index = 5
-        QA_index = 4
+        QD_index = 4
+        QA_index = 5
         MAXROWS = 81
+
+        dataReport2 = [["T-CCC","CCC","T-HCC","HCC","QD","QA"]]
+# HS 20090611. Row with strings added
+# the data transfer to OpenOffice spreadsheet for some reason doesn't like arrays with
+# numbers only
+
 #        print "start curves"
         for i in range(0,MAXROWS):
             row = ["","","","","",""]
             dataReport2.append(row)
         entryCount = len(self.data.curves[0].X)
         for i in range(0,min(MAXROWS,entryCount)):            
-            dataReport2[i][CCC_X_index] = self.data.curves[0].X[i]
-            dataReport2[i][CCC_Y_index] = self.data.curves[0].Y[i]        
+            dataReport2[i+1][CCC_X_index] = self.data.curves[0].X[i]
+            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[i]
+
+        for i in range(min(MAXROWS,entryCount),MAXROWS):
+            dataReport2[i+1][CCC_X_index] = self.data.curves[0].X[entryCount-1]
+            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[entryCount-1]
+           
         entryCount = len(self.data.curves[1].X)
         for i in range(0,min(MAXROWS,entryCount)):            
-            dataReport2[i][HCC_X_index] = self.data.curves[1].X[i]
-            dataReport2[i][HCC_Y_index] = self.data.curves[1].Y[i]                              
+            dataReport2[i+1][HCC_X_index] = self.data.curves[1].X[i]
+            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[i]                              
+
+        for i in range(min(MAXROWS,entryCount),MAXROWS):
+            dataReport2[i+1][HCC_X_index] = self.data.curves[1].X[entryCount-1]
+            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[entryCount-1]
+
 #        print "start qd"
         for i in range(0,min(MAXROWS,len(QD_T))):
-            dataReport2[i][QD_index] = QD_T[i]                
+            dataReport2[i+1][QD_index] = QD_T[i]                
         for i in range(0,min(MAXROWS,len(QA_T))):
-            dataReport2[i][QA_index] = QA_T[i]
+            dataReport2[i+1][QA_index] = QA_T[i]
+
 #        print "end"
-#        print "%s\n"%key,dataReport2
+        print "%s\n"%key,dataReport2
         Status.int.setGraphicsData(key, array(dataReport2))
         
     def __updateCurveData(self):                 

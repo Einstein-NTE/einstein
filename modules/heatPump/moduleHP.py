@@ -505,7 +505,7 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 #   Looks for the minimum temperature in heat demand
 #------------------------------------------------------------------------------
-        iT = firstNonZero(Q_T) - 1      #find the index, SD: -1: assume linear change in the last interval,06/05/2008
+        iT = max(firstNonZero(Q_T) - 1,0)      #find the index, SD: -1: assume linear change in the last interval,06/05/2008
         return(Status.int.T[iT])        #find the T corresponding to index
         
 #------------------------------------------------------------------------------
@@ -513,9 +513,7 @@ class ModuleHP():
 #------------------------------------------------------------------------------
 #   Looks for the minimum temperature in heat demand
 #------------------------------------------------------------------------------
-        iT = lastNonZero(Q_T) + 1       #find the index, SD: +1: assume linear change in the last interval,06/05/2008
-        print "ModuleHP: getTMaxA Q_T = ",Q_T
-        print "iT = ",iT
+        iT = min(lastNonZero(Q_T) + 1,Status.NT+1)       #find the index, SD: +1: assume linear change in the last interval,06/05/2008
         return(Status.int.T[iT])        #find the T corresponding to index
         
 #------------------------------------------------------------------------------
