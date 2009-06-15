@@ -63,7 +63,7 @@ class Status(object):
   # Tool interface configuration [==> SQL Table STATUS]
 
   UserInteractionLevel = "interactive" # Selected level of user interaction
-  LanguageTool = "english"         # Selected language for tool interface
+  LanguageTool = "en"         # Selected language for tool interface
   Units = "SI-kWh"                 # System of units (default: SI-kWh)
   Country = "Spain"                # Configuration for country specific aids ... NOT USED AT PRESENT
   UserType = "Expert"              # type of user: expert, student, end-user ... ???

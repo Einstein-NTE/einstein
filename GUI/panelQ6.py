@@ -518,7 +518,7 @@ class PanelQ6(wx.Panel):
                         
         tmp = {
             "HXName":check(self.tc1.GetValue()),
-            "HXType":check(findKey(TRANSHXTYPES,self.tc2.GetValue(text=True))),
+            "HXType":check(findKey(Status.TRANS.HXTYPES,self.tc2.GetValue(text=True))),
             "QdotHX":check(self.tc3.GetValue()), 
             "HXLMTD":check(self.tc4.GetValue()), 
             "QHX":check(self.tc5.GetValue()), 
@@ -625,7 +625,7 @@ class PanelQ6(wx.Panel):
 
         if self.WHEEName is not None: self.listBoxWHEE.SetStringSelection(self.WHEEName)
 
-        fillChoice(self.tc2.entry,TRANSHXTYPES)
+        fillChoice(self.tc2.entry,Status.TRANS.HXTYPES.values())
 
         self.sourceList = Status.prj.getEqList("Equipment")
         self.sourceList.extend(Status.prj.getPipeList("Pipeduct"))
@@ -657,7 +657,7 @@ class PanelQ6(wx.Panel):
             
             self.tc1.SetValue(q.HXName)
             
-            if str(q.HXType) in TRANSHXTYPES.keys():
+            if str(q.HXType) in Status.TRANS.HXTYPES.keys():
                 self.tc2.SetValue(TRANSHXTYPES[str(q.HXType)])
                 
             self.tc3.SetValue(str(q.QdotHX))

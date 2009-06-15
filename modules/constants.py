@@ -38,7 +38,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "V1.0.05 Revision No. 311" #Number of upload in sourceforge
+VERSION = "V1.0.05 Revision No. 313" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
@@ -84,7 +84,7 @@ EINSTEIN_OK = 1
 EINSTEIN_NOTOK = 0
 
 INTERACTIONLEVELS = ['interactive','semi-automatic','automatic']
-
+LANGUAGES = ['en','cz','de','es','it','pl','si']
 
 #------------------------------------------------------------------------------		
 #default entries for parameters
@@ -174,9 +174,11 @@ HXTYPES = [ "plate HX (liquid-liquid)",
             "plate HX (air-air)",
             "shell and tube HX (liquid-liquid)",
             "finned tubes (liquid-air)"]
+
+global TRANSHXTYPES
 TRANSHXTYPES = {"plate HX (liquid-liquid)":     _("plate HX (liquid-liquid)"),
                 "plate HX (air-air)":           _("plate HX (air-air)"),
-                "shell and tube HX (liquid-liquid)":_("shell and tube HX (liquid-liquid)"),
+                "shell and tube HX (liquid-liquid)":_("shell&tube HX (liquid-liquid)"),
                 "finned tubes (liquid-air)":    _("finned tubes (liquid-air)")
                 }
 
@@ -414,7 +416,28 @@ def setDebugMode(value):
     global DEBUG
     if value in DEBUGMODES:
         DEBUG = value
+#------------------------------------------------------------------------------    
+
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 #------------------------------------------------------------------------------
+class updateConstants():
+#------------------------------------------------------------------------------
+#   gets the updated values for translatable constants
+#   this function has to be called after each language change !!!
+#
+#   OLD CONSTANTS TRANS_XY... should be substituted by attribute of this class
+#------------------------------------------------------------------------------
+
+    def __init__(self):
+        NEWTRANSHXTYPES = {"plate HX (liquid-liquid)":     _U("plate HX (liquid-liquid)"),
+                        "plate HX (air-air)":           _U("plate HX (air-air)"),
+                        "shell and tube HX (liquid-liquid)":_U("shell&tube HX (liquid-liquid)"),
+                        "finned tubes (liquid-air)":    _U("finned tubes (liquid-air)")
+                        }
+
+        self.HXTYPES = NEWTRANSHXTYPES
 
 if __name__ == '__main__':
 

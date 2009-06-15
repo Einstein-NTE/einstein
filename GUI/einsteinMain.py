@@ -222,8 +222,19 @@ class EinsteinFrame(wx.Frame):
                                    
     def setLanguage(self):
         #TS20080528 Took this out of createUI, so it can be called before creating the UI
-        LANGUAGE = self.conf.get('GUI', 'LANGUAGE')
-        self.doLog.LogThis('Reading config done')
+        LANGUAGE = Status.DB.stool.STool_ID[1][0].LanguageTool
+        print "Main(setLanguage): language set to ",LANGUAGE
+
+        if LANGUAGE not in LANGUAGES:
+            LANGUAGE = self.conf.get('GUI', 'LANGUAGE')
+
+        if LANGUAGE not in LANGUAGES:
+            LANGUAGE = 'en' #default -> set to English
+
+        Status.LanguageTool = LANGUAGE
+        Status.DB.stool.STool_ID[1][0].LanguageTool = LANGUAGE
+                    
+#        self.doLog.LogThis('Reading config done')
 
         #----- I18N
         #TS20080120 Installed runtime text translation infrastructure
@@ -233,6 +244,8 @@ class EinsteinFrame(wx.Frame):
         gettext.install("einstein", "locale", unicode=False)
         language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)], fallback=True)
         language.install()
+
+        Status.TRANS = updateConstants()
 
 #HS2008-10-09 added (see http://wiki.wxpython.org/Internationalization#head-45277e6d8f10a94d0f9dadaa64a7e8527f59f948)
 #        self.prnt.locale = wx.Locale(wx.wxLANGUAGE_ITALIAN)
@@ -665,6 +678,7 @@ class EinsteinFrame(wx.Frame):
             language.install()
 
         dialogLang.Destroy()
+        Status.TRANS = updateConstants()
         self.changeUI()
 
     def OnMenuSettingsViewMessages(self,event):
@@ -724,16 +738,20 @@ class EinsteinFrame(wx.Frame):
         #PageTitle
         if select == _U("Einstein"):
             self.hidePages()
+            self.activePanel = "MAIN" ####HS 20090613 - was an attempt. uncompleted !!!
+                                        #function required that associates translated text with code or english text
             self.pageTitle.Show()
         #Page0
         elif select == _U('Edit Industry Data'): #Edit Industry Data
             self.hidePages()
+            self.activePanel = "Q0"
             self.Page0 = PanelQ0(self.leftpanel2, self)
             self.Page0.fillPage()
             self.Page0.Show()
         #Page1
         elif select == _U('General data'): #General data
             self.hidePages()
+            self.activePanel = "Q1"
             self.Page1 = PanelQ1(self.leftpanel2, self)
             self.Page1.display()
 ##            self.Page1.clear()
@@ -744,6 +762,7 @@ class EinsteinFrame(wx.Frame):
         #Page2
         elif select == _U("Energy consumption"): #Energy consumption
             self.hidePages()
+            self.activePanel = "Q2"
             self.Page2 = PanelQ2(self.leftpanel2, self)
             self.Page2.display()
 ##            self.Page2.clear()
@@ -754,24 +773,28 @@ class EinsteinFrame(wx.Frame):
         #Page3
         elif select == _U("Processes data"): #Processes data
             self.hidePages()
+            self.activePanel = "Q3"
             self.Page3 = PanelQ3(self.leftpanel2, self)
             self.Page3.display()
 
         #Page4
         elif select == _U("Generation of heat and cold"): #Generation of heat and cold
             self.hidePages()
+            self.activePanel = "Q4"
             #HS2008-04-13 None as argument added.
             self.Page4 = PanelQ4(self.leftpanel2, self, None)
             self.Page4.display()
         #Page5
         elif select == _U("Distribution of heat and cold"): #Distribution of heat and cold
             self.hidePages()
+            self.activePanel = "Q5"
             self.Page5 = PanelQ5(self.leftpanel2, self)
             self.Page5.display()
 
         #Page6 (Heat Recovery Missing)
         elif select == _U("Heat recovery"): #Heat recovery
             self.hidePages()
+            self.activePanel = "Q6"
             self.Page6 = PanelQ6(self.leftpanel2, self)
             self.Page6.display()
 ##            self.Page6.clear()
@@ -781,6 +804,7 @@ class EinsteinFrame(wx.Frame):
         #Page7
         elif select == _U("Renewable energies"): # Renewable energies
             self.hidePages()
+            self.activePanel = "Q7"
             self.Page7 = PanelQ7(self.leftpanel2, self)
             self.logMessage(_U("city / country"))
             self.Page7.display()
@@ -791,6 +815,7 @@ class EinsteinFrame(wx.Frame):
         #Page8
         elif select == _U("Buildings"): #Buildings
             self.hidePages()
+            self.activePanel = "Q8"
             self.Page8 = PanelQ8(self.leftpanel2, self)
             self.Page8.display()
 ##            self.Page8.clear()
@@ -800,6 +825,7 @@ class EinsteinFrame(wx.Frame):
         #Page9
         elif select == _U("Economic parameters"): #Economic parameters
             self.hidePages()
+            self.activePanel = "Q9"
             self.Page9 = PanelQ9(self.leftpanel2, self)
             self.Page9.display()
 ##            self.Page9.clear()
@@ -809,6 +835,7 @@ class EinsteinFrame(wx.Frame):
         #qDataCheck
         elif select == _U("Consistency Check"):
             self.hidePages()
+            self.activePanel = "CC"
             self.panelCC = PanelCC(id=-1, name='panelCC',
                                    parent=self.leftpanel2, main=self,
                                    pos=wx.Point(0, 0), size=wx.Size(800, 600))
@@ -818,6 +845,7 @@ class EinsteinFrame(wx.Frame):
             #TS 2008-3-26 No action here
             #self.hidePages()
             #self.pageStatistics.Show()
+            self.activePanel = "EA"
             pass
         #qEA1 'Primary energy - Yearly'
         elif select == _U("Primary energy"):
@@ -1569,9 +1597,6 @@ class EinsteinApp(wx.App):
                                  ("Starting EINSTEIN Version %s"%VERSION)+\
                                  "\n==================================\n")
 
-        # initialize language
-        self.frame.setLanguage()
-
         # attempt to connect to database
         # if not possible, invoke a database setup dialog, so the user can
         # attempt to change some parameters and fix the problem.
@@ -1593,6 +1618,9 @@ class EinsteinApp(wx.App):
                     continue
                 # user has canceled
                 sys.exit(1)
+
+        # initialize language
+        self.frame.setLanguage()
 
         #initialize fonts management
         # (needs database connected)

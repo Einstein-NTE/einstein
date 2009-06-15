@@ -33,6 +33,8 @@
 #==============================================================================
 
 import wx
+from einstein.modules.constants import updateConstants
+from einstein.GUI.status import Status
 
 def _U(text):
     return unicode(_(text),"utf-8")
@@ -88,11 +90,23 @@ class DialogLanguage(wx.Dialog):
 #--- Eventhandlers
 #------------------------------------------------------------------------------		
     def OnButtonOKButton(self, event):
-        self.language = self.listBoxLang.GetStringSelection()[:2]
+        self.language = self.listBoxLang.GetStringSelection().split("-")[0]
+
+        Status.LanguageTool = self.language
+
+        stool = Status.DB.stool.STool_ID[1][0]
+        stool.LanguageTool = self.language
+
         self.EndModal(wx.ID_OK)
 
     def OnListBoxLangDclick(self, event):
-        self.language = self.listBoxLang.GetStringSelection()[:2]
+        self.language = self.listBoxLang.GetStringSelection().split("-")[0]
+
+        Status.LanguageTool = self.language
+
+        stool = Status.DB.stool.STool_ID[1][0]
+        stool.LanguageTool = self.language
+
         self.EndModal(wx.ID_OK)
 
 #------------------------------------------------------------------------------
