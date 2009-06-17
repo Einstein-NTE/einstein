@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>EINSTEIN Tool User Manual</title></head>
+
+<body>
+<div style="text-align: center;"><img alt="einstein_logo" src="img/einstein_logo.jpg" style="width: 421px; height: 108px;"><br>
+</div>
+<br>
+<h1 style="text-align: center;">User Manual</h1>
+<br>
+<table style="width: 300px; text-align: left;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual_FAQ.html">&lt;&lt;&lt;</a><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">UP</a><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="einstein_manual.html">&gt;&gt;&gt;</a><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h1><span style="font-weight: bold;">Tips &amp; Tricks</span></h1>
+&nbsp;<br>In this section some tips &amp; tricks are collected for the work with the current version V1.0.06.<br><br>Features that are not yet - or not yet fully - working are highlighted and some possible workarounds are mentioned.<br>
+<br>
+<h2><span style="font-weight: bold;">1. Data Entry - general issues</span></h2>
+
+<font color="#330033"><span style="color: red;" lang="EN-GB"><font color="black">a) It is not possible to change
+the name of an existing equipment, process etc once it has been created and
+saved. The tool will automatically add a new item to the list with the new name
+(in addition to the existing ones). <br>Workaround:
+If You want to change the name, create a copy with the new name and
+delete the old one. Take care: Connections from / to this equipment /
+process / pipe etc. then have to be established again.<br><br>b) Fuel data bases<br><br></font></span></font><font color="black"><span style="color: red;" lang="EN-GB"><font color="black">- LCV of natural is in kWh/kg (not in kWh/m3)<br><br>c) Refresh of windows<br><br></font></span></font><font color="#330033"><span style="color: red;" lang="EN-GB"><font color="black">- Lists for selection of parameters are not updated automatically in the questionnaire panels.</font></span></font><span style="color: red;" lang="EN-GB"> <font color="black">E.g., if a new fluid is added
+into the DB while data entering, in order to view the new fluid in the pop up
+list close and enter again the window in use (e.g. the process questionnaire).<o:p></o:p></font></span><font color="black">
+<br></font><span lang="EN-GB"><br>- In order to view
+a New project or an imported one among the &#8220; project in the database&#8221; go to the
+EINSTEIN main screen and then go back again to &#8220;Einstein industry data&#8221;</span>
+<br><font color="black"><br></font>
+
+
+
+
+
+<span style="" lang="EN-GB">d)&nbsp;<span style=""><span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;"> </span></span></span><!--[endif]--><span lang="EN-GB">Buildings. Not yet active. But there is a workaround: heating and air conditioning of
+production halls can be modelled like a process (into the process data sheet)
+and therefore data on heating and air conditioning of production halls must be
+collected even though the building calculation module does not exist<span style="">&nbsp; </span></span>
+
+<br><!--[if !supportLists]--><span style="" lang="EN-GB"><span style=""></span></span><span style="" lang="EN-GB"><span style=""></span></span><span style="" lang="EN-GB"><span style=""></span></span><span style="" lang="EN-GB"><span style=""></span></span><span style="" lang="EN-GB"><span style=""></span></span><font color="black"><span style="color: red;" lang="EN-GB"><font color="black"><br></font></span></font><h2><span style="font-weight: bold;">2. Modeling of processes</span></h2>
+
+<font color="#330033"><span style="color: red;" lang="EN-GB"></span></font>a) Processes with several incoming and / or outgoing flows (multi-flow processes)<br><br>In the current version, it is only possible to model processes with one incoming and one outgoing flow.<br><br><i>Work-around for multi-flow processes:</i><br>
+
+<p class="MsoNormal">
+
+<span lang="EN-GB">Take the case that
+You have processes with two or more incoming different streams (e.g. water and
+meat) and/or two or more three different outgoing streams (e.g. water, meat,
+steam).</span>
+
+<span lang="EN-GB"></span>&nbsp;<br></p><span lang="EN-GB"><o:p></o:p></span><span lang="EN-GB">Let's treat them
+separately:</span>
+
+<br><span lang="EN-GB"><o:p>&nbsp;</o:p></span>
+
+<br><u><span lang="EN-GB">A. The
+INCOMING STREAMS<o:p></o:p></span></u>
+
+<span lang="EN-GB"><o:p>&nbsp;</o:p></span>
+
+<span lang="EN-GB"><br>In the example
+of a meat cooker we have two incoming streams:</span>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>The CIRCULATION
+heat for bringing the incoming streams to process temperature is
+mdot*cp*(T_process - T_inlet)</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">- If we want to
+consider both the meat and the water, we have to define some MIX as
+"working medium" (-&gt; add as new fluid) whose properties are a
+weighted average (weighted by thermal mass m*cp)</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">- If one thermal
+mass is very small compared to the other, then we just select ONE and
+depreciate the other.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p>The MEDIUM of
+the incoming streams is the "process medium", and which one depends
+on what you chose above.</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><u><span lang="EN-GB">B. The
+OUTGOING ONES<o:p></o:p></span></u></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>The problem is
+the same as with the incoming, EINSTEIN allows only for one. </span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>But: while the
+Incoming streams ALL contribute to the heat demand, the Outgoing streams are
+only of interest for us, if either their waste heat content is already used, or
+we think that it MIGHT be used.</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">The other ones
+can be just neglected.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>So in the
+specific case of the meat cooker:</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">- recovering
+some heat from the outgoing cooked meat should be very difficult, so it will be
+neglected </span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">- the remaining
+problem is whether to consider waste heat flow associated to water or to steam <span style="">&nbsp;</span>-&gt; Choose the one which is more relevant
+(energy content, possibility of recovery&#8230;).</span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">- if you want to
+consider both this is - in the present version - rather complicated.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>You can define
+some "mix" fluid X with the c_p value and the condensation
+temperature set so that</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>mdot_X*[h_X(out)
+- h_X(final)] = mdot_steam*[h_vapour(out) - h_condensed_ steam(final)] +
+mdot_waste_water*cp_waste_water*[(T_waste_water(out) - T_waste_water(final)]</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>The simplest way
+to do this and that more or less maintains not only the quantity but also the
+temperature distribution of the waste heat, would be to adjust the cp of the
+outgoing vapour (cp_X = cp_water + Delta, T_cond_X = T_cond_vapour), adjusting
+the unknown Delta until the upper<span style="">&nbsp; </span>condition
+is fulfilled.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>Idem, the
+outgoing medium depends on your choice, can be the waste water, the steam, or
+the X.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>This explanation
+is limited now to the circulation part of the heat demand: inflows + outflows.
+Start-up and heat losses (maintenance) may be also take into account.</span></p>
+<p class="MsoNormal"><span style="color: red;" lang="IT"> <o:p></o:p></span></p>
+
+
+
+<h2><span style="font-weight: bold;"><font color="#330033">3.</font> Consistency checking and energy statistics</span></h2>a) Only annual data are available in V1.0.06. Monthly and daily statistics not yet implemented<br>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">b) In order to get
+familiar with the data input and the <u>consistency-check concept,</u> <span style="">&nbsp;</span>it is recommended to try to perform the
+example 4.2 (Project&nbsp;Einstein Guide 4.2 Basecase) according
+the description given within the Audit Guide at pages 92-97.</span></p>
+
+
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB"><o:p></o:p>Following a
+simple procedure for data entering may help to pass the consistency check in a
+shorter time. </span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">It is
+recommended to enter the process&#8217; data first, then the equipment&#8217;s (but without
+any boundary such as the load factor), then the pipes&#8217;
+and last the overall consumption. Of course in order to perform the consistency
+check equipments and pipes have to be previously created and linked each other and
+to the processes &#8211; but without adding any specific parameter such as the power
+etc. </span></p>
+
+<p class="MsoNormal" style="text-align: justify;"><span lang="EN-GB">It is also
+recommended to analyse sub-system by sub-system (e.g. Enter data of equipment 1
+-&gt; related pipes -&gt; related processes THEN check the consistency and enter
+the second group of data<span style="">&nbsp; </span>equipment 2 -&gt;
+related pipes -&gt; related processes&#8230;).</span></p>
+<h2><span style="font-weight: bold;">4. Benchmark Module</span></h2>Not yet fully active in V1.0.06. Operations with the benchmark module may cause instabilities. =&gt; on your own risk.<h2><span style="font-weight: bold;">5.Heat recovery module</span></h2><b style=""><span style="" lang="EN-GB"></span></b><span style="" lang="EN-GB">1)
+The heat exchangers can be seen with all their details, back in the
+questionnaire sheet "Heat reovery". Here heat exchanger data can be
+changed and heat exchangers can be deleted.<span style="">&nbsp; </span>In
+case you want to change the size of a heat exchanger, please do so by
+changing the "total heat transferred" and either adjust the heat
+transfer rate as well, or leave it empty.<o:p></o:p></span><br><span style="" lang="EN-GB">If
+too many heat exchangers that are connected to the SAME heat sink or
+heat source are CHANGED IN SIZE, this might cause problems for the
+calculation, as complexity for the algorithm for splitting streams and
+keeping the thermodynamic balance correct, increase. In this case the
+remaining energy demand in the YED curves, might NOT coincide with the
+remaining energy demand shown in "Heat demand (temp)" in the energy
+statistics.1)<o:p></o:p></span><br><span style="" lang="EN-GB"><o:p>&nbsp;</o:p></span><br><span style="" lang="EN-GB">2)
+Processes that have a "maintainance heat demand" in EINSTEIN, are
+modelled in the Heat recovery module as LATENT streams. In some cases
+energy transferred over a heat exchanger that<o:p></o:p></span><br><span style="" lang="EN-GB">- has a latent stream as heat sink AND<o:p></o:p></span><br><span style="" lang="EN-GB">- when only a part of this latent stream is covered by the heat exchanger<o:p></o:p></span><br><span style="" lang="EN-GB">are not substracted from the energy demand curves.<br><br></span><h2><span style="font-weight: bold;">6. Heat and cold supply</span></h2>1)&nbsp;&nbsp;&nbsp; <font color="#ff6600"><b>COOLING</b></font>. Cooling is not yet supported in V1.0.06<br><br>Possible
+workaround: Define a process with an equivalent heat demand and an
+electrical boiler. This allows you (a) to include the electricity
+demand for chillers in the energy statistics and (b) to evaluate the
+possibility to cover part of the cooling demand with thermal chillers
+(absorption, adsorption, etc.) using heat as driving energy.<br><br>For the latter purpose, the equivalent heat demand should be defined with <br>a) equivalent process temperature = average driving temperature for the thermal chiller<br>b) equivalent heat demand = cooling demand / average COP<br>c)
+equivalent efficiency electrical boiler = (COP_electrically driven
+compression chiller / average COP_thermal chiller) &nbsp;- (parasitic
+electricity thermal chiller / heat input thermal chiller)<br><br><span style="" lang="EN-GB"><span style="">2)<span style="font-family: &quot;Times New Roman&quot;; font-style: normal; font-variant: normal; font-weight: normal; font-size: 7pt; line-height: normal; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></span><span lang="EN-GB"><font color="#ff6600"><b>BIOMASS</b></font>. Not yet supported in V1.0.06<br><br></span>3) <b><font color="#ff6600">CHP</font></b><br>Only manual design of CHP plants is active. Automatic design not yet supported in V1.0.06<br><br>4) <b><font color="#ff6600">BOILERS AND BURNERS</font></b><br><br>For automatic design of boilers and burners, only natural gas fired boilers are considered. <br><br><!--[if !supportLists]--><br><h2><span style="font-weight: bold;">7. Total cost analysis</span></h2>For tips &amp; tricks on total cost analysis see <a href="einstein_manual_TCA_Tricks.html">section 11 - TCA Tips &amp; Tricks</a><br><span style="font-style: italic;"></span><br>
+</body></html>

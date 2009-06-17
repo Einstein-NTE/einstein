@@ -76,7 +76,7 @@ class PanelCS4(wx.Panel):
                    'key'         : "CS4_Plot",                      # key for Interface
                    'title'       :_U('Investment cost'), # title of the graph
                    'ylabel'      :_U('Total cost (Own+Subsidies)[EUR]'),  # y axis label
-                   'legend'      :[_U('Own cost [EUR]'),_U('Subsidies [EUR]')],  # legend
+                   'legend'      :[_U('Subsidies [EUR]'),_U('Own cost [EUR]')],  # legend
                    'backcolor'   :GRAPH_BACKGROUND_COLOR,        # graph background color
                    'tickfontsize': 8,                            # tick label fontsize
                    'ignoredrows' :[0]}                        # rows that should not be plotted

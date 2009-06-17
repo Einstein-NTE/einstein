@@ -179,8 +179,12 @@ class ModuleHR(object):
             q = hx["QHX"]
             if qTotal > 0 and q is not None: qhxperc = 100.0*q/qTotal
             else: qhxperc = "---"
-            
-            row = [hx["HXName"],hx["QdotHX"],hx["HXSource"],hx["HXSink"],hx["QHX"],qhxperc]
+
+            if hx["QHX"] is not None:
+                qhx_MWh = q/1000.
+            else:
+                qhx_MWh = 0.0
+            row = [hx["HXName"],hx["QdotHX"],hx["HXSource"],hx["HXSink"],qhx_MWh,qhxperc]
             if index < 20:
                 dataListReport.append(noneFilter(row))
             elif index == 20:
@@ -191,7 +195,7 @@ class ModuleHR(object):
             row = [" "," "," "," "," "," "]
             dataListReport.append(row)
 
-        row = [_("Total"),qdotTotal," "," ",qTotal,100.0]
+        row = [_("Total"),qdotTotal," "," ",qTotal/1000.0,100.0]
         dataListReport.append(row)
         
         dataReport = array(dataListReport)
@@ -243,26 +247,26 @@ class ModuleHR(object):
         entryCount = len(self.data.curves[0].X)
         for i in range(0,min(MAXROWS,entryCount)):            
             dataReport2[i+1][CCC_X_index] = self.data.curves[0].X[i]
-            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[i]
+            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[i]/1000.0
 
         for i in range(min(MAXROWS,entryCount),MAXROWS):
             dataReport2[i+1][CCC_X_index] = self.data.curves[0].X[entryCount-1]
-            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[entryCount-1]
+            dataReport2[i+1][CCC_Y_index] = self.data.curves[0].Y[entryCount-1]/1000.0
            
         entryCount = len(self.data.curves[1].X)
         for i in range(0,min(MAXROWS,entryCount)):            
             dataReport2[i+1][HCC_X_index] = self.data.curves[1].X[i]
-            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[i]                              
+            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[i]/1000.0                              
 
         for i in range(min(MAXROWS,entryCount),MAXROWS):
             dataReport2[i+1][HCC_X_index] = self.data.curves[1].X[entryCount-1]
-            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[entryCount-1]
+            dataReport2[i+1][HCC_Y_index] = self.data.curves[1].Y[entryCount-1]/1000.0
 
 #        print "start qd"
         for i in range(0,min(MAXROWS,len(QD_T))):
-            dataReport2[i+1][QD_index] = QD_T[i]                
+            dataReport2[i+1][QD_index] = QD_T[i]/1000.0                
         for i in range(0,min(MAXROWS,len(QA_T))):
-            dataReport2[i+1][QA_index] = QA_T[i]
+            dataReport2[i+1][QA_index] = QA_T[i]/1000.0
 
 #        print "end"
         print "%s\n"%key,dataReport2

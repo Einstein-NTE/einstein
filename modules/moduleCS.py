@@ -515,7 +515,8 @@ class ModuleCS(object):
                 tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dTotalCost_Table,dOwnCost_Table,dSubsidies_Table])
 
-                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dOwnCost,dSubsidies])
+#                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dOwnCost,dSubsidies])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dTotalCost,dOwnCost])
                
                 CS4Table.append(tableEntry)
                 CS4Plot.append(plotEntry)
@@ -661,7 +662,10 @@ class ModuleCS(object):
                 tableEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),
                                          dAmortization_Table,dEnergyCost_Table,dOMCost_Table])
 
-                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),dAmortization,dEnergyCost,dOMCost])
+                plotEntry = noneFilter([unicode(salternatives[i].ShortName,"utf-8"),\
+                                        dAmortization+dEnergyCost+dOMCost,\
+                                        dEnergyCost+dOMCost,\
+                                        dOMCost])
                
                 CS5Table.append(tableEntry)
                 CS5Plot.append(plotEntry)

@@ -242,7 +242,11 @@ class EinsteinFrame(wx.Frame):
         #TS20080120 added fallback to avoid errors on inexistent translations
         #
         gettext.install("einstein", "locale", unicode=False)
-        language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)], fallback=True)
+
+        if LANGUAGE == "cz":
+            language = gettext.translation("einstein", "locale", languages=['cs_CZ'], fallback=True)
+        else:
+            language = gettext.translation("einstein", "locale", languages=['%s' % (LANGUAGE,)], fallback=True)
         language.install()
 
         Status.TRANS = updateConstants()
