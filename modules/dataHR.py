@@ -14,18 +14,20 @@
 #           
 #==============================================================================
 #
-#   Version No.: 0.01
+#   Version No.: 0.03
 #   Created by:         Florian Joebstl  02/09/2008
 #   Last revised by:
-#                       Florian Joebstl  25/09/2008                       
+#                       Florian Joebstl  25/09/2008
+#                       Hans Schweiger   06/07/2009
 #
 #   Changes to previous version:
 #       25/09/08   FJ   getStreamsFromHiddenHX added
+#       06/07/09   HS   change of __storeNewHX, so that UTF names are supported
 #
 #
 #   
 #------------------------------------------------------------------------------     
-#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #   www.energyxperts.net / info@energyxperts.net
 #
 #   This program is free software: you can redistribute it or modify it under
@@ -36,6 +38,7 @@
 
 
 from einstein.GUI.status import *
+from einstein.GUI.GUITools import check
 from einstein.modules.messageLogger import *
 #--------------------------------------------------------------------------------------------
 # stores all data needed in the HRModule
@@ -87,14 +90,47 @@ class HRData:
     def __storeNewHX(self,listofhexdata):   
     #stores HEXers found in XML document
     #deletes old HEX             
-        try:
-            delquery = "DELETE FROM qheatexchanger  WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (self.pid,self.ano)
-            Status.DB.sql_query(delquery)
-            for hx in listofhexdata:                
-                query = hx.getInsertSQL(self.pid,self.ano)
-                Status.DB.sql_query(query)
-        except:            
-            logError(_("Error writing new HX into database.")) 
+#        try:
+        delquery = "DELETE FROM qheatexchanger  WHERE ProjectID=%s AND AlternativeProposalNo=%s" % (self.pid,self.ano)
+        Status.DB.sql_query(delquery)
+
+        qhxTable = Status.DB.qheatexchanger
+        for hx in listofhexdata:                
+#                query = hx.getInsertSQL(self.pid,self.ano)
+#                Status.DB.sql_query(query)
+
+            tmp = {"ProjectID":self.pid,
+                   "AlternativeProposalNo":self.ano,
+                   "HXNo":check(hx.getValue("HXNo")),
+                   "HXName":check(hx.getValue("HxName")),
+                   "HXType":check(hx.getValue("HXType")),
+                   "QdotHX":check(hx.getValue("QdotHX")),
+                   "HXLMTD":check(hx.getValue("HXLMTD")),
+                   "Area":check(hx.getValue("HEX_area")),
+                   "QHX":check(hx.getValue("QHX")),
+                   "HXSource":check(hx.getValue("HXSource")),
+                   "FluidIDSource":check(hx.getValue("HXSource_FluidID")),
+                   "HXTSourceInlet":check(hx.getValue("HXTSourceInlet")),
+                   "HXhSourceInlet":check(hx.getValue("HXhSourceInlet")),
+                   "HXTSourceOutlet":check(hx.getValue("HXTSourceOutlet")),
+                   "HXhSourceOutlet":check(hx.getValue("HXhSourceOutlet")),
+                   "HXSink":check(hx.getValue("HXSink")),
+                   "FluidIDSink":check(hx.getValue("HXSink_FluidID")),
+                   "HXTSinkInlet":check(hx.getValue("HXTSinkInlet")),
+                   "HXTSinkOutlet":check(hx.getValue("HXTSinkOutlet")),
+                   "TurnKeyPrice":check(hx.getValue("HEX_turnkeyprice")),
+                   "OMFix":check(hx.getValue("HX_OandMfix")),
+                   "OMVar":check(hx.getValue("HX_OandMvar")),
+                   "StorageSize":check(hx.getValue("storage_size")),
+                   "StreamStatusSource":check(hx.getValue("StreamStatusSource")),
+                   "StreamStatusSink":check(hx.getValue("StreamStatusSink")),
+                   "StreamTypeSink":check(hx.getValue("StreamTypeSink")),
+                   "StreamTypeSource":check(hx.getValue("StreamTypeSource"))}
+
+            qhxTable.insert(tmp)
+
+#        except:            
+#            logError(_("Error writing new HX into database.")) 
     
     def __loadStreams(self,listofstreamdata):
     #loads streams from document

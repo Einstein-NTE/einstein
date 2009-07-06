@@ -19,20 +19,22 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.01
+#	Version No.: 0.04
 #	Created by: 	    Hans Schweiger	    10/06/2008
 #	Last revised by:
 #                       Stoyan Danov        18/06/2008
 #                       Florian Joebstl     02/09/2008
+#                       Hans Schweiger      06/07/2009
 #                           
 #
 #   Changes to previous version:
 #   
 #   18/06/2008 SD: change to translatable text _(...)
 #   02/09/2008 FJ: redone the entire GUI (grid,plot,controls...)
+#   06/07/2009 HS: adaptations to UTF and number of decimals in grid
 #       
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -429,9 +431,17 @@ class PanelHR(wx.Panel):
             rows = 0
             cols = COLNO
             
+        decimals = [-1,2,2,-1,2,2,-1,2,2,2,0,0]   #number of decimal digits for each colum
+
         for r in range(rows):
             for c in range(cols):
-                self.grid.SetCellValue(r, c, data[r][c])
+                if decimals[c] < 0:
+                    try:
+                        self.grid.SetCellValue(r,c,unicode(data[r][c],"utf-8"))
+                    except:
+                        self.grid.SetCellValue(r,c,data[r][c])
+                else:
+                    self.grid.SetCellValue(r, c, convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
 
         for r in range(rows,MAXROWS):
             for c in range(cols):

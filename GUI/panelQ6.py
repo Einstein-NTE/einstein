@@ -16,16 +16,18 @@
 #   Created by: 	Heiko Henning, Tom Sobota, Hans Schweiger, Stoyan Danov
 #                       04/05/2008 - 13/10/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger      01/04/2009
+#                       Hans Schweiger      06/07/2009
 #
 #       Changes to previous version:
 #       01/04/2009: HS  impossibility to save entries with empty name field
+#       06/07/2009: HS  small bug-fix: storage of WHEEMedium was not possible
 #
 #------------------------------------------------------------------------------
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	http://www.energyxperts.net/
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -703,9 +705,15 @@ class PanelQ6(wx.Panel):
                 
             self.tc104.SetValue(str(q.QWHEE))
             
-            fluidDict = Status.prj.getFluidDict()        
-            if q.WHEEMedium in fluidDict.keys():
-                fluidName = fluidDict[q.WHEEMedium]
+            fluidDict = Status.prj.getFluidDict()
+
+            if q.WHEEMedium is not None:
+                WHEEMediumID = int(q.WHEEMedium)
+            else:
+                WHEEMediumID = None
+                
+            if WHEEMediumID in fluidDict.keys():
+                fluidName = fluidDict[WHEEMediumID]
                 self.tc105.SetValue(fluidName)
             else:
                 self.tc105.SetValue("None")
