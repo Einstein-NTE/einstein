@@ -142,6 +142,7 @@ class CheckEq():
         self.DTExhaustGas2 = CCPar("DTExhaustGas2",parType="DT")#
         self.DTOffGasUse = CCPar("DTOffGasUse",parType="DT")#
         self.DTOffGasUse1 = CCPar("DTOffGasUse1",parType="DT")#
+        self.DTOffGasUse2 = CCPar("DTOffGasUse2",parType="DT")#
         self.OffGasUse = CCPar("OffGasUse",parType="X")
         self.OffGasUse1 = CCPar("OffGasUse1",parType="X")
         self.TEnvEq1 = CCPar("TEnvEq1")

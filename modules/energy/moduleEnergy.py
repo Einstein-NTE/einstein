@@ -264,9 +264,11 @@ class ModuleEnergy(object):
             for iT in range(NT+2):   #+1 = the > 400 ºC case
                 USHj_Tt[iT][it] = min(QD_Tt[iT][it],PNom*Dt) #just max(demand,nom.power) 
                 QHXj_Tt[iT][it] = 0
+                QWHj_Tt[iT][it] = 0
 
             USHj += USHj_Tt[NT+1][it]
             QHXj += QHXj_Tt[NT+1][it]
+            QWHj += QWHj_Tt[NT+1][it]
 
             if USHj_Tt[NT+1][it] > 0:
                 HPerYear += Dt
@@ -292,12 +294,20 @@ class ModuleEnergy(object):
         Status.int.QHXj_T[cascadeIndex-1] = Status.int.calcQ_T(QHXj_Tt)
         Status.int.QHXj_t[cascadeIndex-1] = copy.deepcopy(QHXj_Tt[Status.NT+1])
 
+# waste heat produced by present equipment
+
+        Status.int.QWHj_Tt[cascadeIndex-1] = QWHj_Tt
+        Status.int.QWHj_T[cascadeIndex-1] = Status.int.calcQ_T(QWHj_Tt)
+        Status.int.QWHj_t[cascadeIndex-1] = copy.deepcopy(QWHj_Tt[Status.NT+1])
+
         Status.int.cascadeUpdateLevel = cascadeIndex
 
 #........................................................................
 # Global results (annual energy flows)
 
         Status.int.USHj[cascadeIndex-1] = USHj*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.QWHj[cascadeIndex-1] = QWHj*Status.EXTRAPOLATE_TO_YEAR
+        Status.int.QHXj[cascadeIndex-1] = QHXj*Status.EXTRAPOLATE_TO_YEAR
 
         if COPh_nom > 0:
             FETFuel_j = USHj/COPh_nom
@@ -407,6 +417,17 @@ class ModuleEnergy(object):
                 
             logTrack("ModuleEnergy (runSimulation): updating Energy balances")
             Status.mod.moduleEA.calculateEquipmentEnergyBalances()
+
+            try:
+                x = Status.StatusEnergy
+            except:
+                Status.StatusEnergy = 0
+                
+            if Status.StatusEnergy == 0:
+                Status.mod.moduleHR.runHRModule()   # update waste heat calculations
+                Status.prj.setStatus("Energy")      # set Status to avoid infinite recursive loop
+                self.runSimulation(1,self.NEquipe)
+                
             Status.prj.setStatus("Energy")
     
 #------------------------------------------------------------------------------

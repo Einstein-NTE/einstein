@@ -963,7 +963,7 @@ class Project(object):
                 newPipeIDs = []
                 for pipeID in pipeIDs:
                     if pipeID in pipeIDDict:
-                        newPipeIDs.append("%10d"%pipeIDDict[pipeID])
+                        newPipeIDs.append("%d"%pipeIDDict[pipeID])
                     else:
                         logDebug(_("Project (reconnect equipes): pipe ID %s was not in old pipe table")%pipeID)
 #                print "Project (reconnectEquipesToPipes): pipeIDs ",newPipeIDs

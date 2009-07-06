@@ -38,6 +38,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.modules.constants import *
 from einstein.GUI.status import Status
 from einstein.modules.messageLogger import *
+from einstein.modules.fluids import Fuel
 from einstein.GUI.dialogGauge import DialogGauge
 import copy
 
@@ -235,19 +236,24 @@ class Processes(object):
                 TExhaustGas = 200
 #            print "Process (calcAggDemand): Tgas(%s) = %s"%(j,TExhaustGas)
 
+            if equipe.DBFuel_id is None:
+                TMinOffGas = 0
+                dTtot = 1.e-10
+            else:
+                fuel = Fuel(equipe.DBFuel_id)
+                TMinOffGas = max(fuel.TCondOffGas(),0)
+                dTtot = max(TExhaustGas-TMinOffGas,1.e-10)
+            
             QWHj = equipe.QWHEq
             if QWHj is None:
                 QWHj = 0.0
             Status.int.QWHEqTotal += QWHj
 
-            TEnvEq = 15.0
-            dTtot = max(TExhaustGas-TEnvEq,1.e-10)
-
             QWHj_T = Status.int.createQ_T()
 
             for iT in range(Status.NT+2):
                 temp = Status.int.T[iT]
-                dT = max(temp - TEnvEq,0.)
+                dT = max(temp - TMinOffGas,0.)
                 QWHj_T[iT] = QWHj*max(0.0,1.0 - dT/dTtot)
                 Status.int.QWHEqTotal_T[iT] += QWHj_T[iT]
                 
