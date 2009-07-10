@@ -70,7 +70,7 @@ class FrameHelpAbout(wx.Dialog):
 		     "<br><br>"
 		     "<b>Expert System for an Intelligent Supply of Thermal Energy in Industry</b><br>"
 		     "<a href=\"http://www.iee-einstein.org\">www.iee-einstein.org</a>"
-		     "<br><br>Version 1.0.06 (17 June 2009)"
+		     "<br><br>Version 1.0.07 (10 July 2009)"
 		     "<p>(C) copyleft energyXperts.NET (E4-Experts SL), Barcelona, Spain&nbsp;2008</p>"
 		     "<p>Web page: <a href=\"http://www.energyxperts.net\">www.energyxperts.net</a></p>"
 		     "<p>Email: <a href=\"mailto://info@energyxperts.net\">info@energyxperts.net</a></p>"
