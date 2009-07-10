@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 009
+#   Update No. 010
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -31,6 +31,7 @@
 #                       Hans Schweiger          09/06/2009
 #                       Hans Schweiger          11/06/2009
 #                       Hans Schweiger          26/06/2009
+#                       Hans Schweiger          08/07/2009
 #
 #   Changes to previous version:
 #
@@ -49,6 +50,8 @@
 #                   to HRData in __runPE2 (following mail BS/FJ from 04/06/09)
 #   11/06/2009: HS  adaptations in report generation: plot data for graphics
 #   26/06/2009: HS  small bux fix in estimativeMethod
+#   08/07/2009: HS  severe error in PE2 results (doPostProcessing) now displayed
+#                   to the user (logError)
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -271,7 +274,7 @@ class ModuleHR(object):
             dataReport2[i+1][QA_index] = QA_T[i]/1000.0
 
 #        print "end"
-        print "%s\n"%key,dataReport2
+#        print "%s\n"%key,dataReport2
         Status.int.setGraphicsData(key, array(dataReport2))
         
     def __updateCurveData(self):                 
@@ -370,10 +373,7 @@ class ModuleHR(object):
             elif ((self.data.ano != Status.ANo) or (self.data.pid != Status.PId)):
                 self.data = HRData(Status.PId,Status.ANo)
                         
-            if (redesign):
-                self.data.loadFromDocument(doc,overrideHX = True)
-            else:
-                self.data.loadFromDocument(doc,overrideHX = False)
+            self.data.loadFromDocument(doc,overrideHX = True)
                     
 
     
@@ -398,7 +398,7 @@ class ModuleHR(object):
 
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
         UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
-        print "UPH_T = %r"%UPHProc_T
+#        print "UPH_T = %r"%UPHProc_T
 
         QWHAmb_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
 
@@ -408,7 +408,7 @@ class ModuleHR(object):
         
         for iT in range(Status.NT+2):
             for it in range(Status.Nt):
-                QWHAmb_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it]
+                QWHAmb_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it] + Status.int.QWHEE_Tt[iT][it]
         
         QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
 #        print "QWHAmb_T = %r"%QWHAmb_T
@@ -420,11 +420,17 @@ class ModuleHR(object):
 
         self.__calcQD_T()
         self.__calcQA_T()
-        print "QD_T = %r"%self.data.QD_T
+#        print "QD_T (PE2) = %r"%self.data.QD_T
+#        print "QA_T (PE2) = %r"%self.data.QA_T
 
         for iT in range(Status.NT+2):
             QHX_T_res[iT] = max(Status.int.UPHTotal_T[iT] - self.data.QD_T[iT],0.0)
             iTw = min(iT+2,Status.NT+1)
+
+            diff = QHX_T_res[iT] - QWHAmb_T[2]
+            if diff > 1.e-10:
+                logDebug("ModuleHR (doPostProcessing): Severe error corrected in PE2 results - recovered heat greater than total available waste heat at T = %s"% \
+                         (Status.int.T[iT]))
             QHX_T_res[iT] = min(QHX_T_res[iT],QWHAmb_T[2])     #necessary, because waste heat from
                                                                 #exhaust gas not available ...
 #            print "iT %s UPH %s QD %s QHX %s"% \
@@ -493,6 +499,7 @@ class ModuleHR(object):
                     fR = -1.0
                     pass                #if this is the case, leave dQHX_Tt = 0 !!!
 
+            
 # check constraint dQHX/dT <= dUPH/dT for each time interval
 
             for iT in range(1,Status.NT+2):       
@@ -532,16 +539,17 @@ class ModuleHR(object):
                         for iTp in range(iT,Status.NT+2):
                             for it in PList:
                                 dQHX_Tt[iTp][it] -= dQP[it]
-#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                print "dQHX_Tt[%s][%s] updated by dQP from %s to %s"% \
 #                                      (iTp,it,dQHX_Tt[iTp][it]+dQP[it],dQHX_Tt[iTp][it])
                                 
                             for it in NList:
                                 dQHX_Tt[iT][it] += dP/nN
-#                                print "dQHX_Tt[%s][%s] updated from %s to %s"% \
+#                                print "dQHX_Tt[%s][%s] updated by dP/nN from %s to %s"% \
 #                                      (iTp,it,dQHX_Tt[iTp][it]-dP/nN,dQHX_Tt[iTp][it])
 
-                    if nP == 9:
+                    if n == 9:
                         logDebug("ModuleHR (doPostProcessing): ERROR - dQHX_Tt check not converged for iT = %s!!!!"%iT)
+
 
 # check constraint dQHX_Tt/dT >= 0
 
@@ -625,7 +633,7 @@ class ModuleHR(object):
 
             elif timeShift == 24:
                 logDebug("ModuleHR (__doPostProcessing): time shift of 168 hours not enough for realising PE2 HR potential")
-            
+                
 #..............................................................................
 # settings of the conversion UPH -> USH
 

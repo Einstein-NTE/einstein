@@ -14,14 +14,16 @@
 #           
 #==============================================================================
 #
-#   Version No.: 0.03
+#   Version No.: 0.04
 #   Created by:         Florian Joebstl  20/08/2008
 #   Last revised by:
-#                       Florian Joebstl  04/09/2008                       
+#                       Florian Joebstl  04/09/2008
+#                       Hans Schweiger   06/07/2009
 #
 #   Changes to previous version:
 #   01/09/2008: (FJ) Set all NULL values to 0 like expected by the external tool 
 #   04/09/2008: (FJ) Fixed the QOpProc value problem
+#   06/07/2009: HS   Export of TCond and LatentHeat in QWHProc data
 #   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -137,7 +139,7 @@ class SQLViews(object):
                             ORDER BY q.`ProcNo`;"""   
                             
     SQL_QWHProcessMed1=  """SELECT d.`FluidName`, q.`PTOutFlow`, q.`HOutFlow`, q.`PTFinal`, 
-                            q.`VOutFlow`, q.`HeatRecOK`, d.`DBFluid_ID`, d.`FluidDensity`, d.`FluidCp` 
+                            q.`VOutFlow`, q.`HeatRecOK`, d.`DBFluid_ID`, d.`FluidDensity`, d.`FluidCp`, d.`TCond`, d.`LatentHeat` 
                             FROM qprocessdata q, dbfluid d
                             WHERE q.`QProcessData_ID`=%s AND q.`Questionnaire_id`=%s AND q.`AlternativeProposalNo`=%s AND q.`ProcMedOut` =d.`DBFluid_ID`
                             ORDER BY q.`ProcNo`;""" 
@@ -530,7 +532,7 @@ class XMLDocHRModuleAll(XMLDocHRModuleBase):
     
     #QWasteHeatProcessMedium1 structure
     qwhprocmed1tags = ["ProcMedOut","PTOutFlow","HOutFlow","PTFinal","VOutFlow","HeatRecOK","FluidId","FluidDensity",
-                       "FluidCp"]
+                       "FluidCp","TCond","LatentHeat"]
     qwhprocmed1     = [None,"QWasteHeatProcessMedium1",qwhprocmed1tags,SQLViews.SQL_QWHProcessMed1,None,None]
     
     #InputSupplyMedium1 structure    

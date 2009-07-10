@@ -57,6 +57,12 @@ class CheckWHEE():
 # assign a variable to all intermediate/calculated values needed
 
         self.QWHEE1 = CCPar("QWHEE1")
+        self.QWHEEYear = CCPar("QWHEEYear",priority = 2)
+        self.QWHEEYear1 = CCPar("QWHEEYear1")
+        self.HPerYear = CCPar("HPerYear")
+        self.HPerYear1 = CCPar("HPerYear1")
+        self.HPerDayWHEE1 = CCPar("HPerDayWHEE1")
+        self.NDaysWHEE1 = CCPar("NDaysWHEE1")
         
         self.importData(n)
 
@@ -76,6 +82,10 @@ class CheckWHEE():
 # assign empty CCPar to all questionnaire parameters
 
         self.QWHEE = CCPar("QWHEE")
+        self.HPerDayWHEE = CCPar("HPerDayWHEE")
+        self.HPerDayWHEE.valMax = 24.0
+        self.NDaysWHEE = CCPar("NDaysWHEE")
+        self.NDaysWHEE.valMax = 365.
         
 #..............................................................................
 # reading data from table "qprocessdata"
@@ -86,7 +96,12 @@ class CheckWHEE():
             if len(qwheeTable) > 0:
                 qwhee = qwheeTable[0]
 
-                self.QWHEE.setValue(qwhee.QWHEE)                
+                self.QWHEE.setValue(qwhee.QWHEE)
+
+                if qwhee.NDaysWHEE is not None:
+                    self.NDaysWHEE.setValue(qwhee.NDaysWHEE,err=0.0)
+                    
+                self.HPerDayWHEE.setValue(qwhee.HPerDayWHEE)                
 
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -105,6 +120,8 @@ class CheckWHEE():
                 qwhee = qwheeTable[0]
 
                 qwhee.QWHEE = check(self.QWHEE.val)
+                qwhee.NDaysWHEE = check(self.NDaysWHEE.val)
+                qwhee.HPerDayWHEE = check(self.HPerDayWHEE.val)
                 
                 Status.SQL.commit()
                 
@@ -119,6 +136,8 @@ class CheckWHEE():
         print "====================="
         self.QWHEE.show()
         self.QWHEE1.show()
+        self.QWHEEYear.show()
+        self.QWHEEYear1.show()
         print "====================="
 #------------------------------------------------------------------------------
     def screen(self):  
@@ -126,7 +145,9 @@ class CheckWHEE():
 #   screens all variables in the block
 #------------------------------------------------------------------------------
        self.QWHEE.screen()
-
+       self.QWHEEYear.screen()
+       self.NDaysWHEE.screen()
+       self.HPerDayWHEE.screen()
 
 #------------------------------------------------------------------------------
     def check(self):     #function that is called at the beginning when object is created
@@ -148,6 +169,10 @@ class CheckWHEE():
 # Step 1: Call all calculation routines in a given sequence
 
                 print "Step 1: calculating from left to right (CALC)"
+
+            self.HPerYear1 = calcProd("HPerYearWHEE1",self.NDaysWHEE,self.HPerDayWHEE)
+            self.QWHEEYear1 = calcProd("QWHEEYear1",self.QWHEE,self.HPerYear)
+
             pass     #here calcSum(self.QWHEE,sel.QWHEERec,self.QWHEEAmb)
             
             if DEBUG in ["ALL"]:
@@ -157,16 +182,17 @@ class CheckWHEE():
 
                 print "Step 2: cross checking"
 
-            ccheck1(self.QWHEE,self.QWHEE1)
-            
+            self.ccheckAll()
             
             if DEBUG in ["ALL"]:
                 self.showAll()
 
 # Step 3: Adjust the variables (inverse of calculation routines)
-
+            
                 print "Step 3: calculating from right to left (ADJUST)"
             
+            adjustProd(self.HPerYear1,self.NDaysWHEE,self.HPerDayWHEE)
+            adjustProd(self.QWHEEYear1,self.QWHEE,self.HPerYear)
             
             if DEBUG in ["ALL"]:
                 self.showAll()
@@ -175,8 +201,7 @@ class CheckWHEE():
 
                 print "Step 4: second cross checking"
 
-            pass
-        # ccheck1(self.QWHEE,self.QWHEE1)
+            self.ccheckAll()
            
 
             if DEBUG in ["ALL"]:
@@ -185,6 +210,17 @@ class CheckWHEE():
         if DEBUG in ["ALL","BASIC"]:
             self.showAll()
         
+#------------------------------------------------------------------------------
+    def ccheckAll(self):    
+#------------------------------------------------------------------------------
+#   check block
+#------------------------------------------------------------------------------
+        ccheck1(self.QWHEE,self.QWHEE1)
+        ccheck1(self.QWHEEYear,self.QWHEEYear1)
+        ccheck1(self.HPerYear,self.HPerYear1)
+        ccheck1(self.HPerDayWHEE,self.HPerDayWHEE1)
+        ccheck1(self.NDaysWHEE,self.NDaysWHEE1)
+
 #==============================================================================
 if __name__ == "__main__":
     

@@ -523,9 +523,6 @@ class CheckEq():
             self.FETel_c_j1 = calcProd("FETel_c_j1",self.ElectriConsum2,self.HPerYearEqNom2)
             self.FETel_j1 = calcDiff("FETel_j1",self.FETel_c_j,self.ElGen_j,parType="S")
             self.QExhaustGas1 = calcProd("QExhaustGas1",self.QExhaustGasdot,self.HPerYearEqNom3)#
-
-            self.DTOffGasUse = calcProd("DTOffGasUse",self.OffGasUse,self.DTExhaustGas)
-            self.QWHEq1 = calcProd("QWHEq1",self.OffGasUse,self.QWHEqTot)
             
             if self.mainSource == "Fuel":
 #                print "CheckEq (calcs): fuel as main source"

@@ -16,17 +16,20 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.02
+#	Version No.: 0.03
 #	Created by: 	    Hans Schweiger	07/05/2008
 #	Revised by:         Hans Schweiger      02/09/2008
+#                           Hans Schweiger      08/07/2009
 #
 #       Changes in last update:
 #
 #       02/09/08: HS    Security feature added -> avoid zero division in function
 #                       normalize
+#       08/07/09: HS    Bug-fix in fav: schedules with very short start,stop intervals
+#                       didn't work well.
 #	
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
@@ -128,14 +131,16 @@ class Schedule():
                 weekTime1 = weekTime + Status.TimeStep
                 if weekTime1 > start:
                     if weekTime >= start and weekTime1 <= stop:     #time interval fully within period
-                        fweek = 1.
+                        fweek += 1.
                         break
                     elif weekTime >= start and weekTime1 > stop:    #time interval starts within period, but ends afterwards
-                        fweek = (stop - weekTime)/Status.TimeStep
-                        break
+                        fweek += (stop - weekTime)/Status.TimeStep
                     elif weekTime < start and weekTime1 <= stop:    #time interval starts before period, but ends within
-                        fweek = (weekTime1 - start)/Status.TimeStep
-                        break
+                        fweek += (weekTime1 - start)/Status.TimeStep
+                    elif weekTime < start and weekTime1 > stop:
+                        fweek += (stop - start)/Status.TimeStep
+                else:
+                    break
             
         month = findFirstGE(day,MONTHSTARTDAY)
         fmonth =  self.monthly[month-1]
@@ -275,7 +280,8 @@ class Schedule():
 #..............................................................................		
 # Now extend daily to weekly profile
 
-        self.NDaysPerWeek = (self.NDays - self.NHolidays - 1.0)/52.0
+        self.NDaysPerWeek = (self.NDays + self.NHolidays - 1.0)/52.0
+        self.HPerYear = self.HPerDay*self.NDays
 
         self.weekly = []
         for i in range(7):
@@ -356,6 +362,7 @@ class Schedules(object):
                     process.NBatch = 1
                     Status.SQL.commit()
 
+            logDebug("Process No.%s (%s):"%(process.ProcNo,process.Process))
 #..............................................................................
 # schedule for process operation
                     
@@ -470,7 +477,7 @@ class Schedules(object):
                                 whee.HPerDayWHEE,
                                 whee.NBatchWHEE,
                                 whee.HBatchWHEE)
-            self.equipmentSchedules.append(newSchedule)
+            self.WHEESchedules.append(newSchedule)
             
 #------------------------------------------------------------------------------		
     

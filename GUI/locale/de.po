@@ -605,15 +605,15 @@ msgstr "Kühlleistung (COP)"
 
 #: GUI/DBTitles.py:79
 msgid "Nominal cooling COP"
-msgstr "Nennleistungskoeffizient (COP) Kühlung"
+msgstr "Nennleistungskoeff. (COP) Kühlung"
 
 #: GUI/DBTitles.py:80
 msgid "Exergetic cooling COP"
-msgstr "Exergetischer Leistungskoeffizient (COP) Kühlung"
+msgstr "Exergetischer Leistungskoeff. (COP) Kühlung"
 
 #: GUI/DBTitles.py:81
 msgid "Theoretical cooling COP"
-msgstr "Theoretischer Leistungskoeffizient (COP) Kühlung"
+msgstr "Theoretischer Leistungskoeff. (COP) Kühlung"
 
 #: GUI/DBTitles.py:82
 msgid "Temperature range of constant exergetic COP application, cooling"
@@ -641,15 +641,15 @@ msgstr "Heizleistung (COP)"
 
 #: GUI/DBTitles.py:88
 msgid "Nominal heating COP"
-msgstr "Nennleistungskoeffizient (COP) Heizung"
+msgstr "Nennleistungskoeff. (COP) Heizung"
 
 #: GUI/DBTitles.py:89
 msgid "Exergetic heating COP"
-msgstr "Exergetischer Leistungskoeffizient (COP) Heizung"
+msgstr "Exergetischer Leistungskoeff. (COP) Heizung"
 
 #: GUI/DBTitles.py:90
 msgid "Theoretical heating COP"
-msgstr "Theoretischer Leistungskoeffizient (COP) Heizung"
+msgstr "Theoretischer Leistungskoeff. (COP) Heizung"
 
 #: GUI/DBTitles.py:91
 msgid "Temperature range of constant exergetic COP application, heating"
@@ -759,15 +759,15 @@ msgstr "Nennleistung Kühlung"
 
 #: GUI/DBTitles.py:120
 msgid "Nominal COP cooling"
-msgstr "Nennleistungskoeffizient COP Kühlung"
+msgstr "Nennleistungskoeff. COP Kühlung"
 
 #: GUI/DBTitles.py:121
 msgid "Exergetic COP cooling"
-msgstr "Exergetischer Leistungskoeffizient (COP) Kühlung"
+msgstr "Exergetischer Leistungskoeff. (COP) Kühlung"
 
 #: GUI/DBTitles.py:122
 msgid "Theoretical COP cooling"
-msgstr "Theoretischer Leistungskoeffizient (COP) Kühlung"
+msgstr "Theoretischer Leistungskoeff. (COP) Kühlung"
 
 #: GUI/DBTitles.py:123
 msgid "Temperature interval COPex is assumed constant, cooling"
@@ -796,15 +796,15 @@ msgstr "Nennheizleistung"
 
 #: GUI/DBTitles.py:129
 msgid "Nominal COP heating"
-msgstr "Nennleistungskoeffizient Heizung"
+msgstr "Nennleistungskoeff. Heizung"
 
 #: GUI/DBTitles.py:130
 msgid "Exergetic COP heating"
-msgstr "Exergetischer Leistungskoeffizient (COP) Heizung"
+msgstr "Exergetischer Leistungskoeff. (COP) Heizung"
 
 #: GUI/DBTitles.py:131
 msgid "Theoretical COP heating"
-msgstr "Theoretischer Leistungskoeffizient (COP) Heizung"
+msgstr "Theoretischer Leistungskoeff. (COP) Heizung"
 
 #: GUI/DBTitles.py:132
 msgid "Temperature interval COPex is assumed constant, heating"
@@ -3905,11 +3905,11 @@ msgstr "Ist das Unternehmen unabhängig?"
 
 #: GUI/panelQ1.py:304
 msgid "Yearly O&M heat & cold"
-msgstr "Jährliche  W&I-Kosten für Wärme & Kälte"
+msgstr "Jährliche  Wartungs. und Instandh. Kosten für Wärme & Kälte"
 
 #: GUI/panelQ1.py:310
 msgid "Yearly O&M electrical"
-msgstr "Jährliche  W&I-Kosten der elektrischen Anlagen"
+msgstr "Jährliche Wart. und Instandh. kosten der elektrischen Anlagen"
 
 #: GUI/panelQ1.py:316
 #: modules/ccheck/parameterList.py:163
@@ -4089,11 +4089,11 @@ msgstr "GESAMT"
 
 #: GUI/panelQ2.py:255
 msgid "Self-generation"
-msgstr "Eigenerzeugung"
+msgstr "Eigenerz."
 
 #: GUI/panelQ2.py:256
 msgid "Sales to grid"
-msgstr "Abgabe an das öffentliche Netz"
+msgstr "Einspeisung"
 
 #: GUI/panelQ2.py:258
 #: GUI/panelQ2.py:266
@@ -4110,7 +4110,7 @@ msgstr "Tarifart"
 
 #: GUI/panelQ2.py:261
 msgid "Tariff installed power [EUR/kW.month]"
-msgstr "Tarif installierte Leistung [EUR/kW.Monat]"
+msgstr "Leistungskosten [EUR/kW.Monat]"
 
 #: GUI/panelQ2.py:262
 msgid "Tariff on consumption [EUR/kWh]"
@@ -5829,11 +5829,11 @@ msgstr "Ist das Unternehmen unabhängig?"
 
 #: modules/ccheck/parameterList.py:33
 msgid "yearly O&M heat & cold"
-msgstr "Jährliche W&I-Kosten für Wärme und Kälte"
+msgstr "Jährliche Wart. u. Instandh. Kosten für Wärme und Kälte"
 
 #: modules/ccheck/parameterList.py:34
 msgid "yearly O&M electrical "
-msgstr "Jährliche W&I-Kosten Elektrik"
+msgstr "Jährliche Wart. u. Instanh. Kosten der elektr. Anlagen"
 
 #: modules/ccheck/parameterList.py:35
 msgid "total hours of operation per working day"

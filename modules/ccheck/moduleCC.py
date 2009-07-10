@@ -625,7 +625,7 @@ class ModuleCC(object):
 
                 self.ccWHEE[n].check()             # ejecuta la función check para proceso k
 
-                self.QWHEE[n].update(self.ccWHEE[n].QWHEE)      #obtain results 
+                self.QWHEE[n].update(self.ccWHEE[n].QWHEEYear)      #obtain results 
 
 #..............................................................................
 # check of totals
@@ -798,7 +798,7 @@ class ModuleCC(object):
                     self.ccProc[k].QWHProc.update(self.QWHProc[k])
 
                 for n in range(NN):
-                    self.ccWHEE[n].QWHEE.update(self.QWHEE[n])
+                    self.ccWHEE[n].QWHEEYear.update(self.QWHEE[n])
 
                 for h in range(NH):
                     self.ccHX[h].QWH.update(self.QWH[h])

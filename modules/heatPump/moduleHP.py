@@ -58,6 +58,7 @@ from einstein.GUI.GUITools import *
 
 EPS_COP = 1.e-4
 EPS_TEMP = 1.e-4
+EPS = 1.e-10
 HPTDROP = 5
 
 POWERRANGE = 0.8    #   range of power for heat pump preselection: 1 = only maximum possible power
@@ -176,8 +177,8 @@ class ModuleHP():
         uHProws = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         if len(uHProws) == 0:
-            print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
-            print 'Error: confusion in PId and ANo'
+#            print 'getUserDefinedParamHP: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
+#            print 'Error: confusion in PId and ANo'
             Status.int.setGraphicsData('HP Config',[True, 'compression',1500.0,60.0,100.0,-10.0,100.0])            
 
         else:
@@ -199,7 +200,7 @@ class ModuleHP():
         uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
         
         if len(uhp)==0:
-            print "ModuleHP(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
+#            print "ModuleHP(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
             uhp = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
@@ -365,7 +366,7 @@ class ModuleHP():
         for i in range(len(new_cascade)): #assign new CascadeIndex in QGenerationHC table
             eq = Status.DB.qgenerationhc.QGenerationHC_ID[new_cascade[i]['equipeID']][0] #SD change 30/04.2008
             eq.CascadeIndex = i+1 #SD change 30/04.2008
-            print '\n new_CascadeIndex', eq.CascadeIndex #SD change 30/04.2008
+#            print '\n new_CascadeIndex', eq.CascadeIndex #SD change 30/04.2008
             
         self.sql.commit() #confirm storing to sql of new CascadeIndex #to be activated, SD
 
@@ -414,7 +415,7 @@ class ModuleHP():
 
         model = self.DB.dbheatpump.DBHeatPump_ID[modelID][0]
 
-        print "ModuleHP(setEquipmentFromDB): updating parameters in SQL"        
+#        print "ModuleHP(setEquipmentFromDB): updating parameters in SQL"        
         if model.HPHeatCap != None: equipe.update({"HCGPnom":model.HPHeatCap})
         if model.HPHeatCOP != None: equipe.update({"HCGTEfficiency":model.HPHeatCOP}) #changed from HPThHeatCOP,SD
         if model.HPManufacturer != None: equipe.update({"Manufact":model.HPManufacturer})
@@ -426,7 +427,20 @@ class ModuleHP():
         if model.HPFuelConsum != None: equipe.update({"FuelConsum":model.HPFuelConsum})
         if model.HPUnitsFuelConsum != None: equipe.update({"UnitsFuelConsum":model.HPUnitsFuelConsum})
         if model.HPElectConsum != None: equipe.update({"ElectriConsum":model.HPElectConsum})
-        if model.HPExHeatCOP != None: equipe.update({"HPExHeatCOP":model.HPExHeatCOP})
+        if model.HPExHeatCOP != None:
+            equipe.update({"HPExHeatCOP":model.HPExHeatCOP})
+        else:
+            COP = model.HPHeatCOP
+            COPth = model.HPThHeatCOP
+            if COP is not None and COPth is not None:
+                if COP <= COPth and COPth > 0:
+                    COPex = COP/COPth
+                    logMessage("Exergetic efficiency of HP %s calculated to %s"% \
+                               (equipe.Model,COPex))
+                    equipe.update({"HPExHeatCOP":COPex})
+                else:
+                    logWarning("Error in efficiency data of the heat pump %s"%equipe.Model)
+                
         equipe.update({"IsSelectedFromDB":1})
         equipe.update({"DatabaseNameSelection":"DBHeatPump"})
         if model.HPType != None: equipe.update({"EquipTypeFromDB":model.HPType})
@@ -476,7 +490,7 @@ class ModuleHP():
             DTMax = max(DTMax,subset[i].HPLimDT)
             TCondMax = max(TCondMax,subset[i].HPCondTmax)
 
-        print "ModuleHP (getHPList): ",HPList,HPListPNom,DTMax,TCondMax
+#        print "ModuleHP (getHPList): ",HPList,HPListPNom,DTMax,TCondMax
         return (HPList,HPListPNom,DTMax,TCondMax)
 
 #----------------------------------------------------------------------------
@@ -579,7 +593,7 @@ class ModuleHP():
                        
         (HPList,HPListPNom,DTMaxInList,TCondMaxInList) = self.getHPList(DA_UHPType)  #get the sorted list of available heat pumps
 
-        print "ModuleHP (DA1): HPListPNom = ",HPListPNom
+#        print "ModuleHP (DA1): HPListPNom = ",HPListPNom
 #............................................................................................
 #   analyze heat demand for previous checks
         
@@ -633,12 +647,12 @@ class ModuleHP():
                                     
                 self.setEquipmentFromDB(equipe,modelID)   #assign model from DB to current equipment in equipment list #SD change 30/04.2008
 
-                print "ModuleHP (DA1): equipe ID %s PNom %s"%\
-                      (modelID,equipe.HCGPnom)
+#                print "ModuleHP (DA1): equipe ID %s PNom %s"%\
+#                      (modelID,equipe.HCGPnom)
                 USHj = self.calculateEnergyFlows(equipe,self.cascadeIndex) #SD change 30/04.2008
                 HOp = USHj/equipe.HCGPnom
-                print "ModuleHP (DA1): USH %s HOp %s"%\
-                      (USHj,HOp)
+#                print "ModuleHP (DA1): USH %s HOp %s"%\
+#                      (USHj,HOp)
                
                 if HOp >= DA_UHPMinHop:    #correction factor for simulations < 1 year
                     self.preselection.append(modelID)
@@ -655,7 +669,7 @@ class ModuleHP():
 #............................................................................................
 
         nSelected = len(self.preselection)
-        print "ModuleHP (designAssistant1): return to GUI for manual selection "
+#        print "ModuleHP (designAssistant1): return to GUI for manual selection "
         if nSelected <= 0: #no equipment could be selected
             return("CANCEL",[])
         
@@ -783,7 +797,7 @@ class ModuleHP():
 
         for it in range(Status.Nt):
 
-            if  QD_Tt[Status.NT+1][it] == 0.0:
+            if  QD_Tt[Status.NT+1][it] < EPS or QA_Tt[0][it] < EPS: #no demand or no availability
                 Tc_i=0.0; COPh_i=0.0; COPht_i=0.0;
                 dotQh_i=0.0; dotQw_i=0.0; dotQc_i=0.0
 #..............................................................................
@@ -796,6 +810,9 @@ class ModuleHP():
                 for iT in range(Status.NT+2):
                     QD_T.append(QD_Tt[iT][it])
                     QA_T.append(QA_Tt[iT][it])
+
+#                print "QD(t)",QD_T
+#                print "QA(t)",QA_T
 
 #..............................................................................
 # start estimates for Th,Tc and COP
@@ -920,12 +937,12 @@ class ModuleHP():
 
         Status.int.HPerYearEq[cascadeIndex-1] = HPerYear
 
-        logMessage("ModuleHP: eq.no.:%s USH: %s [MWh] FETFuel: %s [MWh] FETel: %s [MWh] HPerYear: %s [h]"%\
-                   (equipe.EqNo,\
-                    USHj/1000.0,\
-                    0.0,\
-                    FETel_j/1000.0,\
-                    HPerYear/1000.0))
+#        logDebug("ModuleHP: eq.no.:%s USH: %s [MWh] FETFuel: %s [MWh] FETel: %s [MWh] HPerYear: %s [h]"%\
+#                   (equipe.EqNo,\
+#                    USHj/1000.0,\
+#                    0.0,\
+#                    FETel_j/1000.0,\
+#                    HPerYear))
                    
         self.calculateOM(equipe,USHj)
         

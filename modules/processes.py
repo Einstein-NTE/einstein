@@ -274,6 +274,63 @@ class Processes(object):
 #        print "Process (calcAggDemand): QWHEq(t) = ",Status.int.QWHEqTotal_t
         
 #..............................................................................
+#   get waste heat from WHEEs
+
+        whees = Status.prj.getWHEEs()
+
+        Status.int.QWHEE_Tt = Status.int.createQ_Tt()
+        Status.int.QWHEE_T = Status.int.createQ_T()
+        Status.int.QWHEE_t = Status.int.createQ_t()
+        Status.int.QWHEE = 0
+        
+        for whee in whees:
+            n = whee.WHEENo - 1
+            schedule = Status.schedules.WHEESchedules[n]
+           
+            NT = Status.NT
+            Nt = Status.Nt
+
+# temperature distribution of waste heat. assumed as fix
+
+            Tout = whee.WHEETOutlet
+            if Tout == None:
+                logWarning("Processes: WHEE outlet temperature not specified. 70 ºC assumed")
+                Tout = 70
+            Tret = max(Tout - 20,0.0) # by default Delta_T = 20 assumed
+            dTtot = max(Tout-Tret,1.e-10)
+
+            if whee.HPerDayWHEE is None or whee.NDaysWHEE is None or whee.QWHEE is None:
+                QWHEE = 0.0
+            else:
+                QWHEE = whee.QWHEE*whee.HPerDayWHEE*whee.NDaysWHEE
+                
+            Status.int.QWHEE += QWHEE
+
+            QWHEE_T = Status.int.createQ_T()
+
+            for iT in range(Status.NT+2):
+                temp = Status.int.T[iT]
+                dT = max(temp - Tret,0.)
+                QWHEE_T[iT] = QWHEE*max(0.0,1.0 - dT/dTtot)
+                Status.int.QWHEE_T[iT] += QWHj_T[iT]
+                
+
+            QWHEE_Tt = Status.int.createQ_Tt()
+            
+            for it in range(Nt):
+                time = Status.TimeStep*it
+                f = schedule.fav[it]
+#                print "t: %s f: %s"%(time,f)
+
+                for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
+                    QWHEE_Tt[iT][it] = QWHEE_T[iT]*f
+
+                    Status.int.QWHEE_Tt[iT][it] += QWHEE_Tt[iT][it]
+
+        Status.int.QWHEE_t = copy.deepcopy(Status.int.QWHEE_Tt[0])
+#        print "Process (calcAggDemand): QWHEq(t) = ",Status.int.QWHEqTotal_t
+        
+#..............................................................................
 #   now run HR module for calculating heat recovery and effective demand at pipe entry
 
         Status.mod.moduleHR.runHRModule()

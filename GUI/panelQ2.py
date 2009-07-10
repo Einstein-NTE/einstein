@@ -458,6 +458,7 @@ class PanelQ2(wx.Panel):
                     "ElCostYearVall":check(self.grid.GetCellValue(5, 2)),
                     "ElSalesYearCHP":check(self.grid.GetCellValue(5, 5))
                     }
+
                 q.update(tmp)
                 Status.SQL.commit()
 
