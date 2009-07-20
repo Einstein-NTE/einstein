@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 010
+#   Update No. 011
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -32,6 +32,7 @@
 #                       Hans Schweiger          11/06/2009
 #                       Hans Schweiger          26/06/2009
 #                       Hans Schweiger          08/07/2009
+#                       Hans Schweiger          10/07/2009
 #
 #   Changes to previous version:
 #
@@ -52,6 +53,8 @@
 #   26/06/2009: HS  small bux fix in estimativeMethod
 #   08/07/2009: HS  severe error in PE2 results (doPostProcessing) now displayed
 #                   to the user (logError)
+#   10/07/2009: HS  security against division by zero in calcQA/QD + some clean-up
+#                   in these functions
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -364,7 +367,11 @@ class ModuleHR(object):
             if (retcode!=0):
                 raise
         except:
-            logError(_("Error in external program (ProcessEngineering.exe)"))                      
+            logError(_("Error in external program (ProcessEngineering.exe)"))
+
+            if(self.data is None):
+                self.data = HRData(Status.PId,Status.ANo)
+            
         else:    
             doc = XMLImportHRModule.importXML("export.xml")                      
 
@@ -729,10 +736,15 @@ class ModuleHR(object):
 #------------------------------------------------------------------------------    
     def __calcQD_T(self): 
 
-        streams = self.data.streams[:]
-        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
-        for stream in hidden:
-            streams.append(stream)
+        streams = []
+        try:
+            streams = self.data.streams[:]
+            
+            hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+            for stream in hidden:
+                streams.append(stream)
+        except:
+            logDebug("ModuleHR (calcQD) called without existing streams")
            
         QD_T = []
         temperature_step = 5;
@@ -755,10 +767,18 @@ class ModuleHR(object):
         self.data.QD_T = QD_T
         
     def __calcQA_T(self):      
-        streams = self.data.streams[:]
-        hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
-        for stream in hidden:
-            streams.append(stream)
+
+        streams = []
+        
+        try:
+            streams = self.data.streams[:]
+            hidden  = self.data.getStreamsFromHiddenHX(self.HiddenHX)
+            for stream in hidden:
+                streams.append(stream)
+
+        except:
+            logDebug("ModuleHR (calcQA) called without existing streams")
+
           
         QA_T = []
         temperature_step = 5;
@@ -770,8 +790,10 @@ class ModuleHR(object):
             for stream in streams:                
                 if (stream.HotColdType == "hot"):
                     if  ((temperature - stream.StartTemp) <= 0) and (stream.HeatType == "sensible"):  
-                        if (temperature >= stream.EndTemp):                                                                                                                                  
-                            QA_T[temperature / temperature_step] += stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours
+                        if (temperature >= stream.EndTemp and stream.EndTemp <> stream.StartTemp):                                                                                                                                  
+                            QA_T[temperature / temperature_step] += stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * \
+                                                                    abs(temperature - stream.StartTemp) * \
+                                                                    stream.OperatingHours
                         else:
                             QA_T[temperature / temperature_step] += stream.HeatLoad * stream.OperatingHours
                     else:
@@ -803,13 +825,15 @@ class ModuleHR(object):
                     if (stream.HotColdType == "cold"):
                         if (hours < stream.OperatingHours):                            
                             if  ((temperature - stream.StartTemp) > 0) and (stream.HeatType == "sensible"):  
-                                if (temperature <= stream.EndTemp):
-                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours / (stream.OperatingHours / time_step)                                       
+                                if (temperature <= stream.EndTemp and stream.EndTemp <> stream.StartTemp):
+                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad / \
+                                                                                           abs(stream.EndTemp - stream.StartTemp) * \
+                                                                                           abs(temperature - stream.StartTemp) * time_step                                       
                                 else:
-                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
+                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * time_step
                             else:
                                 if (stream.HeatType == "latent")  and ((temperature - stream.StartTemp) >= 0):
-                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
+                                    QD_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * time_step
         self.data.QD_Tt = QD_Tt     
 #        self.debugPrint("QD_Tt.csv", QD_Tt)     
     
@@ -837,12 +861,12 @@ class ModuleHR(object):
                         if (hours < stream.OperatingHours):                            
                             if  ((temperature - stream.StartTemp) <= 0) and (stream.HeatType == "sensible"):  
                                 if (temperature >= stream.EndTemp):
-                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * stream.OperatingHours / (stream.OperatingHours / time_step)                                       
+                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad / abs(stream.EndTemp - stream.StartTemp) * abs(temperature - stream.StartTemp) * time_step                                       
                                 else:
-                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
+                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * time_step
                             else:
                                 if (stream.HeatType == "latent")  and ((temperature - stream.StartTemp) <= 0):
-                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * stream.OperatingHours / (stream.OperatingHours / time_step)
+                                    QA_Tt[hours/time_step][temperature/temperature_step]+= stream.HeatLoad * time_step
         self.data.QA_Tt = QA_Tt
         #self.debugPrint("QA_Tt.csv", QA_Tt)   
 

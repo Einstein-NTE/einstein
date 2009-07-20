@@ -90,8 +90,8 @@ def getConnections():
     
     fuelIDs_j = Status.prj.getEquipmentList("DBFuel_id")
 
-    print "Connect: fuelIDs_i",fuelIDs_i
-    print "Connect: fuelIDs_j",fuelIDs_j
+#    print "Connect: fuelIDs_i",fuelIDs_i
+#    print "Connect: fuelIDs_j",fuelIDs_j
    
 
     Status.FETFuelLink = arange((NI-1)*NJ).reshape(NJ,(NI-1))  # reshape(rows,cols)
@@ -118,7 +118,7 @@ def getConnections():
 #    print Status.FETFuelLink
 #    print Status.FETelLink
     for j in range(NJ):
-        if check_j[j] == 0:
+        if check_j[j] == 0 and fuelIDs_j[j] is not None:
             showError(_("Fuel used in equipment no. %s is not specified or is not in fuel list")%(j+1))
         
 #..............................................................................
@@ -128,8 +128,8 @@ def getConnections():
         
     pipeID_m = Status.prj.getPipeList("QDistributionHC_ID")
 
-    print "Connect: pipes_j",pipes_j
-    print "Connect: pipeID_m",pipeID_m
+#    print "Connect: pipes_j",pipes_j
+#    print "Connect: pipeID_m",pipeID_m
        
     Status.USHLink = arange(NJ*NM).reshape(NM,NJ)  # reshape(rows,cols)
 
@@ -148,7 +148,7 @@ def getConnections():
                     except:
                         logDebug("Connect: erroneous value in pipe-string [%s][%s]"%\
                                  (pipesSplit[i],pipes_j[j]))
-                print "Connect: pipeIDs_j[%s]"%j,pipeIDs_j
+#                print "Connect: pipeIDs_j[%s]"%j,pipeIDs_j
                 
             if pipeID_m[m] in pipeIDs_j:
                 Status.USHLink[m][j] = 1
@@ -170,8 +170,8 @@ def getConnections():
     pipeName_k = Status.prj.getProcessList("PipeDuctProc")    
     pipeName_m = Status.prj.getPipeList("Pipeduct")
 
-    print "Connect: pipeName_k",pipeName_k
-    print "Connect: pipeName_m",pipeName_m
+#    print "Connect: pipeName_k",pipeName_k
+#    print "Connect: pipeName_m",pipeName_m
        
     Status.UPHLink = arange(NM*NK).reshape(NK,NM)  # reshape(rows,cols)
 
@@ -184,8 +184,8 @@ def getConnections():
             else:
                 Status.UPHLink[k][m] = 0
         
-    print "Connect: UPHLink created"
-    print Status.UPHLink
+#    print "Connect: UPHLink created"
+#    print Status.UPHLink
 
 #..............................................................................
 # 4. QHX/QWH - Eq/Pipe/Proc Links
@@ -198,12 +198,12 @@ def getConnections():
     equipeName_j = Status.prj.getEquipmentList("Equipment")
     wheeName_n = Status.prj.getWHEEList("WHEEName")
 
-    print "Connect: sourceName_h",sourceName_h
-    print "Connect: sinkName_h",sinkName_h
-    print "Connect: procName_k",procName_k
-    print "Connect: pipeName_m",pipeName_m
-    print "Connect: equipeName_j",equipeName_j
-    print "Connect: wheeName_n",wheeName_n
+#    print "Connect: sourceName_h",sourceName_h
+#    print "Connect: sinkName_h",sinkName_h
+#    print "Connect: procName_k",procName_k
+#    print "Connect: pipeName_m",pipeName_m
+#    print "Connect: equipeName_j",equipeName_j
+#    print "Connect: wheeName_n",wheeName_n
        
     Status.QWHEqLink = arange(NJ*NH).reshape(NJ,NH)  
     Status.QWHPipeLink = arange(NM*NH).reshape(NM,NH)
