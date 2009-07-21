@@ -253,9 +253,6 @@ class ModuleBM(object):
             bm_el.append(   [e0,e0,e1,e1,e0])
             bm_fuel.append( [f0,f1,f1,f0,f0])
 
-        sqlQuery = "Questionnaire_id = '%s' AND Process = '%s' ORDER BY AlternativeProposalNo ASC"%(Status.PId,self.process)        
-        processData = Status.DB.qprocessdata.sql_select(sqlQuery)
-
         for i in range(Status.NoOfAlternatives+1):
 
             if self.keys[0] == "BM1":
