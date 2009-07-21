@@ -416,6 +416,11 @@ class Processes(object):
             fL = (min(PT,fluid.TCond) - T0)*fluid.cp
 
         f = fL + fX + fV
+        if f <= 0 or f is None:
+            f = 1.0
+            fL = 1.0
+            logDebug("Processes (createInvTempDistLat): f=0 error with PT %s T0 %s h %s x %s x0 %s"% \
+                     (PT,T0,h,x,x0))
 
         distV = self.createTempDist(PT,T0=fluid.TCond,C=C)
         distX = self.createTempDist(fluid.TCond,T0=None,C=C)
