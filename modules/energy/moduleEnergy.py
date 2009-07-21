@@ -16,50 +16,23 @@
 #
 #==============================================================================
 #
-#	Version No.: 0.15
-#	Created by: 	    Hans Schweiger	13/03/2008
-#	Last revised by:    Tom Sobota          17/03/2008
-#                           Hans Schweiger      20/03/2008
-#                           Tom Sobota          31/03/2008
-#                           Hans Schweiger      02/04/2008
-#                           Hans Schweiger      03/04/2008
-#                           Hans Schweiger      13/04/2008
-#                           Hans Schweiger      18/04/2008
-#                           Stoyan Danov        14/05/2008
-#                           Enrico Facci        11/06/2008
-#                           Hans Schweiger      26/06/2008
-#                           Hans Schweiger      28/06/2008
-#                           Hans Schweiger      03/07/2008
-#                           Hans Schweiger      10/07/2008
-#                           Hans Schweiger      02/08/2008
+#   EINSTEIN Version No.: 1.0
+#   Created by: 	Hans Schweiger, Tom Sobota, Enrico Facci, Stoyan Danov
+#                       13/03/2008 - 02/08/2008
 #
-#       Changes to previous version:
-#       16/03/2008 Graphics implementation
-#       17/03/2008 Changes to graphics.
-#       20/03/2008 Adaptation to changes in interfaces and module HP
-#       31/03/2008 Adaptation to new numpy-based graphics
-#       02/04/2008 Small change in instantiatio of ModuleHP (key included)
-#       03/04/2008 Link to modules via parent (= Modules)
-#       13/04/2008 CascadeIndex corrected: now from 1 to N
-#       18/04/2008 Reference to Status.int
-#       14/05/2008 runSimulation reperence to C tables eliminated
-#       11/06/2008 modified runSimulation (getEquipmentClass, activated
-#                  calculateEnergyFlows for boilers
-#       26/06/2008: HS  solar thermal system (ST) added in runSimulation
-#                       try-except eliminated in runSimulation for better
-#                       debugging
-#       28/06/2008: possibility for simulating from first to last introduced
-#                   in run simulation
-#       03/07/2008: check and update of cascadeUpdateLevel incorporated
-#       10/07/2008: adaptation to new panel and solar system simulation
-#       02/08/2008: clean-up of prints in runSimulation and cEF
+#   Update No. 001
+#
+#   Since Version 1.0 revised by:
+#                       Hans Schweiger          21/07/2009
+#
+#   21/07/2009: HS  Iterative cycle in runSimulation introduced
 #	
 #------------------------------------------------------------------------------		
-#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008, 2009
 #	www.energyxperts.net / info@energyxperts.net
 #
 #	This program is free software: you can redistribute it or modify it under
-#	the terms of the GNU general public license as published by the Free
+#	the terms of the GNU general public license v3 as published by the Free
 #	Software Foundation (www.gnu.org).
 #
 #============================================================================== 
@@ -247,6 +220,10 @@ class ModuleEnergy(object):
         QHXj_t = Status.int.createQ_t()
         QHXj_T = Status.int.createQ_T()
 
+        QWHj_Tt = Status.int.createQ_Tt()
+        QWHj_t = Status.int.createQ_t()
+        QWHj_T = Status.int.createQ_T()
+
 #..............................................................................
 # start simulation
 
@@ -333,7 +310,7 @@ class ModuleEnergy(object):
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def runSimulation(self,first=None,last=None):
+    def runSimulation(self,first=None,last=None,loop=True):
 #------------------------------------------------------------------------------
 # updates the energy flows for the full equipment cascade
 #------------------------------------------------------------------------------
@@ -416,20 +393,31 @@ class ModuleEnergy(object):
                             "Remaining heat demand: %s [MWh]"%(uncoveredDemand/1000.0))
                 
             logTrack("ModuleEnergy (runSimulation): updating Energy balances")
-            Status.mod.moduleEA.calculateEquipmentEnergyBalances()
 
-            try:
-                x = Status.StatusEnergy
-            except:
-                Status.StatusEnergy = 0
-                
-            if Status.StatusEnergy == 0:
-                Status.mod.moduleHR.runHRModule()   # update waste heat calculations
-                Status.prj.setStatus("Energy")      # set Status to avoid infinite recursive loop
-                self.runSimulation(1,self.NEquipe)
-                
-            Status.prj.setStatus("Energy")
-    
+            (projectData,generalData) = Status.prj.getProjectData()
+
+            if loop == True:
+                for i in range(10):
+
+                    USH0 = Status.int.USHTotal
+                    QWHEq0 = Status.int.QWHEqTotal
+
+                    Status.mod.moduleEA.calculateEquipmentEnergyBalances()
+                    Status.prj.setStatus("Energy")  #probably redundant, already done in cEEB
+                    self.getEquipmentTotals()
+
+                    USH = Status.int.USHTotal
+                    QWHEq = Status.int.QWHEqTotal
+
+                    logTrack("ModuleEnergy - iterative cycle i %s (USH): %s -> %s (QWH): %s -> %s"% \
+                                          (i,USH0,USH,QWHEq0,QWHEq))
+
+                    if abs(QWHEq - QWHEq0) < 0.0001*(USH + USH0):
+                        break
+                    else:
+                        Status.mod.moduleHR.runHRModule()   # update waste heat calculations
+                        self.runSimulation(1,self.NEquipe,loop=False)
+                    
 #------------------------------------------------------------------------------
     def calculateOM(self,equipe,USH):
 #------------------------------------------------------------------------------
@@ -447,6 +435,25 @@ class ModuleEnergy(object):
 
         Status.SQL.commit()
 #------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def getEquipmentTotals(self):
+#------------------------------------------------------------------------------
+#..............................................................................
+#   estimate equipment waste heat from annual QWHj and equipment schedules
+
+        Status.int.QWHEqTotal_Tt = Status.int.createQ_Tt()
+        
+        equipments = Status.prj.getEquipments()
+        for equipe in equipments:
+            j = equipe.EqNo - 1
+            for iT in range(Status.NT+2):
+                for it in range(Status.Nt):
+                    Status.int.QWHEqTotal_Tt[iT][it] += Status.int.QWHj_Tt[j][iT][it]
+
+        Status.int.QWHEqTotal_t = copy.deepcopy(Status.int.QWHEqTotal_Tt[0])
+        Status.int.QWHEqTotal_T = Status.int.calcQ_T(Status.int.QWHEqTotal_Tt)
+        Status.int.QWHEqTotal = Status.int.QWHEqTotal_T[0]        
               
 #==============================================================================
 

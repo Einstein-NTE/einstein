@@ -19,13 +19,15 @@
 #   EINSTEIN Version No.: 1.0
 #   Created by:     Hans Schweiger	22/06/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
 #                   Hans Schweiger      11/06/2009
+#                   Hans Schweiger      20/07/2009
 #
-#   11/06/09: HS    function TCondOffGas added to fuel class
+#   11/06/09: HS    method TCondOffGas added to fuel class
+#   20/07/09: HS    method enthalpy added to class Fluid
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
@@ -40,6 +42,8 @@
 from einstein.modules.messageLogger import *
 from einstein.auxiliary.auxiliary import *
 from math import log10
+
+EPS = 1.e-6   # accuracy for condensation temperature
 
 #------------------------------------------------------------------------------		
 class Fluid():
@@ -88,7 +92,53 @@ class Fluid():
             self.TCond = 115.0 #
             self.name = "dummy fluid"
             logError(_("Fluid (init): cannot find fluid with ID = %s")%fluidID)
+
+######## provisionally set vapour specific heat == liquid specific heat
+        self.cpV = self.cp
            
+#---------------------------------------------------------------------------
+    def enthalpy(self,T,x=None):
+#---------------------------------------------------------------------------
+#       enthalpy(T,(x)) -> returns enthalpy as a function of T (and x)
+#       x = 0: pure liquid; x = 1: pure vapour
+#---------------------------------------------------------------------------
+        if (T is None):
+            return(None)
+    
+        elif abs(T - self.TCond) < EPS:
+            if x is None:
+                return (self.cp*self.TCond + 0.5*self.hL)
+            else:
+                return(self.cp*self.TCond + x*self.hL)
+        
+        elif T < self.TCond:
+            return(self.cp * T)
+        
+        elif T > self.TCond:
+            return(self.cp*self.TCond + self.hLcL + self.cpV*(T - self.TCond))
+           
+#------------------------------------------------------------------------------		
+#---------------------------------------------------------------------------
+    def steamFraction(self,h,T=None):
+#---------------------------------------------------------------------------
+#       enthalpy(T,(x)) -> returns enthalpy as a function of T (and x)
+#       x = 0: pure liquid; x = 1: pure vapour
+#---------------------------------------------------------------------------
+        if (T is not None):
+            if T > self.TCond + EPS:
+                return (1.0)
+            elif T < self.TCond - EPS:
+                return (0.0)
+
+        h0 = self.cp*self.TCond
+        h1 = h0 + self.hL
+            
+        if h < h0:
+                   return (0.0)
+        elif h > h1:
+                   return (1.0)
+        else:
+                   return (h - h0)/(h1-h0)
            
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -168,14 +218,14 @@ class Fuel():
             x = self.Humidity/(1. - self.Humidity)
             p_sat = x/(18.02/28.9+x)
             TCond = 1730.63 / (7.19621-log10(p_sat*100)) - 233.426
-            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
-                  (x,p_sat,TCond)
+#            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
+#                  (x,p_sat,TCond)
             
         except:
             
             TCond = 80
-            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
-                  ("-","-",TCond)
+#            print "Fuel(TCondOffGas): x %s p_sat %s TCond %s"% \
+#                  ("-","-",TCond)
             
         return (TCond)
 

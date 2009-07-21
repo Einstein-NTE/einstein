@@ -355,7 +355,7 @@ class ModuleEA4(object):
 
 # prepare data for table
             TLevels = [10000.0,80.0,120.0,250.0,400.0]
-            Titles = [_U("  Total  "),
+            Titles = [u"  Total  ",
                       u" <  80 ºC",
                       u" < 120 ºC",
                       u" < 250 ºC",

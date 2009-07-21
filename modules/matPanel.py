@@ -57,7 +57,7 @@ def setFigure(self, color = None, dpi = None):
     self.resizeflag = True
     self.setSize()
     self.params = {}
-    print 'setFigure'
+#    print 'setFigure'
 
 def setColor(self, rgbtuple):
     """

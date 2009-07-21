@@ -94,7 +94,7 @@ class ModuleBB(object):
 
         if Status.int.cascadeUpdateLevel < self.cascadeIndex:
             Status.mod.moduleEnergy.runSimulation(self.cascadeIndex)
-        print"ModuleBB; updatePanel: there are '%s' equipments and the lenght of the QD_Tt_mod is'%s" % (len(self.equipments),len(Status.int.QD_Tt_mod))
+#        print"ModuleBB; updatePanel: there are '%s' equipments and the lenght of the QD_Tt_mod is'%s" % (len(self.equipments),len(Status.int.QD_Tt_mod))
 #............................................................................................
 # 1. List of equipments
 
@@ -108,7 +108,7 @@ class ModuleBB(object):
 #............................................................................................
 # 2. Preparing data
         self.findmaxTemp(Status.int.QD_T)
-        print "ModuleBB; updatePanel: maximum temperature",self.maxTemp
+#        print "ModuleBB; updatePanel: maximum temperature",self.maxTemp
         PowerSum80=0
         PowerSum140=0
         PowerSumTmax=0
@@ -204,7 +204,7 @@ class ModuleBB(object):
         
 #............................................................................................
 # 4. additional information (Info field right side of panel)
-        print"moduleBB;updatePanel: info to be displayed:",self.maxTemp,QResidualMaxTemp[0],QD80C[0],QD140C[0]-QD80C[0],QDmaxTemp[0]
+#        print"moduleBB;updatePanel: info to be displayed:",self.maxTemp,QResidualMaxTemp[0],QD80C[0],QD140C[0]-QD80C[0],QDmaxTemp[0]
         info = []
         info.append(self.maxTemp)  #first value to be displayed
         info.append(QResidualMaxTemp[0])
@@ -241,8 +241,8 @@ class ModuleBB(object):
         urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo]
 
         if len(urows) == 0:
-            print 'getUserDefinedParamBB: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
-            print 'Error: confusion in PId and ANo'
+#            print 'getUserDefinedParamBB: Status.PId =', Status.PId, 'Status.ANo =', Status.ANo, 'not defined'
+#            print 'Error: confusion in PId and ANo'
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
 
@@ -261,7 +261,7 @@ class ModuleBB(object):
                       u.BBHOp,
                       u.BBPmin,
                       u.BBEff]
-            print "ModuleBB (getUserDefinedPars): config = ",config
+#            print "ModuleBB (getUserDefinedPars): config = ",config
         return config
 
 #------------------------------------------------------------------------------
@@ -273,7 +273,7 @@ class ModuleBB(object):
         urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
         
         if len(urows)==0:
-            print "ModuleBB(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
+#            print "ModuleBB(setUserDefinedParamHP): corrupt data base - no entry for uheatpump under current ANo"
             dummy = {"Questionnaire_id":Status.PId,"AlternativeProposalNo":Status.ANo} 
             Status.DB.uheatpump.insert(dummy)
             urows = Status.DB.uheatpump.Questionnaire_id[Status.PId].AlternativeProposalNo[Status.ANo] #row in UHeatPump
@@ -296,7 +296,6 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 #       screens existing equipment, whether there are already heat pumps
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'screenEquipments'"
         self.equipments = Status.prj.getEquipments()
         Status.int.getEquipmentCascade()
         self.NEquipe = len(self.equipments)
@@ -323,7 +322,7 @@ class ModuleBB(object):
             for j in range(len(BBTableDataList[i])):
                 if BBTableDataList[i][j] == None:
                     BBTableDataList[i][j] = 'not available'        
-        print"ModuleBB;screenEquipments: the list of bb is:",self.BBList
+#        print"ModuleBB;screenEquipments: the list of bb is:",self.BBList
         return (self.BBList,BBTableDataList)
         
 
@@ -344,17 +343,16 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 #
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'deleteEquipment'"
         if automatic == False:
             if rowNo == None:   #indicates to delete last added equipment dummy
                 BBid = self.dummyEqId
             else:
             #--> delete BB from the equipment list under current alternative #from C&QGenerationHC under ANo
                 BBid = self.getEqId(rowNo)
-                print "Module BB (delete): id to be deleted = ",BBid
+#                print "Module BB (delete): id to be deleted = ",BBid
         else:
             BBid= rowNo
-            print "Module BB (delete automaticly): id to be deleted = ",BBid
+#            print "Module BB (delete automaticly): id to be deleted = ",BBid
         
         Status.prj.deleteEquipment(BBid)
         self.screenEquipments()
@@ -365,7 +363,6 @@ class ModuleBB(object):
 #       adds a new dummy equipment to the equipment list and returns the
 #       position in the cascade 
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'addEquipmentDummy'"
         self.equipe = Status.prj.addEquipmentDummy()
         self.dummyEqId = self.equipe.QGenerationHC_ID
 
@@ -388,7 +385,6 @@ class ModuleBB(object):
 #   takes an equipment from the data base and stores it under a given Id in
 #   the equipment data base
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'setEquipmentFromDB'"
         model = self.DB.dbboiler.DBBoiler_ID[modelID][0]
 
         if model.BBPnom != None: equipe.update({"HCGPnom":model.BBPnom})
@@ -443,8 +439,8 @@ class ModuleBB(object):
         except:
             pass
 
-        print "ModuleBB (setEqFromDB): FuelConsum %s ElectriConsum %s FlowExhaustGas %s TExhaustGas %s"% \
-              (equipe.FuelConsum,equipe.ElectriConsum,equipe.FlowExhaustGas,equipe.TExhaustGas)
+#        print "ModuleBB (setEqFromDB): FuelConsum %s ElectriConsum %s FlowExhaustGas %s TExhaustGas %s"% \
+#              (equipe.FuelConsum,equipe.ElectriConsum,equipe.FlowExhaustGas,equipe.TExhaustGas)
 
 
 
@@ -471,7 +467,6 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 #   calculates the energy flows in the equipment identified by "cascadeIndex"
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'calculateEnergyFlows'"
         if Status.int.cascadeUpdateLevel < (cascadeIndex - 1):
             logDebug("ModuleBB (calculateEnergyFlows): cannot calulate without previously updating the previous levels")
             Status.mod.moduleEnergy.runSimulation(last=(cascadeIndex-1))
@@ -536,7 +531,7 @@ class ModuleBB(object):
         for iT in range(Status.NT+2):
             
             dT = max(iT*Status.TemperatureInterval - TMinOffGas,0.)
-            f_QWH_T.append(f_QWH*min(1.0,dT/dTtot))
+            f_QWH_T.append(f_QWH*max(0.0,1.0-dT/dTtot))
             
 
 #..............................................................................
@@ -591,7 +586,7 @@ class ModuleBB(object):
 
             for iT in range(Status.NT+2):
                 QWHj_Tt[iT][it] = USHj_Tt[Status.NT+1][it]*f_QWH_T[iT]
-            QWHj += QWHj_Tt[Status.NT+1][it]
+            QWHj += QWHj_Tt[0][it]
 
 #..............................................................................
 # End of year reached. Store results in interfaces
@@ -675,7 +670,6 @@ class ModuleBB(object):
 #  sorts boilers by temperature and by efficiency
 #------------------------------------------------------------------------------
 #first bring all your boilers in a listing for easier access
-        print "moduleBB starting function 'sortBoiler'"
         boilerList = []
         for i in range(len(Status.int.cascade)):
             entry = Status.int.cascade[i]
@@ -763,17 +757,16 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 # delete unefficient boiler
 #------------------------------------------------------------------------------
-        print"entered 'automDeleteBoiler' function" 
         self.screenEquipments()
         automatic=True
         for i in range (len (self.BBList)):
-            print "controlling equipe", self.BBList[i]['equipeID']
+#            print "controlling equipe", self.BBList[i]['equipeID']
             eff= Status.DB.qgenerationhc.QGenerationHC_ID[self.BBList[i]['equipeID']][0]['HCGTEfficiency']
-            print "efficiency of the boiler number '%s'is:'%s'"%(i,eff)
-            print "min efficiency accepted:",minEfficencyAccepted
+#            print "efficiency of the boiler number '%s'is:'%s'"%(i,eff)
+#            print "min efficiency accepted:",minEfficencyAccepted
             if eff < minEfficencyAccepted:
 #                 add the fuel criterion: if not biomass,biofuels?,gas methane ->delete ???
-                print "Module BB (): id to be deleted = ",self.BBList[i]['equipeID']
+#                print "Module BB (): id to be deleted = ",self.BBList[i]['equipeID']
                 self.dummyEqId = self.BBList[i]['equipeID']
                 self.deleteEquipment(None)        #(self.BBList[i]['equipeID'],automatic)# The row number should be passed. is this right? 
                 
@@ -806,7 +799,6 @@ class ModuleBB(object):
 #       N.B. the possibility of retriveing deleted boilers is not implemented yet.
 #       N.B. The possibility that a boiler with nominal power > than biggerBB is in the list has to be considered.
 #------------------------------------------------------------------------------      
-        print "moduleBB:dimensioning reduntant boilers"
         self.maxPow80=0
         self.maxPow140=0
         self.maxPowTmax=0
@@ -827,7 +819,7 @@ class ModuleBB(object):
                 elif equipe['TMaxSupply']>150 and\
                      Pnom > self.maxPowTmax:
                     self.maxPowTmax = Pnom
-        print"moduleBB;Function redundancy: the power of the redundant boiler are", self.maxPow80,self.maxPow140,self.maxPowTmax
+#        print"moduleBB;Function redundancy: the power of the redundant boiler are", self.maxPow80,self.maxPow140,self.maxPowTmax
         if self.maxPow80>0:
             modelID =self.selectBB(max(self.minPow,self.maxPow80),80)
             equipe = self.addEquipmentDummy()
@@ -848,7 +840,6 @@ class ModuleBB(object):
 #------------------------------------------------------------------------------
 # finds the maximum power of the boiler in the DB (for each temperature level)
 #------------------------------------------------------------------------------
-        print "moduleBB starting function 'findBiggerBB'"
         sqlQuery="BoilerTemp >='%s' ORDER BY BBPnom DESC" %(self.maxTemp)
         search= Status.DB.dbboiler.sql_select(sqlQuery)
         self.biggermaxTemp=search[0].BBPnom
@@ -866,7 +857,6 @@ class ModuleBB(object):
 #  we could give the possibility to choose the boiler to the user (in the interactive mode) in a 'selected' list. In this version we take the first  
 #  element of the list
 #------------------------------------------------------------------------------
-        print "moduleBB: entered selectBB function"
         Power = max(self.minPow,Pow)
         sqlQuery="BoilerTemp >= '%s'AND BBPnom >= '%s' ORDER BY BBPnom ASC" %(Top,Power)       
         selected = Status.DB.dbboiler.sql_select(sqlQuery)
@@ -889,12 +879,10 @@ class ModuleBB(object):
         else:
             modelID =selected[0].DBBoiler_ID
             showWarning(_("in the database no boiler with the desired efficiency has be found")) 
-                          
-
-        
+                                  
 #        modelID =selected[0].DBBoiler_ID
-        print "selectBB: the requested power is:", Pow 
-        print "selectBB: the selected boiler ID is:", modelID
+#        print "selectBB: the requested power is:", Pow 
+#        print "selectBB: the selected boiler ID is:", modelID
 #        print "selectBB: the list of boiler is:"
 #        print selected
         return modelID

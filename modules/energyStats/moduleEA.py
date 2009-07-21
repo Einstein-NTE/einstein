@@ -106,8 +106,6 @@ class ModuleEA(object):
 
 
         Status.int.setGraphicsData("PROCHEATTEMP", array(tableReport))
-#        print "ModuleEA (procHeatTemp): resulting array"
-#        print array(tableReport)
 
 #------------------------------------------------------------------------------
     def calculateAnnualResults(self):
@@ -129,7 +127,7 @@ class ModuleEA(object):
 #   calculates the annual fuel balances from the results of system simulations
 #   and stores the within the SQL tables
 #------------------------------------------------------------------------------
-        
+
         logTrack("ModuleEA (calculateEquipmentEnergyBalances)")
         
         (projectData,generalData) = Status.prj.getProjectData()
@@ -148,7 +146,7 @@ class ModuleEA(object):
 # Carried out only if ANo > 0. For ANo = 0 comes from consistency check
 
         if Status.ANo > 0:
-        
+
             if Status.int.cascadeUpdateLevel < len(equipments):
                 logTrack("ModuleEA (calcEq.En.Bal.): calling runSimulation before updating energy balances")
                 Status.mod.moduleEnergy.runSimulation()
@@ -230,6 +228,10 @@ class ModuleEA(object):
                     logWarning("Fuel type for equipe %s is not known"%equipe.Equipment)
 
 #..............................................................................
+#..............................................................................
+
+                
+#..............................................................................
 # calculate derived quantities and store in equipment table
 
             for equipe in equipments:
@@ -309,6 +311,9 @@ class ModuleEA(object):
 
             generalData.FET = FET  #total FET as simple sum
             generalData.USH = USH  #total USH
+
+            Status.int.USHTotal = USH
+            Status.int.QWHEqTotal = QWH
 
 #..............................................................................
 #..............................................................................

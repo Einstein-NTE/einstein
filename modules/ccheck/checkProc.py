@@ -22,13 +22,15 @@
 #   Created by: 	Claudia Vannoni, Hans Schweiger
 #                       08/03/2008 - 03/09/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
-#                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  06/04/2009
+#                       Hans Schweiger  20/07/2009
 #               
-#   06/04/2008  HS  Clean-up: elimination of prints
+#   06/04/2009  HS  Clean-up: elimination of prints
+#   20/07/2009  HS  Bug-fix: fluid properties in outgoing medium
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
@@ -83,8 +85,30 @@ class CheckProc():
         self.PTOutFlowRec = CCPar("PTOutFlowRec",parType="T")
         self.PTOutFlowRec1 = CCPar("PTOUtFlowRec1")
         self.PTOutFlowRec2 = CCPar("PTOUtFlowRec2")
+        self.PTOutFlowRec3 = CCPar("PTOUtFlowRec3")
         self.PTFinal = CCPar("PTFinal",parType = "T")
         self.PTFinal1 = CCPar("PTFinal1")
+        self.PTFinal2 = CCPar("PTFinal2")
+
+        self.hOutFlow1 = CCPar("hOutFlow1")
+        self.hOutFlow2 = CCPar("hOutFlow2")
+        self.hOutFlowRec = CCPar("hOutFlowRec")
+        self.hOutFlowRec1 = CCPar("hOutFlowRec1")
+        self.hFinal = CCPar("hFinal")
+        self.hFinal1 = CCPar("hFinal1")
+        self.dhOutFlow = CCPar("dhOutFlow")
+        self.dhOutFlow1 = CCPar("dhOutFlow1")
+        self.dhFinal = CCPar("dhFinal")
+        self.dhFinal1 = CCPar("dhFinal1")
+
+        self.xOutFlow = CCPar("xOutFlow",parType = "X")
+        self.xOutFlow1 = CCPar("xOutFlow1",parType = "X")
+        self.xOutFlowRec = CCPar("xOutFlowRec",parType = "X")
+        self.xOutFlowRec1 = CCPar("xOutFlowRec1",parType = "X")
+        self.xFinal = CCPar("xFinal",parType = "X")
+        self.xFinal1 = CCPar("xFinal1",parType = "X")
+
+        
         self.HPerYearProc1 = CCPar("HPerYearProc1")
         self.HPerYearProc = CCPar("HPerYearProc",priority=2)
         self.HPerYearProc.valMax = 8760
@@ -183,6 +207,7 @@ class CheckProc():
         self.PTStartUp = CCPar("PTStartUp",parType="T")
         self.VInFlowDay = CCPar("VInFlowDay ")
         self.VOutFlow = CCPar("VOutFlow")
+        self.hOutFlow = CCPar("hOutFlow")
         self.VolProcMed = CCPar("VolProcMed")
         self.NDaysProc = CCPar("NDaysProc")
         self.NDaysProc.valMax = 365
@@ -205,22 +230,34 @@ class CheckProc():
             fluid_number = qprocessdata.ProcMedDBFluid_id   #IMPORT from the FluidDB
             proc_fluid = Fluid(fluid_number)
 
+            fluid_number_w = qprocessdata.ProcMedOut   #IMPORT from the FluidDB
+            proc_fluid_w = Fluid(fluid_number_w)
+
 #            print proc_fluid
             
             self.FluidCp = proc_fluid.cp
             self.FluidDensity = proc_fluid.rho
             self.FluidRhoCp = self.FluidCp * self.FluidDensity
 
+            self.FluidCp_w = proc_fluid_w.cp
+            self.FluidDensity_w = proc_fluid_w.rho
+            self.FluidRhoCp_w = self.FluidCp_w * self.FluidDensity_w
+            self.Fluid_hL_w = proc_fluid_w.hL
+            self.FluidTCond_w = proc_fluid_w.TCond
+
+
             self.PTInFlow.setValue(qprocessdata.PTInFlow)
             self.PT.setValue(qprocessdata.PT,err=0.0)   #if specified, take as fixed
             self.PTOutFlow.setValue(qprocessdata.PTOutFlow)
 
-# if no temperature for Outflow is specified, start with PT as initial estimate
+# if no temperature or enthalpy for Outflow is specified, start with PT as initial estimate
 # but leave error range from 0 to infinite !!!!
 
-            if qprocessdata.PTOutFlow is None:
+            if qprocessdata.PTOutFlow is None and qprocessdata.HOutFlow is None:
                 self.PTOutFlow.val = self.PT.val
                 self.PTOutFlowRec.val = self.PT.val
+                
+            self.hOutFlow.setValue(qprocessdata.HOutFlow)
                 
             self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
             self.PTStartUp.setValue(qprocessdata.PTStartUp)
@@ -290,7 +327,8 @@ class CheckProc():
                 qprocessdata.PTInFlow = check(self.PTInFlow.val)
                 qprocessdata.PT = check(self.PT.val)
                 qprocessdata.PTOutFlow = check(self.PTOutFlow.val)
-                qprocessdata.PTOutFlowRec = check(self.PTOutFlowRec.val) 
+                qprocessdata.PTOutFlowRec = check(self.PTOutFlowRec.val)
+                qprocessdata.HOutFlow = check(self.hOutFlow.val)
                 qprocessdata.PTInFlowRec = check(self.PTInFlowRec.val)
                 qprocessdata.PTStartUp = check(self.PTStartUp.val)
                 qprocessdata.PTFinal = check(self.PTFinal.val)
@@ -383,9 +421,12 @@ class CheckProc():
         self.PTInFlowRec.show()
         self.PTInFlowRec1.show()
         self.PTOutFlow.show()
+        self.hOutFlow.show
         self.PTStartUp.show()
         self.PTFinal.show()
+        self.hFinal.show()
         self.PTOutFlowRec.show()
+        self.hOutFlowRec.show
         self.NBatch.show()
         self.UAProc.show()
         self.QEvapProc.show()
@@ -586,9 +627,13 @@ class CheckProc():
                                           self.PT1,self.PTInFlow,
                                           self.DTUPHcGross,self.DTUPHcGross1)
             if self.internalHR == True:
-                self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidRhoCp,self.VOutFlow,
-                                               self.PTOutFlowRec,self.PTOutFlow,
-                                               self.DTQHXOut,self.DTQHXOut1)
+#                self.QHXdotProcInt1 = calcFlow("QHXdotProcInt1",self.FluidRhoCp_w,self.VOutFlow,
+#                                               self.PTOutFlowRec,self.PTOutFlow,
+#                                               self.DTQHXOut,self.DTQHXOut1)
+
+                self.dhOutFlow1 = calcDiff("dhOutFlow1",self.hOutFlowRec,self.hOutFlow)
+                self.QHXdotProcInt1 = calcProdC("QHXdotProcInt1",self.FluidDensity_w, \
+                                                self.dhOutFlow,self.VOutFlow)
                 self.QHXdotProcInt2 = calcFlow("QHXdotProcInt2",self.FluidRhoCp,self.VInFlowDay2,
                                                self.PTInFlowRec,self.PTInFlow1,
                                                self.DTQHXIn,self.DTQHXIn1)
@@ -619,13 +664,37 @@ class CheckProc():
                 self.DTCrossHXHT1 = calcDiff("DTCrossHXHT",self.PTOutFlowRec,self.PTInFlowRec)
 
             if self.HeatRecOK == True:
-                self.UPHw_dot1 = calcFlow("UPHw_dot1",self.FluidRhoCp,self.VOutFlow,
-                                          self.PTOutFlow,self.PTFinal,
-                                          self.DTOutFlow,self.DTOutFlow1)
+#                self.UPHw_dot1 = calcFlow("UPHw_dot1",self.FluidRhoCp_w,self.VOutFlow,
+#                                          self.PTOutFlow,self.PTFinal,
+#                                          self.DTOutFlow,self.DTOutFlow1)
+
+                self.dhFinal1 = calcDiff("dhFinal1",self.hOutFlow,self.hFinal)
+                self.UPHw_dot1 = calcProdC("UPHw_dot1",self.FluidDensity_w, \
+                                                self.dhFinal,self.VOutFlow)
+
             else:
                 self.UPHw_dot1.setValue(0.0)
                 
             self.UPHw1 = calcProd("UPHw1",self.UPHw_dot,self.NDaysProc3)
+
+            self.hOutFlowRec1 = calcH("hOutFlow1",self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTOutFlowRec,self.xOutFlowRec)
+
+            self.hOutFlow1 = calcH("hOutFlow1",self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTOutFlow,self.xOutFlow)
+
+            self.hFinal1 = calcH("hFinal1",self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTFinal,self.xFinal)
+
                         
             if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
@@ -646,9 +715,31 @@ class CheckProc():
                 print "Step 3: calculating from right to left (ADJUST)"
                 print "-------------------------------------------------"
                 
+            adjustH(self.hOutFlowRec1,self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTOutFlowRec3,self.xOutFlowRec)
+
+            adjustH(self.hOutFlow1,self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTOutFlow3,self.xOutFlow)
+
+            adjustH(self.hFinal1,self.FluidCp_w,
+                      self.FluidCp_w,
+                      self.Fluid_hL_w,
+                      self.FluidTCond_w,
+                      self.PTFinal2,self.xFinal)
+
             if self.HeatRecOK == True:
-                adjustFlow(self.UPHw_dot1,self.FluidRhoCp,self.VOutFlow2,
-                           self.PTOutFlow3,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
+#                adjustFlow(self.UPHw_dot1,self.FluidRhoCp_w,self.VOutFlow2,
+#                           self.PTOutFlow,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
+
+                adjustDiff(self.dhFinal1,self.hOutFlow,self.hFinal)
+                adjustProdC(self.UPHw_dot1,self.FluidDensity_w,self.dhFinal,self.VOutFlow2)
+
             else:
                 self.PTFinal.update(self.PTOutFlow) #for security (link with HR module): -> zero UPHw !!!
                 self.PTFinal1.update(self.PTOutFlow) #avoid conflicts !!!
@@ -674,8 +765,13 @@ class CheckProc():
             adjustDiff(self.UPHcdot1,self.UPHcdotGross,self.QHXdotProcInt)
             adjustFlow(self.QHXdotProcInt2,self.FluidRhoCp,self.VInFlowDay2,
                        self.PTInFlowRec2,self.PTInFlow1,self.DTQHXIn,self.DTQHXIn1)
-            adjustFlow(self.QHXdotProcInt1,self.FluidRhoCp,self.VOutFlow,
-                       self.PTOutFlowRec1,self.PTOutFlow,self.DTQHXOut,self.DTQHXOut1)
+            
+#            adjustFlow(self.QHXdotProcInt1,self.FluidRhoCp_w,self.VOutFlow,
+#                       self.PTOutFlowRec1,self.PTOutFlow,self.DTQHXOut,self.DTQHXOut1)
+
+            adjustDiff(self.dhOutFlow1,self.hOutFlowRec,self.hOutFlow2)
+            adjustProdC(self.QHXdotProcInt1,self.FluidDensity_w,self.dhOutFlow,self.VOutFlow)
+            
             adjustFlow(self.UPHcdotGross1,self.FluidRhoCp,self.VInFlowDay,
                        self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)
             
@@ -725,8 +821,8 @@ class CheckProc():
         ccheck1(self.VolProcMed,self.VolProcMed1)
         ccheck3(self.VInFlowDay,self.VInFlowDay1,self.VInFlowDay2,self.VInFlowDay3)
         ccheck1(self.VOutFlow,self.VOutFlow1)
-        ccheck2(self.PTOutFlow,self.PTOutFlow1,self.PTOutFlow2)
-        ccheck2(self.PTOutFlowRec,self.PTOutFlowRec1,self.PTOutFlowRec2)
+        ccheck3(self.PTOutFlow,self.PTOutFlow1,self.PTOutFlow2,self.PTOutFlow3)
+        ccheck3(self.PTOutFlowRec,self.PTOutFlowRec1,self.PTOutFlowRec2,self.PTOutFlowRec3)
         ccheck1(self.DTCrossHXLT,self.DTCrossHXLT1)
         ccheck1(self.DTCrossHXHT,self.DTCrossHXHT1)
         
@@ -751,9 +847,19 @@ class CheckProc():
         ccheck1(self.UPHw,self.UPHw1)
         ccheck1(self.UPHw_dot,self.UPHw_dot1)
         ccheck1(self.DTOutFlow,self.DTOutFlow1)
-        ccheck1(self.PTFinal,self.PTFinal1)
+        ccheck2(self.PTFinal,self.PTFinal1,self.PTFinal2)
         ccheck1(self.UPHw,self.QWHProc)#At the moment they are the same. Change it next future when vessel heat recovery will be implemented
         ccheck1(self.UAProc,self.UAProc1)
+
+        ccheck2(self.hOutFlow,self.hOutFlow1,self.hOutFlow2)
+        ccheck1(self.hOutFlowRec,self.hOutFlowRec1)
+        ccheck1(self.hFinal,self.hFinal1)
+        ccheck1(self.dhOutFlow,self.dhOutFlow1)
+        ccheck1(self.dhFinal,self.dhFinal1)
+        
+        ccheck1(self.xOutFlow,self.xOutFlow1)
+        ccheck1(self.xOutFlowRec,self.xOutFlowRec1)
+        ccheck1(self.xFinal,self.xFinal1)
         
 #------------------------------------------------------------------------------
     def estimate(self):  

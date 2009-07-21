@@ -19,7 +19,7 @@
 #   Created by: 	Florian Joebstl, Hans Schweiger
 #                       04/09/2008 - 18/10/2008
 #
-#   Update No. 011
+#   Update No. 012
 #
 #   Since Version 1.0 revised by:
 #                       Hans Schweiger          21/10/2008
@@ -33,6 +33,7 @@
 #                       Hans Schweiger          26/06/2009
 #                       Hans Schweiger          08/07/2009
 #                       Hans Schweiger          10/07/2009
+#                       Hans Schweiger          21/07/2009
 #
 #   Changes to previous version:
 #
@@ -55,6 +56,8 @@
 #                   to the user (logError)
 #   10/07/2009: HS  security against division by zero in calcQA/QD + some clean-up
 #                   in these functions
+#   21/07/2009: HS  clean-up -> common functions in __doPostProcessing (PE2) and
+#                   __estimativeMode put together into __storeResults.
 #                   
 #------------------------------------------------------------------------------     
 #   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -401,7 +404,6 @@ class ModuleHR(object):
 # Arrays that need to be calculated (output for further processing)
 
         QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
-        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
 
         UPHProc_Tt = copy.deepcopy(UPH_Tt)      # initial value = UPH. will be reduced by QHX
         UPHProc_T = Status.int.calcQ_T(UPHProc_Tt)
@@ -642,51 +644,10 @@ class ModuleHR(object):
                 logDebug("ModuleHR (__doPostProcessing): time shift of 168 hours not enough for realising PE2 HR potential")
                 
 #..............................................................................
-# settings of the conversion UPH -> USH
-
-        (projectData,generalData) = Status.prj.getProjectData()
-        if generalData is not None:
-            DistributionEfficiency = generalData.HDEffAvg
-        else:
-            logDebug("SimulateHR: error reading distribution efficiency from cgeneraldata")
-            DistributionEfficiency = 0.9
-            
-        fDist = 1./max(DistributionEfficiency,0.1)  #distribution efficiency < 10% doesn't make much sense
-        
-#..............................................................................
-#..............................................................................
 #..............................................................................
                            
-#..............................................................................
-# from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
 
-        for it in range(Status.Nt):
-            
-            USH_Tt[0][it] = 0
-            USH_Tt[1][it] = 0
-            for iT in range(2,Status.NT+2):
-                USH_Tt[iT][it] = UPHProc_Tt[iT-2][it]*fDist
-
-#..............................................................................
-#..............................................................................
-#..............................................................................
-
-# Assignment to global arrays in Interfaces
-
-        Status.int.USHTotal_Tt = USH_Tt
-        Status.int.UPHProcTotal_Tt = UPHProc_Tt
-        Status.int.QHXProcTotal_Tt = QHXProc_Tt
-        Status.int.QWHAmb_Tt = QWHAmb_Tt
-
-        Status.int.USHTotal_T = Status.int.calcQ_T(USH_Tt)
-        Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
-        Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
-        Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
-
-#        print "ModuleHR (__doPostProc.): USHTotal_T = ",Status.int.USHTotal_T
-#        print "ModuleHR (__doPostProc.): UPHProcTotal_T = ",Status.int.UPHProcTotal_T
-#        print "ModuleHR (__doPostProc.): QHXProcTotal_T = ",Status.int.QHXProcTotal_T
-#        print "ModuleHR (__doPostProc.): QWHAmb_T = ",Status.int.QWHAmb_T
+        self.__storeResults(UPHProc_Tt,QHXProc_Tt,QWHAmb_Tt)
             
 #------------------------------------------------------------------------------
     def __maxHRPotential(self,UPH_Tt,QWH_Tt,timeShift):
@@ -1065,7 +1026,6 @@ class ModuleHR(object):
             
         QHXProc_Tt = Status.int.createQ_Tt()    # heat recovered for process heating
         UPHProc_Tt = Status.int.createQ_Tt()    # heat supplied externally to processes
-        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
 #        QWHAmb_Tt = Status.int.createQ_Tt()     # remaining waste heat that currently is dissipated
 
         UPH_Tt = Status.int.UPHTotal_Tt
@@ -1074,7 +1034,7 @@ class ModuleHR(object):
         QWH_Tt = copy.deepcopy(UPHw_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
         for iT in range(Status.NT+2):
             for it in range(Status.Nt):
-                QWH_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it]
+                QWH_Tt[iT][it] += Status.int.QWHEqTotal_Tt[iT][it] + Status.int.QWHEE_Tt[iT][it]
         
         QWHAmb_Tt = copy.deepcopy(QWH_Tt)      # initial value = UPHw (QWHProc) + QWHEq. will be reduced by QHX
 
@@ -1085,16 +1045,7 @@ class ModuleHR(object):
             fHR = 0.8   # fraction of potential heat recovery that is really recovered
         else:
             fHR = 0.0
-        logWarning("Test version. REAL HX network is not taken into consideration !!!!")
-
-        (projectData,generalData) = Status.prj.getProjectData()
-        if generalData is not None:
-            DistributionEfficiency = generalData.HDEffAvg
-        else:
-            logDebug("SimulateHR: error reading distribution efficiency from cgeneraldata")
-            DistributionEfficiency = 0.9
-            
-        fDist = 1./max(DistributionEfficiency,0.1)  #distribution efficiency < 10% doesn't make much sense
+        logWarning("ESTIMATIVE MODE FOR HEAT RECOVERY CALCULATIONS. REAL HX network is not taken into consideration !!!!")
         
 #..............................................................................
 #..............................................................................
@@ -1112,7 +1063,7 @@ class ModuleHR(object):
                 QHXProc_Tt[iT][it] = fHR*(QWH_max - QWH_Tt[iT+2][it])  #maximum available energy
                 if iT > 0:
                     if QHXProc_Tt[iT][it] <= QHXProc_Tt[iT-1][it] - 0.001:
-                        print "error in slope of QWH[%s][%s]"%(iT,it)
+                        logDebug("error in slope of QWH[%s][%s]"%(iT,it))
 
             QHXProc_Tt[Status.NT][it]   = QHXProc_Tt[Status.NT-1][it]         #includes shift by DTmin
             QHXProc_Tt[Status.NT+1][it] = QHXProc_Tt[Status.NT-1][it]
@@ -1127,7 +1078,7 @@ class ModuleHR(object):
 
                 if iT > 0:
                     if QHXProc_Tt[iT][it] <= QHXProc_Tt[iT-1][it] - 0.001:
-                        print "error in slope of QHXProc[%s][%s] after shift"%(iT,it)
+                        logDebug("error in slope of QHXProc[%s][%s] after shift"%(iT,it))
             
 #substract recovered heat from total available waste heat -> QHWAmb
             QHXProc_max = QHXProc_Tt[Status.NT+1][it]
@@ -1144,13 +1095,41 @@ class ModuleHR(object):
             for iT in range(Status.NT,-1,-1):
                 UPHProc_Tt[iT][it] = min(UPHProc_Tt[iT+1][it],UPHProc_Tt[iT][it])
 
-                if iT > 0:
-                    if UPHProc_Tt[iT][it] <= UPHProc_Tt[iT-1][it] - 0.001:
-                        print "error in slope of UPHProc[%s][%s]"%(iT,it)
+#                if iT > 0:
+#                    if UPHProc_Tt[iT][it] <= UPHProc_Tt[iT-1][it] - 0.001:
+#                        print "error in slope of UPHProc[%s][%s]"%(iT,it)
                            
+#..............................................................................
+                
+        self.__storeResults(UPHProc_Tt,QHXProc_Tt,QWHAmb_Tt)
+        
+#------------------------------------------------------------------------------
+    def __storeResults(self,UPHProc_Tt,QHXProc_Tt,QWHAmb_Tt):
+#------------------------------------------------------------------------------
+
+#..............................................................................
+# settings of the conversion UPH -> USH
+
+        (projectData,generalData) = Status.prj.getProjectData()
+        if generalData.HDEffAvg is not None:
+            DistributionEfficiency = generalData.HDEffAvg
+        else:
+            logDebug("SimulateHR: error reading distribution efficiency from cgeneraldata")
+            DistributionEfficiency = 0.9
+
+        if DistributionEfficiency < 0.3:
+            logWarning("Very low distribution efficiency: %s. Revise your data"%DistributionEfficiency)
+            
+        fDist = 1./max(DistributionEfficiency,0.1)  #distribution efficiency < 10% doesn't make much sense
+        
+#..............................................................................
 #..............................................................................
 # from UPHext to USH: shift in temperature (10 K) and divide by distribution efficiency
 
+        USH_Tt = Status.int.createQ_Tt()        # heat demand at entry of pipes
+
+        for it in range(Status.Nt):
+            
             USH_Tt[0][it] = 0
             USH_Tt[1][it] = 0
             for iT in range(2,Status.NT+2):
@@ -1158,8 +1137,7 @@ class ModuleHR(object):
 
 #..............................................................................
 #..............................................................................
-#..............................................................................
-                
+
         Status.int.USHTotal_Tt = USH_Tt
         Status.int.UPHProcTotal_Tt = UPHProc_Tt
         Status.int.QHXProcTotal_Tt = QHXProc_Tt
@@ -1169,22 +1147,26 @@ class ModuleHR(object):
         Status.int.UPHProcTotal_T = Status.int.calcQ_T(UPHProc_Tt)
         Status.int.QHXProcTotal_T = Status.int.calcQ_T(QHXProc_Tt)
         Status.int.QWHAmb_T = Status.int.calcQ_T(QWHAmb_Tt)
-        
-#------------------------------------------------------------------------------
-    def __getQWHEqTotal(self):
-#------------------------------------------------------------------------------
-# calculates the total of waste heat for the equipments
-#------------------------------------------------------------------------------        
 
-        Status.int.QWHEqTotal_Tt = Status.int.createQ_Tt()
+        Status.int.USHTotal = Status.int.USHTotal_T[Status.NT+1]
         
-        for j in range(Status.NEquipe):
-            for iT in range(Status.NT+2):
-                for it in range(Status.Nt):
-                    Status.int.QWHEqTotal_Tt[iT][it] += Status.int.QWHj_Tt[j][iT][it]
-                    
-        Status.int.QWHEqTotal_T = Status.int.calcQ_T(Status.int.QWHEqTotal_Tt)
-                    
+#..............................................................................
+# copying USH/QWHAmb to QD/QA copied into runHRModule                           
+        Status.int.QD_Tt = Status.int.createQ_Tt()   
+        Status.int.QA_Tt = Status.int.createQ_Tt()
+
+        for iT in range(Status.NT+2):
+            for it in range(Status.Nt):
+                Status.int.QD_Tt[iT][it] = Status.int.USHTotal_Tt[iT][it]
+                Status.int.QA_Tt[iT][it] = Status.int.QWHAmb_Tt[iT][it]
+
+        Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
+        Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
+
+        Status.int.initCascadeArrays(0)
+        Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
+
+
 #------------------------------------------------------------------------------
 # Helpers
 #------------------------------------------------------------------------------

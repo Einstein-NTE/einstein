@@ -38,7 +38,7 @@ from einstein.auxiliary.auxiliary import *
 from einstein.modules.constants import *
 from einstein.GUI.status import Status
 from einstein.modules.messageLogger import *
-from einstein.modules.fluids import Fuel
+from einstein.modules.fluids import *
 from einstein.GUI.dialogGauge import DialogGauge
 import copy
 
@@ -103,7 +103,7 @@ class Processes(object):
             distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
 
             UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
-            distUPHw = self.createInvTempDist(process.PTOutFlow,T0=process.PTFinal)
+            distUPHw = self.createInvTempDistLat(process.PTOutFlow,process.HOutFlow,process.ProcMedOut,T0=process.PTFinal)
 
             for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
                 UPHc_T[k][iT] = UPHc*distUPHc[iT]
@@ -175,8 +175,6 @@ class Processes(object):
             scheduleS = Status.schedules.procStartUpSchedules[k]
             scheduleW = Status.schedules.procOutFlowSchedules[k]
             
-            distUPHw = self.createInvTempDist(process.PTOutFlowRec,T0=process.PTFinal)
-
             NT = Status.NT
             Nt = Status.Nt
 
@@ -335,23 +333,8 @@ class Processes(object):
 
         Status.mod.moduleHR.runHRModule()
 
-#..............................................................................
-# copying USH/QWHAmb to QD/QA copied into runHRModule                           
-        Status.int.QD_Tt = Status.int.createQ_Tt()   
-        Status.int.QA_Tt = Status.int.createQ_Tt()
-
-        for iT in range(Status.NT+2):
-            for it in range(Status.Nt):
-                Status.int.QD_Tt[iT][it] = Status.int.USHTotal_Tt[iT][it]
-                Status.int.QA_Tt[iT][it] = Status.int.QWHAmb_Tt[iT][it]
-
-        Status.int.QD_T = Status.int.calcQ_T(Status.int.QD_Tt)
-        Status.int.QA_T = Status.int.calcQ_T(Status.int.QA_Tt)
-
         logTrack("Aggregate demand = %s"%str(Status.int.QD_T))
         dlg.Destroy()
-
-        Status.int.cascadeUpdateLevel = 0 #indicates that demand profile is created !!!
 
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
@@ -404,6 +387,44 @@ class Processes(object):
         
         for iT in range(NT+2):
             dist[iT] = 1.0 - dist[iT]
+        return dist
+
+#------------------------------------------------------------------------------		
+    def createInvTempDistLat(self,PT,h,fluidID,T0=None,C=None):
+#------------------------------------------------------------------------------		
+#   creates a linear DESCENDING temperature distribution between T0 and T,
+#   or a step distribution, if T0 = None
+#------------------------------------------------------------------------------		
+
+        fluid = Fluid(fluidID)
+        x = fluid.steamFraction(h,T=PT)
+        x0 = fluid.steamFraction(None,T=T0)
+
+        if x > x0:
+            fX = (x-x0)*fluid.hL
+        else:
+            fX = 0
+
+        if PT > fluid.TCond:
+            fV = fluid.cpV * (PT - fluid.TCond)
+        else:
+            fV = 0
+
+        if x0 > 0:
+            fL = 0
+        else:
+            fL = (min(PT,fluid.TCond) - T0)*fluid.cp
+
+        f = fL + fX + fV
+
+        distV = self.createTempDist(PT,T0=fluid.TCond,C=C)
+        distX = self.createTempDist(fluid.TCond,T0=None,C=C)
+        distL = self.createTempDist(min(PT,fluid.TCond),T0=T0,C=C)
+        
+        dist = []        
+        for iT in range(Status.NT+2):
+            dist.append(1.0 - (fV*distV[iT] + fX*distX[iT] + fL*distL[iT])/f)
+
         return dist
 
 #------------------------------------------------------------------------------		

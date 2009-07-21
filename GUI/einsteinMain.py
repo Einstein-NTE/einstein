@@ -22,19 +22,21 @@
 #   Created by: 	Hans Schweiger, Heiko Henning, Tom Sobota, Stoyan Danov
 #                       01/02/2008 - 25/09/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #               
-#   01/04/2008  HS  MySQL encoding set fixed to utf-8 (avoids problems with
+#   01/04/2009  HS  MySQL encoding set fixed to utf-8 (avoids problems with
 #                   erroneous configuration files)
+#   21/07/2009  HS  Several minor changes since update 001: storage of language settings,
+#                   clean-up, ...
 #
 #------------------------------------------------------------------------------
-#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#   (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
 #   www.energyxperts.net / info@energyxperts.net
 #
 #   This program is free software: you can redistribute it or modify it under
-#   the terms of the GNU general public license as published by the Free
+#   the terms of the GNU general public license v3 as published by the Free
 #   Software Foundation (www.gnu.org).
 #
 #==============================================================================
@@ -223,7 +225,7 @@ class EinsteinFrame(wx.Frame):
     def setLanguage(self):
         #TS20080528 Took this out of createUI, so it can be called before creating the UI
         LANGUAGE = Status.DB.stool.STool_ID[1][0].LanguageTool
-        print "Main(setLanguage): language set to ",LANGUAGE
+#        print "Main(setLanguage): language set to ",LANGUAGE
 
         if LANGUAGE not in LANGUAGES:
             LANGUAGE = self.conf.get('GUI', 'LANGUAGE')
@@ -364,7 +366,8 @@ class EinsteinFrame(wx.Frame):
 #------------------------------------------------------------------------------
     def _log(self,fcolor,bcolor,text):
         tl = time.localtime()
-        now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+#        now = '%s-%s-%s %s:%s:%s  ' % (tl[0],tl[1],tl[2],tl[3],tl[4],tl[5])
+        now = ""
         item = wx.ListItem()
         try:
             item.SetText(now + text.encode("latin-1","replace"))  
@@ -582,7 +585,7 @@ class EinsteinFrame(wx.Frame):
         im = ImportDB()
 
     def OnMenuExportProject(self, event):
-        print 'PId='+repr(Status.PId)
+#        print 'PId='+repr(Status.PId)
         ex = ExportProject(pid=Status.PId)
 
     def OnMenuImportProject(self, event):
@@ -668,10 +671,10 @@ class EinsteinFrame(wx.Frame):
 
 
     def OnMenuSettingsPreferences(self, event):
-        print "EinsteinMain (OnMenuSettingsPreferences): HRTool received as ",Status.HRTool
+#        print "EinsteinMain (OnMenuSettingsPreferences): HRTool received as ",Status.HRTool
         framePreferences = PreferencesFrame(self)
         x = framePreferences.ShowModal()
-        print "EinsteinMain (OnMenuSettingsPreferences): HRTool set to ",Status.HRTool
+#        print "EinsteinMain (OnMenuSettingsPreferences): HRTool set to ",Status.HRTool
 
     def OnMenuSettingsLanguage(self,event):
         dialogLang = DialogLanguage(self)
@@ -1099,7 +1102,7 @@ class EinsteinFrame(wx.Frame):
     def getNodeNames(self, root, level=0,cookie=0):
         label = self.tree.GetItemText(root)
         if self.treePermissions.has_key(label):
-            print 'Duplicate label in tree:%s. Please change' % (label,)
+#            print 'Duplicate label in tree:%s. Please change' % (label,)
             sys.exit(1)
         else:
             # initially an empty message
