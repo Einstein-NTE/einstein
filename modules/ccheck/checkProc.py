@@ -230,21 +230,11 @@ class CheckProc():
             fluid_number = qprocessdata.ProcMedDBFluid_id   #IMPORT from the FluidDB
             proc_fluid = Fluid(fluid_number)
 
-            fluid_number_w = qprocessdata.ProcMedOut   #IMPORT from the FluidDB
-            proc_fluid_w = Fluid(fluid_number_w)
-
 #            print proc_fluid
             
             self.FluidCp = proc_fluid.cp
             self.FluidDensity = proc_fluid.rho
             self.FluidRhoCp = self.FluidCp * self.FluidDensity
-
-            self.FluidCp_w = proc_fluid_w.cp
-            self.FluidDensity_w = proc_fluid_w.rho
-            self.FluidRhoCp_w = self.FluidCp_w * self.FluidDensity_w
-            self.Fluid_hL_w = proc_fluid_w.hL
-            self.FluidTCond_w = proc_fluid_w.TCond
-
 
             self.PTInFlow.setValue(qprocessdata.PTInFlow)
             self.PT.setValue(qprocessdata.PT,err=0.0)   #if specified, take as fixed
@@ -290,7 +280,8 @@ class CheckProc():
                             (self.ProcNo,qprocessdata.Process))
                 self.HeatRecOK = True
                 if qprocessdata.PTFinal is None:
-                    logMessage(_("No limit specified for cooling of outgoing streams. 0 ºC is assumed"))
+                    logMessage(_("Process No. %s: no final temperature specified for outflowing medium. ")+\
+                               _("zero assumed !"))
                     self.self.PTFinal.setValue(0.0)
                 else:
                     self.PTFinal.setValue(qprocessdata.PTFinal) #reads in PT final only if heat recovery is possible !!!
@@ -309,11 +300,23 @@ class CheckProc():
             else:
                 self.internalHR = True
 
-            if (self.PTFinal.val is None) and (self.HeatRecOK == True):
+            if (self.PTFinal.val is None) and (self.HeatRecOK == True): #should be superfluous now ...
                 self.PTFinal.setValue(0.0)  #set to zero if nothing is specified !!!
                 if self.VOutFlow.val > 0 or self.VOutFlow.val is None:
                     logMessage(_("Process No. %s: no final temperature specified for outflowing medium. ")+\
                                _("zero assumed !"))
+
+            if self.HeatRecOK == True or self.internalHR == True:   # fluid pars only needed in this case
+
+                fluid_number_w = qprocessdata.ProcMedOut   #IMPORT from the FluidDB
+                proc_fluid_w = Fluid(fluid_number_w)
+
+                self.FluidCp_w = proc_fluid_w.cp
+                self.FluidDensity_w = proc_fluid_w.rho
+                self.FluidRhoCp_w = self.FluidCp_w * self.FluidDensity_w
+                self.Fluid_hL_w = proc_fluid_w.hL
+                self.FluidTCond_w = proc_fluid_w.TCond
+
                
 #------------------------------------------------------------------------------
     def exportData(self):  
@@ -681,29 +684,29 @@ class CheckProc():
                 self.UPHw_dot1 = calcProdC("UPHw_dot1",self.FluidDensity_w, \
                                                 self.dhFinal,self.VOutFlow)
 
+                self.hOutFlowRec1 = calcH("hOutFlow1",self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTOutFlowRec,self.xOutFlowRec)
+
+                self.hOutFlow1 = calcH("hOutFlow1",self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTOutFlow,self.xOutFlow)
+
+                self.hFinal1 = calcH("hFinal1",self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTFinal,self.xFinal)
+
+
             else:
                 self.UPHw_dot1.setValue(0.0)
                 
             self.UPHw1 = calcProd("UPHw1",self.UPHw_dot,self.NDaysProc3)
-
-            self.hOutFlowRec1 = calcH("hOutFlow1",self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTOutFlowRec,self.xOutFlowRec)
-
-            self.hOutFlow1 = calcH("hOutFlow1",self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTOutFlow,self.xOutFlow)
-
-            self.hFinal1 = calcH("hFinal1",self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTFinal,self.xFinal)
-
                         
             if DEBUG in ["ALL","MAIN"]:
                 self.showAllUPH()
@@ -724,28 +727,28 @@ class CheckProc():
                 print "Step 3: calculating from right to left (ADJUST)"
                 print "-------------------------------------------------"
                 
-            adjustH(self.hOutFlowRec1,self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTOutFlowRec3,self.xOutFlowRec)
-
-            adjustH(self.hOutFlow1,self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTOutFlow3,self.xOutFlow)
-
-            adjustH(self.hFinal1,self.FluidCp_w,
-                      self.FluidCp_w,
-                      self.Fluid_hL_w,
-                      self.FluidTCond_w,
-                      self.PTFinal2,self.xFinal)
-
             if self.HeatRecOK == True:
 #                adjustFlow(self.UPHw_dot1,self.FluidRhoCp_w,self.VOutFlow2,
 #                           self.PTOutFlow,self.PTFinal,self.DTOutFlow,self.DTOutFlow1)
 
+                adjustH(self.hOutFlowRec1,self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTOutFlowRec3,self.xOutFlowRec)
+
+                adjustH(self.hOutFlow1,self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTOutFlow3,self.xOutFlow)
+
+                adjustH(self.hFinal1,self.FluidCp_w,
+                          self.FluidCp_w,
+                          self.Fluid_hL_w,
+                          self.FluidTCond_w,
+                          self.PTFinal2,self.xFinal)
+                
                 adjustDiff(self.dhFinal1,self.hOutFlow,self.hFinal)
                 adjustProdC(self.UPHw_dot1,self.FluidDensity_w,self.dhFinal,self.VOutFlow2)
 
@@ -758,6 +761,12 @@ class CheckProc():
             if self.internalHR == True:
                 adjustDiff(self.DTCrossHXHT,self.PTOutFlowRec,self.PTInFlowRec)
                 adjustDiff(self.DTCrossHXLT,self.PTOutFlow2,self.PTInFlow2)
+
+                adjustFlow(self.QHXdotProcInt2,self.FluidRhoCp,self.VInFlowDay2,
+                           self.PTInFlowRec2,self.PTInFlow1,self.DTQHXIn,self.DTQHXIn1)
+                
+                adjustDiff(self.dhOutFlow1,self.hOutFlowRec,self.hOutFlow2)
+                adjustProdC(self.QHXdotProcInt1,self.FluidDensity_w,self.dhOutFlow,self.VOutFlow)
                 
             adjustSum(self.UPH2,self.UPHProc,self.QHXProc)
             adjustSum3(self.UPH1,self.UPHm,self.UPHc,self.UPHs)
@@ -772,14 +781,6 @@ class CheckProc():
                        self.PT2,self.PTInFlowRec1,self.DTUPHcNet,self.DTUPHcNet1)
             
             adjustDiff(self.UPHcdot1,self.UPHcdotGross,self.QHXdotProcInt)
-            adjustFlow(self.QHXdotProcInt2,self.FluidRhoCp,self.VInFlowDay2,
-                       self.PTInFlowRec2,self.PTInFlow1,self.DTQHXIn,self.DTQHXIn1)
-            
-#            adjustFlow(self.QHXdotProcInt1,self.FluidRhoCp_w,self.VOutFlow,
-#                       self.PTOutFlowRec1,self.PTOutFlow,self.DTQHXOut,self.DTQHXOut1)
-
-            adjustDiff(self.dhOutFlow1,self.hOutFlowRec,self.hOutFlow2)
-            adjustProdC(self.QHXdotProcInt1,self.FluidDensity_w,self.dhOutFlow,self.VOutFlow)
             
             adjustFlow(self.UPHcdotGross1,self.FluidRhoCp,self.VInFlowDay,
                        self.PT1,self.PTInFlow,self.DTUPHcGross,self.DTUPHcGross1)

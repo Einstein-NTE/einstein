@@ -103,7 +103,10 @@ class Processes(object):
             distUPHs = self.createTempDist(process.PT,T0=process.PTStartUp)
 
             UPHw = checkLimits(process.UPHw,0.0,INFINITE,0.0)
-            distUPHw = self.createInvTempDistLat(process.PTOutFlow,process.HOutFlow,process.ProcMedOut,T0=process.PTFinal)
+            if UPHw <= 0.0:
+                distUPHw = Status.int.createQ_T()
+            else:
+                distUPHw = self.createInvTempDistLat(process.PTOutFlow,process.HOutFlow,process.ProcMedOut,T0=process.PTFinal)
 
             for iT in range(NT+2): #NT + 1 + 1 -> additional value for T > Tmax
                 UPHc_T[k][iT] = UPHc*distUPHc[iT]
