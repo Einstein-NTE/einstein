@@ -441,7 +441,12 @@ class PanelHR(wx.Panel):
                     except:
                         self.grid.SetCellValue(r,c,data[r][c])
                 else:
-                    self.grid.SetCellValue(r, c, convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    try:
+                        self.grid.SetCellValue(r, c, convertDoubleToString(float(data[r][c]),nDecimals = decimals[c]))
+                    except:
+                        self.grid.SetCellValue(r, c, "")
+                        logDebug("PanelHR (UpdateGrid): received corrupt data value [%s] at [r][c] = [%s][%s]"% \
+                                 (r,c,data[r][c]))
 
         for r in range(rows,MAXROWS):
             for c in range(cols):

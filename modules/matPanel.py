@@ -99,7 +99,10 @@ def onIdle(self, evt):
     if self.resizeflag:
         self.resizeflag = False
         self.setSize()
-        self.draw()
+        try:
+            self.draw()
+        except:
+            print "MatPanel (onIdle): error in function draw"
 
 #############################################################
 #
