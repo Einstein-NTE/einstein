@@ -261,7 +261,6 @@ class CheckProc():
                 
             self.PTInFlowRec.setValue(qprocessdata.PTInFlowRec) 
             self.PTStartUp.setValue(qprocessdata.PTStartUp)
-            self.PTFinal.setValue(qprocessdata.PTFinal)
             self.VInFlowDay.setValue(qprocessdata.VInFlowDay) 
             self.VOutFlow.setValue(qprocessdata.VOutFlow) 
             self.VolProcMed.setValue(qprocessdata.VolProcMed) 
@@ -279,12 +278,22 @@ class CheckProc():
 
             if (qprocessdata.HeatRecOK == "yes"):
                 self.HeatRecOK = True
+                if qprocessdata.PTFinal is None:
+                    logMessage(_("No limit specified for cooling of outgoing streams. 0 ºC is assumed"))
+                    self.self.PTFinal.setValue(0.0)
+                else:
+                    self.PTFinal.setValue(qprocessdata.PTFinal) #reads in PT final only if heat recovery is possible !!!
             elif(qprocessdata.HeatRecOK == "no"):
                 self.HeatRecOK = False
             else:
                 logWarning(_("Possibility of heat recovery for process no. %s (%s)is not specified.\nYES is assumed.")%\
                             (self.ProcNo,qprocessdata.Process))
                 self.HeatRecOK = True
+                if qprocessdata.PTFinal is None:
+                    logMessage(_("No limit specified for cooling of outgoing streams. 0 ºC is assumed"))
+                    self.self.PTFinal.setValue(0.0)
+                else:
+                    self.PTFinal.setValue(qprocessdata.PTFinal) #reads in PT final only if heat recovery is possible !!!
                 
             if qprocessdata.TEnvProc is None:
                 self.TEnvProc.setValue(18.0)

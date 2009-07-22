@@ -400,6 +400,12 @@ class Processes(object):
         x = fluid.steamFraction(h,T=PT)
         x0 = fluid.steamFraction(None,T=T0)
 
+        if x is None:
+            x = 0
+
+        if x0 is None:
+            x0 = x
+
         if x > x0:
             fX = (x-x0)*fluid.hL
         else:
@@ -413,7 +419,10 @@ class Processes(object):
         if x0 > 0:
             fL = 0
         else:
-            fL = (min(PT,fluid.TCond) - T0)*fluid.cp
+            if T0 is None:
+                fL = 0
+            else:
+                fL = (min(PT,fluid.TCond) - T0)*fluid.cp
 
         f = fL + fX + fV
         if f <= 0 or f is None:

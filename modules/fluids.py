@@ -130,6 +130,9 @@ class Fluid():
             elif T < self.TCond - EPS:
                 return (0.0)
 
+        if h is None:
+            return None
+        
         h0 = self.cp*self.TCond
         h1 = h0 + self.hL
             
