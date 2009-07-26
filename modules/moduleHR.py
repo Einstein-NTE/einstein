@@ -328,10 +328,15 @@ class ModuleHR(object):
         if Status.HRTool == "estimate":
             self.__estimativeMethod()
         else:
-            self.__runPE2(redesign = False,concondensation = self.ConCondensation)
-            
-            dlg.update(50.0)
-            self.__doPostProcessing()               
+            ret = self.__runPE2(redesign = False,concondensation = self.ConCondensation)
+
+            if ret == 0:
+                dlg.update(50.0)
+                self.__doPostProcessing()
+            else:
+                showError("Error in external heat recovery module (PE2)\n"+ \
+                         "\n Recalculating heat recovery in internal mode (estimate)")
+                self.__estimativeMethod()
 
         dlg.update(99.0)
 
@@ -374,6 +379,8 @@ class ModuleHR(object):
 
             if(self.data is None):
                 self.data = HRData(Status.PId,Status.ANo)
+
+            return (1)
             
         else:    
             doc = XMLImportHRModule.importXML("export.xml")                      
@@ -384,6 +391,8 @@ class ModuleHR(object):
                 self.data = HRData(Status.PId,Status.ANo)
                         
             self.data.loadFromDocument(doc,overrideHX = True)
+
+            return(0)
                     
 
     

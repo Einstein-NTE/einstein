@@ -18,9 +18,9 @@
 #
 #==============================================================================
 #
-#   EINSTEIN Version No.: 1.0
+#   EINSTEIN Version No.: 1.1
 #   Created by: 	Hans Schweiger, Stoyan Danov, Claudia Vannoni
-#                       22/03/2008 - 02/08/2008
+#                       22/03/2008 - 26/07/2009
 #
 #   Update No. 000
 #
@@ -38,7 +38,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "V1.0.07 Revision No. 321" #Number of upload in sourceforge
+VERSION = "V1.1 Revision No. 328" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
