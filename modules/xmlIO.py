@@ -23,7 +23,7 @@
 #   Created by: 	Tom Sobota, Hans Schweiger
 #                       June 2008 - 26/09/2008
 #
-#   Update No. 002
+#   Update No. 003
 #
 #   Since Version 1.0 revised by:
 #
@@ -32,6 +32,7 @@
 #               
 #   01/04/2009  HS  Bug-fix in project import (determination of ID of new rows)
 #   10/06/2009  HS  introduction of _U() function for text (warnings, etc.)
+#   26/07/2009  HS  Bug-fix for import of dates
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008, 2009
@@ -676,8 +677,9 @@ class ImportProject(object):
                             elvalue = elvalue.encode("utf-8")
 
                         if eltype.startswith('date'):
-                            elvalue = "'" + self.subsIllegal(elvalue) + "'"
-                            
+#                            elvalue = "'" + self.subsIllegal(elvalue) + "'"
+                            elvalue = self.subsIllegal(elvalue)
+                          
                         # substitute auto-increment value with NULL
                         if elauto == 'auto_increment':
                             # main key field

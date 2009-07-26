@@ -661,9 +661,13 @@ class PanelQ4(wx.Panel):
 	except: pass
 
     def fillChoiceOfDBFuel(self):
-        self.tc8.entry.Clear()
-        for n in Status.DB.dbfuel.FuelName["%"]:
-            self.tc8.entry.Append(unicode(n.FuelName,"utf-8"))
+        fuelDict = Status.prj.getFuelDict()
+        fuelList = fuelDict.values()
+        fillChoice(self.tc8.entry,fuelList)
+        
+#        self.tc8.entry.Clear()
+#        for n in Status.DB.dbfuel.FuelName["%"]:
+#            self.tc8.entry.Append(unicode(n.FuelName,"utf-8"))
 
     def fillChoiceOfFluid(self):
         fluidDict = Status.prj.getFluidDict()

@@ -73,7 +73,10 @@ MAXROWS = 1
 COLNO = 5
 
 def _U(text):
-    return unicode(_(text),"utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
 
 #------------------------------------------------------------------------------		
 def drawFigure(self):
@@ -84,7 +87,6 @@ def drawFigure(self):
     self.subplot = self.figure.add_subplot(1,1,1)
 
     gdata = Status.int.GData["ENERGY Plot1"]
-    print gdata
     for j in range(1,len(gdata)):
         self.subplot.plot(gdata[0][1:],\
                           gdata[j][1:],\
@@ -96,14 +98,18 @@ def drawFigure(self):
     self.subplot.axis(ymin = 0)
     self.subplot.legend(loc = 0)   #4: left lower; 0: best
 
-    if Status.Nt == 12*168:
-        self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/month]'))
-        self.subplot.axes.set_xlabel(_U('Month'))
-        self.subplot.axis(xmax = 12)
-        
-    else:
-        self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/week]'))
-        self.subplot.axes.set_xlabel(_U('Week'))
+    try:
+        if Status.Nt == 12*168:
+            self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/month]'))
+            self.subplot.axes.set_xlabel(_U('Month'))
+            self.subplot.axis(xmax = 12)
+            
+        else:
+            self.subplot.axes.set_ylabel(_U('Heat supply by equipment [MWh/week]'))
+            self.subplot.axes.set_xlabel(_U('Week'))
+            self.subplot.axis(xmax = 52)
+    except:
+        logDebug("PanelEnergy: problems setting axes")
         self.subplot.axis(xmax = 52)
 
     for label in self.subplot.axes.get_yticklabels():
@@ -333,7 +339,6 @@ class PanelEnergy(wx.Panel):
         try:
             data = Interfaces.GData["ENERGY"]
             (rows,cols) = data.shape
-            print "ENERGY",data,rows,cols
             
         except:
             logDebug("PanelEnergy: problems reading GData entry")
@@ -343,7 +348,6 @@ class PanelEnergy(wx.Panel):
         for r in range(rows):
             for c in range(cols):
                 try:
-                    print "now writing",data[r][c]
                     self.grid.SetCellValue(r, c, convertDoubleToString(data[r][c]))
                 except:
                     self.grid.SetCellValue(r, c, "---")

@@ -46,6 +46,9 @@ from einstein.GUI.status import *
 from einstein.modules.interfaces import *
 import einstein.modules.matPanel as mP
 
+def _U(text):
+    return unicode(_(text),"utf-8")
+
 class ModuleEA3(object):
 
     def __init__(self, keys):
@@ -104,7 +107,7 @@ class ModuleEA3(object):
 
             DBFuel_id = equipe.DBFuel_id
             if DBFuel_id is None or NDBFuel==0: 
-                FuelName = 'not available'
+                FuelName = _U('Electricity')
             else:
                 try:
                     FuelName = unicode(dbfuel.DBFuel_ID[DBFuel_id][0].FuelName,"utf-8")

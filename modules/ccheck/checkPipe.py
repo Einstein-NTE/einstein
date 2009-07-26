@@ -22,14 +22,17 @@
 #   Created by: 	Claudia Vannoni, Hans Schweiger
 #                       30/04/2008 - 03/07/2008
 #
-#   Update No. 001
+#   Update No. 002
 #
 #   Since Version 1.0 revised by:
 #
-#                       Hans Schweiger  06/04/2008
+#                       Hans Schweiger  06/04/2009
+#                       Hans Schweiger  24/07/2009
 #               
-#   01/04/2008  HS  Fix number of operating hours (4000 h) eliminated
+#   01/04/2009  HS  Fix number of operating hours (4000 h) eliminated
 #                   Clean-up: elimination of prints
+#   24/07/2009  HS  Possibility for defining return temperature in open circuits
+#                   introduced
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -253,7 +256,6 @@ class CheckPipe():
         self.dUAPipe = CCPar("dUAPipe")
 
         self.ONE = CCOne()
-
         
         self.importData(m)
 
@@ -306,6 +308,12 @@ class CheckPipe():
             self.ToutDistrib.setValue(qdistributionhc.ToutDistrib)
             self.TreturnDistrib.setValue(qdistributionhc.TreturnDistrib)
             self.PercentRecirc.setValue(qdistributionhc.PercentRecirc)
+
+            if self.PercentRecirc.val == 0.0:
+                self.pipeType = "open"
+            else:
+                self.pipeType = "closed"
+                
             self.Tfeedup.setValue(qdistributionhc.Tfeedup)
             self.TotLengthDistPipe.setValue(qdistributionhc.TotLengthDistPipe)
             self.UAPipe.setValue(qdistributionhc.UAPipe)
@@ -677,16 +685,22 @@ class CheckPipe():
             self.DistribCircFlow1 = calcSum("DistribCircFlow1",self.FeedUpFlow1,self.RecFlow) #DistribCircFlow1, RecFlow
 
             self.QdotLossForw1 = calcProd("QdotLossForw1",self.DhForw,self.DistribCircFlow4)#DistribCircFlow
-            self.QdotLossRet1 = calcProd("QdotLossRet1",self.DhRec,self.RecFlow2) #calculated from DHRec, RecFlow2
+
+            if self.pipeType == "open":
+                self.QdotLossRet1.setValue(0.0)
+                self.QdotLossRet2.setValue(0.0)
+            else:
+                self.QdotLossRet1 = calcProd("QdotLossRet1",self.DhRec,self.RecFlow2) #calculated from DHRec, RecFlow2
+                self.QdotLossRet2 = calcProdC("QdotLossRet2",0.5,self.UAPipe2,self.DTRetLoss)#DTForwLoss2
+                self.DTRetLoss1 = calcDiff("DTRetLoss1",self.TreturnDistrib2,self.TenvPipe) #TreturnDistrib2
+                
             self.QdotWHPipe1 = calcProd("QdotWHPipe1",self.DhWH,self.FeedUpFlow)
             self.USHdotPipe1 = calcProd("USHdotPipe1",self.DhIn,self.DistribCircFlow2)#DistribCircFlow2
             self.UPHdotProcm1 = calcProd("UPHdotProcm1",self.DhOut,self.DistribCircFlow3)#DistribCircFlow3
 
             self.UAPipe1 = calcProdC("UAPipe1",2.0,self.dUAPipe,self.TotLengthDistPipe)
             self.DTForwLoss1 = calcDiff("DTForwLoss1",self.ToutDistrib2,self.TenvPipe) #ToutDistrib2
-            self.DTRetLoss1 = calcDiff("DTRetLoss1",self.TreturnDistrib2,self.TenvPipe) #TreturnDistrib2
             self.QdotLossForw2 = calcProdC("QdotLossForw2",0.5,self.UAPipe,self.DTForwLoss)#DTForwLoss
-            self.QdotLossRet2 = calcProdC("QdotLossRet2",0.5,self.UAPipe2,self.DTRetLoss)#DTForwLoss2
 
             self.QdotLossPipe1 = calcSum("QdotLossPipe1",self.QdotLossForw,self.QdotLossRet)
 
@@ -726,15 +740,23 @@ class CheckPipe():
             adjustProd(self.USHPipe1,self.USHdotPipe,self.HPerYearPipe1)
             adjustSum3(self.USHdotPipe2,self.QdotLossPipe,self.UPHdotProcm,self.QdotWHPipe)
             adjustSum(self.QdotLossPipe1,self.QdotLossForw,self.QdotLossRet)
-            adjustProdC(self.QdotLossRet2,0.5,self.UAPipe2,self.DTRetLoss)
+
+            if self.pipeType == "closed":
+                adjustProdC(self.QdotLossRet2,0.5,self.UAPipe2,self.DTRetLoss)
+                adjustDiff(self.DTRetLoss1,self.TreturnDistrib2,self.TenvPipe,GTZero=True)
+                            
             adjustProdC(self.QdotLossForw2,0.5,self.UAPipe,self.DTForwLoss)
-            adjustDiff(self.DTRetLoss1,self.TreturnDistrib2,self.TenvPipe,GTZero=True)
             adjustDiff(self.DTForwLoss1,self.ToutDistrib2,self.TenvPipe,GTZero=True)
             adjustProdC(self.UAPipe1,2.0,self.dUAPipe,self.TotLengthDistPipe)
             adjustProd(self.UPHdotProcm1,self.DhOut,self.DistribCircFlow3)
             adjustProd(self.USHdotPipe1,self.DhIn,self.DistribCircFlow2)
             adjustProd(self.QdotWHPipe1,self.DhWH,self.FeedUpFlow)
-            adjustProd(self.QdotLossRet1,self.DhRec,self.RecFlow2)
+
+            if self.pipeType == "open":
+                self.DhRec.setValue(0.0)
+            else:
+                adjustProd(self.QdotLossRet1,self.DhRec,self.RecFlow2)
+                
             adjustProd(self.QdotLossForw1,self.DhForw,self.DistribCircFlow4)
             adjustSum(self.DistribCircFlow1,self.FeedUpFlow1,self.RecFlow)
             adjustProd(self.FeedUpFlow2,self.DistribCircFlow5,self.PercentFeedUp2)#PercentRecirc2

@@ -253,6 +253,7 @@ class DlgDatabase(wx.Dialog):
                 outfile += '.sql'
             options = '--add-drop-database --add-drop-table --add-locks --disable-keys --extended-insert'
             program = os.path.join(binfolder,'mysqldump')
+            print "DialogDatabase: program = ",program
             args = ' %s --host=%s --user=%s --password=%s %s > %s' % \
                    (options,
                     self.text_host.GetValue().strip(),
@@ -260,7 +261,6 @@ class DlgDatabase(wx.Dialog):
                     self.text_password.GetValue().strip(),
                     self.text_dbname.GetValue().strip(),
                     outfile)
-
             try:
                 retcode = call(program + args, shell=True)
                 if retcode == 0:

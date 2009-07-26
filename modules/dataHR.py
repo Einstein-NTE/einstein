@@ -127,10 +127,10 @@ class HRData:
                    "StreamTypeSink":check(hx.getValue("StreamTypeSink")),
                    "StreamTypeSource":check(hx.getValue("StreamTypeSource"))}
 
-            qhxTable.insert(tmp)
-
-#        except:            
-#            logError(_("Error writing new HX into database.")) 
+            try:
+                qhxTable.insert(tmp)
+            except:            
+                logError(_("Error writing new HX into database.")+" [%s]"%tmp[HXName]) 
     
     def __loadStreams(self,listofstreamdata):
     #loads streams from document

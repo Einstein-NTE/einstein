@@ -459,7 +459,6 @@ class CFloat(wx.TextCtrl):
         try:
             (integ,frac) = snum.split(".")
         except ValueError:
-            print 'snum=',snum
             integ = snum
             frac = ''
         # set thousands separator

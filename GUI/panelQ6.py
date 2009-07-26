@@ -517,7 +517,7 @@ class PanelQ6(wx.Panel):
         else:
 	    showError("HX name has to be a uniqe value!")
 	    return
-                        
+        
         tmp = {
             "HXName":check(self.tc1.GetValue()),
             "HXType":check(findKey(Status.TRANS.HXTYPES,self.tc2.GetValue(text=True))),
@@ -658,7 +658,7 @@ class PanelQ6(wx.Panel):
             self.HXID = q.QHeatExchanger_ID
             
             self.tc1.SetValue(q.HXName)
-            
+
             if str(q.HXType) in Status.TRANS.HXTYPES.keys():
                 self.tc2.SetValue(TRANSHXTYPES[str(q.HXType)])
                 
