@@ -29,6 +29,7 @@
 #                       Hans Schweiger  01/04/2009
 #                       Hans Schweiger  06/04/2009
 #                       Hans Schweiger  10/06/2009
+#                       Hans Schweiger  26/07/2009
 #               
 #   01/04/2009  HS  Security features added for dealing with corrupt entries
 #                   in db: Equipments w/o name etc.
@@ -37,6 +38,7 @@
 #   06/04/2009  HS  Clean-up: elimination of prints
 #   10/06/2009  HS  bug-fix. empty project description field led to errors in
 #                   setActiveProject
+#   26/07/2009  HS  change in deleteEquipment -> elimination of connected HX
 #		
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009
@@ -1314,15 +1316,19 @@ class Project(object):
 #..............................................................................
 # deleting Q- and corresponding C-Tables
 
+        print "Project (deleteEquipment)",eqID
+        
         DB = Status.DB
         sqlQuery = "Questionnaire_id = '%s' AND AlternativeProposalNo = '%s' AND QGenerationHC_ID = '%s'"\
                     %(Status.PId,Status.ANo,eqID)  #query is redundant, but maintained as is for security
 
         equipes = Status.DB.qgenerationhc.sql_select(sqlQuery)
         if len(equipes) > 0:
+            equipmentName = equipes[0].Equipment
             deletedIndex = equipes[0].CascadeIndex
             deleteSQLRows(DB.qgenerationhc,sqlQuery)
         else:
+            equipmentName = None
             logDebug("Project (deleteEquipment): cannont delete equipment with ID %s. No corresponding entry in database"%eqID)
             return
 
@@ -1348,6 +1354,25 @@ class Project(object):
         Status.NEquipe = len(equipes)
 
         Status.SQL.commit()
+
+#..............................................................................
+# delete heat exchangers connected to the deleted equipment
+        
+        sourceName_h = Status.prj.getHXList("HXSource")
+        sourceID_h = Status.prj.getHXList("QHeatExchanger_ID")
+        sinkName_h = Status.prj.getHXList("HXSink")
+        sinkID_h = Status.prj.getHXList("QHeatExchanger_ID")
+
+        blackList = []
+        for h in range(len(sourceName_h)):
+            if sourceName_h[h] == equipmentName and sourceID_h[h] not in blackList:
+                    blackList.append(sourceID_h[h])
+        for h in range(len(sinkName_h)):
+            if sinkName_h[h] == equipmentName and sinkID_h[h] not in blackList:
+                blackList.append(sinkID_h[h])
+                
+        for i in blackList:
+            self.deleteHX(i)
 
 #------------------------------------------------------------------------------
     def getEquipments(self,PId = None,cascade=False):

@@ -38,7 +38,7 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "V1.1 Revision No. 328" #Number of upload in sourceforge
+VERSION = "V1.1 Revision No. 329" #Number of upload in sourceforge
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]

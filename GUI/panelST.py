@@ -457,11 +457,11 @@ class PanelST(wx.Panel):
 
         self.stInfo6 = wx.StaticText(id=-1,
               label=_U(u'Average operating temperature (coll.) [\xb0C]'), name='stInfo6',
-              parent=self, pos=wx.Point(460, 510), style=0)
+              parent=self, pos=wx.Point(460, 530), style=0)
 
         self.stInfo6val = wx.StaticText(id=-1,
               label="---", name='stInfo6val',
-              parent=self, pos=wx.Point(700, 510), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
+              parent=self, pos=wx.Point(700, 530), size=wx.Size(80, 20), style=wx.ALIGN_RIGHT)
 
 
 #------------------------------------------------------------------------------		
