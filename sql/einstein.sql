@@ -3,7 +3,7 @@
 -- (C) energyXperts.BCN (E4-Experts SL), Barcelona, Spain
 -- 
 -- Host: localhost    Database: einstein
----------------------------------------------------------
+-- -------------------------------------------------------
 -- Server version	5.1.28-rc-community
 
 DROP DATABASE IF EXISTS einstein; 
