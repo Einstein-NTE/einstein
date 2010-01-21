@@ -55,7 +55,7 @@ def setFigure(self, color = None, dpi = None):
     self.Bind(wx.EVT_IDLE, self.onIdle)
     self.Bind(wx.EVT_SIZE, self.onSize)
     self.resizeflag = True
-    self.setSize()
+    #self.setSize()
     self.params = {}
 #    print 'setFigure'
 
@@ -84,7 +84,8 @@ def setSize(self, pixels = None):
     if not pixels:
         pixels = self.GetClientSize()
     self.canvas.SetSize(pixels)
-    self.figure.set_figsize_inches(pixels[0]/self.figure.get_dpi(), pixels[1]/self.figure.get_dpi())
+    #self.figure.set_figsize_inches(pixels[0]/self.figure.get_dpi(), pixels[1]/self.figure.get_dpi())
+    self.SetSize(pixels)
 
 def onSize(self, event):
     """
@@ -96,13 +97,14 @@ def onIdle(self, evt):
     """
     the actual repainting of the figure is done here
     """
-    if self.resizeflag:
-        self.resizeflag = False
-        self.setSize()
-        try:
-            self.draw()
-        except:
-            print "MatPanel (onIdle): error in function draw"
+#    if self.resizeflag:
+#        self.resizeflag = False
+#        self.setSize()
+#        try:
+#            self.draw()
+#        except:
+#            print "MatPanel (onIdle): error in function draw"
+    pass
 
 #############################################################
 #
@@ -127,7 +129,10 @@ class MatPanel(object):
 
         # configure the panel
         widget_instance.setFigure(WHITE)
-        widget_instance.setSize()
+        
+        # for debug use
+        if widget_instance.Name != "panelBM1":
+            widget_instance.setSize()
 
         if params is not None:
             widget_instance.setParams(params)

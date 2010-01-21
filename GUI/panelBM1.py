@@ -55,6 +55,7 @@ from GUITools import *
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
+from einstein.modules.filesystemInteraction import *
 
 
 [wxID_PANELBM1, wxID_PANELBM1BUTTONPAGEBM1BACK, 
@@ -71,6 +72,8 @@ from einstein.modules.interfaces import *
 
 # constants
 #
+
+filename = "image.png"
 
 COLNO = 6
 MAXROWS = 20
@@ -206,6 +209,9 @@ class PanelBM1(wx.Panel):
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
+        # set name for debug use (check it in matPanel)
+        self.panelFig.Name = "panelBM1"
+        
         dummy = Mp.MatPanel(self.panelFig,
                             wx.Panel,
                             drawFigure,
@@ -253,6 +259,21 @@ class PanelBM1(wx.Panel):
                     self.gridPage.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.gridPage.SetGridCursor(0, 0)
+        
+        # create subplot
+        self.panelFig.draw()
+        
+        # set fontsizes
+        self.panelFig.subplot.legend(loc = 'best')
+        for label in self.panelFig.subplot.axes.get_yticklabels():
+            label.set_fontsize(14)
+        for label in self.panelFig.subplot.axes.get_xticklabels():
+            label.set_fontsize(14)
+        for t in self.panelFig.subplot.get_legend().get_texts():
+            t.set_fontsize(18)
+        
+        # save figure for later use
+        saveFigure(self.panelFig.figure, filename)
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -420,7 +441,9 @@ class PanelBM1(wx.Panel):
 #   create graphic representation
 
         self.Hide()
-        self.panelFig.draw()
+        #self.panelFig.draw()
+        loadToPanel(self.panelFig, filename)
+        deleteFileWithoutPrompt(filename)
 
         self.Show()
         
