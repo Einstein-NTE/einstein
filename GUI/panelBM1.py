@@ -51,7 +51,7 @@ from einstein.GUI.status import Status
 from numCtrl import *
 from einstein.modules.messageLogger import *
 from GUITools import *
-
+import matplotlib.font_manager as font
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
@@ -73,7 +73,13 @@ from einstein.modules.filesystemInteraction import *
 # constants
 #
 
-filename = "image.png"
+axeslabel_fontsize = 10
+axesticks_fontsize = 8
+legend_fontsize = 10
+spacing_left = 0.2
+spacing_right = 0.9
+spacing_bottom = 0.2
+spacing_top = 0.85
 
 COLNO = 6
 MAXROWS = 20
@@ -91,7 +97,8 @@ def drawFigure(self):
 #------------------------------------------------------------------------------		
     if hasattr(self, 'subplot'):
        del self.subplot
-    self.subplot = self.figure.add_subplot(1,1,1)
+    self.subplot = self.figure.add_subplot(111)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     gdata = Status.int.GData["BM1 Figure"]
     axis = gdata[0]
@@ -124,26 +131,28 @@ def drawFigure(self):
 ###SD-20080930
 #    self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_U('Energy intensity - fuels [kWh/EUR]'))
-    self.subplot.axes.set_xlabel(_U('Energy intensity - electricity [kWh/EUR]'))
+    fp = font.FontProperties(size = axeslabel_fontsize)
+    self.subplot.axes.set_ylabel(_U('Energy intensity - fuels [kWh/EUR]'), fontproperties=fp)
+    self.subplot.axes.set_xlabel(_U('Energy intensity - electricity [kWh/EUR]'), fontproperties=fp)
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['yticksangle'])
     #
     # properties of labels on the x axis
     #
     for label in self.subplot.axes.get_xticklabels():
 #        label.set_color(self.params['xtickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['xticksangle'])
 
+    self.subplot.legend(loc = 'best')
     try:
         lg = self.subplot.get_legend()
         ltext  = lg.get_texts()             # all the text.Text instance in the legend
         for txt in ltext:
-            txt.set_fontsize(10)  # the legend text fontsize
+            txt.set_fontsize(legend_fontsize)  # the legend text fontsize
         # legend line thickness
         llines = lg.get_lines()             # all the lines.Line2D instance in the legend
         for lli in llines:
@@ -157,7 +166,6 @@ def drawFigure(self):
     except:
         # no legend
         pass
-
 
 #XXXXXX To be checked how to bring x/y- labels to this plot ...
 #    self.figure.xlabel('time (s)')
@@ -209,9 +217,6 @@ class PanelBM1(wx.Panel):
                    'backcolor'   : GRAPH_BACKGROUND_COLOR, # graph background color
                    'ignoredrows' : ignoredrows}            # rows that should not be plotted
 
-        # set name for debug use (check it in matPanel)
-        self.panelFig.Name = "panelBM1"
-        
         dummy = Mp.MatPanel(self.panelFig,
                             wx.Panel,
                             drawFigure,
@@ -259,21 +264,6 @@ class PanelBM1(wx.Panel):
                     self.gridPage.SetCellAlignment(r, c, wx.ALIGN_CENTRE, wx.ALIGN_CENTRE);
 
         self.gridPage.SetGridCursor(0, 0)
-        
-        # create subplot
-        self.panelFig.draw()
-        
-        # set fontsizes
-        self.panelFig.subplot.legend(loc = 'best')
-        for label in self.panelFig.subplot.axes.get_yticklabels():
-            label.set_fontsize(14)
-        for label in self.panelFig.subplot.axes.get_xticklabels():
-            label.set_fontsize(14)
-        for t in self.panelFig.subplot.get_legend().get_texts():
-            t.set_fontsize(18)
-        
-        # save figure for later use
-        saveFigure(self.panelFig.figure, filename)
 
     def _init_ctrls(self, prnt):
         # generated method, don't edit
@@ -441,9 +431,7 @@ class PanelBM1(wx.Panel):
 #   create graphic representation
 
         self.Hide()
-        #self.panelFig.draw()
-        loadToPanel(self.panelFig, filename)
-        deleteFileWithoutPrompt(filename)
+        self.panelFig.draw()
 
         self.Show()
         

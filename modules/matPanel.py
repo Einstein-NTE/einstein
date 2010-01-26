@@ -84,7 +84,7 @@ def setSize(self, pixels = None):
     if not pixels:
         pixels = self.GetClientSize()
     self.canvas.SetSize(pixels)
-    #self.figure.set_figsize_inches(pixels[0]/self.figure.get_dpi(), pixels[1]/self.figure.get_dpi())
+#    self.figure.set_figsize_inches(pixels[0]/self.figure.get_dpi(), pixels[1]/self.figure.get_dpi())
     self.SetSize(pixels)
 
 def onSize(self, event):
@@ -130,9 +130,7 @@ class MatPanel(object):
         # configure the panel
         widget_instance.setFigure(WHITE)
         
-        # for debug use
-        if widget_instance.Name != "panelBM1":
-            widget_instance.setSize()
+        widget_instance.setSize()
 
         if params is not None:
             widget_instance.setParams(params)
