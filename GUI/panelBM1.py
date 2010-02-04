@@ -55,7 +55,6 @@ import matplotlib.font_manager as font
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
-from einstein.modules.filesystemInteraction import *
 
 
 [wxID_PANELBM1, wxID_PANELBM1BUTTONPAGEBM1BACK, 
