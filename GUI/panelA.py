@@ -51,6 +51,7 @@
 import wx
 import wx.grid
 from einstein.GUI.status import Status
+import matplotlib.font_manager as font
 
 import einstein.modules.matPanel as Mp
 from dialogA import *
@@ -70,6 +71,14 @@ from numCtrl import *
 # constants
 #
 
+axeslabel_fontsize = 10
+axesticks_fontsize = 8
+legend_fontsize = 10
+spacing_left = 0.2
+spacing_right = 0.9
+spacing_bottom = 0.2
+spacing_top = 0.85
+
 COLNO = 6
 MAXROWS = 20
 
@@ -86,6 +95,7 @@ def drawFigure(self):
 #------------------------------------------------------------------------------		
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     gdata = Status.int.GData["A Plot"]
 
@@ -112,26 +122,28 @@ def drawFigure(self):
                               'go',  label=Ni)
     self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_U('Primary energy consumption [MWh]'))
-    self.subplot.axes.set_xlabel(_U('Energy cost [€]'))
+    fp = font.FontProperties(size = axeslabel_fontsize)
+    self.subplot.axes.set_ylabel(_U('Primary energy consumption [MWh]'), fontproperties=fp)
+    self.subplot.axes.set_xlabel(_U('Energy cost [€]'), fontproperties=fp)
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['yticksangle'])
     #
     # properties of labels on the x axis
     #
     for label in self.subplot.axes.get_xticklabels():
 #        label.set_color(self.params['xtickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['xticksangle'])
 
+    self.subplot.legend(loc = 'best')
     try:
         lg = self.subplot.get_legend()
         ltext  = lg.get_texts()             # all the text.Text instance in the legend
         for txt in ltext:
-            txt.set_fontsize(10)  # the legend text fontsize
+            txt.set_fontsize(legend_fontsize)  # the legend text fontsize
         # legend line thickness
         llines = lg.get_lines()             # all the lines.Line2D instance in the legend
         for lli in llines:

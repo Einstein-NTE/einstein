@@ -60,6 +60,7 @@ from numCtrl import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 from GUITools import *
 import copy
+import matplotlib.font_manager as font
 
 [wxID_PANEL, wxID_PANELBUTTONADD, 
  wxID_PANELBUTTONBACK, wxID_PANELBUTTONCANCEL, 
@@ -82,6 +83,14 @@ import copy
 #
 # constants
 #
+axeslabel_fontsize = 10
+axesticks_fontsize = 8
+legend_fontsize = 10
+spacing_left = 0.2
+spacing_right = 0.9
+spacing_bottom = 0.2
+spacing_top = 0.85
+
 GRID_LETTER_SIZE = 8 #points
 GRID_LABEL_SIZE = 9  # points
 GRID_LETTER_COLOR = '#000060'     # specified as hex #RRGGBB
@@ -107,6 +116,7 @@ def drawFigure(self):
     if hasattr(self, 'subplot'):
         del self.subplot
     self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     gdata = Status.int.GData['ST Plot']
     
@@ -120,26 +130,28 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
-    self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'))
-    self.subplot.axes.set_xlabel(_U(u'Temperature [\xb0C]'))
+    fp = font.FontProperties(size = axeslabel_fontsize)
+    self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'), fontproperties=fp)
+    self.subplot.axes.set_xlabel(_U(u'Temperature [\xb0C]'), fontproperties=fp)
     
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['yticksangle'])
     #
     # properties of labels on the x axis
     #
     for label in self.subplot.axes.get_xticklabels():
 #        label.set_color(self.params['xtickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['xticksangle'])
 
+    self.subplot.legend(loc = 'best')
     try:
         lg = self.subplot.get_legend()
         ltext  = lg.get_texts()             # all the text.Text instance in the legend
         for txt in ltext:
-            txt.set_fontsize(10)  # the legend text fontsize
+            txt.set_fontsize(legend_fontsize)  # the legend text fontsize
         # legend line thickness
         llines = lg.get_lines()             # all the lines.Line2D instance in the legend
         for lli in llines:
@@ -173,7 +185,7 @@ class PanelST(wx.Panel):
         self._init_ctrls(parent)
 #        self.__do_layout()
 
-	self.keys = ['ST Table']
+        self.keys = ['ST Table']
         self.mod = Status.mod.moduleST
         self.mod.initPanel()
 

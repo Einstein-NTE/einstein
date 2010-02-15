@@ -229,6 +229,7 @@ class ModuleEnergy(object):
 
         USHj = 0
         QHXj = 0
+        QWHj = 0
 
         HPerYear = 0
 

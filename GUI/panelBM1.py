@@ -96,7 +96,7 @@ def drawFigure(self):
 #------------------------------------------------------------------------------		
     if hasattr(self, 'subplot'):
        del self.subplot
-    self.subplot = self.figure.add_subplot(111)
+    self.subplot = self.figure.add_subplot(1,1,1)
     self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     gdata = Status.int.GData["BM1 Figure"]

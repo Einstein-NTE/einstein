@@ -48,7 +48,8 @@ import wx.grid
 
 from GUITools import *
 from numCtrl import *
-from einstein.modules.plotPanel import PlotPanel
+#from einstein.modules.plotPanel import PlotPanel
+import einstein.modules.matPanel as Mp
 from pylab import *
 from matplotlib.ticker import MaxNLocator
 from einstein.GUI.dialog_changeHX import *
@@ -85,132 +86,141 @@ def _U(text):
 MAXROWS = 50
 COLNO = 12
 
+spacing_left = 0.1
+spacing_right = 0.95
+spacing_bottom = 0.15
+spacing_top = 0.9
+spacing_w = 0.4
 
 #from matplotlib.ticker import MaxNLocator
 
-class HRPlotPanelHCG (PlotPanel):
-    """Plots several lines in distinct colors."""
-    def __init__( self, parent, **kwargs ):
-        self.parent = parent
-        # initiate plotter
-        PlotPanel.__init__( self, parent, **kwargs )
-        self.SetColor( (255,255,255) )
-
-    def draw( self ):            
-        try:
-            if not hasattr( self, 'subplot' ):
-                self.subplot = self.figure.add_subplot( 121 )
-            if not hasattr(self, 'subplot2'):
-                self.subplot2 = self.figure.add_subplot(122)
-           
-            if not hasattr(Status.int, 'hrdata'):
-                return
-            data = Status.int.hrdata.curves            
-            if (len(data)==0):
-                return
-                   
-            self.subplot = self.figure.add_subplot(121)
-            curve = data[0]
-            self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
-            self.subplot.legend(loc = 0)
-            self.subplot.set_title(curve.Name)
-            self.subplot.set_xlabel(_U('Power [kW]'))
-            self.subplot.set_ylabel(_U('Temperature [C]'))
-            
-            mmx = [ max(curve.X), min(curve.X) ]
-            mmy = [ max(curve.Y), min(curve.Y) ]
-                                          
-            curve = data[1]
-            self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
-            self.subplot.legend(loc = 0)
-            self.subplot.set_title(curve.Name)          
-            
-            mmx.append(max(curve.X))
-            mmx.append(min(curve.X))
-            mmy.append(max(curve.Y))
-            mmy.append(min(curve.Y))            
-            
-            m = (max(mmy) - min(mmy))*0.2
-            m2 = (max(mmx) - min(mmx))*0.2
-            
-            self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
-                                
-            curve = data[2]
-            self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
-            
-            m = (max(curve.Y) - min(curve.Y))*0.2
-            m2 = (max(curve.X) - min(curve.X))*0.2
-            
-            self.subplot2.axis([min(curve.X),max(curve.X)+m2,min(curve.Y),max(curve.Y)+m])
-            self.subplot2.legend(loc = 0)
-            self.subplot2.set_title(curve.Name)
-            self.subplot2.set_xlabel(_U('Power [kW]'))
-            self.subplot2.set_ylabel(_U('Temperature [C]'))
-    
-            #change axis
-            self.subplot.xaxis.set_major_locator(MaxNLocator(4))
-            self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
-        except:
-            pass
-
-
-class HRPlotPanelYED (PlotPanel):
-    """Plots several lines in distinct colors."""
-    def __init__( self, parent, **kwargs ):
-        self.parent = parent
-        # initiate plotter
-        PlotPanel.__init__( self, parent, **kwargs )
-        self.SetColor( (255,255,255) )
-        #Status.HRTool = "estimate"
-
-    def draw( self ):
-        """Draw data."""
+def drawFigure(self):
+    try:
         if not hasattr( self, 'subplot' ):
             self.subplot = self.figure.add_subplot( 121 )
         if not hasattr(self, 'subplot2'):
             self.subplot2 = self.figure.add_subplot(122)
-       
+        self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top, wspace=spacing_w)
+
         if not hasattr(Status.int, 'hrdata'):
             return
-        
-        if not hasattr(Status.int.hrdata, 'QD_T'):
-            return        
-        data = Status.int.hrdata.QD_T             
+        data = Status.int.hrdata.curves            
         if (len(data)==0):
-            return    
-                     
-        min_ = 100000
-        max_ = 0
-        
-        X = xrange(0, 406, 5)      
-        Y = data[:]   
-        for i in range(0,len(Y)): #scale to MWh
-            Y[i]=Y[i]/1000.0
-             
-        self.subplot = self.figure.add_subplot(121)
-        self.subplot.plot(X,Y,'b',label ="QD_T")    
-        self.subplot.legend(loc = 0)                             
-        self.subplot.axis([min(X),max(X),min(Y),max(Y)*1.1])   
-        self.subplot.set_ylabel(_U('Energy [MWh]'))
-        self.subplot.set_xlabel(_U('Temperature [C]'))
-        
-        if not hasattr(Status.int.hrdata, 'QA_T'):
-            return    
-        data = Status.int.hrdata.QA_T              
-        min_ = 100000
-        max_ = 0
-                        
-        X = xrange(0, 406, 5)      
-        Y = data[:] 
-        for i in range(0,len(Y)): #scale to MWh
-            Y[i]=Y[i]/1000.0                    
+            return
 
-        self.subplot2.plot(X,Y,'r',label ="QA_T")    
-        self.subplot2.legend(loc = 0)                             
-        self.subplot2.axis([min(X),max(X),min(Y),max(Y)*1.1])   
-        self.subplot2.set_ylabel(_U('Energy [MWh]'))
-        self.subplot2.set_xlabel(_U('Temperature [C]'))  
+        self.subplot = self.figure.add_subplot(121)
+        curve = data[0]
+        self.subplot.plot(curve.X,curve.Y,'b',label =curve.Name)            
+        self.subplot.legend(loc = 0)
+        self.subplot.set_title(curve.Name)
+        self.subplot.set_xlabel(_U('Power [kW]'))
+        self.subplot.set_ylabel(_U('Temperature [C]'))
+
+        mmx = [ max(curve.X), min(curve.X) ]
+        mmy = [ max(curve.Y), min(curve.Y) ]
+                                      
+        curve = data[1]
+        self.subplot.plot(curve.X,curve.Y,'r',label =curve.Name)          
+        self.subplot.legend(loc = 0)
+        self.subplot.set_title(curve.Name)          
         
+        mmx.append(max(curve.X))
+        mmx.append(min(curve.X))
+        mmy.append(max(curve.Y))
+        mmy.append(min(curve.Y))            
+        
+        m = (max(mmy) - min(mmy))*0.2
+        m2 = (max(mmx) - min(mmx))*0.2
+        
+        self.subplot.axis([min(mmx),max(mmx)+m2,min(mmy),max(mmy)+m])
+                            
+        curve = data[2]
+        self.subplot2.plot(curve.X,curve.Y,'g',label =curve.Name)
+        
+        m = (max(curve.Y) - min(curve.Y))*0.2
+        m2 = (max(curve.X) - min(curve.X))*0.2
+        
+        self.subplot2.axis([min(curve.X),max(curve.X)+m2,min(curve.Y),max(curve.Y)+m])
+        self.subplot2.legend(loc = 0)
+        self.subplot2.set_title(curve.Name)
+        self.subplot2.set_xlabel(_U('Power [kW]'))
+        self.subplot2.set_ylabel(_U('Temperature [C]'))
+
+        #change axis
+        self.subplot.xaxis.set_major_locator(MaxNLocator(4))
+        self.subplot2.xaxis.set_major_locator(MaxNLocator(4))
+    except:
+        pass
+
+
+def drawFigure2( self ):
+    """Draw data."""
+    if not hasattr( self, 'subplot' ):
+        self.subplot = self.figure.add_subplot( 121 )
+    if not hasattr(self, 'subplot2'):
+        self.subplot2 = self.figure.add_subplot(122)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top, wspace=spacing_w)
+   
+    if not hasattr(Status.int, 'hrdata'):
+        return
+    
+    if not hasattr(Status.int.hrdata, 'QD_T'):
+        return        
+    data = Status.int.hrdata.QD_T             
+    if (len(data)==0):
+        return    
+                 
+    min_ = 100000
+    max_ = 0
+    
+    X = xrange(0, 406, 5)      
+    Y = data[:]   
+    for i in range(0,len(Y)): #scale to MWh
+        Y[i]=Y[i]/1000.0
+         
+    self.subplot = self.figure.add_subplot(121)
+    self.subplot.plot(X,Y,'b',label ="QD_T")    
+    self.subplot.legend(loc = 0)                             
+    self.subplot.axis([min(X),max(X),min(Y),max(Y)*1.1])   
+    self.subplot.set_ylabel(_U('Energy [MWh]'))
+    self.subplot.set_xlabel(_U('Temperature [C]'))
+    
+    if not hasattr(Status.int.hrdata, 'QA_T'):
+        return    
+    data = Status.int.hrdata.QA_T              
+    min_ = 100000
+    max_ = 0
+                    
+    X = xrange(0, 406, 5)      
+    Y = data[:] 
+    for i in range(0,len(Y)): #scale to MWh
+        Y[i]=Y[i]/1000.0                    
+
+    self.subplot2.plot(X,Y,'r',label ="QA_T")    
+    self.subplot2.legend(loc = 0)                             
+    self.subplot2.axis([min(X),max(X),min(Y),max(Y)*1.1])   
+    self.subplot2.set_ylabel(_U('Energy [MWh]'))
+    self.subplot2.set_xlabel(_U('Temperature [C]'))  
+
+
+class HRPlotPanelHCG (wx.Panel):
+    """Plots several lines in distinct colors."""
+    def __init__( self, parent, **kwargs ):
+        self.parent = parent
+        # initiate plotter
+        wx.Panel.__init__(self, id=wx.ID_ANY, name='Panel', parent=parent,
+                          pos=wx.Point(0, 0), size=parent.GetSize(), style=0)
+
+
+class HRPlotPanelYED (wx.Panel):
+    """Plots several lines in distinct colors."""
+    def __init__( self, parent, **kwargs ):
+        self.parent = parent
+        # initiate plotter
+        wx.Panel.__init__(self, id=wx.ID_ANY, name='Panel', parent=parent,
+                          pos=wx.Point(0, 0), size=parent.GetSize(), style=0)
+        #Status.HRTool = "estimate"
+
 
 class PanelHR(wx.Panel):
 
@@ -220,7 +230,7 @@ class PanelHR(wx.Panel):
         self.mod = Status.mod.moduleHR
         self._init_ctrls(parent)
         self.__init_custom_ctrls(parent)
-      
+
     def _init_ctrls(self, prnt):
         # generated method, don't edit
         wx.Panel.__init__(self, id=wxID_PANELHR, name='PanelHR', parent=prnt,
@@ -460,12 +470,18 @@ class PanelHR(wx.Panel):
             except:
                 pass
             self.plotpanel = HRPlotPanelHCG(self.panel_drawcurve)   
-            self.plotpanel.Show()          
+            self.plotpanel.Show()
+            dummy = Mp.MatPanel(self.plotpanel, wx.Panel, drawFigure, None)
+            del dummy
+            self.plotpanel.draw()
         else:
             self.plotpanel.Hide() 
             self.plotpanel.Destroy()
             self.plotpanel = HRPlotPanelYED(self.panel_drawcurve)   
             self.plotpanel.Show()
+            dummy = Mp.MatPanel(self.plotpanel, wx.Panel, drawFigure2, None)
+            del dummy
+            self.plotpanel.draw()
             
     def updateButtons(self,index):
         if (self.mod.indexExists(index)):
