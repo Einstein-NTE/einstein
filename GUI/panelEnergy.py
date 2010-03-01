@@ -35,6 +35,7 @@
 #       09/07/2008: HS  restructuring of the panel
 #                       - elimination of pie-plot (already in E-stats)
 #       13/10/2008: SD  change _() to _U()
+#       15/02/2010 MW: fixed visualization
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -54,7 +55,7 @@ import einstein.modules.matPanel as Mp
 from GUITools import *
 from numCtrl import *
 import matplotlib.font_manager as font
-
+from matplotlib.ticker import FuncFormatter
 
 [wxID_PANELENERGY, wxID_PANELENERGYANNUAL, wxID_PANELENERGYBUTTONBACK, 
  wxID_PANELENERGYBUTTONCANCEL, wxID_PANELENERGYBUTTONFWD, 
@@ -96,17 +97,23 @@ def drawFigure(self):
     self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     gdata = Status.int.GData["ENERGY Plot1"]
-    for j in range(1,len(gdata)):
-        self.subplot.plot(gdata[0][1:],\
-                          gdata[j][1:],\
-                          LINETYPES[(j-1)%len(LINETYPES)],
-                          color = ORANGECASCADE[(j-1)%len(ORANGECASCADE)],
-                          label=gdata[j][0],
-                          linewidth=2)
+    try:
+        for j in range(1,len(gdata)):
+            self.subplot.plot(gdata[0][1:],\
+                              gdata[j][1:],\
+                              LINETYPES[(j-1)%len(LINETYPES)],
+                              color = ORANGECASCADE[(j-1)%len(ORANGECASCADE)],
+                              label=gdata[j][0],
+                              linewidth=2)
+    except:
+        pass
         
     self.subplot.axis(ymin = 0)
     self.subplot.legend(loc = 0)   #4: left lower; 0: best
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
     fp = font.FontProperties(size = axeslabel_fontsize)
     try:
         if Status.Nt == 12*168:

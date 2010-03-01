@@ -32,6 +32,7 @@
 #   18/06/2008 SD: change to translatable text _(...)
 #   02/09/2008 FJ: redone the entire GUI (grid,plot,controls...)
 #   06/07/2009 HS: adaptations to UTF and number of decimals in grid
+#   15/02/2010 MW: fixed visualization
 #       
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008,2009

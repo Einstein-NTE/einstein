@@ -1,4 +1,41 @@
 from math import *
+from itertools import cycle
+
+def format_int_wrapper(x, pos = None):
+    """
+    Wrapper function for format_int,
+    might be called with different separator if needed
+    """
+    return format_int(x, sep = '.')
+
+def format_int(i, sep = '.'):
+    """
+    Format a given number with thousands separators and return
+    the resulting string
+    """
+
+    minus = '-'
+    cyc = cycle(['', '', sep])
+    s = str(i)
+    
+    precomma, comma, postcomma = s.partition(sep)
+    
+    isnegative = False
+    if (precomma.startswith(minus)):
+        isnegative = True
+        precomma = precomma.lstrip(minus)
+    
+    last = len(precomma) - 1
+    formatted = [(cyc.next() if idx != last else '') + char for idx, char in enumerate(reversed(precomma))]
+    formatted = ''.join(reversed(formatted))
+
+    if isnegative:
+        formatted = minus + formatted
+    
+    if (len(comma) != 0 and len(postcomma) != 0 and int(postcomma) != 0):
+        formatted = formatted + ',' + postcomma
+    
+    return formatted
 
 def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
 

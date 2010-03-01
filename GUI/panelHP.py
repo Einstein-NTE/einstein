@@ -64,6 +64,7 @@
 #       28/06/2008: HS  eliminated sql and db as input parameters; minor clean-up.
 #                   - bug-fix in read/write of HP type
 #       13/10/2008: SD  change _() to _U()
+#       15/02/2010 MW: fixed visualization
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -88,9 +89,10 @@ from einstein.modules.interfaces import *
 from einstein.modules.modules import *
 from einstein.modules.constants import *
 from numpy import *
+from numCtrl import *
 from einstein.GUI.addEquipment_popup import * #TS 20080405 changed
 import matplotlib.font_manager as font
-
+from matplotlib.ticker import FuncFormatter
 
 [wxID_PANELHP, wxID_PANELHPBUTTONPAGEHEATPUMPADD, 
  wxID_PANELHPBUTTONPAGEHEATPUMPBACK, wxID_PANELHPBUTTONPAGEHEATPUMPCANCEL, 
@@ -159,6 +161,9 @@ def drawFigure(self):
 #    self.subplot.axis([0, 100, 0, 3e+7])
     self.subplot.legend()
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
     fp = font.FontProperties(size = axeslabel_fontsize)
     self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'), fontproperties=fp)
     self.subplot.axes.set_xlabel(_U(u'Temperature [ºC]'), fontproperties=fp)

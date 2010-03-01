@@ -21,6 +21,7 @@
 #       Changes to previous version:
 #
 #   28/11/2008: HS  str() in labelname and result.name eliminated -> unicode !!!
+#   15/02/2010: MW modified panels to use matPanel instead of plotPanel
 #
 #------------------------------------------------------------------------------
 #    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008

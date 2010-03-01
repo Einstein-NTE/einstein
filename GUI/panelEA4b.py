@@ -36,6 +36,7 @@
 #       02/07/2008: SD  changed to orange colour (staticBox)
 #       03/07/2008 SD: activate eventhandlers Fwd >>> and Back <<<
 #       13/10/2008: SD  change _() to _U()
+#       15/02/2010 MW: fixed visualization
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -51,6 +52,7 @@ import wx
 from einstein.GUI.graphics import drawPiePlot
 from numCtrl import *
 import matplotlib.font_manager as font
+from matplotlib.ticker import FuncFormatter
 
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
@@ -107,6 +109,9 @@ def drawFigure(self):
                       'r:',  label='USH', linewidth=3)
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
     fp = font.FontProperties(size = axeslabel_fontsize)
     self.subplot.axes.set_ylabel(_U('Yearly energy [MWh]'), fontproperties=fp)
     self.subplot.axes.set_xlabel(unicode('Temperature [ºC]', 'latin-1'), fontproperties=fp)

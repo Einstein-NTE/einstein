@@ -33,6 +33,7 @@
 #       25/06/2008: HS  adaptation to changes in module
 #       30/09/2008: SD  graphics figure added
 #       13/10/2008: SD  change _() to _U()
+#       15/02/2010 MW: fixed visualization
 #
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -52,6 +53,7 @@ from numCtrl import *
 from einstein.modules.messageLogger import *
 from GUITools import *
 import matplotlib.font_manager as font
+from matplotlib.ticker import FuncFormatter
 
 import einstein.modules.matPanel as Mp
 from einstein.modules.interfaces import *
@@ -129,7 +131,9 @@ def drawFigure(self):
     self.subplot.axis(axis)
 ###SD-20080930
 #    self.subplot.legend()
-
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
     fp = font.FontProperties(size = axeslabel_fontsize)
     self.subplot.axes.set_ylabel(_U('Energy intensity - fuels [kWh/EUR]'), fontproperties=fp)
     self.subplot.axes.set_xlabel(_U('Energy intensity - electricity [kWh/EUR]'), fontproperties=fp)

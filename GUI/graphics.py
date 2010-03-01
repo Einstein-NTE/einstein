@@ -16,6 +16,8 @@
 #
 #       Changes to previous version:
 #
+#   15/02/2010 MW: fixed visualization
+#
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	http://www.energyxperts.net/
@@ -27,8 +29,9 @@
 #==============================================================================
 
 from numpy import *
+from numCtrl import *
 from einstein.modules.interfaces import *
-
+from matplotlib.ticker import FuncFormatter
 
 #
 # some constants
@@ -266,6 +269,10 @@ def drawStackedBarPlot(self):
     self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
     self.figure.set_facecolor(backcolor)
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
+
     for r in range(1,rows-1):
         row = data[r]
         if len(legend) <= 0:
@@ -320,7 +327,7 @@ def drawSimpleBarPlot(self):
     #
     # some constants for the simple bar plot
     #
-    spacing_left = 0.2
+    spacing_left = 0.25
     spacing_right = 0.9
     spacing_bottom = 0.1
     spacing_top = 0.9
@@ -415,6 +422,10 @@ def drawSimpleBarPlot(self):
     for xlabel in xlabels:
         xlabel.set_size(tickfontsize)
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
+
     # draw legend and set legend parameters
     self.subplot.legend(legendptr,legendlabels,loc='best')
     # legend text size
@@ -451,7 +462,7 @@ def drawComparedBarPlot(self):
     #
     # some constants for the simple bar plot
     #
-    spacing_left = 0.125
+    spacing_left = 0.2
     spacing_right = 0.9
     spacing_bottom = 0.1
     spacing_top = 0.9
@@ -550,6 +561,10 @@ def drawComparedBarPlot(self):
     xlabels = self.subplot.axes.set_xticklabels(xticklabels)
     for xlabel in xlabels:
         xlabel.set_size(tickfontsize)
+
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
 
     # draw legend and set legend parameters
     self.subplot.legend(legendptr,legendlabels,loc='best')
