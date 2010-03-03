@@ -1,1 +1,1 @@
-einsteinMain.py > einsteinMSG.txt
+einsteinMain.py > ..\einsteinMSG.txt
