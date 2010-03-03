@@ -37,7 +37,7 @@ from ConfigParser import ConfigParser
 #----- Constants
 ParameterFile = 'EINSTEIN Parameters 0.4.csv'
 
-LogFile = '..\..\einsteinTRACK.log'
+LogFile = '..\einsteinTRACK.log'
 ConfigFile = 'einstein.ini'
 
 
