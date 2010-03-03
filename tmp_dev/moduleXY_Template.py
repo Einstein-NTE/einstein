@@ -45,7 +45,7 @@ def energyStatistics(sql, DB, Qid):
 
     try:
 
-        put here the main calculation part of the module
+        #put here the main calculation part of the module
 
 #..............................................................................
 #       Subdivision of blocks of the module

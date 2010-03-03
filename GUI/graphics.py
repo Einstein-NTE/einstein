@@ -16,6 +16,8 @@
 #
 #       Changes to previous version:
 #
+#   15/02/2010 MW: fixed visualization
+#
 #------------------------------------------------------------------------------
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
 #	http://www.energyxperts.net/
@@ -27,8 +29,9 @@
 #==============================================================================
 
 from numpy import *
+from numCtrl import *
 from einstein.modules.interfaces import *
-
+from matplotlib.ticker import FuncFormatter
 
 #
 # some constants
@@ -68,6 +71,11 @@ def drawPiePlot(self):
     PIE_LABEL_COLOR = '#808080'
     PIE_PERCENT_COLOR = '#000000'
     PIE_PERCENT_SIZE = 9
+
+    spacing_left = 0.2
+    spacing_right = 0.8
+    spacing_bottom = 0.1
+    spacing_top = 0.9
 
     # generic function for painting pies.
     # Takes its data from the dictionary Interfaces.GData.
@@ -138,6 +146,7 @@ def drawPiePlot(self):
     if hasattr(self, 'subplot'):
         del self.subplot
     self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
     self.figure.set_facecolor(backcolor)
 
     self.subplot.set_title(title, TITLE_FONT_DICT)
@@ -173,6 +182,14 @@ def drawStackedBarPlot(self):
     # The data is a numpy array. The first column has the labels, and another
     # column has the values
     #
+    #
+    # some constants for the stacked bar plot
+    #
+    spacing_left = 0.125
+    spacing_right = 0.9
+    spacing_bottom = 0.1
+    spacing_top = 0.9
+
     # the following params are mandatory
     #
     try:
@@ -249,7 +266,12 @@ def drawStackedBarPlot(self):
     if hasattr(self, 'subplot'):
         del self.subplot
     self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
     self.figure.set_facecolor(backcolor)
+
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
 
     for r in range(1,rows-1):
         row = data[r]
@@ -275,7 +297,7 @@ def drawStackedBarPlot(self):
     #self.subplot.axes.set_yticks(arange(0,61,10))
 
     # draw legend and set legend parameters
-    self.subplot.legend(legendptr,legendlabels)
+    self.subplot.legend(legendptr,legendlabels,loc='best')
     # legend text size
     lg = self.subplot.get_legend()
     ltext  = lg.get_texts()             # all the text.Text instance in the legend
@@ -302,6 +324,14 @@ def drawSimpleBarPlot(self):
     # The data is a numpy array. The first column has the labels, and another
     # column has the values
     #
+    #
+    # some constants for the simple bar plot
+    #
+    spacing_left = 0.25
+    spacing_right = 0.9
+    spacing_bottom = 0.1
+    spacing_top = 0.9
+
     # the following params are mandatory
     #
     try:
@@ -373,6 +403,7 @@ def drawSimpleBarPlot(self):
     if hasattr(self, 'subplot'):
         del self.subplot
     self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
     self.figure.set_facecolor(backcolor)
     # extract data from second row on
     legendlabels = legend
@@ -391,8 +422,12 @@ def drawSimpleBarPlot(self):
     for xlabel in xlabels:
         xlabel.set_size(tickfontsize)
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
+
     # draw legend and set legend parameters
-    self.subplot.legend(legendptr,legendlabels)
+    self.subplot.legend(legendptr,legendlabels,loc='best')
     # legend text size
     lg = self.subplot.get_legend()
     ltext  = lg.get_texts()
@@ -424,6 +459,13 @@ def drawComparedBarPlot(self):
     # Takes its data from the dictionary Interfaces.GData.
     # The data is a numpy array. The first column has the labels, and another
     # column has the values
+    #
+    # some constants for the simple bar plot
+    #
+    spacing_left = 0.2
+    spacing_right = 0.9
+    spacing_bottom = 0.1
+    spacing_top = 0.9
 
     #
     # the following params are mandatory
@@ -498,6 +540,7 @@ def drawComparedBarPlot(self):
         del self.subplot
 
     self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
     self.figure.set_facecolor(backcolor)
 
     # extract the transposed data from second row on
@@ -519,8 +562,12 @@ def drawComparedBarPlot(self):
     for xlabel in xlabels:
         xlabel.set_size(tickfontsize)
 
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
+
     # draw legend and set legend parameters
-    self.subplot.legend(legendptr,legendlabels)
+    self.subplot.legend(legendptr,legendlabels,loc='best')
     # legend text size
     lg = self.subplot.get_legend()
     ltext  = lg.get_texts()

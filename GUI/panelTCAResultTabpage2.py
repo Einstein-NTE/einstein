@@ -21,6 +21,7 @@
 #       Changes to previous version:
 #
 #   28/11/2008: HS  str() in labelname and result.name eliminated -> unicode !!!
+#   15/02/2010: MW modified panels to use matPanel instead of plotPanel
 #
 #------------------------------------------------------------------------------
 #    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -36,11 +37,20 @@
 #import einstein.modules.matPanel as Mp
 
 from einstein.modules.calculationTCA import *
-from einstein.modules.plotPanel import PlotPanel
+#from einstein.modules.plotPanel import PlotPanel
+import einstein.modules.matPanel as Mp
 from pylab import *
 import wx
 #from matplotlib.ticker import MaxNLocator
 from einstein.modules.messageLogger import *
+
+# constants
+#
+
+spacing_left = 0.1
+spacing_right = 0.95
+spacing_bottom = 0.15
+spacing_top = 0.9
 
 def _U(text):
     try:
@@ -48,27 +58,28 @@ def _U(text):
     except:
         return _(text)
 
-class TCAPlotPanel (PlotPanel):
+def drawFigure( self ):
+    try:
+        if not hasattr( self, 'subplot' ):
+            self.subplot = self.figure.add_subplot( 111 )
+        self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
+            
+        if (Status.mod.moduleTCA.result != None): 
+            if (Status.mod.moduleTCA.displayPlot == 0):  
+                self.plot("npv")
+            else:            
+                self.plot("mirr")
+    except:
+        logWarning(_U("Could not plot TCA result."))
+
+class TCAPlotPanel (wx.Panel):
     """Plots several lines in distinct colors."""
     def __init__( self, parent, **kwargs ):
         self.parent = parent
         # initiate plotter
-        PlotPanel.__init__( self, parent, **kwargs )
-        self.SetColor( (255,255,255) )
-
-    def draw( self ):
-        try:
-            if not hasattr( self, 'subplot' ):
-                self.subplot = self.figure.add_subplot( 111 )
-                
-            if (Status.mod.moduleTCA.result != None): 
-                if (Status.mod.moduleTCA.displayPlot == 0):  
-                    self.plot("npv")
-                else:            
-                    self.plot("mirr")
-        except:
-            logWarning(_U("Could not plot TCA result."))
-                                                                       
+        wx.Panel.__init__(self, id=wx.ID_ANY, name='Panel', parent=parent,
+                          pos=wx.Point(0, 0), size=parent.GetSize(), style=0)
+                                        
     def plot(self,mode):                                  
         results = Status.mod.moduleTCA.result
                                                             
@@ -242,7 +253,10 @@ class panelResult2(wx.Panel):
         Status.mod.moduleTCA.showlegend = self.cbShowLegend.GetValue()     
         self.plotpanel = TCAPlotPanel(self.panel1)          
         self.plotpanel.Show()   
-        
+        dummy = Mp.MatPanel(self.plotpanel, wx.Panel, drawFigure, None)
+        del dummy
+        self.plotpanel.draw()
+            
     def OnChoice1Choice(self, event):
         self.updateButtons()
         event.Skip()

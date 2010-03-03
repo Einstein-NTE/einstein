@@ -21,6 +21,7 @@
 #
 #       Changes to previous version:
 #       13/10/2008: SD  change _() to _U()
+#       15/02/2010 MW: fixed visualization
 #	
 #------------------------------------------------------------------------------		
 #	(C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
@@ -35,6 +36,8 @@
 import wx
 from einstein.GUI.graphics import drawPiePlot
 from numCtrl import *
+import matplotlib.font_manager as font
+from matplotlib.ticker import FuncFormatter
 
 from status import Status
 from einstein.modules.energyStats.moduleEA4 import *
@@ -49,6 +52,14 @@ import einstein.modules.matPanel as Mp
 #
 # constants
 #
+
+axeslabel_fontsize = 10
+axesticks_fontsize = 8
+legend_fontsize = 10
+spacing_left = 0.2
+spacing_right = 0.9
+spacing_bottom = 0.2
+spacing_top = 0.85
 
 COLNO = 7
 MAXROWS = 5
@@ -67,43 +78,50 @@ def drawFigure(self):
 
     if not hasattr(self, 'subplot'):
         self.subplot = self.figure.add_subplot(1,1,1)
+    self.figure.subplots_adjust(left=spacing_left, right=spacing_right, bottom=spacing_bottom, top=spacing_top)
 
     data = Status.int.GData['EA4c_Plot']
-    for i in range(1,len(data)):
-        if i == 0:
-            linewidth = 3
-        else:
-            linewidth = 1
-        self.subplot.plot(data[0][1:],
-                          data[i][1:],
-                          LINETYPES[(i-1)%len(LINETYPES)],
-                          color=ORANGECASCADE[(i-1)%len(ORANGECASCADE)],
-                          label=data[i][0],
-                          linewidth=linewidth)
+    try:
+        for i in range(1,len(data)):
+            if i == 0:
+                linewidth = 3
+            else:
+                linewidth = 1
+            self.subplot.plot(data[0][1:],
+                              data[i][1:],
+                              LINETYPES[(i-1)%len(LINETYPES)],
+                              color=ORANGECASCADE[(i-1)%len(ORANGECASCADE)],
+                              label=data[i][0],
+                              linewidth=linewidth)
+    except:
+        pass
 
 #    self.subplot.axis([0, 100, 0, 3e+7])
-    self.subplot.legend(loc = 0)
-
-    self.subplot.axes.set_ylabel(_U('Heat supply load [kW]'))
-    self.subplot.axes.set_xlabel(_U('Annual operating hours [h]'))
+    major_formatter = FuncFormatter(format_int_wrapper)
+    self.subplot.axes.xaxis.set_major_formatter(major_formatter)
+    self.subplot.axes.yaxis.set_major_formatter(major_formatter)
+    fp = font.FontProperties(size = axeslabel_fontsize)
+    self.subplot.axes.set_ylabel(_U('Heat supply load [kW]'), fontproperties=fp)
+    self.subplot.axes.set_xlabel(_U('Annual operating hours [h]'), fontproperties=fp)
 
     for label in self.subplot.axes.get_yticklabels():
 #        label.set_color(self.params['ytickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['yticksangle'])
     #
     # properties of labels on the x axis
     #
     for label in self.subplot.axes.get_xticklabels():
 #        label.set_color(self.params['xtickscolor'])
-        label.set_fontsize(8)
+        label.set_fontsize(axesticks_fontsize)
 #        label.set_rotation(self.params['xticksangle'])
 ##
+    self.subplot.legend(loc = 0)
     try:
         lg = self.subplot.get_legend()
         ltext  = lg.get_texts()             # all the text.Text instance in the legend
         for txt in ltext:
-            txt.set_fontsize(10)  # the legend text fontsize
+            txt.set_fontsize(legend_fontsize)  # the legend text fontsize
         # legend line thickness
         llines = lg.get_lines()             # all the lines.Line2D instance in the legend
         for lli in llines:
