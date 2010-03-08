@@ -1,24 +1,36 @@
 from math import *
 from itertools import cycle
 
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
 def format_int_wrapper(x, pos = None):
     """
-    Wrapper function for format_int,
-    might be called with different separator if needed
+    Wrapper function for format_int
+    change separator and comma in locale settings
     """
-    return format_int(x, sep = '.')
 
-def format_int(i, sep = '.'):
+    separator = _U('\'')
+    comma = _U('.')
+    return format_int(x, separator, comma);
+
+
+def format_int(i, sep = '.', com = ','):
     """
     Format a given number with thousands separators and return
     the resulting string
     """
 
+    old_sep = '.'
+
     minus = '-'
     cyc = cycle(['', '', sep])
     s = str(i)
     
-    precomma, comma, postcomma = s.partition(sep)
+    precomma, comma, postcomma = s.partition(old_sep)
     
     isnegative = False
     if (precomma.startswith(minus)):
@@ -33,9 +45,10 @@ def format_int(i, sep = '.'):
         formatted = minus + formatted
     
     if (len(comma) != 0 and len(postcomma) != 0 and int(postcomma) != 0):
-        formatted = formatted + ',' + postcomma
+        formatted = formatted + com + postcomma
     
     return formatted
+
 
 def convertDoubleToString(x,nDecimals=2,nMaxDigits=12):
 
