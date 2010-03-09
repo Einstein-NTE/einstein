@@ -1080,7 +1080,7 @@ class ImportDB(object):
 
 		
 class ImportQ(object):
-    
+#Import Dialog for questionnaires    
     def __init__(self,mode="ignore",infile=None):
 
         if infile is None:
@@ -1090,12 +1090,7 @@ class ImportQ(object):
                 return None
 
         (conn, cursor) = openconnection()
-        #
-        # get the highest project number so far in the database, add 1, and assign to the
-        # imported project
 
-#......................................................................
-# ask for confirmation before causing a major desaster
 
         dialog =  DialogImport(None,_U("import data"),\
                                _U("This will modify your databases\nIf You are sure, specify what to do with duplicate data")+\
