@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-01 21:15+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: energyXperts <info@energyxperts.net>\n"
+"Last-Translator: Manuel Wallner <Wallner@ntesystems.at>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -5709,6 +5709,14 @@ msgstr "Möchten Sie das Solarsystem wirklich entfernen?"
 #, python-format
 msgid "Units (conversionFactor): unknown unit <%s>"
 msgstr "Einheiten (conversionFactor): unbekannte Einheit <%s>"
+
+#: GUI/numCtrl.py:10
+msgid "'"
+msgstr "."
+
+#: GUI/numCtrl.py:11
+msgid "."
+msgstr ","
 
 #: modules/boiler/moduleBB.py:1092
 msgid "In the present version only Natural Gas boilers has been collected in the DB"
