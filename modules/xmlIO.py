@@ -62,11 +62,11 @@ def _U(text):
     except:
         return _(text)
 
-def openfilecreate(text,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
+def openfilecreate(text, filetype ,style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT):
     # ask for file for exporting
     dialog = wx.FileDialog(parent=None,
                            message=text,
-                           wildcard='XML files (*.xml)|*.xml',
+                           wildcard=filetype,
                            style=style)
     if dialog.ShowModal() != wx.ID_OK:
         return None
@@ -105,7 +105,7 @@ class ImportDataXML(object):
 
     def __init__(self,infile=None):
         if infile is None:
-            infile = openfilecreate('Choose a data file for importing',
+            infile = openfilecreate('Choose a data file for importing','XML files (*.xml)|*.xml',
                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
             if infile is None:
                 return None
@@ -119,7 +119,7 @@ class ImportDataXML(object):
 class ExportDataXML(object):
     def __init__(self,pid=None,ano=None,fuels=[],fluids=[],outfile=None):
         if outfile is None:
-            outfile = openfilecreate('Output file for exporting tables')
+            outfile = openfilecreate(text='Output file for exporting tables',filetype='XML files (*.xml)|*.xml')
             if outfile is None:
                 return None
 
@@ -303,7 +303,7 @@ class ExportDataBaseXML(object):
     #
     def __init__(self,outfile=None):
         if outfile is None:
-            outfile = openfilecreate('Output file for exporting database')
+            outfile = openfilecreate(text='Output file for exporting database',filetype='XML files (*.xml)|*.xml')
             if outfile is None:
                 return None
 
@@ -384,7 +384,7 @@ class ExportSchedulesXML(object):
     def __init__(self,parent,outfile=None):
         self.parent = parent
         if outfile is None:
-            outfile = openfilecreate('Output file for exporting schedules')
+            outfile = openfilecreate(text='Output file for exporting schedules',filetype='XML files (*.xml)|*.xml')
             if outfile is None:
                 return None
 
@@ -462,7 +462,7 @@ class ExportProject(object):
         print "DBName = ",self.DBName
 
         if outfile is None:
-            outfile = openfilecreate('Output file for exporting project')
+            outfile = openfilecreate(text='Output file for exporting project',filetype='XML files (*.xml)|*.xml')
             if outfile is None:
                 return None
 
@@ -592,7 +592,7 @@ class ImportProject(object):
         self.newpid = None
 
         if infile is None:
-            infile = openfilecreate('Choose a project file for importing',
+            infile = openfilecreate('Choose a project file for importing','XML files (*.xml)|*.xml',
                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
             if infile is None:
                 return None
@@ -796,7 +796,7 @@ class ExportDB(object):
         self.DBName = Status.main.conf.get('DB', 'DBName')
 
         if outfile is None:
-            outfile = openfilecreate('Output file for exporting data base')
+            outfile = openfilecreate(text='Output file for exporting data base',filetype='XML files (*.xml)|*.xml')
             if outfile is None:
                 return None
 
@@ -882,7 +882,7 @@ class ImportDB(object):
     def __init__(self,mode="ignore",infile=None):
 
         if infile is None:
-            infile = openfilecreate('Choose a project file for importing',
+            infile = openfilecreate('Choose a project file for importing','XML files (*.xml)|*.xml',
                            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
             if infile is None:
                 return None
@@ -1077,3 +1077,35 @@ class ImportDB(object):
         newtext = "''".join(parts)
         return newtext
 
+
+		
+class ImportQ(object):
+    
+    def __init__(self,mode="ignore",infile=None):
+
+        if infile is None:
+            infile = openfilecreate('Choose a questionnarie file for importing','Excel files (*.xls)|*.xls',
+                           style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if infile is None:
+                return None
+
+        (conn, cursor) = openconnection()
+        #
+        # get the highest project number so far in the database, add 1, and assign to the
+        # imported project
+
+#......................................................................
+# ask for confirmation before causing a major desaster
+
+        dialog =  DialogImport(None,_U("import data"),\
+                               _U("This will modify your databases\nIf You are sure, specify what to do with duplicate data")+\
+                               _U("\nElse press CANCEL"))
+        ret = dialog.ShowModal()
+        if ret == wx.ID_OK:
+            mode = "overwrite"
+        elif ret == wx.ID_IGNORE:
+            mode = "ignore"
+        else:
+            return
+
+        conn.close()

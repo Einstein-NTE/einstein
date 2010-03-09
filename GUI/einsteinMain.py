@@ -593,6 +593,10 @@ class EinsteinFrame(wx.Frame):
         pids = ex.getPid()
         oldPId,newPId = pids
         self.showInfo('Project with pid=%s has been imported. New pid set to %s' % pids)
+		
+    def OnMenuImportQ(self, event):
+        ex = ImportQ()
+		
 
 #..............................................................................
 # Scroll-up menu "VIEW"
@@ -1537,6 +1541,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuImportData, self.ImportData)
         self.Bind(wx.EVT_MENU, self.OnMenuImportProject, self.ImportProject)
         self.Bind(wx.EVT_MENU, self.OnMenuExportProject, self.ExportProject)
+        self.Bind(wx.EVT_MENU, self.OnMenuImportQ, self.ImportQ)
 
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBAdmin, self.EditDBAdmin)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
