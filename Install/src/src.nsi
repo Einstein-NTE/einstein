@@ -587,6 +587,7 @@ Var btnBrowseMySQLpath
 
 
 Function nsInstallPath
+Call einsteinDBexists
 	SectionGetFlags ${mysqlsection} $9
 	${If} $9 == "1"
 		nsDialogs::Create 1018
@@ -639,7 +640,7 @@ FunctionEnd
 #----------------------------------------------------------------------
 
 Function nsFileChoose
-Call einsteinDBexists
+
     nsDialogs::SelectFolderDialog /NOUNLOAD "" $0
     Pop $0
     ${If} $0 != "error"
@@ -773,17 +774,19 @@ FunctionEnd
 
 Function einsteinDBexists
 	
-	Push "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'einstein' INTO OUTFILE '$INSTDIR\einstein.txt';"
+	Push "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'einstein' INTO OUTFILE '$md\einstein.txt';"
 	Push "$INSTDIR\existingdb.txt" 
 	Call WriteToFile  
 	
-	Push '"$mysql_instpath\bin\mysql" --user=root < "$INSTDIR\existingdb.txt"$\n' 
+	#Check for Default Passwords in MySQL root account
+	
+	Push '"$mysql_instpath\bin\mysql" --user=root < "$INSTDIRexistingdb.txt"$\n' 
 	Push "$INSTDIR\existingdb.bat"
 	Call WriteToFile  
 	
-	Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt"$\n' 
-	Push "$INSTDIR\existingdb.bat"
-	Call WriteToFile  
+	#Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt"$\n' 
+	#Push "$INSTDIR\existingdb.bat"
+	#Call WriteToFile  
 	
 	Push '"$mysql_instpath\bin\mysql" --user=root --password=mysql < "$INSTDIR\existingdb.txt"' 
 	Push "$INSTDIR\existingdb.bat"
@@ -791,13 +794,15 @@ Function einsteinDBexists
 
 	ExecWait "$INSTDIR\existingdb.bat"
 
-  #FileOpen $0 $0 a #open file
-   #FileSeek $0 0 END #go to end
-   #FileWrite $0 $1 #write to file
-  #FileClose $0
+	FileOpen $0 "$mdeinstein.txt" r
+	IfErrors done
+	FileRead $0 $1
+	MessageBox MB_OK "Ergebnis: $1"
+	FileClose $0
+	done:
+	MessageBox MB_OK "$mdeinstein.txt  Ergebnis: $1"
 	
-	
-	#Delete "$INSTDIR\existingdb.bat"
-	#Delete "$INSTDIR\existingdb.txt"
-	
+	Delete "$INSTDIR\existingdb.bat"
+	Delete "$INSTDIR\existingdb.txt"
+	#Delete "$md\einstein.txt"
 FunctionEnd
