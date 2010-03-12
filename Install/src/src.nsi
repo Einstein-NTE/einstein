@@ -382,7 +382,7 @@ Function .onInit
 		MessageBox MB_OK "Pfad ist leer"
 		
 	${Else}
-	
+		StrCpy $mysql_instpath $path_result -1
 		MessageBox MB_OK "Pfad ist : $path_result"
 	${EndIf}
 	
@@ -633,8 +633,6 @@ Function nsPathLeave
 
 	${If} $9 == "1" 
         ${NSD_GetText} $DirRequestMySQL $mysql_instpath
-    ${Else}
-        StrCpy $mysql_instpath $path_result -1
     ${EndIf}
 FunctionEnd
 
