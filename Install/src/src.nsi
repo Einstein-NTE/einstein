@@ -94,7 +94,7 @@ Var bmessage
     ReadRegStr $R0 HKLM "${REGKEY}\Components" "${SECTION_NAME}"
     StrCmp $R0 1 0 next${UNSECTION_ID}
     !insertmacro SelectSection "${UNSECTION_ID}"
-    GoTo done${UNSECTION_ID}
+    Goto done${UNSECTION_ID}
 next${UNSECTION_ID}:
     !insertmacro UnselectSection "${UNSECTION_ID}"
 done${UNSECTION_ID}:
@@ -780,13 +780,13 @@ Function einsteinDBexists
 	
 	#Check for Default Passwords in MySQL root account
 	
-	Push '"$mysql_instpath\bin\mysql" --user=root < "$INSTDIRexistingdb.txt"$\n' 
+	Push '"$mysql_instpath\bin\mysql" --user=root < "$INSTDIR\existingdb.txt"$\n' 
 	Push "$INSTDIR\existingdb.bat"
 	Call WriteToFile  
 	
-	#Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt"$\n' 
-	#Push "$INSTDIR\existingdb.bat"
-	#Call WriteToFile  
+	Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt"$\n' 
+	Push "$INSTDIR\existingdb.bat"
+	Call WriteToFile  
 	
 	Push '"$mysql_instpath\bin\mysql" --user=root --password=mysql < "$INSTDIR\existingdb.txt"' 
 	Push "$INSTDIR\existingdb.bat"
@@ -794,15 +794,15 @@ Function einsteinDBexists
 
 	ExecWait "$INSTDIR\existingdb.bat"
 
-	FileOpen $0 "$mdeinstein.txt" r
-	IfErrors done
-	FileRead $0 $1
-	MessageBox MB_OK "Ergebnis: $1"
-	FileClose $0
-	done:
-	MessageBox MB_OK "$mdeinstein.txt  Ergebnis: $1"
+
+	IfFileExists $mdeinstein.txt fin
+    Goto notfound
+	fin:
+	MessageBox MB_OK "gefunden!"
+
+	notfound:
 	
 	Delete "$INSTDIR\existingdb.bat"
 	Delete "$INSTDIR\existingdb.txt"
-	#Delete "$md\einstein.txt"
+	Delete "$md\einstein.txt"
 FunctionEnd
