@@ -51,8 +51,7 @@ ShowUninstDetails hide
 # Default pages are part of Modern User Interface 2 (MUI 2)
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "res\gpl-3.0-standalone.rtf"
-
-Page custom nsAskMySQLAccount nsAskMySQLLeave
+#Page custom nsAskMySQLAccount nsAskMySQLLeave
 !insertmacro MUI_PAGE_COMPONENTS
 Page custom nsAccountsetting nsAccountsettingLeave
 Page custom nsInstallPath nsPathLeave
@@ -71,12 +70,13 @@ Page custom nsInstallPath nsPathLeave
 # Var MainDir
 Var md
 
-Var overrideDB
+Var installeinsteindb
 Var MySQLAccountText
 Var mysql_instpath
 Var mysql_pw
 Var mysql_user
-
+Var mysqlalreadyinstalled
+Var einsteindbexists
 Var bmysqlinstall
 Var bdotnetinstall
 
@@ -198,7 +198,7 @@ Section -DatabaseConig
 	${EndIf}
 	
 	${If} $mysql_user == "root"
-	${AndIf} $overrideDB == "1"
+	${AndIf} $installeinsteindb == "1"
 		${If} $mysql_pw == "root"
 			Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\sql\einstein.sql"'
 		${Else}
@@ -349,19 +349,19 @@ Function testversion
         StrCpy $5 $4 "" -13
         StrCpy $6 $5 1
         StrCpy $5 $4 1 -12
-        ${If} $version_result != ""
+        /*${If} $version_result != ""
             MessageBox MB_YESNO "MySQL Version $version_result is already installed. \ 
 			If you don't want to override or install a new MySQL Version 5.1.24 uncheck it! \
 			Do you want to override the einstein database if it exists?" IDYES true IDNO false
-		${EndIf}
+		${EndIf}*/
     ${EndIf}
-	true:
-	StrCpy $overrideDB "1"
+	/*true:
+	StrCpy $installeinsteindb "1"
 	Goto next
 	false:
-	StrCpy $overrideDB "0"
+	StrCpy $installeinsteindb "0"
 	next:
-
+*/
 FunctionEnd
 
 #----------------------------------------------------------------------
@@ -375,15 +375,17 @@ Function .onInit
     StrCpy $mysql_pw "root"
     StrCpy $regadress "Software\MYSQL AB"
     StrCpy $bmessage "0"
-	StrCpy $overrideDB "0"
+	StrCpy $installeinsteindb "0"
 
     !insertmacro CheckMySqlReg $path_result $version_result
 	${If} $path_result == ""
-		MessageBox MB_OK "Pfad ist leer"
-		
+		#MessageBox MB_OK "Pfad ist leer"
+		StrCpy $mysqlalreadyinstalled "0"
 	${Else}
 		StrCpy $mysql_instpath $path_result -1
-		MessageBox MB_OK "Pfad ist : $path_result"
+		StrCpy $mysqlalreadyinstalled "1"
+
+		#MessageBox MB_OK "Pfad ist : $path_result"
 	${EndIf}
 	
 	
@@ -430,11 +432,11 @@ Var boxMySQLconfig
 Var Chk_path
 Var Chk_path_state
 
-
+/*
 Function nsAskMySQLAccount
 	
     Call testversion
-	${If} $overrideDB == "1"
+	${If} $installeinsteindb == "1"
 		nsDialogs::Create 1018
 		Pop $Dialog
 
@@ -480,13 +482,17 @@ Function nsAskMySQLAccount
 		nsDialogs::Show
 	${EndIf}
 FunctionEnd
-
+*/
 #----------------------------------------------------------------------
 
 
 Function nsAccountsetting
-
-	${If} $overrideDB == "0"
+	SectionGetFlags ${mysqlsection} $9
+	Call einsteinDBexists
+	
+	${If} $mysqlalreadyinstalled == "0"
+	${AndIf} $9 == "1"
+	${AndIf} $einsteindbexists != "1"
 		nsDialogs::Create 1018
 		Pop $Dialog
 		
@@ -550,7 +556,7 @@ Function nsAccountsetting
 FunctionEnd
 
 #----------------------------------------------------------------------
-
+/*
 Function nsAskMySQLLeave
     ${NSD_GetState} $Chk_path $Chk_path_state
     
@@ -562,7 +568,7 @@ Function nsAskMySQLLeave
         StrCpy $mysql_pw "root"
     ${EndIf}
 FunctionEnd
-
+*/
 #----------------------------------------------------------------------
 Function nsAccountsettingLeave
     ${NSD_GetState} $Chk_path $Chk_path_state
@@ -587,9 +593,11 @@ Var btnBrowseMySQLpath
 
 
 Function nsInstallPath
-Call einsteinDBexists
+	
 	SectionGetFlags ${mysqlsection} $9
-	${If} $9 == "1"
+	${If} $mysqlalreadyinstalled == "0"
+	${AndIf} $9 == "1"
+	${AndIf} $einsteindbexists != "1"
 		nsDialogs::Create 1018
 		Pop $DialogInstallpath
 
@@ -781,28 +789,41 @@ Function einsteinDBexists
 	#Check for Default Passwords in MySQL root account
 	
 	Push '"$mysql_instpath\bin\mysql" --user=root < "$INSTDIR\existingdb.txt"$\n' 
-	Push "$INSTDIR\existingdb.bat"
+	Push '"Set WshShell = CreateObject("WScript.Shell") $\n WshShell.Run chr(34) & "$mysql_instpath\bin\mysql" --user=root < "$INSTDIR\existingdb.txt" & Chr(34), 0 $\n Set WshShell = Nothing $\n"'
+	Push "$INSTDIR\existingdb.vbs"
 	Call WriteToFile  
+	ExecWait "$INSTDIR\existingdb.vbs"
+	IfFileExists $mdeinstein.txt found
 	
-	Push '"$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt"$\n' 
-	Push "$INSTDIR\existingdb.bat"
+
+	Push '"Set WshShell = CreateObject("WScript.Shell") $\n WshShell.Run chr(34) & "$mysql_instpath\bin\mysql" --user=root --password=root < "$INSTDIR\existingdb.txt" & Chr(34), 0 $\n Set WshShell = Nothing $\n"'
+	Push "$INSTDIR\existingdb.vbs"
 	Call WriteToFile  
+	ExecWait "$INSTDIR\existingdb.vbs"
+	IfFileExists $mdeinstein.txt found
 	
-	Push '"$mysql_instpath\bin\mysql" --user=root --password=mysql < "$INSTDIR\existingdb.txt"' 
-	Push "$INSTDIR\existingdb.bat"
+	Push '"Set WshShell = CreateObject("WScript.Shell") $\n WshShell.Run chr(34) & "$mysql_instpath\bin\mysql" --user=root --password=mysql < "$INSTDIR\existingdb.txt" & Chr(34), 0 $\n Set WshShell = Nothing $\n"'
+	Push "$INSTDIR\existingdb.vbs"
 	Call WriteToFile  
+	ExecWait "$INSTDIR\existingdb.vbs"
+	IfFileExists $mdeinstein.txt found
 
-	ExecWait "$INSTDIR\existingdb.bat"
-
-
-	IfFileExists $mdeinstein.txt fin
-    Goto notfound
-	fin:
-	MessageBox MB_OK "gefunden!"
-
-	notfound:
+	StrCpy $einsteindbexists "0"
+    Goto next
 	
-	Delete "$INSTDIR\existingdb.bat"
-	Delete "$INSTDIR\existingdb.txt"
-	Delete "$md\einstein.txt"
+	found:
+	StrCpy $einsteindbexists "1"
+	MessageBox MB_YESNO "Einstein DB already exists. Do you want to overwrite it?" IDYES true IDNO false
+
+	true:
+	StrCpy $installeinsteindb "1"
+	Goto next
+	false:
+	StrCpy $installeinsteindb "0"
+	next:
+
+	
+	#Delete "$INSTDIR\existingdb.vbs"
+	#Delete "$INSTDIR\existingdb.txt"
+	#Delete "$md\einstein.txt"
 FunctionEnd
