@@ -45,7 +45,7 @@ ShowUninstDetails hide
 #----------------------------------------------------------------------
 
 # Installerpages with the correct order and custom pages
-# Default pages are part of Modern User Interface 2 (MUI 2)
+# Default pages are part of Modern User Interface 2 (MUI 2) or nsDialogs
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "res\gpl-3.0-standalone.rtf"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -60,12 +60,20 @@ Page custom nsInstallPath nsPathLeave
 # Installer languages
 !insertmacro MUI_LANGUAGE English
 
-Var md
-Var mysql_path
-Var mysql_version
-Var einsteindbexists
-Var mysqlexists
+Var main.dir.path
 
+Var mysql.path
+Var mysql.version
+Var mysql.einstein.exists
+Var mysql.einstein.overwrite
+Var mysql.exists
+Var mysql.user
+Var mysql.password
+
+
+Function .onSelChange
+	MessageBox MB_OK "change"
+FunctionEnd
 #----------------------------------------------------------------------
 !macro CheckMySqlReg _RESULT _RESULT2
 	StrCpy $4 "Software\MYSQL AB"
@@ -91,50 +99,41 @@ Var mysqlexists
 
 #----------------------------------------------------------------------
 
-!macro CheckforEinsteinDB _RESULT
-	
+!macro CheckforEinsteinDB _RESULT _UNAME _PW
+
 	StrCpy ${_RESULT} "0"
-	Push "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'einstein' INTO OUTFILE '$md\einstein.txt';"
-	Push "$md\existingdb.txt" 
+	Push "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'einstein' INTO OUTFILE '$main.dir.path\einstein.txt';"
+	Push "$main.dir.path\existingdb.txt" 
 	Call WriteToFile  
 	
-	Push '"$mysql_pathbin\mysql" --user=root < "$INSTDIR\existingdb.txt"$\n'
-	Push "$INSTDIR\existingdb.bat"
+	Push '"$mysql.pathbin\mysql" --user=${_UNAME} --password=${_PW} < "$main.dir.path\existingdb.txt"$\n'
+	Push "$main.dir.path\existingdb.bat"
 	Call WriteToFile 
 	
-	Push '"$mysql_pathbin\mysql" --user=root --password=root < "$md\existingdb.txt"$\n'
-	Push "$md\existingdb.bat"
-	Call WriteToFile 
-	
-	Push '"$mysql_pathbin\mysql" --user=root --password=mysql < "$INSTDIR\existingdb.txt"'
-	Push "$INSTDIR\existingdb.bat"
-	Call WriteToFile 
-	
-	ExecWait "$md\existingdb.bat"
-	IfFileExists $md\einstein.txt found
+	ExecWait "$main.dir.path\existingdb.bat"
+	IfFileExists $main.dir.path\einstein.txt found
 	Goto notfound
 	found:
 	StrCpy ${_RESULT} "1"
 	notfound:
 	
-	Delete "$md\existingdb.txt"
-	Delete "$md\existingdb.bat"
-	Delete "$md\einstein.txt"
+	Delete "$main.dir.path\existingdb.txt"
+	Delete "$main.dir.path\existingdb.bat"
+	Delete "$main.dir.path\einstein.txt"
 !macroend
-
 #----------------------------------------------------------------------
 Function .onInit
     InitPluginsDir
-    StrCpy $md $PROGRAMFILES 3
-	StrCpy $einsteindbexists "0"
+    StrCpy $main.dir.path $PROGRAMFILES 3
+	StrCpy $mysql.einstein.exists "0"
 	
 	#Test at the Startup if MySQL is installed, and if the database Einstein exists
-	!insertmacro CheckMySqlReg $mysql_path $mysql_version
-	${If} $mysql_path == ""
-		StrCpy $mysqlexists "0"
+	!insertmacro CheckMySqlReg $mysql.path $mysql.version
+	${If} $mysql.path == ""
+		StrCpy $mysql.exists "0"
 	${Else}
-		StrCpy $mysqlexists "1"
-		!insertmacro CheckforEinsteinDB $einsteindbexists
+		StrCpy $mysql.exists "1"
+		#!insertmacro CheckforEinsteinDB $mysql.einstein.exists
 	${EndIf}
 FunctionEnd
 
@@ -164,37 +163,38 @@ Var lbAccountDescription
 Var txtMySQLUser
 Var pwtxtMySQL
 Var boxMySQLconfig
-Var Chk_path
-Var Chk_path_state
-
 
 Function nsAccountsetting
-	SectionGetFlags ${mysqlsection} $9
 
-	${If} $9 == "1"
+  ${If} ${SectionIsSelected} ${MYSQLSEC}
 		nsDialogs::Create 1018
 		Pop $Dialog
 
 		${If} $Dialog == error
 			Abort
 		${EndIf}
-
+		
 		${NSD_CreateLabel} 10u 87u 40u 8u "Username:"
 		Pop $lbUsername
 
-		${If} $mysqlexists == "1"
+		${If} $mysql.exists == "1"
 			${NSD_CreateText} 55u 85u 125u 12u ""
 			MessageBox MB_OK "MySQL Installation already exists. Please enter your username and password to proceed"
+			Pop $txtMySQLUser
 		${Else}
 			${NSD_CreateText} 55u 85u 125u 12u "root"
-		${EndIf}		
+			Pop $txtMySQLUser
+			EnableWindow $txtMySQLUser 0
+		${EndIf}
 		
-		Pop $txtMySQLUser
-
+		Push $txtMySQLUser
+		Call notempty
+		${NSD_OnChange} $txtMySQLUser notempty
+		
 		${NSD_CreateLabel} 10u 107u 40u 8u "Password:"
 		Pop $lbPassword
 
-		${If} $mysqlexists == "1"
+		${If} $mysql.exists == "1"
 			${NSD_CreatePassword} 55u 105u 125u 12u ""
 		${Else}
 			${NSD_CreatePassword} 55u 105u 125u 12u "root"
@@ -208,8 +208,7 @@ Function nsAccountsetting
 		Pop $lbChangepw
 
 		${NSD_CreateLabel} 10u 25u 280u 25u "This option will create a new custom MySQL account for Einstein. \
-		If you dont need a new Useraccount for Einstein leave fields unchanged. If you already got \
-		a MySQL User, please fill in your account data."
+		Please enter username and password."
 		Pop $lbAccountDescription
 
 		${NSD_CreateGroupBox} 5u 5u 290u 125u "MySQL Configuration"
@@ -221,18 +220,33 @@ Function nsAccountsetting
 
 FunctionEnd
 
+Function notempty
+	Pop $2
+	${NSD_GetText} $2 $4
+	GetDlgItem $R1 $HWNDPARENT 1
+	${If} $4 != ""
+        EnableWindow $R1 1
+    ${Else}
+        EnableWindow $R1 0
+    ${EndIf}
+FunctionEnd
+
 #----------------------------------------------------------------------	
 Function nsAccountsettingLeave
-    ${NSD_GetState} $Chk_path $Chk_path_state
-    /*
-    ${If} $Chk_path_state == ${BST_CHECKED}
-        ${NSD_GetText} $txtMySQLUser $mysql_user
-        ${NSD_GetText} $pwtxtMySQL $mysql_pw
-    ${Else}
-        StrCpy $mysql_user "root"
-        StrCpy $mysql_pw "root"
-    ${EndIf}
-    */
+	${NSD_GetText} $txtMySQLUser $mysql.user
+	${NSD_GetText} $pwtxtMySQL $mysql.password
+	${If} $mysql.exists == "1"
+		!insertmacro CheckforEinsteinDB $mysql.einstein.exists $mysql.user $mysql.password
+		${If} $mysql.einstein.exists == "1"
+			MessageBox MB_YESNO "Database with the name Einstein was found! Do you want to overwrite it?" IDYES true IDNO false
+		${EndIf}
+		true:
+		StrCpy $mysql.einstein.overwrite "1"
+		Goto next
+		false:
+		StrCpy $mysql.einstein.overwrite "0"
+		next:
+	${EndIf}
 FunctionEnd
 
 
@@ -245,12 +259,11 @@ Var boxInstallationpath
 Var DirRequestMySQL
 Var btnBrowseMySQLpath
 
-
 Function nsInstallPath
 	
-	SectionGetFlags ${mysqlsection} $9
-
-	${If} $9 == "1"
+	SectionGetFlags ${MYSQLSEC} $9
+	
+	${If} $mysql.exists == "0"
 		nsDialogs::Create 1018
 		Pop $DialogInstallpath
 
@@ -258,7 +271,7 @@ Function nsInstallPath
 			Abort
 		${EndIf}
 		
-		${NSD_CreateGroupbox} 10u 75u 285u 65u "Installation Paths:"
+		${NSD_CreateGroupbox} 10u 75u 285u 65u "Installation Path:"
 		Pop $boxInstallationpath
 	  
 		${NSD_CreateLabel} 20u 117u 45u 10u "MySQL 5.1:"
@@ -267,10 +280,10 @@ Function nsInstallPath
 		${NSD_CreateLabel} 15u 5u 265u 25u "Setup will install MySQL 5.1 in the following folder. To install in a different folder, click 'Browse' and select another folder. Click Next to continue."
 		Pop $lbPythonMysqlDir
 
-		${If} $path_result == ""
+		${If} $mysql.path == ""
 			${NSD_CreateDirRequest} 70u 115u 170u 12u "$PROGRAMFILES\MySQL\MySQL Server 5.1"
 		${Else}
-			${NSD_CreateDirRequest} 70u 115u 170u 12u "$path_result"
+			${NSD_CreateDirRequest} 70u 115u 170u 12u "$mysql.path"
 		${EndIf}
 		Pop $DirRequestMySQL
 		${NSD_OnChange} $DirRequestMySQL nsVerifyPath
@@ -279,7 +292,7 @@ Function nsInstallPath
 		Pop $btnBrowseMySQLpath
 		${NSD_OnClick} $btnBrowseMySQLpath nsFileChoose
 		
-		SectionGetFlags ${mysqlsection} $9
+		SectionGetFlags ${MYSQLSEC} $9
 		${If} $9 != "1"
 			EnableWindow $DirRequestMySQL 0
 			EnableWindow $btnBrowseMySQLpath 0
@@ -292,10 +305,9 @@ FunctionEnd
 #----------------------------------------------------------------------
 
 Function nsPathLeave
-
-	${If} $9 == "1" 
-        #${NSD_GetText} $DirRequestMySQL $mysql_instpath
-    ${EndIf}
+	${If} $mysql.exists == "0"
+		${NSD_GetText} $DirRequestMySQL $mysql.path
+	${EndIf}
 FunctionEnd
 
 #----------------------------------------------------------------------
@@ -306,17 +318,17 @@ Function nsFileChoose
     Pop $0
     ${If} $0 != "error"
         StrCpy $2 $0
-        StrCpy $md $0 "3"
+        StrCpy $main.dir.path $0 "3"
     ${Else}
         StrCpy $4 $2 3
-        ${If} $4 != $md
-            StrCpy $2 md
+        ${If} $4 != $main.dir.path
+            StrCpy $2 main.dir.path
         ${EndIf}
     ${EndIf}
-    ${If} $0 == $md
+    ${If} $0 == $main.dir.path
         ${NSD_SetText} $DirRequestMySQL "$0MySQL\MySQL Server 5.1"
     ${ElseIf} $0 == "error"
-        ${If} $2 == $md
+        ${If} $2 == $main.dir.path
             ${NSD_SetText} $DirRequestMySQL "$2MySQL\MySQL Server 5.1"
         ${Else}
             ${NSD_SetText} $DirRequestMySQL "$2\MySQL\MySQL Server 5.1"
@@ -324,7 +336,7 @@ Function nsFileChoose
     ${Else}
         ${NSD_SetText} $DirRequestMySQL "$0\MySQL\MySQL Server 5.1"
     ${EndIf}
-    ${NSD_GetText} $DirRequestMySQL $mysql_path
+    ${NSD_GetText} $DirRequestMySQL $mysql.path
 FunctionEnd
 #----------------------------------------------------------------------
 
@@ -391,7 +403,7 @@ Function nsVerifyPath
     #Check if Installation isn't attempted in Windows Directory
     StrCpy $3 $1 7
     ${If} ${FileExists} "$0\*.*"
-    ${AndIf} $4 != $md
+    ${AndIf} $4 != $main.dir.path
     ${AndIf} $3 != "Windows"
     ${AndIf} $R2 == "" 
     ${AndIf} $R3 == "" 
@@ -427,26 +439,29 @@ SectionEnd
 
 #----------------------------------------------------------------------
 
-Section "MySQL" mysqlsection
+Section "MySQL" MYSQLSEC
+
 	SetOutPath "$INSTDIR\Prerequisites\"
     File "..\Prerequisites\mysql-essential-5.1.24-rc-win32.msi"
-    ExecWait '"msiexec" /i "$INSTDIR\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" /quiet INSTALLDIR="$mysql_instpath"'
-	ExecWait "$mysql_pathbin\mysqlinstanceconfig.exe -i -q ServiceName=MySQL RootPassword=root ServerType=DEVELOPMENT DatabaseType=MYISAM Port=3306"
-	
-	Push '"$mysql_pathbin\mysql" --user=root --password=root < "$INSTDIR\sql\einstein.sql"'
-	Push "$INSTDIR\db.bat" ;file to write to 
-    Call WriteToFile  
-    ExecWait "$INSTDIR\db.bat"
-	
+    ExecWait '"msiexec" /i "$INSTDIR\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" /quiet INSTALLDIR="$mysql.path"'
+
 SectionEnd
+/*
+Section "Database Update" DBSEC
+${If} mysql.exists != "1"
+	SectionIn RO
+	SectionSetFlags
+${EndIf}
+
+SectionEnd*/
 #----------------------------------------------------------------------
 
 Section -finish
 
-    RmDir /r $INSTDIR\Prerequisites
-	RmDir /r $INSTDIR\Install
+    RMdir /r $INSTDIR\Prerequisites
+	RMdir /r $INSTDIR\Install
     createShortCut "$DESKTOP\Einstein.lnk" "$INSTDIR\GUI\einstein.bat" "" "$INSTDIR\GUI\img\einstein.ico" 0
-    call CreateStartMenu
+    Call CreateStartMenu
     
 SectionEnd
 #----------------------------------------------------------------------
@@ -495,21 +510,21 @@ FunctionEnd
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
 
-    RmDir /r /REBOOTOK $INSTDIR\auxiliary
-    RmDir /r /REBOOTOK $INSTDIR\databases
-    RmDir /r /REBOOTOK $INSTDIR\developers
-    RmDir /r /REBOOTOK $INSTDIR\docs
-    RmDir /r /REBOOTOK $INSTDIR\modules
-    RmDir /r /REBOOTOK $INSTDIR\PE
-    RmDir /r /REBOOTOK $INSTDIR\projects
-    RmDir /r /REBOOTOK $INSTDIR\questionnaire
-    RmDir /r /REBOOTOK $INSTDIR\reports
-    RmDir /r /REBOOTOK $INSTDIR\sql
-    RmDir /r /REBOOTOK $INSTDIR\tmp_dev
-    RmDir /r /REBOOTOK $INSTDIR\.git
-	RmDir /r /REBOOTOK $INSTDIR\Python25Einstein
-	RmDir /r /REBOOTOK $INSTDIR\Prerequisites
-	RmDir /r /REBOOTOK $SMPROGRAMS\Einstein
+    RMDir /r /REBOOTOK $INSTDIR\auxiliary
+    RMDir /r /REBOOTOK $INSTDIR\databases
+    RMDir /r /REBOOTOK $INSTDIR\developers
+    RMDir /r /REBOOTOK $INSTDIR\docs
+    RMDir /r /REBOOTOK $INSTDIR\modules
+    RMDir /r /REBOOTOK $INSTDIR\PE
+    RMDir /r /REBOOTOK $INSTDIR\projects
+    RMDir /r /REBOOTOK $INSTDIR\questionnaire
+    RMDir /r /REBOOTOK $INSTDIR\reports
+    RMDir /r /REBOOTOK $INSTDIR\sql
+    RMDir /r /REBOOTOK $INSTDIR\tmp_dev
+    RMDir /r /REBOOTOK $INSTDIR\.git
+	RMDir /r /REBOOTOK $INSTDIR\Python25Einstein
+	RMDir /r /REBOOTOK $INSTDIR\Prerequisites
+	RMDir /r /REBOOTOK $SMPROGRAMS\Einstein
     Delete $INSTDIR\__init__.py
     Delete $INSTDIR\__init__.pyc
     Delete $INSTDIR\einstein
@@ -520,10 +535,10 @@ Section /o -un.Main UNSEC0000
     Delete $INSTDIR\GUI\einstein.bat
     Delete $INSTDIR\einstein.lnk
     Delete $INSTDIR\GUI\einsteinrun.bat
-    RmDir /r /REBOOTOK $INSTDIR\GUI\img
-    RmDir /r /REBOOTOK $INSTDIR\GUI\locale
+    RMDir /r /REBOOTOK $INSTDIR\GUI\img
+    RMDir /r /REBOOTOK $INSTDIR\GUI\locale
     Delete $DESKTOP\Einstein.lnk
-	RmDir /r /REBOOTOK $SMPROGRAMS\Einstein
+	RMDir /r /REBOOTOK $SMPROGRAMS\Einstein
     
     DeleteRegValue HKLM "${REGKEY}\Components" Main
 SectionEnd
@@ -538,7 +553,7 @@ Section -un.post UNSEC0001
     DeleteRegValue HKLM "${REGKEY}" Path
     DeleteRegKey /IfEmpty HKLM "${REGKEY}\Components"
     DeleteRegKey /IfEmpty HKLM "${REGKEY}"
-    RmDir /REBOOTOK $INSTDIR
+    RMDir /REBOOTOK $INSTDIR
 SectionEnd
 
 #----------------------------------------------------------------------
