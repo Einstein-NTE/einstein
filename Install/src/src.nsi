@@ -67,12 +67,20 @@ Var mysql.version
 Var mysql.einstein.exists
 Var mysql.einstein.overwrite
 Var mysql.exists
+Var mysql.selected
 Var mysql.user
 Var mysql.password
 
 
 Function .onSelChange
-	MessageBox MB_OK "change"
+	/*${If} $mysql.selected == "1"
+		StrCpy $mysql.selected "0"
+	${ElseIf} $mysql.selected == "0"
+		StrCpy $mysql.selected "1"
+	${EndIf}*/
+	${If} ${SectionIsSelected} ${MYSQLSEC}
+		StrCpy $mysql.selected "1"
+	${EndIf}
 FunctionEnd
 #----------------------------------------------------------------------
 !macro CheckMySqlReg _RESULT _RESULT2
@@ -126,7 +134,7 @@ Function .onInit
     InitPluginsDir
     StrCpy $main.dir.path $PROGRAMFILES 3
 	StrCpy $mysql.einstein.exists "0"
-	
+	StrCpy $mysql.selected "1"
 	#Test at the Startup if MySQL is installed, and if the database Einstein exists
 	!insertmacro CheckMySqlReg $mysql.path $mysql.version
 	${If} $mysql.path == ""
@@ -446,14 +454,22 @@ Section "MySQL" MYSQLSEC
     ExecWait '"msiexec" /i "$INSTDIR\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" /quiet INSTALLDIR="$mysql.path"'
 
 SectionEnd
-/*
-Section "Database Update" DBSEC
-${If} mysql.exists != "1"
-	SectionIn RO
-	SectionSetFlags
-${EndIf}
+#----------------------------------------------------------------------
 
-SectionEnd*/
+
+
+
+#----------------------------------------------------------------------
+/*
+Section ".netFramework" dotnetsection
+    StrCpy $bdotnetinstall 1
+    File "..\Prerequisites\WindowsInstaller-KB893803-v2-x86.exe"
+    ExecWait '"$INSTDIR\Prerequisites\WindowsInstaller-KB893803-v2-x86.exe" /quiet'
+    File "..\Prerequisites\dotnetfx35.exe"
+    ExecWait '"$INSTDIR\Prerequisites\dotnetfx35" /passive'
+SectionEnd
+*/
+
 #----------------------------------------------------------------------
 
 Section -finish
