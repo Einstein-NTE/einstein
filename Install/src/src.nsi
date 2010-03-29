@@ -71,7 +71,8 @@ Var mysql.exists
 Var mysql.selected
 Var mysql.user
 Var mysql.password
-Var Windows.Installer.MVersion
+Var Windows.Installer.MajorVersion
+Var Windows.Installer.MinorVersion
 
 
 
@@ -128,7 +129,8 @@ GetDllVersion "$SYSDIR\msi.dll" $R0 $R1
 IntOp $R2 $R0 >> 16
 IntOp $R2 $R2 & 0x0000FFFF # major version
 IntOp $R3 $R0 & 0x0000FFFF # minor version
-StrCpy $Windows.Installer.MVersion $R2
+StrCpy $Windows.Installer.MajorVersion $R2
+StrCpy $Windows.Installer.MinorVersion $R3
 !macroend
 
 #----------------------------------------------------------------------
@@ -140,7 +142,12 @@ Function .onInit
 	#Test at the Startup if MySQL is installed, and if the database Einstein exists
 	!insertmacro CheckMySqlReg $mysql.path $mysql.version
 	!insertmacro CheckMSIInstallerVersion
-	${If} $Windows.Installer.MVersion < 3
+	${If} $Windows.Installer.MajorVersion < 3 
+		MessageBox MB_OK "Your Version of Windows Installer is too old. Please upgrade to Version 3.1 or newer!"
+	    Abort
+	${ElseIf}	$Windows.Installer.MajorVersion >= 4
+	    
+	${ElseIf} $Windows.Installer.MinorVersion < 1
 		MessageBox MB_OK "Your Version of Windows Installer is too old. Please upgrade to Version 3.1 or newer!"
 	    Abort
 	${EndIf}
