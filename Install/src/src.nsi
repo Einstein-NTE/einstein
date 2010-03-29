@@ -16,6 +16,7 @@ ShowInstDetails hide
 InstallDirRegKey HKLM "${REGKEY}" Path
 ShowUninstDetails hide
 
+
 #----------------------------------------------------------------------
 
 
@@ -70,19 +71,10 @@ Var mysql.exists
 Var mysql.selected
 Var mysql.user
 Var mysql.password
+Var Windows.Installer.MVersion
 
 
-Function .onSelChange
-	/*${If} $mysql.selected == "1"
-		StrCpy $mysql.selected "0"
-	${ElseIf} $mysql.selected == "0"
-		StrCpy $mysql.selected "1"
-	${EndIf}*/
-	${If} ${SectionIsSelected} ${MYSQLSEC}
-		StrCpy $mysql.selected "1"
-	${EndIf}
-FunctionEnd
-#----------------------------------------------------------------------
+
 !macro CheckMySqlReg _RESULT _RESULT2
 	StrCpy $4 "Software\MYSQL AB"
     StrCpy $0 0
@@ -114,7 +106,7 @@ FunctionEnd
 	Push "$main.dir.path\existingdb.txt" 
 	Call WriteToFile  
 	
-	Push '"$mysql.pathbin\mysql" --user=${_UNAME} --password=${_PW} < "$main.dir.path\existingdb.txt"$\n'
+	Push '"$mysql.path\bin\mysql" --user=${_UNAME} --password=${_PW} < "$main.dir.path\existingdb.txt"$\n'
 	Push "$main.dir.path\existingdb.bat"
 	Call WriteToFile 
 	
@@ -129,6 +121,16 @@ FunctionEnd
 	Delete "$main.dir.path\existingdb.bat"
 	Delete "$main.dir.path\einstein.txt"
 !macroend
+
+#----------------------------------------------------------------------
+!macro CheckMSIInstallerVersion
+GetDllVersion "$SYSDIR\msi.dll" $R0 $R1
+IntOp $R2 $R0 >> 16
+IntOp $R2 $R2 & 0x0000FFFF # major version
+IntOp $R3 $R0 & 0x0000FFFF # minor version
+StrCpy $Windows.Installer.MVersion $R2
+!macroend
+
 #----------------------------------------------------------------------
 Function .onInit
     InitPluginsDir
@@ -137,6 +139,11 @@ Function .onInit
 	StrCpy $mysql.selected "1"
 	#Test at the Startup if MySQL is installed, and if the database Einstein exists
 	!insertmacro CheckMySqlReg $mysql.path $mysql.version
+	!insertmacro CheckMSIInstallerVersion
+	${If} $Windows.Installer.MVersion < 3
+		MessageBox MB_OK "Your Version of Windows Installer is too old. Please upgrade to Version 3.1 or newer!"
+	    Abort
+	${EndIf}
 	${If} $mysql.path == ""
 		StrCpy $mysql.exists "0"
 	${Else}
@@ -174,7 +181,7 @@ Var boxMySQLconfig
 
 Function nsAccountsetting
 
-  ${If} ${SectionIsSelected} ${MYSQLSEC}
+  ${If} $mysql.selected == "1"
 		nsDialogs::Create 1018
 		Pop $Dialog
 
@@ -186,7 +193,7 @@ Function nsAccountsetting
 		Pop $lbUsername
 
 		${If} $mysql.exists == "1"
-			${NSD_CreateText} 55u 85u 125u 12u ""
+			${NSD_CreateText} 55u 85u 125u 12u "root"
 			MessageBox MB_OK "MySQL Installation already exists. Please enter your username and password to proceed"
 			Pop $txtMySQLUser
 		${Else}
@@ -269,9 +276,9 @@ Var btnBrowseMySQLpath
 
 Function nsInstallPath
 	
-	SectionGetFlags ${MYSQLSEC} $9
 	
 	${If} $mysql.exists == "0"
+	${AndIf} $mysql.selected == "1"
 		nsDialogs::Create 1018
 		Pop $DialogInstallpath
 
@@ -300,12 +307,12 @@ Function nsInstallPath
 		Pop $btnBrowseMySQLpath
 		${NSD_OnClick} $btnBrowseMySQLpath nsFileChoose
 		
-		SectionGetFlags ${MYSQLSEC} $9
+		/*SectionGetFlags ${MYSQLSEC} $9
 		${If} $9 != "1"
 			EnableWindow $DirRequestMySQL 0
 			EnableWindow $btnBrowseMySQLpath 0
 		${EndIf}
-		
+		*/
 		nsDialogs::Show
     ${EndIf}
 FunctionEnd
@@ -360,8 +367,6 @@ Function StrContains
   Exch $STR_NEEDLE
   Exch 1
   Exch $STR_HAYSTACK
-  ; Uncomment to debug
-  ;MessageBox MB_OK 'STR_NEEDLE = $STR_NEEDLE STR_HAYSTACK = $STR_HAYSTACK '
     StrCpy $STR_RETURN_VAR ""
     StrCpy $STR_CONTAINS_VAR_1 -1
     StrLen $STR_CONTAINS_VAR_2 $STR_NEEDLE
@@ -451,24 +456,46 @@ Section "MySQL" MYSQLSEC
 
 	SetOutPath "$INSTDIR\Prerequisites\"
     File "..\Prerequisites\mysql-essential-5.1.24-rc-win32.msi"
-    ExecWait '"msiexec" /i "$INSTDIR\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" /quiet INSTALLDIR="$mysql.path"'
+    ExecWait '"msiexec" /i "$INSTDIR\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" \
+	/quiet INSTALLDIR="$mysql.path"'
+	ExecWait "$mysql.path\bin\mysqlinstanceconfig.exe -i -q ServiceName=MySQL \
+	RootPassword=$mysql.password ServerType=DEVELOPMENT DatabaseType=MYISAM Port=3306"
+	
+	${If} $mysql.einstein.overwrite == "1"
+	${OrIf} $mysql.exists == "0"
+		Push '"$mysql.path\bin\mysql" --user=$mysql.user --password=$mysql.password < "$INSTDIR\sql\einstein.sql"'
+		Push "$INSTDIR\db.bat" 
+		Call WriteToFile
+		ExecWait "$INSTDIR\db.bat"
+		
+		Push '"$mysql.path\bin\mysql" --user=$mysql.user --password=$mysql.password < "$INSTDIR\sql\update_einsteinDB_V1.00b_to_V1.0.sql"'
+		Push "$INSTDIR\data.bat"
+		Call WriteToFile
+		ExecWait "$INSTDIR\data.bat"
+	 
+		Delete "$INSTDIR\db.bat"
+		Delete "$INSTDIR\data.bat"
+		File "..\Prerequisites\writeupdate.py"
+		
+		Push '"$INSTDIR\Python25Einstein\python.exe" "$INSTDIR\Prerequisites\writeupdate.py" "$mysql.path\bin\mysql.exe" \
+		"$INSTDIR" "$PROFILE" "$mysql.user" "$mysql.password"'
+        Push "$INSTDIR\update.bat"
+        Call WriteToFile
+		ExecWait "$INSTDIR\update.bat"
+        ExecWait "$PROFILE\update.bat"
+        Delete "$PROFILE\update.bat"
+		
+	${EndIf}
 
 SectionEnd
 #----------------------------------------------------------------------
 
 
-
-
-#----------------------------------------------------------------------
-/*
 Section ".netFramework" dotnetsection
-    StrCpy $bdotnetinstall 1
-    File "..\Prerequisites\WindowsInstaller-KB893803-v2-x86.exe"
-    ExecWait '"$INSTDIR\Prerequisites\WindowsInstaller-KB893803-v2-x86.exe" /quiet'
     File "..\Prerequisites\dotnetfx35.exe"
     ExecWait '"$INSTDIR\Prerequisites\dotnetfx35" /passive'
 SectionEnd
-*/
+
 
 #----------------------------------------------------------------------
 
@@ -476,6 +503,13 @@ Section -finish
 
     RMdir /r $INSTDIR\Prerequisites
 	RMdir /r $INSTDIR\Install
+	Delete "$INSTDIR\GUI\einstein.bat"
+	Push 'cd "$INSTDIR\GUI" $\n \
+	"..\Python25Einstein\python.exe" einsteinMain.py > ..\einsteinMSG.txt'
+	Push "$INSTDIR\GUI\einstein.bat"
+	Call WriteToFile
+	
+	
     createShortCut "$DESKTOP\Einstein.lnk" "$INSTDIR\GUI\einstein.bat" "" "$INSTDIR\GUI\img\einstein.ico" 0
     Call CreateStartMenu
     
@@ -513,13 +547,7 @@ next${UNSECTION_ID}:
 done${UNSECTION_ID}:
     Pop $R0
 !macroend
-#----------------------------------------------------------------------
 
-# Uninstaller functions
-Function un.onInit
-    ReadRegStr $INSTDIR HKLM "${REGKEY}" Path
-    !insertmacro SELECT_UNSECTION Main ${UNSEC0000}
-FunctionEnd
 
 #----------------------------------------------------------------------
 
@@ -558,7 +586,13 @@ Section /o -un.Main UNSEC0000
     
     DeleteRegValue HKLM "${REGKEY}\Components" Main
 SectionEnd
+#----------------------------------------------------------------------
 
+# Uninstaller functions
+Function un.onInit
+    ReadRegStr $INSTDIR HKLM "${REGKEY}" Path
+    !insertmacro SELECT_UNSECTION Main ${UNSEC0000}
+FunctionEnd
 
 
 #----------------------------------------------------------------------
@@ -575,7 +609,15 @@ SectionEnd
 #----------------------------------------------------------------------
 
 
+Function .onSelChange
 
+	${If} ${SectionIsSelected} ${MYSQLSEC}
+		StrCpy $mysql.selected "1"
+	${Else}	
+		StrCpy $mysql.selected "0"
+	${EndIf}
+FunctionEnd
+#----------------------------------------------------------------------
 
 
 
