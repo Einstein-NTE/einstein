@@ -138,6 +138,8 @@ from dialogLanguage import *
 from panelReport import *
 #TS2008-05-16 export data
 from einstein.modules.xmlIO import *
+
+from einstein.modules.spreadsheetIO import *
 #TS2008-06-18 fonts management
 from fonts import FontProperties
 #TS2008-06-30 database management
