@@ -128,10 +128,10 @@ class PanelDBHeatPump(wx.Panel):
                               label=_U("HPCoolCOP"),
                               tip=_U("Nominal COP for cooling mode"))
 
-        self.tc10 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
-                              label=_U("HPFuelConsum"),
-                              tip=_U("Nominal fuel consumption"))
+#        self.tc10 = FloatEntry(self.page1,
+#                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+#                              label=_U("HPFuelConsum"),
+#                              tip=_U("Nominal fuel consumption"))
 
         self.tc11 = ChoiceEntry(self.page1,
                                values=[],
@@ -187,23 +187,19 @@ class PanelDBHeatPump(wx.Panel):
                               label=_U("HPConstExHeatCOP"),
                               tip=_U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
-        self.tc22 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+        self.tc22 = StaticTextEntry(self.page1,maxchars=255,value='',
                               label=_U("HPExCoolCOP"),
                               tip=_U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc23 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+        self.tc23 = StaticTextEntry(self.page1,maxchars=255,value='',
                               label=_U("HPThCoolCOP"),
                               tip=_U("Carnot COP for cooling mode at nominal conditions (see next point)."))
 
-        self.tc24 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+        self.tc24 = StaticTextEntry(self.page1,maxchars=255,value='',
                               label=_U("HPExHeatCOP"),
                               tip=_U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc25 = FloatEntry(self.page1,
-                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+        self.tc25 = StaticTextEntry(self.page1,maxchars=255,value='',
                               label=_U("HPThHeatCOP"),
                               tip=_U("Carnot COP for heating mode at nominal conditions (see next point)."))
 
@@ -245,9 +241,6 @@ class PanelDBHeatPump(wx.Panel):
         # right tab controls
         # panel 3. Economic Parameters
         #
-        #fp.changeFont(size=TYPE_SIZE_RIGHT)
-#        f = FieldSizes(wHeight=HEIGHT_RIGHT,wLabel=LABEL_WIDTH_RIGHT)
-
         self.tc32 = FloatEntry(self.page3,
                               ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
                               label=_U("HPPrice"),
@@ -302,7 +295,7 @@ class PanelDBHeatPump(wx.Panel):
         self.page1.addControl(self.tc7)
         self.page1.addControl(self.tc8)
         self.page1.addControl(self.tc9)
-        self.page1.addControl(self.tc10)
+        #self.page1.addControl(self.tc10)
         self.page1.addControl(self.tc11)
         self.page1.addControl(self.tc12)
         self.page1.addControl(self.tc13)
@@ -377,25 +370,29 @@ class PanelDBHeatPump(wx.Panel):
         if self.allFieldsEmpty():
             return
 
+        fuelDict = Status.prj.getFuelDict()
+
         tmp = {
                "HPManufacturer":check(self.tc1.GetValue()),
                "HPModel":check(self.tc2.GetValue()),
                "HPType":check(self.tc3.GetValue()),
                "HPSubType":check(self.tc4.GetValue()),
-#               "Reference":check(self.tc5.GetValue()),
+               "Reference":check(self.tc5.GetValue()),
                "HPHeatCap":check(self.tc6.GetValue()),
                "HPHeatCOP":check(self.tc7.GetValue()),
                "HPCoolCap":check(self.tc8.GetValue()),
                "HPCoolCOP":check(self.tc9.GetValue()),
-               "HPFuelConsum":check(self.tc10.GetValue()),
-#               "FuelType":check(self.tc11.GetValue()),
+#               "HPFuelConsum":check(self.tc10.GetValue()),
+               "FuelType":check(findKey(fuelDict,self.tc11.GetValue(text=True))),
                "HPElectConsum":check(self.tc12.GetValue()),
                "HPWorkFluid":check(self.tc13.GetValue()),
                "HPCondTinC":check(self.tc14.GetValue()),
+               "HPAbsTinC":check(self.tc14.GetValue()),
                "HPGenTinC":check(self.tc15.GetValue()),
                "HPEvapTinC":check(self.tc16.GetValue()),
                "HPConstExCoolCOP":check(self.tc17.GetValue()),
                "HPCondTinH":check(self.tc18.GetValue()),
+               "HPAbsTinH":check(self.tc18.GetValue()),
                "HPGenTinH":check(self.tc19.GetValue()),
                "HPEvapTinH":check(self.tc20.GetValue()),
                "HPConstExHeatCOP":check(self.tc21.GetValue()),
@@ -475,18 +472,22 @@ class PanelDBHeatPump(wx.Panel):
     def display(self,q=None):
         self.clear()
 
+        fuelDict = Status.prj.getFuelDict()
+        self.fillChoiceOfDBFuel()
+
         if q is not None:
             self.tc1.SetValue(q.HPManufacturer) if q.HPManufacturer is not None else ''
             self.tc2.SetValue(q.HPModel) if q.HPModel is not None else ''
             self.tc3.SetValue(q.HPType) if q.HPType is not None else ''
             self.tc4.SetValue(str(q.HPSubType)) if q.HPSubType is not None else ''
-#            self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
+            self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
             self.tc6.SetValue(str(q.HPHeatCap)) if q.HPHeatCap is not None else ''
             self.tc7.SetValue(str(q.HPHeatCOP)) if q.HPHeatCOP is not None else ''
             self.tc8.SetValue(str(q.HPCoolCap)) if q.HPCoolCap is not None else ''
             self.tc9.SetValue(str(q.HPCoolCOP)) if q.HPCoolCOP is not None else ''
-            self.tc10.SetValue(str(q.HPFuelConsum)) if q.HPFuelConsum is not None else ''
-#            self.tc11.SetValue(str(q.FuelType)) if q.FuelType is not None else ''
+#            self.tc10.SetValue(str(q.HPFuelConsum)) if q.HPFuelConsum is not None else ''
+            if q.FuelType is not None:
+                self.tc11.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else '' 
             self.tc12.SetValue(str(q.HPElectConsum)) if q.HPElectConsum is not None else ''
             self.tc13.SetValue(str(q.HPWorkFluid)) if q.HPWorkFluid is not None else ''
             self.tc14.SetValue(str(q.HPCondTinC)) if q.HPCondTinC is not None else ''
@@ -501,7 +502,7 @@ class PanelDBHeatPump(wx.Panel):
             self.tc23.SetValue(str(q.HPThCoolCOP)) if q.HPThCoolCOP is not None else ''
             self.tc24.SetValue(str(q.HPExHeatCOP)) if q.HPExHeatCOP is not None else ''
             self.tc25.SetValue(str(q.HPThHeatCOP)) if q.HPThHeatCOP is not None else ''
-#            self.tc26.SetValue(str(q.HPSourceSink)) if q.HPSourceSink is not None else ''
+            self.tc26.SetValue(str(q.HPSourceSink)) if q.HPSourceSink is not None else ''
             self.tc27.SetValue(str(q.HPLimDT)) if q.HPLimDT is not None else ''
             self.tc28.SetValue(str(q.HPCondTmax)) if q.HPCondTmax is not None else ''
             self.tc29.SetValue(str(q.HPEvapTmin)) if q.HPEvapTmin is not None else ''
@@ -524,7 +525,7 @@ class PanelDBHeatPump(wx.Panel):
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
-        self.tc10.SetValue('')
+#        self.tc10.SetValue('')
         self.tc11.SetValue('')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
@@ -551,6 +552,11 @@ class PanelDBHeatPump(wx.Panel):
         self.tc34.SetValue('')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
+
+    def fillChoiceOfDBFuel(self):
+        fuelDict = Status.prj.getFuelDict()
+        fuelList = fuelDict.values()
+        fillChoice(self.tc11.entry,fuelList)
 
     def fillEquipmentList(self):
         self.page0.clearListBox()
@@ -585,7 +591,6 @@ class PanelDBHeatPump(wx.Panel):
            self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\
            self.tc9.GetValue() is None and\
-           self.tc10.GetValue() is None and\
            self.tc11.GetValue() < 0 and\
            self.tc12.GetValue() is None and\
            len(self.tc13.GetValue()) == 0 and\
