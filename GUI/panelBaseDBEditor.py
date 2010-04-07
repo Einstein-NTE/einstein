@@ -40,7 +40,7 @@ VSEP = 4
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 100
-DATA_ENTRY_WIDTH_LEFT = 200
+DATA_ENTRY_WIDTH_LEFT = 195
 UNITS_WIDTH = 0
 
 class PanelBaseDBEditor(wx.Panel):
@@ -105,46 +105,44 @@ class PanelBaseDBEditor(wx.Panel):
 
         self.sizerPage = wx.StaticBoxSizer(self.frame1, wx.HORIZONTAL)
 
-        self.sizerPageLeft = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizerGridBag = wx.GridBagSizer(hgap = 4, vgap = 4)
 
-        self.sizerPageLeftEquip = wx.StaticBoxSizer(self.frame2, wx.VERTICAL)
-        self.sizerPageLeftEquip.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
+        self.sizerPageLeft = wx.StaticBoxSizer(self.frame2, wx.VERTICAL)
+        self.sizerPageLeft.Add(self.listBoxEquipment, 1, wx.EXPAND, 0)
         if self.button1 is not None:
-            self.sizerPageLeftEquip.Add(self.button1, 0, wx.ALIGN_RIGHT | wx.TOP, 4)
+            self.sizerPageLeft.Add(self.button1, 0, wx.ALIGN_RIGHT | wx.TOP, 4)
         if self.button2 is not None:
-            self.sizerPageLeftEquip.Add(self.button2, 0, wx.ALIGN_RIGHT | wx.TOP, 4)
-
-        self.sizerPageLeftSpacer = wx.BoxSizer(wx.VERTICAL)
-
-        self.sizerPageLeft.Add(self.sizerPageLeftEquip, 1, wx.EXPAND | wx.TOP, 10)
-        self.sizerPageLeft.Add(self.sizerPageLeftSpacer, 1, wx.EXPAND | wx.TOP, 10)
-
-        self.sizerPage.Add(self.sizerPageLeft, 1, wx.EXPAND, 0)
+            self.sizerPageLeft.Add(self.button2, 0, wx.ALIGN_RIGHT | wx.TOP, 4)
 
         self.sizerPageRight = wx.BoxSizer(wx.VERTICAL)
+        self.sizerPageRightBottomLeft = wx.BoxSizer(wx.VERTICAL)
+        self.sizerPageRightBottomRight = wx.BoxSizer(wx.VERTICAL)
 
-        self.sizerPageRightTop = wx.BoxSizer(wx.VERTICAL)
-        self.sizerPageRightBottom = wx.BoxSizer(wx.VERTICAL)
+        self.sizerGridBag.Add(self.sizerPageRight, pos = (0,1), flag = wx.ALIGN_CENTER, span = (1,2))
+        self.sizerGridBag.Add(self.sizerPageRightBottomLeft, pos = (1,1))
+        self.sizerGridBag.Add(self.sizerPageRightBottomRight, pos = (1,2))
 
-        self.sizerPageRight.Add(self.sizerPageRightTop, 1, wx.EXPAND, 0)
-        #self.sizerPageRight.Add(self.sizerPageRightBottom, 1, wx.EXPAND, 0)
-
-        self.sizerPage.Add(self.sizerPageRight, 1, wx.EXPAND | wx.TOP, 10)
+        self.sizerPage.Add(self.sizerPageLeft, 0.5, wx.EXPAND | wx.TOP, 10)
+        self.sizerPage.Add(self.sizerGridBag, 1, wx.EXPAND | wx.TOP, 10)
 
         self.SetSizer(self.sizerPage)
         self.Layout()
 
     def addControl(self, control):
 
-        self.sizerPageRightTop.Add(control, 0, wx.TOP | wx.EXPAND, VSEP)
+        self.sizerPageRight.Add(control, 0, wx.TOP | wx.EXPAND, VSEP)
 
-#    def addControlBottom(self, control):
-#
-#        self.sizerPageRightBottom.Add(control, 0, wx.TOP | wx.EXPAND, VSEP)
+    def addControlBottomLeft(self, control):
+
+        self.sizerPageRightBottomLeft.Add(control, 0, wx.TOP | wx.EXPAND, VSEP)
+
+    def addControlBottomRight(self, control):
+
+        self.sizerPageRightBottomRight.Add(control, 0, wx.TOP | wx.EXPAND, VSEP)
 
     def addStretchSpacer(self):
 
-        self.sizerPageRightTop.AddStretchSpacer()
+        self.sizerPageRight.AddStretchSpacer()
 
     def clearListBox(self):
 

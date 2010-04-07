@@ -100,9 +100,8 @@ from einstein.GUI.panelQ9 import PanelQ9
 
 # DBEditor
 from einstein.GUI.panelDB import PanelDB
-from einstein.GUI.panelDBHP import PanelDBHP
-#from einstein.GUI.panelDBHeatpump import PanelDBHeatpump
-from einstein.GUI.panelDBSolarthermal import PanelDBSolarthermal
+from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
+#from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -761,25 +760,21 @@ class EinsteinFrame(wx.Frame):
 
         elif select == _U("Database Equipments"):
             self.hidePages()
-            self.activePanel = "DB"
+            self.activePanel = "DB0"
             self.PageDB0 = PanelDB(self.leftpanel2)
             self.PageDB0.display()
 
-        #elif select == _U("DBHeatpump"):
-        elif select == _U("DBHP"):
+        elif select == _U("DBHeatPump"):
             self.hidePages()
-            self.activePanel = "DBHeatpump"
-            #self.activePanel = "DBHP"
-            self.PageDBHP = PanelDBHP(self.leftpanel2)
-            #self.PageDBHeatpump = PanelDBHeatpump(self.leftpanel2)
-            self.PageDBHP.display()
-            #self.PageDBHeatpump.display()
+            self.activePanel = "DBHeatPump"
+            self.PageDBHeatPump = PanelDBHeatPump(self.leftpanel2)
+            self.PageDBHeatPump.display()
 
-        elif select == _U("DBSolarthermal"):
+        elif select == _U("DBSolarThermal"):
             self.hidePages()
-            self.activePanel = "DBSolarthermal"
-            self.PageDBSolarthermal = PanelDBSolarthermal(self.leftpanel2)
-            self.PageDBSolarthermal.display()
+            self.activePanel = "DBSolarThermal"
+            self.PageDBSolarThermal = PanelDBSolarThermal(self.leftpanel2)
+            self.PageDBSolarThermal.display()
 
         #Page0
         elif select == _U('Edit Industry Data'): #Edit Industry Data
@@ -1292,11 +1287,9 @@ class EinsteinFrame(wx.Frame):
 
         try:self.PageDB0.Destroy()
         except:pass
-        try:self.PageDBHP.Destroy()
+        try:self.PageDBHeatPump.Destroy()
         except:pass
-        #try:self.PageDBHeatpump.Destroy()
-        #except:pass
-        try:self.PageDBSolarthermal.Destroy()
+        try:self.PageDBSolarThermal.Destroy()
         except:pass
 
     def CreateMenu(self):
@@ -1455,9 +1448,8 @@ class EinsteinFrame(wx.Frame):
         self.qRoot = self.tree.AddRoot("Einstein")
 
         self.qPageDB0 = self.tree.AppendItem (self.qRoot, _U("Database Equipments"),0)
-        #self.qPageDBHeatpump = self.tree.AppendItem (self.qPageDB0, _U("DBHeatpump"),0)
-        self.qPageDBHP = self.tree.AppendItem (self.qPageDB0, _U("DBHP"),0)
-        #self.qPageDBSolarthermal = self.tree.AppendItem (self.qPageDB0, _U("DBSolarthermal"),0)
+        self.qPageDBHeatPump = self.tree.AppendItem (self.qPageDB0, _U("DBHeatPump"),0)
+        #self.qPageDBSolarThermal = self.tree.AppendItem (self.qPageDB0, _U("DBSolarThermal"),0)
 
         self.qPage0 = self.tree.AppendItem (self.qRoot, _U("Edit Industry Data"),0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, _U("General data"),0)
@@ -1629,14 +1621,6 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnTreeSelChanged, self.tree)
         self.Bind(wx.EVT_TREE_SEL_CHANGING, self.OnTreeSelChanging, self.tree)
         self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.OnTreeItemExpanding, self.tree)
-
-#    def changePanel(self, page, equip):
-#        if page == _U("DBHP"):
-#            self.hidePages()
-#            self.activePanel = "DBHeatpump"
-#            self.PageDBHP = PanelDBHP(self.leftpanel2)
-#            self.PageDBHP.display()
-#            self.PageDBHP.page0.listBoxEquipment.SetStringSelection(equip)
 
 #==============================================================================
 #------------------------------------------------------------------------------
