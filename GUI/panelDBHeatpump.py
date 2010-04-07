@@ -128,10 +128,10 @@ class PanelDBHeatPump(wx.Panel):
                               label=_U("HPCoolCOP"),
                               tip=_U("Nominal COP for cooling mode"))
 
-#        self.tc10 = FloatEntry(self.page1,
-#                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
-#                              label=_U("HPFuelConsum"),
-#                              tip=_U("Nominal fuel consumption"))
+        self.tc10 = FloatEntry(self.page1,
+                              ipart=6, decimals=1, minval=0., maxval=1.e+12, value=0.,
+                              label=_U("HPFuelConsum"),
+                              tip=_U("Nominal fuel consumption"))
 
         self.tc11 = ChoiceEntry(self.page1,
                                values=[],
@@ -295,7 +295,7 @@ class PanelDBHeatPump(wx.Panel):
         self.page1.addControl(self.tc7)
         self.page1.addControl(self.tc8)
         self.page1.addControl(self.tc9)
-        #self.page1.addControl(self.tc10)
+        self.page1.addControl(self.tc10)
         self.page1.addControl(self.tc11)
         self.page1.addControl(self.tc12)
         self.page1.addControl(self.tc13)
@@ -382,7 +382,7 @@ class PanelDBHeatPump(wx.Panel):
                "HPHeatCOP":check(self.tc7.GetValue()),
                "HPCoolCap":check(self.tc8.GetValue()),
                "HPCoolCOP":check(self.tc9.GetValue()),
-#               "HPFuelConsum":check(self.tc10.GetValue()),
+               "HPFuelConsum":check(self.tc10.GetValue()),
                "FuelType":check(findKey(fuelDict,self.tc11.GetValue(text=True))),
                "HPElectConsum":check(self.tc12.GetValue()),
                "HPWorkFluid":check(self.tc13.GetValue()),
@@ -404,7 +404,7 @@ class PanelDBHeatPump(wx.Panel):
                "HPLimDT":check(self.tc27.GetValue()),
                "HPCondTmax":check(self.tc28.GetValue()),
                "HPEvapTmin":check(self.tc29.GetValue()),
-               "HPAbsHeatMed":check(self.tc30.GetValue()),
+#               "HPAbsHeatMed":check(self.tc30.GetValue()),
                "HPGenTmin":check(self.tc31.GetValue()),
                "HPPrice":check(self.tc32.GetValue()),
                "HPTurnKeyPrice":check(self.tc33.GetValue()),
@@ -485,7 +485,7 @@ class PanelDBHeatPump(wx.Panel):
             self.tc7.SetValue(str(q.HPHeatCOP)) if q.HPHeatCOP is not None else ''
             self.tc8.SetValue(str(q.HPCoolCap)) if q.HPCoolCap is not None else ''
             self.tc9.SetValue(str(q.HPCoolCOP)) if q.HPCoolCOP is not None else ''
-#            self.tc10.SetValue(str(q.HPFuelConsum)) if q.HPFuelConsum is not None else ''
+            self.tc10.SetValue(str(q.HPFuelConsum)) if q.HPFuelConsum is not None else ''
             if q.FuelType is not None:
                 self.tc11.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else '' 
             self.tc12.SetValue(str(q.HPElectConsum)) if q.HPElectConsum is not None else ''
@@ -525,7 +525,7 @@ class PanelDBHeatPump(wx.Panel):
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
-#        self.tc10.SetValue('')
+        self.tc10.SetValue('')
         self.tc11.SetValue('')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
@@ -591,6 +591,7 @@ class PanelDBHeatPump(wx.Panel):
            self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\
            self.tc9.GetValue() is None and\
+           self.tc10.GetValue() is None and\
            self.tc11.GetValue() < 0 and\
            self.tc12.GetValue() is None and\
            len(self.tc13.GetValue()) == 0 and\
