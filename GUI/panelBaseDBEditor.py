@@ -38,11 +38,6 @@ TYPE_SIZE_TITLES = 10
 
 VSEP = 4
 
-HEIGHT = 20
-LABEL_WIDTH_LEFT = 100
-DATA_ENTRY_WIDTH_LEFT = 195
-UNITS_WIDTH = 0
-
 class PanelBaseDBEditor(wx.Panel):
 
     def __init__(self, parent, frame1label, frame2label, button1label, button2label):
@@ -55,9 +50,6 @@ class PanelBaseDBEditor(wx.Panel):
               pos=wx.DefaultPosition, size=wx.DefaultSize,
               style=wx.TAB_TRAVERSAL)
         self.SetClientSize(wx.DefaultSize)
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         fp = FontProperties()
 
