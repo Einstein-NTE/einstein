@@ -1148,6 +1148,105 @@ class TextEntry(wx.Panel):
     def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
         self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
         self.entry.SetForegroundColour(self.g.makeColour(fgColor))
+
+
+class StaticTextEntry(wx.Panel):
+    def __init__(self, parent=None,
+                 maxchars=None,    # max characters accepted
+                 value='',         # initial value
+                 wLabel=None,      # width of the label
+                 wData=None,       # width of the data entry
+                 wUnits=None,      # width of the unit selector (not used)
+                 label='',         # text of the label
+                 tip='',           # text of the tip
+                 fontsize=None):
+
+        style = wx.NO_BORDER|wx.TAB_TRAVERSAL
+        self.g = Generics()
+        self.f = FontProperties()
+
+        (size,lblSize,datSize,uniSize) = self.g.setSizes(wLabel,wData,False,wUnits)
+
+        wx.Panel.__init__(self, parent, id=-1, size=size, style=style)
+
+        if label.strip():
+            # creates label
+            self.label = wx.lib.stattext.GenStaticText(self,ID=-1,label=label,size=lblSize,pos=(0,0),
+                                                       style=wx.ST_NO_AUTORESIZE|wx.ALIGN_RIGHT)
+            self.f.setFont(self.label,size=fontsize)
+
+        # create a text control
+        self.entry = wx.TextCtrl(self,-1,pos=(lblSize[0]+1,0),
+                                 value=value,size=datSize,style=wx.ALIGN_RIGHT|wx.TE_READONLY)
+        self.f.setFont(self.entry,size=fontsize)
+        self.entry.Bind(wx.EVT_CONTEXT_MENU, self.OnShowPopup)
+
+        foregroundColour = self.g.makeColour(FGCOLOR)
+        validBackgroundColour = self.g.makeColour(TEXTBKGCOLOR)
+        self.entry.SetForegroundColour(foregroundColour)
+        self.entry.SetBackgroundColour(validBackgroundColour)
+        if maxchars is not None:
+            self.entry.SetMaxLength(maxchars)
+
+        # set tooltips
+        self.g.setTooltips(self,tip)
+
+        # create popup menu for easy clearing
+        self.popupmenu = wx.Menu()
+        for text in "Clear Unknown".split():
+            item = self.popupmenu.Append(-1, text)
+            self.Bind(wx.EVT_MENU, self.OnPopupItemSelected, item)
+
+    def OnShowPopup(self, event):
+        pos = event.GetPosition()
+        pos = self.ScreenToClient(pos)
+        self.PopupMenu(self.popupmenu, pos)
+
+    def OnPopupItemSelected(self, event):
+        item = self.popupmenu.FindItemById(event.GetId())
+        text = item.GetText()
+        if text == 'Clear':
+            self.entry.SetValue('')
+        if text == 'Unknown':
+            self.entry.SetValue('None')
+
+
+    def setUnits(self,tip,unitdict):
+        # this method is just for compatibility
+        pass
+
+    def GetValue(self):
+#        return self.entry.GetValue().encode(ENCODING)
+        return self.entry.GetValue()
+
+    def Clear(self):
+        self.SetValue('')
+
+    def SetValue(self, value):
+        if value == None:
+            self.entry.SetValue('')
+            return
+
+#        print "DisplayClasses (TextEntry - SetValue): value = %r"%value
+        try:
+            self.entry.SetValue(unicode(value,"utf-8"))
+        except:
+            try:
+                self.entry.SetValue(unicode(value,ENCODING))
+            except:
+                self.entry.SetValue(value)
+
+    def getUnit(self):
+        # this method is just for compatibility
+        return None
+
+    def setUnit(self,value):
+        # this method is just for compatibility
+        pass
+
+    def setColor(self, bgColor=(255,255,255), fgColor=(0,0,0)):
+        self.entry.SetBackgroundColour(self.g.makeColour(bgColor))
+        self.entry.SetForegroundColour(self.g.makeColour(fgColor))
  
 
 class DateEntry(wx.Panel):
