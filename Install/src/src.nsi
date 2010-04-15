@@ -534,10 +534,10 @@ SectionEnd
 
 
 Section ".netFramework" dotnetsection
-/*
+
     File "..\Prerequisites\dotnetfx35.exe"
     ExecWait '"$INSTDIR\Prerequisites\dotnetfx35" /passive'
-*/
+
 SectionEnd
 
 
