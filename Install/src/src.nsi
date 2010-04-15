@@ -278,6 +278,7 @@ Function nsAccountsettingLeave
 
 		!insertmacro CheckforEinsteinDB $mysql.einstein.exists $mysql.user $mysql.password
 		${If} $mysql.einstein.exists == "1"
+		${AndIf} $mysql.selected == "1"
 			MessageBox MB_YESNO "Database with the name Einstein was found! Do you want to overwrite it?" IDYES true IDNO false
 		${EndIf}
 		true:
@@ -487,7 +488,7 @@ Section "MySQL" MYSQLSEC
 	RootPassword=$mysql.password ServerType=DEVELOPMENT DatabaseType=MYISAM Port=3306"
 
 	${If} $mysql.einstein.overwrite == "1"
-		Push '"$mysql.path\bin\mysqldump.exe" --user=$mysql.user --password=$mysql.password einstein > "$INSTDIR\dumpPreviousDB.sql" $\n  pause '
+		Push '"$mysql.path\bin\mysqldump.exe" --user=$mysql.user --password=$mysql.password einstein > "$INSTDIR\dumpPreviousDB.sql" '
 		Push "$INSTDIR\sqldump.bat"
 		Call WriteToFile
 		ExecWait "$INSTDIR\sqldump.bat"
@@ -718,8 +719,6 @@ Function .onSelChange
 			EnableWindow $R1 1
 		${EndIf}
 	${EndIf}
-	
-	
 	
 FunctionEnd
 #----------------------------------------------------------------------
