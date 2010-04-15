@@ -487,7 +487,7 @@ Section "MySQL" MYSQLSEC
 	RootPassword=$mysql.password ServerType=DEVELOPMENT DatabaseType=MYISAM Port=3306"
 
 	${If} $mysql.einstein.overwrite == "1"
-		Push '"$mysql.path\bin\mysqldump.exe" --user=$mysql.user --password=$mysql.password einstein > "$INSTDIR\dumpPreviousDB.sql"'
+		Push '"$mysql.path\bin\mysqldump.exe" --user=$mysql.user --password=$mysql.password einstein > "$INSTDIR\dumpPreviousDB.sql" $\n  pause '
 		Push "$INSTDIR\sqldump.bat"
 		Call WriteToFile
 		ExecWait "$INSTDIR\sqldump.bat"
@@ -594,40 +594,90 @@ SectionEnd
 
 #----------------------------------------------------------------------
 
+Function un.RmFilesButOne
+ Exch $R0 ; exclude file
+ Exch
+ Exch $R1 ; route dir
+ Push $R2
+ Push $R3
+  FindFirst $R3 $R2 "$R1\*.*"
+  IfErrors Exit
+ 
+  Top:
+   StrCmp $R2 "." Next
+   StrCmp $R2 ".." Next
+   StrCmp $R2 $R0 Next
+   IfFileExists "$R1\$R2\*.*" Next
+    Delete "$R1\$R2"
+
+   Next:
+    ClearErrors
+    FindNext $R3 $R2
+    IfErrors Exit
+   Goto Top
+  Exit:
+  FindClose $R3
+ Pop $R3
+ Pop $R2
+ Pop $R1
+ Pop $R0
+FunctionEnd
+
+Function un.RmDirsButOne
+ Exch $R0 ; exclude dir
+ Exch
+ Exch $R1 ; route dir
+ Push $R2
+ Push $R3
+ 
+  ClearErrors
+  FindFirst $R3 $R2 "$R1\*.*"
+  IfErrors Exit
+ 
+  Top:
+   StrCmp $R2 "." Next
+   StrCmp $R2 ".." Next
+   StrCmp $R2 $R0 Next
+   IfFileExists "$R1\$R2\*.*" 0 Next
+    RmDir /r "$R1\$R2"
+
+   Next:
+    ClearErrors
+    FindNext $R3 $R2
+    IfErrors Exit
+   Goto Top
+ 
+  Exit:
+  FindClose $R3
+ 
+ Pop $R3
+ Pop $R2
+ Pop $R1
+ Pop $R0
+FunctionEnd
+
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
 
-    RMDir /r /REBOOTOK $INSTDIR\auxiliary
-    RMDir /r /REBOOTOK $INSTDIR\databases
-    RMDir /r /REBOOTOK $INSTDIR\developers
-    RMDir /r /REBOOTOK $INSTDIR\docs
-    RMDir /r /REBOOTOK $INSTDIR\modules
-    RMDir /r /REBOOTOK $INSTDIR\PE
-    RMDir /r /REBOOTOK $INSTDIR\projects
-    RMDir /r /REBOOTOK $INSTDIR\questionnaire
-    RMDir /r /REBOOTOK $INSTDIR\reports
-    RMDir /r /REBOOTOK $INSTDIR\sql
-    RMDir /r /REBOOTOK $INSTDIR\tmp_dev
-    RMDir /r /REBOOTOK $INSTDIR\.git
-	RMDir /r /REBOOTOK $INSTDIR\Python25Einstein
-	RMDir /r /REBOOTOK $INSTDIR\Prerequisites
+	Push $INSTDIR
+	Push "nofile.txt"
+	Call un.RmFilesButOne
+	
+	Push $INSTDIR
+	Push "GUI"
+	Call un.RmDirsButOne
+	
+	Push "$INSTDIR\GUI"
+	Push "einstein.ini"
+	Call un.RmFilesButOne
+	
+	Push "$INSTDIR\GUI"
+	Push "nofolder"
+	Call un.RmDirsButOne
+	
 	RMDir /r /REBOOTOK $SMPROGRAMS\Einstein
-    Delete $INSTDIR\__init__.py
-    Delete $INSTDIR\__init__.pyc
-    Delete $INSTDIR\einstein
-    Delete $INSTDIR\GUI\*.py
-    Delete $INSTDIR\GUI\*.pyc
-    Delete $INSTDIR\GUI\*.txt
-    Delete $INSTDIR\GUI\*.csv
-    Delete $INSTDIR\GUI\einstein.bat
-    Delete $INSTDIR\einstein.lnk
-    Delete $INSTDIR\GUI\einsteinrun.bat
-	Delete $INSTDIR\einsteinMSG.txt
-	Delete $INSTDIR\einsteinTRACK.log
-	Delete $INSTDIR\dumpPreviousDB.sql
-    RMDir /r /REBOOTOK $INSTDIR\GUI\img
-    RMDir /r /REBOOTOK $INSTDIR\GUI\locale
-    Delete $DESKTOP\Einstein.lnk
+
+	Delete $DESKTOP\Einstein.lnk
 	RMDir /r /REBOOTOK $SMPROGRAMS\Einstein
     
     DeleteRegValue HKLM "${REGKEY}\Components" Main
