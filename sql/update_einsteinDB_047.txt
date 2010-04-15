@@ -1,0 +1,63 @@
+-- -----------------------------------------------------
+-- Table `einstein`.`periods`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`periods` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`periods` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `start` DATE NOT NULL ,
+  `stop` DATE NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = MyISAM;
+
+
+-- -----------------------------------------------------
+-- Table `einstein`.`process_periods`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`process_periods` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`process_periods` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `step` TINYINT NULL ,
+  `scale` TINYINT NULL ,
+  `periods_id` INT NOT NULL ,
+  `qprocessdata_QProcessData_ID` INT(10) UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_process_periods_periods` (`periods_id` ASC) ,
+  INDEX `fk_process_periods_qprocessdata` (`qprocessdata_QProcessData_ID` ASC) ,
+  CONSTRAINT `fk_process_periods_periods`
+    FOREIGN KEY (`periods_id` )
+    REFERENCES `einstein`.`periods` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_process_periods_qprocessdata`
+    FOREIGN KEY (`qprocessdata_QProcessData_ID` )
+    REFERENCES `einstein`.`qprocessdata` (`QProcessData_ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM;
+
+
+-- -----------------------------------------------------
+-- Table `einstein`.`process_period_profiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`process_period_profiles` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`process_period_profiles` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `process_periods_id` INT NOT NULL ,
+  `profiles_id` INT NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_process_period_profiles_process_periods` (`process_periods_id` ASC) ,
+  INDEX `fk_process_period_profiles_profiles` (`profiles_id` ASC) ,
+  CONSTRAINT `fk_process_period_profiles_process_periods`
+    FOREIGN KEY (`process_periods_id` )
+    REFERENCES `einstein`.`process_periods` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_process_period_profiles_profiles`
+    FOREIGN KEY (`profiles_id` )
+    REFERENCES `einstein`.`profiles` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM;

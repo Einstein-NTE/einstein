@@ -1,0 +1,18 @@
+CREATE  TABLE IF NOT EXISTS `einstein`.`process_schedules_correlations` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `source` INT NOT NULL ,
+  `target` INT NOT NULL ,
+  INDEX `fk_process_schedules_correlations_source` (`source` ASC) ,
+  INDEX `fk_process_schedules_correlations_target` (`target` ASC) ,
+  PRIMARY KEY (`id`) ,
+  CONSTRAINT `fk_process_schedules_correlations_source`
+    FOREIGN KEY (`source` )
+    REFERENCES `einstein`.`qprocessdata` (`QProcessData_ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_process_schedules_correlations_target`
+    FOREIGN KEY (`target` )
+    REFERENCES `einstein`.`qprocessdata` (`QProcessData_ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM;

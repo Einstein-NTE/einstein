@@ -1,0 +1,55 @@
+-- -----------------------------------------------------
+-- Table `einstein`.`profiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`profiles` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`profiles` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  `monday` TINYINT(1) NOT NULL ,
+  `tuesday` TINYINT(1) NOT NULL ,
+  `wednesday` TINYINT(1) NOT NULL ,
+  `thursday` TINYINT(1) NOT NULL ,
+  `friday` TINYINT(1) NOT NULL ,
+  `saturday` TINYINT(1) NOT NULL ,
+  `sunday` TINYINT(1) NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = MyISAM;
+
+
+-- -----------------------------------------------------
+-- Table `einstein`.`intervals`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`intervals` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`intervals` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `start` TIME NOT NULL ,
+  `stop` TIME NOT NULL ,
+  `scale` TINYINT NOT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = MyISAM;
+
+-- -----------------------------------------------------
+-- Table `einstein`.`profile_intervals`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `einstein`.`profile_intervals` ;
+
+CREATE  TABLE IF NOT EXISTS `einstein`.`profile_intervals` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `profiles_id` INT NOT NULL ,
+  `intervals_id` INT NOT NULL ,
+  INDEX `fk_profile_intervalls_profiles` (`profiles_id` ASC) ,
+  INDEX `fk_profile_intervalls_intervals` (`intervals_id` ASC) ,
+  PRIMARY KEY (`id`) ,
+  CONSTRAINT `fk_profile_intervalls_profiles`
+    FOREIGN KEY (`profiles_id` )
+    REFERENCES `einstein`.`profiles` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_profile_intervalls_intervals`
+    FOREIGN KEY (`intervals_id` )
+    REFERENCES `einstein`.`intervals` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = MyISAM;

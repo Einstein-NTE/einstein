@@ -1,0 +1,7 @@
+USE einstein;
+
+ALTER TABLE qprocessdata ADD COLUMN `InFlowDuration` DOUBLE NULL DEFAULT NULL AFTER `QdotProc_w`;
+ALTER TABLE qprocessdata ADD COLUMN `OutFlowDuration` DOUBLE NULL DEFAULT NULL AFTER `InFlowDuration`;
+ALTER TABLE qprocessdata ADD COLUMN `StartUpDuration` DOUBLE NULL DEFAULT NULL AFTER `OutFlowDuration`;
+ALTER TABLE qprocessdata ADD COLUMN `ScheduleTolerance` DOUBLE NULL DEFAULT NULL AFTER `StartUpDuration`;
+ALTER TABLE qprocessdata ADD COLUMN `HolidayScale` TINYINT NULL DEFAULT NULL AFTER `ScheduleTolerance`;

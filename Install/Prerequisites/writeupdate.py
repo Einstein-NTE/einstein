@@ -15,7 +15,7 @@ fobj = open( str(args[2])+"\\update.bat", "w")
 
 for i in range(1,filenum+1):
     fobj.write("\""+str(args[0]) +"\""+ " --user=" + str(args[3])+" --password="+ str(args[4]) +"< "+ "\""+ str(args[1]) + "\sql\\" +
-               "update_einsteinDB_"+"0"*(3-len(str(i)))+str(i)+".txt\"" + "\n") 
+               "update_einsteinDB_"+"0"*(3-len(str(i)))+str(i)+".txt\"" + "\n" )#+ "pause" + "\n") 
 
 fobj.close()
 

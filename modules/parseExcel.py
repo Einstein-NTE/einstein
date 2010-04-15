@@ -35,16 +35,16 @@ class parseExcel(parseSpreadsheet):
     
     def __readQ(self):
         self.__sheets = ["Q1 GeneralData",
-                  "Q2 EnergyConsumption",
-                  "Q3_ Processes",
-                  "Q3A",
-                  "Q4H_HeatGeneration",
-                  "Q4C_ColdGeneration",
-                  "Q5_Distribution",
-                  "Q6_HeatRecovery",
-                  "Q7_ Renewables",
-                  "Q8 Buildings",
-                  "Q9 Economics"]
+                        "Q2 EnergyConsumption",
+                        "Q3_ Processes",
+                        "Q3A",
+                        "Q4H_HeatGeneration",
+                        "Q4C_ColdGeneration",
+                        "Q5_Distribution",
+                        "Q6_HeatRecovery",
+                        "Q7_ Renewables",
+                        "Q8 Buildings",
+                        "Q9 Economics"]
         sht=[]
         for i in xrange(0,len(self.__sheets)):
             try:
@@ -53,40 +53,19 @@ class parseExcel(parseSpreadsheet):
                 return 'Failed to import ' + self.__filepath + ' at table: ' + self.__sheets[i] + "!"
         
         try:
-            self.__Q1GD=self.__tupleToSimpleList(sht[0].Range("GenInfo"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("StatData"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("operations"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("products"))
+            self.__Q1GD=self.__tupleToSimpleList(sht[0].Range("GeneralData"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("StatisticalData"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("PeriodOfOperation"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("InformationOnProducts"))
             self.__md.questionnaire.insert(SD.createQ1Dictionary(self, self.__Q1GD))
             #return 'Import completed!'
         except:
             return 'Failed to parse ' + self.__filepath + ' at table: ' + self.__sheets[0] + "!"
         
-
-                                            
-            
-        """ 
         try:
-            sht = self.__xlWb.Worksheets(sheets[1])
-            
+            pass
         except:
-            return 'Failed to import ' + self.__filepath + ' at table: ' + sheets[1] + "!"
-
-        try:
-            sht = self.__xlWb.Worksheets(sheets[2])
-        except:
-            return 'Failed to import ' + self.__filepath + ' at table: ' + sheets[2] + "!"
-        
-        try:
-            sht = self.__xlWb.Worksheets(sheets[3])
-        except:
-            return 'Failed to import ' + self.__filepath + ' at table: ' + sheets[3] + "!"
-        
-        try:
-            sht = self.__xlWb.Worksheets(sheets[4])
-        except:
-            return 'Failed to import ' + self.__filepath + ' at table: ' + sheets[4] + "!"
-        """
+            pass
         
         return 'Import completed!'
     
