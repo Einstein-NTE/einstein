@@ -465,7 +465,7 @@ FunctionEnd
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-	File /r /x "..\Prerequisites\dotnetfx35.exe" /x "..\Prerequisites\mysql-essential-5.1.24-rc-win32.msi" ..\..\*
+	File /r /x "dotnetfx35.exe" /x "mysql-essential-5.1.24-rc-win32.msi" ..\..\*
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
 SectionEnd
 
@@ -548,7 +548,7 @@ Section -finish
     RMdir /r $INSTDIR\Prerequisites
 	RMdir /r $INSTDIR\Install
 	Delete "$INSTDIR\GUI\einstein.bat"
-	Push 'cd "$INSTDIR\GUI" $\n \
+	Push 'cd  /D "$INSTDIR\GUI" $\n \
 	"..\Python25Einstein\python.exe" einsteinMain.py > ..\einsteinMSG.txt'
 	Push "$INSTDIR\GUI\einstein.bat"
 	Call WriteToFile
