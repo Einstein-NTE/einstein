@@ -61,33 +61,31 @@ class parseExcel(parseSpreadsheet):
         return md
     
     def __readQ(self):
-        self.__sheets = ["Q1 GeneralData",
-                        "Q2 EnergyConsumption",
-                        "Q3_ Processes",
-                        "Q3A",
-                        "Q4H_HeatGeneration",
-                        "Q4C_ColdGeneration",
-                        "Q5_Distribution",
-                        "Q6_HeatRecovery",
-                        "Q7_ Renewables",
-                        "Q8 Buildings",
-                        "Q9 Economics"]
-        sht=[]
-        for i in xrange(0,len(self.__sheets)):
+
+        sheets = self.__xlWb.Sheets
+        sheetnames = []
+        
+        for i in xrange(0,sheets.count):
+            if sheets[i].Name[0] == 'Q':
+                sheetnames.append(sheets[i].Name)
+        
+        
+        for i in xrange(0,len(sheetnames)):
             try:
-                sht.append(self.__xlWb.Worksheets(self.__sheets[i]))
+                sht.append(self.__xlWb.Worksheets(sheetnames[i]))
             except:
-                return 'Failed to import ' + self.__filepath + ' at table: ' + self.__sheets[i] + "!"
+                return 'Failed to import ' + self.__filepath + ' at table: ' + sheetnames[i] + "!"
         
         try:
-            self.__Q1GD=self.__tupleToSimpleList(sht[0].Range("GeneralData"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("StatisticalData"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("PeriodOfOperation"))
-            self.__Q1GD+=self.__tupleToSimpleList(sht[0].Range("InformationOnProducts"))
+            sht = xlWb.Worksheets(sheetnames[0])
+            self.__Q1GD=self.__tupleToSimpleList(sht.Range("GeneralData"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht.Range("StatisticalData"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht.Range("PeriodOfOperation"))
+            self.__Q1GD+=self.__tupleToSimpleList(sht.Range("InformationOnProducts"))
             self.__md.questionnaire.insert(SD.createQ1Dictionary(self, self.__Q1GD))
             #return 'Import completed!'
         except:
-            return 'Failed to parse ' + self.__filepath + ' at table: ' + self.__sheets[0] + "!"
+            return 'Failed to parse ' + self.__filepath + ' at table: ' + sht + "!"
         
         try:
             pass
