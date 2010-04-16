@@ -69,28 +69,33 @@ class parseExcel(parseSpreadsheet):
             if sheets[i].Name[0] == 'Q':
                 sheetnames.append(sheets[i].Name)
         
-        
+        """
         for i in xrange(0,len(sheetnames)):
             try:
                 sht.append(self.__xlWb.Worksheets(sheetnames[i]))
             except:
                 return 'Failed to import ' + self.__filepath + ' at table: ' + sheetnames[i] + "!"
+        """
         
         try:
-            sht = xlWb.Worksheets(sheetnames[0])
+            sht = self.__xlWb.Worksheets(sheetnames[0])
             self.__Q1GD=self.__tupleToSimpleList(sht.Range("GeneralData"))
             self.__Q1GD+=self.__tupleToSimpleList(sht.Range("StatisticalData"))
             self.__Q1GD+=self.__tupleToSimpleList(sht.Range("PeriodOfOperation"))
             self.__Q1GD+=self.__tupleToSimpleList(sht.Range("InformationOnProducts"))
-            self.__md.questionnaire.insert(SD.createQ1Dictionary(self, self.__Q1GD))
+            self.__md.questionnaire.insert(SD.createQuestionnaireDictionary(self,self.__Q1GD))
             #return 'Import completed!'
         except:
-            return 'Failed to parse ' + self.__filepath + ' at table: ' + sht + "!"
+            return 'Failed to parse ' + self.__filepath + ' at table: ' + sheetnames[0] + "!"
         
         try:
-            pass
+            sht = self.__xlWb.Worksheets(sheetnames[1])
+            self.__Qelectricity= self.__tupleToSimpleList(sht.Range("EnergyConsumption"))
+            self.__Qelectricity+=self.__tupleToSimpleList(sht.Range("ElectricityConsumption"))
+            self.__Qelectricity+=self.__tupleToSimpleList(sht.Range("EnergyConsumptionProduct"))
+            self.__md.qelectricity.insert(SD.createQElectricityDictionary(self,self.__Qelectricity))
         except:
-            pass
+            return 'Failed to parse ' + self.__filepath + ' at table: ' + sheetnames[1] + "!"
         
         return 'Import completed!'
     

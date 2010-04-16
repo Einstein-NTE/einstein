@@ -26,7 +26,7 @@
 #==============================================================================
 
 class SpreadsheetDict():
-        def createQ1Dictionary(self,Q1):
+        def createQuestionnaireDictionary(self,Q1):
             Q1dict = {}
             Q1dict['Name']= Q1[0]
             Q1dict['City']= Q1[2]
@@ -58,7 +58,7 @@ class SpreadsheetDict():
             #Q1dict['']= Q1[]
             return Q1dict
         
-        def createQ2Dictionary(self,Q2):
+        def createQElectricityDictionary(self,Q2):
             Q2dict = {}
             Q2dict['ElectricityPeakYear']= Q2[36]
             Q2dict['ElectricityStandYear']= Q2[37]
@@ -117,8 +117,8 @@ class SpreadsheetDict():
         def createQ6Dictionary(self,Q6):
             pass    
     
-        createQ1Dictionary=staticmethod(createQ1Dictionary)
-        createQ2Dictionary=staticmethod(createQ2Dictionary)
+        createQuestionnaireDictionary=staticmethod(createQuestionnaireDictionary)
+        createQElectricityDictionary=staticmethod(createQElectricityDictionary)
         createQ3Dictionary=staticmethod(createQ3Dictionary)
         createQ4Dictionary=staticmethod(createQ4Dictionary)
         createQ5Dictionary=staticmethod(createQ5Dictionary)
