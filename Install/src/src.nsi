@@ -466,8 +466,16 @@ FunctionEnd
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
+	
+	IfFileExists "$INSTDIR\einstein\*.*" found
+	Goto notfound
+	found:
+	RMDir /r /REBOOTOK "$INSTDIR\einstein"
+	notfound:
+	
 	File /r /x "dotnetfx35.exe" /x "mysql-essential-5.1.24-rc-win32.msi" ..\..\*
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
+
 SectionEnd
 
 #----------------------------------------------------------------------
