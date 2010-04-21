@@ -36,8 +36,8 @@ from einstein.GUI.panelBaseDBEditor import *
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
-DATA_ENTRY_WIDTH_LEFT = 195
-UNITS_WIDTH = 0
+DATA_ENTRY_WIDTH_LEFT = 140
+UNITS_WIDTH = 55
 
 def _U(text):
     return unicode(_(text), "utf-8")
@@ -148,6 +148,7 @@ class PanelDBSolarThermal(wx.Panel):
 
         self.tc6 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("STc0"),
                               tip = _U("Optical efficiency"))
 
@@ -163,56 +164,67 @@ class PanelDBSolarThermal(wx.Panel):
 
         self.tc9 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("K50L"),
                               tip = unicode("Incidence angle correction factor at 50º (longitudinal)", 'latin-1'))
 
         self.tc10 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("K50T"),
                               tip = unicode("Incidence angle correction factor at 50º (transversal)", 'latin-1'))
 
         self.tc11 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'MASSORVOLUMEFLOW',
                               label = _U("STMassFlowRate"),
                               tip = _U("Recommended collector mass flow rate"))
 
         self.tc12 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
                               label = _U("STLengthGross"),
                               tip = _U(""))
 
         self.tc13 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
                               label = _U("STHeightGross"),
                               tip = _U(""))
 
         self.tc14 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'AREA',
                               label = _U("STAreaGross"),
                               tip = _U(""))
 
         self.tc15 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
                               label = _U("STLengthAper"),
                               tip = _U(""))
 
         self.tc16 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
                               label = _U("STHeightAper"),
                               tip = _U(""))
 
         self.tc17 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'AREA',
                               label = _U("STAreaAper"),
                               tip = _U(""))
 
         self.tc18 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("STAreaFactor"),
                               tip = _U(""))
 
         self.tc19 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'MASSPERAREA',
                               label = _U("STWeightFactor"),
                               tip = _U(""))
 
@@ -225,26 +237,31 @@ class PanelDBSolarThermal(wx.Panel):
         #
         self.tc20 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
                               label = _U("STUnitPrice300kW"),
                               tip = _U(""))
 
         self.tc21 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice30kW"),
                               tip = _U(""))
 
         self.tc22 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice300kW"),
                               tip = _U(""))
 
         self.tc23 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice3000kW"),
                               tip = _U(""))
 
         self.tc24 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
                               label = _U("STOMUnitFix"),
                               tip = _U(""))
 
