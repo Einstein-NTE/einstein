@@ -104,6 +104,9 @@ from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
 from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
 from einstein.GUI.panelDBCHP import PanelDBCHP
 
+from einstein.GUI.panelDBHeatPumpNew import PanelDBHeatPumpNew
+from einstein.GUI.panelDBHeatPumpNew1 import PanelDBHeatPumpNew1
+
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
 from panelEA2 import *
@@ -145,7 +148,7 @@ from panelReport import *
 #TS2008-05-16 export data
 from einstein.modules.xmlIO import *
 
-from einstein.modules.spreadsheetIO import *
+#from einstein.modules.spreadsheetIO import *
 #TS2008-06-18 fonts management
 from fonts import FontProperties
 #TS2008-06-30 database management
@@ -785,6 +788,18 @@ class EinsteinFrame(wx.Frame):
             self.PageDBCHP = PanelDBCHP(self.leftpanel2)
             self.PageDBCHP.display()
 
+        elif select == _U("DBHeatPumpNew"):
+            self.hidePages()
+            self.activePanel = "DBHeatPumpNew"
+            self.PageDBHeatPumpNew = PanelDBHeatPumpNew(self.leftpanel2)
+            self.PageDBHeatPumpNew.display()
+
+        elif select == _U("DBHeatPumpNew1"):
+            self.hidePages()
+            self.activePanel = "DBHeatPumpNew1"
+            self.PageDBHeatPumpNew1 = PanelDBHeatPumpNew1(self.leftpanel2)
+            self.PageDBHeatPumpNew1.display()
+
         #Page0
         elif select == _U('Edit Industry Data'): #Edit Industry Data
             self.hidePages()
@@ -1302,6 +1317,10 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.PageDBCHP.Destroy()
         except:pass
+        try:self.PageDBHeatPumpNew.Destroy()
+        except:pass
+        try:self.PageDBHeatPumpNew.Destroy()
+        except:pass
 
     def CreateMenu(self):
         self.menuBar = wx.MenuBar()
@@ -1462,6 +1481,8 @@ class EinsteinFrame(wx.Frame):
         self.qPageDBHeatPump = self.tree.AppendItem (self.qPageDB0, _U("DBHeatPump"),0)
         self.qPageDBSolarThermal = self.tree.AppendItem (self.qPageDB0, _U("DBSolarThermal"),0)
         self.qPageDBCHP = self.tree.AppendItem (self.qPageDB0, _U("DBCHP"),0)
+        self.qPageDBHeatPumpNew = self.tree.AppendItem (self.qPageDB0, _U("DBHeatPumpNew"),0)
+        self.qPageDBHeatPumpNew1 = self.tree.AppendItem (self.qPageDB0, _U("DBHeatPumpNew1"),0)
 
         self.qPage0 = self.tree.AppendItem (self.qRoot, _U("Edit Industry Data"),0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, _U("General data"),0)
