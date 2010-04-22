@@ -98,8 +98,8 @@ class PanelDBHeatPumpNew1(wx.Panel):
 #        self.grid.SetColSize(3,120)
 #        self.grid.SetColSize(4,120)
 
-        self.grid.EnableDragColSize(False)
-        self.grid.EnableDragRowSize(False)
+#        self.grid.EnableDragColSize(False)
+#        self.grid.EnableDragRowSize(False)
         
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
@@ -160,7 +160,7 @@ class PanelDBHeatPumpNew1(wx.Panel):
 #              pos=wx.Point(512, 30), size=wx.Size(87, 13), style=0)
 
         self.grid = wx.grid.Grid(id=wxID_PANELCCGRID, name='gridpanel',
-              parent=self, pos=wx.Point(20, 60), size=wx.Size(650, 340), style=0)
+              parent=self, pos=wx.Point(24, 32), size=wx.Size(650, 340), style=0)
         
         self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,
               self.OnGridPanelGridCellLeftDclick, id=wxID_PANELCCGRID)
