@@ -1319,7 +1319,7 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.PageDBHeatPumpNew.Destroy()
         except:pass
-        try:self.PageDBHeatPumpNew.Destroy()
+        try:self.PageDBHeatPumpNew1.Destroy()
         except:pass
 
     def CreateMenu(self):
