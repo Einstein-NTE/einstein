@@ -46,14 +46,18 @@ class parseExcel(parseSpreadsheet):
             data.append(elem.GetValue())
         return data
     
+    def openExcelDispatch(self,filepath):
+        xlApp = Dispatch("Excel.Application")
+        xlWb = xlApp.Workbooks.Open(filepath)
+        return xlApp, xlWb
+    
     def parse(self):
-        self.__xlApp = Dispatch("Excel.Application")
-        self.__xlWb = self.__xlApp.Workbooks.Open(self.__filepath)
-        self.__md = self.__connectToDB()
-        self.handle = self.__readQ()    
+        self.__xlApp, self.__xlWb = self.openExcelDispatch(self.__filepath)
+        __md = self.__connectToDB()
+        __handle = self.__readQ()    
         self.__xlWb.Close(SaveChanges=0)
         self.__xlApp.Quit()
-        return self.handle    
+        return __handle    
         
     def __connectToDB(self):
         conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
