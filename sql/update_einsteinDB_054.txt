@@ -1,4 +1,7 @@
 USE einstein;
+ALTER TABLE qrenewables ADD COLUMN `QBiomassProc` DOUBLE NULL DEFAULT NULL AFTER `PeriodBiomassProcStop`;
+ALTER TABLE qrenewables ADD COLUMN `PriceBiomassProc` DOUBLE NULL DEFAULT NULL AFTER `HumidBiomassProc`;
+
 ALTER TABLE qbuildings ADD COLUMN `BuildTHeating` DOUBLE NULL DEFAULT NULL AFTER `BuildDailyDHW`;
 ALTER TABLE qbuildings ADD COLUMN `BuildTAirCond` DOUBLE NULL DEFAULT NULL AFTER `BuildTHeating`;
 
