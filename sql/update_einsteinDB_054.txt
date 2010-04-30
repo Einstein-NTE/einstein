@@ -1,4 +1,7 @@
 USE einstein;
+ALTER TABLE qrenewables ADD COLUMN `HumidBiomassRegion` DOUBLE NULL DEFAULT NULL AFTER `HumidBiomassProc`;
+ALTER TABLE qrenewables ADD COLUMN `LCVBiomassRegion` DOUBLE NULL DEFAULT NULL AFTER `LCVBiomassProc`;
+ALTER TABLE qrenewables ADD COLUMN `QBiomassRegion` DOUBLE NULL DEFAULT NULL AFTER `PeriodBiomassProcStop`;
 ALTER TABLE qrenewables ADD COLUMN `QBiomassProc` DOUBLE NULL DEFAULT NULL AFTER `PeriodBiomassProcStop`;
 ALTER TABLE qrenewables ADD COLUMN `PriceBiomassProc` DOUBLE NULL DEFAULT NULL AFTER `HumidBiomassProc`;
 
