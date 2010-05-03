@@ -99,7 +99,6 @@ from einstein.GUI.panelQ8 import PanelQ8
 from einstein.GUI.panelQ9 import PanelQ9
 
 # DBEditor
-from einstein.GUI.panelDB import PanelDB
 from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
 from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
 from einstein.GUI.panelDBCHP import PanelDBCHP
@@ -145,7 +144,7 @@ from panelReport import *
 #TS2008-05-16 export data
 from einstein.modules.xmlIO import *
 
-from einstein.modules.spreadsheetIO import *
+#from einstein.modules.spreadsheetIO import *
 #TS2008-06-18 fonts management
 from fonts import FontProperties
 #TS2008-06-30 database management
@@ -762,10 +761,7 @@ class EinsteinFrame(wx.Frame):
             self.pageTitle.Show()
 
         elif select == _U("Database Equipments"):
-            self.hidePages()
             self.activePanel = "DB0"
-            self.PageDB0 = PanelDB(self.leftpanel2)
-            self.PageDB0.display()
 
         elif select == _U("DBHeatPump"):
             self.hidePages()
@@ -1302,6 +1298,10 @@ class EinsteinFrame(wx.Frame):
         except:pass
         try:self.PageDBCHP.Destroy()
         except:pass
+        try:self.PageDBHeatPumpNew.Destroy()
+        except:pass
+        try:self.PageDBHeatPumpNew1.Destroy()
+        except:pass
 
     def CreateMenu(self):
         self.menuBar = wx.MenuBar()
@@ -1460,8 +1460,8 @@ class EinsteinFrame(wx.Frame):
 
         self.qPageDB0 = self.tree.AppendItem (self.qRoot, _U("Database Equipments"),0)
         self.qPageDBHeatPump = self.tree.AppendItem (self.qPageDB0, _U("DBHeatPump"),0)
-        self.qPageDBSolarThermal = self.tree.AppendItem (self.qPageDB0, _U("DBSolarThermal"),0)
-        self.qPageDBCHP = self.tree.AppendItem (self.qPageDB0, _U("DBCHP"),0)
+        #self.qPageDBSolarThermal = self.tree.AppendItem (self.qPageDB0, _U("DBSolarThermal"),0)
+        #self.qPageDBCHP = self.tree.AppendItem (self.qPageDB0, _U("DBCHP"),0)
 
         self.qPage0 = self.tree.AppendItem (self.qRoot, _U("Edit Industry Data"),0)
         self.qPage1 = self.tree.AppendItem (self.qPage0, _U("General data"),0)

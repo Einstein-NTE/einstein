@@ -32,12 +32,11 @@ from GUITools import *
 from units import *
 from fonts import *
 from einstein.modules.messageLogger import *
-from einstein.GUI.panelBaseDBEditor import *
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
-DATA_ENTRY_WIDTH_LEFT = 195
-UNITS_WIDTH = 0
+DATA_ENTRY_WIDTH_LEFT = 140
+UNITS_WIDTH = 55
 
 def _U(text):
     return unicode(_(text), "utf-8")
@@ -67,17 +66,22 @@ class PanelDBCHP(wx.Panel):
         self.notebook = wx.Notebook(self, -1, style = 0)
         self.notebook.SetFont(fp.getFont())
 
-        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of chp equipment',
-                                       'Add Equipment', 'Delete Equipment')
+#        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of chp equipment',
+#                                       'Add Equipment', 'Delete Equipment')
+#
+#        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of chp equipment',
+#                                       'Add Equipment', 'Delete Equipment')
+#
+#        self.page2 = PanelBaseDBEditor(self.notebook, 'Heat source / sink', 'List of chp equipment',
+#                                       'Add Equipment', 'Delete Equipment')
+#
+#        self.page3 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of chp equipment',
+#                                       'Add Equipment', 'Delete Equipment')
 
-        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of chp equipment',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.page2 = PanelBaseDBEditor(self.notebook, 'Heat source / sink', 'List of chp equipment',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.page3 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of chp equipment',
-                                       'Add Equipment', 'Delete Equipment')
+        self.page0 = wx.Panel(self.notebook)
+        self.page1 = wx.Panel(self.notebook)
+        self.page2 = wx.Panel(self.notebook)
+        self.page3 = wx.Panel(self.notebook)
 
         self.notebook.AddPage(self.page0, _U('Descriptive Data'))
         self.notebook.AddPage(self.page1, _U('Technical Data'))
@@ -130,16 +134,19 @@ class PanelDBCHP(wx.Panel):
 
         self.tc9 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("Eta_t"),
                               tip = _U("Nominal thermal conversion efficiency"))
 
         self.tc10 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'POWER',
                                label = _U("CHPPe"),
                                tip = _U("Nominal electrical power"))
 
         self.tc11 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'FRACTION',
                                label = _U("Eta_e"),
                                tip = _U("Electrical efficiency"))
 
@@ -152,31 +159,37 @@ class PanelDBCHP(wx.Panel):
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'POWER',
                                label = _U("FluidSupply"),
                                tip = _U("Heat transport medium"))
 
         self.tc13 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("Tsupply"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'MASSFLOWRATE',
                                label = _U("FlowRateSupply"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'POWER',
                                label = _U("FluidSupply2"),
                                tip = _U("Heat transport medium"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("Tsupply2"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'MASSFLOWRATE',
                                label = _U("FlowRateSupply2"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
@@ -189,21 +202,25 @@ class PanelDBCHP(wx.Panel):
         #
         self.tc18 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("Price"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("InvRate"),
                                tip = _U("Turn-key price"))
 
         self.tc20 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'UNITPRICE',
                                label = _U("OMRateFix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'UNITPRICEENERGY',
                                label = _U("OMRateVar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
