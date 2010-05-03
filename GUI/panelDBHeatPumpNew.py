@@ -55,6 +55,8 @@ class PanelDBHeatPumpNew(wx.Panel):
         self._init_ctrls(parent)
         self._init_grid()
         self.__do_layout()
+        self.fillEquipmentList()
+        self.fillChoices()
 
     def _init_ctrls(self, parent):
 #------------------------------------------------------------------------------
@@ -97,6 +99,16 @@ class PanelDBHeatPumpNew(wx.Panel):
 
         self.grid = wx.grid.Grid(name = 'summarytable', parent = self.page0,
                                  pos = wx.Point(42, 32), style = 0)
+
+        self.tc_type = ChoiceEntry(self.page0,
+                                   values = [],
+                                   label = _U("Type"),
+                                   tip = _U("Show only equipment of type"))
+
+        self.tc_subtype = ChoiceEntry(self.page0,
+                                      values = [],
+                                      label = _U("Subtype"),
+                                      tip = _U("Show only equipment of subtype"))
 
         #
         # tab 1 - Descriptive Data
@@ -323,7 +335,7 @@ class PanelDBHeatPumpNew(wx.Panel):
         self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
-        self.buttonOK.SetDefault()
+        #self.buttonOK.SetDefault()
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
@@ -331,6 +343,7 @@ class PanelDBHeatPumpNew(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnNotebookPageChanged, self.notebook)
+        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
 
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
@@ -361,8 +374,6 @@ class PanelDBHeatPumpNew(wx.Panel):
             self.grid.SetColLabelValue(i, _U(colLabels[i]))
 
         self.grid.SetGridCursor(0, 0)
-    
-        self.fillEquipmentList()
 
     def __do_layout(self):
         flagText = wx.TOP
@@ -373,6 +384,8 @@ class PanelDBHeatPumpNew(wx.Panel):
 
         sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
+        sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -498,6 +511,8 @@ class PanelDBHeatPumpNew(wx.Panel):
                     equipe = equipments[0]
                     self.display(equipe)
                 break
+        self.fillChoices()
+        event.Skip()
 
     def OnButtonDeleteEquipment(self, event):
         if not self.grid.IsSelection():
@@ -519,6 +534,7 @@ class PanelDBHeatPumpNew(wx.Panel):
 
     def OnButtonCancel(self, event):
         self.clearPage0()
+        event.Skip()
 
     def OnButtonOK(self, event):
         if self.allFieldsEmpty():
@@ -567,15 +583,26 @@ class PanelDBHeatPumpNew(wx.Panel):
                "HPYearUpdate":check(self.tc36.GetValue())
                }
 
-        id = self.grid.GetCellValue(self.grid.GetGridCursorRow(), 0)
+        try:
+            id = self.grid.GetCellValue(self.grid.GetGridCursorRow(), 0)
+        except:
+            return
+
         equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(id)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
             equipe.update(tmp)
 
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillChoices()
+        self.fillEquipmentList()
+
+        event.Skip()
+
     def OnNotebookPageChanged(self, event):
-        pass
+        event.Skip()
 
     def OnGridCellLeftClick(self, event):
         self.clear()
@@ -611,6 +638,14 @@ class PanelDBHeatPumpNew(wx.Panel):
     def OnGridLabelDClick(self, event):
         event.Skip()
 
+    def OnChoiceEntryClick(self, event):
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillEquipmentList()
+        event.Skip()
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
@@ -619,7 +654,6 @@ class PanelDBHeatPumpNew(wx.Panel):
         self.clear()
 
         fuelDict = Status.prj.getFuelDict()
-        self.fillChoiceOfDBFuel()
 
         if q is not None:
             self.tc1.SetValue(str(q.HPManufacturer)) if q.HPManufacturer is not None else ''
@@ -704,11 +738,61 @@ class PanelDBHeatPumpNew(wx.Panel):
         fuelList = fuelDict.values()
         fillChoice(self.tc11.entry, fuelList)
 
+    def fillChoiceOfType(self):
+        equipments = Status.DB.dbheatpump.get_table()
+        typeList = []
+        for equipe in equipments:
+            sqlQuery = "SELECT HPType FROM dbheatpump WHERE DBHeatPump_ID = %s"%equipe.DBHeatPump_ID
+            result = Status.DB.sql_query(sqlQuery)
+            if result not in typeList and result is not None:
+                typeList.append(str(result))
+        fillChoice(self.tc_type.entry, typeList)
+        self.tc_type.entry.Append("All")
+        self.tc_type.entry.SetStringSelection("All")
+
+    def fillChoiceOfSubType(self):
+        equipments = Status.DB.dbheatpump.get_table()
+        subtypeList = []
+        for equipe in equipments:
+            sqlQuery = "SELECT HPSubType FROM dbheatpump WHERE DBHeatPump_ID = %s"%equipe.DBHeatPump_ID
+            result = Status.DB.sql_query(sqlQuery)
+            if result not in subtypeList and result is not None:
+                subtypeList.append(str(result))
+        fillChoice(self.tc_subtype.entry, subtypeList)
+        self.tc_subtype.entry.Append("All")
+        self.tc_subtype.entry.SetStringSelection("All")
+
+    def fillChoices(self):
+        self.fillChoiceOfDBFuel()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
+
     def fillEquipmentList(self):
         equipments = Status.DB.dbheatpump.get_table()
+        fields = ', '.join([f for f in colLabels])
+        hp_type = self.tc_type.GetValue(True)
+        hp_subtype = self.tc_subtype.GetValue(True)
+
         for equipe in equipments:
-            fields = ', '.join([f for f in colLabels])
-            sqlQuery = "SELECT %s FROM dbheatpump WHERE DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            if (hp_type == "All" or len(hp_type) <= 0) and (hp_subtype == "All" or len(hp_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif (hp_type == "All" or len(hp_type) <= 0) and hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif hp_type == "None" and (hp_subtype == "All" or len(hp_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif hp_type == "None" and hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif (hp_type == "All" or len(hp_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
+            elif (hp_subtype == "All" or len(hp_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
+            elif hp_type == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
+            elif hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
+            else:
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,hp_subtype,equipe.DBHeatPump_ID)
+
             result = Status.DB.sql_query(sqlQuery)
             if len(result) > 0:
                 self.grid.AppendRows(1, True)
@@ -721,8 +805,8 @@ class PanelDBHeatPumpNew(wx.Panel):
         self.grid.ClearSelection()
         for i in range(self.grid.GetNumberRows()):
             self.grid.DeleteRows()
+        self.fillChoices()
         self.fillEquipmentList()
-        self.fillChoiceOfDBFuel()
         self.notebook.ChangeSelection(0)
 
     def allFieldsEmpty(self):
