@@ -32,7 +32,6 @@ from GUITools import *
 from units import *
 from fonts import *
 from einstein.modules.messageLogger import *
-from einstein.GUI.panelBaseDBEditor import *
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
@@ -67,21 +66,21 @@ class PanelDBSolarThermal(wx.Panel):
         self.notebook = wx.Notebook(self, -1, style = 0)
         self.notebook.SetFont(fp.getFont())
 
-        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of solarthermals',
-                                       'Add Equipment', 'Delete Equipment')
+#        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of solarthermals',
+#                                       'Add Equipment', 'Delete Equipment')
 
-#        self.page0 = wx.Panel(self.notebook)
+        self.page0 = wx.Panel(self.notebook)
 #        self.notebook.AddPage(self.page0, _U('Descriptive Data'))
 
-        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of solarthermals',
-                                       'Add Equipment', 'Delete Equipment')
-#        self.page1 = wx.Panel(self.notebook)
+#        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of solarthermals',
+#                                       'Add Equipment', 'Delete Equipment')
+        self.page1 = wx.Panel(self.notebook)
 #        self.notebook.AddPage(self.page1, _U('Technical Data'))
 
-        self.page2 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of solarthermals',
-                                       'Add Equipment', 'Delete Equipment')
+#        self.page2 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of solarthermals',
+#                                       'Add Equipment', 'Delete Equipment')
 
-#        self.page2 = wx.Panel(self.notebook)
+        self.page2 = wx.Panel(self.notebook)
 #        self.notebook.AddPage(self.page2, _U('Economic Parameters'))
 
         self.notebook.AddPage(self.page0, _U('Descriptive Data'))

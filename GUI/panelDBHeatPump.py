@@ -32,22 +32,31 @@ from GUITools import *
 from units import *
 from fonts import *
 from einstein.modules.messageLogger import *
-from einstein.GUI.panelBaseDBEditor import *
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 195
 UNITS_WIDTH = 0
 
+VSEP = 4
+
 def _U(text):
-    return unicode(_(text), "utf-8")
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
+# DBHeatPump_ID needs to remain as first entry
+colLabels = "DBHeatPump_ID", "HPManufacturer", "HPModel", "HPType", "HPSubType", "HPSourceSink"
 
 class PanelDBHeatPump(wx.Panel):
     def __init__(self, parent):
         self.parent = parent
         self._init_ctrls(parent)
+        self._init_grid()
         self.__do_layout()
         self.fillEquipmentList()
+        self.fillChoices()
 
     def _init_ctrls(self, parent):
 #------------------------------------------------------------------------------
@@ -67,213 +76,254 @@ class PanelDBHeatPump(wx.Panel):
         self.notebook = wx.Notebook(self, -1, style = 0)
         self.notebook.SetFont(fp.getFont())
 
-        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of heatpumps',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of heatpumps',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.page2 = PanelBaseDBEditor(self.notebook, 'Heat source / sink', 'List of heatpumps',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.page3 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of heatpumps',
-                                       'Add Equipment', 'Delete Equipment')
-
-        self.notebook.AddPage(self.page0, _U('Descriptive Data'))
-        self.notebook.AddPage(self.page1, _U('Technical Data'))
-        self.notebook.AddPage(self.page2, _U('Heat source / sink'))
-        self.notebook.AddPage(self.page3, _U('Economic Parameters'))
+        self.page0 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page0, _U('Summary table'))
+        self.page1 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page1, _U('Descriptive Data'))
+        self.page2 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page2, _U('Technical Data'))
+        self.page3 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page3, _U('Heat source / sink'))
+        self.page4 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page4, _U('Economic Parameters'))
 
         #
-        # left tab controls
-        # tab 0 - Descriptive Data
+        # tab 0 - Summary table
         #
-        # right side: entries
-        self.tc1 = TextEntry(self.page0, maxchars = 45, value = '',
+        self.frame_summary_table = wx.StaticBox(self.page0, -1, _U("Summary table"))
+        self.frame_summary_table.SetForegroundColour(TITLE_COLOR)
+        self.frame_summary_table.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_summary_table.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.grid = wx.grid.Grid(name = 'summarytable', parent = self.page0,
+                                 pos = wx.Point(42, 32), style = 0)
+
+        self.tc_type = ChoiceEntry(self.page0,
+                                   values = [],
+                                   label = _U("Type"),
+                                   tip = _U("Show only equipment of type"))
+
+        self.tc_subtype = ChoiceEntry(self.page0,
+                                      values = [],
+                                      label = _U("Subtype"),
+                                      tip = _U("Show only equipment of subtype"))
+
+        #
+        # tab 1 - Descriptive Data
+        #
+        self.frame_descriptive_data = wx.StaticBox(self.page1, -1, _U("Descriptive data"))
+        self.frame_descriptive_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_descriptive_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_descriptive_data.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("HPManufacturer"),
                              tip = _U("Heatpump Manufacturer"))
 
-        self.tc2 = TextEntry(self.page0, maxchars = 45, value = '',
+        self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("HPModel"),
                              tip = _U("Heatpump Model"))
 
-        self.tc3 = TextEntry(self.page0, maxchars = 45, value = '',
+        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("HPType"),
                              tip = _U("Heatpump Type"))
 
-        self.tc4 = TextEntry(self.page0, maxchars = 45, value = '',
+        self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("HPSubType"),
                              tip = _U("Heatpump Sub Type"))
 
-        self.tc5 = TextEntry(self.page0, maxchars = 200, value = '',
+        self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
 
         #
-        # middle left tab controls
-        # tab 1 - Technical data
+        # tab 2 - Technical data
         #
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = 100,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+        self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
+        self.frame_heating = wx.StaticBox(self.page2, -1, _U("Heating"))
+        self.frame_cooling = wx.StaticBox(self.page2, -1, _U("Cooling"))
+        self.frame_general = wx.StaticBox(self.page2, -1, _U("General"))
+        self.frame_nominal_working_conditions = wx.StaticBox(self.page2, -1, _U("Nominal working conditions"))
+        self.frame_theoretical_efficiency = wx.StaticBox(self.page2, -1, _U("Theoretical efficiency and exergetic efficiency"))
+        self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_technical_data.SetFont(fp.getFont())
+        fp.popFont()
 
-        self.tc6 = FloatEntry(self.page1,
+        self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPHeatCap"),
                               tip = _U("Nominal heating capacity"))
 
-        self.tc7 = FloatEntry(self.page1,
+        self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPHeatCOP"),
                               tip = _U("Nominal COP for heating mode"))
 
-        self.tc8 = FloatEntry(self.page1,
+        self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCoolCap"),
                               tip = _U("Nominal cooling capacity"))
 
-        self.tc9 = FloatEntry(self.page1,
+        self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCoolCOP"),
                               tip = _U("Nominal COP for cooling mode"))
 
-        self.tc10 = FloatEntry(self.page1,
+        self.tc10 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPFuelConsum"),
                               tip = _U("Nominal fuel consumption"))
 
-        self.tc11 = ChoiceEntry(self.page1,
+        self.tc11 = ChoiceEntry(self.page2,
                                values = [],
                                label = _U("FuelType"),
                                tip = _U("Fuel type"))
 
-        self.tc12 = FloatEntry(self.page1,
+        self.tc12 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPElectConsum"),
                               tip = _U("Nominal electrical power consumption"))
 
-        self.tc13 = TextEntry(self.page1, maxchars = 45, value = '',
+        self.tc13 = TextEntry(self.page2, maxchars = 45, value = '',
                              label = _U("HPWorkFluid"),
                              tip = _U("Refrigerant / absorbent refrigerant pair"))
 
-        self.tc14 = FloatEntry(self.page1,
+        self.tc14 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCondTinC"),
                               tip = _U("inlet temperature to the condenser (and absorber)"))
 
-        self.tc15 = FloatEntry(self.page1,
+        self.tc15 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPGenTinC"),
                               tip = _U("inlet temperature to the generator"))
 
-        self.tc16 = FloatEntry(self.page1,
+        self.tc16 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPEvapTinC"),
                               tip = _U("inlet temperature to the evaporator"))
 
-        self.tc17 = FloatEntry(self.page1,
+        self.tc17 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPConstExCoolCOP"),
                               tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
-        self.tc18 = FloatEntry(self.page1,
+        self.tc18 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCondTinH"),
                               tip = _U("inlet temperature to the condenser (and absorber)"))
 
-        self.tc19 = FloatEntry(self.page1,
+        self.tc19 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPGenTinH"),
                               tip = _U("inlet temperature to the generator"))
 
-        self.tc20 = FloatEntry(self.page1,
+        self.tc20 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPEvapTinH"),
                               tip = _U("inlet temperature to the evaporator"))
 
-        self.tc21 = FloatEntry(self.page1,
+        self.tc21 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPConstExHeatCOP"),
                               tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
-        self.tc22 = StaticTextEntry(self.page1, maxchars = 255, value = '',
+        self.tc22 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                               label = _U("HPExCoolCOP"),
                               tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc23 = StaticTextEntry(self.page1, maxchars = 255, value = '',
+        self.tc23 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                               label = _U("HPThCoolCOP"),
                               tip = _U("Carnot COP for cooling mode at nominal conditions (see next point)."))
 
-        self.tc24 = StaticTextEntry(self.page1, maxchars = 255, value = '',
+        self.tc24 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                               label = _U("HPExHeatCOP"),
                               tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc25 = StaticTextEntry(self.page1, maxchars = 255, value = '',
+        self.tc25 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                               label = _U("HPThHeatCOP"),
                               tip = _U("Carnot COP for heating mode at nominal conditions (see next point)."))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+        #
+        # tab 3 - Heat source / sink
+        #
+        self.frame_heat_source_sink = wx.StaticBox(self.page3, -1, _U("Heat source / sink"))
+        self.frame_low_temp_heat_source_sink = wx.StaticBox(self.page3, -1, _U("Low temperature heat source / sink"))
+        self.frame_high_temp_heat_source_sink = wx.StaticBox(self.page3, -1, _U("High temperature heat source / sink"))
+        self.frame_heat_source_sink.SetForegroundColour(TITLE_COLOR)
+        self.frame_heat_source_sink.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_heat_source_sink.SetFont(fp.getFont())
+        fp.popFont()
 
-        #
-        # middle right tab controls
-        # tab 2. Heat source / sink
-        #
-        self.tc26 = ChoiceEntry(self.page2,
+        self.tc26 = ChoiceEntry(self.page3,
                                values = [],
-                               label = _U("HPSourceSink"),
+                               label = _U("HPAbsEffects"),
                                tip = _U("Heat source and sink"))
 
-        self.tc27 = FloatEntry(self.page2,
+        self.tc27 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPLimDT"),
                               tip = _U("Maximum acceptable temperature difference between evaporator and condenser temperatures (primary fluid: Tco - Tev) - working limit"))
 
-        self.tc28 = FloatEntry(self.page2,
+        self.tc28 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCondTmax"),
                               tip = _U("Maximum condensing (and absorption) temperature (primary fluid) - working limit"))
 
-        self.tc29 = FloatEntry(self.page2,
+        self.tc29 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPEvapTmin"),
                               tip = _U("Minimum evaporating temperature (primary fluid) - working limit"))
 
-        self.tc30 = ChoiceEntry(self.page2,
+        self.tc30 = ChoiceEntry(self.page3,
                                values = [],
                                label = _U("HPAbsHeatMed"),
                                tip = _U("Heat transport medium used for heat supply to the generator"))
 
-        self.tc31 = FloatEntry(self.page2,
+        self.tc31 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPGenTmin"),
                               tip = _U("Minimum required inlet temperature to the generator"))
 
         #
-        # right tab controls
-        # panel 3. Economic Parameters
+        # tab 4 - Economic Parameters
         #
-        self.tc32 = FloatEntry(self.page3,
+        self.frame_economic_parameters = wx.StaticBox(self.page4, -1, _U("Economic parameters"))
+        self.frame_economic_parameters.SetForegroundColour(TITLE_COLOR)
+        self.frame_economic_parameters.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_economic_parameters.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.tc32 = FloatEntry(self.page4,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPPrice"),
                               tip = _U("Equipment price at factory applied installer's discount"))
 
-        self.tc33 = FloatEntry(self.page3,
+        self.tc33 = FloatEntry(self.page4,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPTurnKeyPrice"),
                               tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
-        self.tc34 = FloatEntry(self.page3,
+        self.tc34 = FloatEntry(self.page4,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPOandMfix"),
                               tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
-        self.tc35 = FloatEntry(self.page3,
+        self.tc35 = FloatEntry(self.page4,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPOandMvar"),
                               tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
-        self.tc36 = FloatEntry(self.page3,
+        self.tc36 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("HPYearUpdate"),
                                tip = _U("Year of last update of the economic data"))
@@ -281,71 +331,165 @@ class PanelDBHeatPump(wx.Panel):
         #
         # buttons
         #
+        self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
+        self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
         #self.buttonOK.SetDefault()
 
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.page0.button1)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.page0.button2)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
-        self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentClick, self.page0.listBoxEquipment)
+
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnNotebookPageChanged, self.notebook)
+        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
+
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnGridLabelLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
+
+    def _init_grid(self):
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+        self.grid.CreateGrid(0, len(colLabels))
+
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetDefaultColSize(100)
+
+        self.grid.EnableEditing(False)
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        for i in range(len(colLabels)):
+            self.grid.SetColLabelValue(i, _U(colLabels[i]))
+
+        self.grid.SetGridCursor(0, 0)
 
     def __do_layout(self):
+        flagText = wx.TOP
 
         # global sizer for panel.
         sizerGlobal = wx.BoxSizer(wx.VERTICAL)
 
-        self.page0.addControl(self.tc1)
-        self.page0.addControl(self.tc2)
-        self.page0.addControl(self.tc3)
-        self.page0.addControl(self.tc4)
-        self.page0.addControl(self.tc5)
 
-        self.page1.addControl(self.tc6)
-        self.page1.addControl(self.tc7)
-        self.page1.addControl(self.tc8)
-        self.page1.addControl(self.tc9)
-        self.page1.addControl(self.tc10)
-        self.page1.addControl(self.tc11)
-        self.page1.addControl(self.tc12)
-        self.page1.addControl(self.tc13)
+        sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
+        sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
+        sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
-        self.page1.addControlBottomLeft(self.tc14)
-        self.page1.addControlBottomLeft(self.tc15)
-        self.page1.addControlBottomLeft(self.tc16)
-        self.page1.addControlBottomLeft(self.tc17)
+        self.page0.SetSizer(sizerPage0)
 
-        self.page1.addControlBottomRight(self.tc18)
-        self.page1.addControlBottomRight(self.tc19)
-        self.page1.addControlBottomRight(self.tc20)
-        self.page1.addControlBottomRight(self.tc21)
 
-        self.page1.addControlBottomLeft(self.tc22)
-        self.page1.addControlBottomLeft(self.tc23)
-        self.page1.addControlBottomRight(self.tc24)
-        self.page1.addControlBottomRight(self.tc25)
+        sizerPage1 = wx.StaticBoxSizer(self.frame_descriptive_data, wx.VERTICAL)
+        sizerPage1.Add(self.tc1, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage1.Add(self.tc2, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage1.Add(self.tc3, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage1.Add(self.tc4, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage1.Add(self.tc5, 0, flagText | wx.ALIGN_CENTER, VSEP)
 
-        self.page2.addControl(self.tc26)
-        self.page2.addControl(self.tc27)
-        self.page2.addControl(self.tc28)
-        self.page2.addControl(self.tc29)
-        self.page2.addControl(self.tc30)
-        self.page2.addControl(self.tc31)
+        self.page1.SetSizer(sizerPage1)
 
-        self.page3.addControl(self.tc32)
-        self.page3.addControl(self.tc33)
-        self.page3.addControl(self.tc34)
-        self.page3.addControl(self.tc35)
-        self.page3.addControl(self.tc36)
+
+        sizerPage2_H1 = wx.StaticBoxSizer(self.frame_heating, wx.VERTICAL)
+        sizerPage2_H1.Add(self.tc6, 0, flagText, VSEP)
+        sizerPage2_H1.Add(self.tc7, 0, flagText, VSEP)
+
+        sizerPage2_C1 = wx.StaticBoxSizer(self.frame_cooling, wx.VERTICAL)
+        sizerPage2_C1.Add(self.tc8, 0, flagText, VSEP)
+        sizerPage2_C1.Add(self.tc9, 0, flagText, VSEP)
+
+        sizerPage2_G = wx.StaticBoxSizer(self.frame_general, wx.VERTICAL)
+        sizerPage2_G.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage2_G.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage2_G.Add(self.tc12, 0, flagText, VSEP)
+        sizerPage2_G.Add(self.tc13, 0, flagText, VSEP)
+
+        sizerPage2_nwc_C = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_nwc_C.Add(self.tc14, 0, flagText, VSEP)
+        sizerPage2_nwc_C.Add(self.tc15, 0, flagText, VSEP)
+        sizerPage2_nwc_C.Add(self.tc16, 0, flagText, VSEP)
+        sizerPage2_nwc_C.Add(self.tc17, 0, flagText, VSEP)
+
+        sizerPage2_nwc_H = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_nwc_H.Add(self.tc18, 0, flagText, VSEP)
+        sizerPage2_nwc_H.Add(self.tc19, 0, flagText, VSEP)
+        sizerPage2_nwc_H.Add(self.tc20, 0, flagText, VSEP)
+        sizerPage2_nwc_H.Add(self.tc21, 0, flagText, VSEP)
+
+        sizerPage2_nwc = wx.StaticBoxSizer(self.frame_nominal_working_conditions, wx.HORIZONTAL)
+        sizerPage2_nwc.Add(sizerPage2_nwc_C)
+        sizerPage2_nwc.Add(sizerPage2_nwc_H)
+
+        sizerPage2_teee_C = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_teee_C.Add(self.tc22, 0, flagText, VSEP)
+        sizerPage2_teee_C.Add(self.tc23, 0, flagText, VSEP)
+
+        sizerPage2_teee_H = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_teee_H.Add(self.tc24, 0, flagText, VSEP)
+        sizerPage2_teee_H.Add(self.tc25, 0, flagText, VSEP)
+
+        sizerPage2_teee = wx.StaticBoxSizer(self.frame_theoretical_efficiency, wx.HORIZONTAL)
+        sizerPage2_teee.Add(sizerPage2_teee_C)
+        sizerPage2_teee.Add(sizerPage2_teee_H)
+
+        sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
+        sizerPage2.Add(sizerPage2_H1, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage2.Add(sizerPage2_C1, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage2.Add(sizerPage2_G, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage2.Add(sizerPage2_nwc, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage2.Add(sizerPage2_teee, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+
+        self.page2.SetSizer(sizerPage2)
+
+
+        sizerPage3_low = wx.StaticBoxSizer(self.frame_low_temp_heat_source_sink, wx.VERTICAL)
+        sizerPage3_low.Add(self.tc26, 0, flagText, VSEP)
+        sizerPage3_low.Add(self.tc27, 0, flagText, VSEP)
+        sizerPage3_low.Add(self.tc28, 0, flagText, VSEP)
+        sizerPage3_low.Add(self.tc29, 0, flagText, VSEP)
+
+        sizerPage3_high = wx.StaticBoxSizer(self.frame_high_temp_heat_source_sink, wx.VERTICAL)
+        sizerPage3_high.Add(self.tc30, 0, flagText, VSEP)
+        sizerPage3_high.Add(self.tc31, 0, flagText, VSEP)
+
+        sizerPage3 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.VERTICAL)
+        sizerPage3.Add(sizerPage3_low, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage3.Add(sizerPage3_high, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+
+        self.page3.SetSizer(sizerPage3)
+
+        sizerPage4 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
+        sizerPage4.Add(self.tc32, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage4.Add(self.tc33, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage4.Add(self.tc34, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage4.Add(self.tc35, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage4.Add(self.tc36, 0, flagText | wx.ALIGN_CENTER, VSEP)
+
+        self.page4.SetSizer(sizerPage4)
+
+
+        sizerAddDelete = wx.BoxSizer(wx.HORIZONTAL)
+        sizerAddDelete.Add(self.buttonDeleteEquipment, 1, wx.EXPAND, 0)
+        sizerAddDelete.Add(self.buttonAddEquipment, 1, wx.EXPAND | wx.LEFT, 4)
 
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        sizerOKCancel.Add(self.buttonCancel, 0, wx.EXPAND, 0)
-        sizerOKCancel.Add(self.buttonOK, 0, wx.EXPAND | wx.LEFT, 4)
+        sizerOKCancel.Add(self.buttonCancel, 1, wx.EXPAND, 0)
+        sizerOKCancel.Add(self.buttonOK, 1, wx.EXPAND | wx.LEFT, 4)
 
         sizerGlobal.Add(self.notebook, 1, wx.EXPAND, 0)
+        sizerGlobal.Add(sizerAddDelete, 0, wx.ALIGN_RIGHT, 0)
         sizerGlobal.Add(sizerOKCancel, 0, wx.ALIGN_RIGHT, 0)
+
         self.SetSizer(sizerGlobal)
         self.Layout()
         self.Show()
@@ -355,22 +499,42 @@ class PanelDBHeatPump(wx.Panel):
 #------------------------------------------------------------------------------
 
     def OnButtonAddEquipment(self, event):
+        retval = Status.DB.dbheatpump.insert({})
         self.clearPage0()
+        for i in range(self.grid.GetNumberRows() - 1, -1, -1):
+            if self.grid.GetCellValue(i, 0) == str(retval):
+                self.grid.SetGridCursor(i, 0)
+                self.grid.MakeCellVisible(i, 0)
+                self.grid.SelectRow(i)
+                equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(retval)]
+                if len(equipments) > 0:
+                    equipe = equipments[0]
+                    self.display(equipe)
+                break
+        self.fillChoices()
+        event.Skip()
 
     def OnButtonDeleteEquipment(self, event):
-        self.equipeName = self.page0.listBoxEquipment.GetStringSelection()
-        logTrack("PanelDBHeatPump (DELETE Button): deleting heatpump ID %s" % self.equipeName)
+        if not self.grid.IsSelection():
+            print "Select a row first"
+            return
 
-        sqlQuery = "SELECT * FROM dbheatpump WHERE DBHeatPump_ID = '%s'" % self.equipeName
+        id = self.grid.GetCellValue(self.grid.GetGridCursorRow(), 0)
+        logTrack("PanelDBHeatPump (DELETE Button): deleting heatpump ID %s" % id)
+
+        sqlQuery = "SELECT * FROM dbheatpump WHERE DBHeatPump_ID = '%s'" % id
         result = Status.DB.sql_query(sqlQuery)
 
         if len(result) > 0:
-            sqlQuery = "DELETE FROM dbheatpump WHERE DBHeatPump_ID = '%s'" % self.equipeName
+            sqlQuery = "DELETE FROM dbheatpump WHERE DBHeatPump_ID = '%s'" % id
             Status.DB.sql_query(sqlQuery)
             self.clearPage0()
 
+        event.Skip()
+
     def OnButtonCancel(self, event):
         self.clearPage0()
+        event.Skip()
 
     def OnButtonOK(self, event):
         if self.allFieldsEmpty():
@@ -393,12 +557,12 @@ class PanelDBHeatPump(wx.Panel):
                "HPElectConsum":check(self.tc12.GetValue()),
                "HPWorkFluid":check(self.tc13.GetValue()),
                "HPCondTinC":check(self.tc14.GetValue()),
-               "HPAbsTinC":check(self.tc14.GetValue()),
+               "HPAbsTinC":check(self.tc14.GetValue()), # equal to HPCondTinC
                "HPGenTinC":check(self.tc15.GetValue()),
                "HPEvapTinC":check(self.tc16.GetValue()),
                "HPConstExCoolCOP":check(self.tc17.GetValue()),
                "HPCondTinH":check(self.tc18.GetValue()),
-               "HPAbsTinH":check(self.tc18.GetValue()),
+               "HPAbsTinH":check(self.tc18.GetValue()), # equal to HPCondTinH
                "HPGenTinH":check(self.tc19.GetValue()),
                "HPEvapTinH":check(self.tc20.GetValue()),
                "HPConstExHeatCOP":check(self.tc21.GetValue()),
@@ -419,60 +583,77 @@ class PanelDBHeatPump(wx.Panel):
                "HPYearUpdate":check(self.tc36.GetValue())
                }
 
-        if len(self.page0.listBoxEquipment.GetSelections()) + \
-           len(self.page1.listBoxEquipment.GetSelections()) + \
-           len(self.page2.listBoxEquipment.GetSelections()) + \
-           len(self.page3.listBoxEquipment.GetSelections()) == 0:
-            retval = Status.DB.dbheatpump.insert(tmp)
-            self.fillEquipmentList()
-            self.page0.listBoxEquipment.SetStringSelection(str(retval))
-            self.page1.listBoxEquipment.SetStringSelection(str(retval))
-            self.page2.listBoxEquipment.SetStringSelection(str(retval))
-            self.page3.listBoxEquipment.SetStringSelection(str(retval))
-        else:
-            self.equipeName = self.page0.listBoxEquipment.GetStringSelection()
-            equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(self.equipeName)]
+        row = self.grid.GetGridCursorRow()
+        col = self.grid.GetGridCursorCol()
 
-            if len(equipments) > 0:
-                equipe = equipments[0]
+        try:
+            id = self.grid.GetCellValue(row, 0)
+        except:
+            return
 
-            equipe.update(tmp)
-            self.page0.listBoxEquipment.SetStringSelection(str(self.equipeName))
-
-    def OnListBoxEquipmentClick(self, event):
-        self.equipeName = event.String
-        self.page0.listBoxEquipment.SetStringSelection(self.equipeName)
-        self.page1.listBoxEquipment.SetStringSelection(self.equipeName)
-        self.page2.listBoxEquipment.SetStringSelection(self.equipeName)
-        self.page3.listBoxEquipment.SetStringSelection(self.equipeName)
-
-        equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(self.equipeName)]
+        equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(id)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
-        else:
-            logDebug("PanelDBHeatPump (ListBoxClick): equipe %s not found in database" % self.equipeName)
-            return
+            equipe.update(tmp)
+
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
+        self.fillEquipmentList()
+
+        if row >= 0 and col >= 0:
+            self.grid.SetGridCursor(row, col)
+            self.grid.SelectRow(row)
+            self.grid.MakeCellVisible(row, col)
+
+        event.Skip()
+
+    def OnNotebookPageChanged(self, event):
+        event.Skip()
+
+    def OnGridCellLeftClick(self, event):
+        self.clear()
+        self.grid.ClearSelection()
+        self.grid.SetGridCursor(event.GetRow(), event.GetCol())
+        id = self.grid.GetCellValue(event.GetRow(), 0)
+
+        equipments = Status.DB.dbheatpump.DBHeatPump_ID[check(id)]
+
+        if len(equipments) > 0:
+            equipe = equipments[0]
 
         self.display(equipe)
 
-    def OnNotebookPageChanged(self, event):
-        old = event.OldSelection
-        selection = ''
+        event.Skip()
 
-        if old == 0:
-            selection = self.page0.listBoxEquipment.GetStringSelection()
-        elif old == 1:
-            selection = self.page1.listBoxEquipment.GetStringSelection()
-        if old == 2:
-            selection = self.page2.listBoxEquipment.GetStringSelection()
-        elif old == 3:
-            selection = self.page3.listBoxEquipment.GetStringSelection()
+    def OnGridCellRightClick(self, event):
+        event.Skip()
 
-        self.page0.listBoxEquipment.SetStringSelection(selection)
-        self.page1.listBoxEquipment.SetStringSelection(selection)
-        self.page2.listBoxEquipment.SetStringSelection(selection)
-        self.page3.listBoxEquipment.SetStringSelection(selection)
+    def OnGridCellDClick(self, event):
+        event.Skip()
+
+    def OnGridLabelLeftClick(self, event):
+        self.clear()
+        if event.GetRow() >= 0:
+            self.OnGridCellLeftClick(event)
+            self.grid.SetGridCursor(event.GetRow(), 0)
+        event.Skip()
+
+    def OnGridLabelRightClick(self, event):
+        event.Skip()
+
+    def OnGridLabelDClick(self, event):
+        event.Skip()
+
+    def OnChoiceEntryClick(self, event):
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillEquipmentList()
+        event.Skip()
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -567,28 +748,75 @@ class PanelDBHeatPump(wx.Panel):
         fuelList = fuelDict.values()
         fillChoice(self.tc11.entry, fuelList)
 
-    def fillEquipmentList(self):
-        self.page0.clearListBox()
-        self.page1.clearListBox()
-        self.page2.clearListBox()
-        self.page3.clearListBox()
-
+    def fillChoiceOfType(self):
         equipments = Status.DB.dbheatpump.get_table()
+        typeList = []
+        for equipe in equipments:
+            sqlQuery = "SELECT HPType FROM dbheatpump WHERE DBHeatPump_ID = %s"%equipe.DBHeatPump_ID
+            result = Status.DB.sql_query(sqlQuery)
+            if result not in typeList and result is not None:
+                typeList.append(str(result))
+        fillChoice(self.tc_type.entry, typeList)
+        self.tc_type.entry.Append("All")
+        self.tc_type.entry.SetStringSelection("All")
+
+    def fillChoiceOfSubType(self):
+        equipments = Status.DB.dbheatpump.get_table()
+        subtypeList = []
+        for equipe in equipments:
+            sqlQuery = "SELECT HPSubType FROM dbheatpump WHERE DBHeatPump_ID = %s"%equipe.DBHeatPump_ID
+            result = Status.DB.sql_query(sqlQuery)
+            if result not in subtypeList and result is not None:
+                subtypeList.append(str(result))
+        fillChoice(self.tc_subtype.entry, subtypeList)
+        self.tc_subtype.entry.Append("All")
+        self.tc_subtype.entry.SetStringSelection("All")
+
+    def fillChoices(self):
+        self.fillChoiceOfDBFuel()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
+
+    def fillEquipmentList(self):
+        equipments = Status.DB.dbheatpump.get_table()
+        fields = ', '.join([f for f in colLabels])
+        hp_type = self.tc_type.GetValue(True)
+        hp_subtype = self.tc_subtype.GetValue(True)
 
         for equipe in equipments:
-            self.page0.addListBoxElement(equipe.DBHeatPump_ID)
-            self.page1.addListBoxElement(equipe.DBHeatPump_ID)
-            self.page2.addListBoxElement(equipe.DBHeatPump_ID)
-            self.page3.addListBoxElement(equipe.DBHeatPump_ID)
+            if (hp_type == "All" or len(hp_type) <= 0) and (hp_subtype == "All" or len(hp_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif (hp_type == "All" or len(hp_type) <= 0) and hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif hp_type == "None" and (hp_subtype == "All" or len(hp_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif hp_type == "None" and hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
+            elif (hp_type == "All" or len(hp_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
+            elif (hp_subtype == "All" or len(hp_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
+            elif hp_type == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
+            elif hp_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
+            else:
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,hp_subtype,equipe.DBHeatPump_ID)
+
+            result = Status.DB.sql_query(sqlQuery)
+            if len(result) > 0:
+                self.grid.AppendRows(1, True)
+                for i in range(len(colLabels)):
+                    self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
 
     def clearPage0(self):
         self.clear()
-        self.page0.listBoxEquipment.DeselectAll()
-        self.page1.listBoxEquipment.DeselectAll()
-        self.page2.listBoxEquipment.DeselectAll()
-        self.page3.listBoxEquipment.DeselectAll()
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillChoices()
         self.fillEquipmentList()
-        self.fillChoiceOfDBFuel()
         self.notebook.ChangeSelection(0)
 
     def allFieldsEmpty(self):
