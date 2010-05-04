@@ -49,9 +49,10 @@ def _U(text):
 # DBHeatPump_ID needs to remain as first entry
 colLabels = "DBHeatPump_ID", "HPManufacturer", "HPModel", "HPType", "HPSubType", "HPSourceSink"
 
-class PanelDBHeatPump(wx.Panel):
-    def __init__(self, parent):
+class PanelDBHeatPump(wx.Dialog):
+    def __init__(self, parent, title):
         self.parent = parent
+        self.title = title
         self._init_ctrls(parent)
         self._init_grid()
         self.__do_layout()
@@ -63,8 +64,10 @@ class PanelDBHeatPump(wx.Panel):
 #--- UI setup
 #------------------------------------------------------------------------------
 
-        wx.Panel.__init__(self, id = -1, name = 'PanelDBHeatPump', parent = parent,
-              pos = wx.Point(0, 0), size = wx.Size(780, 580))
+        wx.Dialog.__init__(self, parent, -1, self.title,
+                           wx.Point(wx.CENTER_ON_SCREEN), wx.Size(800, 600),
+                           wx.DEFAULT_FRAME_STYLE, 'PanelDBHeatPump')
+        self.Centre()
         self.Hide()
 
         # access to font properties object
@@ -335,14 +338,13 @@ class PanelDBHeatPump(wx.Panel):
         self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
-        #self.buttonOK.SetDefault()
+        self.buttonOK.SetDefault()
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
         self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
 
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnNotebookPageChanged, self.notebook)
         self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
 
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
@@ -528,12 +530,19 @@ class PanelDBHeatPump(wx.Panel):
         if len(result) > 0:
             sqlQuery = "DELETE FROM dbheatpump WHERE DBHeatPump_ID = '%s'" % id
             Status.DB.sql_query(sqlQuery)
-            self.clearPage0()
+
+            self.clear()
+            self.grid.ClearGrid()
+            self.grid.ClearSelection()
+            for i in range(self.grid.GetNumberRows()):
+                self.grid.DeleteRows()
+            self.fillChoiceOfDBFuel()
+            self.fillEquipmentList()
+            self.notebook.ChangeSelection(0)
 
         event.Skip()
 
     def OnButtonCancel(self, event):
-        self.clearPage0()
         event.Skip()
 
     def OnButtonOK(self, event):
@@ -607,11 +616,6 @@ class PanelDBHeatPump(wx.Panel):
             self.grid.SetGridCursor(row, col)
             self.grid.SelectRow(row)
             self.grid.MakeCellVisible(row, col)
-
-        event.Skip()
-
-    def OnNotebookPageChanged(self, event):
-        event.Skip()
 
     def OnGridCellLeftClick(self, event):
         self.clear()

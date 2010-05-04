@@ -38,23 +38,36 @@ LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 
-def _U(text):
-    return unicode(_(text), "utf-8")
+VSEP = 4
 
-class PanelDBSolarThermal(wx.Panel):
-    def __init__(self, parent):
+def _U(text):
+    try:
+        return unicode(_(text),"utf-8")
+    except:
+        return _(text)
+
+# DBSolarThermal_ID needs to remain as first entry
+colLabels = "DBSolarThermal_ID", "STManufacturer", "STModel", "STType", "STPnomColl"
+
+class PanelDBSolarThermal(wx.Dialog):
+    def __init__(self, parent, title):
         self.parent = parent
+        self.title = title
         self._init_ctrls(parent)
+        self._init_grid()
         self.__do_layout()
         self.fillEquipmentList()
+        self.fillChoices()
 
     def _init_ctrls(self, parent):
 #------------------------------------------------------------------------------
 #--- UI setup
 #------------------------------------------------------------------------------
 
-        wx.Panel.__init__(self, id = -1, name = 'PanelDBSolarthermal', parent = parent,
-              pos = wx.Point(0, 0), size = wx.Size(780, 580))
+        wx.Dialog.__init__(self, parent, -1, self.title,
+                           wx.Point(wx.CENTER_ON_SCREEN), wx.Size(800, 600),
+                           wx.DEFAULT_FRAME_STYLE, 'PanelDBSolarThermal')
+        self.Centre()
         self.Hide()
 
         # access to font properties object
@@ -66,162 +79,152 @@ class PanelDBSolarThermal(wx.Panel):
         self.notebook = wx.Notebook(self, -1, style = 0)
         self.notebook.SetFont(fp.getFont())
 
-#        self.page0 = PanelBaseDBEditor(self.notebook, 'Descriptive Data', 'List of solarthermals',
-#                                       'Add Equipment', 'Delete Equipment')
-
         self.page0 = wx.Panel(self.notebook)
-#        self.notebook.AddPage(self.page0, _U('Descriptive Data'))
-
-#        self.page1 = PanelBaseDBEditor(self.notebook, 'Technical Data', 'List of solarthermals',
-#                                       'Add Equipment', 'Delete Equipment')
+        self.notebook.AddPage(self.page0, _U('Summary table'))
         self.page1 = wx.Panel(self.notebook)
-#        self.notebook.AddPage(self.page1, _U('Technical Data'))
-
-#        self.page2 = PanelBaseDBEditor(self.notebook, 'Economic Parameters', 'List of solarthermals',
-#                                       'Add Equipment', 'Delete Equipment')
-
+        self.notebook.AddPage(self.page1, _U('Descriptive Data'))
         self.page2 = wx.Panel(self.notebook)
-#        self.notebook.AddPage(self.page2, _U('Economic Parameters'))
-
-        self.notebook.AddPage(self.page0, _U('Descriptive Data'))
-        self.notebook.AddPage(self.page1, _U('Technical Data'))
-        self.notebook.AddPage(self.page2, _U('Economic Parameters'))
-
-#        self.frame_descriptive_data = wx.StaticBox(self.page0, -1,_U("Descriptive Data"))
-#        self.frame_descriptive_data.SetForegroundColour(TITLE_COLOR)
-#        self.frame_descriptive_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-#
-#        self.frame_technical_data = wx.StaticBox(self.page1, -1, _U("Technical Data"))
-#        self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
-#        self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-#
-#        self.frame_economix = wx.StaticBox(self.page2, -1, _U("Economic Parameters"))
-#        self.frame_economix.SetForegroundColour(TITLE_COLOR)
-#        self.frame_economix.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-
-        # set font for titles
-        # 1. save actual font parameters on the stack
-#        fp.pushFont()
-#        # 2. change size and weight
-#        fp.changeFont(size=TYPE_SIZE_TITLES, weight=wx.BOLD)
-#        self.frame_descriptive_data.SetFont(fp.getFont())
-#        self.frame_technical_data.SetFont(fp.getFont())
-#        self.frame_economix.SetFont(fp.getFont())
-#        # 3. recover previous font state
-#        fp.popFont()
-
-#        fs = FieldSizes(wHeight=HEIGHT,wLabel=LABEL_WIDTH_LEFT,
-#                       wData=DATA_ENTRY_WIDTH_LEFT,wUnits=UNITS_WIDTH)
+        self.notebook.AddPage(self.page2, _U('Technical Data'))
+        self.page3 = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.page3, _U('Economic Parameters'))
 
         #
-        # left tab controls
-        # tab 0 - Descriptive Data
+        # tab 0 - Summary table
         #
-        #right side: entries
-        self.tc1 = TextEntry(self.page0, maxchars = 20, value = '',
+        self.frame_summary_table = wx.StaticBox(self.page0, -1, _U("Summary table"))
+        self.frame_summary_table.SetForegroundColour(TITLE_COLOR)
+        self.frame_summary_table.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_summary_table.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.grid = wx.grid.Grid(name = 'summarytable', parent = self.page0,
+                                 pos = wx.Point(42, 32), style = 0)
+
+        self.tc_type = ChoiceEntry(self.page0,
+                                   values = [],
+                                   label = _U("Type"),
+                                   tip = _U("Show only equipment of type"))
+
+        #
+        # tab 1 - Descriptive Data
+        #
+        self.frame_descriptive_data = wx.StaticBox(self.page1, -1, _U("Descriptive data"))
+        self.frame_descriptive_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_descriptive_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_descriptive_data.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.tc1 = TextEntry(self.page1, maxchars = 20, value = '',
                              label = _U("STManufacturer"),
                              tip = _U("Solarthermal Manufacturer"))
 
-        self.tc2 = TextEntry(self.page0, maxchars = 20, value = '',
+        self.tc2 = TextEntry(self.page1, maxchars = 20, value = '',
                              label = _U("STModel"),
                              tip = _U("Solarthermal Model"))
 
-        self.tc3 = TextEntry(self.page0, maxchars = 45, value = '',
+        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("STType"),
                              tip = _U("Solarthermal Type"))
 
-        self.tc4 = TextEntry(self.page0, maxchars = 200, value = '',
+        self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("STReference"),
                              tip = _U("Source of data"))
 
         #
-        # middle tab controls
-        # tab 1 - Technical data
+        # tab 2 - Technical data
         #
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = 100,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+        self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
+        self.frame_col_eff_par = wx.StaticBox(self.page2, -1, _U("Collector efficiency parameters"))
+        self.frame_col_dim_wei = wx.StaticBox(self.page2, -1, _U("Collector dimension and weight"))
+        self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
+        self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_technical_data.SetFont(fp.getFont())
+        fp.popFont()
 
-        self.tc5 = StaticTextEntry(self.page1, maxchars = 255, value = '',
+        self.tc5 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                               label = _U("STPnomColl"),
                               tip = _U(""))
 
-        self.tc6 = FloatEntry(self.page1,
+        self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("STc0"),
                               tip = _U("Optical efficiency"))
 
-        self.tc7 = FloatEntry(self.page1,
+        self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("STc1"),
                               tip = _U("Linear thermal loss coefficient"))
 
-        self.tc8 = FloatEntry(self.page1,
+        self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("STc2"),
                               tip = _U("Quadratic thermal loss coefficient"))
 
-        self.tc9 = FloatEntry(self.page1,
+        self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("K50L"),
                               tip = unicode("Incidence angle correction factor at 50º (longitudinal)", 'latin-1'))
 
-        self.tc10 = FloatEntry(self.page1,
+        self.tc10 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("K50T"),
                               tip = unicode("Incidence angle correction factor at 50º (transversal)", 'latin-1'))
 
-        self.tc11 = FloatEntry(self.page1,
+        self.tc11 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'MASSORVOLUMEFLOW',
                               label = _U("STMassFlowRate"),
                               tip = _U("Recommended collector mass flow rate"))
 
-        self.tc12 = FloatEntry(self.page1,
+        self.tc12 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'LENGTH',
                               label = _U("STLengthGross"),
                               tip = _U(""))
 
-        self.tc13 = FloatEntry(self.page1,
+        self.tc13 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'LENGTH',
                               label = _U("STHeightGross"),
                               tip = _U(""))
 
-        self.tc14 = FloatEntry(self.page1,
+        self.tc14 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'AREA',
                               label = _U("STAreaGross"),
                               tip = _U(""))
 
-        self.tc15 = FloatEntry(self.page1,
+        self.tc15 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'LENGTH',
                               label = _U("STLengthAper"),
                               tip = _U(""))
 
-        self.tc16 = FloatEntry(self.page1,
+        self.tc16 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'LENGTH',
                               label = _U("STHeightAper"),
                               tip = _U(""))
 
-        self.tc17 = FloatEntry(self.page1,
+        self.tc17 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'AREA',
                               label = _U("STAreaAper"),
                               tip = _U(""))
 
-        self.tc18 = FloatEntry(self.page1,
+        self.tc18 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("STAreaFactor"),
                               tip = _U(""))
 
-        self.tc19 = FloatEntry(self.page1,
+        self.tc19 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'MASSPERAREA',
                               label = _U("STWeightFactor"),
@@ -231,40 +234,46 @@ class PanelDBSolarThermal(wx.Panel):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
-        # right tab controls
-        # panel 2. Economic Parameters
+        # tab 3 - Economic Parameters
         #
-        self.tc20 = FloatEntry(self.page2,
+        self.frame_economic_parameters = wx.StaticBox(self.page3, -1, _U("Economic parameters"))
+        self.frame_economic_parameters.SetForegroundColour(TITLE_COLOR)
+        self.frame_economic_parameters.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        fp.pushFont()
+        self.frame_economic_parameters.SetFont(fp.getFont())
+        fp.popFont()
+
+        self.tc20 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'UNITPRICE',
                               label = _U("STUnitPrice300kW"),
                               tip = _U(""))
 
-        self.tc21 = FloatEntry(self.page2,
+        self.tc21 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice30kW"),
                               tip = _U(""))
 
-        self.tc22 = FloatEntry(self.page2,
+        self.tc22 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice300kW"),
                               tip = _U(""))
 
-        self.tc23 = FloatEntry(self.page2,
+        self.tc23 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'UNITPRICE',
                               label = _U("STUnitTurnKeyPrice3000kW"),
                               tip = _U(""))
 
-        self.tc24 = FloatEntry(self.page2,
+        self.tc24 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
 #                              unitdict = 'UNITPRICE',
                               label = _U("STOMUnitFix"),
                               tip = _U(""))
 
-        self.tc25 = FloatEntry(self.page2,
+        self.tc25 = FloatEntry(self.page3,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("STYearUpdate"),
                                tip = _U("Year of last update of the economic data"))
@@ -272,59 +281,129 @@ class PanelDBSolarThermal(wx.Panel):
         #
         # buttons
         #
+        self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
+        self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
         self.buttonOK.SetDefault()
 
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.page0.button1)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.page0.button2)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
         self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
         self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
-        self.Bind(wx.EVT_LISTBOX, self.OnListBoxEquipmentClick, self.page0.listBoxEquipment)
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnNotebookPageChanged, self.notebook)
+
+        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
+
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnGridLabelLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
+
+    def _init_grid(self):
+        attr = wx.grid.GridCellAttr()
+        attr.SetTextColour(GRID_LETTER_COLOR)
+        attr.SetBackgroundColour(GRID_BACKGROUND_COLOR)
+        attr.SetFont(wx.Font(GRID_LETTER_SIZE, wx.SWISS, wx.NORMAL, wx.NORMAL))
+
+        self.grid.CreateGrid(0, len(colLabels))
+
+        self.grid.EnableGridLines(True)
+        self.grid.SetDefaultRowSize(20)
+        self.grid.SetRowLabelSize(30)
+        self.grid.SetDefaultColSize(125)
+
+        self.grid.EnableEditing(False)
+        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        self.grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        for i in range(len(colLabels)):
+            self.grid.SetColLabelValue(i, _U(colLabels[i]))
+
+        self.grid.SetGridCursor(0, 0)
 
     def __do_layout(self):
+        flagText_left = wx.TOP | wx.ALIGN_LEFT
+        flagText = wx.TOP | wx.ALIGN_CENTER
 
         # global sizer for panel.
         sizerGlobal = wx.BoxSizer(wx.VERTICAL)
 
-        self.page0.addControl(self.tc1)
-        self.page0.addControl(self.tc2)
-        self.page0.addControl(self.tc3)
-        self.page0.addControl(self.tc4)
+        sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
+        sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
+        sizerPage0.Add(self.tc_type, 0, wx.TOP | wx.ALIGN_RIGHT, VSEP)
 
-        self.page1.addControl(self.tc5)
-        self.page1.addControl(self.tc6)
-        self.page1.addControl(self.tc7)
-        self.page1.addControl(self.tc8)
-        self.page1.addControl(self.tc9)
-        self.page1.addControl(self.tc10)
-        self.page1.addControl(self.tc11)
+        self.page0.SetSizer(sizerPage0)
 
-        self.page1.addControlBottomLeft(self.tc12)
-        self.page1.addControlBottomLeft(self.tc13)
-        self.page1.addControlBottomLeft(self.tc14)
 
-        self.page1.addControlBottomRight(self.tc15)
-        self.page1.addControlBottomRight(self.tc16)
-        self.page1.addControlBottomRight(self.tc17)
+        sizerPage1 = wx.StaticBoxSizer(self.frame_descriptive_data, wx.VERTICAL)
+        sizerPage1.Add(self.tc1, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc2, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc3, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc4, 0, flagText, VSEP)
 
-        self.page1.addControl(self.tc18)
-        self.page1.addControl(self.tc19)
+        self.page1.SetSizer(sizerPage1)
 
-        self.page2.addControl(self.tc20)
-        self.page2.addControl(self.tc21)
-        self.page2.addControl(self.tc22)
-        self.page2.addControl(self.tc23)
-        self.page2.addControl(self.tc24)
-        self.page2.addControl(self.tc25)
+
+        sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
+        sizerPage2.Add(self.tc5, 0, flagText_left, VSEP)
+
+        sizerPage2_eff = wx.StaticBoxSizer(self.frame_col_eff_par, wx.VERTICAL)
+        sizerPage2_eff.Add(self.tc6, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc7, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc8, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc11, 0, flagText, VSEP)
+
+        sizerPage2.Add(sizerPage2_eff, 0, flagText_left, VSEP)
+
+        sizerPage2_dim_gross = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_dim_gross.Add(self.tc12, 0, flagText, VSEP)
+        sizerPage2_dim_gross.Add(self.tc13, 0, flagText, VSEP)
+        sizerPage2_dim_gross.Add(self.tc14, 0, flagText, VSEP)
+
+        sizerPage2_dim_aper = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_dim_aper.Add(self.tc15, 0, flagText, VSEP)
+        sizerPage2_dim_aper.Add(self.tc16, 0, flagText, VSEP)
+        sizerPage2_dim_aper.Add(self.tc17, 0, flagText, VSEP)
+
+        sizerPage2_dim = wx.StaticBoxSizer(self.frame_col_dim_wei, wx.HORIZONTAL)
+        sizerPage2_dim.Add(sizerPage2_dim_gross)
+        sizerPage2_dim.Add(sizerPage2_dim_aper)
+
+        sizerPage2.Add(sizerPage2_dim, 0, flagText_left, VSEP)
+        sizerPage2.Add(self.tc18, 0, flagText_left, VSEP)
+        sizerPage2.Add(self.tc19, 0, flagText_left, VSEP)
+
+        self.page2.SetSizer(sizerPage2)
+
+
+        sizerPage3 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
+        sizerPage3.Add(self.tc20, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc21, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc22, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc23, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc24, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc25, 0, flagText, VSEP)
+
+        self.page3.SetSizer(sizerPage3)
+
+
+        sizerAddDelete = wx.BoxSizer(wx.HORIZONTAL)
+        sizerAddDelete.Add(self.buttonDeleteEquipment, 1, wx.EXPAND, 0)
+        sizerAddDelete.Add(self.buttonAddEquipment, 1, wx.EXPAND | wx.LEFT, 4)
 
         sizerOKCancel = wx.BoxSizer(wx.HORIZONTAL)
-        sizerOKCancel.Add(self.buttonCancel, 0, wx.ALL | wx.EXPAND, 0)
-        sizerOKCancel.Add(self.buttonOK, 0, wx.EXPAND | wx.LEFT, 4)
+        sizerOKCancel.Add(self.buttonCancel, 1, wx.EXPAND, 0)
+        sizerOKCancel.Add(self.buttonOK, 1, wx.EXPAND | wx.LEFT, 4)
 
         sizerGlobal.Add(self.notebook, 1, wx.EXPAND, 0)
-        sizerGlobal.Add(sizerOKCancel, 0, wx.TOP | wx.ALIGN_RIGHT, 0)
+        sizerGlobal.Add(sizerAddDelete, 0, wx.ALIGN_RIGHT, 0)
+        sizerGlobal.Add(sizerOKCancel, 0, wx.ALIGN_RIGHT, 0)
+
         self.SetSizer(sizerGlobal)
         self.Layout()
         self.Show()
@@ -334,26 +413,54 @@ class PanelDBSolarThermal(wx.Panel):
 #------------------------------------------------------------------------------
 
     def OnButtonAddEquipment(self, event):
+        retval = Status.DB.dbsolarthermal.insert({})
         self.clearPage0()
+        for i in range(self.grid.GetNumberRows() - 1, -1, -1):
+            if self.grid.GetCellValue(i, 0) == str(retval):
+                self.grid.SetGridCursor(i, 0)
+                self.grid.MakeCellVisible(i, 0)
+                self.grid.SelectRow(i)
+                equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(retval)]
+                if len(equipments) > 0:
+                    equipe = equipments[0]
+                    self.display(equipe)
+                break
+        self.fillChoices()
+        event.Skip()
 
     def OnButtonDeleteEquipment(self, event):
-        self.equipeName = self.page0.listBoxEquipment.GetStringSelection()
-        logTrack("PanelDBSolarThermal (DELETE Button): deleting solarthermal ID %s" % self.equipeName)
+        if not self.grid.IsSelection():
+            print "Select a row first"
+            return
 
-        sqlQuery = "SELECT * FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % self.equipeName
+        id = self.grid.GetCellValue(self.grid.GetGridCursorRow(), 0)
+        logTrack("PanelDBSolarThermal (DELETE Button): deleting solarthermal ID %s" % id)
+
+        sqlQuery = "SELECT * FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % id
         result = Status.DB.sql_query(sqlQuery)
 
         if len(result) > 0:
-            sqlQuery = "DELETE FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % self.equipeName
+            sqlQuery = "DELETE FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % id
             Status.DB.sql_query(sqlQuery)
-            self.clearPage0()
+
+            self.clear()
+            self.grid.ClearGrid()
+            self.grid.ClearSelection()
+            for i in range(self.grid.GetNumberRows()):
+                self.grid.DeleteRows()
+            self.fillEquipmentList()
+            self.notebook.ChangeSelection(0)
+
+        event.Skip()
 
     def OnButtonCancel(self, event):
-        self.clearPage0()
+        event.Skip()
 
     def OnButtonOK(self, event):
         if self.allFieldsEmpty():
             return
+
+        fuelDict = Status.prj.getFuelDict()
 
         tmp = {
                "STManufacturer":check(self.tc1.GetValue()),
@@ -382,54 +489,72 @@ class PanelDBSolarThermal(wx.Panel):
                "STYearUpdate":check(self.tc25.GetValue())
                }
 
-        if len(self.page0.listBoxEquipment.GetSelections()) + \
-           len(self.page1.listBoxEquipment.GetSelections()) + \
-           len(self.page2.listBoxEquipment.GetSelections()) == 0:
-            retval = Status.DB.dbsolarthermal.insert(tmp)
-            self.fillEquipmentList()
-            self.page0.listBoxEquipment.SetStringSelection(str(retval))
-            self.page1.listBoxEquipment.SetStringSelection(str(retval))
-            self.page2.listBoxEquipment.SetStringSelection(str(retval))
-        else:
-            self.equipeName = self.page0.listBoxEquipment.GetStringSelection()
-            equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(self.equipeName)]
+        row = self.grid.GetGridCursorRow()
+        col = self.grid.GetGridCursorCol()
 
-            if len(equipments) > 0:
-                equipe = equipments[0]
+        try:
+            id = self.grid.GetCellValue(row, 0)
+        except:
+            return
 
-            equipe.update(tmp)
-            self.page0.listBoxEquipment.SetStringSelection(str(self.equipeName))
-
-    def OnListBoxEquipmentClick(self, event):
-        self.equipeName = event.String
-        self.page0.listBoxEquipment.SetStringSelection(self.equipeName)
-        self.page1.listBoxEquipment.SetStringSelection(self.equipeName)
-        self.page2.listBoxEquipment.SetStringSelection(self.equipeName)
-
-        equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(self.equipeName)]
+        equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(id)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
-        else:
-            logDebug("PanelDBSolarThermal (ListBoxClick): equipe %s not found in database" % self.equipeName)
-            return
+            equipe.update(tmp)
+
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillChoiceOfType()
+        self.fillEquipmentList()
+
+        if row >= 0 and col >= 0:
+            self.grid.SetGridCursor(row, col)
+            self.grid.SelectRow(row)
+            self.grid.MakeCellVisible(row, col)
+
+    def OnGridCellLeftClick(self, event):
+        self.clear()
+        self.grid.ClearSelection()
+        self.grid.SetGridCursor(event.GetRow(), event.GetCol())
+        id = self.grid.GetCellValue(event.GetRow(), 0)
+
+        equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(id)]
+
+        if len(equipments) > 0:
+            equipe = equipments[0]
 
         self.display(equipe)
 
-    def OnNotebookPageChanged(self, event):
-        old = event.OldSelection
-        selection = ''
+        event.Skip()
 
-        if old == 0:
-            selection = self.page0.listBoxEquipment.GetStringSelection()
-        elif old == 1:
-            selection = self.page1.listBoxEquipment.GetStringSelection()
-        if old == 2:
-            selection = self.page2.listBoxEquipment.GetStringSelection()
+    def OnGridCellRightClick(self, event):
+        event.Skip()
 
-        self.page0.listBoxEquipment.SetStringSelection(selection)
-        self.page1.listBoxEquipment.SetStringSelection(selection)
-        self.page2.listBoxEquipment.SetStringSelection(selection)
+    def OnGridCellDClick(self, event):
+        event.Skip()
+
+    def OnGridLabelLeftClick(self, event):
+        self.clear()
+        if event.GetRow() >= 0:
+            self.OnGridCellLeftClick(event)
+            self.grid.SetGridCursor(event.GetRow(), 0)
+        event.Skip()
+
+    def OnGridLabelRightClick(self, event):
+        event.Skip()
+
+    def OnGridLabelDClick(self, event):
+        event.Skip()
+
+    def OnChoiceEntryClick(self, event):
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillEquipmentList()
+        event.Skip()
+
 
 #------------------------------------------------------------------------------
 #--- Public methods
@@ -493,23 +618,47 @@ class PanelDBSolarThermal(wx.Panel):
         self.tc24.SetValue('')
         self.tc25.SetValue('')
 
-    def fillEquipmentList(self):
-        self.page0.clearListBox()
-        self.page1.clearListBox()
-        self.page2.clearListBox()
-
+    def fillChoiceOfType(self):
         equipments = Status.DB.dbsolarthermal.get_table()
+        typeList = []
+        for equipe in equipments:
+            sqlQuery = "SELECT STType FROM dbsolarthermal WHERE DBSolarThermal_ID = %s"%equipe.DBSolarThermal_ID
+            result = Status.DB.sql_query(sqlQuery)
+            if result not in typeList and result is not None:
+                typeList.append(str(result))
+        fillChoice(self.tc_type.entry, typeList)
+        self.tc_type.entry.Append("All")
+        self.tc_type.entry.SetStringSelection("All")
+
+    def fillChoices(self):
+        self.fillChoiceOfType()
+
+    def fillEquipmentList(self):
+        equipments = Status.DB.dbsolarthermal.get_table()
+        fields = ', '.join([f for f in colLabels])
+        hp_type = self.tc_type.GetValue(True)
 
         for equipe in equipments:
-            self.page0.addListBoxElement(equipe.DBSolarThermal_ID)
-            self.page1.addListBoxElement(equipe.DBSolarThermal_ID)
-            self.page2.addListBoxElement(equipe.DBSolarThermal_ID)
+            if hp_type == "All" or len(hp_type) <= 0:
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
+            elif hp_type == "None":
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType is NULL and DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
+            else:
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType = '%s' and DBSolarThermal_ID = %s"%(fields,hp_type,equipe.DBSolarThermal_ID)
+
+            result = Status.DB.sql_query(sqlQuery)
+            if len(result) > 0:
+                self.grid.AppendRows(1, True)
+                for i in range(len(colLabels)):
+                    self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
 
     def clearPage0(self):
         self.clear()
-        self.page0.listBoxEquipment.DeselectAll()
-        self.page1.listBoxEquipment.DeselectAll()
-        self.page2.listBoxEquipment.DeselectAll()
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillChoices()
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
 
