@@ -143,7 +143,6 @@ class PanelDBHeatPump(wx.Dialog):
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
-
         #
         # tab 2 - Technical data
         #
@@ -378,7 +377,7 @@ class PanelDBHeatPump(wx.Dialog):
         self.grid.SetGridCursor(0, 0)
 
     def __do_layout(self):
-        flagText = wx.TOP
+        flagText = wx.TOP | wx.ALIGN_CENTER
 
         # global sizer for panel.
         sizerGlobal = wx.BoxSizer(wx.VERTICAL)
@@ -393,11 +392,11 @@ class PanelDBHeatPump(wx.Dialog):
 
 
         sizerPage1 = wx.StaticBoxSizer(self.frame_descriptive_data, wx.VERTICAL)
-        sizerPage1.Add(self.tc1, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage1.Add(self.tc2, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage1.Add(self.tc3, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage1.Add(self.tc4, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage1.Add(self.tc5, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage1.Add(self.tc1, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc2, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc3, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc4, 0, flagText, VSEP)
+        sizerPage1.Add(self.tc5, 0, flagText, VSEP)
 
         self.page1.SetSizer(sizerPage1)
 
@@ -445,11 +444,11 @@ class PanelDBHeatPump(wx.Dialog):
         sizerPage2_teee.Add(sizerPage2_teee_H)
 
         sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
-        sizerPage2.Add(sizerPage2_H1, 0, wx.ALIGN_CENTER | wx.TOP, 4)
-        sizerPage2.Add(sizerPage2_C1, 0, wx.ALIGN_CENTER | wx.TOP, 4)
-        sizerPage2.Add(sizerPage2_G, 0, wx.ALIGN_CENTER | wx.TOP, 4)
-        sizerPage2.Add(sizerPage2_nwc, 0, wx.ALIGN_CENTER | wx.TOP, 4)
-        sizerPage2.Add(sizerPage2_teee, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage2.Add(sizerPage2_H1, 0, flagText, 4)
+        sizerPage2.Add(sizerPage2_C1, 0, flagText, 4)
+        sizerPage2.Add(sizerPage2_G, 0, flagText, 4)
+        sizerPage2.Add(sizerPage2_nwc, 0, flagText, 4)
+        sizerPage2.Add(sizerPage2_teee, 0, flagText, 4)
 
         self.page2.SetSizer(sizerPage2)
 
@@ -465,17 +464,17 @@ class PanelDBHeatPump(wx.Dialog):
         sizerPage3_high.Add(self.tc31, 0, flagText, VSEP)
 
         sizerPage3 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.VERTICAL)
-        sizerPage3.Add(sizerPage3_low, 0, wx.ALIGN_CENTER | wx.TOP, 4)
-        sizerPage3.Add(sizerPage3_high, 0, wx.ALIGN_CENTER | wx.TOP, 4)
+        sizerPage3.Add(sizerPage3_low, 0, flagText, 4)
+        sizerPage3.Add(sizerPage3_high, 0, flagText, 4)
 
         self.page3.SetSizer(sizerPage3)
 
         sizerPage4 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
-        sizerPage4.Add(self.tc32, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage4.Add(self.tc33, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage4.Add(self.tc34, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage4.Add(self.tc35, 0, flagText | wx.ALIGN_CENTER, VSEP)
-        sizerPage4.Add(self.tc36, 0, flagText | wx.ALIGN_CENTER, VSEP)
+        sizerPage4.Add(self.tc32, 0, flagText, VSEP)
+        sizerPage4.Add(self.tc33, 0, flagText, VSEP)
+        sizerPage4.Add(self.tc34, 0, flagText, VSEP)
+        sizerPage4.Add(self.tc35, 0, flagText, VSEP)
+        sizerPage4.Add(self.tc36, 0, flagText, VSEP)
 
         self.page4.SetSizer(sizerPage4)
 
@@ -784,28 +783,28 @@ class PanelDBHeatPump(wx.Dialog):
     def fillEquipmentList(self):
         equipments = Status.DB.dbheatpump.get_table()
         fields = ', '.join([f for f in colLabels])
-        hp_type = self.tc_type.GetValue(True)
-        hp_subtype = self.tc_subtype.GetValue(True)
+        equipe_type = self.tc_type.GetValue(True)
+        equipe_subtype = self.tc_subtype.GetValue(True)
 
         for equipe in equipments:
-            if (hp_type == "All" or len(hp_type) <= 0) and (hp_subtype == "All" or len(hp_subtype) <= 0):
+            if (equipe_type == "All" or len(equipe_type) <= 0) and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
                 sqlQuery = "SELECT %s FROM dbheatpump WHERE DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
-            elif (hp_type == "All" or len(hp_type) <= 0) and hp_subtype == "None":
+            elif (equipe_type == "All" or len(equipe_type) <= 0) and equipe_subtype == "None":
                 sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
-            elif hp_type == "None" and (hp_subtype == "All" or len(hp_subtype) <= 0):
+            elif equipe_type == "None" and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
                 sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
-            elif hp_type == "None" and hp_subtype == "None":
+            elif equipe_type == "None" and equipe_subtype == "None":
                 sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe.DBHeatPump_ID)
-            elif (hp_type == "All" or len(hp_type) <= 0):
-                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
-            elif (hp_subtype == "All" or len(hp_type) <= 0):
-                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
-            elif hp_type == "None":
-                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_subtype,equipe.DBHeatPump_ID)
-            elif hp_subtype == "None":
-                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,hp_type,equipe.DBHeatPump_ID)
+            elif (equipe_type == "All" or len(equipe_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,equipe_subtype,equipe.DBHeatPump_ID)
+            elif (equipe_subtype == "All" or len(equipe_type) <= 0):
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and DBHeatPump_ID = %s"%(fields,equipe_type,equipe.DBHeatPump_ID)
+            elif equipe_type == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType is NULL and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,equipe_subtype,equipe.DBHeatPump_ID)
+            elif equipe_subtype == "None":
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType is NULL and DBHeatPump_ID = %s"%(fields,equipe_type,equipe.DBHeatPump_ID)
             else:
-                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,hp_type,hp_subtype,equipe.DBHeatPump_ID)
+                sqlQuery = "SELECT %s FROM dbheatpump WHERE HPType = '%s' and HPSubType = '%s' and DBHeatPump_ID = %s"%(fields,equipe_type,equipe_subtype,equipe.DBHeatPump_ID)
 
             result = Status.DB.sql_query(sqlQuery)
             if len(result) > 0:

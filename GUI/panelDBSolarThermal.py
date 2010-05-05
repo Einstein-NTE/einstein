@@ -636,15 +636,15 @@ class PanelDBSolarThermal(wx.Dialog):
     def fillEquipmentList(self):
         equipments = Status.DB.dbsolarthermal.get_table()
         fields = ', '.join([f for f in colLabels])
-        hp_type = self.tc_type.GetValue(True)
+        equipe_type = self.tc_type.GetValue(True)
 
         for equipe in equipments:
-            if hp_type == "All" or len(hp_type) <= 0:
+            if equipe_type == "All" or len(equipe_type) <= 0:
                 sqlQuery = "SELECT %s FROM dbsolarthermal WHERE DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
-            elif hp_type == "None":
+            elif equipe_type == "None":
                 sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType is NULL and DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
             else:
-                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType = '%s' and DBSolarThermal_ID = %s"%(fields,hp_type,equipe.DBSolarThermal_ID)
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType = '%s' and DBSolarThermal_ID = %s"%(fields,equipe_type,equipe.DBSolarThermal_ID)
 
             result = Status.DB.sql_query(sqlQuery)
             if len(result) > 0:

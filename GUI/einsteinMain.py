@@ -640,11 +640,11 @@ class EinsteinFrame(wx.Frame):
         frameEditDBUnitOperation = DBEditFrame(None, "Edit DBUnitOperation", 'dbunitoperation', 0, True)
         frameEditDBUnitOperation.ShowModal()
     def OnMenuEditDBCHP(self, event):
-        frameEditDBCHP = DBEditFrame(None, "Edit DBCHP", 'dbchp', 0, True)
+#        frameEditDBCHP = DBEditFrame(None, "Edit DBCHP", 'dbchp', 0, True)
+        frameEditDBCHP = PanelDBCHP(self, "Edit DBCHP")
         frameEditDBCHP.ShowModal()
     def OnMenuEditDBHeatPump(self, event):
 #        frameEditDBHeatPump = DBEditFrame(self, "Edit DBHeatPump", 'dbheatpump', 0, True)
-#        frameEditDBHeatPump.ShowModal()
         frameEditDBHeatPump = PanelDBHeatPump(self, "Edit DBHeatPump")
         frameEditDBHeatPump.ShowModal()
     def OnMenuEditDBFluid(self, event):
@@ -658,7 +658,6 @@ class EinsteinFrame(wx.Frame):
         frameEditDBBoiler.ShowModal()
     def OnMenuEditDBSolarThermal(self, event):
 #        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)
-#        frameEditDBSolarThermal.ShowModal()
         frameEditDBSolarThermal = PanelDBSolarThermal(self, "Edit DBSolarThermal")
         frameEditDBSolarThermal.ShowModal()
     def OnMenuEditDBChiller(self, event):
