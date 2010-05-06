@@ -50,9 +50,10 @@ def _U(text):
 colLabels = "DBCHP_ID", "Manufacturer", "CHPequip", "Type", "SubType", "CHPPt"
 
 class PanelDBCHP(wx.Dialog):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, closeOnOk = False):
         self.parent = parent
         self.title = title
+        self.closeOnOk = closeOnOk
         self._init_ctrls(parent)
         self._init_grid()
         self.__do_layout()
@@ -69,6 +70,8 @@ class PanelDBCHP(wx.Dialog):
                            wx.DEFAULT_FRAME_STYLE, 'PanelDBCHP')
         self.Centre()
         self.Hide()
+
+        self.theId = -1
 
         # access to font properties object
         fp = FontProperties()
@@ -453,6 +456,7 @@ class PanelDBCHP(wx.Dialog):
 
     def OnButtonOK(self, event):
         if self.allFieldsEmpty():
+            self.theId = -1
             return
 
         fuelDict = Status.prj.getFuelDict()
@@ -486,11 +490,11 @@ class PanelDBCHP(wx.Dialog):
         col = self.grid.GetGridCursorCol()
 
         try:
-            id = self.grid.GetCellValue(row, 0)
+            self.theId = self.grid.GetCellValue(row, 0)
         except:
             return
 
-        equipments = Status.DB.dbchp.DBCHP_ID[check(id)]
+        equipments = Status.DB.dbchp.DBCHP_ID[check(self.theId)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
@@ -506,6 +510,9 @@ class PanelDBCHP(wx.Dialog):
             self.grid.SetGridCursor(row, col)
             self.grid.SelectRow(row)
             self.grid.MakeCellVisible(row, col)
+
+        if self.closeOnOk:
+            self.EndModal(wx.ID_OK)
 
     def OnGridCellLeftClick(self, event):
         self.clear()
