@@ -49,6 +49,7 @@ class ImportQ(object):
         pe = parseExcel(self.infile,frame.DBUser,frame.DBPass)
         
         wx.MessageBox(pe.parse(), 'Info')
+        
 
         
         #pe.printQ1() 

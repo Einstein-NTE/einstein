@@ -32,6 +32,9 @@ class parseSpreadsheet():
     def parse(self):
         pass
 
-
+    @staticmethod
+    def parseError(errorname):
+        return "Parsing failed because of: " + str(errorname)+ "! Please check your data and try again."
+        
 
 
