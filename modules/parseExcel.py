@@ -80,71 +80,103 @@ class parseExcel(parseSpreadsheet):
             list = []
     
     def __getExcelLists(self, sheetnames, xlWb): 
-        sht = xlWb.Worksheets(sheetnames[0])
-        Q1=self.__tupleToList(sht.Range("Q1_GeneralData"))    
-        Q1+=self.__tupleToList(sht.Range("Q1_StatisticalData"))
-        Q1+=self.__tupleToList(sht.Range("Q1_Operation"))
+        lists = []
+        if len(sheetnames)!=11:
+            return self.__parseError("wrong number of Sheets"), []
+        try:
+            sht = xlWb.Worksheets(sheetnames[0])
+            Q1=self.__tupleToList(sht.Range("Q1_GeneralData"))    
+            Q1+=self.__tupleToList(sht.Range("Q1_StatisticalData"))
+            Q1+=self.__tupleToList(sht.Range("Q1_Operation"))
+            QProduct =self.__tupleToList(sht.Range("Q1_Products"))
+        except:
+            return self.__parseError(sheetnames[0]), []
         
-        QProduct =self.__tupleToList(sht.Range("Q1_Products"))
-        
-        sht = xlWb.Worksheets(sheetnames[1])
-        
-        Q1+=self.__tupleToList(sht.Range("Q1_Percent"))
-        QProduct+=self.__tupleToList(sht.Range("Q2_Products"))
-        
-        Q2 = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
-        Q2 += self.__tupleToList(sht.Range("Q2_ElectricityConsumption"))
-        Q2 += self.__tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
-        QFuel = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
-        
-        sht = xlWb.Worksheets(sheetnames[2])
-        Q3 = self.__tupleToList(sht.Range("Q3_ProcessData"))
-        Q3 += self.__tupleToList(sht.Range("Q3_WasteHeat"))
-        Q3 += self.__tupleToList(sht.Range("Q3_Schedule")) 
-        Q3 += self.__tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
-        
-        sht= xlWb.Worksheets(sheetnames[3])
-        Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
-        Q3+= self.__tupleToList(sht.Range("Q3_OperationCycle"))
-        
-        sht = xlWb.Worksheets(sheetnames[8])
-        QRenewables = self.__tupleToList(sht.Range("Q7_Interest"))
-        QRenewables += self.__tupleToList(sht.Range("Q7_REReason"))
-        QRenewables += self.__tupleToList(sht.Range("Q7_Others"))
-        QRenewables += self.__tupleToList(sht.Range("Q7_Latitude"))
-        QRenewables += self.__tupleToList(sht.Range("Q7_Biomass"))
-        
-        QSurf = self.__tupleToList(sht.Range("Q7_Area"))
-        QSurf += self.__tupleToList(sht.Range("Q7_Roof"))
-        
-        sht = xlWb.Worksheets(sheetnames[3])
-    
-        QProfiles = []
-        QProcNames = self.__tupleToList(sht.Range("Q3A_ProcessName"))
-        
-        for i in xrange(3):
-            QProfil = self.__tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
-            QProfil.append(QProcNames[i*3])
-            QProfiles.append(QProfil)
-    
+        try:
+            sht = xlWb.Worksheets(sheetnames[1])
+            Q1+=self.__tupleToList(sht.Range("Q1_Percent"))
+            QProduct+=self.__tupleToList(sht.Range("Q2_Products"))
             
-        QIntervals  = self.__tupleToList(sht.Range("Q3A_StartTime_1"))
-        QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_2"))
-        QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_3"))
-        QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_1"))
-        QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_2"))
-        QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_3"))
+            Q2 = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
+            Q2 += self.__tupleToList(sht.Range("Q2_ElectricityConsumption"))
+            Q2 += self.__tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
+            QFuel = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
+        except:
+            return self.__parseError(sheetnames[1]), []
         
-        Q9_Questionnaire=[]
-        for i in xrange(3):
-            Q9_Questionnaire+=self.__tupleToList(xlWb.Worksheets(sheetnames[10]).Range("Q9_"+str(i+1)))
-
+        try:
+            sht = xlWb.Worksheets(sheetnames[2])
+            Q3 = self.__tupleToList(sht.Range("Q3_ProcessData"))
+            Q3 += self.__tupleToList(sht.Range("Q3_WasteHeat"))
+            Q3 += self.__tupleToList(sht.Range("Q3_Schedule")) 
+            Q3 += self.__tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
+        except:
+            return self.__parseError(sheetnames[2]), []
+            
+        try:    
+            sht= xlWb.Worksheets(sheetnames[3])
+            Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
+            Q3+= self.__tupleToList(sht.Range("Q3_OperationCycle"))
+        except:
+            return self.__parseError(sheetnames[3]), []
+            
+        try:    
+            sht = xlWb.Worksheets(sheetnames[8])
+            QRenewables = self.__tupleToList(sht.Range("Q7_Interest"))
+            QRenewables += self.__tupleToList(sht.Range("Q7_REReason"))
+            QRenewables += self.__tupleToList(sht.Range("Q7_Others"))
+            QRenewables += self.__tupleToList(sht.Range("Q7_Latitude"))
+            QRenewables += self.__tupleToList(sht.Range("Q7_Biomass"))
+            
+            QSurf = self.__tupleToList(sht.Range("Q7_Area"))
+            QSurf += self.__tupleToList(sht.Range("Q7_Roof"))
+        except:
+            return self.__parseError(sheetnames[8]), []
+          
+        try:    
+            sht = xlWb.Worksheets(sheetnames[3])
+            QProfiles = []
+            QProcNames = self.__tupleToList(sht.Range("Q3A_ProcessName"))
+            
+            for i in xrange(3):
+                QProfil = self.__tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
+                QProfil.append(QProcNames[i*3])
+                QProfiles.append(QProfil)
         
+            QIntervals  = self.__tupleToList(sht.Range("Q3A_StartTime_1"))
+            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_2"))
+            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_3"))
+            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_1"))
+            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_2"))
+            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_3"))
+        except:
+            return self.__parseError(sheetnames[3]), []
         
-        return Q1, Q2, QProduct, QFuel, Q3 , QRenewables, QSurf, QProfiles, QIntervals, Q9_Questionnaire
+        try:
+            sht = xlWb.Worksheets(sheetnames[10])
+            Q9Questionnaire=[]
+            for i in xrange(3):
+                Q9Questionnaire+=self.__tupleToList(sht.Range("Q9_"+str(i+1)))
+        except:
+            return self.__parseError(sheetnames[10]), []
+            
+        lists.append(Q1)
+        lists.append(Q2)
+        lists.append(QProduct)
+        lists.append(QFuel)
+        lists.append(Q3)
+        lists.append(QRenewables)
+        lists.append(QSurf)
+        lists.append(QProfiles)
+        lists.append(QIntervals)
+        lists.append(Q9Questionnaire)
+        
+        return "", lists
 
     
     def parse(self):
+        
+        Q1 = Q2 = QProduct = QFuel = Q3 = QRenewables = QSurf = QProfiles = QIntervals = Q9Questionnaire = []
         try:
             self.__xlApp, self.__xlWb = self.__openExcelDispatch(self.__filepath)
             __sheets = self.__xlWb.Sheets
@@ -157,46 +189,64 @@ class parseExcel(parseSpreadsheet):
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
             return "An error #431 occurred while parsing. Please close all excel worksheets and try again! "
-        
-        self.__Q1, self.__Q2, self.__QProduct, self.__QFuel, self.__Q3, self.__QRenewables, self.__QSurf, self.__QProfiles, self.__QIntervals, self.__Q9Questionnaire = self.__getExcelLists(self.__sheetnames,self.__xlWb)
+            
         try:
-            self.__Q1, self.__Q2, self.__QProduct, self.__QFuel, self.__Q3, self.__QRenewables, self.__QSurf, self.__QProfiles, self.__QIntervals, self.__Q9Questionnaire = self.__getExcelLists(self.__sheetnames,self.__xlWb)
+            __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
         except:
             try:
                 time.sleep(3)
                 self.__xlApp, self.__xlWb = openExcelDispatch()
-                self.__Q1, self.__Q2, self.__QProduct, self.__QFuel, self.__Q3, self.__QRenewables, self.__QSurf, self.__QProfiles, self.__QIntervals, self.__Q9Questionnaire = self.__getExcelLists(self.__sheetnames,self.__xlWb)
+                __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
             except:
                 try:
                     time.sleep(3)
                     self.__xlApp, self.__xlWb = openExcelDispatch()
-                    self.__Q1, self.__Q2, self.__QProduct, self.__QFuel, self.__Q3, self.__QRenewables, self.__QSurf, self.__QProfiles, self.__QIntervals, self.__Q9Questionnaire = self.__getExcelLists(__sheetnames,__xlWb)
+                    __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
                 except:
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
                     return "An error #432 occurred while parsing. Please close all excel worksheets and try again!"
-        
-        __handle = self.__writeToDB()
+        try:
+            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire = lists
+        except:
+            return __handle
+        __handle = self.__writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire)
         return __handle
         
-    def __writeToDB(self):
-        q2dict = SD.createQElectricityDictionary(self.__Q2, self.__md)
+        
+    def __parseError(self, errorname):
+        return "Parsing failed because of: " + str(errorname)+ "! Please check your data and try again."
+        
+            
+    def __writeToDB(self,Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire):
+        
+        #try:
+        q2dict = SD.createQElectricityDictionary(Q2, self.__md)
         self.__md.qelectricity.insert(q2dict)
-        
-        for i in xrange(3):
-            self.__md.profiles.insert(SD.createProfilesDictionary(self.__QProfiles[i], self.__md))
+        #except:
+        #    return self.__parseError(self.__sheetnames[1])
 
-        for i in xrange(len(self.__QIntervals)/2):
-            self.__md.intervals.insert(SD.createIntervalDictionary([self.__QIntervals[i],self.__QIntervals[len(self.__QIntervals)/2+i]], self.__md))
+        try:
+            for i in xrange(3):
+                self.__md.profiles.insert(SD.createProfilesDictionary(QProfiles[i], self.__md))
+    
+            for i in xrange(len(QIntervals)/2):
+                self.__md.intervals.insert(SD.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
+        except:
+            return self.__parseError(self.__sheetnames[3])
         
-        Q1dict = SD.createQuestionnaireDictionary(self.__Q1, self.__md)
-        Q9dict = SD.createQ9dictionary(self.__Q9Questionnaire, self.__md)
-        NaceDict = SD.createNACEDictionary(self.__Q1, self.__md)
-        strNace = "CodeNACE = '"+str(self.__Q1[20])+"' AND CodeNACESub ='"+str(int(self.__Q1[24]))+"'"
-        dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
+        try:
+            Q1dict = SD.createQuestionnaireDictionary(Q1, self.__md)
+            Q9dict = SD.createQ9dictionary(Q9Questionnaire, self.__md)
+            NaceDict = SD.createNACEDictionary(Q1, self.__md)
+            strNace = "CodeNACE = '"+str(Q1[20])+"' AND CodeNACESub ='"+str(int(Q1[24]))+"'"
+            dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
+            
+            Q1dict.update(Q9dict)
+            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
+            self.__md.questionnaire.insert(Q1dict)
+        except:
+            return self.__parseError(self.__sheetnames[0])
         
-        Q1dict.update(Q9dict)
-        Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
-        self.__md.questionnaire.insert(Q1dict)
         
         Questionnaire_ID = self.__md.questionnaire.sql_select("LAST_INSERT_ID()")
         Questionnaire_ID =  Questionnaire_ID[-1]['Questionnaire_ID']
@@ -220,21 +270,21 @@ class parseExcel(parseSpreadsheet):
             Q8dict[quest_id]=Questionnaire_ID
             self.__md.qbuildings.insert(Q8dict)
             
-        QRenewables = SD.createQ7Dictionary(self.__QRenewables, self.__md)
+        QRenewables = SD.createQ7Dictionary(QRenewables, self.__md)
             
         QRenewables[quest_id] = Questionnaire_ID
         self.__md.qrenewables.insert(QRenewables)
         
-        self.__splitExcelColumns(3, 5, self.__QProduct, {}, Questionnaire_ID ,SD.createQProductDictionary,self.__md.qproduct)
-        self.__splitExcelColumns(6, 6, self.__QFuel, {}, Questionnaire_ID ,SD.createQFuelDictionary,self.__md.qfuel)
+        self.__splitExcelColumns(3, 5, QProduct, {}, Questionnaire_ID ,SD.createQProductDictionary,self.__md.qproduct)
+        self.__splitExcelColumns(6, 6, QFuel, {}, Questionnaire_ID ,SD.createQFuelDictionary,self.__md.qfuel)
         latitude = self.__xlWb.Worksheets(self.__sheetnames[8]).Range("Q7_Latitude")
-        self.__splitExcelColumns(4, 4, self.__QSurf, {'ST_IT':latitude[1]}, "", SD.createQSurfDictionary, self.__md.qsurfarea)
+        self.__splitExcelColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SD.createQSurfDictionary, self.__md.qsurfarea)
         
         # Code to skip a specific amount of columns
         index =0
         Q3n = []
-        for i in range(0,len(self.__Q3),3):
-            Q3n.append(self.__Q3[i]) 
+        for i in range(0,len(Q3),3):
+            Q3n.append(Q3[i]) 
             index+=1
             
         self.__splitExcelColumns(3, 3, Q3n, {}, Questionnaire_ID, SD.createQProcessDictionary,self.__md.qprocessdata)
