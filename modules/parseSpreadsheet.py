@@ -32,13 +32,6 @@ class parseSpreadsheet():
     def parse(self):
         pass
 
-    def normDecimalPlace(number):
-        """
-        returns valid float values for the database
-        """
-        try:
-            return float(str(number).replace(',', '.'))
-        except:
-            return "no valid number" 
+
 
 

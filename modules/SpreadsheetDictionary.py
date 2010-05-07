@@ -27,7 +27,18 @@
 
 class SpreadsheetDict():
 
-    def createQuestionnaireDictionary(self,Q1):
+    @staticmethod
+    def normDecimalPlace(number):
+        """
+        returns valid float values for the database
+        """
+        try:
+            return float(str(number).replace(',', '.'))
+        except:
+            return "no valid number" 
+
+    @staticmethod
+    def createQuestionnaireDictionary(Q1,db_conn):
         Q1dict = {}
         Q1dict['Name']= Q1[0]
         Q1dict['City']= Q1[2]
@@ -68,8 +79,41 @@ class SpreadsheetDict():
         #Q1dict['']= Q1[]
         
         return Q1dict
+    #createQuestionnaireDictionary= staticmethod(createQuestionnaireDictionary)
     
-    def createQElectricityDictionary(self,Q2):
+    @staticmethod
+    def createNACEDictionary(Q1,db_conn):
+        NACEDict = {}
+        NACEDict['NACE']=Q1[20]  
+        NACEDict['SubNACE']=Q1[24]  
+        return NACEDict
+    
+    @staticmethod
+    def createQProductDictionary(QProduct,db_conn):
+        qproddict = {}
+        qproddict['Product'] = QProduct[0]
+        qproddict['ProductCode'] = QProduct[1]
+        qproddict['QProdYear'] = QProduct[2]
+        qproddict['ProdUnit'] = QProduct[3]
+        qproddict['TurnoverProd'] = QProduct[4]
+        qproddict['FuelProd'] = QProduct[5]
+        qproddict['ElProd'] = QProduct[6]
+        return qproddict
+    
+    @staticmethod
+    def createQFuelDictionary(QFuel,db_conn):
+        QFuelDict = {}
+        DBFuelSel = db_conn.dbfuel.sql_select('FuelName = "' + str(QFuel[0])+ '"')
+        QFuelDict['DBFuel_id'] = DBFuelSel[0]["DBFuel_ID"]
+        QFuelDict['FuelUnit'] = QFuel[1]
+        QFuelDict['MFuelYear'] = QFuel[2]
+        QFuelDict['FECFuel'] = QFuel[3]
+        QFuelDict['FuelTariff'] = QFuel[4]
+        QFuelDict['FuelCostYear'] = QFuel[5]
+        return QFuelDict
+    
+    @staticmethod
+    def createQElectricityDictionary(Q2,db_conn):
         Q2dict = {}
         Q2dict['ElectricityPeakYear']= Q2[36]
         Q2dict['ElectricityStandYear']= Q2[37]
@@ -116,48 +160,42 @@ class SpreadsheetDict():
         Q2dict['ElectricityLight']= Q2[89]
         return Q2dict
 
-    
-    def createQProcessDictionary(self,Q3):
+    @staticmethod
+    def createQProcessDictionary(Q3,db_conn):
         Q3dict = {}
-        index = 0
-        """for elem in Q3:
-            print str(index) + " : " + str(elem)
-            index+=1
-        print
-        """
         Q3dict['Process'] = Q3[0]
         Q3dict['Description'] = Q3[1]
         Q3dict['ProcType']= Q3[2]
-        dbunitop = md.dbunitoperation.sql_select("UnitOperation"+"='"+str(Q3[3])+"'")
+        dbunitop = db_conn.dbunitoperation.sql_select("UnitOperation"+"='"+str(Q3[3])+"'")
         Q3dict['DBUnitOperation_id']= dbunitop[0]['DBUnitOperation_ID']
-        dbfluid = md.dbfluid.sql_select("FluidName"+"='"+str(Q3[4])+"'")
+        dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q3[4])+"'")
         # Test if all values e.g. Air Water Steam are correct or build exception or log
         Q3dict['ProcMedDBFluid_id']= dbfluid[0]['DBFluid_ID']
     
-        Q3dict['PT']= normDecimalPlace(Q3[6])
-        Q3dict['PTInFlow']= normDecimalPlace(Q3[7])
-        Q3dict['PTInFlowRec']= normDecimalPlace(Q3[8])
+        Q3dict['PT']= SpreadsheetDict.normDecimalPlace(Q3[6])
+        Q3dict['PTInFlow']= SpreadsheetDict.normDecimalPlace(Q3[7])
+        Q3dict['PTInFlowRec']= SpreadsheetDict.normDecimalPlace(Q3[8])
         
-        Q3dict['mInFlowNom']= normDecimalPlace(Q3[9])
-        Q3dict['VInFlowCycle']= normDecimalPlace(Q3[10])
-        Q3dict['VolProcMed']= normDecimalPlace(Q3[12])
-        Q3dict['PTStartUp']= normDecimalPlace(Q3[13])
-        Q3dict['QOpProc']= normDecimalPlace(Q3[15])
+        Q3dict['mInFlowNom']= SpreadsheetDict.normDecimalPlace(Q3[9])
+        Q3dict['VInFlowCycle']= SpreadsheetDict.normDecimalPlace(Q3[10])
+        Q3dict['VolProcMed']= SpreadsheetDict.normDecimalPlace(Q3[12])
+        Q3dict['PTStartUp']= SpreadsheetDict.normDecimalPlace(Q3[13])
+        Q3dict['QOpProc']= SpreadsheetDict.normDecimalPlace(Q3[15])
         Q3dict['HeatRecOK']= Q3[16]
         Q3dict['ProcMedOut']= Q3[17]
-        Q3dict['PTOutFlow']= normDecimalPlace(Q3[18])
-        Q3dict['HOutFlow']= normDecimalPlace(Q3[19])
-        Q3dict['XOutFlow']= normDecimalPlace(Q3[20])
-        Q3dict['PTFinal']= normDecimalPlace(Q3[21]) 
+        Q3dict['PTOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[18])
+        Q3dict['HOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[19])
+        Q3dict['XOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[20])
+        Q3dict['PTFinal']= SpreadsheetDict.normDecimalPlace(Q3[21]) 
         
-        Q3dict['mOutFlowNom']= normDecimalPlace(Q3[22])
-        Q3dict['VOutFlowNom']= normDecimalPlace(Q3[23])
+        Q3dict['mOutFlowNom']= SpreadsheetDict.normDecimalPlace(Q3[22])
+        Q3dict['VOutFlowNom']= SpreadsheetDict.normDecimalPlace(Q3[23])
         Q3dict['HPerDayProc']= Q3[24]
         Q3dict['NBatch']= Q3[25]
         Q3dict['HBatch']= Q3[26]
         Q3dict['NDaysProc']= Q3[27]
         
-        dbfluid = md.dbfluid.sql_select("FluidName"+"='"+str(Q3[28])+"'")
+        dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q3[28])+"'")
         Q3dict['SupplyMedDBFluid_id']= dbfluid[0]['DBFluid_ID']
         Q3dict['PipeDuctProc']= Q3[29]
         Q3dict['TSupply']= Q3[30]
@@ -168,14 +206,10 @@ class SpreadsheetDict():
         Q3dict['InFlowDuration']= Q3[34]
         Q3dict['HBatch']= Q3[35]+Q3[34]
         Q3dict['OutFlowDuration']= Q3[36]
-        index=0
-        for elem in Q3:
-            print index, ": ",elem
-            index+=1
-        print
         return Q3dict
     
-    def createProfilesDictionary(self,QProfiles):
+    @staticmethod
+    def createProfilesDictionary(QProfiles,db_conn):
         QPdict = {}
         weekdays = ["monday",
                     "tuesday",
@@ -196,11 +230,12 @@ class SpreadsheetDict():
     
     # Database connect
     
-    def createIntervalDictionary(self,QInterval):
+    @staticmethod
+    def createIntervalDictionary(QInterval,db_conn):
         return {"start" : QInterval[0],"stop" : QInterval[1], "scale" : 100}
     
-    
-    def createQ4HDictionary(self,Q4H):
+    @staticmethod
+    def createQ4HDictionary(Q4H,db_conn):
         Q4Hdict = {}
         Q4Hdict["Equipment"] = Q4H[0]
         Q4Hdict["Manufact"] = Q4H[1]
@@ -210,7 +245,7 @@ class SpreadsheetDict():
         Q4Hdict["NumEquipUnits"] = Q4H[5]
         Q4Hdict["HCGPnom"] = Q4H[8]
         # Fuel Type Q4Hdict[""] = Q4H[9]
-        DBFuelSel = md.dbfuel.sql_select('FuelName = "' + str(Q4H[9])+ '"')
+        DBFuelSel = db_conn.dbfuel.sql_select('FuelName = "' + str(Q4H[9])+ '"')
         Q4Hdict['DBFuel_id'] = DBFuelSel[0]["DBFuel_ID"]
         Q4Hdict["FuelConsum"] = Q4H[10]
         Q4Hdict["UnitsFuelConsum"] = Q4H[11]
@@ -233,8 +268,8 @@ class SpreadsheetDict():
         
         return Q4Hdict
         
-    
-    def createQ4CDictionary(self,Q4C):
+    @staticmethod
+    def createQ4CDictionary(Q4C,db_conn):
         Q4Cdict = {}
         Q4Cdict["Equipment"] = Q4C[0]
         Q4Cdict["Manufact"] = Q4C[1]
@@ -259,8 +294,8 @@ class SpreadsheetDict():
         Q4Cdict["NDaysEq"] = Q4C[29]
         return Q4Cdict
     
-    
-    def createQ5Dictionary(self,Q5):
+    @staticmethod
+    def createQ5Dictionary(Q5,db_conn):
         Q5dict = {}
         Q5dict["Pipeduct"] = Q5[0]
         Q5dict["HeatDistMedium"] = Q5[1]
@@ -282,8 +317,8 @@ class SpreadsheetDict():
         
         return Q5dict
     
-    
-    def createQ6Dictionary(self,Q6):
+    @staticmethod
+    def createQ6Dictionary(Q6,db_conn):
         Q6dict={}
         Q6dict["HXName"] = Q6[0]
         Q6dict["HXType"] = Q6[1]
@@ -300,7 +335,8 @@ class SpreadsheetDict():
         Q6dict["HXTSinkOutlet"] = Q6[12]
         return Q6dict
     
-    def createQ6EDictionary(self,Q6):
+    @staticmethod
+    def createQ6EDictionary(Q6,db_conn):
         Q6dict={}
         Q6dict["WHEEName"] = Q6[16]
         Q6dict["WHEEEqType"] = Q6[17]
@@ -317,7 +353,8 @@ class SpreadsheetDict():
         Q6dict["NDaysWHEE"] = Q6[29]
         return Q6dict
     
-    def createQ7Dictionary(self,Q7):
+    @staticmethod
+    def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
         if str(Q7[0]).lower()=="yes":
             Q7dict["REInterest"] = 1
@@ -342,7 +379,8 @@ class SpreadsheetDict():
         Q7dict["SpaceBiomassProc"] = Q7[21]
         return Q7dict        
     
-    def createQSurfDictionary(self,QSurfarea):
+    @staticmethod
+    def createQSurfDictionary(QSurfarea,db_conn):
         QSurfdict = {}
         QSurfdict['SurfAreaName'] = QSurfarea[0]
         QSurfdict['SurfArea'] = QSurfarea[1]
@@ -359,7 +397,8 @@ class SpreadsheetDict():
     
         return QSurfdict
     
-    def createQ8Dictionary(self,Q8):
+    @staticmethod
+    def createQ8Dictionary(Q8,db_conn):
         Q8dict = {}
     
         Q8dict['BuildName'] = Q8[0]
@@ -382,7 +421,8 @@ class SpreadsheetDict():
         # date Q8dict[''] = Q8[17]
         return Q8dict
     
-    def createQ9dictionary(self,Q9):
+    @staticmethod
+    def createQ9dictionary(Q9,db_conn):
         Q9dict = {}
         Q9dict["InflationRate"] = Q9[0]
         Q9dict["FuelPriceRate"] = Q9[1]
@@ -436,5 +476,9 @@ class SpreadsheetDict():
         createQ6Dictionary=staticmethod(createQ6Dictionary)
         
         
-        
-        
+
+    
+    
+    
+    
+    
