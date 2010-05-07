@@ -41,37 +41,40 @@ class parseOO(parseSpreadsheet):
     def parse(self):
         pass
         
-    def __getExcelLists(self, sheetnames, xlWb): 
+    def __getLists(self,ooWb): 
         lists = []
-        if len(sheetnames)!=11:
-            return self.__parseError("wrong number of Sheets"), []
+        #if len(sheetnames)!=11:
+        #    return self.__parseError("wrong number of Sheets"), []
         try:
-            sht = xlWb.Worksheets(sheetnames[0])
-            Q1=self.__tupleToList(sht.Range("Q1_GeneralData"))    
-            Q1+=self.__tupleToList(sht.Range("Q1_StatisticalData"))
-            Q1+=self.__tupleToList(sht.Range("Q1_Operation"))
-            QProduct =self.__tupleToList(sht.Range("Q1_Products"))
-        except:
-            return self.__parseError(sheetnames[0]), []
-        
-        try:
-            sht = xlWb.Worksheets(sheetnames[1])
-            Q1+=self.__tupleToList(sht.Range("Q1_Percent"))
-            QProduct+=self.__tupleToList(sht.Range("Q2_Products"))
+            sheetname = "Q1_GeneralData"
             
-            Q2 = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
-            Q2 += self.__tupleToList(sht.Range("Q2_ElectricityConsumption"))
-            Q2 += self.__tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
-            QFuel = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
+            Q1 = parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)
+            Q1+= parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
+            Q1+= parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
+            QProduct = parseOOxmlarea(ooWb, "Q1_Products", sheetname)
+            
         except:
-            return self.__parseError(sheetnames[1]), []
+            pass
+            #return self.__parseError(sheetnames[0]), []
         
         try:
-            sht = xlWb.Worksheets(sheetnames[2])
-            Q3 = self.__tupleToList(sht.Range("Q3_ProcessData"))
-            Q3 += self.__tupleToList(sht.Range("Q3_WasteHeat"))
-            Q3 += self.__tupleToList(sht.Range("Q3_Schedule")) 
-            Q3 += self.__tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
+            sheetname = "Q2 EnergyConsumption"
+            Q1+= parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
+            QProduct += parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
+            Q2 = parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
+            Q2+= parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
+            Q2+= parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
+            QFuel = parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
+        except:
+            return self.__parseError(sheetname), []
+        
+        try:
+            sheetname = "Q3_ Processes"
+            Q2 = parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
+            Q2+= parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
+            Q2+= parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
+            Q2+= parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
+ 
         except:
             return self.__parseError(sheetnames[2]), []
             
@@ -139,12 +142,13 @@ class parseOO(parseSpreadsheet):
         """
         reads the input file (.ods) and opens the content.xml
         """
+        # TODO Add Exception if File doesnt exist
         if zipfile.is_zipfile(filename):
             ziparchive = zipfile.ZipFile(filename, "r")
             archivedata = ziparchive.read("content.xml")
             return archivedata
-        
-    def parseOOxmlarea(xmlString,area):
+    
+    def parseOOxmlarea(xmlString,area,worksheet):
         """
         parses the given string into a domstructure, and extracts a list of the given area.
         area: the assigned range in the .ods document
@@ -158,20 +162,17 @@ class parseOO(parseSpreadsheet):
         namedrange = parsedDom.getElementsByTagName("table:named-range")
         
         table = None
+        cellrange = None
         for elem in namedrange:
             if elem.getAttribute("table:name")==area:
-                table = elem.getAttribute("table:base-cell-address")
                 cellrange = elem.getAttribute("table:cell-range-address")
-                break
-        if table == None:
+                break    
+        if cellrange == None:
             print "Area not found"
             return
-        
-        table = table.strip('$\'')
-        table = table.split('\'')[0]
         cellrange = cellrange.split('$')
         cellr = []
-        
+    
         for elem in xrange(2,len(cellrange)):
             cellr.append(cellrange[elem].strip(".:"))
         cellrange = cellr
@@ -179,9 +180,11 @@ class parseOO(parseSpreadsheet):
         #On OO only rectangular areas can be selected -> length should be ok
         domtable = parsedDom.getElementsByTagName("table:table")
         for elem in domtable:
-            if elem.getAttribute("table:name")==table:
+            if elem.getAttribute("table:name")==worksheet:
                 table = elem
-            
+        if table == None:
+            print "Area not found"
+            return
         tablerows = table.getElementsByTagName("table:table-row")
         data = []
         repeatedcells=0
@@ -206,3 +209,10 @@ class parseOO(parseSpreadsheet):
                 except:
                     data.append(None)
         return data
+        
+        
+    
+    def __connectToDB(self):
+        conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
+        md = pSQL.pSQL(conn, "einstein")
+        return md

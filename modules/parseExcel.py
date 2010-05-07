@@ -84,7 +84,7 @@ class parseExcel(parseSpreadsheet):
     def __getExcelLists(self, sheetnames, xlWb): 
         lists = []
         if len(sheetnames)!=11:
-            return self.__parseError("wrong number of Sheets"), []
+            return parseSpreadsheet.parseError("wrong number of Sheets"), []
         try:
             sht = xlWb.Worksheets(sheetnames[0])
             Q1=self.__tupleToList(sht.Range("Q1_GeneralData"))    
@@ -92,7 +92,7 @@ class parseExcel(parseSpreadsheet):
             Q1+=self.__tupleToList(sht.Range("Q1_Operation"))
             QProduct =self.__tupleToList(sht.Range("Q1_Products"))
         except:
-            return self.__parseError(sheetnames[0]), []
+            return parseSpreadsheet.parseError(sheetnames[0]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[1])
@@ -104,7 +104,7 @@ class parseExcel(parseSpreadsheet):
             Q2 += self.__tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
             QFuel = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
         except:
-            return self.__parseError(sheetnames[1]), []
+            return parseSpreadsheet.parseError(sheetnames[1]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[2])
@@ -113,14 +113,14 @@ class parseExcel(parseSpreadsheet):
             Q3 += self.__tupleToList(sht.Range("Q3_Schedule")) 
             Q3 += self.__tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
         except:
-            return self.__parseError(sheetnames[2]), []
+            return parseSpreadsheet.parseError(sheetnames[2]), []
             
         try:    
             sht= xlWb.Worksheets(sheetnames[3])
             Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
             Q3+= self.__tupleToList(sht.Range("Q3_OperationCycle"))
         except:
-            return self.__parseError(sheetnames[3]), []
+            return parseSpreadsheet.parseError(sheetnames[3]), []
             
         try:    
             sht = xlWb.Worksheets(sheetnames[8])
@@ -133,7 +133,7 @@ class parseExcel(parseSpreadsheet):
             QSurf = self.__tupleToList(sht.Range("Q7_Area"))
             QSurf += self.__tupleToList(sht.Range("Q7_Roof"))
         except:
-            return self.__parseError(sheetnames[8]), []
+            return parseSpreadsheet.parseError(sheetnames[8]), []
           
         try:    
             sht = xlWb.Worksheets(sheetnames[3])
@@ -152,7 +152,7 @@ class parseExcel(parseSpreadsheet):
             QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_2"))
             QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_3"))
         except:
-            return self.__parseError(sheetnames[3]), []
+            return parseSpreadsheet.parseError(sheetnames[3]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[10])
@@ -160,7 +160,7 @@ class parseExcel(parseSpreadsheet):
             for i in xrange(3):
                 Q9Questionnaire+=self.__tupleToList(sht.Range("Q9_"+str(i+1)))
         except:
-            return self.__parseError(sheetnames[10]), []
+            return parseSpreadsheet.parseError(sheetnames[10]), []
             
         lists.append(Q1)
         lists.append(Q2)
@@ -190,7 +190,7 @@ class parseExcel(parseSpreadsheet):
             
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-            return parseError(self, "test")
+            return parseSpreadsheet.parseError("Consistency")
             
         try:
             __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
@@ -206,7 +206,7 @@ class parseExcel(parseSpreadsheet):
                     __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
                 except:
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-                    return parseSpreadsheet.parseError("teest")
+                    return parseSpreadsheet.parseError("Consistency")
                 
         try:
             Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire = lists
@@ -224,7 +224,7 @@ class parseExcel(parseSpreadsheet):
             q2dict = SD.createQElectricityDictionary(Q2, self.__md)
             self.__md.qelectricity.insert(q2dict)
         except:
-            return self.__parseError(self.__sheetnames[1])
+            return parseSpreadsheet.parseError(self.__sheetnames[1])
 
         try:
             for i in xrange(3):
@@ -233,7 +233,7 @@ class parseExcel(parseSpreadsheet):
             for i in xrange(len(QIntervals)/2):
                 self.__md.intervals.insert(SD.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
         except:
-            return self.__parseError(self.__sheetnames[3])
+            return parseSpreadsheet.parseError(self.__sheetnames[3])
         
         try:
             Q1dict = SD.createQuestionnaireDictionary(Q1, self.__md)
@@ -246,13 +246,13 @@ class parseExcel(parseSpreadsheet):
             Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
             self.__md.questionnaire.insert(Q1dict)
         except:
-            return self.__parseError(self.__sheetnames[0])
+            return parseSpreadsheet.parseError(self.__sheetnames[0])
         
         try:
             Questionnaire_ID = self.__md.questionnaire.sql_select("LAST_INSERT_ID()")
             Questionnaire_ID =  Questionnaire_ID[-1]['Questionnaire_ID']
         except: 
-            return self.__parseError("No Questionnare ID Found")
+            return parseSpreadsheet.parseError("No Questionnare ID Found")
         quest_id = 'Questionnaire_id'
         Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
 
@@ -262,40 +262,40 @@ class parseExcel(parseSpreadsheet):
                 Q4Hdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Hdict)
             except:
-                return self.__parseError(self.__sheetnames[4])
+                return parseSpreadsheet.parseError(self.__sheetnames[4])
                 
             try:    
                 Q4Cdict = SD.createQ4CDictionary(self.__tupleToList(self.__xlWb.Worksheets(self.__sheetnames[5]).Range("Q4C_"+str(i+1))), self.__md)
                 Q4Cdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Cdict)
             except:
-                return self.__parseError(self.__sheetnames[5])
+                return parseSpreadsheet.parseError(self.__sheetnames[5])
             
             try:
                 self.__md.qdistributionhc.insert(SD.createQ5Dictionary(self.__tupleToList(self.__xlWb.Worksheets(self.__sheetnames[6]).Range("Q5_"+str(i+1))), self.__md))
             except:
-                return self.__parseError(self.__sheetnames[6])
+                return parseSpreadsheet.parseError(self.__sheetnames[6])
             
             try:
                 Q6 = self.__tupleToList(self.__xlWb.Worksheets(self.__sheetnames[7]).Range("Q6_"+str(i+1)))
                 self.__md.qheatexchanger.insert(SD.createQ6Dictionary(Q6, self.__md))
                 self.__md.qwasteheatelequip.insert(SD.createQ6EDictionary(Q6, self.__md))
             except:
-                return self.__parseError(self.__sheetnames[7])
+                return parseSpreadsheet.parseError(self.__sheetnames[7])
                 
             try:
                 Q8dict = SD.createQ8Dictionary(self.__tupleToList(self.__xlWb.Worksheets(self.__sheetnames[9]).Range("Q8_"+str(i+1))), self.__md)
                 Q8dict[quest_id]=Questionnaire_ID
                 self.__md.qbuildings.insert(Q8dict)
             except:
-                return self.__parseError(self.__sheetnames[9])
+                return parseSpreadsheet.parseError(self.__sheetnames[9])
                 
         try:
             QRenewables = SD.createQ7Dictionary(QRenewables, self.__md)
             QRenewables[quest_id] = Questionnaire_ID
             self.__md.qrenewables.insert(QRenewables)
         except:
-            return self.__parseError(self.__sheetnames[8])
+            return parseSpreadsheet.parseError(self.__sheetnames[8])
         
         try:
             self.__splitExcelColumns(3, 5, QProduct, {}, Questionnaire_ID ,SD.createQProductDictionary,self.__md.qproduct)
@@ -312,7 +312,7 @@ class parseExcel(parseSpreadsheet):
                 
             self.__splitExcelColumns(3, 3, Q3n, {}, Questionnaire_ID, SD.createQProcessDictionary,self.__md.qprocessdata)
         except:
-            return self.__parseError("QProduct, QFuel or QSurfarea")
+            return parseSpreadsheet.parseError("QProduct, QFuel or QSurfarea")
 
         
         return "Parsing successful!"
