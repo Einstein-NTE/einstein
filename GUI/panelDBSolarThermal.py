@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 #
-#    PanelDBCHP: Database Design Assistant
+#    PanelDBSolarThermal: Database Design Assistant
 #
 #==============================================================================
 #
@@ -46,10 +46,10 @@ def _U(text):
     except:
         return _(text)
 
-# DBCHP_ID needs to remain as first entry
-colLabels = "DBCHP_ID", "Manufacturer", "CHPequip", "Type", "SubType", "CHPPt"
+# DBSolarThermal_ID needs to remain as first entry
+colLabels = "DBSolarThermal_ID", "STManufacturer", "STModel", "STType", "STPnomColl"
 
-class PanelDBCHP(wx.Dialog):
+class PanelDBSolarThermal(wx.Dialog):
     def __init__(self, parent, title, closeOnOk = False):
         self.parent = parent
         self.title = title
@@ -67,7 +67,7 @@ class PanelDBCHP(wx.Dialog):
 
         wx.Dialog.__init__(self, parent, -1, self.title,
                            wx.Point(wx.CENTER_ON_SCREEN), wx.Size(800, 600),
-                           wx.DEFAULT_FRAME_STYLE, 'PanelDBCHP')
+                           wx.DEFAULT_FRAME_STYLE, 'PanelDBSolarThermal')
         self.Centre()
         self.Hide()
 
@@ -89,9 +89,7 @@ class PanelDBCHP(wx.Dialog):
         self.page2 = wx.Panel(self.notebook)
         self.notebook.AddPage(self.page2, _U('Technical Data'))
         self.page3 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page3, _U('Heat source / sink'))
-        self.page4 = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.page4, _U('Economic Parameters'))
+        self.notebook.AddPage(self.page3, _U('Economic Parameters'))
 
         #
         # tab 0 - Summary table
@@ -111,11 +109,6 @@ class PanelDBCHP(wx.Dialog):
                                    label = _U("Type"),
                                    tip = _U("Show only equipment of type"))
 
-        self.tc_subtype = ChoiceEntry(self.page0,
-                                      values = [],
-                                      label = _U("Subtype"),
-                                      tip = _U("Show only equipment of subtype"))
-
         #
         # tab 1 - Descriptive Data
         #
@@ -126,156 +119,166 @@ class PanelDBCHP(wx.Dialog):
         self.frame_descriptive_data.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Manufacturer"),
-                             tip = _U("Manufacturer"))
+        self.tc1 = TextEntry(self.page1, maxchars = 20, value = '',
+                             label = _U("STManufacturer"),
+                             tip = _U("Solarthermal Manufacturer"))
 
-        self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("CHPequip"),
-                             tip = _U(""))
+        self.tc2 = TextEntry(self.page1, maxchars = 20, value = '',
+                             label = _U("STModel"),
+                             tip = _U("Solarthermal Model"))
 
         self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Type"),
-                             tip = _U(""))
+                             label = _U("STType"),
+                             tip = _U("Solarthermal Type"))
 
-        self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("SubType"),
-                             tip = _U(""))
-
-        self.tc5 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Reference"),
+        self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
+                             label = _U("STReference"),
                              tip = _U("Source of data"))
 
         #
         # tab 2 - Technical data
         #
         self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
-        self.frame_electricity = wx.StaticBox(self.page2, -1, _U("Electricity generation parameters"))
+        self.frame_col_eff_par = wx.StaticBox(self.page2, -1, _U("Collector efficiency parameters"))
+        self.frame_col_dim_wei = wx.StaticBox(self.page2, -1, _U("Collector dimension and weight"))
         self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         fp.pushFont()
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
+        self.tc5 = StaticTextEntry(self.page2, maxchars = 255, value = '',
+                              label = _U("STPnomColl"),
+                              tip = _U(""))
+
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              label = _U("CHPPt"),
-                              tip = _U("Nominal thermal power"))
+                              unitdict = 'FRACTION',
+                              label = _U("STc0"),
+                              tip = _U("Optical efficiency"))
 
-        self.tc7 = ChoiceEntry(self.page2,
-                               values = [],
-                               label = _U("FuelType"),
-                               tip = _U("Fuel type"))
+        self.tc7 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              label = _U("STc1"),
+                              tip = _U("Linear thermal loss coefficient"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              label = _U("FuelConsum"),
-                              tip = _U("Nominal fuel consumption"))
+                              label = _U("STc2"),
+                              tip = _U("Quadratic thermal loss coefficient"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("Eta_t"),
-                              tip = _U("Nominal thermal conversion efficiency"))
+                              label = _U("K50L"),
+                              tip = unicode("Incidence angle correction factor at 50º (longitudinal)", 'latin-1'))
 
         self.tc10 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("CHPPe"),
-                               tip = _U("Nominal electrical power"))
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
+                              label = _U("K50T"),
+                              tip = unicode("Incidence angle correction factor at 50º (transversal)", 'latin-1'))
 
         self.tc11 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'FRACTION',
-                               label = _U("Eta_e"),
-                               tip = _U("Electrical efficiency"))
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'MASSORVOLUMEFLOW',
+                              label = _U("STMassFlowRate"),
+                              tip = _U("Recommended collector mass flow rate"))
 
-        #
-        # tab 3 - Heat source / sink
-        #
-        self.frame_heat_source_sink = wx.StaticBox(self.page3, -1, _U("Heat source / sink"))
-        self.frame_heat_source_sink.SetForegroundColour(TITLE_COLOR)
-        self.frame_heat_source_sink.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
-        fp.pushFont()
-        self.frame_heat_source_sink.SetFont(fp.getFont())
-        fp.popFont()
+        self.tc12 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
+                              label = _U("STLengthGross"),
+                              tip = _U(""))
 
-        self.tc12 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply"),
-                               tip = _U("Heat transport medium"))
+        self.tc13 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
+                              label = _U("STHeightGross"),
+                              tip = _U(""))
 
-        self.tc13 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply"),
-                               tip = _U("Outlet temperature at nominal conditions"))
+        self.tc14 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'AREA',
+                              label = _U("STAreaGross"),
+                              tip = _U(""))
 
-        self.tc14 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply"),
-                               tip = _U("Mass flow rate of heat transport medium"))
+        self.tc15 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
+                              label = _U("STLengthAper"),
+                              tip = _U(""))
 
-        self.tc15 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply2"),
-                               tip = _U("Heat transport medium"))
+        self.tc16 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'LENGTH',
+                              label = _U("STHeightAper"),
+                              tip = _U(""))
 
-        self.tc16 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply2"),
-                               tip = _U("Outlet temperature at nominal conditions"))
+        self.tc17 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'AREA',
+                              label = _U("STAreaAper"),
+                              tip = _U(""))
 
-        self.tc17 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply2"),
-                               tip = _U("Mass flow rate of heat transport medium"))
+        self.tc18 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
+                              label = _U("STAreaFactor"),
+                              tip = _U(""))
+
+        self.tc19 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'MASSPERAREA',
+                              label = _U("STWeightFactor"),
+                              tip = _U(""))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
-        # tab 4 - Economic Parameters
+        # tab 3 - Economic Parameters
         #
-        self.frame_economic_parameters = wx.StaticBox(self.page4, -1, _U("Economic parameters"))
+        self.frame_economic_parameters = wx.StaticBox(self.page3, -1, _U("Economic parameters"))
         self.frame_economic_parameters.SetForegroundColour(TITLE_COLOR)
         self.frame_economic_parameters.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         fp.pushFont()
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc18 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'PRICE',
-                               label = _U("Price"),
-                               tip = _U("Equipment price at factory applied installer's discount"))
+        self.tc20 = FloatEntry(self.page3,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
+                              label = _U("STUnitPrice300kW"),
+                              tip = _U(""))
 
-        self.tc19 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'PRICE',
-                               label = _U("InvRate"),
-                               tip = _U("Turn-key price"))
+        self.tc21 = FloatEntry(self.page3,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
+                              label = _U("STUnitTurnKeyPrice30kW"),
+                              tip = _U(""))
 
-        self.tc20 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'UNITPRICE',
-                               label = _U("OMRateFix"),
-                               tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
+        self.tc22 = FloatEntry(self.page3,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
+                              label = _U("STUnitTurnKeyPrice300kW"),
+                              tip = _U(""))
 
-        self.tc21 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'UNITPRICEENERGY',
-                               label = _U("OMRateVar"),
-                               tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
+        self.tc23 = FloatEntry(self.page3,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
+                              label = _U("STUnitTurnKeyPrice3000kW"),
+                              tip = _U(""))
 
-        self.tc22 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               label = _U("YearUpdate"),
+        self.tc24 = FloatEntry(self.page3,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                              unitdict = 'UNITPRICE',
+                              label = _U("STOMUnitFix"),
+                              tip = _U(""))
+
+        self.tc25 = FloatEntry(self.page3,
+                               ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
+                               label = _U("STYearUpdate"),
                                tip = _U("Year of last update of the economic data"))
 
         #
@@ -314,7 +317,7 @@ class PanelDBCHP(wx.Dialog):
         self.grid.EnableGridLines(True)
         self.grid.SetDefaultRowSize(20)
         self.grid.SetRowLabelSize(30)
-        self.grid.SetDefaultColSize(100)
+        self.grid.SetDefaultColSize(125)
 
         self.grid.EnableEditing(False)
         self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
@@ -325,6 +328,7 @@ class PanelDBCHP(wx.Dialog):
         self.grid.SetGridCursor(0, 0)
 
     def __do_layout(self):
+        flagText_left = wx.TOP | wx.ALIGN_LEFT
         flagText = wx.TOP | wx.ALIGN_CENTER
 
         # global sizer for panel.
@@ -332,8 +336,7 @@ class PanelDBCHP(wx.Dialog):
 
         sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
-        sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
-        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_type, 0, wx.TOP | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -343,50 +346,53 @@ class PanelDBCHP(wx.Dialog):
         sizerPage1.Add(self.tc2, 0, flagText, VSEP)
         sizerPage1.Add(self.tc3, 0, flagText, VSEP)
         sizerPage1.Add(self.tc4, 0, flagText, VSEP)
-        sizerPage1.Add(self.tc5, 0, flagText, VSEP)
 
         self.page1.SetSizer(sizerPage1)
 
 
         sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
-        sizerPage2.Add(self.tc6, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc7, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc8, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage2.Add(self.tc5, 0, flagText_left, VSEP)
 
-        sizerPage2_electricity = wx.StaticBoxSizer(self.frame_electricity, wx.VERTICAL)
-        sizerPage2_electricity.Add(self.tc10, 0, flagText, VSEP)
-        sizerPage2_electricity.Add(self.tc11, 0, flagText, VSEP)
-        sizerPage2.Add(sizerPage2_electricity)
+        sizerPage2_eff = wx.StaticBoxSizer(self.frame_col_eff_par, wx.VERTICAL)
+        sizerPage2_eff.Add(self.tc6, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc7, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc8, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage2_eff.Add(self.tc11, 0, flagText, VSEP)
+
+        sizerPage2.Add(sizerPage2_eff, 0, flagText_left, VSEP)
+
+        sizerPage2_dim_gross = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_dim_gross.Add(self.tc12, 0, flagText, VSEP)
+        sizerPage2_dim_gross.Add(self.tc13, 0, flagText, VSEP)
+        sizerPage2_dim_gross.Add(self.tc14, 0, flagText, VSEP)
+
+        sizerPage2_dim_aper = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_dim_aper.Add(self.tc15, 0, flagText, VSEP)
+        sizerPage2_dim_aper.Add(self.tc16, 0, flagText, VSEP)
+        sizerPage2_dim_aper.Add(self.tc17, 0, flagText, VSEP)
+
+        sizerPage2_dim = wx.StaticBoxSizer(self.frame_col_dim_wei, wx.HORIZONTAL)
+        sizerPage2_dim.Add(sizerPage2_dim_gross)
+        sizerPage2_dim.Add(sizerPage2_dim_aper)
+
+        sizerPage2.Add(sizerPage2_dim, 0, flagText_left, VSEP)
+        sizerPage2.Add(self.tc18, 0, flagText_left, VSEP)
+        sizerPage2.Add(self.tc19, 0, flagText_left, VSEP)
 
         self.page2.SetSizer(sizerPage2)
 
 
-        sizerPage3 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.VERTICAL)
-        sizerPage3_1 = wx.BoxSizer(wx.VERTICAL)
-        sizerPage3_1.Add(self.tc12, 0, flagText, VSEP)
-        sizerPage3_1.Add(self.tc13, 0, flagText, VSEP)
-        sizerPage3_1.Add(self.tc14, 0, flagText, VSEP)
-
-        sizerPage3_2 = wx.BoxSizer(wx.VERTICAL)
-        sizerPage3_2.Add(self.tc15, 0, flagText, VSEP)
-        sizerPage3_2.Add(self.tc16, 0, flagText, VSEP)
-        sizerPage3_2.Add(self.tc17, 0, flagText, VSEP)
-
-        sizerPage3.Add(sizerPage3_1)
-        sizerPage3.Add(sizerPage3_2)
+        sizerPage3 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
+        sizerPage3.Add(self.tc20, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc21, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc22, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc23, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc24, 0, flagText, VSEP)
+        sizerPage3.Add(self.tc25, 0, flagText, VSEP)
 
         self.page3.SetSizer(sizerPage3)
-
-
-        sizerPage4 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
-        sizerPage4.Add(self.tc18, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc19, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc20, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc21, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc22, 0, flagText, VSEP)
-
-        self.page4.SetSizer(sizerPage4)
 
 
         sizerAddDelete = wx.BoxSizer(wx.HORIZONTAL)
@@ -410,14 +416,14 @@ class PanelDBCHP(wx.Dialog):
 #------------------------------------------------------------------------------
 
     def OnButtonAddEquipment(self, event):
-        retval = Status.DB.dbchp.insert({})
+        retval = Status.DB.dbsolarthermal.insert({})
         self.clearPage0()
         for i in range(self.grid.GetNumberRows() - 1, -1, -1):
             if self.grid.GetCellValue(i, 0) == str(retval):
                 self.grid.SetGridCursor(i, 0)
                 self.grid.MakeCellVisible(i, 0)
                 self.grid.SelectRow(i)
-                equipments = Status.DB.dbchp.DBCHP_ID[check(retval)]
+                equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(retval)]
                 if len(equipments) > 0:
                     equipe = equipments[0]
                     self.display(equipe)
@@ -431,13 +437,13 @@ class PanelDBCHP(wx.Dialog):
             return
 
         id = self.grid.GetCellValue(self.grid.GetGridCursorRow(), 0)
-        logTrack("PanelDBCHP (DELETE Button): deleting chp ID %s" % id)
+        logTrack("PanelDBSolarThermal (DELETE Button): deleting solarthermal ID %s" % id)
 
-        sqlQuery = "SELECT * FROM dbchp WHERE DBCHP_ID = '%s'" % id
+        sqlQuery = "SELECT * FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % id
         result = Status.DB.sql_query(sqlQuery)
 
         if len(result) > 0:
-            sqlQuery = "DELETE FROM dbchp WHERE DBCHP_ID = '%s'" % id
+            sqlQuery = "DELETE FROM dbsolarthermal WHERE DBSolarThermal_ID = '%s'" % id
             Status.DB.sql_query(sqlQuery)
 
             self.clear()
@@ -445,7 +451,6 @@ class PanelDBCHP(wx.Dialog):
             self.grid.ClearSelection()
             for i in range(self.grid.GetNumberRows()):
                 self.grid.DeleteRows()
-            self.fillChoiceOfDBFuel()
             self.fillEquipmentList()
             self.notebook.ChangeSelection(0)
 
@@ -462,28 +467,30 @@ class PanelDBCHP(wx.Dialog):
         fuelDict = Status.prj.getFuelDict()
 
         tmp = {
-               "Manufacturer":check(self.tc1.GetValue()),
-               "CHPequip":check(self.tc2.GetValue()),
-               "Type":check(self.tc3.GetValue()),
-               "SubType":check(self.tc4.GetValue()),
-               "Reference":check(self.tc5.GetValue()),
-               "CHPPt":check(self.tc6.GetValue()),
-               "FuelType":check(findKey(fuelDict, self.tc7.GetValue(text = True))),
-               "FuelConsum":check(self.tc8.GetValue()),
-               "Eta_t":check(self.tc9.GetValue()),
-               "CHPPe":check(self.tc10.GetValue()),
-               "Eta_e":check(self.tc11.GetValue()),
-               "FluidSupply":check(self.tc12.GetValue()),
-               "Tsupply":check(self.tc13.GetValue()),
-               "FlowRateSupply":check(self.tc14.GetValue()),
-               "FluidSupply2":check(self.tc15.GetValue()),
-               "Tsupply2":check(self.tc16.GetValue()),
-               "FlowRateSupply2":check(self.tc17.GetValue()),
-               "Price":check(self.tc18.GetValue()),
-               "InvRate":check(self.tc19.GetValue()),
-               "OMRateFix":check(self.tc20.GetValue()),
-               "OMRateVar":check(self.tc21.GetValue()),
-               "YearUpdate":check(self.tc22.GetValue())
+               "STManufacturer":check(self.tc1.GetValue()),
+               "STModel":check(self.tc2.GetValue()),
+               "STType":check(self.tc3.GetValue()),
+               "STReference":check(self.tc4.GetValue()),
+               "STc0":check(self.tc6.GetValue()),
+               "STc1":check(self.tc7.GetValue()),
+               "STc2":check(self.tc8.GetValue()),
+               "K50L":check(self.tc9.GetValue()),
+               "K50T":check(self.tc10.GetValue()),
+               "STMassFlowRate":check(self.tc11.GetValue()),
+               "STLengthGross":check(self.tc12.GetValue()),
+               "STHeightGross":check(self.tc13.GetValue()),
+               "STAreaGross":check(self.tc14.GetValue()),
+               "STLengthAper":check(self.tc15.GetValue()),
+               "STHeightAper":check(self.tc16.GetValue()),
+               "STAreaAper":check(self.tc17.GetValue()),
+               "STAreaFactor":check(self.tc18.GetValue()),
+               "STWeightFactor":check(self.tc19.GetValue()),
+               "STUnitPrice300kW":check(self.tc20.GetValue()),
+               "STUnitTurnKeyPrice30kW":check(self.tc21.GetValue()),
+               "STUnitTurnKeyPrice300kW":check(self.tc22.GetValue()),
+               "STUnitTurnKeyPrice3000kW":check(self.tc23.GetValue()),
+               "STOMUnitFix":check(self.tc24.GetValue()),
+               "STYearUpdate":check(self.tc25.GetValue())
                }
 
         row = self.grid.GetGridCursorRow()
@@ -494,7 +501,7 @@ class PanelDBCHP(wx.Dialog):
         except:
             return
 
-        equipments = Status.DB.dbchp.DBCHP_ID[check(self.theId)]
+        equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(self.theId)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
@@ -503,7 +510,6 @@ class PanelDBCHP(wx.Dialog):
         for i in range(self.grid.GetNumberRows()):
             self.grid.DeleteRows()
         self.fillChoiceOfType()
-        self.fillChoiceOfSubType()
         self.fillEquipmentList()
 
         if row >= 0 and col >= 0:
@@ -520,7 +526,7 @@ class PanelDBCHP(wx.Dialog):
         self.grid.SetGridCursor(event.GetRow(), event.GetCol())
         id = self.grid.GetCellValue(event.GetRow(), 0)
 
-        equipments = Status.DB.dbchp.DBCHP_ID[check(id)]
+        equipments = Status.DB.dbsolarthermal.DBSolarThermal_ID[check(id)]
 
         if len(equipments) > 0:
             equipe = equipments[0]
@@ -556,6 +562,7 @@ class PanelDBCHP(wx.Dialog):
         self.fillEquipmentList()
         event.Skip()
 
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
@@ -563,33 +570,32 @@ class PanelDBCHP(wx.Dialog):
     def display(self, q = None):
         self.clear()
 
-        fuelDict = Status.prj.getFuelDict()
-        self.fillChoiceOfDBFuel()
-
         if q is not None:
-            self.tc1.SetValue(str(q.Manufacturer)) if q.Manufacturer is not None else ''
-            self.tc2.SetValue(str(q.CHPequip)) if q.CHPequip is not None else ''
-            self.tc3.SetValue(str(q.Type)) if q.Type is not None else ''
-            self.tc4.SetValue(str(q.SubType)) if q.SubType is not None else ''
-            self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
-            self.tc6.SetValue(str(q.CHPPt)) if q.CHPPt is not None else ''
-            if q.FuelType is not None:
-                self.tc7.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
-            self.tc8.SetValue(str(q.FuelConsum)) if q.FuelConsum is not None else ''
-            self.tc9.SetValue(str(q.Eta_t)) if q.Eta_t is not None else ''
-            self.tc10.SetValue(str(q.CHPPe)) if q.CHPPe is not None else ''
-            self.tc11.SetValue(str(q.Eta_e)) if q.Eta_e is not None else ''
-            self.tc12.SetValue(str(q.FluidSupply)) if q.FluidSupply is not None else ''
-            self.tc13.SetValue(str(q.Tsupply)) if q.Tsupply is not None else ''
-            self.tc14.SetValue(str(q.FlowRateSupply)) if q.FlowRateSupply is not None else ''
-            self.tc15.SetValue(str(q.FluidSupply2)) if q.FluidSupply2 is not None else ''
-            self.tc16.SetValue(str(q.Tsupply2)) if q.Tsupply2 is not None else ''
-            self.tc17.SetValue(str(q.FlowRateSupply2)) if q.FlowRateSupply2 is not None else ''
-            self.tc18.SetValue(str(q.Price)) if q.Price is not None else ''
-            self.tc19.SetValue(str(q.InvRate)) if q.InvRate is not None else ''
-            self.tc20.SetValue(str(q.OMRateFix)) if q.OMRateFix is not None else ''
-            self.tc21.SetValue(str(q.OMRateVar)) if q.OMRateVar is not None else ''
-            self.tc22.SetValue(str(q.YearUpdate)) if q.YearUpdate is not None else ''
+            self.tc1.SetValue(str(q.STManufacturer)) if q.STManufacturer is not None else ''
+            self.tc2.SetValue(str(q.STModel)) if q.STModel is not None else ''
+            self.tc3.SetValue(str(q.STType)) if q.STType is not None else ''
+            self.tc4.SetValue(str(q.STReference)) if q.STReference is not None else ''
+            self.tc5.SetValue(str(q.STPnomColl)) if q.STPnomColl is not None else ''
+            self.tc6.SetValue(str(q.STc0)) if q.STc0 is not None else ''
+            self.tc7.SetValue(str(q.STc1)) if q.STc1 is not None else ''
+            self.tc8.SetValue(str(q.STc2)) if q.STc2 is not None else ''
+            self.tc9.SetValue(str(q.K50L)) if q.K50L is not None else ''
+            self.tc10.SetValue(str(q.K50T)) if q.K50T is not None else ''
+            self.tc11.SetValue(str(q.STMassFlowRate)) if q.STMassFlowRate is not None else ''
+            self.tc12.SetValue(str(q.STLengthGross)) if q.STLengthGross is not None else ''
+            self.tc13.SetValue(str(q.STHeightGross)) if q.STHeightGross is not None else ''
+            self.tc14.SetValue(str(q.STAreaGross)) if q.STAreaGross is not None else ''
+            self.tc15.SetValue(str(q.STLengthAper)) if q.STLengthAper is not None else ''
+            self.tc16.SetValue(str(q.STHeightAper)) if q.STHeightAper is not None else ''
+            self.tc17.SetValue(str(q.STAreaAper)) if q.STAreaAper is not None else ''
+            self.tc18.SetValue(str(q.STAreaFactor)) if q.STAreaFactor is not None else ''
+            self.tc19.SetValue(str(q.STWeightFactor)) if q.STWeightFactor is not None else ''
+            self.tc20.SetValue(str(q.STUnitPrice300kW)) if q.STUnitPrice300kW is not None else ''
+            self.tc21.SetValue(str(q.STUnitTurnKeyPrice30kW)) if q.STUnitTurnKeyPrice30kW is not None else ''
+            self.tc22.SetValue(str(q.STUnitTurnKeyPrice300kW)) if q.STUnitTurnKeyPrice300kW is not None else ''
+            self.tc23.SetValue(str(q.STUnitTurnKeyPrice3000kW)) if q.STUnitTurnKeyPrice3000kW is not None else ''
+            self.tc24.SetValue(str(q.STOMUnitFix)) if q.STOMUnitFix is not None else ''
+            self.tc25.SetValue(str(q.STYearUpdate)) if q.STYearUpdate is not None else ''
         self.Show()
 
     def clear(self):
@@ -615,17 +621,15 @@ class PanelDBCHP(wx.Dialog):
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
-
-    def fillChoiceOfDBFuel(self):
-        fuelDict = Status.prj.getFuelDict()
-        fuelList = fuelDict.values()
-        fillChoice(self.tc7.entry, fuelList)
+        self.tc23.SetValue('')
+        self.tc24.SetValue('')
+        self.tc25.SetValue('')
 
     def fillChoiceOfType(self):
-        equipments = Status.DB.dbchp.get_table()
+        equipments = Status.DB.dbsolarthermal.get_table()
         typeList = []
         for equipe in equipments:
-            sqlQuery = "SELECT Type FROM dbchp WHERE DBCHP_ID = %s"%equipe.DBCHP_ID
+            sqlQuery = "SELECT STType FROM dbsolarthermal WHERE DBSolarThermal_ID = %s"%equipe.DBSolarThermal_ID
             result = Status.DB.sql_query(sqlQuery)
             if result not in typeList and result is not None:
                 typeList.append(str(result))
@@ -633,48 +637,21 @@ class PanelDBCHP(wx.Dialog):
         self.tc_type.entry.Append("All")
         self.tc_type.entry.SetStringSelection("All")
 
-    def fillChoiceOfSubType(self):
-        equipments = Status.DB.dbchp.get_table()
-        subtypeList = []
-        for equipe in equipments:
-            sqlQuery = "SELECT SubType FROM dbchp WHERE DBCHP_ID = %s"%equipe.DBCHP_ID
-            result = Status.DB.sql_query(sqlQuery)
-            if result not in subtypeList and result is not None:
-                subtypeList.append(str(result))
-        fillChoice(self.tc_subtype.entry, subtypeList)
-        self.tc_subtype.entry.Append("All")
-        self.tc_subtype.entry.SetStringSelection("All")
-
     def fillChoices(self):
-        self.fillChoiceOfDBFuel()
         self.fillChoiceOfType()
-        self.fillChoiceOfSubType()
 
     def fillEquipmentList(self):
-        equipments = Status.DB.dbchp.get_table()
+        equipments = Status.DB.dbsolarthermal.get_table()
         fields = ', '.join([f for f in colLabels])
         equipe_type = self.tc_type.GetValue(True)
-        equipe_subtype = self.tc_subtype.GetValue(True)
 
         for equipe in equipments:
-            if (equipe_type == "All" or len(equipe_type) <= 0) and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM dbchp WHERE DBCHP_ID = %s"%(fields,equipe.DBCHP_ID)
-            elif (equipe_type == "All" or len(equipe_type) <= 0) and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM dbchp WHERE SubType is NULL and DBCHP_ID = %s"%(fields,equipe.DBCHP_ID)
-            elif equipe_type == "None" and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type is NULL and DBCHP_ID = %s"%(fields,equipe.DBCHP_ID)
-            elif equipe_type == "None" and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type is NULL and SubType is NULL and DBCHP_ID = %s"%(fields,equipe.DBCHP_ID)
-            elif (equipe_type == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM dbchp WHERE SubType = '%s' and DBCHP_ID = %s"%(fields,equipe_subtype,equipe.DBCHP_ID)
-            elif (equipe_subtype == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type = '%s' and DBCHP_ID = %s"%(fields,equipe_type,equipe.DBCHP_ID)
+            if equipe_type == "All" or len(equipe_type) <= 0:
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
             elif equipe_type == "None":
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type is NULL and SubType = '%s' and DBCHP_ID = %s"%(fields,equipe_subtype,equipe.DBCHP_ID)
-            elif equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type = '%s' and SubType is NULL and DBCHP_ID = %s"%(fields,equipe_type,equipe.DBCHP_ID)
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType is NULL and DBSolarThermal_ID = %s"%(fields,equipe.DBSolarThermal_ID)
             else:
-                sqlQuery = "SELECT %s FROM dbchp WHERE Type = '%s' and SubType = '%s' and DBCHP_ID = %s"%(fields,equipe_type,equipe_subtype,equipe.DBCHP_ID)
+                sqlQuery = "SELECT %s FROM dbsolarthermal WHERE STType = '%s' and DBSolarThermal_ID = %s"%(fields,equipe_type,equipe.DBSolarThermal_ID)
 
             result = Status.DB.sql_query(sqlQuery)
             if len(result) > 0:
@@ -697,8 +674,8 @@ class PanelDBCHP(wx.Dialog):
            len(self.tc2.GetValue()) == 0 and\
            len(self.tc3.GetValue()) == 0 and\
            len(self.tc4.GetValue()) == 0 and\
-           len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
+           self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\
            self.tc9.GetValue() is None and\
            self.tc10.GetValue() is None and\
@@ -713,7 +690,11 @@ class PanelDBCHP(wx.Dialog):
            self.tc19.GetValue() is None and\
            self.tc20.GetValue() is None and\
            self.tc21.GetValue() is None and\
-           self.tc22.GetValue() is None:
+           self.tc22.GetValue() is None and\
+           self.tc23.GetValue() is None and\
+           self.tc24.GetValue() is None and\
+           self.tc25.GetValue() is None:
             return True
         else:
             return False
+
