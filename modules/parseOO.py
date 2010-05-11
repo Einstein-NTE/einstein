@@ -39,7 +39,11 @@ class parseOO(parseSpreadsheet):
         self.__password = mysql_password
     
     def parse(self):
-        pass
+        self.__md = self.__connectToDB()
+        ooWb = readOOContent(self.__filepath)
+        __handle, lists = self.__getLists(ooWb)
+        
+        return "not implemented"
         
     def __getLists(self,ooWb): 
         lists = []
@@ -48,10 +52,10 @@ class parseOO(parseSpreadsheet):
         try:
             sheetname = "Q1_GeneralData"
             
-            Q1 = parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)
-            Q1+= parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
-            Q1+= parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
-            QProduct = parseOOxmlarea(ooWb, "Q1_Products", sheetname)
+            Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)
+            Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
+            Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
+            QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetname)
             
         except:
             pass
@@ -59,25 +63,27 @@ class parseOO(parseSpreadsheet):
         
         try:
             sheetname = "Q2 EnergyConsumption"
-            Q1+= parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
-            QProduct += parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
-            Q2 = parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
-            Q2+= parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
-            Q2+= parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
-            QFuel = parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
+            Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
+            QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
+            Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
+            Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
+            Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
+            QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
         except:
-            return self.__parseError(sheetname), []
+            pass
+            #return self.__parseError(sheetname), []
         
         try:
             sheetname = "Q3_ Processes"
-            Q2 = parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
-            Q2+= parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
-            Q2+= parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
-            Q2+= parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
+            Q2 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
+            Q2+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
+            Q2+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
+            Q2+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
  
         except:
-            return self.__parseError(sheetnames[2]), []
-            
+            pass
+            #return self.__parseError(sheetnames[2]), []
+        """    
         try:    
             sht= xlWb.Worksheets(sheetnames[3])
             Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
@@ -124,18 +130,19 @@ class parseOO(parseSpreadsheet):
                 Q9Questionnaire+=self.__tupleToList(sht.Range("Q9_"+str(i+1)))
         except:
             return self.__parseError(sheetnames[10]), []
-            
+        """    
         lists.append(Q1)
         lists.append(Q2)
         lists.append(QProduct)
         lists.append(QFuel)
+        """
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
         lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
-        
+        """
         return "", lists
     
     def readOOContent(filename):
