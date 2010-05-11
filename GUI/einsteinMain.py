@@ -102,6 +102,7 @@ from einstein.GUI.panelQ9 import PanelQ9
 from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
 from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
 from einstein.GUI.panelDBCHP import PanelDBCHP
+from einstein.GUI.panelDBBoiler import PanelDBBoiler
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -654,7 +655,8 @@ class EinsteinFrame(wx.Frame):
         frameEditDBFuel = DBEditFrame(None, "Edit DBFuel", 'dbfuel', 0, True)
         frameEditDBFuel.ShowModal()
     def OnMenuEditDBBoiler(self, event):
-        frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
+#        frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
+        frameEditDBBoiler = PanelDBBoiler(self, "Edit DBBoiler", False)
         frameEditDBBoiler.ShowModal()
     def OnMenuEditDBSolarThermal(self, event):
 #        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)

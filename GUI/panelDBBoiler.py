@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 #
-#    PanelDBCHP: Database Design Assistant
+#    PanelDBHeatPump: Database Design Assistant
 #
 #==============================================================================
 #
@@ -37,8 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
-DATA_ENTRY_WIDTH_LEFT = 140
-UNITS_WIDTH = 55
+DATA_ENTRY_WIDTH_LEFT = 195
+UNITS_WIDTH = 0
 
 VSEP = 4
 
@@ -48,14 +48,14 @@ def _U(text):
     except:
         return _(text)
 
-class PanelDBCHP(PanelDBBase):
+class PanelDBBoiler(PanelDBBase):
     def __init__(self, parent, title, closeOnOk = False):
         self.parent = parent
         self.title = title
         self.closeOnOk = closeOnOk
-        self.name = "CHP"
+        self.name = "Boiler"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(125)
         self.__do_layout()
         self.fillEquipmentList()
         self.fillChoices()
@@ -65,16 +65,15 @@ class PanelDBCHP(PanelDBBase):
 #--- UI setup
 #------------------------------------------------------------------------------
 
-        PanelDBBase.__init__(self, self.parent, "Edit DBCHP", self.name)
+        PanelDBBase.__init__(self, self.parent, "Edit DBBoiler", self.name)
 
-        # DBCHP_ID needs to remain as first entry
-        self.colLabels = "DBCHP_ID", "Manufacturer", "CHPequip", "Type", "SubType", "CHPPt"
+        # DBBoiler_ID needs to remain as first entry
+        self.colLabels = "DBBoiler_ID", "BoilerManufacturer", "BoilerModel", "BoilerType", "BBPnom"
 
-        self.db = Status.DB.dbchp
-        self.table = "dbchp"
+        self.db = Status.DB.dbboiler
+        self.table = "dbboiler"
         self.identifier = self.colLabels[0]
         self.type = self.colLabels[3]
-        self.subtype = self.colLabels[4]
 
         # access to font properties object
         fp = FontProperties()
@@ -114,11 +113,6 @@ class PanelDBCHP(PanelDBBase):
                                    label = _U("Type"),
                                    tip = _U("Show only equipment of type"))
 
-        self.tc_subtype = ChoiceEntry(self.page0,
-                                      values = [],
-                                      label = _U("Subtype"),
-                                      tip = _U("Show only equipment of subtype"))
-
         #
         # tab 1 - Descriptive Data
         #
@@ -130,22 +124,18 @@ class PanelDBCHP(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Manufacturer"),
-                             tip = _U("Manufacturer"))
+                             label = _U("BoilerManufacturer"),
+                             tip = _U("Boiler Manufacturer"))
 
         self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("CHPequip"),
-                             tip = _U(""))
+                             label = _U("BoilerModel"),
+                             tip = _U("Boiler Model"))
 
         self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Type"),
-                             tip = _U(""))
+                             label = _U("BoilerType"),
+                             tip = _U("Boiler Type"))
 
-        self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("SubType"),
-                             tip = _U(""))
-
-        self.tc5 = TextEntry(self.page1, maxchars = 45, value = '',
+        self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
@@ -153,45 +143,82 @@ class PanelDBCHP(PanelDBBase):
         # tab 2 - Technical data
         #
         self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
-        self.frame_electricity = wx.StaticBox(self.page2, -1, _U("Electricity generation parameters"))
+        self.frame_boiler_spec = wx.StaticBox(self.page2, -1, _U("Boiler specific technical parameters"))
+        self.frame_eco_preh = wx.StaticBox(self.page2, -1, _U("Economiser / Preheater"))
         self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         fp.pushFont()
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc6 = FloatEntry(self.page2,
+        self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              label = _U("CHPPt"),
+                              #unitdict = 'POWER',
+                              label = _U("BBPnom"),
                               tip = _U("Nominal thermal power"))
 
-        self.tc7 = ChoiceEntry(self.page2,
+        self.tc6 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              #unitdict = 'FRACTION',
+                              label = _U("BBEfficiency"),
+                              tip = _U("Nominal efficiency"))
+
+        self.tc7 = FloatEntry(self.page2,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              #unitdict = 'POWER',
+                              label = _U("FuelConsum"),
+                              tip = _U("Nominal fuel consumption (LCV)"))
+
+        self.tc8 = ChoiceEntry(self.page2,
                                values = [],
                                label = _U("FuelType"),
                                tip = _U("Fuel type"))
 
-        self.tc8 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              label = _U("FuelConsum"),
-                              tip = _U("Nominal fuel consumption"))
-
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              unitdict = 'FRACTION',
-                              label = _U("Eta_t"),
-                              tip = _U("Nominal thermal conversion efficiency"))
+                              #unitdict = 'POWER',
+                              label = _U("ElConsum"),
+                              tip = _U("Nominal electrical power consumption"))
 
-        self.tc10 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("CHPPe"),
-                               tip = _U("Nominal electrical power"))
+        self.tc10 = ChoiceEntry(self.page2,
+                                values = ["Yes", "No"],
+                                label = _U("Economiser"),
+                                tip = _U("Does the equipment include an economiser (water preheater)?"))
 
-        self.tc11 = FloatEntry(self.page2,
+        self.tc11 = ChoiceEntry(self.page2,
+                                values = ["Yes", "No"],
+                                label = _U("Preheater"),
+                                tip = _U("Does the equipment include an air preheater ?"))
+
+        self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'FRACTION',
-                               label = _U("Eta_e"),
-                               tip = _U("Electrical efficiency"))
+                               #unitdict = 'FRACTION',
+                               label = _U("ExcessAirRatio"),
+                               tip = _U("Typical excess air ratio"))
+
+        self.tc13 = FloatEntry(self.page2,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               #unitdict = 'FRACTION',
+                               label = _U("BBA1"),
+                               tip = _U("Linear dependence of the efficiency on the load"))
+
+        self.tc14 = FloatEntry(self.page2,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               #unitdict = 'FRACTION',
+                               label = _U("BBA2"),
+                               tip = _U("Quadratic dependence of the efficiency on the load"))
+
+        self.tc15 = FloatEntry(self.page2,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               #unitdict = 'INVTEMP',
+                               label = _U("BBK1"),
+                               tip = _U("Linear dependence of the efficiency on the temperature"))
+
+        self.tc16 = FloatEntry(self.page2,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               #unitdict = 'INVTEMP2',
+                               label = _U("BBK2"),
+                               tip = _U("Quadratic dependence of the efficiency on the temperature"))
 
         #
         # tab 3 - Heat source / sink
@@ -203,44 +230,11 @@ class PanelDBCHP(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc12 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply"),
-                               tip = _U("Heat transport medium"))
-
-        self.tc13 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply"),
-                               tip = _U("Outlet temperature at nominal conditions"))
-
-        self.tc14 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply"),
-                               tip = _U("Mass flow rate of heat transport medium"))
-
-        self.tc15 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply2"),
-                               tip = _U("Heat transport medium"))
-
-        self.tc16 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply2"),
-                               tip = _U("Outlet temperature at nominal conditions"))
-
         self.tc17 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply2"),
-                               tip = _U("Mass flow rate of heat transport medium"))
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+                               unitdict = 'TEMPERATURE',
+                               label = _U("BoilerTemp"),
+                               tip = _U("Maximum outlet temperature"))
 
         #
         # tab 4 - Economic Parameters
@@ -254,30 +248,30 @@ class PanelDBCHP(PanelDBBase):
 
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'PRICE',
-                               label = _U("Price"),
+                               #unitdict = '',
+                               label = _U("BoilerPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'PRICE',
-                               label = _U("InvRate"),
-                               tip = _U("Turn-key price"))
+                               #unitdict = '',
+                               label = _U("BoilerTurnKeyPrice"),
+                               tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               label = _U("OMRateFix"),
+                               #unitdict = '',
+                               label = _U("BoilerOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICEENERGY',
-                               label = _U("OMRateVar"),
+                               #unitdict = '',
+                               label = _U("BoilerOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
         self.tc22 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("YearUpdate"),
                                tip = _U("Year of last update of the economic data"))
 
@@ -291,7 +285,6 @@ class PanelDBCHP(PanelDBBase):
         sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
-        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -301,38 +294,35 @@ class PanelDBCHP(PanelDBBase):
         sizerPage1.Add(self.tc2, 0, flagText, VSEP)
         sizerPage1.Add(self.tc3, 0, flagText, VSEP)
         sizerPage1.Add(self.tc4, 0, flagText, VSEP)
-        sizerPage1.Add(self.tc5, 0, flagText, VSEP)
 
         self.page1.SetSizer(sizerPage1)
 
 
+        sizerPage2_eco_preh = wx.StaticBoxSizer(self.frame_eco_preh, wx.VERTICAL)
+        sizerPage2_eco_preh.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage2_eco_preh.Add(self.tc11, 0, flagText, VSEP)
+
+        sizerPage2_boiler_spec = wx.StaticBoxSizer(self.frame_boiler_spec, wx.VERTICAL)
+        sizerPage2_boiler_spec.Add(sizerPage2_eco_preh)
+        sizerPage2_boiler_spec.Add(self.tc6, 0, flagText, VSEP)
+        sizerPage2_boiler_spec.Add(self.tc12, 0, flagText, VSEP)
+        sizerPage2_boiler_spec.Add(self.tc13, 0, flagText, VSEP)
+        sizerPage2_boiler_spec.Add(self.tc14, 0, flagText, VSEP)
+        sizerPage2_boiler_spec.Add(self.tc15, 0, flagText, VSEP)
+        sizerPage2_boiler_spec.Add(self.tc16, 0, flagText, VSEP)
+
         sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
-        sizerPage2.Add(self.tc6, 0, flagText, VSEP)
+        sizerPage2.Add(self.tc5, 0, flagText, VSEP)
         sizerPage2.Add(self.tc7, 0, flagText, VSEP)
         sizerPage2.Add(self.tc8, 0, flagText, VSEP)
         sizerPage2.Add(self.tc9, 0, flagText, VSEP)
-
-        sizerPage2_electricity = wx.StaticBoxSizer(self.frame_electricity, wx.VERTICAL)
-        sizerPage2_electricity.Add(self.tc10, 0, flagText, VSEP)
-        sizerPage2_electricity.Add(self.tc11, 0, flagText, VSEP)
-        sizerPage2.Add(sizerPage2_electricity, 0, flagText)
+        sizerPage2.Add(sizerPage2_boiler_spec, 0, flagText, VSEP)
 
         self.page2.SetSizer(sizerPage2)
 
 
-        sizerPage3 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.HORIZONTAL)
-        sizerPage3_1 = wx.BoxSizer(wx.VERTICAL)
-        sizerPage3_1.Add(self.tc12, 0, flagText, VSEP)
-        sizerPage3_1.Add(self.tc13, 0, flagText, VSEP)
-        sizerPage3_1.Add(self.tc14, 0, flagText, VSEP)
-
-        sizerPage3_2 = wx.BoxSizer(wx.VERTICAL)
-        sizerPage3_2.Add(self.tc15, 0, flagText, VSEP)
-        sizerPage3_2.Add(self.tc16, 0, flagText, VSEP)
-        sizerPage3_2.Add(self.tc17, 0, flagText, VSEP)
-
-        sizerPage3.Add(sizerPage3_1, 0, flagText)
-        sizerPage3.Add(sizerPage3_2, 0, flagText)
+        sizerPage3 = wx.StaticBoxSizer(self.frame_heat_source_sink, wx.VERTICAL)
+        sizerPage3.Add(self.tc17, 0, flagText, VSEP)
 
         self.page3.SetSizer(sizerPage3)
 
@@ -375,27 +365,27 @@ class PanelDBCHP(PanelDBBase):
         fuelDict = Status.prj.getFuelDict()
 
         tmp = {
-               "Manufacturer":check(self.tc1.GetValue()),
-               "CHPequip":check(self.tc2.GetValue()),
-               "Type":check(self.tc3.GetValue()),
-               "SubType":check(self.tc4.GetValue()),
-               "Reference":check(self.tc5.GetValue()),
-               "CHPPt":check(self.tc6.GetValue()),
-               "FuelType":check(findKey(fuelDict, self.tc7.GetValue(text = True))),
-               "FuelConsum":check(self.tc8.GetValue()),
-               "Eta_t":check(self.tc9.GetValue()),
-               "CHPPe":check(self.tc10.GetValue()),
-               "Eta_e":check(self.tc11.GetValue()),
-               "FluidSupply":check(self.tc12.GetValue()),
-               "Tsupply":check(self.tc13.GetValue()),
-               "FlowRateSupply":check(self.tc14.GetValue()),
-               "FluidSupply2":check(self.tc15.GetValue()),
-               "Tsupply2":check(self.tc16.GetValue()),
-               "FlowRateSupply2":check(self.tc17.GetValue()),
-               "Price":check(self.tc18.GetValue()),
-               "InvRate":check(self.tc19.GetValue()),
-               "OMRateFix":check(self.tc20.GetValue()),
-               "OMRateVar":check(self.tc21.GetValue()),
+               "BoilerManufacturer":check(self.tc1.GetValue()),
+               "BoilerModel":check(self.tc2.GetValue()),
+               "BoilerType":check(self.tc3.GetValue()),
+               "Reference":check(self.tc4.GetValue()),
+               "BBPnom":check(self.tc5.GetValue()),
+               "BBEfficiency":check(self.tc6.GetValue()),
+               "FuelConsum":check(self.tc7.GetValue()),
+               "FuelType":check(findKey(fuelDict, self.tc8.GetValue(text = True))),
+               "ElConsum":check(self.tc9.GetValue()),
+               "Economiser":check(self.tc10.GetValue()),
+               "Preheater":check(self.tc11.GetValue()),
+               "ExcessAirRatio":check(self.tc12.GetValue()),
+               "BBA1":check(self.tc13.GetValue()),
+               "BBA2":check(self.tc14.GetValue()),
+               "BBK1":check(self.tc15.GetValue()),
+               "BBK2":check(self.tc16.GetValue()),
+               "BoilerTemp":check(self.tc17.GetValue()),
+               "BoilerPrice":check(self.tc18.GetValue()),
+               "BoilerTurnKeyPrice":check(self.tc19.GetValue()),
+               "BoilerOandMfix":check(self.tc20.GetValue()),
+               "BoilerOandMvar":check(self.tc21.GetValue()),
                "YearUpdate":check(self.tc22.GetValue())
                }
 
@@ -412,31 +402,31 @@ class PanelDBCHP(PanelDBBase):
         self.clear()
 
         fuelDict = Status.prj.getFuelDict()
-        self.fillChoiceOfDBFuel(self.tc7.entry)
+        self.fillChoiceOfDBFuel(self.tc8.entry)
 
         if q is not None:
-            self.tc1.SetValue(str(q.Manufacturer)) if q.Manufacturer is not None else ''
-            self.tc2.SetValue(str(q.CHPequip)) if q.CHPequip is not None else ''
-            self.tc3.SetValue(str(q.Type)) if q.Type is not None else ''
-            self.tc4.SetValue(str(q.SubType)) if q.SubType is not None else ''
-            self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
-            self.tc6.SetValue(str(q.CHPPt)) if q.CHPPt is not None else ''
+            self.tc1.SetValue(str(q.BoilerManufacturer)) if q.BoilerManufacturer is not None else ''
+            self.tc2.SetValue(str(q.BoilerModel)) if q.BoilerModel is not None else ''
+            self.tc3.SetValue(str(q.BoilerType)) if q.BoilerType is not None else ''
+            self.tc4.SetValue(str(q.Reference)) if q.Reference is not None else ''
+            self.tc5.SetValue(str(q.BBPnom)) if q.BBPnom is not None else ''
+            self.tc6.SetValue(str(q.BBEfficiency)) if q.BBEfficiency is not None else ''
+            self.tc7.SetValue(str(q.FuelConsum)) if q.FuelConsum is not None else ''
             if q.FuelType is not None:
-                self.tc7.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
-            self.tc8.SetValue(str(q.FuelConsum)) if q.FuelConsum is not None else ''
-            self.tc9.SetValue(str(q.Eta_t)) if q.Eta_t is not None else ''
-            self.tc10.SetValue(str(q.CHPPe)) if q.CHPPe is not None else ''
-            self.tc11.SetValue(str(q.Eta_e)) if q.Eta_e is not None else ''
-            self.tc12.SetValue(str(q.FluidSupply)) if q.FluidSupply is not None else ''
-            self.tc13.SetValue(str(q.Tsupply)) if q.Tsupply is not None else ''
-            self.tc14.SetValue(str(q.FlowRateSupply)) if q.FlowRateSupply is not None else ''
-            self.tc15.SetValue(str(q.FluidSupply2)) if q.FluidSupply2 is not None else ''
-            self.tc16.SetValue(str(q.Tsupply2)) if q.Tsupply2 is not None else ''
-            self.tc17.SetValue(str(q.FlowRateSupply2)) if q.FlowRateSupply2 is not None else ''
-            self.tc18.SetValue(str(q.Price)) if q.Price is not None else ''
-            self.tc19.SetValue(str(q.InvRate)) if q.InvRate is not None else ''
-            self.tc20.SetValue(str(q.OMRateFix)) if q.OMRateFix is not None else ''
-            self.tc21.SetValue(str(q.OMRateVar)) if q.OMRateVar is not None else ''
+                self.tc8.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
+            self.tc9.SetValue(str(q.ElConsum)) if q.ElConsum is not None else ''
+            self.tc10.SetValue(str(q.Economiser)) if q.Economiser is not None else ''
+            self.tc11.SetValue(str(q.Preheater)) if q.Preheater is not None else ''
+            self.tc12.SetValue(str(q.ExcessAirRatio)) if q.ExcessAirRatio is not None else ''
+            self.tc13.SetValue(str(q.BBA1)) if q.BBA1 is not None else ''
+            self.tc14.SetValue(str(q.BBA2)) if q.BBA2 is not None else ''
+            self.tc15.SetValue(str(q.BBK1)) if q.BBK1 is not None else ''
+            self.tc16.SetValue(str(q.BBK2)) if q.BBK2 is not None else ''
+            self.tc17.SetValue(str(q.BoilerTemp)) if q.BoilerTemp is not None else ''
+            self.tc18.SetValue(str(q.BoilerPrice)) if q.BoilerPrice is not None else ''
+            self.tc19.SetValue(str(q.BoilerTurnKeyPrice)) if q.BoilerTurnKeyPrice is not None else ''
+            self.tc20.SetValue(str(q.BoilerOandMfix)) if q.BoilerOandMfix is not None else ''
+            self.tc21.SetValue(str(q.BoilerOandMvar)) if q.BoilerOandMvar is not None else ''
             self.tc22.SetValue(str(q.YearUpdate)) if q.YearUpdate is not None else ''
         self.Show()
 
@@ -465,21 +455,20 @@ class PanelDBCHP(PanelDBBase):
         self.tc22.SetValue('')
 
     def fillChoices(self):
-        self.fillChoiceOfDBFuel(self.tc7.entry)
+        self.fillChoiceOfDBFuel(self.tc8.entry)
         self.fillChoiceOfType()
-        self.fillChoiceOfSubType()
 
     def getDBCol(self):
-        return self.db.DBCHP_ID
+        return self.db.DBBoiler_ID
 
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
            len(self.tc3.GetValue()) == 0 and\
            len(self.tc4.GetValue()) == 0 and\
-           len(self.tc5.GetValue()) == 0 and\
+           self.tc5.GetValue() is None and\
            self.tc6.GetValue() is None and\
-           self.tc8.GetValue() is None and\
+           self.tc7.GetValue() is None and\
            self.tc9.GetValue() is None and\
            self.tc10.GetValue() is None and\
            self.tc11.GetValue() is None and\
