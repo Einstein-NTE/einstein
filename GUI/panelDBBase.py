@@ -62,6 +62,31 @@ class PanelDBBase(wx.Dialog):
         self.tc_type = None
         self.tc_subtype = None
 
+        #
+        # buttons
+        #
+        self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
+        self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
+        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
+        self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
+        self.buttonOK.SetDefault()
+
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+
+        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
+
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnGridLabelLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
+
     def _init_grid(self, defaultColSize):
         self.grid.CreateGrid(0, len(self.colLabels))
 
@@ -197,12 +222,6 @@ class PanelDBBase(wx.Dialog):
             self.grid.SelectRow(row)
             self.grid.MakeCellVisible(row, col)
 
-    def display(self, q = None):
-        pass
-
-    def clear(self):
-        pass
-
     def fillChoiceOfDBFuel(self, entry):
         fuelDict = Status.prj.getFuelDict()
         fuelList = fuelDict.values()
@@ -250,11 +269,79 @@ class PanelDBBase(wx.Dialog):
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
 
-# methods to be implemented by derived classes
-    def fillChoices(self):
-        pass
+
 
     def fillEquipmentList(self):
+        if self.tc_subtype is not None:
+            self.fillEquipmentListWithTypeAndSubType()
+        else:
+            self.fillEquipmentListWithType()
+
+    def fillEquipmentListWithType(self):
+        equipments = self.db.get_table()
+        ids = equipments.column(self.identifier)
+        fields = ', '.join([f for f in self.colLabels])
+        if self.tc_type is not None:
+            equipe_type = self.tc_type.GetValue(True)
+
+        for id in ids:
+            if equipe_type == "All" or len(equipe_type) <= 0:
+                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
+            elif equipe_type == "None":
+                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
+            else:
+                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
+
+            result = Status.DB.sql_query(sqlQuery)
+            self.appendResultToGrid(result)
+
+    def fillEquipmentListWithTypeAndSubType(self):
+        equipments = self.db.get_table()
+        ids = equipments.column(self.identifier)
+        fields = ', '.join([f for f in self.colLabels])
+
+        if self.tc_type is not None:
+            equipe_type = self.tc_type.GetValue(True)
+        if self.tc_subtype is not None:
+            equipe_subtype = self.tc_subtype.GetValue(True)
+
+        for id in ids:
+            if (equipe_type == "All" or len(equipe_type) <= 0) and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
+            elif (equipe_type == "All" or len(equipe_type) <= 0) and equipe_subtype == "None":
+                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.subtype,self.identifier,id)
+            elif equipe_type == "None" and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
+                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
+            elif equipe_type == "None" and equipe_subtype == "None":
+                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s is NULL and %s = %s"%(fields,self.table,self.type,self.subtype,self.identifier,id)
+            elif (equipe_type == "All" or len(equipe_type) <= 0):
+                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.subtype,equipe_subtype,self.identifier,id)
+            elif (equipe_subtype == "All" or len(equipe_type) <= 0):
+                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
+            elif equipe_type == "None":
+                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = '%s' and %s = %s"%(fields,self.table,self.type,self.subtype,equipe_subtype,self.identifier,id)
+            elif equipe_subtype == "None":
+                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s is NULL and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,self.identifier,id)
+            else:
+                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,equipe_subtype,self.identifier,id)
+
+            result = Status.DB.sql_query(sqlQuery)
+            self.appendResultToGrid(result)
+
+    def appendResultToGrid(self, result):
+        if len(result) > 0:
+            self.grid.AppendRows(1, True)
+            for i in range(len(self.colLabels)):
+                self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
+
+# methods to be implemented by derived classes
+    def display(self, q = None):
+        pass
+
+    def clear(self):
+        pass
+
+    def fillChoices(self):
         pass
 
     def getDBCol(self):
