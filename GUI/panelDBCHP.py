@@ -277,7 +277,7 @@ class PanelDBCHP(PanelDBBase):
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
         self.tc22 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("YearUpdate"),
                                tip = _U("Year of last update of the economic data"))
 

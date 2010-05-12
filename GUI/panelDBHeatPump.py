@@ -165,27 +165,27 @@ class PanelDBHeatPump(PanelDBBase):
         fp.popFont()
 
         self.tc6 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPHeatCap"),
                               tip = _U("Nominal heating capacity"))
 
         self.tc7 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPHeatCOP"),
                               tip = _U("Nominal COP for heating mode"))
 
         self.tc8 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCoolCap"),
                               tip = _U("Nominal cooling capacity"))
 
         self.tc9 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("HPCoolCOP"),
                               tip = _U("Nominal COP for cooling mode"))
 
         self.tc10 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPFuelConsum"),
                                tip = _U("Nominal fuel consumption"))
 
@@ -195,7 +195,7 @@ class PanelDBHeatPump(PanelDBBase):
                                 tip = _U("Fuel type"))
 
         self.tc12 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPElectConsum"),
                                tip = _U("Nominal electrical power consumption"))
 
@@ -204,42 +204,42 @@ class PanelDBHeatPump(PanelDBBase):
                               tip = _U("Refrigerant / absorbent refrigerant pair"))
 
         self.tc14 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPCondTinC"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc15 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPGenTinC"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc16 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPEvapTinC"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc17 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPConstExCoolCOP"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
         self.tc18 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPCondTinH"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc19 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPGenTinH"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc20 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPEvapTinH"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc21 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPConstExHeatCOP"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
@@ -277,17 +277,17 @@ class PanelDBHeatPump(PanelDBBase):
                                 tip = _U("Heat source and sink"))
 
         self.tc27 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPLimDT"),
                                tip = _U("Maximum acceptable temperature difference between evaporator and condenser temperatures (primary fluid: Tco - Tev) - working limit"))
 
         self.tc28 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPCondTmax"),
                                tip = _U("Maximum condensing (and absorption) temperature (primary fluid) - working limit"))
 
         self.tc29 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPEvapTmin"),
                                tip = _U("Minimum evaporating temperature (primary fluid) - working limit"))
 
@@ -297,7 +297,7 @@ class PanelDBHeatPump(PanelDBBase):
                                 tip = _U("Heat transport medium used for heat supply to the generator"))
 
         self.tc31 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPGenTmin"),
                                tip = _U("Minimum required inlet temperature to the generator"))
 
@@ -312,22 +312,22 @@ class PanelDBHeatPump(PanelDBBase):
         fp.popFont()
 
         self.tc32 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc33 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPTurnKeyPrice"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc34 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc35 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+122, value = 0.,
+                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                label = _U("HPOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 

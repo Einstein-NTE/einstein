@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 #
-#    PanelDBHeatPump: Database Design Assistant
+#    PanelDBBoiler: Database Design Assistant
 #
 #==============================================================================
 #
@@ -37,8 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
-DATA_ENTRY_WIDTH_LEFT = 195
-UNITS_WIDTH = 0
+DATA_ENTRY_WIDTH_LEFT = 140
+UNITS_WIDTH = 55
 
 VSEP = 4
 

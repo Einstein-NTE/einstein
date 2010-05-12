@@ -227,6 +227,12 @@ class PanelDBBase(wx.Dialog):
         fuelList = fuelDict.values()
         fillChoice(entry, fuelList)
 
+    def fillChoiceOfDBFuelUnits(self, entry):
+        pass
+#        fuelUnitDict = ...
+#        fuelUnitList = fuelUnitDict.values()
+#        fillChoice(entry, fuelUnitList)
+
     def fillChoiceOfType(self):
         try:
             equipments = self.db.get_table()

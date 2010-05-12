@@ -103,6 +103,9 @@ from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
 from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
 from einstein.GUI.panelDBCHP import PanelDBCHP
 from einstein.GUI.panelDBBoiler import PanelDBBoiler
+from einstein.GUI.panelDBFuel import PanelDBFuel
+from einstein.GUI.panelDBFluid import PanelDBFluid
+from einstein.GUI.panelDBElectricityMix import PanelDBElectricityMix
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -649,10 +652,12 @@ class EinsteinFrame(wx.Frame):
         frameEditDBHeatPump = PanelDBHeatPump(self, "Edit DBHeatPump", False)
         frameEditDBHeatPump.ShowModal()
     def OnMenuEditDBFluid(self, event):
-        frameEditDBFluid = DBEditFrame(None, "Edit DBFluid", 'dbfluid', 0, True)
+#        frameEditDBFluid = DBEditFrame(None, "Edit DBFluid", 'dbfluid', 0, True)
+        frameEditDBFluid = PanelDBFluid(self, "Edit DBFluid", False)
         frameEditDBFluid.ShowModal()
     def OnMenuEditDBFuel(self, event):
-        frameEditDBFuel = DBEditFrame(None, "Edit DBFuel", 'dbfuel', 0, True)
+#        frameEditDBFuel = DBEditFrame(None, "Edit DBFuel", 'dbfuel', 0, True)
+        frameEditDBFuel = PanelDBFuel(self, "Edit DBFuel", False)
         frameEditDBFuel.ShowModal()
     def OnMenuEditDBBoiler(self, event):
 #        frameEditDBBoiler = DBEditFrame(None, "Edit DBBoiler", 'dbboiler', 0, True)
@@ -666,7 +671,8 @@ class EinsteinFrame(wx.Frame):
         frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
         frameEditDBChiller.ShowModal()
     def OnMenuEditDBElectricityMix(self, event):
-        frameEditDBElectricityMix = DBEditFrame(None, "Edit DBElectricityMix", 'dbelectricitymix', 0, True)
+#        frameEditDBElectricityMix = DBEditFrame(None, "Edit DBElectricityMix", 'dbelectricitymix', 0, True)
+        frameEditDBElectricityMix = PanelDBElectricityMix(self, "Edit DBElectricityMix", False)
         frameEditDBElectricityMix.ShowModal()
 
 #..............................................................................
