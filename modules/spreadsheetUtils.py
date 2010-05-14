@@ -468,12 +468,7 @@ class SpreadsheetDict():
         return Q9dict
 
     
-        createQuestionnaireDictionary=staticmethod(createQuestionnaireDictionary)
-        createQElectricityDictionary=staticmethod(createQElectricityDictionary)
-        createQ3Dictionary=staticmethod(createQ3Dictionary)
-        createQ4Dictionary=staticmethod(createQ4Dictionary)
-        createQ5Dictionary=staticmethod(createQ5Dictionary)
-        createQ6Dictionary=staticmethod(createQ6Dictionary)
+
         
         
 

@@ -28,6 +28,7 @@
 
 from xmlIO import *
 from parseExcel import *
+from parseOO import *
 
 def _U(text):
     try:
@@ -42,21 +43,24 @@ class ImportQ(object):
         
 
         self.infile = openfilecreate('Choose a questionnaire file for importing',
-                                     'Excel files (*.xls)|*.xls|Open Office calc files (*.ods)|*.ods',
+                                     'Spreadsheet files (*.xls,*.odt)|*.xls;*.ods|\
+                                     Excel files (*.xls)|*.xls|\
+                                     Open Office calc files (*.ods)|*.ods',
                                      style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if self.infile is None:
             return None       
         
-        pe = parseExcel(self.infile,frame.DBUser,frame.DBPass)
-        
+        frame = wx.GetApp().GetTopWindow()
         if self.infile.endswith('xls'):
+            pe = parseExcel(self.infile,frame.DBUser,frame.DBPass)
             wx.MessageBox(pe.parse(), 'Info')
         elif self.infile.endswith('ods'):
-            wx.MessageBox('Open Office','Info')
+            pe = parseOO(self.infile,frame.DBUser,frame.DBPass)
+            wx.MessageBox(pe.parse(), 'Info')
         else:
             wx.MessageBox('File corrupted', 'Info')
         
-        frame = wx.GetApp().GetTopWindow() 
+         
 
         
         #conn.close()

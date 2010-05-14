@@ -40,112 +40,118 @@ class parseOO(parseSpreadsheet):
     
     def parse(self):
         self.__md = self.__connectToDB()
-        ooWb = readOOContent(self.__filepath)
-        __handle, lists = self.__getLists(ooWb)
+        xmlString = self.readOOContent(self.__filepath)
+        parsedDom = xml.dom.minidom.parseString(xmlString)
+        __handle, lists = self.__getLists(parsedDom)
         
-        return "not implemented"
+        
+        return __handle
         
     def __getLists(self,ooWb): 
         lists = []
         #if len(sheetnames)!=11:
         #    return self.__parseError("wrong number of Sheets"), []
-        try:
-            sheetname = "Q1_GeneralData"
+        #try:
+        sheetname = "Q1 GeneralData"
             
-            Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
-            QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetname)
-            
-        except:
-            pass
+        Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)      
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
+        QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetname)
+        #except:
+        #    return "parseError Sheet Q1", []
             #return self.__parseError(sheetnames[0]), []
         
-        try:
-            sheetname = "Q2 EnergyConsumption"
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
-            QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
-            Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
-            Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
-            Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
-            QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
-        except:
-            pass
+        #try:
+        sheetname = "Q2 EnergyConsumption"
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
+        QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
+        Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
+        Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
+        Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
+        QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
+        #except:
+            #return "parseError Sheet Q2", []
             #return self.__parseError(sheetname), []
         
-        try:
-            sheetname = "Q3_ Processes"
-            Q2 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
-            Q2+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
-            Q2+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
-            Q2+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
+        #try:
+        sheetname = "Q3_ Processes"
+        Q3 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
  
-        except:
-            pass
+        #except:
+            #return "parseError Sheet Q3", []
             #return self.__parseError(sheetnames[2]), []
-        """    
-        try:    
-            sht= xlWb.Worksheets(sheetnames[3])
-            Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
-            Q3+= self.__tupleToList(sht.Range("Q3_OperationCycle"))
-        except:
-            return self.__parseError(sheetnames[3]), []
-            
-        try:    
-            sht = xlWb.Worksheets(sheetnames[8])
-            QRenewables = self.__tupleToList(sht.Range("Q7_Interest"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_REReason"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Others"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Latitude"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Biomass"))
-            
-            QSurf = self.__tupleToList(sht.Range("Q7_Area"))
-            QSurf += self.__tupleToList(sht.Range("Q7_Roof"))
-        except:
-            return self.__parseError(sheetnames[8]), []
-          
-        try:    
-            sht = xlWb.Worksheets(sheetnames[3])
-            QProfiles = []
-            QProcNames = self.__tupleToList(sht.Range("Q3A_ProcessName"))
-            
-            for i in xrange(3):
-                QProfil = self.__tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
-                QProfil.append(QProcNames[i*3])
-                QProfiles.append(QProfil)
+        #Q3A
+        #try:    
+        sheetname = "Q3A"
         
-            QIntervals  = self.__tupleToList(sht.Range("Q3A_StartTime_1"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_2"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_3"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_1"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_2"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_3"))
-        except:
-            return self.__parseError(sheetnames[3]), []
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_ScheduleTolerance", sheetname)
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_OperationCycle", sheetname)
+        #except:
+            #return self.__parseError(sheetnames[3]), []
+            
+        #try:    
         
-        try:
-            sht = xlWb.Worksheets(sheetnames[10])
-            Q9Questionnaire=[]
-            for i in xrange(3):
-                Q9Questionnaire+=self.__tupleToList(sht.Range("Q9_"+str(i+1)))
-        except:
-            return self.__parseError(sheetnames[10]), []
-        """    
+        sheetname = "Q7_ Renewables"
+        QRenewables = []
+        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Interest", sheetname))
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_REReason", sheetname)
+        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Others", sheetname))
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetname)
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Biomass", sheetname)
+        
+        QSurf = self.parseOOxmlarea(ooWb, "Q7_Area", sheetname)
+        QSurf += self.parseOOxmlarea(ooWb, "Q7_Roof", sheetname)
+        #except:
+            #return self.__parseError(sheetnames[8]), []
+        
+        #try:    
+        sheetname = "Q3A"
+        QProfiles = []
+        QProcNames = self.parseOOxmlarea(ooWb, "Q3A_ProcessName", sheetname)
+        
+        for i in xrange(3):
+            QProfil = self.parseOOxmlarea(ooWb, "Q3A_Profiles_"+ str(i+1), sheetname)
+            QProfil.append(QProcNames[i*3])
+            QProfiles.append(QProfil)
+
+        QIntervals  = self.parseOOxmlarea(ooWb, "Q3A_StartTime_1", sheetname)
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_2", sheetname)
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_3", sheetname)
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_1", sheetname)
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_2", sheetname)
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_3", sheetname)
+        #except:
+            #return self.__parseError(sheetnames[3]), []
+        
+        #try:
+        
+        sheetname = "Q9 Economics"
+        Q9Questionnaire=[]
+        for i in xrange(3):
+            Q9Questionnaire+=self.parseOOxmlarea(ooWb, "Q9_"+str(i+1), sheetname)
+
+        #except:
+            #return self.__parseError(sheetnames[10]), []
+        
         lists.append(Q1)
         lists.append(Q2)
         lists.append(QProduct)
         lists.append(QFuel)
-        """
+        
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
         lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
-        """
+        print lists
         return "", lists
     
-    def readOOContent(filename):
+    def readOOContent(self, filename):
         """
         reads the input file (.ods) and opens the content.xml
         """
@@ -155,15 +161,14 @@ class parseOO(parseSpreadsheet):
             archivedata = ziparchive.read("content.xml")
             return archivedata
     
-    def parseOOxmlarea(xmlString,area,worksheet):
+    def parseOOxmlarea(self, parsedDom, area, worksheet):
         """
         parses the given string into a domstructure, and extracts a list of the given area.
         area: the assigned range in the .ods document
-        Example usage: parseOOxmlarea(readOOContent("File.ods"),"PersonalInfo")
+        Example usage: parseOOxmlarea(readOOContent("File.ods"),Areaname, Sheetname)
         
         returns a list with the data read from the ods file
         """
-        parsedDom = xml.dom.minidom.parseString(xmlString)
         
         #Get all named expressions and resolve the areas
         namedrange = parsedDom.getElementsByTagName("table:named-range")
@@ -196,6 +201,15 @@ class parseOO(parseSpreadsheet):
         data = []
         repeatedcells=0
         sumRepeatedCells=0
+        # If only one cell is selected
+        if len(cellrange)<4:
+            tabledata =  tablerows[int(cellrange[1])-1].childNodes[ord(cellrange[0])-64-1]
+            while tabledata.hasChildNodes():
+                tabledata = tabledata.firstChild
+            try:    
+                return tabledata.data
+            except:
+                return None
         for i in xrange(int(cellrange[1]), int(cellrange[3])+1):
             for j in xrange(ord(cellrange[0])-64, ord(cellrange[2])-64+1):
                 tabledata = tablerows[i-1].childNodes[j-1]
