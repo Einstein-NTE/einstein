@@ -29,7 +29,9 @@ from parseSpreadsheet import parseSpreadsheet
 import MySQLdb
 import pSQL
 from win32com.client import Dispatch
-from SpreadsheetDictionary import SpreadsheetDict as SD
+from spreadsheetUtils import Utils
+
+ 
 import wx
 import time
 
@@ -40,9 +42,7 @@ class parseExcel(parseSpreadsheet):
         self.__filepath=filepath
         self.__username = mysql_username
         self.__password = mysql_password
-    
-    
-    
+
     
     def __tupleToList(self,tuple):
         data = []
@@ -85,83 +85,83 @@ class parseExcel(parseSpreadsheet):
     def __getExcelLists(self, sheetnames, xlWb): 
         lists = []
         if len(sheetnames)!=11:
-            return parseSpreadsheet.parseError("wrong number of Sheets"), []
+            return Utils.parseError("wrong number of Sheets"), []
         try:
             sht = xlWb.Worksheets(sheetnames[0])
-            Q1=self.__tupleToList(sht.Range("Q1_GeneralData"))    
-            Q1+=self.__tupleToList(sht.Range("Q1_StatisticalData"))
-            Q1+=self.__tupleToList(sht.Range("Q1_Operation"))
-            QProduct =self.__tupleToList(sht.Range("Q1_Products"))
+            Q1=Utils.tupleToList(sht.Range("Q1_GeneralData"))    
+            Q1+=Utils.tupleToList(sht.Range("Q1_StatisticalData"))
+            Q1+=Utils.tupleToList(sht.Range("Q1_Operation"))
+            QProduct =Utils.tupleToList(sht.Range("Q1_Products"))
         except:
-            return parseSpreadsheet.parseError(sheetnames[0]), []
+            return Utils.parseError(sheetnames[0]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[1])
-            Q1+=self.__tupleToList(sht.Range("Q1_Percent"))
-            QProduct+=self.__tupleToList(sht.Range("Q2_Products"))
+            Q1+=Utils.tupleToList(sht.Range("Q1_Percent"))
+            QProduct+=Utils.tupleToList(sht.Range("Q2_Products"))
             
-            Q2 = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
-            Q2 += self.__tupleToList(sht.Range("Q2_ElectricityConsumption"))
-            Q2 += self.__tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
-            QFuel = self.__tupleToList(sht.Range("Q2_EnergyConsumption"))
+            Q2 = Utils.tupleToList(sht.Range("Q2_EnergyConsumption"))
+            Q2 += Utils.tupleToList(sht.Range("Q2_ElectricityConsumption"))
+            Q2 += Utils.tupleToList(sht.Range("Q2_EnergyConsumptionProduct"))
+            QFuel = Utils.tupleToList(sht.Range("Q2_EnergyConsumption"))
         except:
-            return parseSpreadsheet.parseError(sheetnames[1]), []
+            return Utils.parseError(sheetnames[1]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[2])
-            Q3 = self.__tupleToList(sht.Range("Q3_ProcessData"))
-            Q3 += self.__tupleToList(sht.Range("Q3_WasteHeat"))
-            Q3 += self.__tupleToList(sht.Range("Q3_Schedule")) 
-            Q3 += self.__tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
+            Q3 = Utils.tupleToList(sht.Range("Q3_ProcessData"))
+            Q3 += Utils.tupleToList(sht.Range("Q3_WasteHeat"))
+            Q3 += Utils.tupleToList(sht.Range("Q3_Schedule")) 
+            Q3 += Utils.tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
         except:
-            return parseSpreadsheet.parseError(sheetnames[2]), []
+            return Utils.parseError(sheetnames[2]), []
             
         try:    
             sht= xlWb.Worksheets(sheetnames[3])
-            Q3+= self.__tupleToList(sht.Range("Q3_ScheduleTolerance"))
-            Q3+= self.__tupleToList(sht.Range("Q3_OperationCycle"))
+            Q3+= Utils.tupleToList(sht.Range("Q3_ScheduleTolerance"))
+            Q3+= Utils.tupleToList(sht.Range("Q3_OperationCycle"))
         except:
-            return parseSpreadsheet.parseError(sheetnames[3]), []
+            return Utils.parseError(sheetnames[3]), []
             
         try:    
             sht = xlWb.Worksheets(sheetnames[8])
-            QRenewables = self.__tupleToList(sht.Range("Q7_Interest"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_REReason"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Others"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Latitude"))
-            QRenewables += self.__tupleToList(sht.Range("Q7_Biomass"))
+            QRenewables = Utils.tupleToList(sht.Range("Q7_Interest"))
+            QRenewables += Utils.tupleToList(sht.Range("Q7_REReason"))
+            QRenewables += Utils.tupleToList(sht.Range("Q7_Others"))
+            QRenewables += Utils.tupleToList(sht.Range("Q7_Latitude"))
+            QRenewables += Utils.tupleToList(sht.Range("Q7_Biomass"))
             
-            QSurf = self.__tupleToList(sht.Range("Q7_Area"))
-            QSurf += self.__tupleToList(sht.Range("Q7_Roof"))
+            QSurf = Utils.tupleToList(sht.Range("Q7_Area"))
+            QSurf += Utils.tupleToList(sht.Range("Q7_Roof"))
         except:
-            return parseSpreadsheet.parseError(sheetnames[8]), []
+            return Utils.parseError(sheetnames[8]), []
           
         try:    
             sht = xlWb.Worksheets(sheetnames[3])
             QProfiles = []
-            QProcNames = self.__tupleToList(sht.Range("Q3A_ProcessName"))
+            QProcNames = Utils.tupleToList(sht.Range("Q3A_ProcessName"))
             
             for i in xrange(3):
-                QProfil = self.__tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
+                QProfil = Utils.tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
                 QProfil.append(QProcNames[i*3])
                 QProfiles.append(QProfil)
         
-            QIntervals  = self.__tupleToList(sht.Range("Q3A_StartTime_1"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_2"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_StartTime_3"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_1"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_2"))
-            QIntervals += self.__tupleToList(sht.Range("Q3A_EndTime_3"))
+            QIntervals  = Utils.tupleToList(sht.Range("Q3A_StartTime_1"))
+            QIntervals += Utils.tupleToList(sht.Range("Q3A_StartTime_2"))
+            QIntervals += Utils.tupleToList(sht.Range("Q3A_StartTime_3"))
+            QIntervals += Utils.tupleToList(sht.Range("Q3A_EndTime_1"))
+            QIntervals += Utils.tupleToList(sht.Range("Q3A_EndTime_2"))
+            QIntervals += Utils.tupleToList(sht.Range("Q3A_EndTime_3"))
         except:
-            return parseSpreadsheet.parseError(sheetnames[3]), []
+            return Utils.parseError(sheetnames[3]), []
         
         try:
             sht = xlWb.Worksheets(sheetnames[10])
             Q9Questionnaire=[]
             for i in xrange(3):
-                Q9Questionnaire+=self.__tupleToList(sht.Range("Q9_"+str(i+1)))
+                Q9Questionnaire+=Utils.tupleToList(sht.Range("Q9_"+str(i+1)))
         except:
-            return parseSpreadsheet.parseError(sheetnames[10]), []
+            return Utils.parseError(sheetnames[10]), []
             
         lists.append(Q1)
         lists.append(Q2)
@@ -191,8 +191,8 @@ class parseExcel(parseSpreadsheet):
             
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-            return parseSpreadsheet.parseError("Consistency")
-            
+            return Utils.parseError("Consistency")
+        
         try:
             __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
         except:
@@ -207,14 +207,15 @@ class parseExcel(parseSpreadsheet):
                     __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
                 except:
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-                    return parseSpreadsheet.parseError("Consistency")
+                    return Utils.parseError("Consistency")
                 
         try:
             Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire = lists
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
             return __handle
-        __handle = self.__writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire)
+        DButil = Utils(self.__md, self.__sheetnames)
+        __handle = DButil.writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire,self.__xlWb)
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
         return __handle
         

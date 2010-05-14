@@ -468,8 +468,149 @@ class SpreadsheetDict():
         return Q9dict
 
     
+class Utils():
+    
+    def __init__(self,md,sheetnames):
+        self.__md = md
+        self.__sheetnames = sheetnames
+    
+    @staticmethod    
+    def tupleToList(tuple):
+        data = []
+        for elem in tuple:
+            data.append(elem.GetValue())
+        return data
+    
+    def splitColumns(self,nr_of_elements, columns, parsed_list,dict,Questionnaire_id,createDictionary,db_table):
+        """
+        Splits columns of the excel import and inserts them into the Database
+        nr_of_elements: Number of Columns that should be inserted into the database (count from left)
+        columns: Existing Columns 
+        parsed_list: Parsed list from the Excel Worksheet
+        dict: additional Dictionary that should be included
+        createDictionary: Function that creates the Database Dictionary from the input list
+        db_table: pSQL Database Table
+        Example Usage: 
+        splitExcelColumns(4, 6, QFuel, Questionnaire_ID, createQFuelDictionary,md.qfuel)
+        """
+        list = []
+        for i in xrange(nr_of_elements):
+            for j in xrange(0+i,len(parsed_list),columns):
+                list.append(parsed_list[j])
+            Dict = createDictionary(list,self.__md)
+            if Questionnaire_id != "":
+                Dict['Questionnaire_id']= Questionnaire_id
+            Dict.update(dict)
+            db_table.insert(Dict)
+            list = []
+    
+    
+    
+    @staticmethod
+    def parseError(errorname):
+        return "Parsing failed because of: " + str(errorname)+ "! Please check your data and try again."
+    
+    
+    def writeToDB(self, Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire,xlWb):
+        
+        self.__xlWb = xlWb
+        
+        try:
+            q2dict = SpreadsheetDict.createQElectricityDictionary(Q2, self.__md)
+            self.__md.qelectricity.insert(q2dict)
+        except:
+            return self.parseError(self.__sheetnames[1])
+
+        try:
+            for i in xrange(3):
+                self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md))
+    
+            for i in xrange(len(QIntervals)/2):
+                self.__md.intervals.insert(SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
+        except:
+            return self.parseError(self.__sheetnames[3])
+        
+        try:
+            Q1dict = SpreadsheetDict.createQuestionnaireDictionary(Q1, self.__md)
+            Q9dict = SpreadsheetDict.createQ9dictionary(Q9Questionnaire, self.__md)
+            NaceDict = SpreadsheetDict.createNACEDictionary(Q1, self.__md)
+            strNace = "CodeNACE = '"+str(Q1[20])+"' AND CodeNACESub ='"+str(int(Q1[24]))+"'"
+            dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
+            
+            Q1dict.update(Q9dict)
+            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
+            self.__md.questionnaire.insert(Q1dict)
+        except:
+            return self.parseError(self.__sheetnames[0])
+        
+        try:
+            Questionnaire_ID = self.__md.questionnaire.sql_select("LAST_INSERT_ID()")
+            Questionnaire_ID =  Questionnaire_ID[-1]['Questionnaire_ID']
+        except: 
+            return self.parseError("No Questionnare ID Found")
+        quest_id = 'Questionnaire_id'
+        Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
+
+        for i in xrange(5):
+            try:
+                Q4Hdict = SpreadsheetDict.createQ4HDictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[4]).Range("Q4H_"+str(i+1))),self.__md)
+                Q4Hdict[quest_id]=Questionnaire_ID
+                self.__md.qgenerationhc.insert(Q4Hdict)
+            except:
+                return self.parseError(self.__sheetnames[4])
+                
+            try:    
+                Q4Cdict = SpreadsheetDict.createQ4CDictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[5]).Range("Q4C_"+str(i+1))), self.__md)
+                Q4Cdict[quest_id]=Questionnaire_ID
+                self.__md.qgenerationhc.insert(Q4Cdict)
+            except:
+                return self.parseError(self.__sheetnames[5])
+            
+            try:
+                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[6]).Range("Q5_"+str(i+1))), self.__md))
+            except:
+                return self.parseError(self.__sheetnames[6])
+            
+            try:
+                Q6 = self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[7]).Range("Q6_"+str(i+1)))
+                self.__md.qheatexchanger.insert(SpreadsheetDict.createQ6Dictionary(Q6, self.__md))
+                self.__md.qwasteheatelequip.insert(SpreadsheetDict.createQ6EDictionary(Q6, self.__md))
+            except:
+                return self.parseError(self.__sheetnames[7])
+                
+            try:
+                Q8dict = SpreadsheetDict.createQ8Dictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[9]).Range("Q8_"+str(i+1))), self.__md)
+                Q8dict[quest_id]=Questionnaire_ID
+                self.__md.qbuildings.insert(Q8dict)
+            except:
+                return self.parseError(self.__sheetnames[9])
+                
+        try:
+            QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)
+            QRenewables[quest_id] = Questionnaire_ID
+            self.__md.qrenewables.insert(QRenewables)
+        except:
+            return self.parseError(self.__sheetnames[8])
+        
+        try:
+            self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
+            self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+            latitude = self.__xlWb.Worksheets(self.__sheetnames[8]).Range("Q7_Latitude")
+            self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+            
+            # Code to skip a specific amount of columns
+            index =0
+            Q3n = []
+            for i in range(0,len(Q3),3):
+                Q3n.append(Q3[i]) 
+                index+=1
+                
+            self.splitColumns(3, 3, Q3n, {}, Questionnaire_ID, SpreadsheetDict.createQProcessDictionary,self.__md.qprocessdata)
+        except:
+            return self.parseError("QProduct, QFuel or QSurfarea")
 
         
+        return "Parsing successful!"
         
 
     
