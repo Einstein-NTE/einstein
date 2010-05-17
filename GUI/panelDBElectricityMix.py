@@ -119,6 +119,9 @@ class PanelDBElectricityMix(PanelDBBase):
         self.frame_general_information.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("Country"),
                              tip = _U("Country or region"))
@@ -140,6 +143,9 @@ class PanelDBElectricityMix(PanelDBBase):
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("AuditorID"),
                               tip = _U("Auditor responsible for data set"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Data

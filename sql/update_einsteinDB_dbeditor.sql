@@ -34,7 +34,7 @@ ALTER TABLE dbboiler ADD COLUMN ExcessAirRatio VARCHAR(200) DEFAULT NULL AFTER P
 ALTER TABLE dbboiler ADD COLUMN YearUpdate VARCHAR(200) DEFAULT NULL AFTER BoilerOandMvar;
 
 -- update dbfuel
-ALTER TABLE dbfuel CHANGE COLUMN FuelCode FuelType VARCHAR(20) COMMENT '' AFTER DBFuelUnit;
+ALTER TABLE dbfuel CHANGE COLUMN FuelCode FuelType VARCHAR(20) DEFAULT NULL AFTER DBFuelUnit;
 
 -- update dbfluid
 ALTER TABLE dbfluid ADD COLUMN FluidDataSource VARCHAR(200) DEFAULT NULL AFTER RefrigerantCode;
@@ -42,3 +42,6 @@ ALTER TABLE dbfluid ADD COLUMN FluidCpG DOUBLE DEFAULT NULL AFTER TCond;
 
 -- update dbelectricitymix
 ALTER TABLE dbelectricitymix ADD COLUMN PercCHP DOUBLE DEFAULT NULL AFTER PercNukes;
+
+-- update dbbenchmark
+ALTER TABLE dbbenchmark CHANGE COLUMN ProductionUnit ProductUnit VARCHAR(45) DEFAULT NULL AFTER Product;

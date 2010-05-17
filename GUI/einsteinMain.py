@@ -106,6 +106,7 @@ from einstein.GUI.panelDBBoiler import PanelDBBoiler
 from einstein.GUI.panelDBFuel import PanelDBFuel
 from einstein.GUI.panelDBFluid import PanelDBFluid
 from einstein.GUI.panelDBElectricityMix import PanelDBElectricityMix
+from einstein.GUI.panelDBBenchmark import PanelDBBenchmark
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -629,7 +630,8 @@ class EinsteinFrame(wx.Frame):
             self.showWarning(_U('Any changes will be in effect next time you restart Einstein'))
             
     def OnMenuEditDBBenchmark(self, event):
-        frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
+#        frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
+        frameEditDBBenchmark = PanelDBBenchmark(self, "Edit DBBenchmark", False)
         frameEditDBBenchmark.ShowModal()
 
     def OnMenuEditDBBAT(self, event):
@@ -645,7 +647,7 @@ class EinsteinFrame(wx.Frame):
         frameEditDBUnitOperation.ShowModal()
     def OnMenuEditDBCHP(self, event):
 #        frameEditDBCHP = DBEditFrame(None, "Edit DBCHP", 'dbchp', 0, True)
-        frameEditDBCHP = PanelDBCHP(self, "Edit DBCHP")
+        frameEditDBCHP = PanelDBCHP(self, "Edit DBCHP", False)
         frameEditDBCHP.ShowModal()
     def OnMenuEditDBHeatPump(self, event):
 #        frameEditDBHeatPump = DBEditFrame(self, "Edit DBHeatPump", 'dbheatpump', 0, True)
