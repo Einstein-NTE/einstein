@@ -136,8 +136,60 @@ class parseOO(parseSpreadsheet):
 
         #except:
             #return self.__parseError(sheetnames[10]), []
+         
         
         Q4_8=[]
+        # sheets with the same structure
+        structureNames = ["Q4H_HeatGeneration",
+                          "Q4C_ColdGeneration",
+                          "Q5_Distribution",
+                          "Q6_HeatRecovery",
+                          "Q8 Buildings"]
+        
+        startStructure = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
+        
+        for i in xrange(5):
+            for j in xrange(len(structureNames)):
+                try:
+                    Q4_8.append(self.parseOOxmlarea(ooWb, startStructure[j]+str(i+1), structureNames[j]))
+                except:
+                    return structureNames[j],[]
+         
+        """
+        Q4_8=[]
+        for i in xrange(5):
+            try:
+                sheetname = "Q4H_HeatGeneration"
+                Q4_8.append(self.parseOOxmlarea(ooWb, "Q4H_"+str(i+1), sheetname))
+            except:
+                return "Parsing failed at "+sheetname, []
+                
+           # try:
+            sheetname = "Q4C_ColdGeneration"
+            Q4_8.append(self.parseOOxmlarea(ooWb, "Q4C_"+str(i+1), sheetname))
+            #except:
+             #   return "Parsing failed at "+sheetname, []
+            
+            try:
+                sheetname = "Q5_Distribution"
+                Q4_8.append(self.parseOOxmlarea(ooWb, "Q5_"+str(i+1), sheetname))
+            except:
+                return "Parsing failed at "+sheetname, []
+            
+            try:
+                sheetname = "Q6_HeatRecovery"
+                Q4_8.append(self.parseOOxmlarea(ooWb, "Q6_"+str(i+1), sheetname))
+                
+            except:
+                return "Parsing failed at "+sheetname, []
+                
+            try:
+                sheetname = "Q8 Buildings"
+                Q4_8.append(self.parseOOxmlarea(ooWb, "Q8_"+str(i+1), sheetname))
+                
+            except:
+                return "Parsing failed at "+sheetname, []
+        """
         
         lists.append(Q1)
         lists.append(Q2)
