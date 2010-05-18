@@ -137,19 +137,20 @@ class parseOO(parseSpreadsheet):
         #except:
             #return self.__parseError(sheetnames[10]), []
         
+        Q4_8=[]
+        
         lists.append(Q1)
         lists.append(Q2)
         lists.append(QProduct)
         lists.append(QFuel)
-        
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
         lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
-        print lists
-        return "", lists
+        lists.append(Q4_8)
+        return "Parsing successful!", lists
     
     def readOOContent(self, filename):
         """

@@ -236,6 +236,12 @@ class SpreadsheetDict():
     
     @staticmethod
     def createQ4HDictionary(Q4H,db_conn):
+        i =0
+        for elem in Q4H:
+            print str(i) + " " + str(elem)
+            i=i+1
+        
+        
         Q4Hdict = {}
         Q4Hdict["Equipment"] = Q4H[0]
         Q4Hdict["Manufact"] = Q4H[1]
@@ -244,7 +250,6 @@ class SpreadsheetDict():
         Q4Hdict["EquipType"] = Q4H[4]
         Q4Hdict["NumEquipUnits"] = Q4H[5]
         Q4Hdict["HCGPnom"] = Q4H[8]
-        # Fuel Type Q4Hdict[""] = Q4H[9]
         DBFuelSel = db_conn.dbfuel.sql_select('FuelName = "' + str(Q4H[9])+ '"')
         Q4Hdict['DBFuel_id'] = DBFuelSel[0]["DBFuel_ID"]
         Q4Hdict["FuelConsum"] = Q4H[10]
@@ -511,7 +516,7 @@ class Utils():
         return "Parsing failed because of: " + str(errorname)+ "! Please check your data and try again."
     
     
-    def writeToDB(self, Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire,xlWb):
+    def writeToDB(self, Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, xlWb):
         
         self.__xlWb = xlWb
         
@@ -551,39 +556,42 @@ class Utils():
         quest_id = 'Questionnaire_id'
         Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
 
-        for i in xrange(5):
+
+
+        for i in xrange(0,25,5):
             try:
-                Q4Hdict = SpreadsheetDict.createQ4HDictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[4]).Range("Q4H_"+str(i+1))),self.__md)
+                Q4Hdict = SpreadsheetDict.createQ4HDictionary(Q4_8[i],self.__md)
                 Q4Hdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Hdict)
             except:
                 return self.parseError(self.__sheetnames[4])
                 
             try:    
-                Q4Cdict = SpreadsheetDict.createQ4CDictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[5]).Range("Q4C_"+str(i+1))), self.__md)
+                Q4Cdict = SpreadsheetDict.createQ4CDictionary(Q4_8[i+1], self.__md)
                 Q4Cdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Cdict)
             except:
                 return self.parseError(self.__sheetnames[5])
             
             try:
-                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[6]).Range("Q5_"+str(i+1))), self.__md))
+                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], self.__md))
             except:
                 return self.parseError(self.__sheetnames[6])
             
             try:
-                Q6 = self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[7]).Range("Q6_"+str(i+1)))
-                self.__md.qheatexchanger.insert(SpreadsheetDict.createQ6Dictionary(Q6, self.__md))
-                self.__md.qwasteheatelequip.insert(SpreadsheetDict.createQ6EDictionary(Q6, self.__md))
+                self.__md.qheatexchanger.insert(SpreadsheetDict.createQ6Dictionary(Q4_8[i+3], self.__md))
+                self.__md.qwasteheatelequip.insert(SpreadsheetDict.createQ6EDictionary(Q4_8[i+3], self.__md))
             except:
                 return self.parseError(self.__sheetnames[7])
                 
             try:
-                Q8dict = SpreadsheetDict.createQ8Dictionary(self.tupleToList(self.__xlWb.Worksheets(self.__sheetnames[9]).Range("Q8_"+str(i+1))), self.__md)
+                Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
                 Q8dict[quest_id]=Questionnaire_ID
                 self.__md.qbuildings.insert(Q8dict)
             except:
                 return self.parseError(self.__sheetnames[9])
+                
+                
                 
         try:
             QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)

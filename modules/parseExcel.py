@@ -59,28 +59,7 @@ class parseExcel(parseSpreadsheet):
         xlWb.Close(SaveChanges=0)
         xlApp.Quit()
     
-    def __splitExcelColumns(self,nr_of_elements, columns, parsed_list,dict,Questionnaire_id,createDictionary,db_table):
-        """
-        Splits columns of the excel import and inserts them into the Database
-        nr_of_elements: Number of Columns that should be inserted into the database (count from left)
-        columns: Existing Columns 
-        parsed_list: Parsed list from the Excel Worksheet
-        dict: additional Dictionary that should be included
-        createDictionary: Function that creates the Database Dictionary from the input list
-        db_table: pSQL Database Table
-        Example Usage: 
-        splitExcelColumns(4, 6, QFuel, Questionnaire_ID, createQFuelDictionary,md.qfuel)
-        """
-        list = []
-        for i in xrange(nr_of_elements):
-            for j in xrange(0+i,len(parsed_list),columns):
-                list.append(parsed_list[j])
-            Dict = createDictionary(list,self.__md)
-            if Questionnaire_id != "":
-                Dict['Questionnaire_id']= Questionnaire_id
-            Dict.update(dict)
-            db_table.insert(Dict)
-            list = []
+
     
     def __getExcelLists(self, sheetnames, xlWb): 
         lists = []
@@ -163,6 +142,38 @@ class parseExcel(parseSpreadsheet):
         except:
             return Utils.parseError(sheetnames[10]), []
             
+        
+        Q4_8 = []    
+        for i in xrange(5):
+            try:
+                Q4_8.append(Utils.tupleToList(xlWb.Worksheets(sheetnames[4]).Range("Q4H_"+str(i+1))))
+                
+            except:
+                return self.parseError(sheetnames[4])
+                
+            try:    
+                Q4_8.append(Utils.tupleToList(xlWb.Worksheets(sheetnames[5]).Range("Q4C_"+str(i+1))))
+            except:
+                return self.parseError(sheetnames[5])
+            
+            try:
+                Q4_8.append(Utils.tupleToList(xlWb.Worksheets(sheetnames[6]).Range("Q5_"+str(i+1))))
+            except:
+                return self.parseError(sheetnames[6])
+            
+            try:
+                Q4_8.append(Utils.tupleToList(xlWb.Worksheets(sheetnames[7]).Range("Q6_"+str(i+1))))
+                
+            except:
+                return self.parseError(sheetnames[7])
+                
+            try:
+                Q4_8.append(Utils.tupleToList(xlWb.Worksheets(sheetnames[9]).Range("Q8_"+str(i+1))))
+                
+            except:
+                return self.parseError(sheetnames[9])
+        
+
         lists.append(Q1)
         lists.append(Q2)
         lists.append(QProduct)
@@ -173,7 +184,8 @@ class parseExcel(parseSpreadsheet):
         lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
-        print lists
+        lists.append(Q4_8)
+
         return "", lists
 
     
@@ -210,12 +222,12 @@ class parseExcel(parseSpreadsheet):
                     return Utils.parseError("Consistency")
                 
         try:
-            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire = lists
+            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8 = lists
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
             return __handle
         DButil = Utils(self.__md, self.__sheetnames)
-        __handle = DButil.writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire,self.__xlWb)
+        __handle = DButil.writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, self.__xlWb)
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
         return __handle
         
