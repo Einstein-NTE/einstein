@@ -233,6 +233,39 @@ class PanelDBBase(wx.Dialog):
 #        fuelUnitList = fuelUnitDict.values()
 #        fillChoice(entry, fuelUnitList)
 
+    def fillChoiceOfDBUnitOpCodes(self, entry):
+        unitOpDict = Status.prj.getUnitOpDict()
+        unitOpList = unitOpDict.values()
+        fillChoice(entry, unitOpList)
+
+    def getNACECodeandNACESubCodeList(self):
+        naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']
+        naceList = []
+        for entry in naceTable:
+            naceCode = entry.CodeNACE
+            naceSubCode = entry.CodeNACEsub
+            naceCode = naceCode + "." + naceSubCode
+            naceList.append(naceCode)
+        naceList.sort()
+        return naceList
+
+    def getProductCodeList(self):
+        productCodeTable = Status.DB.lproductcode.LProductCode_ID['%']
+        productCodeList = []
+        for entry in productCodeTable:
+            productCode = entry.ProductCode
+            productCodeList.append(productCode)
+        productCodeList.sort()
+        return productCodeList
+
+    def fillChoiceOfNaceCode(self, entry):
+        naceList = self.getNACECodeandNACESubCodeList()
+        fillChoice(entry, naceList)
+
+    def fillChoiceOfProductCodes(self, entry):
+        productCodeList = self.getProductCodeList()
+        fillChoice(entry, productCodeList)
+
     def fillChoiceOfType(self):
         try:
             equipments = self.db.get_table()

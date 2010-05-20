@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 #
-#    PanelDBFluid: Database Design Assistant
+#    PanelDBBenchmark: Database Design Assistant
 #
 #==============================================================================
 #
@@ -57,6 +57,7 @@ class PanelDBBenchmark(PanelDBBase):
         self._init_ctrls(parent)
         self._init_grid(100)
         self.__do_layout()
+        self.clear()
         self.fillEquipmentList()
         self.fillChoices()
 
@@ -576,69 +577,60 @@ class PanelDBBenchmark(PanelDBBase):
 #------------------------------------------------------------------------------
 
     def OnButtonOK(self, event):
-#        if self.allFieldsEmpty():
-#            self.theId = -1
-#            return
+        if self.allFieldsEmpty():
+            self.theId = -1
+            return
 
-        NACEDict = Status.prj.getNACEDict()
         unitOpDict = Status.prj.getUnitOpDict()
 
-
-
-
-
         tmp = {
-               "NACECode":check(findKey(NACEDict, self.tc1.GetValue(text = True))),
+               "NACECode":check(self.tc1.GetValue(text = True)),
                "UnitOp":check(findKey(unitOpDict, self.tc2.GetValue(text = True))),
-               "ProductCode":check(self.tc28.GetValue()),
-#  `Product` varchar(45) default NULL,
-#  `E_EnergyInt_MIN_PC` double default NULL,
-#  `E_EnergyInt_MAX_PC` double default NULL,
-#  `E_EnergyInt_TARG_PC` double default NULL,
-#  `E_EnergyInt_MIN_T` double default NULL,
-#  `E_EnergyInt_MAX_T` double default NULL,
-#  `E_EnergyInt_TARG_T` double default NULL,
-#  `E_SEC_MIN` double default NULL,
-#  `E_SEC_MAX` double default NULL,
-#  `E_SEC_TARG` double default NULL,
-#  `E_Unit` varchar(45) default NULL,
-#  `H_EnergyInt_MIN_PC` double default NULL,
-#  `H_EnergyInt_MAX_PC` double default NULL,
-#  `H_EnergyInt_TARG_PC` double default NULL,
-#  `H_EnergyInt_MIN_T` double default NULL,
-#  `H_EnergyInt_MAX_T` double default NULL,
-#  `H_EnergyInt_TARG_T` double default NULL,
-#  `H_SEC_MIN` double default NULL,
-#  `H_SEC_MAX` double default NULL,
-#  `H_SEC_TARG` double default NULL,
-#  `H_Unit` varchar(45) default NULL,
-#  `T_EnergyInt_MIN_PC` double default NULL,
-#  `T_EnergyInt_MAX_PC` double default NULL,
-#  `T_EnergyInt_TARG_PC` double default NULL,
-#  `T_EnergyInt_MIN_T` double default NULL,
-#  `T_EnergyInt_MAX_T` double default NULL,
-#  `T_EnergyInt_TARG_T` double default NULL,
-#  `T_SEC_MIN` double default NULL,
-#  `T_SEC_MAX` double default NULL,
-#  `T_SEC_TARG` double default NULL,
-#  `T_Unit` varchar(45) default NULL,
-#  `Comments` text,
-#  `YearReference` int(10) unsigned default NULL,
-#  `Reference` text,
-#  `Literature` text,
-#  `DataRelevance` varchar(200) default NULL,
-#  `TurnoverMin` double default NULL,
-#  `TurnoverMax` double default NULL,
-#  `ProductionMin` double default NULL,
-#  `ProductionMax` double default NULL,
-#  `ProductionUnit` double default NULL,
 
+                # FIXME where do i get the ProductCodes for the ChoiceEntry from?
+               #"ProductCode":check(self.tc3.GetValue()),
 
-
-
-
-
-
+               "Product":check(self.tc4.GetValue()),
+               "ProductUnit":check(self.tc5.GetValue()),
+               "Comments":check(self.tc6.GetValue()),
+               "DataRelevance":check(self.tc7.GetValue()),
+               "TurnoverMin":check(self.tc8.GetValue()),
+               "TurnoverMax":check(self.tc9.GetValue()),
+               "ProductionMin":check(self.tc10.GetValue()),
+               "ProductionMax":check(self.tc11.GetValue()),
+               "YearReference":check(self.tc12.GetValue()),
+               "Reference":check(self.tc13.GetValue()),
+               "Literature":check(self.tc14.GetValue()),
+               "E_EnergyInt_MIN_PC":check(self.tc15.GetValue()),
+               "E_EnergyInt_MAX_PC":check(self.tc16.GetValue()),
+               "E_EnergyInt_TARG_PC":check(self.tc17.GetValue()),
+               "E_EnergyInt_MIN_T":check(self.tc18.GetValue()),
+               "E_EnergyInt_MAX_T":check(self.tc19.GetValue()),
+               "E_EnergyInt_TARG_T":check(self.tc20.GetValue()),
+               "E_SEC_MIN":check(self.tc21.GetValue()),
+               "E_SEC_MAX":check(self.tc22.GetValue()),
+               "E_SEC_TARG":check(self.tc23.GetValue()),
+               "E_Unit":check(self.tc24.GetValue(text = True)),
+               "H_EnergyInt_MIN_PC":check(self.tc25.GetValue()),
+               "H_EnergyInt_MAX_PC":check(self.tc26.GetValue()),
+               "H_EnergyInt_TARG_PC":check(self.tc27.GetValue()),
+               "H_EnergyInt_MIN_T":check(self.tc28.GetValue()),
+               "H_EnergyInt_MAX_T":check(self.tc29.GetValue()),
+               "H_EnergyInt_TARG_T":check(self.tc30.GetValue()),
+               "H_SEC_MIN":check(self.tc31.GetValue()),
+               "H_SEC_MAX":check(self.tc32.GetValue()),
+               "H_SEC_TARG":check(self.tc33.GetValue()),
+               "H_Unit":check(self.tc34.GetValue(text = True)),
+               "T_EnergyInt_MIN_PC":check(self.tc35.GetValue()),
+               "T_EnergyInt_MAX_PC":check(self.tc36.GetValue()),
+               "T_EnergyInt_TARG_PC":check(self.tc37.GetValue()),
+               "T_EnergyInt_MIN_T":check(self.tc38.GetValue()),
+               "T_EnergyInt_MAX_T":check(self.tc39.GetValue()),
+               "T_EnergyInt_TARG_T":check(self.tc40.GetValue()),
+               "T_SEC_MIN":check(self.tc41.GetValue()),
+               "T_SEC_MAX":check(self.tc42.GetValue()),
+               "T_SEC_TARG":check(self.tc43.GetValue()),
+               "T_Unit":check(self.tc44.GetValue(text = True))
                }
 
         self.updateValues(tmp)
@@ -647,7 +639,72 @@ class PanelDBBenchmark(PanelDBBase):
             self.EndModal(wx.ID_OK)
 
     def display(self, q = None):
-        pass
+        self.clear()
+
+        self.fillChoiceOfNaceCode(self.tc1.entry)
+        self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
+        unitOpDict = Status.prj.getUnitOpDict()
+
+        if q is not None:
+            if q.NACECode is not None:
+                codes = q.NACECode.split('.')
+                try:
+                    subcode = codes[1]
+                except:
+                    subcode = "00"
+                if subcode != "00" and len(subcode) < 2:
+                    subcode = ''.join([subcode, "0"])
+                print ''.join([codes[0], '.', subcode])
+                self.tc1.entry.SetStringSelection(''.join([codes[0], '.', subcode]))
+            else:
+                self.tc1.entry.SetStringSelection("None")
+            if q.UnitOp is not None:
+                self.tc2.SetValue(unitOpDict[int(q.UnitOp)]) if int(q.UnitOp) in unitOpDict.keys() else ''
+
+            # FIXME fill in the proper product codes
+            #self.tc3.SetValue(q.ProductCode)
+
+            self.tc4.SetValue(str(q.Product)) if q.Product is not None else ''
+            self.tc5.SetValue(str(q.ProductUnit)) if q.ProductUnit is not None else ''
+            self.tc6.SetValue(str(q.Comments)) if q.Comments is not None else ''
+            self.tc7.SetValue(str(q.DataRelevance)) if q.DataRelevance is not None else ''
+            self.tc8.SetValue(str(q.TurnoverMin)) if q.TurnoverMin is not None else ''
+            self.tc9.SetValue(str(q.TurnoverMax)) if q.TurnoverMax is not None else ''
+            self.tc10.SetValue(str(q.ProductionMin)) if q.ProductionMin is not None else ''
+            self.tc11.SetValue(str(q.ProductionMax)) if q.ProductionMax is not None else ''
+            self.tc12.SetValue(str(q.YearReference)) if q.YearReference is not None else ''
+            self.tc13.SetValue(str(q.Reference)) if q.Reference is not None else ''
+            self.tc14.SetValue(str(q.Literature)) if q.Literature is not None else ''
+            self.tc15.SetValue(str(q.E_EnergyInt_MIN_PC)) if q.E_EnergyInt_MIN_PC is not None else ''
+            self.tc16.SetValue(str(q.E_EnergyInt_MAX_PC)) if q.E_EnergyInt_MAX_PC is not None else ''
+            self.tc17.SetValue(str(q.E_EnergyInt_TARG_PC)) if q.E_EnergyInt_TARG_PC is not None else ''
+            self.tc18.SetValue(str(q.E_EnergyInt_MIN_T)) if q.E_EnergyInt_MIN_T is not None else ''
+            self.tc19.SetValue(str(q.E_EnergyInt_MAX_T)) if q.E_EnergyInt_MAX_T is not None else ''
+            self.tc20.SetValue(str(q.E_EnergyInt_TARG_T)) if q.E_EnergyInt_TARG_T is not None else ''
+            self.tc21.SetValue(str(q.E_SEC_MIN)) if q.E_SEC_MIN is not None else ''
+            self.tc22.SetValue(str(q.E_SEC_MAX)) if q.E_SEC_MAX is not None else ''
+            self.tc23.SetValue(str(q.E_SEC_TARG)) if q.E_SEC_TARG is not None else ''
+            self.tc24.SetValue(str(q.E_Unit)) if q.E_Unit is not None else ''
+            self.tc25.SetValue(str(q.H_EnergyInt_MIN_PC)) if q.H_EnergyInt_MIN_PC is not None else ''
+            self.tc26.SetValue(str(q.H_EnergyInt_MAX_PC)) if q.H_EnergyInt_MAX_PC is not None else ''
+            self.tc27.SetValue(str(q.H_EnergyInt_TARG_PC)) if q.H_EnergyInt_TARG_PC is not None else ''
+            self.tc28.SetValue(str(q.H_EnergyInt_MIN_T)) if q.H_EnergyInt_MIN_T is not None else ''
+            self.tc29.SetValue(str(q.H_EnergyInt_MAX_T)) if q.H_EnergyInt_MAX_T is not None else ''
+            self.tc30.SetValue(str(q.H_EnergyInt_TARG_T)) if q.H_EnergyInt_TARG_T is not None else ''
+            self.tc31.SetValue(str(q.H_SEC_MIN)) if q.H_SEC_MIN is not None else ''
+            self.tc32.SetValue(str(q.H_SEC_MAX)) if q.H_SEC_MAX is not None else ''
+            self.tc33.SetValue(str(q.H_SEC_TARG)) if q.H_SEC_TARG is not None else ''
+            self.tc34.SetValue(str(q.H_Unit)) if q.H_Unit is not None else ''
+            self.tc35.SetValue(str(q.T_EnergyInt_MIN_PC)) if q.T_EnergyInt_MIN_PC is not None else ''
+            self.tc36.SetValue(str(q.T_EnergyInt_MAX_PC)) if q.T_EnergyInt_MAX_PC is not None else ''
+            self.tc37.SetValue(str(q.T_EnergyInt_TARG_PC)) if q.T_EnergyInt_TARG_PC is not None else ''
+            self.tc38.SetValue(str(q.T_EnergyInt_MIN_T)) if q.T_EnergyInt_MIN_T is not None else ''
+            self.tc39.SetValue(str(q.T_EnergyInt_MAX_T)) if q.T_EnergyInt_MAX_T is not None else ''
+            self.tc40.SetValue(str(q.T_EnergyInt_TARG_T)) if q.T_EnergyInt_TARG_T is not None else ''
+            self.tc41.SetValue(str(q.T_SEC_MIN)) if q.T_SEC_MIN is not None else ''
+            self.tc42.SetValue(str(q.T_SEC_MAX)) if q.T_SEC_MAX is not None else ''
+            self.tc43.SetValue(str(q.T_SEC_TARG)) if q.T_SEC_TARG is not None else ''
+            self.tc44.SetValue(str(q.T_Unit)) if q.T_Unit is not None else ''
 
     def clear(self):
         self.tc1.SetValue('')
@@ -696,10 +753,54 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc44.SetValue('')
 
     def fillChoices(self):
-        pass
+        self.fillChoiceOfNaceCode(self.tc1.entry)
+        self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
+        self.fillChoiceOfProductCodes(self.tc3.entry)
 
     def getDBCol(self):
-        return self.db.DBHeatPump_ID
+        return self.db.DBBenchmark_ID
 
     def allFieldsEmpty(self):
-        return False
+        if self.tc1.GetValue(text = True) == "None" and\
+           self.tc2.GetValue(text = True) == "None" and\
+           len(self.tc4.GetValue()) == 0 and\
+           len(self.tc5.GetValue()) == 0 and\
+           len(self.tc6.GetValue()) == 0 and\
+           len(self.tc7.GetValue()) == 0 and\
+           self.tc8.GetValue() is None and\
+           self.tc9.GetValue() is None and\
+           self.tc10.GetValue() is None and\
+           self.tc11.GetValue() is None and\
+           self.tc12.GetValue() is None and\
+           len(self.tc13.GetValue()) == 0 and\
+           len(self.tc14.GetValue()) == 0 and\
+           self.tc15.GetValue() is None and\
+           self.tc16.GetValue() is None and\
+           self.tc17.GetValue() is None and\
+           self.tc18.GetValue() is None and\
+           self.tc19.GetValue() is None and\
+           self.tc20.GetValue() is None and\
+           self.tc21.GetValue() is None and\
+           self.tc22.GetValue() is None and\
+           self.tc23.GetValue() is None and\
+           self.tc25.GetValue() is None and\
+           self.tc26.GetValue() is None and\
+           self.tc27.GetValue() is None and\
+           self.tc28.GetValue() is None and\
+           self.tc29.GetValue() is None and\
+           self.tc30.GetValue() is None and\
+           self.tc31.GetValue() is None and\
+           self.tc32.GetValue() is None and\
+           self.tc33.GetValue() is None and\
+           self.tc35.GetValue() is None and\
+           self.tc36.GetValue() is None and\
+           self.tc37.GetValue() is None and\
+           self.tc38.GetValue() is None and\
+           self.tc39.GetValue() is None and\
+           self.tc40.GetValue() is None and\
+           self.tc41.GetValue() is None and\
+           self.tc42.GetValue() is None and\
+           self.tc43.GetValue() is None:
+            return True
+        else:
+            return False
