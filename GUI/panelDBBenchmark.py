@@ -756,6 +756,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.fillChoiceOfNaceCode(self.tc1.entry)
         self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
         self.fillChoiceOfProductCodes(self.tc3.entry)
+        self.fillChoiceOfType()
 
     def getDBCol(self):
         return self.db.DBBenchmark_ID

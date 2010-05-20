@@ -306,13 +306,15 @@ class PanelDBFuel(PanelDBBase):
             self.theId = -1
             return
 
+        
+
 # FIXME
         fuelDict = []
         fuelUnitDict = []
-
+        print check(self.tc2.GetValue(text = True))
         tmp = {
                "FuelName":check(self.tc1.GetValue()),
-#               "FuelType":check(findKey(fuelDict, self.tc2.GetValue(text = True))),
+               "FuelType":check(self.tc2.GetValue(text = True)),
 #               "DBFuelUnit":check(findKey(fuelUnitDict, self.tc3.GetValue(text = True))),
                "FuelDataSource":check(self.tc4.GetValue()),
                "FuelComment":check(self.tc5.GetValue()),
@@ -340,18 +342,15 @@ class PanelDBFuel(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-# FIXME
-        fuelDict = []
-        fuelUnitDict = []
+        self.fillChoiceOfDBFuelType(self.tc2.entry)
 
 # FIXME
-        #self.fillChoiceOfDBFuel(self.tc2.entry)
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.FuelName)) if q.FuelName is not None else ''
-#            if q.FuelType is not None:
-#                self.tc2.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
+            if q.FuelType is not None:
+                self.tc2.entry.SetStringSelection(q.FuelType)
 #            if q.DBFuelUnit is not None:
 #                self.tc3.SetValue(fuelUnitDict[int(q.DBFuelUnit)]) if int(q.DBFuelUnit) in fuelUnitDict.keys() else ''
             self.tc4.SetValue(str(q.FuelDataSource)) if q.FuelDataSource is not None else ''
@@ -387,7 +386,7 @@ class PanelDBFuel(PanelDBBase):
 
     def fillChoices(self):
 # FIXME
-        #self.fillChoiceOfDBFuel(self.tc2.entry)
+        self.fillChoiceOfDBFuelType(self.tc2.entry)
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
         self.fillChoiceOfType()
 
@@ -395,7 +394,9 @@ class PanelDBFuel(PanelDBBase):
         return self.db.DBFuel_ID
 
     def allFieldsEmpty(self):
+        print self.tc2.GetValue(text = True)
         if len(self.tc1.GetValue()) == 0 and\
+           self.tc2.GetValue(text = True) == "None" and\
            len(self.tc4.GetValue()) == 0 and\
            len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
