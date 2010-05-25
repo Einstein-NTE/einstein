@@ -205,6 +205,8 @@ class PanelDBBase(wx.Dialog):
         except:
             return
 
+        print "theid: ", self.theId
+
         equipments = self.getDBCol()[check(self.theId)]
 
         if len(equipments) > 0:
@@ -222,16 +224,57 @@ class PanelDBBase(wx.Dialog):
             self.grid.SelectRow(row)
             self.grid.MakeCellVisible(row, col)
 
+    def getNACECodeandNACESubCodeList(self):
+        naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']
+        naceList = []
+        for entry in naceTable:
+            naceCode = entry.CodeNACE
+            naceSubCode = entry.CodeNACEsub
+            naceCode = naceCode + "." + naceSubCode
+            naceList.append(str(naceCode))
+        naceList.sort()
+        return naceList
+
+    def getProductCodeList(self):
+        productCodeTable = Status.DB.lproductcode.LProductCode_ID['%']
+        productCodeList = []
+        for entry in productCodeTable:
+            productCode = entry.ProductCode
+            productCodeList.append(str(productCode))
+        productCodeList.sort()
+        return productCodeList
+
+    def getFuelTypeList(self):
+        fuelTypeTable = Status.DB.dbfuel.DBFuel_ID['%']
+        fuelTypeList = []
+        for entry in fuelTypeTable:
+            fuelType = entry.FuelType
+            if fuelType not in fuelTypeList:
+                fuelTypeList.append(str(fuelType))
+        fuelTypeList.sort()
+        return fuelTypeList
+
+    def fillChoiceOfNaceCode(self, entry):
+        naceList = self.getNACECodeandNACESubCodeList()
+        fillChoice(entry, naceList)
+
+    def fillChoiceOfProductCodes(self, entry):
+        productCodeList = self.getProductCodeList()
+        fillChoice(entry, productCodeList)
+
+    def fillChoiceOfDBFuelType(self, entry):
+        fuelTypeList = self.getFuelTypeList()
+        fillChoice(entry, fuelTypeList)
+
     def fillChoiceOfDBFuel(self, entry):
         fuelDict = Status.prj.getFuelDict()
         fuelList = fuelDict.values()
         fillChoice(entry, fuelList)
 
-    def fillChoiceOfDBFuelUnits(self, entry):
-        pass
-#        fuelUnitDict = ...
-#        fuelUnitList = fuelUnitDict.values()
-#        fillChoice(entry, fuelUnitList)
+    def fillChoiceOfDBUnitOpCodes(self, entry):
+        unitOpDict = Status.prj.getUnitOpDict()
+        unitOpList = unitOpDict.values()
+        fillChoice(entry, unitOpList)
 
     def fillChoiceOfType(self):
         try:
