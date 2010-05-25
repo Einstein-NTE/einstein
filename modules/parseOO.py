@@ -30,6 +30,7 @@ import MySQLdb
 import pSQL
 from spreadsheetUtils import SpreadsheetDict as SD
 import xml.dom.minidom, zipfile
+from dialogGauge import DialogGauge
 
 class parseOO(parseSpreadsheet):
     def __init__(self,filepath,mysql_username,mysql_password):
@@ -39,15 +40,18 @@ class parseOO(parseSpreadsheet):
         self.__password = mysql_password
     
     def parse(self):
+        dlg = DialogGauge(None,"OpenOffice Calc Parsing","reading document")
         self.__md = self.__connectToDB()
         xmlString = self.readOOContent(self.__filepath)
+        dlg.update(10)
         parsedDom = xml.dom.minidom.parseString(xmlString)
-        __handle, lists = self.__getLists(parsedDom)
-        
-        
+        dlg.update(53)
+        __handle, lists = self.__getLists(parsedDom, dlg)
+        dlg.update(100)
+        dlg.Destroy()
         return __handle
         
-    def __getLists(self,ooWb): 
+    def __getLists(self,ooWb,dlg): 
         lists = []
         #if len(sheetnames)!=11:
         #    return self.__parseError("wrong number of Sheets"), []
@@ -61,7 +65,7 @@ class parseOO(parseSpreadsheet):
         #except:
         #    return "parseError Sheet Q1", []
             #return self.__parseError(sheetnames[0]), []
-        
+        dlg.update(60)
         #try:
         sheetname = "Q2 EnergyConsumption"
         Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
@@ -73,7 +77,7 @@ class parseOO(parseSpreadsheet):
         #except:
             #return "parseError Sheet Q2", []
             #return self.__parseError(sheetname), []
-        
+        dlg.update(68)
         #try:
         sheetname = "Q3_ Processes"
         Q3 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
@@ -81,6 +85,7 @@ class parseOO(parseSpreadsheet):
         Q3+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
         Q3+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
  
+        dlg.update(76)
         #except:
             #return "parseError Sheet Q3", []
             #return self.__parseError(sheetnames[2]), []
@@ -107,7 +112,7 @@ class parseOO(parseSpreadsheet):
         QSurf += self.parseOOxmlarea(ooWb, "Q7_Roof", sheetname)
         #except:
             #return self.__parseError(sheetnames[8]), []
-        
+        dlg.update(84)
         #try:    
         sheetname = "Q3A"
         QProfiles = []
@@ -126,7 +131,7 @@ class parseOO(parseSpreadsheet):
         QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_3", sheetname)
         #except:
             #return self.__parseError(sheetnames[3]), []
-        
+        dlg.update(92)
         #try:
         
         sheetname = "Q9 Economics"
@@ -139,6 +144,7 @@ class parseOO(parseSpreadsheet):
          
         
         Q4_8=[]
+        
         # sheets with the same structure
         structureNames = ["Q4H_HeatGeneration",
                           "Q4C_ColdGeneration",
@@ -148,48 +154,16 @@ class parseOO(parseSpreadsheet):
         
         startStructure = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
         
-        for i in xrange(5):
+        
+        # Change to xrange(5) to get all sheets --> Q4C_5
+        for i in xrange(3):
             for j in xrange(len(structureNames)):
                 try:
                     Q4_8.append(self.parseOOxmlarea(ooWb, startStructure[j]+str(i+1), structureNames[j]))
                 except:
-                    return structureNames[j],[]
-         
-        """
-        Q4_8=[]
-        for i in xrange(5):
-            try:
-                sheetname = "Q4H_HeatGeneration"
-                Q4_8.append(self.parseOOxmlarea(ooWb, "Q4H_"+str(i+1), sheetname))
-            except:
-                return "Parsing failed at "+sheetname, []
-                
-           # try:
-            sheetname = "Q4C_ColdGeneration"
-            Q4_8.append(self.parseOOxmlarea(ooWb, "Q4C_"+str(i+1), sheetname))
-            #except:
-             #   return "Parsing failed at "+sheetname, []
-            
-            try:
-                sheetname = "Q5_Distribution"
-                Q4_8.append(self.parseOOxmlarea(ooWb, "Q5_"+str(i+1), sheetname))
-            except:
-                return "Parsing failed at "+sheetname, []
-            
-            try:
-                sheetname = "Q6_HeatRecovery"
-                Q4_8.append(self.parseOOxmlarea(ooWb, "Q6_"+str(i+1), sheetname))
-                
-            except:
-                return "Parsing failed at "+sheetname, []
-                
-            try:
-                sheetname = "Q8 Buildings"
-                Q4_8.append(self.parseOOxmlarea(ooWb, "Q8_"+str(i+1), sheetname))
-                
-            except:
-                return "Parsing failed at "+sheetname, []
-        """
+                    return structureNames[j] + " " + startStructure[j]+str(i+1),[]
+        
+
         
         lists.append(Q1)
         lists.append(Q2)

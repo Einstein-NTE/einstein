@@ -30,7 +30,7 @@ import MySQLdb
 import pSQL
 from win32com.client import Dispatch
 from spreadsheetUtils import Utils
-
+from dialogGauge import DialogGauge
  
 import wx
 import time
@@ -61,7 +61,7 @@ class parseExcel(parseSpreadsheet):
     
 
     
-    def __getExcelLists(self, sheetnames, xlWb): 
+    def __getExcelLists(self, sheetnames, xlWb , dlg): 
         lists = []
         if len(sheetnames)!=11:
             return Utils.parseError("wrong number of Sheets"), []
@@ -73,7 +73,7 @@ class parseExcel(parseSpreadsheet):
             QProduct =Utils.tupleToList(sht.Range("Q1_Products"))
         except:
             return Utils.parseError(sheetnames[0]), []
-        
+        dlg.update(13)
         try:
             sht = xlWb.Worksheets(sheetnames[1])
             Q1+=Utils.tupleToList(sht.Range("Q1_Percent"))
@@ -85,7 +85,7 @@ class parseExcel(parseSpreadsheet):
             QFuel = Utils.tupleToList(sht.Range("Q2_EnergyConsumption"))
         except:
             return Utils.parseError(sheetnames[1]), []
-        
+        dlg.update(22)
         try:
             sht = xlWb.Worksheets(sheetnames[2])
             Q3 = Utils.tupleToList(sht.Range("Q3_ProcessData"))
@@ -94,14 +94,14 @@ class parseExcel(parseSpreadsheet):
             Q3 += Utils.tupleToList(sht.Range("Q3_DataOfExistingHCSupply")) 
         except:
             return Utils.parseError(sheetnames[2]), []
-            
+        dlg.update(31)
         try:    
             sht= xlWb.Worksheets(sheetnames[3])
             Q3+= Utils.tupleToList(sht.Range("Q3_ScheduleTolerance"))
             Q3+= Utils.tupleToList(sht.Range("Q3_OperationCycle"))
         except:
             return Utils.parseError(sheetnames[3]), []
-            
+        dlg.update(40)    
         try:    
             sht = xlWb.Worksheets(sheetnames[8])
             QRenewables = Utils.tupleToList(sht.Range("Q7_Interest"))
@@ -114,7 +114,7 @@ class parseExcel(parseSpreadsheet):
             QSurf += Utils.tupleToList(sht.Range("Q7_Roof"))
         except:
             return Utils.parseError(sheetnames[8]), []
-          
+        dlg.update(49)  
         try:    
             sht = xlWb.Worksheets(sheetnames[3])
             QProfiles = []
@@ -133,7 +133,7 @@ class parseExcel(parseSpreadsheet):
             QIntervals += Utils.tupleToList(sht.Range("Q3A_EndTime_3"))
         except:
             return Utils.parseError(sheetnames[3]), []
-        
+        dlg.update(57)
         try:
             sht = xlWb.Worksheets(sheetnames[10])
             Q9Questionnaire=[]
@@ -142,7 +142,7 @@ class parseExcel(parseSpreadsheet):
         except:
             return Utils.parseError(sheetnames[10]), []
             
-        
+        dlg.update(66)
         Q4_8 = []    
         for i in xrange(5):
             try:
@@ -172,7 +172,7 @@ class parseExcel(parseSpreadsheet):
                 
             except:
                 return self.parseError(sheetnames[9])
-        
+        dlg.update(72)
 
         lists.append(Q1)
         lists.append(Q2)
@@ -190,7 +190,7 @@ class parseExcel(parseSpreadsheet):
 
     
     def parse(self):
-        
+        dlg = DialogGauge(None,"Excel Parsing","reading document")
         Q1 = Q2 = QProduct = QFuel = Q3 = QRenewables = QSurf = QProfiles = QIntervals = Q9Questionnaire = []
         try:
             self.__xlApp, self.__xlWb = self.__openExcelDispatch(self.__filepath)
@@ -204,19 +204,19 @@ class parseExcel(parseSpreadsheet):
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
             return Utils.parseError("Consistency")
-        
+        dlg.update(5)
         try:
-            __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
+            __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb,dlg)
         except:
             try:
                 time.sleep(3)
                 self.__xlApp, self.__xlWb = openExcelDispatch()
-                __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
+                __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb,dlg)
             except:
                 try:
                     time.sleep(3)
                     self.__xlApp, self.__xlWb = openExcelDispatch()
-                    __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb)
+                    __handle, lists = self.__getExcelLists(self.__sheetnames, self.__xlWb, dlg)
                 except:
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
                     return Utils.parseError("Consistency")
@@ -226,8 +226,12 @@ class parseExcel(parseSpreadsheet):
         except:
             self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
             return __handle
+        
         DButil = Utils(self.__md, self.__sheetnames)
+        dlg.update(75)
         __handle = DButil.writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, self.__xlWb)
+        dlg.update(100)
+        dlg.Destroy()
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
         return __handle
         
