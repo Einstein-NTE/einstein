@@ -74,7 +74,8 @@ class PanelDBBenchmark(PanelDBBase):
         self.db = Status.DB.dbbenchmark
         self.table = "dbbenchmark"
         self.identifier = self.colLabels[0]
-        self.type = self.colLabels[4]
+        self.type = self.colLabels[1]
+        self.subtype = self.colLabels[3]
 
         # access to font properties object
         fp = FontProperties()
@@ -111,8 +112,13 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc_type = ChoiceEntry(self.page0,
                                    values = [],
-                                   label = _U("Type"),
-                                   tip = _U("Show only equipment of type"))
+                                   label = _U("NACECode"),
+                                   tip = _U("Show only"))
+
+        self.tc_subtype = ChoiceEntry(self.page0,
+                                      values = [],
+                                      label = _U("ProductCode"),
+                                      tip = _U("Show only"))
 
         #
         # tab 1 - Validity of benchmark – association with industrial sector, unit operation and product type
@@ -479,6 +485,7 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -756,6 +763,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
         self.fillChoiceOfProductCodes(self.tc3.entry)
         self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
 
     def getDBCol(self):
         return self.db.DBBenchmark_ID
