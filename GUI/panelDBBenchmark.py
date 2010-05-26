@@ -148,7 +148,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc5 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("Measurement unit for product"),
-                             tip = _U(""))
+                             tip = _U("Measurement unit for product"))
 
         self.tc6 = TextEntry(self.page1, value = '',
                              label = _U("Comments on range of application"),
@@ -156,7 +156,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc7 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Data relevance/reliability"),
-                             tip = _U(""))
+                             tip = _U("Data relevance/reliability"))
 
         self.tc8 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -164,7 +164,7 @@ class PanelDBBenchmark(PanelDBBase):
                               unitdict = 'FRACTION',
                               #unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (minimum)"),
-                              tip = _U(""))
+                              tip = _U("Yearly turnover (minimum)"))
 
         self.tc9 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -172,7 +172,7 @@ class PanelDBBenchmark(PanelDBBase):
                               unitdict = 'FRACTION',
                               #unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (maximum)"),
-                              tip = _U(""))
+                              tip = _U("Yearly turnover (maximum)"))
 
         self.tc10 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -180,7 +180,7 @@ class PanelDBBenchmark(PanelDBBase):
                                unitdict = 'FRACTION',
                                #unitdict = 'PU',
                                label = _U("Yearly production volume (minimum)"),
-                               tip = _U(""))
+                               tip = _U("Yearly production volume (minimum)"))
 
         self.tc11 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -188,7 +188,7 @@ class PanelDBBenchmark(PanelDBBase):
                                unitdict = 'FRACTION',
                                #unitdict = 'PU',
                                label = _U("Yearly production volume (maximum)"),
-                               tip = _U(""))
+                               tip = _U("Yearly production volume (maximum)"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
@@ -654,7 +654,6 @@ class PanelDBBenchmark(PanelDBBase):
                     subcode = "00"
                 if subcode != "00" and len(subcode) < 2:
                     subcode = ''.join([subcode, "0"])
-                print ''.join([codes[0], '.', subcode])
                 self.tc1.entry.SetStringSelection(''.join([codes[0], '.', subcode]))
             else:
                 self.tc1.entry.SetStringSelection("None")

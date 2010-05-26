@@ -205,8 +205,6 @@ class PanelDBBase(wx.Dialog):
         except:
             return
 
-        print "theid: ", self.theId
-
         equipments = self.getDBCol()[check(self.theId)]
 
         if len(equipments) > 0:
@@ -275,6 +273,10 @@ class PanelDBBase(wx.Dialog):
         unitOpDict = Status.prj.getUnitOpDict()
         unitOpList = unitOpDict.values()
         fillChoice(entry, unitOpList)
+
+    def fillChoiceYesNo(self, entry):
+        values = ["Yes", "No"]
+        fillChoice(entry, values, False)
 
     def fillChoiceOfType(self):
         try:

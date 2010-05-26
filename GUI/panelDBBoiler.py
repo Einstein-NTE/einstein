@@ -155,18 +155,20 @@ class PanelDBBoiler(PanelDBBase):
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'POWER',
+                              unitdict = 'FRACTION',
                               label = _U("BBPnom"),
                               tip = _U("Nominal thermal power"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'FRACTION',
+                              unitdict = 'FRACTION',
                               label = _U("BBEfficiency"),
                               tip = _U("Nominal efficiency"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'POWER',
+                              unitdict = 'FRACTION',
                               label = _U("FuelConsum"),
                               tip = _U("Nominal fuel consumption (LCV)"))
 
@@ -178,6 +180,7 @@ class PanelDBBoiler(PanelDBBase):
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'POWER',
+                              unitdict = 'FRACTION',
                               label = _U("ElConsum"),
                               tip = _U("Nominal electrical power consumption"))
 
@@ -193,31 +196,33 @@ class PanelDBBoiler(PanelDBBase):
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'FRACTION',
+                               unitdict = 'FRACTION',
                                label = _U("ExcessAirRatio"),
                                tip = _U("Typical excess air ratio"))
 
         self.tc13 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'FRACTION',
+                               unitdict = 'FRACTION',
                                label = _U("BBA1"),
                                tip = _U("Linear dependence of the efficiency on the load"))
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'FRACTION',
+                               unitdict = 'FRACTION',
                                label = _U("BBA2"),
                                tip = _U("Quadratic dependence of the efficiency on the load"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'INVTEMP',
+                               unitdict = 'FRACTION',
                                label = _U("BBK1"),
                                tip = _U("Linear dependence of the efficiency on the temperature"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'INVTEMP2',
+                               unitdict = 'FRACTION',
                                label = _U("BBK2"),
                                tip = _U("Quadratic dependence of the efficiency on the temperature"))
 
@@ -247,27 +252,26 @@ class PanelDBBoiler(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = '',
                                label = _U("BoilerPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = '',
                                label = _U("BoilerTurnKeyPrice"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = '',
                                label = _U("BoilerOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = '',
                                label = _U("BoilerOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
@@ -275,6 +279,10 @@ class PanelDBBoiler(PanelDBBase):
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("YearUpdate"),
                                tip = _U("Year of last update of the economic data"))
+
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
@@ -404,6 +412,8 @@ class PanelDBBoiler(PanelDBBase):
 
         fuelDict = Status.prj.getFuelDict()
         self.fillChoiceOfDBFuel(self.tc8.entry)
+        self.fillChoiceYesNo(self.tc10.entry)
+        self.fillChoiceYesNo(self.tc11.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.BoilerManufacturer)) if q.BoilerManufacturer is not None else ''
@@ -457,6 +467,8 @@ class PanelDBBoiler(PanelDBBase):
 
     def fillChoices(self):
         self.fillChoiceOfDBFuel(self.tc8.entry)
+        self.fillChoiceYesNo(self.tc10.entry)
+        self.fillChoiceYesNo(self.tc11.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):
@@ -471,8 +483,6 @@ class PanelDBBoiler(PanelDBBase):
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
            self.tc9.GetValue() is None and\
-           self.tc10.GetValue() is None and\
-           self.tc11.GetValue() is None and\
            self.tc12.GetValue() is None and\
            self.tc13.GetValue() is None and\
            self.tc14.GetValue() is None and\
