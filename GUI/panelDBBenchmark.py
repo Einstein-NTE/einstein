@@ -160,7 +160,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc8 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              # FIXME
+                              # FIXXXME
                               unitdict = 'FRACTION',
                               #unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (minimum)"),
@@ -168,7 +168,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc9 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              # FIXME
+                              # FIXXXME
                               unitdict = 'FRACTION',
                               #unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (maximum)"),
@@ -176,7 +176,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc10 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'PU',
                                label = _U("Yearly production volume (minimum)"),
@@ -184,7 +184,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc11 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'PU',
                                label = _U("Yearly production volume (maximum)"),
@@ -221,7 +221,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN"),
@@ -229,7 +229,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MAX"),
@@ -237,7 +237,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET"),
@@ -245,7 +245,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MIN"),
@@ -253,7 +253,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX"),
@@ -261,7 +261,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc20 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Electricity: Energy intensity TARGET (turnover)"),
@@ -269,7 +269,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc21 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (MIN)"),
@@ -277,7 +277,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc22 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (MAX)"),
@@ -285,7 +285,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc23 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) TARGET"),
@@ -308,7 +308,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN [kWh/€]"),
@@ -316,7 +316,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc26 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (production cost) MAX [kWh/€]"),
@@ -324,7 +324,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc27 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
@@ -332,7 +332,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc28 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (turnover) MIN  [kWh/€]"),
@@ -340,7 +340,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc29 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX [kWh/€]"),
@@ -348,7 +348,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc30 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (turnover) TARGET [kWh/€]"),
@@ -356,7 +356,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc31 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption MIN"),
@@ -364,7 +364,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc32 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption MAX"),
@@ -372,7 +372,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc33 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption TARGET"),
@@ -395,7 +395,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc35 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN [kWh/€]"),
@@ -403,7 +403,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc36 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MAX [kWh/€]"),
@@ -411,7 +411,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc37 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
@@ -419,7 +419,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc38 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MIN [kWh/€]"),
@@ -427,7 +427,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc39 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX [kWh/€]"),
@@ -435,7 +435,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc40 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) TARGET [kWh/€]"),
@@ -443,7 +443,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc41 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC)"),
@@ -451,7 +451,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc42 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) TARGET"),
@@ -459,7 +459,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc43 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXME
+                               # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) AVERAGE"),
@@ -587,7 +587,7 @@ class PanelDBBenchmark(PanelDBBase):
                "NACECode":check(self.tc1.GetValue(text = True)),
                "UnitOp":check(findKey(unitOpDict, self.tc2.GetValue(text = True))),
 
-                # FIXME where do i get the ProductCodes for the ChoiceEntry from?
+                # FIXXXME where do i get the ProductCodes for the ChoiceEntry from?
                #"ProductCode":check(self.tc3.GetValue()),
 
                "Product":check(self.tc4.GetValue()),
@@ -661,7 +661,7 @@ class PanelDBBenchmark(PanelDBBase):
             if q.UnitOp is not None:
                 self.tc2.SetValue(unitOpDict[int(q.UnitOp)]) if int(q.UnitOp) in unitOpDict.keys() else ''
 
-            # FIXME fill in the proper product codes
+            # FIXXXME fill in the proper product codes
             #self.tc3.SetValue(q.ProductCode)
 
             self.tc4.SetValue(str(q.Product)) if q.Product is not None else ''

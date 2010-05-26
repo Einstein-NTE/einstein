@@ -308,7 +308,7 @@ class PanelDBFuel(PanelDBBase):
 
         
 
-# FIXME
+# FIXXXME
         fuelDict = []
         fuelUnitDict = []
         print check(self.tc2.GetValue(text = True))
@@ -344,7 +344,7 @@ class PanelDBFuel(PanelDBBase):
 
         self.fillChoiceOfDBFuelType(self.tc2.entry)
 
-# FIXME
+# FIXXXME
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
@@ -385,7 +385,7 @@ class PanelDBFuel(PanelDBBase):
         self.tc15.SetValue('')
 
     def fillChoices(self):
-# FIXME
+# FIXXXME
         self.fillChoiceOfDBFuelType(self.tc2.entry)
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
         self.fillChoiceOfType()
