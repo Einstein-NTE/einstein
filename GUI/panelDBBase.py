@@ -67,8 +67,8 @@ class PanelDBBase(wx.Dialog):
         #
         self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
         self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
-        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
-        self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
+        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Close')
+        self.buttonOK = wx.Button(self, wx.ID_OK, label = 'Save')
         self.buttonOK.SetDefault()
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
