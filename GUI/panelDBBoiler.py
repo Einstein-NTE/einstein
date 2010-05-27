@@ -383,8 +383,8 @@ class PanelDBBoiler(PanelDBBase):
                "FuelConsum":check(self.tc7.GetValue()),
                "FuelType":check(findKey(fuelDict, self.tc8.GetValue(text = True))),
                "ElConsum":check(self.tc9.GetValue()),
-               "Economiser":check(self.tc10.GetValue()),
-               "Preheater":check(self.tc11.GetValue()),
+               "Economiser":check(self.tc10.GetValue(text = True)),
+               "Preheater":check(self.tc11.GetValue(text = True)),
                "ExcessAirRatio":check(self.tc12.GetValue()),
                "BBA1":check(self.tc13.GetValue()),
                "BBA2":check(self.tc14.GetValue()),
@@ -426,8 +426,14 @@ class PanelDBBoiler(PanelDBBase):
             if q.FuelType is not None:
                 self.tc8.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
             self.tc9.SetValue(str(q.ElConsum)) if q.ElConsum is not None else ''
-            self.tc10.SetValue(str(q.Economiser)) if q.Economiser is not None else ''
-            self.tc11.SetValue(str(q.Preheater)) if q.Preheater is not None else ''
+            if q.Economiser is not None and q.Economiser.lower() == "yes":
+                self.tc10.entry.SetStringSelection("Yes")
+            else:
+                self.tc10.entry.SetStringSelection("No")
+            if q.Preheater is not None and q.Preheater.lower() == "yes":
+                self.tc11.entry.SetStringSelection("Yes")
+            else:
+                self.tc11.entry.SetStringSelection("No")
             self.tc12.SetValue(str(q.ExcessAirRatio)) if q.ExcessAirRatio is not None else ''
             self.tc13.SetValue(str(q.BBA1)) if q.BBA1 is not None else ''
             self.tc14.SetValue(str(q.BBA2)) if q.BBA2 is not None else ''
