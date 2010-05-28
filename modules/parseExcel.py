@@ -119,7 +119,7 @@ class parseExcel(parseSpreadsheet):
             sht = xlWb.Worksheets(sheetnames[3])
             QProfiles = []
             QProcNames = Utils.tupleToList(sht.Range("Q3A_ProcessName"))
-            
+            print QProcNames
             for i in xrange(3):
                 QProfil = Utils.tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
                 QProfil.append(QProcNames[i*3])

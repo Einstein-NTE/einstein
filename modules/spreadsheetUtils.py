@@ -237,9 +237,9 @@ class SpreadsheetDict():
     @staticmethod
     def createQ4HDictionary(Q4H,db_conn):
         i =0
-        for elem in Q4H:
-            print str(i) + " " + str(elem)
-            i=i+1
+#        for elem in Q4H:
+#            print str(i) + " " + str(elem)
+#            i=i+1
         
         
         Q4Hdict = {}
