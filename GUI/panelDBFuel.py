@@ -159,18 +159,21 @@ class PanelDBFuel(PanelDBBase):
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'SPECIFICENTHALPY',
+                              unitdict = 'FRACTION',
                               label = _U("FuelLCV"),
                               tip = _U("Lower calorific value"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'SPECIFICENTHALPY',
+                              unitdict = 'FRACTION',
                               label = _U("FuelHCV"),
                               tip = _U("Higher calorific value"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'DENSITY',
+                              unitdict = 'FRACTION',
                               label = _U("FuelDensity"),
                               tip = _U("Density"))
 
@@ -187,14 +190,19 @@ class PanelDBFuel(PanelDBBase):
         self.tc9 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'HEATCAPACITY',
+                              unitdict = 'FRACTION',
                               label = _U("OffgasHeatCapacity"),
                               tip = _U("OffgasHeatCapacity"))
 
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'DENSITY',
+                               unitdict = 'FRACTION',
                                label = _U("OffgasDensity"),
                                tip = _U("OffgasDensity"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc11 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -211,6 +219,9 @@ class PanelDBFuel(PanelDBBase):
                                label = _U("Offgas"),
                                tip = _U("Offgas"))
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         #
         # tab 4 - Environment parameters
         #
@@ -224,12 +235,14 @@ class PanelDBFuel(PanelDBBase):
         self.tc14 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'DENSITY',
+                               unitdict = 'FRACTION',
                                label = _U("PEConvFuel"),
                                tip = _U("Primary energy conversion ratio"))
 
         self.tc15 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'CO2RATIO',
+                               unitdict = 'FRACTION',
                                label = _U("CO2ConvFuel"),
                                tip = _U("Ratio of CO2 generation"))
 
@@ -308,10 +321,10 @@ class PanelDBFuel(PanelDBBase):
 
         
 
-# FIXME
+# FIXXXME
         fuelDict = []
         fuelUnitDict = []
-        print check(self.tc2.GetValue(text = True))
+
         tmp = {
                "FuelName":check(self.tc1.GetValue()),
                "FuelType":check(self.tc2.GetValue(text = True)),
@@ -344,7 +357,7 @@ class PanelDBFuel(PanelDBBase):
 
         self.fillChoiceOfDBFuelType(self.tc2.entry)
 
-# FIXME
+# FIXXXME
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
@@ -385,7 +398,7 @@ class PanelDBFuel(PanelDBBase):
         self.tc15.SetValue('')
 
     def fillChoices(self):
-# FIXME
+# FIXXXME
         self.fillChoiceOfDBFuelType(self.tc2.entry)
         #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
         self.fillChoiceOfType()
@@ -394,7 +407,6 @@ class PanelDBFuel(PanelDBBase):
         return self.db.DBFuel_ID
 
     def allFieldsEmpty(self):
-        print self.tc2.GetValue(text = True)
         if len(self.tc1.GetValue()) == 0 and\
            self.tc2.GetValue(text = True) == "None" and\
            len(self.tc4.GetValue()) == 0 and\

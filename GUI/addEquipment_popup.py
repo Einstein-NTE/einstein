@@ -40,6 +40,11 @@ from einstein.GUI.DBEditFrame import DBEditFrame
 from einstein.GUI.panelQ4 import PanelQ4
 from einstein.modules.interfaces import Interfaces
 
+from einstein.GUI.panelDBCHP import PanelDBCHP
+from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
+from einstein.GUI.panelDBHeatPump import PanelDBHeatPump
+from einstein.GUI.panelDBBoiler import PanelDBBoiler
+
 [wxID_AEPOPUP1, #wxID_AEPOPUP1BTNACCEPT, wxID_AEPOPUP1BTNCANCEL, 
  wxID_AEPOPUP1BTNENTERMANUALLY, wxID_AEPOPUP1BTNSELECTFROMDATABASE, 
  wxID_AEPOPUP1LISTBOX1, wxID_AEPOPUP1STATICTEXT1, 
@@ -121,7 +126,18 @@ class AddEquipment(wx.Dialog):
     def OnBtnSelectFromDatabaseButton(self, event):
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------		
-        self.dbe = DBEditFrame(self, self.title, self.tablename, self.col_returned, self.can_edit)
+
+        if self.tablename == "dbchp":
+            self.dbe = PanelDBCHP(self, "Edit DBCHP", True)
+        elif self.tablename == "dbsolarthermal":
+            self.dbe = PanelDBSolarThermal(self, "Edit DBSolarThermal", True)
+        elif self.tablename == "dbheatpump":
+            self.dbe = PanelDBHeatPump(self, "Edit DBHeatPump", True)
+        elif self.tablename == "dbboiler":
+            self.dbe = PanelDBBoiler(self, "Edit DBBoiler", True)
+        else:
+            self.dbe = DBEditFrame(self, self.title, self.tablename, self.col_returned, self.can_edit)
+
         if self.dbe.ShowModal() == wx.ID_OK:
 	    # the user has accepted a selection from the database dialog
 	    # so we exit also from this dialog

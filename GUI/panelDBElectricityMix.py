@@ -168,12 +168,14 @@ class PanelDBElectricityMix(PanelDBBase):
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'CO2RATIO',
+                              unitdict = 'FRACTION',
                               label = _U("CO2ConvEl"),
                               tip = _U("CO2 generation per unit of electricity"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'CO2RATIO',
+                              unitdict = 'FRACTION',
                               label = _U("NoNukesConvEl"),
                               tip = _U("Highly radiactive nuclear waste per unit of electricity"))
 

@@ -107,6 +107,7 @@ from einstein.GUI.panelDBFuel import PanelDBFuel
 from einstein.GUI.panelDBFluid import PanelDBFluid
 from einstein.GUI.panelDBElectricityMix import PanelDBElectricityMix
 from einstein.GUI.panelDBBenchmark import PanelDBBenchmark
+from einstein.GUI.panelDBAuditor import PanelDBAuditor
 
 #TS2008-03-23 panelEA1-EA6, EM1 added
 from panelEA1 import *
@@ -629,6 +630,10 @@ class EinsteinFrame(wx.Frame):
         if dlgdb.getChanges():
             self.showWarning(_U('Any changes will be in effect next time you restart Einstein'))
             
+    def OnMenuEditDBAuditor(self, event):
+        frameEditDBAuditor = PanelDBAuditor(self, "Edit DBAuditor", False)
+        frameEditDBAuditor.ShowModal()
+
     def OnMenuEditDBBenchmark(self, event):
 #        frameEditDBBenchmark = DBEditFrame(self, "Edit DBBenchmark", 'dbbenchmark', 0, True)
         frameEditDBBenchmark = PanelDBBenchmark(self, "Edit DBBenchmark", False)
@@ -1331,6 +1336,7 @@ class EinsteinFrame(wx.Frame):
         self.EditDBBenchmark = self.menuDatabase.Append(-1, _U("&Benchmarks"))
         self.EditDBBAT = self.menuDatabase.Append(-1, _U("Best available technologies"))
         self.EditDBAdmin = self.menuDatabase.Append(-1, _U("Database administration"))
+        self.EditDBAuditor = self.menuDatabase.Append(-1, _U("Auditor"))
 
         self.EditDBNaceCode = self.submenuClassification.Append(-1, _U("&Nace code"))
         self.EditDBUnitOperation = self.submenuClassification.Append(-1, _U("&Unit operation"))
@@ -1563,6 +1569,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuImportQ, self.ImportQ)
 
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBAdmin, self.EditDBAdmin)
+        self.Bind(wx.EVT_MENU, self.OnMenuEditDBAuditor, self.EditDBAuditor)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBenchmark, self.EditDBBenchmark)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBAT, self.EditDBBAT)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBNaceCode, self.EditDBNaceCode)

@@ -152,13 +152,16 @@ class PanelDBSolarThermal(PanelDBBase):
 
         self.tc5 = StaticTextEntry(self.page2, maxchars = 255, value = '',
                                    label = _U("STPnomColl"),
-                                   tip = _U(""))
+                                   tip = _U("STPnomColl"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("STc0"),
                               tip = _U("Optical efficiency"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -169,6 +172,9 @@ class PanelDBSolarThermal(PanelDBBase):
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("STc2"),
                               tip = _U("Quadratic thermal loss coefficient"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -192,49 +198,50 @@ class PanelDBSolarThermal(PanelDBBase):
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STLengthGross"),
-                               tip = _U(""))
+                               tip = _U("STLengthGross"))
 
         self.tc13 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STHeightGross"),
-                               tip = _U(""))
+                               tip = _U("STHeightGross"))
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'AREA',
                                label = _U("STAreaGross"),
-                               tip = _U(""))
+                               tip = _U("STAreaGross"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STLengthAper"),
-                               tip = _U(""))
+                               tip = _U("STLengthAper"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STHeightAper"),
-                               tip = _U(""))
+                               tip = _U("STHeightAper"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'AREA',
                                label = _U("STAreaAper"),
-                               tip = _U(""))
+                               tip = _U("STAreaAper"))
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("STAreaFactor"),
-                               tip = _U(""))
+                               tip = _U("STAreaFactor"))
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'MASSPERAREA',
+                               unitdict = 'FRACTION',
                                label = _U("STWeightFactor"),
-                               tip = _U(""))
+                               tip = _U("STWeightFactor"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
@@ -252,37 +259,48 @@ class PanelDBSolarThermal(PanelDBBase):
         self.tc20 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("STUnitPrice300kW"),
-                               tip = _U(""))
+                               tip = _U("STUnitPrice300kW"))
 
         self.tc21 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("STUnitTurnKeyPrice30kW"),
-                               tip = _U(""))
+                               tip = _U("STUnitTurnKeyPrice30kW"))
 
         self.tc22 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("STUnitTurnKeyPrice300kW"),
-                               tip = _U(""))
+                               tip = _U("STUnitTurnKeyPrice300kW"))
 
         self.tc23 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("STUnitTurnKeyPrice3000kW"),
-                               tip = _U(""))
+                               tip = _U("STUnitTurnKeyPrice3000kW"))
 
         self.tc24 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("STOMUnitFix"),
-                               tip = _U(""))
+                               tip = _U("STOMUnitFix"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("STYearUpdate"),
                                tip = _U("Year of last update of the economic data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         #flagText_left = wx.TOP | wx.ALIGN_LEFT

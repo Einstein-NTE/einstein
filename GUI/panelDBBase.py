@@ -67,8 +67,8 @@ class PanelDBBase(wx.Dialog):
         #
         self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
         self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
-        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Cancel')
-        self.buttonOK = wx.Button(self, wx.ID_OK, label = 'OK')
+        self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Close')
+        self.buttonOK = wx.Button(self, wx.ID_OK, label = 'Save')
         self.buttonOK.SetDefault()
 
         self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
@@ -205,8 +205,6 @@ class PanelDBBase(wx.Dialog):
         except:
             return
 
-        print "theid: ", self.theId
-
         equipments = self.getDBCol()[check(self.theId)]
 
         if len(equipments) > 0:
@@ -275,6 +273,10 @@ class PanelDBBase(wx.Dialog):
         unitOpDict = Status.prj.getUnitOpDict()
         unitOpList = unitOpDict.values()
         fillChoice(entry, unitOpList)
+
+    def fillChoiceYesNo(self, entry):
+        values = ["Yes", "No"]
+        fillChoice(entry, values, False)
 
     def fillChoiceOfType(self):
         try:

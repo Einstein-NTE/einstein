@@ -136,15 +136,15 @@ class PanelDBCHP(PanelDBBase):
 
         self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("CHPequip"),
-                             tip = _U(""))
+                             tip = _U("CHPequip"))
 
         self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("Type"),
-                             tip = _U(""))
+                             tip = _U("Type"))
 
         self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("SubType"),
-                             tip = _U(""))
+                             tip = _U("SubType"))
 
         self.tc5 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("Reference"),
@@ -161,20 +161,32 @@ class PanelDBCHP(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("CHPPt"),
                               tip = _U("Nominal thermal power"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc7 = ChoiceEntry(self.page2,
                                values = [],
                                label = _U("FuelType"),
                                tip = _U("Fuel type"))
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               label = _U("FuelConsum"),
                               tip = _U("Nominal fuel consumption"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -219,6 +231,7 @@ class PanelDBCHP(PanelDBBase):
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'MASSFLOWRATE',
+                               unitdict = 'FRACTION',
                                label = _U("FlowRateSupply"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
@@ -237,6 +250,7 @@ class PanelDBCHP(PanelDBBase):
         self.tc17 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'MASSFLOWRATE',
+                               unitdict = 'FRACTION',
                                label = _U("FlowRateSupply2"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
@@ -268,19 +282,27 @@ class PanelDBCHP(PanelDBBase):
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICE',
+                               unitdict = 'FRACTION',
                                label = _U("OMRateFix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'UNITPRICEENERGY',
+                               unitdict = 'FRACTION',
                                label = _U("OMRateVar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc22 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("YearUpdate"),
                                tip = _U("Year of last update of the economic data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL

@@ -151,30 +151,35 @@ class PanelDBFluid(PanelDBBase):
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'HEATCAPACITY',
+                              unitdict = 'FRACTION',
                               label = _U("FluidCp"),
                               tip = _U("Specific heat in liquid state"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'TEMPERATURE',
+                              unitdict = 'FRACTION',
                               label = _U("TCond"),
                               tip = _U("Temperature of evaporation"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'HEATCAPACITY',
+                              unitdict = 'FRACTION',
                               label = _U("FluidCpG"),
                               tip = _U("Specific heat in gaseous state (vapour)"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'SPECIFICENTHALPY',
+                              unitdict = 'FRACTION',
                               label = _U("LatentHeat"),
                               tip = _U("Latent heat of evaporation"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               #unitdict = 'DENSITY',
+                              unitdict = 'FRACTION',
                               label = _U("FluidDensity"),
                               tip = _U("Density"))
 
@@ -191,30 +196,35 @@ class PanelDBFluid(PanelDBBase):
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'CO2RATIO',
+                               unitdict = 'FRACTION',
                                label = _U("SpecificMassFlow"),
                                tip = _U("Typical specific mass flow of refrigerant"))
 
         self.tc11 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'TEMPERATURE',
+                               unitdict = 'FRACTION',
                                label = _U("THighP"),
                                tip = _U("Typical outlet temperature of compressor"))
 
         self.tc12 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'DYNAMICVISCOSITY',
+                               unitdict = 'FRACTION',
                                label = _U("Viscosity"),
                                tip = _U("Dynamic Viscosity at typical working conditions"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'CONDUCTIVITY',
+                               unitdict = 'FRACTION',
                                label = _U("Conductivity"),
                                tip = _U("Thermal conductivity at typical working conditions"))
 
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'SPECIFICENTHALPY',
+                               unitdict = 'FRACTION',
                                label = _U("SensibleHeat"),
                                tip = _U("Senisble heat at typical working conditions"))
 
