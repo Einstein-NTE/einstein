@@ -119,7 +119,6 @@ class parseExcel(parseSpreadsheet):
             sht = xlWb.Worksheets(sheetnames[3])
             QProfiles = []
             QProcNames = Utils.tupleToList(sht.Range("Q3A_ProcessName"))
-            print QProcNames
             for i in xrange(3):
                 QProfil = Utils.tupleToList(sht.Range("Q3A_Profiles_"+ str(i+1)))
                 QProfil.append(QProcNames[i*3])
@@ -178,6 +177,32 @@ class parseExcel(parseSpreadsheet):
         lists.append(Q2)
         lists.append(QProduct)
         lists.append(QFuel)
+        #lists.append(Q3)
+        lists.append(QRenewables)
+        lists.append(QSurf)
+        lists.append(QProfiles)
+        lists.append(QIntervals)
+        lists.append(Q9Questionnaire)
+        lists.append(Q4_8)
+        
+#        biglist = []
+#        for listelem in lists:
+#            QList = []
+#            for elem in listelem:
+#                try:
+#                    QList.append(float(elem))
+#                except:
+#                    try:
+#                        QList.append(float(str(elem).replace(',', '.')))
+#                    except:
+#                        QList.append(elem)
+#            biglist.append(QList)
+#        print biglist 
+        lists = []
+        lists.append(Q1)
+        lists.append(Q2)
+        lists.append(QProduct)
+        lists.append(QFuel)
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
@@ -185,6 +210,23 @@ class parseExcel(parseSpreadsheet):
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
+       
+       
+        listelem = Q4_8
+        #biglist = []
+        #for listelem in lists:
+        QList = []
+        for elem in listelem:
+            try:
+                QList.append(float(elem))
+            except:
+                try:
+                    QList.append(float(str(elem).replace(',', '.')))
+                except:
+                    QList.append(elem)
+        print QList
+        #biglist.append(QList)
+        #print biglist
 
         return "", lists
 

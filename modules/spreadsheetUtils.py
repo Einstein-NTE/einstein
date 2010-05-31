@@ -98,6 +98,9 @@ class SpreadsheetDict():
         qproddict['TurnoverProd'] = QProduct[4]
         qproddict['FuelProd'] = QProduct[5]
         qproddict['ElProd'] = QProduct[6]
+        
+        qproddict['AlternativeProposalNo'] = -1
+        
         return qproddict
     
     @staticmethod
@@ -110,6 +113,8 @@ class SpreadsheetDict():
         QFuelDict['FECFuel'] = QFuel[3]
         QFuelDict['FuelTariff'] = QFuel[4]
         QFuelDict['FuelCostYear'] = QFuel[5]
+        
+        QFuelDict['AlternativeProposalNo'] = -1
         return QFuelDict
     
     @staticmethod
@@ -158,6 +163,8 @@ class SpreadsheetDict():
         Q2dict['ElectricityMotors']= Q2[87]
         Q2dict['ElectricityChem']= Q2[88]
         Q2dict['ElectricityLight']= Q2[89]
+        
+        Q2dict['AlternativeProposalNo'] = -1
         return Q2dict
 
     @staticmethod
@@ -206,6 +213,8 @@ class SpreadsheetDict():
         Q3dict['InFlowDuration']= Q3[34]
         Q3dict['HBatch']= Q3[35]+Q3[34]
         Q3dict['OutFlowDuration']= Q3[36]
+        
+        Q3dict['AlternativeProposalNo'] = -1
         return Q3dict
     
     @staticmethod
@@ -271,6 +280,7 @@ class SpreadsheetDict():
         Q4Hdict["HPerDayEq"] = Q4H[35]
         Q4Hdict["NDaysEq"] = Q4H[36]
         
+        Q4Hdict['AlternativeProposalNo'] = -1
         return Q4Hdict
         
     @staticmethod
@@ -297,6 +307,8 @@ class SpreadsheetDict():
         Q4Cdict["HeatSourceHT"] = Q4C[25]
         Q4Cdict["HPerDayEq"] = Q4C[28]
         Q4Cdict["NDaysEq"] = Q4C[29]
+        
+        Q4Cdict['AlternativeProposalNo'] = -1
         return Q4Cdict
     
     @staticmethod
@@ -319,7 +331,7 @@ class SpreadsheetDict():
         Q5dict["TypeStorage"] = Q5[16]
         Q5dict["PmaxStorage"] = Q5[17]
         Q5dict["TmaxStorage"] = Q5[18]
-        
+        Q5dict['AlternativeProposalNo'] = -1
         return Q5dict
     
     @staticmethod
@@ -338,6 +350,7 @@ class SpreadsheetDict():
         Q6dict["HXSink"] = Q6[10]
         Q6dict["HXTSinkInlet"] = Q6[11]
         Q6dict["HXTSinkOutlet"] = Q6[12]
+        Q6dict['AlternativeProposalNo'] = -1
         return Q6dict
     
     @staticmethod
@@ -356,16 +369,33 @@ class SpreadsheetDict():
         Q6dict["NBatchWHEE"] = Q6[27]
         Q6dict["HBatchWHEE"] = Q6[28]
         Q6dict["NDaysWHEE"] = Q6[29]
+        Q6dict['AlternativeProposalNo'] = -1
         return Q6dict
     
     @staticmethod
     def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
+        
+        i = 0
+        for elem in Q7:
+            print str(i) + " " + str(elem) 
+            i+=1
+        
         if str(Q7[0]).lower()=="yes":
             Q7dict["REInterest"] = 1
         elif str(Q7[0]).lower()=="no":
             Q7dict["REInterest"] = 0
-        # REReason Q7dict["REInterest"] = Q7[1]
+            
+        REReason = ""    
+        for i in xrange(4):
+            if(str(Q7[i]).upper() == "YES" or str(Q7[i]).upper() == "Y"):
+                REReason+= "y"
+            else:
+                REReason+= "n"
+                
+        Q7dict["REReason"] = REReason
+        
+        Q7dict["REMotivation"] = Q7[4]
         # REReason Q7dict["REInterest"] = Q7[2]
         # REReason Q7dict["REInterest"]itude"] = Q7[5]
         # Belongs to Surface Q7dict["ST_IT"] = Q7[6]
@@ -382,7 +412,12 @@ class SpreadsheetDict():
         Q7dict["PriceBiomassProc"] = Q7[17]
         Q7dict["PriceBiomassRegion"] = Q7[18]
         Q7dict["SpaceBiomassProc"] = Q7[21]
+        
+        Q7dict['AlternativeProposalNo'] = -1
         return Q7dict        
+    
+
+    
     
     @staticmethod
     def createQSurfDictionary(QSurfarea,db_conn):
@@ -424,6 +459,9 @@ class SpreadsheetDict():
         Q8dict['BuildTAirCond'] = Q8[15]
         # date Q8dict[''] = Q8[16]
         # date Q8dict[''] = Q8[17]
+        
+        Q8dict['AlternativeProposalNo'] = -1
+        
         return Q8dict
     
     @staticmethod
@@ -600,22 +638,22 @@ class Utils():
         except:
             return self.parseError(self.__sheetnames[8])
         
-        try:
-            self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
-            self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-            latitude = self.__xlWb.Worksheets(self.__sheetnames[8]).Range("Q7_Latitude")
-            self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+        #try:
+        self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
+        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+        latitude = self.__xlWb.Worksheets(self.__sheetnames[8]).Range("Q7_Latitude")
+        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+        
+        # Code to skip a specific amount of columns
+        index =0
+        Q3n = []
+        for i in range(0,len(Q3),3):
+            Q3n.append(Q3[i]) 
+            index+=1
             
-            # Code to skip a specific amount of columns
-            index =0
-            Q3n = []
-            for i in range(0,len(Q3),3):
-                Q3n.append(Q3[i]) 
-                index+=1
-                
-            self.splitColumns(3, 3, Q3n, {}, Questionnaire_ID, SpreadsheetDict.createQProcessDictionary,self.__md.qprocessdata)
-        except:
-            return self.parseError("QProduct, QFuel or QSurfarea")
+        self.splitColumns(3, 3, Q3n, {}, Questionnaire_ID, SpreadsheetDict.createQProcessDictionary,self.__md.qprocessdata)
+        #except:
+        #    return self.parseError("QProduct, QFuel or QSurfarea")
 
         
         return "Parsing successful!"
