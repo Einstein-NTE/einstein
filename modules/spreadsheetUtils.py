@@ -376,10 +376,10 @@ class SpreadsheetDict():
     def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
         
-        i = 0
-        for elem in Q7:
-            print str(i) + " " + str(elem) 
-            i+=1
+#        i = 0
+#        for elem in Q7:
+#            print str(i) + " " + str(elem) 
+#            i+=1
         
         if str(Q7[0]).lower()=="yes":
             Q7dict["REInterest"] = 1

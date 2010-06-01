@@ -177,27 +177,28 @@ class parseExcel(parseSpreadsheet):
         lists.append(Q2)
         lists.append(QProduct)
         lists.append(QFuel)
-        #lists.append(Q3)
+        lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
-        lists.append(QProfiles)
+        #lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
         
-#        biglist = []
-#        for listelem in lists:
-#            QList = []
-#            for elem in listelem:
-#                try:
-#                    QList.append(float(elem))
-#                except:
-#                    try:
-#                        QList.append(float(str(elem).replace(',', '.')))
-#                    except:
-#                        QList.append(elem)
-#            biglist.append(QList)
-#        print biglist 
+        biglist = []
+        for listelem in lists:
+            QList = []
+            for elem in listelem:
+                try:
+                    QList.append(float(elem))
+                except:
+                    try:
+                        QList.append(float(str(elem).replace(',', '.')))
+                    except:
+                        QList.append(elem)
+            biglist.append(QList)
+        print biglist 
+
         lists = []
         lists.append(Q1)
         lists.append(Q2)
@@ -211,20 +212,19 @@ class parseExcel(parseSpreadsheet):
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
        
-       
-        listelem = Q4_8
-        #biglist = []
-        #for listelem in lists:
-        QList = []
-        for elem in listelem:
-            try:
-                QList.append(float(elem))
-            except:
-                try:
-                    QList.append(float(str(elem).replace(',', '.')))
-                except:
-                    QList.append(elem)
-        print QList
+#        listelem = QProfiles
+#        #biglist = []
+#        #for listelem in lists:
+#        QList = []
+#        for elem in listelem:
+#            try:
+#                QList.append(float(elem))
+#            except:
+#                try:
+#                    QList.append(float(str(elem).replace(',', '.')))
+#                except:
+#                    QList.append(elem)
+#        print QList
         #biglist.append(QList)
         #print biglist
 

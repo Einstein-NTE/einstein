@@ -160,7 +160,7 @@ class parseOO(parseSpreadsheet):
             for j in xrange(len(structureNames)):
                 #try:
                 Q4_8.append(self.parseOOxmlarea(ooWb, startStructure[j]+str(i+1), structureNames[j]))
-                # CHANGE TO +=
+                
                 #except:
                     #return structureNames[j] + " " + startStructure[j]+str(i+1),[]
                     #
@@ -173,41 +173,41 @@ class parseOO(parseSpreadsheet):
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
-        lists.append(QProfiles)
+        #lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
      
 
-#        biglist = []
-#        for listelem in lists:
-#            QList = []
-#            for elem in listelem:
-#                try:
-#                    QList.append(float(elem))
-#                except:
-#                    try:
-#                        QList.append(float(str(elem).replace(',', '.')))
-#                    except:
-#                        QList.append(elem)
-#            biglist.append(QList)
-#        print biglist
+        biglist = []
+        for listelem in lists:
+            QList = []
+            for elem in listelem:
+                try:
+                    QList.append(float(elem))
+                except:
+                    try:
+                        QList.append(float(str(elem).replace(',', '.')))
+                    except:
+                        QList.append(elem)
+            biglist.append(QList)
+        print biglist
      
      
         
-        listelem = Q4_8
-        #biglist = []
-        #for listelem in lists:
-        QList = []
-        for elem in listelem:
-            try:
-                QList.append(float(elem))
-            except:
-                try:
-                    QList.append(float(str(elem).replace(',', '.')))
-                except:
-                    QList.append(elem)
-        print QList
+#        listelem = QProfiles
+#        #biglist = []
+#        #for listelem in lists:
+#        QList = []
+#        for elem in listelem:
+#            try:
+#                QList.append(float(elem))
+#            except:
+#                try:
+#                    QList.append(float(str(elem).replace(',', '.')))
+#                except:
+#                    QList.append(elem)
+#        print QList
         #biglist.append(QList)
         #print biglist
 
@@ -263,11 +263,17 @@ class parseOO(parseSpreadsheet):
             return
         tablerows = table.getElementsByTagName("table:table-row")
         data = []
-        repeatedcells=0
         sumRepeatedCells=0
         # If only one cell is selected
         if len(cellrange)<4:
-            tabledata =  tablerows[int(cellrange[1])-1].childNodes[ord(cellrange[0])-64-1]
+            sumRepeatedCells = 0
+            tablecells = tablerows[int(cellrange[1])-1].childNodes
+            for j in xrange(1,ord(str(cellrange[0]).upper())-64+1):
+                if tablecells[j-1].hasAttribute("table:number-columns-repeated"):
+                    repeatedCells= int(tablecells[j-1].getAttribute("table:number-columns-repeated"))
+                    sumRepeatedCells += (repeatedCells-1)
+                
+            tabledata =  tablerows[int(cellrange[1])-1].childNodes[ord(cellrange[0])-64-1-sumRepeatedCells]
             while tabledata.hasChildNodes():
                 tabledata = tabledata.firstChild
             try:    
@@ -276,57 +282,44 @@ class parseOO(parseSpreadsheet):
                 return None
             
         repeatedcells = 0
+        # Cell rows
         for i in xrange(int(cellrange[1]), int(cellrange[3])+1):
             tablecells = tablerows[i-1].childNodes
-            # count repeatedCells
-            repeatedcelllist = [0]
-            for elem in tablecells:
-                if(len(repeatedcelllist)>1):
-                    if elem.hasAttribute("table:number-columns-repeated"):
-                        repeatedcells= int(elem.getAttribute("table:number-columns-repeated"))
-                        if repeatedcells < 10:
-                            repeatedcelllist.append(repeatedcells+ repeatedcelllist[len(repeatedcelllist)-1]-1)
-                    else:
-                        repeatedcelllist.append(repeatedcelllist[len(repeatedcelllist)-1])
-                else: 
-                    if elem.hasAttribute("table:number-columns-repeated"):
-                        repeatedcells= int(elem.getAttribute("table:number-columns-repeated"))
-                        if repeatedcells < 10:
-                            repeatedcelllist.append(repeatedcells-1)
-                    else:
-                        repeatedcelllist.append(0)
+
             sumRepeatedCells=0
+            # Cell columns
             
-            for j in xrange(ord(str(cellrange[0]).upper())-64, ord(str(cellrange[2]).upper())-64+1):
+            for j in xrange(1,ord(str(cellrange[2]).upper())-64+1):
                 try:
-                    if(ord(str(cellrange[2]).upper())-64-sumRepeatedCells +1<j):
+                    tablecell = tablecells[j-1]
+                    if(ord(str(cellrange[2]).upper())-64-sumRepeatedCells +0<j):
                         continue
                     
-                    tabletext = tablecells[j-1-repeatedcelllist[j-1]].getElementsByTagName("text:p")
-                    
-                    if tablecells[j-1-repeatedcelllist[j-1]].hasAttribute("table:number-columns-repeated"):
-                        repeatedcells= int(tablecells[j-1].getAttribute("table:number-columns-repeated"))
-                        if repeatedcells ==1014 or repeatedcells == 1011:
+                    if tablecell.hasAttribute("table:number-columns-repeated"):
+                        repeatedCells= int(tablecell.getAttribute("table:number-columns-repeated"))
+                        if repeatedCells > 50:
                             continue
-                        for i in xrange(repeatedcells):
+                        for k in xrange(repeatedCells):
                             data.append(None)
-                        sumRepeatedCells+=repeatedcells
-                        continue 
-                    
-                    if(len(tabletext)<1):
-                        data.append(None)
-                    else:
-                        for elem in tabletext:
-                            while elem.hasChildNodes():
-                                elem = elem.firstChild
-                            try:
-                                data.append(elem.data)
-
-                            except:
-                                data.append(None)
+                        sumRepeatedCells+=(repeatedCells-1)
+                        continue
+                        
+                    if j >= ord(str(cellrange[0]).upper())-64:
+                        tabletext = tablecell.getElementsByTagName("text:p")
+                        if(len(tabletext)<1):
+                            data.append(None)
+                        else:
+                            for elem in tabletext:
+                                while elem.hasChildNodes():
+                                    elem = elem.firstChild
+                                try:
+                                    data.append(elem.data)
+                                except:
+                                    data.append(None)
                 except:
                     pass
-
+            
+            
         
 #        for i in xrange(int(cellrange[1]), int(cellrange[3])+1):
 #            tablecells = tablerows[i-1].childNodes
