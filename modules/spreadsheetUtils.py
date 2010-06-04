@@ -479,13 +479,27 @@ class SpreadsheetDict():
         Q8dict['BuildDailyDHW'] = Q8[13]
         Q8dict['BuildTHeating'] = Q8[14]
         Q8dict['BuildTAirCond'] = Q8[15]
-        datestart, dateend = SpreadsheetDict.parseDate(Q8[16])
+        
+        datestart, dateend = SpreadsheetDict.parseDate(Q8[7])
         if datestart != None:
             Q8dict['BuildHolidaysPeriodStart_1'] = datestart
         if dateend != None:
             Q8dict['BuildHolidaysPeriodStop_1'] = dateend
         # date Q8dict[''] = Q8[16]
         # date Q8dict[''] = Q8[17]
+        datestart, dateend = SpreadsheetDict.parseDate(Q8[16])
+        if datestart != None:
+            Q8dict['BuildHeatingPeriodStart'] = datestart
+        if dateend != None:
+            Q8dict['BuildHeatingPeriodStop'] = dateend
+            
+        datestart, dateend = SpreadsheetDict.parseDate(Q8[17])
+        if datestart != None:
+            Q8dict['BuildAirCondPeriodStart'] = datestart
+        if dateend != None:
+            Q8dict['BuildAirCondPeriodStop'] = dateend
+        
+        
         
         Q8dict['AlternativeProposalNo'] = -1
         
