@@ -28,6 +28,13 @@
 class SpreadsheetDict():
 
     @staticmethod
+    def _U(text):
+        try:
+            return unicode(_(text),"utf-8")
+        except:
+            return _(text)
+
+    @staticmethod
     def normDecimalPlace(number):
         """
         returns valid float values for the database
@@ -554,24 +561,22 @@ class Utils():
         return "Parsing failed because of: " + str(errorname)+ "! Please check your data and try again."
     
     
-    def writeToDB(self, Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, xlWb):
-        
-        self.__xlWb = xlWb
-        
+    def writeToDB(self,lists):
+        Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
         try:
             q2dict = SpreadsheetDict.createQElectricityDictionary(Q2, self.__md)
             self.__md.qelectricity.insert(q2dict)
         except:
             return self.parseError(self.__sheetnames[1])
 
-        try:
-            for i in xrange(3):
-                self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md))
-    
-            for i in xrange(len(QIntervals)/2):
-                self.__md.intervals.insert(SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
-        except:
-            return self.parseError(self.__sheetnames[3])
+        #try:
+        for i in xrange(3):
+            self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md))
+
+        for i in xrange(len(QIntervals)/2):
+            self.__md.intervals.insert(SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
+        #except:
+         #   return self.parseError(self.__sheetnames[3])
         
         try:
             Q1dict = SpreadsheetDict.createQuestionnaireDictionary(Q1, self.__md)
@@ -641,7 +646,7 @@ class Utils():
         #try:
         self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
         self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-        latitude = self.__xlWb.Worksheets(self.__sheetnames[8]).Range("Q7_Latitude")
+        
         self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
         
         # Code to skip a specific amount of columns

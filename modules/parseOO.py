@@ -29,6 +29,7 @@ from parseSpreadsheet import parseSpreadsheet
 import MySQLdb
 import pSQL
 from spreadsheetUtils import SpreadsheetDict as SD
+from spreadsheetUtils import Utils
 import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
 
@@ -40,50 +41,63 @@ class parseOO(parseSpreadsheet):
         self.__password = mysql_password
     
     def parse(self):
+        
+        __sheetnames = [u'Q1 GeneralData', 
+              u'Q2 EnergyConsumption', 
+              u'Q3_ Processes', 
+              u'Q3A', 
+              u'Q4H_HeatGeneration', 
+              u'Q4C_ColdGeneration', 
+              u'Q5_Distribution', 
+              u'Q6_HeatRecovery', 
+              u'Q7_ Renewables', 
+              u'Q8 Buildings', 
+              u'Q9 Economics']
+        
         dlg = DialogGauge(None,"OpenOffice Calc Parsing","reading document")
         self.__md = self.__connectToDB()
         xmlString = self.readOOContent(self.__filepath)
         dlg.update(10)
         parsedDom = xml.dom.minidom.parseString(xmlString)
         dlg.update(53)
-        __handle, lists = self.__getLists(parsedDom, dlg)
+        
+        __handle, lists = self.__getLists(parsedDom, dlg, __sheetnames)
+        DButil = Utils(self.__md, __sheetnames)
+        __handle = DButil.writeToDB(lists)
         dlg.update(100)
         dlg.Destroy()
         return __handle
         
-    def __getLists(self,ooWb,dlg): 
+    def __getLists(self,ooWb,dlg, sheetnames): 
         lists = []
         #if len(sheetnames)!=11:
         #    return self.__parseError("wrong number of Sheets"), []
         #try:
-        sheetname = "Q1 GeneralData"
-            
-        Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetname)      
-        Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetname)
-        Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetname)
-        QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetname)
+
+        Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetnames[0])      
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetnames[0])
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetnames[0])
+        QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetnames[0])
         #except:
         #    return "parseError Sheet Q1", []
             #return self.__parseError(sheetnames[0]), []
         dlg.update(60)
         #try:
-        sheetname = "Q2 EnergyConsumption"
-        Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetname)
-        QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetname) 
-        Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)    
-        Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetname) 
-        Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetname)  
-        QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetname)
+        Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetnames[1])
+        QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetnames[1]) 
+        Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetnames[1])    
+        Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetnames[1]) 
+        Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetnames[1])  
+        QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetnames[1])
         #except:
             #return "parseError Sheet Q2", []
             #return self.__parseError(sheetname), []
         dlg.update(68)
         #try:
-        sheetname = "Q3_ Processes"
-        Q3 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetname)
-        Q3+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetname)
-        Q3+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetname)
-        Q3+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetname)
+        Q3 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetnames[2])
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetnames[2])
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetnames[2])
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetnames[2])
  
         dlg.update(76)
         #except:
@@ -91,60 +105,54 @@ class parseOO(parseSpreadsheet):
             #return self.__parseError(sheetnames[2]), []
         #Q3A
         #try:    
-        sheetname = "Q3A"
-        
-        Q3+= self.parseOOxmlarea(ooWb, "Q3_ScheduleTolerance", sheetname)
-        Q3+= self.parseOOxmlarea(ooWb, "Q3_OperationCycle", sheetname)
+
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_ScheduleTolerance", sheetnames[3])
+        Q3+= self.parseOOxmlarea(ooWb, "Q3_OperationCycle", sheetnames[3])
         #except:
             #return self.__parseError(sheetnames[3]), []
             
         #try:    
         
-        sheetname = "Q7_ Renewables"
         QRenewables = []
-        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Interest", sheetname))
-        QRenewables += self.parseOOxmlarea(ooWb, "Q7_REReason", sheetname)
-        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Others", sheetname))
-        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetname)
-        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Biomass", sheetname)
+        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Interest", sheetnames[8]))
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_REReason", sheetnames[8])
+        QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Others", sheetnames[8]))
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetnames[8])
+        QRenewables += self.parseOOxmlarea(ooWb, "Q7_Biomass", sheetnames[8])
         
-        QSurf = self.parseOOxmlarea(ooWb, "Q7_Area", sheetname)
-        QSurf += self.parseOOxmlarea(ooWb, "Q7_Roof", sheetname)
+        QSurf = self.parseOOxmlarea(ooWb, "Q7_Area", sheetnames[8])
+        QSurf += self.parseOOxmlarea(ooWb, "Q7_Roof", sheetnames[8])
         #except:
             #return self.__parseError(sheetnames[8]), []
         dlg.update(84)
         #try:    
         sheetname = "Q3A"
         QProfiles = []
-        QProcNames = self.parseOOxmlarea(ooWb, "Q3A_ProcessName", sheetname)
-        
+        QProcNames = self.parseOOxmlarea(ooWb, "Q3A_ProcessName", sheetnames[3])
         for i in xrange(3):
-            QProfil = self.parseOOxmlarea(ooWb, "Q3A_Profiles_"+ str(i+1), sheetname)
+            QProfil = self.parseOOxmlarea(ooWb, "Q3A_Profiles_"+ str(i+1), sheetnames[3])
             QProfil.append(QProcNames[i*3])       
             QProfiles.append(QProfil)
 
-        QIntervals  = self.parseOOxmlarea(ooWb, "Q3A_StartTime_1", sheetname)
-        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_2", sheetname)
-        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_3", sheetname)
-        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_1", sheetname)
-        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_2", sheetname)
-        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_3", sheetname)
+        QIntervals  = self.parseOOxmlarea(ooWb, "Q3A_StartTime_1", sheetnames[3])
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_2", sheetnames[3])
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_3", sheetnames[3])
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_1", sheetnames[3])
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_2", sheetnames[3])
+        QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_3", sheetnames[3])
         #except:
             #return self.__parseError(sheetnames[3]), []
         dlg.update(92)
         #try:
         
-        sheetname = "Q9 Economics"
         Q9Questionnaire=[]
         for i in xrange(3):
-            Q9Questionnaire+=self.parseOOxmlarea(ooWb, "Q9_"+str(i+1), sheetname)
+            Q9Questionnaire+=self.parseOOxmlarea(ooWb, "Q9_"+str(i+1), sheetnames[10])
 
         #except:
             #return self.__parseError(sheetnames[10]), []
          
-        
         Q4_8=[]
-        
         # sheets with the same structure
         structureNames = ["Q4H_HeatGeneration",
                           "Q4C_ColdGeneration",
@@ -164,7 +172,11 @@ class parseOO(parseSpreadsheet):
                 #except:
                     #return structureNames[j] + " " + startStructure[j]+str(i+1),[]
                     #
-        #print Q4_8
+        
+        try:
+            latitude = self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetnames[8])
+        except:
+            return self.parseError(sheetnames[8])
         
         lists.append(Q1)
         lists.append(Q2)
@@ -173,10 +185,11 @@ class parseOO(parseSpreadsheet):
         lists.append(Q3)
         lists.append(QRenewables)
         lists.append(QSurf)
-        #lists.append(QProfiles)
+        lists.append(QProfiles)
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
+        lists.append(latitude)
      
 
         biglist = []
@@ -189,7 +202,19 @@ class parseOO(parseSpreadsheet):
                     try:
                         QList.append(float(str(elem).replace(',', '.')))
                     except:
-                        QList.append(elem)
+                        if type(elem) == type(QList):
+                           list = []
+                           for el in elem:
+                               try:
+                                   list.append(float(el))
+                               except:
+                                   try:
+                                       list.append(float(str(el).replace(',', '.')))
+                                   except:
+                                       list.append(el)
+                           QList.append(list)
+                        else:
+                            QList.append(elem)
             biglist.append(QList)
         print biglist
      
@@ -263,6 +288,7 @@ class parseOO(parseSpreadsheet):
             return
         tablerows = table.getElementsByTagName("table:table-row")
         data = []
+        appendData = []
         sumRepeatedCells=0
         # If only one cell is selected
         if len(cellrange)<4:
@@ -292,84 +318,62 @@ class parseOO(parseSpreadsheet):
             for j in xrange(1,ord(str(cellrange[2]).upper())-64+1):
                 try:
                     tablecell = tablecells[j-1]
-                    if(ord(str(cellrange[2]).upper())-64-sumRepeatedCells +0<j):
+                    if(ord(str(cellrange[2]).upper())-64 +0<j+sumRepeatedCells):
                         continue
                     
                     if tablecell.hasAttribute("table:number-columns-repeated"):
                         repeatedCells= int(tablecell.getAttribute("table:number-columns-repeated"))
                         if repeatedCells > 50:
                             continue
-                        for k in xrange(repeatedCells):
-                            data.append(None)
-                        sumRepeatedCells+=(repeatedCells-1)
+                        sumRepeatedCells=sumRepeatedCells+(repeatedCells-1)
+                        if j+sumRepeatedCells >= ord(str(cellrange[0]).upper())-64:
+                            if ord(str(cellrange[2]).upper()) - ord(str(cellrange[0]).upper()) >0:
+                                for k in xrange(repeatedCells):
+                                    data.append(None)
+                            else:
+                                data.append(None)
                         continue
                         
-                    if j >= ord(str(cellrange[0]).upper())-64:
+                    if j+sumRepeatedCells >= ord(str(cellrange[0]).upper())-64:
                         tabletext = tablecell.getElementsByTagName("text:p")
                         if(len(tabletext)<1):
                             data.append(None)
+                        elif len(tabletext) == 1:
+                            
+                            for elem in tabletext:
+                                while elem.hasChildNodes():
+                                    elem = elem.firstChild
+                                try:
+                                    if tablecell.hasAttribute("office:value-type"):
+                                        celltype = tablecell.getAttribute("office:value-type")
+                                        if celltype == "float":
+                                            cell = tablecell.getAttribute("office:value")
+                                            data.append(cell)
+                                            #data.append(str(elem.data).replace('.', ''))
+                                            continue
+                                    data.append(elem.data)
+                                except:
+                                    data.append(None)
                         else:
                             for elem in tabletext:
                                 while elem.hasChildNodes():
                                     elem = elem.firstChild
                                 try:
-                                    data.append(elem.data)
+                                    appendData.append(elem.data)
                                 except:
-                                    data.append(None)
+                                    pass
+                            dataelem = ""
+                            for elem1 in appendData:
+                                dataelem +=str(elem1)+"\n"
+                            try:
+                                data.append(SD._U(dataelem))
+                            except:
+                                data.append(None)
                 except:
                     pass
             
             
-        
-#        for i in xrange(int(cellrange[1]), int(cellrange[3])+1):
-#            tablecells = tablerows[i-1].childNodes
-#            # count repeatedCells
-#            repeatedcelllist = [0]
-#            for elem in tablecells:
-#                if(len(repeatedcelllist)>1):
-#                    if elem.hasAttribute("table:number-columns-repeated"):
-#                        repeatedcells= int(elem.getAttribute("table:number-columns-repeated"))
-#                        if repeatedcells < 10:
-#                            repeatedcelllist.append(repeatedcells+ repeatedcelllist[len(repeatedcelllist)-1]-1)
-#                    else:
-#                        repeatedcelllist.append(repeatedcelllist[len(repeatedcelllist)-1])
-#                else: 
-#                    if elem.hasAttribute("table:number-columns-repeated"):
-#                        repeatedcells= int(elem.getAttribute("table:number-columns-repeated"))
-#                        if repeatedcells < 10:
-#                            repeatedcelllist.append(repeatedcells-1)
-#                    else:
-#                        repeatedcelllist.append(0)
-#            sumRepeatedCells=0
-#            
-#            for j in xrange(ord(str(cellrange[0]).upper())-64, ord(str(cellrange[2]).upper())-64+1):
-#                try:
-#                    if(ord(str(cellrange[2]).upper())-64-sumRepeatedCells +1<j):
-#                        continue
-#                    
-#                    tabletext = tablecells[j-repeatedcelllist[j-1]-1].getElementsByTagName("text:p")
-#                    if(len(tabletext)<1):
-#                        #data.append(None)
-#                        if tablecells[j-1-repeatedcelllist[j-1]].hasAttribute("table:number-columns-repeated"):
-#                            repeatedcells= int(tablecells[j-1].getAttribute("table:number-columns-repeated"))
-#                            if repeatedcells ==1014 or repeatedcells == 1011:
-#                                continue
-#                            for i in xrange(repeatedcells):
-#                                data.append(None)
-#                            sumRepeatedCells+=repeatedcells
-#                            continue 
-#                        else:
-#                            data.append(None)
-#                    else:
-#                        for elem in tabletext:
-#                            while elem.hasChildNodes():
-#                                elem = elem.firstChild
-#                            try:
-#                                data.append(elem.data)
-#                            except:
-#                                data.append(None)
-#                except:
-#                    pass
+
 
            
 

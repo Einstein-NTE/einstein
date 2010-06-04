@@ -171,35 +171,12 @@ class parseExcel(parseSpreadsheet):
                 
             except:
                 return self.parseError(sheetnames[9])
+        try:
+            latitude = self.__xlWb.Worksheets(sheetnames[8]).Range("Q7_Latitude")
+        except:
+            return self.parseError(sheetnames[8])
         dlg.update(72)
 
-        lists.append(Q1)
-        lists.append(Q2)
-        lists.append(QProduct)
-        lists.append(QFuel)
-        lists.append(Q3)
-        lists.append(QRenewables)
-        lists.append(QSurf)
-        #lists.append(QProfiles)
-        lists.append(QIntervals)
-        lists.append(Q9Questionnaire)
-        lists.append(Q4_8)
-        
-        biglist = []
-        for listelem in lists:
-            QList = []
-            for elem in listelem:
-                try:
-                    QList.append(float(elem))
-                except:
-                    try:
-                        QList.append(float(str(elem).replace(',', '.')))
-                    except:
-                        QList.append(elem)
-            biglist.append(QList)
-        print biglist 
-
-        lists = []
         lists.append(Q1)
         lists.append(Q2)
         lists.append(QProduct)
@@ -211,23 +188,35 @@ class parseExcel(parseSpreadsheet):
         lists.append(QIntervals)
         lists.append(Q9Questionnaire)
         lists.append(Q4_8)
-       
-#        listelem = QProfiles
-#        #biglist = []
-#        #for listelem in lists:
-#        QList = []
-#        for elem in listelem:
-#            try:
-#                QList.append(float(elem))
-#            except:
-#                try:
-#                    QList.append(float(str(elem).replace(',', '.')))
-#                except:
-#                    QList.append(elem)
-#        print QList
-        #biglist.append(QList)
-        #print biglist
+        lists.append(latitude)
+        
+        biglist = []
+        for listelem in lists:
+            QList = []
+            for elem in listelem:
+                try:
+                    QList.append(float(elem))
+                except:
+                    try:
+                        QList.append(float(str(elem).replace(',', '.')))
+                    except:
+                        if type(elem) == type(QList):
+                           list = []
+                           for el in elem:
+                               try:
+                                   list.append(float(el))
+                               except:
+                                   try:
+                                       list.append(float(str(el).replace(',', '.')))
+                                   except:
+                                       list.append(el)
+                           QList.append(list)
+                        else:
+                            QList.append(elem)
+            biglist.append(QList)
+        print biglist
 
+       
         return "", lists
 
     
@@ -263,15 +252,15 @@ class parseExcel(parseSpreadsheet):
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
                     return Utils.parseError("Consistency")
                 
-        try:
-            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8 = lists
-        except:
-            self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-            return __handle
+#        try:
+#            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
+#        except:
+#            self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
+#            return __handle
         
         DButil = Utils(self.__md, self.__sheetnames)
         dlg.update(75)
-        __handle = DButil.writeToDB(Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, self.__xlWb)
+        __handle = DButil.writeToDB(lists)
         dlg.update(100)
         dlg.Destroy()
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
