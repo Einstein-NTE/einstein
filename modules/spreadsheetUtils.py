@@ -25,6 +25,8 @@
 #
 #==============================================================================
 
+import re
+
 class SpreadsheetDict():
 
     @staticmethod
@@ -45,8 +47,18 @@ class SpreadsheetDict():
             return "no valid number" 
 
     @staticmethod
+    def parseDate(date):
+        if date != None:
+            split = re.split('\W+', date)
+            print split
+            return "2007-"+ split[1]+"-"+split[0], "2007-"+ split[3]+"-"+split[2]
+        else:
+            return None, None
+        
+    @staticmethod
     def createQuestionnaireDictionary(Q1,db_conn):
         Q1dict = {}
+
         Q1dict['Name']= Q1[0]
         Q1dict['City']= Q1[2]
         Q1dict['Contact']= Q1[4]
@@ -423,8 +435,6 @@ class SpreadsheetDict():
         Q7dict['AlternativeProposalNo'] = -1
         return Q7dict        
     
-
-    
     
     @staticmethod
     def createQSurfDictionary(QSurfarea,db_conn):
@@ -448,6 +458,11 @@ class SpreadsheetDict():
     def createQ8Dictionary(Q8,db_conn):
         Q8dict = {}
     
+        index = 0
+        for elem in Q8:
+            print str(index) + ". " + str(elem)
+            index+=1
+    
         Q8dict['BuildName'] = Q8[0]
         Q8dict['BuildConstructSurface'] = Q8[1]
         Q8dict['BuildUsefulSurface'] = Q8[2]
@@ -464,6 +479,11 @@ class SpreadsheetDict():
         Q8dict['BuildDailyDHW'] = Q8[13]
         Q8dict['BuildTHeating'] = Q8[14]
         Q8dict['BuildTAirCond'] = Q8[15]
+        datestart, dateend = SpreadsheetDict.parseDate(Q8[16])
+        if datestart != None:
+            Q8dict['BuildHolidaysPeriodStart_1'] = datestart
+        if dateend != None:
+            Q8dict['BuildHolidaysPeriodStop_1'] = dateend
         # date Q8dict[''] = Q8[16]
         # date Q8dict[''] = Q8[17]
         
@@ -627,12 +647,12 @@ class Utils():
             except:
                 return self.parseError(self.__sheetnames[7])
                 
-            try:
-                Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
-                Q8dict[quest_id]=Questionnaire_ID
-                self.__md.qbuildings.insert(Q8dict)
-            except:
-                return self.parseError(self.__sheetnames[9])
+            #try:
+            Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
+            Q8dict[quest_id]=Questionnaire_ID
+            self.__md.qbuildings.insert(Q8dict)
+            #except:
+             #   return self.parseError(self.__sheetnames[9])
                 
                 
                 
