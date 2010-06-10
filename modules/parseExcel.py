@@ -99,6 +99,7 @@ class parseExcel(parseSpreadsheet):
             sht= xlWb.Worksheets(sheetnames[3])
             Q3+= Utils.tupleToList(sht.Range("Q3_ScheduleTolerance"))
             Q3+= Utils.tupleToList(sht.Range("Q3_OperationCycle"))
+            Q3+= Utils.tupleToList(sht.Range("Q3_ScheduleCorrelation"))
         except:
             return Utils.parseError(sheetnames[3]), []
         dlg.update(40)    
@@ -190,6 +191,8 @@ class parseExcel(parseSpreadsheet):
         lists.append(Q4_8)
         lists.append(latitude)
         
+        
+        """
         biglist = []
         for listelem in lists:
             QList = []
@@ -215,7 +218,7 @@ class parseExcel(parseSpreadsheet):
                             QList.append(elem)
             biglist.append(QList)
         print biglist
-
+        """
        
         return "", lists
 
@@ -252,11 +255,6 @@ class parseExcel(parseSpreadsheet):
                     self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
                     return Utils.parseError("Consistency")
                 
-#        try:
-#            Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
-#        except:
-#            self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
-#            return __handle
         
         DButil = Utils(self.__md, self.__sheetnames)
         dlg.update(75)

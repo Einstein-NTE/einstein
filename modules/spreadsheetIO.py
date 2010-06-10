@@ -61,6 +61,5 @@ class ImportQ(object):
             wx.MessageBox('File corrupted', 'Info')
         
          
-
-        
         #conn.close()
+        
