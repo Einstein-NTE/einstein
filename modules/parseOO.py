@@ -62,6 +62,8 @@ class parseOO(parseSpreadsheet):
         dlg.update(53)
         
         __handle, lists = self.__getLists(parsedDom, dlg, __sheetnames)
+        if len(lists)==0:
+            return __handle
         DButil = Utils(self.__md, __sheetnames)
         __handle = DButil.writeToDB(lists)
         dlg.update(100)
