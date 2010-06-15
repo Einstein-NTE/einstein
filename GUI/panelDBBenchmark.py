@@ -121,9 +121,9 @@ class PanelDBBenchmark(PanelDBBase):
                                       tip = _U("Show only"))
 
         #
-        # tab 1 - Validity of benchmark – association with industrial sector, unit operation and product type
+        # tab 1 - Validity of benchmark - association with industrial sector, unit operation and product type
         #
-        self.frame_validity_of_benchmark = wx.StaticBox(self.page1, -1, _U("Validity of benchmark – association with industrial sector, unit operation and product type"))
+        self.frame_validity_of_benchmark = wx.StaticBox(self.page1, -1, _U("Validity of benchmark - association with industrial sector, unit operation and product type"))
         self.frame_validity_range = wx.StaticBox(self.page1, -1, _U("Validity range for benchmark (general)"))
         self.frame_limits_of_validity = wx.StaticBox(self.page1, -1, _U("Limits of validity range depending on company size / production volume"))
         self.frame_data_source = wx.StaticBox(self.page1, -1, _U("Data source"))
@@ -593,10 +593,7 @@ class PanelDBBenchmark(PanelDBBase):
         tmp = {
                "NACECode":check(self.tc1.GetValue(text = True)),
                "UnitOp":check(findKey(unitOpDict, self.tc2.GetValue(text = True))),
-
-                # FIXXXME where do i get the ProductCodes for the ChoiceEntry from?
-               #"ProductCode":check(self.tc3.GetValue()),
-
+               "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
                "ProductUnit":check(self.tc5.GetValue()),
                "Comments":check(self.tc6.GetValue()),
@@ -650,6 +647,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.fillChoiceOfNaceCode(self.tc1.entry)
         self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
+        self.fillChoiceOfProductCodes(self.tc3.entry)
         unitOpDict = Status.prj.getUnitOpDict()
 
         if q is not None:
@@ -666,10 +664,8 @@ class PanelDBBenchmark(PanelDBBase):
                 self.tc1.entry.SetStringSelection("None")
             if q.UnitOp is not None:
                 self.tc2.SetValue(unitOpDict[int(q.UnitOp)]) if int(q.UnitOp) in unitOpDict.keys() else ''
-
-            # FIXXXME fill in the proper product codes
-            #self.tc3.SetValue(q.ProductCode)
-
+            if q.ProductCode is not None:
+                self.tc3.SetValue(PRODUCTCODES[str(q.ProductCode)]) if str(q.ProductCode) in PRODUCTCODES.keys() else ''
             self.tc4.SetValue(str(q.Product)) if q.Product is not None else ''
             self.tc5.SetValue(str(q.ProductUnit)) if q.ProductUnit is not None else ''
             self.tc6.SetValue(str(q.Comments)) if q.Comments is not None else ''

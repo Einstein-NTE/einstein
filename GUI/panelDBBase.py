@@ -237,11 +237,9 @@ class PanelDBBase(wx.Dialog):
         return naceList
 
     def getProductCodeList(self):
-        productCodeTable = Status.DB.lproductcode.LProductCode_ID['%']
         productCodeList = []
-        for entry in productCodeTable:
-            productCode = entry.ProductCode
-            productCodeList.append(str(productCode))
+        for entry in PRODUCTCODES.values():
+            productCodeList.append(str(entry))
         productCodeList.sort()
         return productCodeList
 

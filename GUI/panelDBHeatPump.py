@@ -274,7 +274,7 @@ class PanelDBHeatPump(PanelDBBase):
 
         self.tc26 = ChoiceEntry(self.page3,
                                 values = [],
-                                label = _U("HPAbsEffects"),
+                                label = _U("HPSourceSink"),
                                 tip = _U("Heat source and sink"))
 
         self.tc27 = FloatEntry(self.page3,
