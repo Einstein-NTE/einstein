@@ -55,7 +55,7 @@ class PanelDBHeatPump(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "HeatPump"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(120)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBHeatPump(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBHeatPump", self.name)
 
-        # DBHeatPump_ID needs to remain as first entry
+        # DBHeatPump_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBHeatPump_ID", "HPManufacturer", "HPModel", "HPType", "HPSubType", "HPHeatCAP"
 
         self.db = Status.DB.dbheatpump

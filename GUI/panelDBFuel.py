@@ -55,7 +55,7 @@ class PanelDBFuel(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Fuel"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(145)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBFuel(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBFuel", self.name)
 
-        # DBFuel_ID needs to remain as first entry
+        # DBFuel_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBFuel_ID", "FuelName", "FuelType", "DBFuelUnit"
 
         self.db = Status.DB.dbfuel

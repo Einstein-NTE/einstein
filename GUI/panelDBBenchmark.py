@@ -55,7 +55,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Benchmark"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(120)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBBenchmark", self.name)
 
-        # DBBenchmark_ID needs to remain as first entry
+        # DBBenchmark_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "ProductUnit"
 
         self.db = Status.DB.dbbenchmark

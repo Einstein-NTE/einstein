@@ -55,7 +55,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "SolarThermal"
         self._init_ctrls(parent)
-        self._init_grid(125)
+        self._init_grid(155)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBSolarThermal(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBSolarThermal", self.name)
 
-        # DBSolarThermal_ID needs to remain as first entry
+        # DBSolarThermal_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBSolarThermal_ID", "STManufacturer", "STModel", "STType", "STPnomColl"
 
         self.db = Status.DB.dbsolarthermal

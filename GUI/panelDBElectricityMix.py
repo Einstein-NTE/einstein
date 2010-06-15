@@ -55,7 +55,7 @@ class PanelDBElectricityMix(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "ElectricityMix"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(145)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBElectricityMix(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBElectricityMix", self.name)
 
-        # id needs to remain as first entry
+        # id needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "id", "Country", "Year", "Type"
 
         self.db = Status.DB.dbelectricitymix

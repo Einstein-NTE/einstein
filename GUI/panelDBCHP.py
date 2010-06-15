@@ -55,7 +55,7 @@ class PanelDBCHP(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "CHP"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(125)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBCHP(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBCHP", self.name)
 
-        # DBCHP_ID needs to remain as first entry
+        # DBCHP_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBCHP_ID", "Manufacturer", "CHPequip", "Type", "SubType", "CHPPt"
 
         self.db = Status.DB.dbchp

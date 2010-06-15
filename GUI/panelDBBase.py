@@ -101,7 +101,10 @@ class PanelDBBase(wx.Dialog):
         for i in range(len(self.colLabels)):
             self.grid.SetColLabelValue(i, _U(self.colLabels[i]))
 
-        self.grid.SetGridCursor(0, 0)
+        self.grid.SetColMinimalAcceptableWidth(0)
+        self.grid.SetColSize(0, 0)
+
+        self.grid.SetGridCursor(0, 1)
 
 #------------------------------------------------------------------------------
 #--- UI actions

@@ -55,7 +55,7 @@ class PanelDBFluid(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Fluid"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(155)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBFluid(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBFluid", self.name)
 
-        # DBFluid_ID needs to remain as first entry
+        # DBFluid_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBFluid_ID", "FluidName", "RefrigerantCode"
 
         self.db = Status.DB.dbfluid
