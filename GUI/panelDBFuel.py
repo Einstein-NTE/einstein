@@ -319,16 +319,10 @@ class PanelDBFuel(PanelDBBase):
             self.theId = -1
             return
 
-        
-
-# FIXXXME
-        fuelDict = []
-        fuelUnitDict = []
-
         tmp = {
                "FuelName":check(self.tc1.GetValue()),
                "FuelType":check(self.tc2.GetValue(text = True)),
-#               "DBFuelUnit":check(findKey(fuelUnitDict, self.tc3.GetValue(text = True))),
+               "DBFuelUnit":check(self.tc3.GetValue(text = True)),
                "FuelDataSource":check(self.tc4.GetValue()),
                "FuelComment":check(self.tc5.GetValue()),
                "FuelLCV":check(self.tc6.GetValue()),
@@ -356,16 +350,14 @@ class PanelDBFuel(PanelDBBase):
         self.clear()
 
         self.fillChoiceOfDBFuelType(self.tc2.entry)
-
-# FIXXXME
-        #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
+        self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.FuelName)) if q.FuelName is not None else ''
             if q.FuelType is not None:
                 self.tc2.entry.SetStringSelection(q.FuelType)
-#            if q.DBFuelUnit is not None:
-#                self.tc3.SetValue(fuelUnitDict[int(q.DBFuelUnit)]) if int(q.DBFuelUnit) in fuelUnitDict.keys() else ''
+            if q.DBFuelUnit is not None:
+                self.tc3.SetValue(str(q.DBFuelUnit)) if str(q.DBFuelUnit) in UNITS["MASSORVOLUME"].keys() else ''
             self.tc4.SetValue(str(q.FuelDataSource)) if q.FuelDataSource is not None else ''
             self.tc5.SetValue(str(q.FuelComment)) if q.FuelComment is not None else ''
             self.tc6.SetValue(str(q.FuelLCV)) if q.FuelLCV is not None else ''
@@ -398,9 +390,8 @@ class PanelDBFuel(PanelDBBase):
         self.tc15.SetValue('')
 
     def fillChoices(self):
-# FIXXXME
         self.fillChoiceOfDBFuelType(self.tc2.entry)
-        #self.fillChoiceOfDBFuelUnits(self.tc3.entry)
+        self.fillChoiceOfDBFuelUnits(self.tc3.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):
@@ -409,6 +400,7 @@ class PanelDBFuel(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            self.tc2.GetValue(text = True) == "None" and\
+           self.tc3.GetValue(text = True) == "None" and\
            len(self.tc4.GetValue()) == 0 and\
            len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\

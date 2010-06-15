@@ -253,6 +253,13 @@ class PanelDBBase(wx.Dialog):
         fuelTypeList.sort()
         return fuelTypeList
 
+    def getFuelUnitList(self):
+        fuelUnitsList = []
+        for entry in UNITS["MASSORVOLUME"]:
+            fuelUnitsList.append(str(entry))
+        fuelUnitsList.sort()
+        return fuelUnitsList
+
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
         fillChoice(entry, naceList)
@@ -269,6 +276,10 @@ class PanelDBBase(wx.Dialog):
         fuelDict = Status.prj.getFuelDict()
         fuelList = fuelDict.values()
         fillChoice(entry, fuelList)
+
+    def fillChoiceOfDBFuelUnits(self, entry):
+        fuelUnitList = self.getFuelUnitList()
+        fillChoice(entry, fuelUnitList)
 
     def fillChoiceOfDBUnitOpCodes(self, entry):
         unitOpDict = Status.prj.getUnitOpDict()
