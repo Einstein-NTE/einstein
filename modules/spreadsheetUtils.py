@@ -691,11 +691,7 @@ class Utils():
     
     def writeToDB(self,lists):
         Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
-        try:
-            q2dict = SpreadsheetDict.createQElectricityDictionary(Q2, self.__md)
-            self.__md.qelectricity.insert(q2dict)
-        except:
-            return self.parseError(self.__sheetnames[1])
+
 
         #try:
 #        for i in xrange(3):
@@ -727,6 +723,14 @@ class Utils():
         except: 
             return self.parseError("No Questionnare ID Found")
         quest_id = 'Questionnaire_id'
+        
+        try:
+            q2dict = SpreadsheetDict.createQElectricityDictionary(Q2, self.__md)
+            q2dict[quest_id]=Questionnaire_ID
+            self.__md.qelectricity.insert(q2dict)
+        except:
+            return self.parseError(self.__sheetnames[1])
+        
         Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
 
 
