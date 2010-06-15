@@ -760,7 +760,8 @@ class PanelST(wx.Panel):
 #------------------------------------------------------------------------------		
 #   opens the dialog for manual selection of a collector
 #------------------------------------------------------------------------------		
-        self.dbe = DBEditFrame(self, _U("Select solar collector"), "dbsolarthermal", 0, False)
+        #self.dbe = DBEditFrame(self, _U("Select solar collector"), "dbsolarthermal", 0, False)
+        self.dbe = PanelDBSolarThermal(self, "Edit DBSolarThermal", True)
         if self.dbe.ShowModal() == wx.ID_OK:
             self.theId = self.dbe.theId
             self.selectedCollector = self.theId
