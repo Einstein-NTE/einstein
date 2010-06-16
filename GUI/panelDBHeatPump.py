@@ -495,11 +495,11 @@ class PanelDBHeatPump(PanelDBBase):
                "HPThCoolCOP":check(self.tc23.GetValue()),
                "HPExHeatCOP":check(self.tc24.GetValue()),
                "HPThHeatCOP":check(self.tc25.GetValue()),
-#               "HPSourceSink":check(self.tc26.GetValue()),
+               "HPSourceSink":check(self.tc26.GetValue(text = True)),
                "HPLimDT":check(self.tc27.GetValue()),
                "HPCondTmax":check(self.tc28.GetValue()),
                "HPEvapTmin":check(self.tc29.GetValue()),
-#               "HPAbsHeatMed":check(self.tc30.GetValue()),
+               "HPAbsHeatMed":check(self.tc30.GetValue(text = True)),
                "HPGenTmin":check(self.tc31.GetValue()),
                "HPPrice":check(self.tc32.GetValue()),
                "HPTurnKeyPrice":check(self.tc33.GetValue()),
@@ -522,6 +522,8 @@ class PanelDBHeatPump(PanelDBBase):
 
         fuelDict = Status.prj.getFuelDict()
         self.fillChoiceOfDBFuel(self.tc11.entry)
+        self.fillChoiceOfHPSourceSink(self.tc26.entry)
+        self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.HPManufacturer)) if q.HPManufacturer is not None else ''
@@ -603,6 +605,8 @@ class PanelDBHeatPump(PanelDBBase):
 
     def fillChoices(self):
         self.fillChoiceOfDBFuel(self.tc11.entry)
+        self.fillChoiceOfHPSourceSink(self.tc26.entry)
+        self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 

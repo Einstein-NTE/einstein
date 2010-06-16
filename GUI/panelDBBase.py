@@ -102,7 +102,7 @@ class PanelDBBase(wx.Dialog):
             self.grid.SetColLabelValue(i, _U(self.colLabels[i]))
 
         self.grid.SetColMinimalAcceptableWidth(0)
-        self.grid.SetColSize(0, 0)
+#        self.grid.SetColSize(0, 0)
 
         self.grid.SetGridCursor(0, 1)
 
@@ -156,11 +156,6 @@ class PanelDBBase(wx.Dialog):
         event.Skip()
 
     def OnChoiceEntryClick(self, event):
-        self.grid.ClearGrid()
-        self.grid.ClearSelection()
-        for i in range(self.grid.GetNumberRows()):
-            self.grid.DeleteRows()
-        self.fillEquipmentList()
         event.Skip()
 
 #------------------------------------------------------------------------------
@@ -248,7 +243,7 @@ class PanelDBBase(wx.Dialog):
         fuelTypeList = []
         for entry in fuelTypeTable:
             fuelType = entry.FuelType
-            if str(fuelType) not in fuelTypeList:
+            if str(fuelType) not in fuelTypeList and len(str(fuelType)) > 0:
                 fuelTypeList.append(str(fuelType))
         fuelTypeList.sort()
         return fuelTypeList
@@ -289,6 +284,26 @@ class PanelDBBase(wx.Dialog):
                 tUnitList.append(str(tUnit))
         tUnitList.sort()
         return tUnitList
+
+    def getSourceSinkList(self):
+        sourceSinkTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
+        sourceSinkList = []
+        for entry in sourceSinkTable:
+            sourceSink = entry.HPSourceSink
+            if str(sourceSink) not in sourceSinkList and len(str(sourceSink)) > 0:
+                sourceSinkList.append(str(sourceSink))
+        sourceSinkList.sort()
+        return sourceSinkList
+
+    def getAbsHeatMedList(self):
+        absHeatMedTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
+        absHeatMedList = []
+        for entry in absHeatMedTable:
+            absHeatMed = entry.HPAbsHeatMed
+            if str(absHeatMed) not in absHeatMedList and len(str(absHeatMed)) > 0:
+                absHeatMedList.append(str(absHeatMed))
+        absHeatMedList.sort()
+        return absHeatMedList
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
@@ -331,6 +346,16 @@ class PanelDBBase(wx.Dialog):
     def fillChoiceOfTUnit(self, entry):
         productUnitList = self.getTUnitList()
         fillChoice(entry, productUnitList)
+
+    def fillChoiceOfHPSourceSink(self, entry):
+        sourceSinkList = self.getSourceSinkList()
+        appendNone = False if "None" in sourceSinkList else True;
+        fillChoice(entry, sourceSinkList, appendNone)
+
+    def fillChoiceOfHPAbsHeatMed(self, entry):
+        absHeatMedList = self.getAbsHeatMedList()
+        appendNone = False if "None" in absHeatMedList else True;
+        fillChoice(entry, absHeatMedList, appendNone)
 
     def fillChoiceOfType(self):
         try:
