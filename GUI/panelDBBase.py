@@ -248,7 +248,7 @@ class PanelDBBase(wx.Dialog):
         fuelTypeList = []
         for entry in fuelTypeTable:
             fuelType = entry.FuelType
-            if fuelType not in fuelTypeList:
+            if str(fuelType) not in fuelTypeList:
                 fuelTypeList.append(str(fuelType))
         fuelTypeList.sort()
         return fuelTypeList
@@ -259,6 +259,36 @@ class PanelDBBase(wx.Dialog):
             fuelUnitsList.append(str(entry))
         fuelUnitsList.sort()
         return fuelUnitsList
+
+    def getEUnitList(self):
+        eUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        eUnitList = []
+        for entry in eUnitTable:
+            eUnit = entry.E_Unit
+            if str(eUnit) not in eUnitList and len(str(eUnit)) > 0:
+                eUnitList.append(str(eUnit))
+        eUnitList.sort()
+        return eUnitList
+
+    def getHUnitList(self):
+        hUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        hUnitList = []
+        for entry in hUnitTable:
+            hUnit = entry.H_Unit
+            if str(hUnit) not in hUnitList and len(str(hUnit)) > 0:
+                hUnitList.append(str(hUnit))
+        hUnitList.sort()
+        return hUnitList
+
+    def getTUnitList(self):
+        tUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        tUnitList = []
+        for entry in tUnitTable:
+            tUnit = entry.T_Unit
+            if str(tUnit) not in tUnitList and len(str(tUnit)) > 0:
+                tUnitList.append(str(tUnit))
+        tUnitList.sort()
+        return tUnitList
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
@@ -289,6 +319,18 @@ class PanelDBBase(wx.Dialog):
     def fillChoiceYesNo(self, entry):
         values = ["Yes", "No"]
         fillChoice(entry, values, False)
+
+    def fillChoiceOfEUnit(self, entry):
+        productUnitList = self.getEUnitList()
+        fillChoice(entry, productUnitList)
+
+    def fillChoiceOfHUnit(self, entry):
+        productUnitList = self.getHUnitList()
+        fillChoice(entry, productUnitList)
+
+    def fillChoiceOfTUnit(self, entry):
+        productUnitList = self.getTUnitList()
+        fillChoice(entry, productUnitList)
 
     def fillChoiceOfType(self):
         try:
