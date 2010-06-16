@@ -102,7 +102,7 @@ class PanelDBBase(wx.Dialog):
             self.grid.SetColLabelValue(i, _U(self.colLabels[i]))
 
         self.grid.SetColMinimalAcceptableWidth(0)
-#        self.grid.SetColSize(0, 0)
+        self.grid.SetColSize(0, 0)
 
         self.grid.SetGridCursor(0, 1)
 
