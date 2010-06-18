@@ -1,0 +1,212 @@
+# -*- coding: iso-8859-15 -*-
+#==============================================================================
+#
+#    E I N S T E I N
+#
+#       Expert System for an Intelligent Supply of Thermal Energy in Industry
+#       (<a href="http://www.iee-einstein.org/" target="_blank">www.iee-einstein.org</a>)
+#
+#------------------------------------------------------------------------------
+#
+#    parseSpreadsheet.py
+#
+#==============================================================================
+#
+#   EINSTEIN Version No.: 1.0
+#   Created by:     André Rattinger 29/03/2010
+#
+#------------------------------------------------------------------------------
+#    (C) copyleft energyXperts.BCN (E4-Experts SL), Barcelona, Spain 2008
+#    http://www.energyxperts.net/
+#
+#    This program is free software: you can redistribute it or modify it under
+#    the terms of the GNU general public license as published by the Free
+#    Software Foundation (www.gnu.org).
+#
+#==============================================================================
+from parseExcel import ExcelSpreadsheetParser
+from parseOO import OOSpreadsheetParser
+from parseSpreadsheet import parseSpreadsheet
+import MySQLdb
+import pSQL
+from spreadsheetUtils import SpreadsheetDict as SD
+from spreadsheetUtils import Utils
+import xml.dom.minidom, zipfile
+from dialogGauge import DialogGauge
+class SpreadsheetProcessing():
+    
+    def __init__(self, inputfile, DBUser, DBPass, fileending):
+        self.__filepath=inputfile
+        self.__username = DBUser
+        self.__password = DBPass
+        self.__fileending = fileending
+        self.__md = self.__connectToDB()
+        if fileending == 'xls':
+            self.spreadsheetparser = ExcelSpreadsheetParser(inputfile, DBUser, DBPass)
+            self.__sheetnames = self.spreadsheetparser.sheetnames
+            self.__dialog = ["Excel Parsing","reading document"]
+        elif fileending == 'ods':
+            self.spreadsheetparser = OOSpreadsheetParser(inputfile, DBUser, DBPass)
+            self.__sheetnames = self.spreadsheetparser.sheetnames
+            self.__dialog = ["OpenOffice Calc Parsing","reading document"]
+            
+            
+    def parse(self):
+        dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
+        self.spreadsheetparser.startProcessing()
+        __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
+        DButil = Utils(self.__md, self.__sheetnames)
+        __handle = DButil.writeToDB(lists)
+        self.spreadsheetparser.endProcessing()
+        dlg.Destroy()
+        return __handle
+        
+    def __getLists(self, sheetnames, dlg, spreadsheetparser):
+        lists = []
+        if len(sheetnames)!=11:
+            return Utils.parseError("wrong number of Sheets"), []
+        try:
+            sht = sheetnames[0]
+            Q1=spreadsheetparser.parseRange("Q1_GeneralData",sht)    
+            Q1+=spreadsheetparser.parseRange("Q1_StatisticalData",sht)
+            Q1+=spreadsheetparser.parseRange("Q1_Operation",sht)
+            QProduct =spreadsheetparser.parseRange("Q1_Products",sht)
+        except:
+            return Utils.parseError(sheetnames[0]), []
+        dlg.update(13)
+        try:
+            sht = sheetnames[1]
+            Q1+=spreadsheetparser.parseRange("Q1_Percent",sht)
+            QProduct+=spreadsheetparser.parseRange("Q2_Products",sht)
+            Q2 = spreadsheetparser.parseRange("Q2_EnergyConsumption",sht)
+            Q2 += spreadsheetparser.parseRange("Q2_ElectricityConsumption",sht)
+            Q2 += spreadsheetparser.parseRange("Q2_EnergyConsumptionProduct",sht)
+            QFuel = spreadsheetparser.parseRange("Q2_EnergyConsumption",sht)
+        except:
+            return Utils.parseError(sheetnames[1]), []
+        dlg.update(22)
+        try:
+            sht = sheetnames[2]
+            Q3 = spreadsheetparser.parseRange("Q3_ProcessData",sht)
+            Q3 += spreadsheetparser.parseRange("Q3_WasteHeat",sht)
+            Q3 += spreadsheetparser.parseRange("Q3_Schedule",sht) 
+            Q3 += spreadsheetparser.parseRange("Q3_DataOfExistingHCSupply",sht) 
+        except:
+            return Utils.parseError(sheetnames[2]), []
+        dlg.update(31)
+        try:    
+            sht= sheetnames[3]
+            Q3+= spreadsheetparser.parseRange("Q3_ScheduleTolerance",sht)
+            Q3+= spreadsheetparser.parseRange("Q3_OperationCycle",sht)
+            Q3+= spreadsheetparser.parseRange("Q3_ScheduleCorrelation",sht)
+        except:
+            return Utils.parseError(sheetnames[3]), []
+        dlg.update(40)    
+        try: 
+            
+            if(self.__fileending == 'xls'):   
+                sht = sheetnames[8]
+                QRenewables = []
+                QRenewables += spreadsheetparser.parseRange("Q7_Interest",sht)
+                QRenewables += spreadsheetparser.parseRange("Q7_REReason",sht)
+                QRenewables += spreadsheetparser.parseRange("Q7_Others",sht)
+                QRenewables += spreadsheetparser.parseRange("Q7_Latitude",sht)
+                QRenewables += spreadsheetparser.parseRange("Q7_Biomass",sht)
+            else:
+                QRenewables = []
+                QRenewables.append(spreadsheetparser.parseRange( "Q7_Interest", sheetnames[8]))
+                QRenewables += spreadsheetparser.parseRange( "Q7_REReason", sheetnames[8])
+                QRenewables.append(spreadsheetparser.parseRange( "Q7_Others", sheetnames[8]))
+                QRenewables += spreadsheetparser.parseRange( "Q7_Latitude", sheetnames[8])
+                QRenewables += spreadsheetparser.parseRange( "Q7_Biomass", sheetnames[8])
+                                                                
+            
+            QSurf = spreadsheetparser.parseRange("Q7_Area",sht)
+            QSurf += spreadsheetparser.parseRange("Q7_Roof",sht)
+        except:
+            return Utils.parseError(sheetnames[8]), []
+        dlg.update(49)  
+        try:    
+            sht = sheetnames[3]
+            QProfiles = []
+            QProcNames = spreadsheetparser.parseRange("Q3A_ProcessName",sht)
+            for i in xrange(3):
+                QProfil = spreadsheetparser.parseRange("Q3A_Profiles_"+ str(i+1), sht)
+                QProfil.append(QProcNames[i*3])
+                QProfiles.append(QProfil)
+        
+            QIntervals  = spreadsheetparser.parseRange("Q3A_StartTime_1",sht)
+            QIntervals += spreadsheetparser.parseRange("Q3A_StartTime_2",sht)
+            QIntervals += spreadsheetparser.parseRange("Q3A_StartTime_3",sht)
+            QIntervals += spreadsheetparser.parseRange("Q3A_EndTime_1",sht)
+            QIntervals += spreadsheetparser.parseRange("Q3A_EndTime_2",sht)
+            QIntervals += spreadsheetparser.parseRange("Q3A_EndTime_3",sht)
+        except:
+            return Utils.parseError(sheetnames[3]), []
+        dlg.update(57)
+        try:
+            sht = sheetnames[10]
+            Q9Questionnaire=[]
+            for i in xrange(3):
+                Q9Questionnaire+=spreadsheetparser.parseRange("Q9_"+str(i+1),sht)
+        except:
+            return Utils.parseError(sheetnames[10]), []
+            
+        dlg.update(66)
+        
+        Q4_8=[]
+        # sheets with the same structure
+        structureNames = ["Q4H_HeatGeneration",
+                          "Q4C_ColdGeneration",
+                          "Q5_Distribution",
+                          "Q6_HeatRecovery",
+                          "Q8 Buildings"]
+        
+        startStructure = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
+        
+        
+        # Change to xrange(5) to get all sheets --> Q4C_5
+        for i in xrange(5):
+            for j in xrange(len(structureNames)):
+                try:
+                    Q4_8.append(spreadsheetparser.parseRange( startStructure[j]+str(i+1), structureNames[j]))
+                except:
+                    return structureNames[j] + " " + startStructure[j]+str(i+1),[]
+                    
+        
+        try:
+            sht = sheetnames[8]
+            latitude = spreadsheetparser.parseRange("Q7_Latitude",sht)
+        except:
+            return self.parseError(sheetnames[8])
+        dlg.update(72)
+
+        lists.append(Q1)
+        lists.append(Q2)
+        lists.append(QProduct)
+        lists.append(QFuel)
+        lists.append(Q3)
+        lists.append(QRenewables)
+        lists.append(QSurf)
+        lists.append(QProfiles)
+        lists.append(QIntervals)
+        lists.append(Q9Questionnaire)
+        lists.append(Q4_8)
+        lists.append(latitude)
+        
+        return "", lists
+    
+    def __connectToDB(self):
+        __conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
+        __md = pSQL.pSQL(__conn, "einstein")
+        return __md
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -29,6 +29,7 @@
 from xmlIO import *
 from parseExcel import *
 from parseOO import *
+from SpreadsheetProcessing import *
 
 def _U(text):
     try:
@@ -52,10 +53,10 @@ class ImportQ(object):
         
         frame = wx.GetApp().GetTopWindow()
         if self.infile.endswith('xls'):
-            pe = parseExcel(self.infile,frame.DBUser,frame.DBPass)
+            pe = SpreadsheetProcessing(self.infile, frame.DBUser, frame.DBPass, 'xls')
             wx.MessageBox(pe.parse(), 'Info')
         elif self.infile.endswith('ods'):
-            pe = parseOO(self.infile,frame.DBUser,frame.DBPass)
+            pe = SpreadsheetProcessing(self.infile, frame.DBUser, frame.DBPass, 'ods')
             wx.MessageBox(pe.parse(), 'Info')
         else:
             wx.MessageBox('File corrupted', 'Info')
