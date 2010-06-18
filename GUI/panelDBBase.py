@@ -101,7 +101,10 @@ class PanelDBBase(wx.Dialog):
         for i in range(len(self.colLabels)):
             self.grid.SetColLabelValue(i, _U(self.colLabels[i]))
 
-        self.grid.SetGridCursor(0, 0)
+        self.grid.SetColMinimalAcceptableWidth(0)
+        self.grid.SetColSize(0, 0)
+
+        self.grid.SetGridCursor(0, 1)
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -153,11 +156,6 @@ class PanelDBBase(wx.Dialog):
         event.Skip()
 
     def OnChoiceEntryClick(self, event):
-        self.grid.ClearGrid()
-        self.grid.ClearSelection()
-        for i in range(self.grid.GetNumberRows()):
-            self.grid.DeleteRows()
-        self.fillEquipmentList()
         event.Skip()
 
 #------------------------------------------------------------------------------
@@ -234,11 +232,9 @@ class PanelDBBase(wx.Dialog):
         return naceList
 
     def getProductCodeList(self):
-        productCodeTable = Status.DB.lproductcode.LProductCode_ID['%']
         productCodeList = []
-        for entry in productCodeTable:
-            productCode = entry.ProductCode
-            productCodeList.append(str(productCode))
+        for entry in PRODUCTCODES.values():
+            productCodeList.append(str(entry))
         productCodeList.sort()
         return productCodeList
 
@@ -247,10 +243,67 @@ class PanelDBBase(wx.Dialog):
         fuelTypeList = []
         for entry in fuelTypeTable:
             fuelType = entry.FuelType
-            if fuelType not in fuelTypeList:
+            if str(fuelType) not in fuelTypeList and len(str(fuelType)) > 0:
                 fuelTypeList.append(str(fuelType))
         fuelTypeList.sort()
         return fuelTypeList
+
+    def getFuelUnitList(self):
+        fuelUnitsList = []
+        for entry in UNITS["MASSORVOLUME"]:
+            fuelUnitsList.append(str(entry))
+        fuelUnitsList.sort()
+        return fuelUnitsList
+
+    def getEUnitList(self):
+        eUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        eUnitList = []
+        for entry in eUnitTable:
+            eUnit = entry.E_Unit
+            if str(eUnit) not in eUnitList and len(str(eUnit)) > 0:
+                eUnitList.append(str(eUnit))
+        eUnitList.sort()
+        return eUnitList
+
+    def getHUnitList(self):
+        hUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        hUnitList = []
+        for entry in hUnitTable:
+            hUnit = entry.H_Unit
+            if str(hUnit) not in hUnitList and len(str(hUnit)) > 0:
+                hUnitList.append(str(hUnit))
+        hUnitList.sort()
+        return hUnitList
+
+    def getTUnitList(self):
+        tUnitTable = Status.DB.dbbenchmark.DBBenchmark_ID['%']
+        tUnitList = []
+        for entry in tUnitTable:
+            tUnit = entry.T_Unit
+            if str(tUnit) not in tUnitList and len(str(tUnit)) > 0:
+                tUnitList.append(str(tUnit))
+        tUnitList.sort()
+        return tUnitList
+
+    def getSourceSinkList(self):
+        sourceSinkTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
+        sourceSinkList = []
+        for entry in sourceSinkTable:
+            sourceSink = entry.HPSourceSink
+            if str(sourceSink) not in sourceSinkList and len(str(sourceSink)) > 0:
+                sourceSinkList.append(str(sourceSink))
+        sourceSinkList.sort()
+        return sourceSinkList
+
+    def getAbsHeatMedList(self):
+        absHeatMedTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
+        absHeatMedList = []
+        for entry in absHeatMedTable:
+            absHeatMed = entry.HPAbsHeatMed
+            if str(absHeatMed) not in absHeatMedList and len(str(absHeatMed)) > 0:
+                absHeatMedList.append(str(absHeatMed))
+        absHeatMedList.sort()
+        return absHeatMedList
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
@@ -269,6 +322,10 @@ class PanelDBBase(wx.Dialog):
         fuelList = fuelDict.values()
         fillChoice(entry, fuelList)
 
+    def fillChoiceOfDBFuelUnits(self, entry):
+        fuelUnitList = self.getFuelUnitList()
+        fillChoice(entry, fuelUnitList)
+
     def fillChoiceOfDBUnitOpCodes(self, entry):
         unitOpDict = Status.prj.getUnitOpDict()
         unitOpList = unitOpDict.values()
@@ -277,6 +334,28 @@ class PanelDBBase(wx.Dialog):
     def fillChoiceYesNo(self, entry):
         values = ["Yes", "No"]
         fillChoice(entry, values, False)
+
+    def fillChoiceOfEUnit(self, entry):
+        productUnitList = self.getEUnitList()
+        fillChoice(entry, productUnitList)
+
+    def fillChoiceOfHUnit(self, entry):
+        productUnitList = self.getHUnitList()
+        fillChoice(entry, productUnitList)
+
+    def fillChoiceOfTUnit(self, entry):
+        productUnitList = self.getTUnitList()
+        fillChoice(entry, productUnitList)
+
+    def fillChoiceOfHPSourceSink(self, entry):
+        sourceSinkList = self.getSourceSinkList()
+        appendNone = False if "None" in sourceSinkList else True;
+        fillChoice(entry, sourceSinkList, appendNone)
+
+    def fillChoiceOfHPAbsHeatMed(self, entry):
+        absHeatMedList = self.getAbsHeatMedList()
+        appendNone = False if "None" in absHeatMedList else True;
+        fillChoice(entry, absHeatMedList, appendNone)
 
     def fillChoiceOfType(self):
         try:

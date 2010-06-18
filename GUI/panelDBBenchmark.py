@@ -55,7 +55,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Benchmark"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(120)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBBenchmark", self.name)
 
-        # DBBenchmark_ID needs to remain as first entry
+        # DBBenchmark_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "ProductUnit"
 
         self.db = Status.DB.dbbenchmark
@@ -121,9 +121,9 @@ class PanelDBBenchmark(PanelDBBase):
                                       tip = _U("Show only"))
 
         #
-        # tab 1 - Validity of benchmark – association with industrial sector, unit operation and product type
+        # tab 1 - Validity of benchmark - association with industrial sector, unit operation and product type
         #
-        self.frame_validity_of_benchmark = wx.StaticBox(self.page1, -1, _U("Validity of benchmark – association with industrial sector, unit operation and product type"))
+        self.frame_validity_of_benchmark = wx.StaticBox(self.page1, -1, _U("Validity of benchmark - association with industrial sector, unit operation and product type"))
         self.frame_validity_range = wx.StaticBox(self.page1, -1, _U("Validity range for benchmark (general)"))
         self.frame_limits_of_validity = wx.StaticBox(self.page1, -1, _U("Limits of validity range depending on company size / production volume"))
         self.frame_data_source = wx.StaticBox(self.page1, -1, _U("Data source"))
@@ -593,10 +593,7 @@ class PanelDBBenchmark(PanelDBBase):
         tmp = {
                "NACECode":check(self.tc1.GetValue(text = True)),
                "UnitOp":check(findKey(unitOpDict, self.tc2.GetValue(text = True))),
-
-                # FIXXXME where do i get the ProductCodes for the ChoiceEntry from?
-               #"ProductCode":check(self.tc3.GetValue()),
-
+               "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
                "ProductUnit":check(self.tc5.GetValue()),
                "Comments":check(self.tc6.GetValue()),
@@ -650,6 +647,10 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.fillChoiceOfNaceCode(self.tc1.entry)
         self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
+        self.fillChoiceOfProductCodes(self.tc3.entry)
+        self.fillChoiceOfEUnit(self.tc24.entry)
+        self.fillChoiceOfHUnit(self.tc34.entry)
+        self.fillChoiceOfTUnit(self.tc44.entry)
         unitOpDict = Status.prj.getUnitOpDict()
 
         if q is not None:
@@ -666,10 +667,8 @@ class PanelDBBenchmark(PanelDBBase):
                 self.tc1.entry.SetStringSelection("None")
             if q.UnitOp is not None:
                 self.tc2.SetValue(unitOpDict[int(q.UnitOp)]) if int(q.UnitOp) in unitOpDict.keys() else ''
-
-            # FIXXXME fill in the proper product codes
-            #self.tc3.SetValue(q.ProductCode)
-
+            if q.ProductCode is not None:
+                self.tc3.SetValue(PRODUCTCODES[str(q.ProductCode)]) if str(q.ProductCode) in PRODUCTCODES.keys() else ''
             self.tc4.SetValue(str(q.Product)) if q.Product is not None else ''
             self.tc5.SetValue(str(q.ProductUnit)) if q.ProductUnit is not None else ''
             self.tc6.SetValue(str(q.Comments)) if q.Comments is not None else ''
@@ -690,7 +689,10 @@ class PanelDBBenchmark(PanelDBBase):
             self.tc21.SetValue(str(q.E_SEC_MIN)) if q.E_SEC_MIN is not None else ''
             self.tc22.SetValue(str(q.E_SEC_MAX)) if q.E_SEC_MAX is not None else ''
             self.tc23.SetValue(str(q.E_SEC_TARG)) if q.E_SEC_TARG is not None else ''
-            self.tc24.SetValue(str(q.E_Unit)) if q.E_Unit is not None else ''
+            if q.E_Unit is not None and len(str(q.E_Unit)) > 0:
+                    self.tc24.SetValue(str(q.E_Unit)) if str(q.E_Unit) in self.getEUnitList() else ''
+            else:
+                self.tc24.SetValue('None')
             self.tc25.SetValue(str(q.H_EnergyInt_MIN_PC)) if q.H_EnergyInt_MIN_PC is not None else ''
             self.tc26.SetValue(str(q.H_EnergyInt_MAX_PC)) if q.H_EnergyInt_MAX_PC is not None else ''
             self.tc27.SetValue(str(q.H_EnergyInt_TARG_PC)) if q.H_EnergyInt_TARG_PC is not None else ''
@@ -700,7 +702,10 @@ class PanelDBBenchmark(PanelDBBase):
             self.tc31.SetValue(str(q.H_SEC_MIN)) if q.H_SEC_MIN is not None else ''
             self.tc32.SetValue(str(q.H_SEC_MAX)) if q.H_SEC_MAX is not None else ''
             self.tc33.SetValue(str(q.H_SEC_TARG)) if q.H_SEC_TARG is not None else ''
-            self.tc34.SetValue(str(q.H_Unit)) if q.H_Unit is not None else ''
+            if q.H_Unit is not None and len(str(q.H_Unit)) > 0:
+                    self.tc34.SetValue(str(q.H_Unit)) if str(q.H_Unit) in self.getHUnitList() else ''
+            else:
+                self.tc34.SetValue('None')
             self.tc35.SetValue(str(q.T_EnergyInt_MIN_PC)) if q.T_EnergyInt_MIN_PC is not None else ''
             self.tc36.SetValue(str(q.T_EnergyInt_MAX_PC)) if q.T_EnergyInt_MAX_PC is not None else ''
             self.tc37.SetValue(str(q.T_EnergyInt_TARG_PC)) if q.T_EnergyInt_TARG_PC is not None else ''
@@ -710,7 +715,10 @@ class PanelDBBenchmark(PanelDBBase):
             self.tc41.SetValue(str(q.T_SEC_MIN)) if q.T_SEC_MIN is not None else ''
             self.tc42.SetValue(str(q.T_SEC_MAX)) if q.T_SEC_MAX is not None else ''
             self.tc43.SetValue(str(q.T_SEC_TARG)) if q.T_SEC_TARG is not None else ''
-            self.tc44.SetValue(str(q.T_Unit)) if q.T_Unit is not None else ''
+            if q.T_Unit is not None and len(str(q.T_Unit)) > 0:
+                    self.tc44.SetValue(str(q.T_Unit)) if str(q.T_Unit) in self.getTUnitList() else ''
+            else:
+                self.tc44.SetValue('None')
 
     def clear(self):
         self.tc1.SetValue('')
@@ -762,6 +770,9 @@ class PanelDBBenchmark(PanelDBBase):
         self.fillChoiceOfNaceCode(self.tc1.entry)
         self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
         self.fillChoiceOfProductCodes(self.tc3.entry)
+        self.fillChoiceOfEUnit(self.tc24.entry)
+        self.fillChoiceOfHUnit(self.tc34.entry)
+        self.fillChoiceOfTUnit(self.tc44.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 

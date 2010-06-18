@@ -55,7 +55,7 @@ class PanelDBBoiler(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Boiler"
         self._init_ctrls(parent)
-        self._init_grid(125)
+        self._init_grid(145)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBBoiler(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBBoiler", self.name)
 
-        # DBBoiler_ID needs to remain as first entry
+        # DBBoiler_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBBoiler_ID", "BoilerManufacturer", "BoilerModel", "BoilerType", "BBPnom"
 
         self.db = Status.DB.dbboiler

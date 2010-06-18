@@ -129,8 +129,6 @@ class AddEquipment(wx.Dialog):
 
         if self.tablename == "dbchp":
             self.dbe = PanelDBCHP(self, "Edit DBCHP", True)
-        elif self.tablename == "dbsolarthermal":
-            self.dbe = PanelDBSolarThermal(self, "Edit DBSolarThermal", True)
         elif self.tablename == "dbheatpump":
             self.dbe = PanelDBHeatPump(self, "Edit DBHeatPump", True)
         elif self.tablename == "dbboiler":

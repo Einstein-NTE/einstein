@@ -55,7 +55,7 @@ class PanelDBElectricityMix(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "ElectricityMix"
         self._init_ctrls(parent)
-        self._init_grid(100)
+        self._init_grid(145)
         self.__do_layout()
         self.clear()
         self.fillEquipmentList()
@@ -68,7 +68,7 @@ class PanelDBElectricityMix(PanelDBBase):
 
         PanelDBBase.__init__(self, self.parent, "Edit DBElectricityMix", self.name)
 
-        # id needs to remain as first entry
+        # id needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "id", "Country", "Year", "Type"
 
         self.db = Status.DB.dbelectricitymix
@@ -320,20 +320,20 @@ class PanelDBElectricityMix(PanelDBBase):
 
         if q is not None:
             self.tc1.SetValue(str(q.Country)) if q.Country is not None else ''
-            self.tc1.SetValue(str(q.Year)) if q.Year is not None else ''
-            self.tc1.SetValue(str(q.Type)) if q.Type is not None else ''
-            self.tc1.SetValue(str(q.Reference)) if q.Reference is not None else ''
-            self.tc1.SetValue(str(q.AuditorID)) if q.AuditorID is not None else ''
-            self.tc1.SetValue(str(q.PE2ConvEl)) if q.PE2ConvEl is not None else ''
-            self.tc1.SetValue(str(q.CO2ConvEl)) if q.CO2ConvEl is not None else ''
-            self.tc1.SetValue(str(q.NoNukesConvEl)) if q.NoNukesConvEl is not None else ''
-            self.tc1.SetValue(str(q.PercNaturalGas)) if q.PercNaturalGas is not None else ''
-            self.tc1.SetValue(str(q.PercCarbon)) if q.PercCarbon is not None else ''
-            self.tc1.SetValue(str(q.PercOil)) if q.PercOil is not None else ''
-            self.tc1.SetValue(str(q.PercRenewables)) if q.PercRenewables is not None else ''
-            self.tc1.SetValue(str(q.PercNukes)) if q.PercNukes is not None else ''
-            self.tc1.SetValue(str(q.PercCHP)) if q.PercCHP is not None else ''
-            self.tc1.SetValue(str(q.PercOther)) if q.PercOther is not None else ''
+            self.tc2.SetValue(str(q.Year)) if q.Year is not None else ''
+            self.tc3.SetValue(str(q.Type)) if q.Type is not None else ''
+            self.tc4.SetValue(str(q.Reference)) if q.Reference is not None else ''
+            self.tc5.SetValue(str(q.AuditorID)) if q.AuditorID is not None else ''
+            self.tc6.SetValue(str(q.PE2ConvEl)) if q.PE2ConvEl is not None else ''
+            self.tc7.SetValue(str(q.CO2ConvEl)) if q.CO2ConvEl is not None else ''
+            self.tc8.SetValue(str(q.NoNukesConvEl)) if q.NoNukesConvEl is not None else ''
+            self.tc9.SetValue(str(q.PercNaturalGas)) if q.PercNaturalGas is not None else ''
+            self.tc10.SetValue(str(q.PercCarbon)) if q.PercCarbon is not None else ''
+            self.tc11.SetValue(str(q.PercOil)) if q.PercOil is not None else ''
+            self.tc12.SetValue(str(q.PercRenewables)) if q.PercRenewables is not None else ''
+            self.tc13.SetValue(str(q.PercNukes)) if q.PercNukes is not None else ''
+            self.tc14.SetValue(str(q.PercCHP)) if q.PercCHP is not None else ''
+            self.tc15.SetValue(str(q.PercOther)) if q.PercOther is not None else ''
         self.Show()
 
     def clear(self):
