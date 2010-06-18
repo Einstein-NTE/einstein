@@ -42,11 +42,15 @@ class SpreadsheetProcessing():
         self.__filepath=inputfile
         self.__fileending = fileending
         self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
-        
+        self.__error = 0
         if fileending == 'xls':
-            self.spreadsheetparser = ExcelSpreadsheetParser(inputfile)
-            self.__sheetnames = self.spreadsheetparser.sheetnames
-            self.__dialog = ["Excel Parsing","reading document"]
+            try:
+                self.spreadsheetparser = ExcelSpreadsheetParser(inputfile)
+                self.__sheetnames = self.spreadsheetparser.sheetnames
+                self.__dialog = ["Excel Parsing","reading document"]
+            except:
+                self.__error = 1
+                
         elif fileending == 'ods':
             self.spreadsheetparser = OOSpreadsheetParser(inputfile)
             self.__sheetnames = self.spreadsheetparser.sheetnames
@@ -54,13 +58,16 @@ class SpreadsheetProcessing():
             
             
     def parse(self):
-        dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
-        self.spreadsheetparser.startProcessing()
-        __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
-        DButil = Utils(self.__md, self.__sheetnames)
-        __handle = DButil.writeToDB(lists)
-        self.spreadsheetparser.endProcessing()
-        dlg.Destroy()
+        if self.__error == 0: 
+            dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
+            self.spreadsheetparser.startProcessing()
+            __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
+            DButil = Utils(self.__md, self.__sheetnames)
+            __handle = DButil.writeToDB(lists)
+            self.spreadsheetparser.endProcessing()
+            dlg.Destroy()
+        else:
+            return "Parsing of Spreadsheet not possible. Check if all System Componenents exist"
         return __handle
         
     def __getLists(self, sheetnames, dlg, spreadsheetparser):
