@@ -33,20 +33,22 @@ from spreadsheetUtils import SpreadsheetDict as SD
 from spreadsheetUtils import Utils
 import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
+from status import Status
+
+
 class SpreadsheetProcessing():
     
-    def __init__(self, inputfile, DBUser, DBPass, fileending):
+    def __init__(self, inputfile, frame, fileending):
         self.__filepath=inputfile
-        self.__username = DBUser
-        self.__password = DBPass
         self.__fileending = fileending
-        self.__md = self.__connectToDB()
+        self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
+        
         if fileending == 'xls':
-            self.spreadsheetparser = ExcelSpreadsheetParser(inputfile, DBUser, DBPass)
+            self.spreadsheetparser = ExcelSpreadsheetParser(inputfile)
             self.__sheetnames = self.spreadsheetparser.sheetnames
             self.__dialog = ["Excel Parsing","reading document"]
         elif fileending == 'ods':
-            self.spreadsheetparser = OOSpreadsheetParser(inputfile, DBUser, DBPass)
+            self.spreadsheetparser = OOSpreadsheetParser(inputfile)
             self.__sheetnames = self.spreadsheetparser.sheetnames
             self.__dialog = ["OpenOffice Calc Parsing","reading document"]
             
@@ -196,9 +198,9 @@ class SpreadsheetProcessing():
         
         return "", lists
     
-    def __connectToDB(self):
-        __conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
-        __md = pSQL.pSQL(__conn, "einstein")
+    def __connectToDB(self, hostname, username, password, dbname):
+        __conn = MySQLdb.connect(hostname, username, password, db=dbname)
+        __md = pSQL.pSQL(__conn, dbname)
         return __md
     
     

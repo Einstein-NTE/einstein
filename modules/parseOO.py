@@ -34,11 +34,9 @@ import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
 
 class OOSpreadsheetParser(parseSpreadsheet):
-    def __init__(self,filepath,mysql_username,mysql_password):
+    def __init__(self,filepath):
         parseSpreadsheet.__init__(self, filepath)
         self.__filepath=filepath
-        self.__username = mysql_username
-        self.__password = mysql_password
         self.sheetnames = [u'Q1 GeneralData', 
               u'Q2 EnergyConsumption', 
               u'Q3_ Processes', 
@@ -366,11 +364,7 @@ class OOSpreadsheetParser(parseSpreadsheet):
                 except:
                     pass
             
-            
-
-
-           
-
+   
         return data
         
         
@@ -385,7 +379,3 @@ class OOSpreadsheetParser(parseSpreadsheet):
         pass
     
     
-    def __connectToDB(self):
-        conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
-        md = pSQL.pSQL(conn, "einstein")
-        return md

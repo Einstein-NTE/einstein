@@ -52,11 +52,12 @@ class ImportQ(object):
             return None       
         
         frame = wx.GetApp().GetTopWindow()
+        frame.DBHost
         if self.infile.endswith('xls'):
-            pe = SpreadsheetProcessing(self.infile, frame.DBUser, frame.DBPass, 'xls')
+            pe = SpreadsheetProcessing(self.infile, frame, 'xls')
             wx.MessageBox(pe.parse(), 'Info')
         elif self.infile.endswith('ods'):
-            pe = SpreadsheetProcessing(self.infile, frame.DBUser, frame.DBPass, 'ods')
+            pe = SpreadsheetProcessing(self.infile, frame, 'ods')
             wx.MessageBox(pe.parse(), 'Info')
         else:
             wx.MessageBox('File corrupted', 'Info')
