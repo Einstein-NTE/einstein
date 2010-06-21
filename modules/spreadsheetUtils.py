@@ -712,7 +712,9 @@ class Utils():
             dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
             
             Q1dict.update(Q9dict)
-            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
+            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID'], 
+                           'Branch' : dbnacecodeid[0]['NameNACE'], 
+                           'SubBranch' : dbnacecodeid[0]['NameNACEsub']})
             self.__md.questionnaire.insert(Q1dict)
         except:
             return self.parseError(self.__sheetnames[0])
