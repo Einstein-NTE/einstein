@@ -298,9 +298,9 @@ class SpreadsheetDict():
         profileID = []
         for i in xrange(3):
             try:
-                db_conn.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], db_conn))
-                profid = db_conn.profiles.sql_select("name"+"='"+QProfiles[i][-1]+"'")
-                profileID.append(profid[-1]['id'])
+                profileID = db_conn.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], db_conn))
+                #profid = db_conn.profiles.sql_select("name"+"='"+QProfiles[i][-1]+"'")
+                #profileID.append(profid[-1]['id'])
             except:
                 pass
         intervalID = []
@@ -308,9 +308,9 @@ class SpreadsheetDict():
         for i in xrange(len(QIntervals)/2):
             try:
                 interval = SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], db_conn)
-                db_conn.intervals.insert(interval)
-                interid = db_conn.intervals.sql_select("LAST_INSERT_ID()")
-                intervalID.append(interid[-1]['id'])
+                intervalID = db_conn.intervals.insert(interval)
+                #interid = db_conn.intervals.sql_select("LAST_INSERT_ID()")
+                #intervalID.append(interid[-1]['id'])
             except:
                 pass
         
@@ -329,18 +329,18 @@ class SpreadsheetDict():
         
         try:
             periodsDict = {"start" : "2007-01-01", "stop" : "2007-12-31"}
-            db_conn.periods.insert(periodsDict)
-            periodsSel = db_conn.periods.sql_select("LAST_INSERT_ID()")
-            periodsSel = periodsSel[-1]['id']
+            periodsSel = db_conn.periods.insert(periodsDict)
+            #periodsSel = db_conn.periods.sql_select("LAST_INSERT_ID()")
+            #periodsSel = periodsSel[-1]['id']
 
             PPD['periods_id']=periodsSel
             
             processid = db_conn.qprocessdata.sql_select("Process"+"='"+processName+"'")
             PPD['qprocessdata_QProcessData_ID']= processid[-1]['QProcessData_ID']
-            db_conn.process_periods.insert(PPD)
+            PPID = db_conn.process_periods.insert(PPD)
             
-            PPID = db_conn.process_periods.sql_select("LAST_INSERT_ID()")
-            PPID = PPID[-1]['id']
+            #PPID = db_conn.process_periods.sql_select("LAST_INSERT_ID()")
+            #PPID = PPID[-1]['id']
             
             profilesID = db_conn.profiles.sql_select("name"+"='"+profileName+"'")
             profilesID = profilesID[-1]['id']
@@ -429,10 +429,13 @@ class SpreadsheetDict():
         return Q4Cdict
     
     @staticmethod
-    def createQ5Dictionary(Q5,db_conn):
+    def createQ5Dictionary(Q5,Questionnaire_ID, db_conn):
         Q5dict = {}
         Q5dict["Pipeduct"] = Q5[0]
-        Q5dict["HeatDistMedium"] = Q5[1]
+        dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q5[1])+"'")
+        Q5dict["HeatDistMedium"]= dbfluid[0]['DBFluid_ID']
+        
+        #Q5dict["HeatDistMedium"] = Q5[1]
         Q5dict["DistribCircFlow"] = Q5[2]
         Q5dict["ToutDistrib"] = Q5[3]
         Q5dict["TreturnDistrib"] = Q5[4]
@@ -449,6 +452,7 @@ class SpreadsheetDict():
         Q5dict["PmaxStorage"] = Q5[17]
         Q5dict["TmaxStorage"] = Q5[18]
         Q5dict['AlternativeProposalNo'] = -1
+        Q5dict['Questionnaire_id'] = Questionnaire_ID
         return Q5dict
     
     @staticmethod
@@ -645,6 +649,21 @@ class SpreadsheetDict():
             Q9dict["EnergyManagExternal"] = 0
         return Q9dict
 
+    @staticmethod
+    def createsprojectDictionary(questionnaire_id):
+        sp = {}
+        sp['ProjectID']=questionnaire_id
+        sp['NoOfAlternatives'] = -1
+        sp['ActiveAlternative'] = -1
+        sp['WriteProtected'] = 0
+        sp['StatusQ'] = 0
+        sp['StatusCC'] = 0
+        sp['StatusCA'] = 0
+        sp['StatusR'] = 0 
+        sp['LanguageReport'] = 'en'
+        sp['UnitsReport'] = 'SI-kWh'
+        return sp
+        
     
 class Utils():
     
@@ -712,16 +731,13 @@ class Utils():
             dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
             
             Q1dict.update(Q9dict)
-            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID']})
-            self.__md.questionnaire.insert(Q1dict)
+            Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID'], 
+                           'Branch' : dbnacecodeid[0]['NameNACE'], 
+                           'SubBranch' : dbnacecodeid[0]['NameNACEsub']})
+            Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
         except:
             return self.parseError(self.__sheetnames[0])
         
-        try:
-            Questionnaire_ID = self.__md.questionnaire.sql_select("LAST_INSERT_ID()")
-            Questionnaire_ID =  Questionnaire_ID[-1]['Questionnaire_ID']
-        except: 
-            return self.parseError("No Questionnare ID Found")
         quest_id = 'Questionnaire_id'
         
         try:
@@ -753,7 +769,7 @@ class Utils():
                 #return self.parseError(self.__sheetnames[5])
             
             try:
-                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], self.__md))
+                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], Questionnaire_ID, self.__md))
             except:
                 pass
                 #return self.parseError(self.__sheetnames[6])
@@ -782,12 +798,13 @@ class Utils():
         except:
             return self.parseError(self.__sheetnames[8])
         
-        try:
-            self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
-            self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-            
-            self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+        
+        self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
+        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+        
+        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
 
+        try:
             # Code to skip a specific amount of columns
             index =0
             Q3n = []
@@ -802,11 +819,13 @@ class Utils():
                 SpreadsheetDict.createProcessPeriodsDictionary(Q3n[i], self.__md, QProfiles[i][-1])
             
             SpreadsheetDict.createProcessScheduleCorrDictionary(Q3n, self.__md)
-            
-            self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
-            self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set'})
         except:
             pass
+        print Questionnaire_ID
+        self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
+        self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set'})
+        #self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
+
         return "Parsing successful!"
         
 

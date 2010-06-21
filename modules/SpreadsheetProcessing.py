@@ -33,32 +33,51 @@ from spreadsheetUtils import SpreadsheetDict as SD
 from spreadsheetUtils import Utils
 import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
+from einstein.GUI.status import *
+
 class SpreadsheetProcessing():
     
-    def __init__(self, inputfile, DBUser, DBPass, fileending):
+    def __init__(self, inputfile, frame, fileending):
         self.__filepath=inputfile
-        self.__username = DBUser
-        self.__password = DBPass
         self.__fileending = fileending
-        self.__md = self.__connectToDB()
+        #self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
+        self.__md = Status.DB
+        self.__error = 0
         if fileending == 'xls':
-            self.spreadsheetparser = ExcelSpreadsheetParser(inputfile, DBUser, DBPass)
-            self.__sheetnames = self.spreadsheetparser.sheetnames
-            self.__dialog = ["Excel Parsing","reading document"]
+            try:
+                self.spreadsheetparser = ExcelSpreadsheetParser(inputfile)
+                self.__sheetnames = self.spreadsheetparser.sheetnames
+                self.__dialog = ["Excel Parsing","reading document"]
+            except:
+                self.__error = 1
+                
         elif fileending == 'ods':
-            self.spreadsheetparser = OOSpreadsheetParser(inputfile, DBUser, DBPass)
-            self.__sheetnames = self.spreadsheetparser.sheetnames
-            self.__dialog = ["OpenOffice Calc Parsing","reading document"]
-            
+            try:
+                self.spreadsheetparser = OOSpreadsheetParser(inputfile)
+                self.__sheetnames = self.spreadsheetparser.sheetnames
+                self.__dialog = ["OpenOffice Calc Parsing","reading document"]
+            except:
+                self.__error = 1
             
     def parse(self):
-        dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
-        self.spreadsheetparser.startProcessing()
-        __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
-        DButil = Utils(self.__md, self.__sheetnames)
-        __handle = DButil.writeToDB(lists)
-        self.spreadsheetparser.endProcessing()
-        dlg.Destroy()
+        if self.__error == 0: 
+            dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
+            self.spreadsheetparser.startProcessing()
+            
+            __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
+            if len(lists)==0:
+                self.spreadsheetparser.endProcessing()
+                dlg.Destroy()
+                return __handle
+            dlg.update(80)
+            DButil = Utils(self.__md, self.__sheetnames)
+            __handle = DButil.writeToDB(lists)
+            self.spreadsheetparser.endProcessing()
+            dlg.Destroy()
+        else:
+            return "Parsing of Spreadsheet not possible. Check if all System Components exist"
+        
+        Status.SQL.commit()
         return __handle
         
     def __getLists(self, sheetnames, dlg, spreadsheetparser):
@@ -196,9 +215,9 @@ class SpreadsheetProcessing():
         
         return "", lists
     
-    def __connectToDB(self):
-        __conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
-        __md = pSQL.pSQL(__conn, "einstein")
+    def __connectToDB(self, hostname, username, password, dbname):
+        __conn = MySQLdb.connect(hostname, username, password, db=dbname)
+        __md = pSQL.pSQL(__conn, dbname)
         return __md
     
     

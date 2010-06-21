@@ -28,7 +28,11 @@
 from parseSpreadsheet import parseSpreadsheet
 import MySQLdb
 import pSQL
-from win32com.client import Dispatch
+try:
+    from win32com.client import Dispatch
+except ImportError:
+    pass
+
 from spreadsheetUtils import Utils
 from dialogGauge import DialogGauge
  
@@ -37,11 +41,9 @@ import time
 
 
 class ExcelSpreadsheetParser(parseSpreadsheet):
-    def __init__(self,filepath,mysql_username,mysql_password):
+    def __init__(self,filepath):
         parseSpreadsheet.__init__(self, filepath)
         self.__filepath=filepath
-        self.__username = mysql_username
-        self.__password = mysql_password
         self.__xlApp, self.__xlWb = self.__openExcelDispatch(self.__filepath)
         __sheets = self.__xlWb.Sheets
         self.sheetnames = []
@@ -173,40 +175,6 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
                     
         
         
-#        Q4_8 = []    
-#        for i in xrange(5):
-#            try:
-#                sht = sheetnames[4]
-#                Q4_8.append(self.parseRange("Q4H_"+str(i+1),sht))
-#                
-#            except:
-#                return self.parseError(sheetnames[4])
-#                
-#            try:    
-#                sht = sheetnames[5]
-#                Q4_8.append(self.parseRange("Q4C_"+str(i+1),sht))
-#            except:
-#                return self.parseError(sheetnames[5])
-#            
-#            try:
-#                sht = sheetnames[6]
-#                Q4_8.append(self.parseRange("Q5_"+str(i+1),sht))
-#            except:
-#                return self.parseError(sheetnames[6])
-#            
-#            try:
-#                sht = sheetnames[7]
-#                Q4_8.append(self.parseRange("Q6_"+str(i+1),sht))
-#                
-#            except:
-#                return self.parseError(sheetnames[7])
-#                
-#            try:
-#                sht = sheetnames[9]
-#                Q4_8.append(self.parseRange("Q8_"+str(i+1),sht))
-#                
-#            except:
-#                return self.parseError(sheetnames[9])
         try:
             sht = sheetnames[8]
             latitude = self.parseRange("Q7_Latitude",sht)
@@ -309,11 +277,7 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
     def endProcessing(self):
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
         
-    def __connectToDB(self):
-        conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
-        md = pSQL.pSQL(conn, "einstein")
-        return md
-    
+
 
     
 
