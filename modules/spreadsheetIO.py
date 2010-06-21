@@ -30,6 +30,7 @@ from xmlIO import *
 from parseExcel import *
 from parseOO import *
 from SpreadsheetProcessing import *
+from einstein.GUI.status import *
 
 def _U(text):
     try:
@@ -52,7 +53,6 @@ class ImportQ(object):
             return None       
         
         frame = wx.GetApp().GetTopWindow()
-        frame.DBHost
         if self.infile.endswith('xls'):
             pe = SpreadsheetProcessing(self.infile, frame, 'xls')
             wx.MessageBox(pe.parse(), 'Info')

@@ -33,13 +33,15 @@ from spreadsheetUtils import SpreadsheetDict as SD
 from spreadsheetUtils import Utils
 import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
+from einstein.GUI.status import *
 
 class SpreadsheetProcessing():
     
     def __init__(self, inputfile, frame, fileending):
         self.__filepath=inputfile
         self.__fileending = fileending
-        self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
+        #self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
+        self.__md = Status.DB
         self.__error = 0
         if fileending == 'xls':
             try:
@@ -75,7 +77,7 @@ class SpreadsheetProcessing():
         else:
             return "Parsing of Spreadsheet not possible. Check if all System Components exist"
         
-
+        Status.SQL.commit()
         return __handle
         
     def __getLists(self, sheetnames, dlg, spreadsheetparser):
