@@ -375,8 +375,6 @@ class PanelDBBoiler(PanelDBBase):
             self.theId = -1
             return
 
-        fuelDict = Status.prj.getFuelDict()
-
         tmp = {
                "BoilerManufacturer":check(self.tc1.GetValue()),
                "BoilerModel":check(self.tc2.GetValue()),

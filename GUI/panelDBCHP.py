@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_ECONOMIC = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -138,15 +139,17 @@ class PanelDBCHP(PanelDBBase):
                              label = _U("CHPequip"),
                              tip = _U("CHPequip"))
 
-        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Type"),
-                             tip = _U("Type"))
+        self.tc3 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("Type"),
+                               tip = _U("Type"))
 
-        self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("SubType"),
-                             tip = _U("SubType"))
+        self.tc4 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("SubType"),
+                               tip = _U("SubType"))
 
-        self.tc5 = TextEntry(self.page1, maxchars = 45, value = '',
+        self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
@@ -161,32 +164,22 @@ class PanelDBCHP(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
-
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'POWER',
                               label = _U("CHPPt"),
                               tip = _U("Nominal thermal power"))
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc7 = ChoiceEntry(self.page2,
                                values = [],
                                label = _U("FuelType"),
                                tip = _U("Fuel type"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
-
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'POWER',
                               label = _U("FuelConsum"),
                               tip = _U("Nominal fuel consumption"))
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -216,11 +209,15 @@ class PanelDBCHP(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc12 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply"),
-                               tip = _U("Heat transport medium"))
+#        self.tc12 = FloatEntry(self.page3,
+#                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'POWER',
+#                               label = _U("FluidSupply"),
+#                               tip = _U("Heat transport medium"))
+
+        self.tc12 = TextEntry(self.page3, maxchars = 200, value = '',
+                             label = _U("FluidSupply"),
+                             tip = _U("Heat transport medium"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -235,11 +232,15 @@ class PanelDBCHP(PanelDBBase):
                                label = _U("FlowRateSupply"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
-        self.tc15 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               unitdict = 'POWER',
-                               label = _U("FluidSupply2"),
-                               tip = _U("Heat transport medium"))
+#        self.tc15 = FloatEntry(self.page3,
+#                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+#                               unitdict = 'POWER',
+#                               label = _U("FluidSupply2"),
+#                               tip = _U("Heat transport medium"))
+
+        self.tc15 = TextEntry(self.page3, maxchars = 200, value = '',
+                             label = _U("FluidSupply2"),
+                             tip = _U("Heat transport medium"))
 
         self.tc16 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -254,9 +255,6 @@ class PanelDBCHP(PanelDBBase):
                                label = _U("FlowRateSupply2"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
-
         #
         # tab 4 - Economic Parameters
         #
@@ -266,6 +264,9 @@ class PanelDBCHP(PanelDBBase):
         fp.pushFont()
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_ECONOMIC)
 
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -281,20 +282,18 @@ class PanelDBCHP(PanelDBBase):
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("OMRateFix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICEENERGY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'ENERGYTARIFF',
                                label = _U("OMRateVar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_ECONOMIC, wUnits = 0)
 
         self.tc22 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
@@ -395,16 +394,14 @@ class PanelDBCHP(PanelDBBase):
             self.theId = -1
             return
 
-        fuelDict = Status.prj.getFuelDict()
-
         tmp = {
                "Manufacturer":check(self.tc1.GetValue()),
                "CHPequip":check(self.tc2.GetValue()),
-               "Type":check(self.tc3.GetValue()),
-               "SubType":check(self.tc4.GetValue()),
+               "Type":check(self.tc3.GetValue(text = True)),
+               "SubType":check(self.tc4.GetValue(text = True)),
                "Reference":check(self.tc5.GetValue()),
                "CHPPt":check(self.tc6.GetValue()),
-               "FuelType":check(findKey(fuelDict, self.tc7.GetValue(text = True))),
+               "FuelType":check(self.tc7.GetValue(text = True)),
                "FuelConsum":check(self.tc8.GetValue()),
                "Eta_t":check(self.tc9.GetValue()),
                "CHPPe":check(self.tc10.GetValue()),
@@ -434,18 +431,22 @@ class PanelDBCHP(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-        fuelDict = Status.prj.getFuelDict()
+        fuelDict = FUELTYPES
+        self.fillChoiceOfCHPType(self.tc3.entry)
+        self.fillChoiceOfCHPSubType(self.tc4.entry)
         self.fillChoiceOfDBFuel(self.tc7.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.Manufacturer)) if q.Manufacturer is not None else ''
             self.tc2.SetValue(str(q.CHPequip)) if q.CHPequip is not None else ''
-            self.tc3.SetValue(str(q.Type)) if q.Type is not None else ''
-            self.tc4.SetValue(str(q.SubType)) if q.SubType is not None else ''
+            if q.Type is not None:
+                self.tc3.SetValue(str(q.Type)) if q.Type in CHPTYPES else ''
+            if q.SubType is not None:
+                self.tc4.SetValue(str(q.SubType)) if q.SubType in self.getCHPSubTypeList() else ''
             self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
             self.tc6.SetValue(str(q.CHPPt)) if q.CHPPt is not None else ''
             if q.FuelType is not None:
-                self.tc7.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
+                self.tc7.SetValue(str(q.FuelType)) if str(q.FuelType) in fuelDict.values() else ''
             self.tc8.SetValue(str(q.FuelConsum)) if q.FuelConsum is not None else ''
             self.tc9.SetValue(str(q.Eta_t)) if q.Eta_t is not None else ''
             self.tc10.SetValue(str(q.CHPPe)) if q.CHPPe is not None else ''
@@ -489,6 +490,8 @@ class PanelDBCHP(PanelDBBase):
 
     def fillChoices(self):
         self.fillChoiceOfDBFuel(self.tc7.entry)
+        self.fillChoiceOfCHPType(self.tc3.entry)
+        self.fillChoiceOfCHPSubType(self.tc4.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 
@@ -498,10 +501,11 @@ class PanelDBCHP(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           len(self.tc3.GetValue()) == 0 and\
-           len(self.tc4.GetValue()) == 0 and\
+           len(self.tc3.GetValue(text = True)) == "None" and\
+           len(self.tc4.GetValue(text = True)) == "None" and\
            len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
+           self.tc7.GetValue(text = True) == "None" and\
            self.tc8.GetValue() is None and\
            self.tc9.GetValue() is None and\
            self.tc10.GetValue() is None and\

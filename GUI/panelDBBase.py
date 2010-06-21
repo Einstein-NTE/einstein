@@ -310,6 +310,16 @@ class PanelDBBase(wx.Dialog):
         hpSubTypeList.sort()
         return hpSubTypeList
 
+    def getCHPSubTypeList(self):
+        chpSubTypeList = []
+        for list in CHPSUBTYPES.values():
+            listEntry = ""
+            for e in list:
+                listEntry += e + "-"
+            chpSubTypeList.append(listEntry.rstrip('-'))
+        chpSubTypeList.sort()
+        return chpSubTypeList
+
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
         fillChoice(entry, naceList)
@@ -380,6 +390,15 @@ class PanelDBBase(wx.Dialog):
         stTypeList = STTYPES
         stTypeList.sort()
         fillChoice(entry, stTypeList)
+
+    def fillChoiceOfCHPType(self, entry):
+        chpTypeList = CHPTYPES
+        chpTypeList.sort()
+        fillChoice(entry, chpTypeList)
+
+    def fillChoiceOfCHPSubType(self, entry):
+        chpSubTypeList = self.getCHPSubTypeList()
+        fillChoice(entry, chpSubTypeList)
 
     def fillChoiceOfType(self):
         try:

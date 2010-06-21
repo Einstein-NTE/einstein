@@ -513,8 +513,6 @@ class PanelDBHeatPump(PanelDBBase):
             self.theId = -1
             return
 
-        fuelDict = Status.prj.getFuelDict()
-
         tmp = {
                "HPManufacturer":check(self.tc1.GetValue()),
                "HPModel":check(self.tc2.GetValue()),
@@ -526,7 +524,7 @@ class PanelDBHeatPump(PanelDBBase):
                "HPCoolCap":check(self.tc8.GetValue()),
                "HPCoolCOP":check(self.tc9.GetValue()),
                "HPFuelConsum":check(self.tc10.GetValue()),
-               "FuelType":check(self.tc11.GetValue()),
+               "FuelType":check(self.tc11.GetValue(text = True)),
                "HPElectConsum":check(self.tc12.GetValue()),
                "HPWorkFluid":check(self.tc13.GetValue()),
                "HPCondTinC":check(self.tc14.GetValue()),
@@ -579,7 +577,8 @@ class PanelDBHeatPump(PanelDBBase):
         if q is not None:
             self.tc1.SetValue(str(q.HPManufacturer)) if q.HPManufacturer is not None else ''
             self.tc2.SetValue(str(q.HPModel)) if q.HPModel is not None else ''
-            self.tc3.SetValue(str(q.HPType)) if q.HPType is not None else ''
+            if q.HPType:
+                self.tc3.SetValue(str(q.HPType)) if q.HPType in HPTYPES else ''
             if q.HPSubType:
                 self.tc4.SetValue(str(q.HPSubType)) if q.HPSubType in self.getHPSubTypeList() else ''
             self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
