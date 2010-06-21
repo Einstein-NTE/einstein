@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 #
-#    parseOO.py : provides functionality to parse Open Office Questionnaires
+#    OOSpreadsheetParser.py : provides functionality to parse Open Office Questionnaires
 #
 #==============================================================================
 #
@@ -33,16 +33,13 @@ from spreadsheetUtils import Utils
 import xml.dom.minidom, zipfile
 from dialogGauge import DialogGauge
 
-class parseOO(parseSpreadsheet):
+class OOSpreadsheetParser(parseSpreadsheet):
     def __init__(self,filepath,mysql_username,mysql_password):
         parseSpreadsheet.__init__(self, filepath)
         self.__filepath=filepath
         self.__username = mysql_username
         self.__password = mysql_password
-    
-    def parse(self):
-        
-        __sheetnames = [u'Q1 GeneralData', 
+        self.sheetnames = [u'Q1 GeneralData', 
               u'Q2 EnergyConsumption', 
               u'Q3_ Processes', 
               u'Q3A', 
@@ -54,51 +51,60 @@ class parseOO(parseSpreadsheet):
               u'Q8 Buildings', 
               u'Q9 Economics']
         
+        self.xmlString = self.readOOContent(self.__filepath)
+        
+    @DeprecationWarning
+    def parseold(self):
         dlg = DialogGauge(None,"OpenOffice Calc Parsing","reading document")
         self.__md = self.__connectToDB()
         xmlString = self.readOOContent(self.__filepath)
         dlg.update(10)
-        parsedDom = xml.dom.minidom.parseString(xmlString)
+        self.__parsedDom = xml.dom.minidom.parseString(xmlString)
         dlg.update(53)
-        
-        __handle, lists = self.__getLists(parsedDom, dlg, __sheetnames)
+        __handle, lists = self.__getLists(dlg, self.sheetnames)
         if len(lists)==0:
             return __handle
-        DButil = Utils(self.__md, __sheetnames)
+        DButil = Utils(self.__md, self.sheetnames)
         __handle = DButil.writeToDB(lists)
         dlg.update(100)
         dlg.Destroy()
         return __handle
         
-    def __getLists(self,ooWb,dlg, sheetnames): 
+    def parseRange(self, range, sht):
+        return self.parseOOxmlarea(self.__parsedDom,range,sht) 
+        
+    def __getLists(self,dlg, sheetnames): 
         lists = []
         #if len(sheetnames)!=11:
         #    return self.__parseError("wrong number of Sheets"), []
-        try:
-            Q1 = self.parseOOxmlarea(ooWb,"Q1_GeneralData",sheetnames[0])      
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_StatisticalData", sheetnames[0])
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_Operation", sheetnames[0])
-            QProduct = self.parseOOxmlarea(ooWb, "Q1_Products", sheetnames[0])
-        except:
-            return "parseError Sheet Q1", []
+#        try:
+        if len(sheetnames)!=11:
+            return Utils.parseError("wrong number of Sheets"), []
+
+        Q1 = self.parseRange("Q1_GeneralData",sheetnames[0])      
+        Q1+= self.parseRange( "Q1_StatisticalData", sheetnames[0])
+        Q1+= self.parseRange( "Q1_Operation", sheetnames[0])
+        QProduct = self.parseRange( "Q1_Products", sheetnames[0])
+#        except:
+#            return "parseError Sheet Q1", []
             #return self.__parseError(sheetnames[0]), []
         dlg.update(60)
         try:
-            Q1+= self.parseOOxmlarea(ooWb, "Q1_Percent", sheetnames[1])
-            QProduct += self.parseOOxmlarea(ooWb, "Q2_Products", sheetnames[1]) 
-            Q2 = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetnames[1])    
-            Q2+= self.parseOOxmlarea(ooWb, "Q2_ElectricityConsumption", sheetnames[1]) 
-            Q2+= self.parseOOxmlarea(ooWb, "Q2_EnergyConsumptionProduct", sheetnames[1])  
-            QFuel = self.parseOOxmlarea(ooWb, "Q2_EnergyConsumption", sheetnames[1])
+            Q1+= self.parseRange( "Q1_Percent", sheetnames[1])
+            QProduct += self.parseRange( "Q2_Products", sheetnames[1]) 
+            Q2 = self.parseRange( "Q2_EnergyConsumption", sheetnames[1])    
+            Q2+= self.parseRange( "Q2_ElectricityConsumption", sheetnames[1]) 
+            Q2+= self.parseRange( "Q2_EnergyConsumptionProduct", sheetnames[1])  
+            QFuel = self.parseRange( "Q2_EnergyConsumption", sheetnames[1])
         except:
             return "parseError Sheet Q2", []
             #return self.__parseError(sheetname), []
         dlg.update(68)
         try:
-            Q3 = self.parseOOxmlarea(ooWb, "Q3_ProcessData", sheetnames[2])
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_WasteHeat", sheetnames[2])
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_Schedule", sheetnames[2])
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_DataOfExistingHCSupply", sheetnames[2])
+            Q3 = self.parseRange( "Q3_ProcessData", sheetnames[2])
+            Q3+= self.parseRange( "Q3_WasteHeat", sheetnames[2])
+            Q3+= self.parseRange( "Q3_Schedule", sheetnames[2])
+            Q3+= self.parseRange( "Q3_DataOfExistingHCSupply", sheetnames[2])
      
             dlg.update(76)
         except:
@@ -107,41 +113,41 @@ class parseOO(parseSpreadsheet):
         #Q3A
         try:    
 
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_ScheduleTolerance", sheetnames[3])
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_OperationCycle", sheetnames[3])
-            Q3+= self.parseOOxmlarea(ooWb, "Q3_ScheduleCorrelation", sheetnames[3])
+            Q3+= self.parseRange( "Q3_ScheduleTolerance", sheetnames[3])
+            Q3+= self.parseRange( "Q3_OperationCycle", sheetnames[3])
+            Q3+= self.parseRange( "Q3_ScheduleCorrelation", sheetnames[3])
         except:
             return self.__parseError(sheetnames[3]), []
             
         try:    
         
             QRenewables = []
-            QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Interest", sheetnames[8]))
-            QRenewables += self.parseOOxmlarea(ooWb, "Q7_REReason", sheetnames[8])
-            QRenewables.append(self.parseOOxmlarea(ooWb, "Q7_Others", sheetnames[8]))
-            QRenewables += self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetnames[8])
-            QRenewables += self.parseOOxmlarea(ooWb, "Q7_Biomass", sheetnames[8])
+            QRenewables.append(self.parseRange( "Q7_Interest", sheetnames[8]))
+            QRenewables += self.parseRange( "Q7_REReason", sheetnames[8])
+            QRenewables.append(self.parseRange( "Q7_Others", sheetnames[8]))
+            QRenewables += self.parseRange( "Q7_Latitude", sheetnames[8])
+            QRenewables += self.parseRange( "Q7_Biomass", sheetnames[8])
         
-            QSurf = self.parseOOxmlarea(ooWb, "Q7_Area", sheetnames[8])
-            QSurf += self.parseOOxmlarea(ooWb, "Q7_Roof", sheetnames[8])
+            QSurf = self.parseRange( "Q7_Area", sheetnames[8])
+            QSurf += self.parseRange( "Q7_Roof", sheetnames[8])
         except:
             return self.__parseError(sheetnames[8]), []
         dlg.update(84)
         try:    
-            sheetname = "Q3A"
+            sheetname = sheetnames[3]
             QProfiles = []
-            QProcNames = self.parseOOxmlarea(ooWb, "Q3A_ProcessName", sheetnames[3])
+            QProcNames = self.parseRange( "Q3A_ProcessName", sheetnames[3])
             for i in xrange(3):
-                QProfil = self.parseOOxmlarea(ooWb, "Q3A_Profiles_"+ str(i+1), sheetnames[3])
+                QProfil = self.parseRange( "Q3A_Profiles_"+ str(i+1), sheetnames[3])
                 QProfil.append(QProcNames[i*3])       
                 QProfiles.append(QProfil)
     
-            QIntervals  = self.parseOOxmlarea(ooWb, "Q3A_StartTime_1", sheetnames[3])
-            QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_2", sheetnames[3])
-            QIntervals += self.parseOOxmlarea(ooWb, "Q3A_StartTime_3", sheetnames[3])
-            QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_1", sheetnames[3])
-            QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_2", sheetnames[3])
-            QIntervals += self.parseOOxmlarea(ooWb, "Q3A_EndTime_3", sheetnames[3])
+            QIntervals  = self.parseRange( "Q3A_StartTime_1", sheetnames[3])
+            QIntervals += self.parseRange( "Q3A_StartTime_2", sheetnames[3])
+            QIntervals += self.parseRange( "Q3A_StartTime_3", sheetnames[3])
+            QIntervals += self.parseRange( "Q3A_EndTime_1", sheetnames[3])
+            QIntervals += self.parseRange( "Q3A_EndTime_2", sheetnames[3])
+            QIntervals += self.parseRange( "Q3A_EndTime_3", sheetnames[3])
         except:
             return self.__parseError(sheetnames[3]), []
         dlg.update(92)
@@ -149,7 +155,7 @@ class parseOO(parseSpreadsheet):
         
             Q9Questionnaire=[]
             for i in xrange(3):
-                Q9Questionnaire+=self.parseOOxmlarea(ooWb, "Q9_"+str(i+1), sheetnames[10])
+                Q9Questionnaire+=self.parseRange( "Q9_"+str(i+1), sheetnames[10])
 
         except:
             return self.__parseError(sheetnames[10]), []
@@ -169,13 +175,13 @@ class parseOO(parseSpreadsheet):
         for i in xrange(5):
             for j in xrange(len(structureNames)):
                 try:
-                    Q4_8.append(self.parseOOxmlarea(ooWb, startStructure[j]+str(i+1), structureNames[j]))
+                    Q4_8.append(self.parseRange( startStructure[j]+str(i+1), structureNames[j]))
                 except:
                     return structureNames[j] + " " + startStructure[j]+str(i+1),[]
                     
         
         try:
-            latitude = self.parseOOxmlarea(ooWb, "Q7_Latitude", sheetnames[8])
+            latitude = self.parseRange( "Q7_Latitude", sheetnames[8])
         except:
             return self.parseError(sheetnames[8])
         
@@ -330,6 +336,10 @@ class parseOO(parseSpreadsheet):
                                 try:
                                     if tablecell.hasAttribute("office:value-type"):
                                         celltype = tablecell.getAttribute("office:value-type")
+                                        if celltype == "date":
+                                            cell = tablecell.getAttribute("office:date-value")
+                                            data.append(cell)
+                                            continue
                                         if celltype == "float":
                                             cell = tablecell.getAttribute("office:value")
                                             data.append(cell)
@@ -364,6 +374,16 @@ class parseOO(parseSpreadsheet):
         return data
         
         
+    def startProcessing(self):
+        self.__parsedDom = xml.dom.minidom.parseString(self.xmlString)
+
+
+    def setLists(self, lists):
+        self.__lists = lists    
+    
+    def endProcessing(self):
+        pass
+    
     
     def __connectToDB(self):
         conn = MySQLdb.connect("localhost", self.__username, self.__password, db="einstein")
