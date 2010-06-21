@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_ECONOMIC = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -130,9 +131,10 @@ class PanelDBSolarThermal(PanelDBBase):
                              label = _U("STModel"),
                              tip = _U("Solarthermal Model"))
 
-        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("STType"),
-                             tip = _U("Solarthermal Type"))
+        self.tc3 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("STType"),
+                               tip = _U("Solarthermal Type"))
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("STReference"),
@@ -150,9 +152,11 @@ class PanelDBSolarThermal(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc5 = StaticTextEntry(self.page2, maxchars = 255, value = '',
-                                   label = _U("STPnomColl"),
-                                   tip = _U("STPnomColl"))
+        self.tc5 = StaticFloatEntry(self.page2,
+                                    ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                    unitdict = 'POWER',
+                                    label = _U("STPnomColl"),
+                                    tip = _U("STPnomColl"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -160,21 +164,17 @@ class PanelDBSolarThermal(PanelDBBase):
                               label = _U("STc0"),
                               tip = _U("Optical efficiency"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
-
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'HEATLOSSCOEFF',
                               label = _U("STc1"),
                               tip = _U("Linear thermal loss coefficient"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'HEATLOSSCOEFF2',
                               label = _U("STc2"),
                               tip = _U("Quadratic thermal loss coefficient"))
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -238,6 +238,7 @@ class PanelDBSolarThermal(PanelDBBase):
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               #fixxxme
                                #unitdict = 'MASSPERAREA',
                                unitdict = 'FRACTION',
                                label = _U("STWeightFactor"),
@@ -256,43 +257,41 @@ class PanelDBSolarThermal(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_ECONOMIC)
+
         self.tc20 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("STUnitPrice300kW"),
                                tip = _U("STUnitPrice300kW"))
 
         self.tc21 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice30kW"),
                                tip = _U("STUnitTurnKeyPrice30kW"))
 
         self.tc22 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice300kW"),
                                tip = _U("STUnitTurnKeyPrice300kW"))
 
         self.tc23 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice3000kW"),
                                tip = _U("STUnitTurnKeyPrice3000kW"))
 
         self.tc24 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'UNITPRICE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'UNITPRICE',
                                label = _U("STOMUnitFix"),
                                tip = _U("STOMUnitFix"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_ECONOMIC, wUnits = 0)
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
@@ -303,7 +302,6 @@ class PanelDBSolarThermal(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
-        #flagText_left = wx.TOP | wx.ALIGN_LEFT
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
 
         # global sizer for panel.
@@ -399,8 +397,9 @@ class PanelDBSolarThermal(PanelDBBase):
         tmp = {
                "STManufacturer":check(self.tc1.GetValue()),
                "STModel":check(self.tc2.GetValue()),
-               "STType":check(self.tc3.GetValue()),
+               "STType":check(self.tc3.GetValue(text = True)),
                "STReference":check(self.tc4.GetValue()),
+               "STPnomColl":check(self.tc5.GetValue()),
                "STc0":check(self.tc6.GetValue()),
                "STc1":check(self.tc7.GetValue()),
                "STc2":check(self.tc8.GetValue()),
@@ -435,10 +434,13 @@ class PanelDBSolarThermal(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
+        self.fillChoiceOfSTType(self.tc3.entry)
+
         if q is not None:
             self.tc1.SetValue(str(q.STManufacturer)) if q.STManufacturer is not None else ''
             self.tc2.SetValue(str(q.STModel)) if q.STModel is not None else ''
-            self.tc3.SetValue(str(q.STType)) if q.STType is not None else ''
+            if q.STType is not None:
+                self.tc3.SetValue(str(q.STType)) if q.STType in STTYPES else ''
             self.tc4.SetValue(str(q.STReference)) if q.STReference is not None else ''
             self.tc5.SetValue(str(q.STPnomColl)) if q.STPnomColl is not None else ''
             self.tc6.SetValue(str(q.STc0)) if q.STc0 is not None else ''
@@ -491,6 +493,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.tc25.SetValue('')
 
     def fillChoices(self):
+        self.fillChoiceOfSTType(self.tc3.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):
@@ -499,7 +502,7 @@ class PanelDBSolarThermal(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           len(self.tc3.GetValue()) == 0 and\
+           len(self.tc3.GetValue(text = True)) == "None" and\
            len(self.tc4.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\

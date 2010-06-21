@@ -286,24 +286,29 @@ class PanelDBBase(wx.Dialog):
         return tUnitList
 
     def getSourceSinkList(self):
-        sourceSinkTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
-        sourceSinkList = []
-        for entry in sourceSinkTable:
-            sourceSink = entry.HPSourceSink
-            if str(sourceSink) not in sourceSinkList and len(str(sourceSink)) > 0:
-                sourceSinkList.append(str(sourceSink))
+        sourceSinkList = HPSOURCESINK.values()
         sourceSinkList.sort()
         return sourceSinkList
 
     def getAbsHeatMedList(self):
-        absHeatMedTable = Status.DB.dbheatpump.DBHeatPump_ID['%']
+        absHeatMedTable = Status.DB.dbfluid.DBFluid_ID['%']
         absHeatMedList = []
         for entry in absHeatMedTable:
-            absHeatMed = entry.HPAbsHeatMed
+            absHeatMed = entry.FluidName
             if str(absHeatMed) not in absHeatMedList and len(str(absHeatMed)) > 0:
                 absHeatMedList.append(str(absHeatMed))
         absHeatMedList.sort()
         return absHeatMedList
+
+    def getHPSubTypeList(self):
+        hpSubTypeList = []
+        for list in HPSUBTYPES.values():
+            listEntry = ""
+            for e in list:
+                listEntry += e + "-"
+            hpSubTypeList.append(listEntry.rstrip('-'))
+        hpSubTypeList.sort()
+        return hpSubTypeList
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
@@ -361,6 +366,20 @@ class PanelDBBase(wx.Dialog):
         boilerTypeList = BBTYPES
         boilerTypeList.sort()
         fillChoice(entry, boilerTypeList)
+
+    def fillChoiceOfHPType(self, entry):
+        hpTypeList = HPTYPES
+        hpTypeList.sort()
+        fillChoice(entry, hpTypeList)
+
+    def fillChoiceOfHPSubType(self, entry):
+        hpSubTypeList = self.getHPSubTypeList()
+        fillChoice(entry, hpSubTypeList)
+
+    def fillChoiceOfSTType(self, entry):
+        stTypeList = STTYPES
+        stTypeList.sort()
+        fillChoice(entry, stTypeList)
 
     def fillChoiceOfType(self):
         try:

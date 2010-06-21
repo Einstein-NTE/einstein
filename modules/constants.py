@@ -160,7 +160,7 @@ HPTYPES = ["compression",
            "thermal"]
 
 HPSUBTYPES = {
-              'compression' : ['subtype1', 'subtype2'],
+              'compression' : ['water', 'water'],
               'thermal'     : ['subtype1', 'subtype2'],
               }
 

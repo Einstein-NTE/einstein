@@ -37,8 +37,9 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
-DATA_ENTRY_WIDTH_LEFT = 195
-UNITS_WIDTH = 0
+DATA_ENTRY_WIDTH_LEFT = 140
+UNITS_WIDTH = 55
+UNITS_WIDTH_ECONOMIC = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -138,13 +139,15 @@ class PanelDBHeatPump(PanelDBBase):
                              label = _U("HPModel"),
                              tip = _U("Heatpump Model"))
 
-        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("HPType"),
-                             tip = _U("Heatpump Type"))
+        self.tc3 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("HPType"),
+                               tip = _U("Heatpump type"))
 
-        self.tc4 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("HPSubType"),
-                             tip = _U("Heatpump Sub Type"))
+        self.tc4 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("HPSubType"),
+                               tip = _U("Heatpump sub type"))
 
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Reference"),
@@ -167,26 +170,31 @@ class PanelDBHeatPump(PanelDBBase):
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'POWER',
                               label = _U("HPHeatCap"),
                               tip = _U("Nominal heating capacity"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("HPHeatCOP"),
                               tip = _U("Nominal COP for heating mode"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'POWER',
                               label = _U("HPCoolCap"),
                               tip = _U("Nominal cooling capacity"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              unitdict = 'FRACTION',
                               label = _U("HPCoolCOP"),
                               tip = _U("Nominal COP for cooling mode"))
 
         self.tc10 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'POWER',
                                label = _U("HPFuelConsum"),
                                tip = _U("Nominal fuel consumption"))
 
@@ -197,68 +205,91 @@ class PanelDBHeatPump(PanelDBBase):
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'POWER',
                                label = _U("HPElectConsum"),
                                tip = _U("Nominal electrical power consumption"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc13 = TextEntry(self.page2, maxchars = 45, value = '',
                               label = _U("HPWorkFluid"),
                               tip = _U("Refrigerant / absorbent refrigerant pair"))
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPCondTinC"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPGenTinC"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPEvapTinC"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATUREDIFF',
                                label = _U("HPConstExCoolCOP"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPCondTinH"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPGenTinH"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc20 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPEvapTinH"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc21 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATUREDIFF',
                                label = _U("HPConstExHeatCOP"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
-        self.tc22 = StaticTextEntry(self.page2, maxchars = 255, value = '',
-                                    label = _U("HPExCoolCOP"),
-                                    tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
+        self.tc22 = StaticFloatEntry(self.page2,
+                                     ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                     unitdict = 'FRACTION',
+                                     label = _U("HPExCoolCOP"),
+                                     tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc23 = StaticTextEntry(self.page2, maxchars = 255, value = '',
-                                    label = _U("HPThCoolCOP"),
-                                    tip = _U("Carnot COP for cooling mode at nominal conditions (see next point)."))
+        self.tc23 = StaticFloatEntry(self.page2,
+                                     ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                     unitdict = 'FRACTION',
+                                     label = _U("HPThCoolCOP"),
+                                     tip = _U("Carnot COP for cooling mode at nominal conditions (see next point)."))
 
-        self.tc24 = StaticTextEntry(self.page2, maxchars = 255, value = '',
-                                    label = _U("HPExHeatCOP"),
-                                    tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
+        self.tc24 = StaticFloatEntry(self.page2,
+                                     ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                     unitdict = 'FRACTION',
+                                     label = _U("HPExHeatCOP"),
+                                     tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc25 = StaticTextEntry(self.page2, maxchars = 255, value = '',
-                                    label = _U("HPThHeatCOP"),
-                                    tip = _U("Carnot COP for heating mode at nominal conditions (see next point)."))
+        self.tc25 = StaticFloatEntry(self.page2,
+                                     ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                     unitdict = 'FRACTION',
+                                     label = _U("HPThHeatCOP"),
+                                     tip = _U("Carnot COP for heating mode at nominal conditions (see next point)."))
 
         #
         # tab 3 - Heat source / sink
@@ -279,16 +310,19 @@ class PanelDBHeatPump(PanelDBBase):
 
         self.tc27 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATUREDIFF',
                                label = _U("HPLimDT"),
                                tip = _U("Maximum acceptable temperature difference between evaporator and condenser temperatures (primary fluid: Tco - Tev) - working limit"))
 
         self.tc28 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPCondTmax"),
                                tip = _U("Maximum condensing (and absorption) temperature (primary fluid) - working limit"))
 
         self.tc29 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPEvapTmin"),
                                tip = _U("Minimum evaporating temperature (primary fluid) - working limit"))
 
@@ -299,6 +333,7 @@ class PanelDBHeatPump(PanelDBBase):
 
         self.tc31 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'TEMPERATURE',
                                label = _U("HPGenTmin"),
                                tip = _U("Minimum required inlet temperature to the generator"))
 
@@ -312,30 +347,43 @@ class PanelDBHeatPump(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_ECONOMIC)
+
         self.tc32 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("HPPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc33 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("HPTurnKeyPrice"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc34 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'UNITPRICE',
                                label = _U("HPOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc35 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'ENERGYTARIFF',
                                label = _U("HPOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_ECONOMIC, wUnits = 0)
 
         self.tc36 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
                                label = _U("HPYearUpdate"),
                                tip = _U("Year of last update of the economic data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
@@ -470,15 +518,15 @@ class PanelDBHeatPump(PanelDBBase):
         tmp = {
                "HPManufacturer":check(self.tc1.GetValue()),
                "HPModel":check(self.tc2.GetValue()),
-               "HPType":check(self.tc3.GetValue()),
-               "HPSubType":check(self.tc4.GetValue()),
+               "HPType":check(self.tc3.GetValue(text = True)),
+               "HPSubType":check(self.tc4.GetValue(text = True)),
                "Reference":check(self.tc5.GetValue()),
                "HPHeatCap":check(self.tc6.GetValue()),
                "HPHeatCOP":check(self.tc7.GetValue()),
                "HPCoolCap":check(self.tc8.GetValue()),
                "HPCoolCOP":check(self.tc9.GetValue()),
                "HPFuelConsum":check(self.tc10.GetValue()),
-               "FuelType":check(findKey(fuelDict, self.tc11.GetValue(text = True))),
+               "FuelType":check(self.tc11.GetValue()),
                "HPElectConsum":check(self.tc12.GetValue()),
                "HPWorkFluid":check(self.tc13.GetValue()),
                "HPCondTinC":check(self.tc14.GetValue()),
@@ -520,16 +568,20 @@ class PanelDBHeatPump(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-        fuelDict = Status.prj.getFuelDict()
+        fuelDict = FUELTYPES
+        hpSourceSinkDict = HPSOURCESINK
         self.fillChoiceOfDBFuel(self.tc11.entry)
         self.fillChoiceOfHPSourceSink(self.tc26.entry)
         self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
+        self.fillChoiceOfHPType(self.tc3.entry)
+        self.fillChoiceOfHPSubType(self.tc4.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.HPManufacturer)) if q.HPManufacturer is not None else ''
             self.tc2.SetValue(str(q.HPModel)) if q.HPModel is not None else ''
             self.tc3.SetValue(str(q.HPType)) if q.HPType is not None else ''
-            self.tc4.SetValue(str(q.HPSubType)) if q.HPSubType is not None else ''
+            if q.HPSubType:
+                self.tc4.SetValue(str(q.HPSubType)) if q.HPSubType in self.getHPSubTypeList() else ''
             self.tc5.SetValue(str(q.Reference)) if q.Reference is not None else ''
             self.tc6.SetValue(str(q.HPHeatCap)) if q.HPHeatCap is not None else ''
             self.tc7.SetValue(str(q.HPHeatCOP)) if q.HPHeatCOP is not None else ''
@@ -537,7 +589,7 @@ class PanelDBHeatPump(PanelDBBase):
             self.tc9.SetValue(str(q.HPCoolCOP)) if q.HPCoolCOP is not None else ''
             self.tc10.SetValue(str(q.HPFuelConsum)) if q.HPFuelConsum is not None else ''
             if q.FuelType is not None:
-                self.tc11.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
+                self.tc11.SetValue(str(q.FuelType)) if str(q.FuelType) in fuelDict.values() else ''
             self.tc12.SetValue(str(q.HPElectConsum)) if q.HPElectConsum is not None else ''
             self.tc13.SetValue(str(q.HPWorkFluid)) if q.HPWorkFluid is not None else ''
             self.tc14.SetValue(str(q.HPCondTinC)) if q.HPCondTinC is not None else ''
@@ -552,11 +604,13 @@ class PanelDBHeatPump(PanelDBBase):
             self.tc23.SetValue(str(q.HPThCoolCOP)) if q.HPThCoolCOP is not None else ''
             self.tc24.SetValue(str(q.HPExHeatCOP)) if q.HPExHeatCOP is not None else ''
             self.tc25.SetValue(str(q.HPThHeatCOP)) if q.HPThHeatCOP is not None else ''
-            self.tc26.SetValue(str(q.HPSourceSink)) if q.HPSourceSink is not None else ''
+            if q.HPSourceSink is not None:
+                self.tc26.SetValue(str(q.HPSourceSink)) if q.HPSourceSink in hpSourceSinkDict.values() else ''
             self.tc27.SetValue(str(q.HPLimDT)) if q.HPLimDT is not None else ''
             self.tc28.SetValue(str(q.HPCondTmax)) if q.HPCondTmax is not None else ''
             self.tc29.SetValue(str(q.HPEvapTmin)) if q.HPEvapTmin is not None else ''
-            self.tc30.SetValue(str(q.HPAbsHeatMed)) if q.HPAbsHeatMed is not None else ''
+            if q.HPAbsHeatMed is not None:
+                self.tc30.SetValue(str(q.HPAbsHeatMed)) if q.HPAbsHeatMed in self.getAbsHeatMedList() else ''
             self.tc31.SetValue(str(q.HPGenTmin)) if q.HPGenTmin is not None else ''
             self.tc32.SetValue(str(q.HPPrice)) if q.HPPrice is not None else ''
             self.tc33.SetValue(str(q.HPTurnKeyPrice)) if q.HPTurnKeyPrice is not None else ''
@@ -607,6 +661,8 @@ class PanelDBHeatPump(PanelDBBase):
         self.fillChoiceOfDBFuel(self.tc11.entry)
         self.fillChoiceOfHPSourceSink(self.tc26.entry)
         self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
+        self.fillChoiceOfHPType(self.tc3.entry)
+        self.fillChoiceOfHPSubType(self.tc4.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 
@@ -616,14 +672,15 @@ class PanelDBHeatPump(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           len(self.tc3.GetValue()) == 0 and\
-           len(self.tc4.GetValue()) == 0 and\
+           self.tc3.GetValue(text = True) == "None" and\
+           self.tc4.GetValue(text = True) == "None" and\
            len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\
            self.tc9.GetValue() is None and\
            self.tc10.GetValue() is None and\
+           self.tc11.GetValue(text = True) == "None" and\
            self.tc12.GetValue() is None and\
            len(self.tc13.GetValue()) == 0 and\
            self.tc14.GetValue() is None and\
@@ -634,11 +691,11 @@ class PanelDBHeatPump(PanelDBBase):
            self.tc19.GetValue() is None and\
            self.tc20.GetValue() is None and\
            self.tc21.GetValue() is None and\
-           self.tc26.GetValue() < 0 and\
+           self.tc26.GetValue(text = True) == "None" and\
            self.tc27.GetValue() is None and\
            self.tc28.GetValue() is None and\
            self.tc29.GetValue() is None and\
-           self.tc30.GetValue() < 0 and\
+           self.tc30.GetValue(text = True) == "None" and\
            self.tc31.GetValue() is None and\
            self.tc32.GetValue() is None and\
            self.tc33.GetValue() is None and\
