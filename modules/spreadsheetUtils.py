@@ -429,10 +429,13 @@ class SpreadsheetDict():
         return Q4Cdict
     
     @staticmethod
-    def createQ5Dictionary(Q5,db_conn):
+    def createQ5Dictionary(Q5,Questionnaire_ID, db_conn):
         Q5dict = {}
         Q5dict["Pipeduct"] = Q5[0]
-        Q5dict["HeatDistMedium"] = Q5[1]
+        dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q5[1])+"'")
+        Q5dict["HeatDistMedium"]= dbfluid[0]['DBFluid_ID']
+        
+        #Q5dict["HeatDistMedium"] = Q5[1]
         Q5dict["DistribCircFlow"] = Q5[2]
         Q5dict["ToutDistrib"] = Q5[3]
         Q5dict["TreturnDistrib"] = Q5[4]
@@ -449,6 +452,7 @@ class SpreadsheetDict():
         Q5dict["PmaxStorage"] = Q5[17]
         Q5dict["TmaxStorage"] = Q5[18]
         Q5dict['AlternativeProposalNo'] = -1
+        Q5dict['Questionnaire_id'] = Questionnaire_ID
         return Q5dict
     
     @staticmethod
@@ -765,7 +769,7 @@ class Utils():
                 #return self.parseError(self.__sheetnames[5])
             
             try:
-                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], self.__md))
+                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], Questionnaire_ID, self.__md))
             except:
                 pass
                 #return self.parseError(self.__sheetnames[6])
@@ -794,13 +798,12 @@ class Utils():
         except:
             return self.parseError(self.__sheetnames[8])
         
-        try:
-            self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
-            self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-            
-            self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
-        except:
-            pass
+        
+        self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
+        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+        
+        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+
         try:
             # Code to skip a specific amount of columns
             index =0
@@ -818,10 +821,10 @@ class Utils():
             SpreadsheetDict.createProcessScheduleCorrDictionary(Q3n, self.__md)
         except:
             pass
-        
+        print Questionnaire_ID
         self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
         self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set'})
-        self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
+        #self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
 
         return "Parsing successful!"
         
