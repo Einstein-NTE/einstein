@@ -318,7 +318,7 @@ class PanelDBBase(wx.Dialog):
         fillChoice(entry, fuelTypeList)
 
     def fillChoiceOfDBFuel(self, entry):
-        fuelDict = Status.prj.getFuelDict()
+        fuelDict = FUELTYPES
         fuelList = fuelDict.values()
         fillChoice(entry, fuelList)
 
@@ -356,6 +356,11 @@ class PanelDBBase(wx.Dialog):
         absHeatMedList = self.getAbsHeatMedList()
         appendNone = False if "None" in absHeatMedList else True;
         fillChoice(entry, absHeatMedList, appendNone)
+
+    def fillChoiceOfBoilerType(self, entry):
+        boilerTypeList = BBTYPES
+        boilerTypeList.sort()
+        fillChoice(entry, boilerTypeList)
 
     def fillChoiceOfType(self):
         try:

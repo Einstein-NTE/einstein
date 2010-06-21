@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-15 -*-
+# -*- coding: utf-8 -*-
 #==============================================================================
 #
 #	E I N S T E I N
@@ -107,17 +107,29 @@ def changeMassOrVolumeUnits():
 
 
 UNITS = {
-# conversion to internal unit: [ºC]
+# conversion to internal unit: [Â°C]
     'TEMPERATURE' : {
-        'ºC':   (1.0,   0.0),
-        'ºF':   (5.0/9, -32.0*5/9),
+        'Â°C':   (1.0,   0.0),
+        'Â°F':   (5.0/9, -32.0*5/9),
         'K':    (1.0,   -273.15)
         },
 
 # conversion to internal unit: [K]
     'TEMPERATUREDIFF' : {
         'K':    (1.0,   0.0),
-        'ºF':   (5.0/9, 0.0),
+        'Â°F':   (5.0/9, 0.0),
+        },
+
+# conversion to internal unit: [1/K]
+    'INVTEMP' : {
+        '1/K':    (1.0, 0.0),
+        '1/Â°F':   (9/5.0, 0.0),
+        },
+
+# conversion to internal unit: [1/K^2]
+    'INVTEMP2' : {
+        '1/K^2':    (1.0, 0.0),
+        '1/Â°F^2':   (81/25.0, 0.0),
         },
 
 # conversion to internal unit: [h]
@@ -265,25 +277,43 @@ UNITS = {
         'kcal/kg' : (1.163e-3,0.0),
         'btu/lb' : (0.0002930711/0.45359,0.0)
         },
+        
+# conversion to internal unit: [kg/kWh]
+    'CO2RATIO' : {
+        'kg/kWh' : (1.0,0.0),
+        'kg/kJ' : (3600,0.0),
+        'kg/kcal' : (1/1.163e-3,0.0),
+        'lb/btu' : (0.45359/0.0002930711,0.0)
+        },
 
 # conversion to internal unit: [kWh/kgK]
     'SPECIFICHEAT' : {
         'kWh/kgK' : (1.0,0.0),
         'kJ/kgK' : (1.0/3600.0,0.0),
         'kcal/kgK' : (1.163e-3,0.0),
-        'btu/lbºF' : (((0.0002930711*9)/(0.45359*5)),0.0)
+        'btu/lbÂ°F' : (((0.0002930711*9)/(0.45359*5)),0.0)
         },
 
 # conversion to internal unit: [kW/K]
     'HEATTRANSFERCOEF' : {
         'kW/K' : (1.0,0.0),
         'W/K' : (1.0e-3,0.0),
-        'btu/hºF' : ((0.0002930711*9)/5,0.0)
+        'btu/hÂ°F' : ((0.0002930711*9)/5,0.0)
+        },
+
+# conversion to internal unit: [X]
+    'HEATLOSSCOEFF' : {
+        'X' : (1.0, 0.0),
+        },
+        
+# conversion to internal unit: [X]^2
+    'HEATLOSSCOEFF2' : {
+        'X^2' : (1.0, 0.0),
         },
 
 # conversion to internal unit: [-]
     'ANGLE' : {
-        'º' : (1.0,0.0),
+        'Â°' : (1.0,0.0),
         'rad' : (0.017453,0.0),
         },
 
@@ -299,7 +329,20 @@ UNITS = {
         '%/a' : (0.01,0.0),
         },
 
-# conversion to internal unit: [¤/kWh]
+# conversion to internal unit: [â‚¬]
+    'PRICE': {
+        '%s'%CURRENCY : (1.0,0.0),
+        'k%s'%CURRENCY: (1000.0,0.0),
+        'M%s'%CURRENCY: (1.e+6,0.0),
+        },
+
+# conversion to internal unit: [â‚¬/kW]
+    'UNITPRICE' : {
+        '%s/kW'%CURRENCY : (1.0,0.0),
+        '%s/MW'%CURRENCY: (0.001,0.0),
+        },
+
+# conversion to internal unit: [â‚¬/kWh]
     'ENERGYTARIFF': {
         '%s/kWh'%CURRENCY : (1.0,0.0),
         '%s/MWh'%CURRENCY : (0.001,0.0),
@@ -308,21 +351,16 @@ UNITS = {
         '%s/GJ'%CURRENCY: (3.6e-3,0.0),
         '%s/btu'%CURRENCY: (1.0/0.0002930711,0.0)
         },
-
-# conversion to internal unit: [¤]
-    'PRICE': {
-        '%s'%CURRENCY : (1.0,0.0),
-        'k%s'%CURRENCY: (1000.0,0.0),
-        'M%s'%CURRENCY: (1.e+6,0.0),
-        }
     }
 
 
 
 UNITSYSTEM = {
     'SI' :      {
-                'TEMPERATURE':'ºC',
+                'TEMPERATURE':'Â°C',
                 'TEMPERATUREDIFF':'K',
+                'INVTEMP' : '1/K',
+                'INVTEMP2' : '1/K^2',
                 'TIME':'s',
                 'LONGTIME':'a',
                 'LENGTH': 'm',
@@ -341,16 +379,19 @@ UNITSYSTEM = {
                 'SPECIFICENTHALPY':'kWh/kg',
                 'SPECIFICHEAT':'kWh/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
-                'ANGLE':'º',
+                'ANGLE':'Â°',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/GJ'%CURRENCY,
-                'PRICE':'%s'%CURRENCY
+                'PRICE':'%s'%CURRENCY,
+                'UNITPRICE' : '%s/kW'%CURRENCY
                 },
     
     'SI-kWh' :  {
-                'TEMPERATURE':'ºC',
+                'TEMPERATURE':'Â°C',
                 'TEMPERATUREDIFF':'K',
+                'INVTEMP' : '1/K',
+                'INVTEMP2' : '1/K^2',
                 'TIME':'h',
                 'LONGTIME':'a',
                 'LENGTH': 'm',
@@ -369,16 +410,19 @@ UNITSYSTEM = {
                 'SPECIFICENTHALPY':'kWh/kg',
                 'SPECIFICHEAT':'kWh/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
-                'ANGLE':'º',
+                'ANGLE':'Â°',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/MWh'%CURRENCY,
-                'PRICE':'%s'%CURRENCY
+                'PRICE':'%s'%CURRENCY,
+                'UNITPRICE' : '%s/kW'%CURRENCY
                 },
 
     'BTU' :     {
-                'TEMPERATURE':'ºF',
-                'TEMPERATUREDIFF':'ºF',
+                'TEMPERATURE':'Â°F',
+                'TEMPERATUREDIFF':'Â°F',
+                'INVTEMP' : '1/K',
+                'INVTEMP2' : '1/K^2',
                 'TIME':'h',
                 'LONGTIME':'a',
                 'LENGTH': 'ft',
@@ -395,13 +439,14 @@ UNITSYSTEM = {
                 'ENERGYFLOW':'btu/h.ft2.a',
                 'POWER':'btu/h',
                 'SPECIFICENTHALPY':'btu/lb',
-                'SPECIFICHEAT':'btu/lbºF',
-                'HEATTRANSFERCOEF':'btu/hºF',
-                'ANGLE':'º',
+                'SPECIFICHEAT':'btu/lbÂ°F',
+                'HEATTRANSFERCOEF':'btu/hÂ°F',
+                'ANGLE':'Â°',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,
-                'PRICE':'%s'%CURRENCY
+                'PRICE':'%s'%CURRENCY,
+                'UNITPRICE' : '%s/kW'%CURRENCY
                 }
 }
 
@@ -460,7 +505,7 @@ def conversionFactor(unit):
 #------------------------------------------------------------------------------
 def getUnitTypes(unit):
 #------------------------------------------------------------------------------
-#   gets the unit type (TEMPERATURE, MASSFLOW, ...) from the unit (ºC, kg/h, ...)
+#   gets the unit type (TEMPERATURE, MASSFLOW, ...) from the unit (ï¿½C, kg/h, ...)
 #   used for distinction of mass flow and volume flow, mass and volume, ...
 #------------------------------------------------------------------------------
     unitTypes = []

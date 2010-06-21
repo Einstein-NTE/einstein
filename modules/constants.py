@@ -1,4 +1,4 @@
-# -*- coding: cp1252 -*-
+# -*- coding: utf-8 -*-
 #============================================================================== 				
 #
 #	E I N S T E I N
@@ -38,7 +38,8 @@
 #============================================================================== 
 
 #------------------------------------------------------------------------------		
-VERSION = "V1.1 Revision No. 329" #Number of upload in sourceforge
+VERSION      = "1.2"
+RELEASE_DATE = "21 April 2010"
 #------------------------------------------------------------------------------		
 DEBUG = "OFF"   #Set to:
 DEBUGMODES = ["OFF","BASIC","MAIN","ALL"]
@@ -158,6 +159,11 @@ TRANSCHTYPES = { "compression chiller":_("compression chiller"),
 HPTYPES = ["compression",
            "thermal"]
 
+HPSUBTYPES = {
+              'compression' : ['subtype1', 'subtype2'],
+              'thermal'     : ['subtype1', 'subtype2'],
+              }
+
 TRANSHPTYPES = {"compression":_("compression"),
                 "thermal":_("thermal")}
 
@@ -186,6 +192,11 @@ CHPTYPES = [ "CHP engine",
              "CHP steam turbine",
              "CHP gas turbine",
              "CHP fuel cell"]
+
+CHPSUBTYPES = {"CHP engine"        : ["subtype1", "subtype2"],
+               "CHP steam turbine" : ["subtype1", "subtype2"],
+               "CHP gas turbine"   : ["subtype1", "subtype2"],
+               "CHP fuel cell"     : ["subtype1", "subtype2"]}
 
 TRANSCHPTYPES = {
              "CHP engine":_("CHP engine"),
@@ -333,7 +344,8 @@ ROOFTYPES = {"Corrugated metal roof":_("Corrugated metal roof"),
                 "Tiled roof":_("Tiled roof"),
                 "Other":_("Other")}
 
-PRODUCTCODES = {"ZZ000":_("ZZ000: other products"),
+PRODUCTCODES = {"ZZ999":_("ZZ999: auxiliary services"),
+                "ZZ000":_("ZZ000: other products"),
                 "DA010":_("DA010: milk products"),
                 "DA020":_("DA020: fruits/vegetables/herbs"),
                 "DA030":_("DA030: sugar"),
@@ -345,6 +357,19 @@ PRODUCTCODES = {"ZZ000":_("ZZ000: other products"),
                 "DA090":_("DA090: meat"),
                 "DA100":_("DA100: fish"),
                 "DA110":_("DA110: aroma")}
+
+FUELTYPES = {'NG' : _('Natural gas'),
+             'LPG': _('Liquid petroleum gas'),
+             'HFO': _('Heavy fuel oil'),
+             'BUT': _('Butane'),
+             'PRO': _('Propane'),
+             'GO' : _('Gas oil')}
+
+HPSOURCESINK = {'air-air'    : _('air-air'),
+                'air-water'  : _('air-water'),
+                'water-air'  : _('water-air'),
+                'water-water': _('water-water')}
+
 
 #==============================================================================
 #   auxiliary functions for lookup in default tables and dictionaries

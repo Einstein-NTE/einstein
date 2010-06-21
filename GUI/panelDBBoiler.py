@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_ECONOMIC = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -132,9 +133,10 @@ class PanelDBBoiler(PanelDBBase):
                              label = _U("BoilerModel"),
                              tip = _U("Boiler Model"))
 
-        self.tc3 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("BoilerType"),
-                             tip = _U("Boiler Type"))
+        self.tc3 = ChoiceEntry(self.page1,
+                               values = [],
+                               label = _U("BoilerType"),
+                               tip = _U("Boiler type"))
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              label = _U("Reference"),
@@ -154,8 +156,7 @@ class PanelDBBoiler(PanelDBBase):
 
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'POWER',
-                              unitdict = 'FRACTION',
+                              unitdict = 'POWER',
                               label = _U("BBPnom"),
                               tip = _U("Nominal thermal power"))
 
@@ -167,8 +168,7 @@ class PanelDBBoiler(PanelDBBase):
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'POWER',
-                              unitdict = 'FRACTION',
+                              unitdict = 'POWER',
                               label = _U("FuelConsum"),
                               tip = _U("Nominal fuel consumption (LCV)"))
 
@@ -179,8 +179,7 @@ class PanelDBBoiler(PanelDBBase):
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'POWER',
-                              unitdict = 'FRACTION',
+                              unitdict = 'POWER',
                               label = _U("ElConsum"),
                               tip = _U("Nominal electrical power consumption"))
 
@@ -214,15 +213,13 @@ class PanelDBBoiler(PanelDBBase):
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'INVTEMP',
-                               unitdict = 'FRACTION',
+                               unitdict = 'INVTEMP',
                                label = _U("BBK1"),
                                tip = _U("Linear dependence of the efficiency on the temperature"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'INVTEMP2',
-                               unitdict = 'FRACTION',
+                               unitdict = 'INVTEMP2',
                                label = _U("BBK2"),
                                tip = _U("Quadratic dependence of the efficiency on the temperature"))
 
@@ -253,27 +250,34 @@ class PanelDBBoiler(PanelDBBase):
         fp.popFont()
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_ECONOMIC)
 
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("BoilerPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'PRICE',
                                label = _U("BoilerTurnKeyPrice"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'UNITPRICE',
                                label = _U("BoilerOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'ENERGYTARIFF',
                                label = _U("BoilerOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_ECONOMIC, wUnits = 0)
 
         self.tc22 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
@@ -376,12 +380,12 @@ class PanelDBBoiler(PanelDBBase):
         tmp = {
                "BoilerManufacturer":check(self.tc1.GetValue()),
                "BoilerModel":check(self.tc2.GetValue()),
-               "BoilerType":check(self.tc3.GetValue()),
+               "BoilerType":check(self.tc3.GetValue(text = True)),
                "Reference":check(self.tc4.GetValue()),
                "BBPnom":check(self.tc5.GetValue()),
                "BBEfficiency":check(self.tc6.GetValue()),
                "FuelConsum":check(self.tc7.GetValue()),
-               "FuelType":check(findKey(fuelDict, self.tc8.GetValue(text = True))),
+               "FuelType":check(self.tc8.GetValue(text = True)),
                "ElConsum":check(self.tc9.GetValue()),
                "Economiser":check(self.tc10.GetValue(text = True)),
                "Preheater":check(self.tc11.GetValue(text = True)),
@@ -410,10 +414,11 @@ class PanelDBBoiler(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-        fuelDict = Status.prj.getFuelDict()
+        fuelDict = FUELTYPES
         self.fillChoiceOfDBFuel(self.tc8.entry)
         self.fillChoiceYesNo(self.tc10.entry)
         self.fillChoiceYesNo(self.tc11.entry)
+        self.fillChoiceOfBoilerType(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.BoilerManufacturer)) if q.BoilerManufacturer is not None else ''
@@ -424,7 +429,7 @@ class PanelDBBoiler(PanelDBBase):
             self.tc6.SetValue(str(q.BBEfficiency)) if q.BBEfficiency is not None else ''
             self.tc7.SetValue(str(q.FuelConsum)) if q.FuelConsum is not None else ''
             if q.FuelType is not None:
-                self.tc8.SetValue(fuelDict[int(q.FuelType)]) if int(q.FuelType) in fuelDict.keys() else ''
+                self.tc8.SetValue(str(q.FuelType)) if str(q.FuelType) in fuelDict.values() else ''
             self.tc9.SetValue(str(q.ElConsum)) if q.ElConsum is not None else ''
             if q.Economiser is not None and q.Economiser.lower() == "yes":
                 self.tc10.entry.SetStringSelection("Yes")
@@ -475,6 +480,7 @@ class PanelDBBoiler(PanelDBBase):
         self.fillChoiceOfDBFuel(self.tc8.entry)
         self.fillChoiceYesNo(self.tc10.entry)
         self.fillChoiceYesNo(self.tc11.entry)
+        self.fillChoiceOfBoilerType(self.tc3.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):
@@ -483,11 +489,12 @@ class PanelDBBoiler(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           len(self.tc3.GetValue()) == 0 and\
+           self.tc3.GetValue() is None and\
            len(self.tc4.GetValue()) == 0 and\
            self.tc5.GetValue() is None and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
+           self.tc8.GetValue(text = True) == "None" and\
            self.tc9.GetValue() is None and\
            self.tc12.GetValue() is None and\
            self.tc13.GetValue() is None and\
