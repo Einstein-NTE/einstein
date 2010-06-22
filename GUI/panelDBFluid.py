@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -157,8 +158,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'TEMPERATURE',
-                              unitdict = 'FRACTION',
+                              unitdict = 'TEMPERATURE',
                               label = _U("TCond"),
                               tip = _U("Temperature of evaporation"))
 
@@ -171,8 +171,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'SPECIFICENTHALPY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'SPECIFICENTHALPY',
                               label = _U("LatentHeat"),
                               tip = _U("Latent heat of evaporation"))
 
@@ -195,15 +194,13 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'CO2RATIO',
-                               unitdict = 'FRACTION',
+                               unitdict = 'CO2RATIO',
                                label = _U("SpecificMassFlow"),
                                tip = _U("Typical specific mass flow of refrigerant"))
 
         self.tc11 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'TEMPERATURE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'TEMPERATURE',
                                label = _U("THighP"),
                                tip = _U("Typical outlet temperature of compressor"))
 
@@ -223,8 +220,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'SPECIFICENTHALPY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'SPECIFICENTHALPY',
                                label = _U("SensibleHeat"),
                                tip = _U("Senisble heat at typical working conditions"))
 

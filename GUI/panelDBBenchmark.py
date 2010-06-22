@@ -166,17 +166,13 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc8 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              # FIXXXME
-                              unitdict = 'FRACTION',
-                              #unitdict = 'CURRENCY',
+                              unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (minimum)"),
                               tip = _U("Yearly turnover (minimum)"))
 
         self.tc9 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              # FIXXXME
-                              unitdict = 'FRACTION',
-                              #unitdict = 'CURRENCY',
+                              unitdict = 'CURRENCY',
                               label = _U("Yearly turnover (maximum)"),
                               tip = _U("Yearly turnover (maximum)"))
 
@@ -452,7 +448,7 @@ class PanelDBBenchmark(PanelDBBase):
                                # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC)"),
+                               label = _U("Specific Energy Consumption (SEC) MIN"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc42 = FloatEntry(self.page4,
@@ -460,7 +456,7 @@ class PanelDBBenchmark(PanelDBBase):
                                # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) TARGET"),
+                               label = _U("Specific Energy Consumption (SEC) MAX"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc43 = FloatEntry(self.page4,
@@ -468,7 +464,7 @@ class PanelDBBenchmark(PanelDBBase):
                                # FIXXXME
                                unitdict = 'FRACTION',
                                #unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) AVERAGE"),
+                               label = _U("Specific Energy Consumption (SEC) TARGET"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc44 = ChoiceEntry(self.page4,
@@ -592,7 +588,7 @@ class PanelDBBenchmark(PanelDBBase):
 
         tmp = {
                "NACECode":check(self.tc1.GetValue(text = True)),
-               "UnitOp":check(findKey(unitOpDict, self.tc2.GetValue(text = True))),
+               "UnitOp":check(int(self.tc2.GetValue(text = True).split(':')[0])),
                "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
                "ProductUnit":check(self.tc5.GetValue()),
@@ -664,9 +660,18 @@ class PanelDBBenchmark(PanelDBBase):
                     subcode = ''.join([subcode, "0"])
                 self.tc1.entry.SetStringSelection(''.join([codes[0], '.', subcode]))
             else:
-                self.tc1.entry.SetStringSelection("None")
+                self.tc1.SetValue("None")
             if q.UnitOp is not None:
-                self.tc2.SetValue(unitOpDict[int(q.UnitOp)]) if int(q.UnitOp) in unitOpDict.keys() else ''
+                codeSet = False
+                for entry in self.getUnitOpCodeList():
+                    if not codeSet:
+                        spl = entry.split(':')
+                        if int(spl[0]) == int(q.UnitOp):
+                            self.tc2.SetValue(entry) if int(q.UnitOp) in unitOpDict.keys() else ''
+                            codeSet = True
+                            break
+                if not codeSet:
+                    self.tc2.SetValue("None")
             if q.ProductCode is not None:
                 self.tc3.SetValue(PRODUCTCODES[str(q.ProductCode)]) if str(q.ProductCode) in PRODUCTCODES.keys() else ''
             self.tc4.SetValue(str(q.Product)) if q.Product is not None else ''

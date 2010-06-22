@@ -140,10 +140,9 @@ class PanelDBElectricityMix(PanelDBBase):
                              label = _U("Bibliographic reference / data source"),
                              tip = _U("Please give a full reference of the data source that allows for tracking back the data"))
 
-        self.tc5 = FloatEntry(self.page1,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              label = _U("AuditorID"),
-                              tip = _U("Auditor responsible for data set"))
+        self.tc5 = StaticTextEntry(self.page1, value = '',
+                                   label = _U("Auditor responsible for data set"),
+                                   tip = _U("Auditor responsible for data set"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
@@ -167,15 +166,13 @@ class PanelDBElectricityMix(PanelDBBase):
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'CO2RATIO',
-                              unitdict = 'FRACTION',
+                              unitdict = 'CO2RATIO',
                               label = _U("CO2ConvEl"),
                               tip = _U("CO2 generation per unit of electricity"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'CO2RATIO',
-                              unitdict = 'FRACTION',
+                              unitdict = 'CO2RATIO',
                               label = _U("NoNukesConvEl"),
                               tip = _U("Highly radiactive nuclear waste per unit of electricity"))
 
@@ -293,7 +290,7 @@ class PanelDBElectricityMix(PanelDBBase):
                "Year":check(self.tc2.GetValue()),
                "Type":check(self.tc3.GetValue()),
                "Reference":check(self.tc4.GetValue()),
-               "AuditorID":check(self.tc5.GetValue()),
+               #"AuditorID":, # read only field
                "PE2ConvEl":check(self.tc6.GetValue()),
                "CO2ConvEl":check(self.tc7.GetValue()),
                "NoNukesConvEl":check(self.tc8.GetValue()),
@@ -323,7 +320,7 @@ class PanelDBElectricityMix(PanelDBBase):
             self.tc2.SetValue(str(q.Year)) if q.Year is not None else ''
             self.tc3.SetValue(str(q.Type)) if q.Type is not None else ''
             self.tc4.SetValue(str(q.Reference)) if q.Reference is not None else ''
-            self.tc5.SetValue(str(q.AuditorID)) if q.AuditorID is not None else ''
+            self.tc5.SetValue(str(self.getAuditorName())) if self.getAuditorName() is not None else ''
             self.tc6.SetValue(str(q.PE2ConvEl)) if q.PE2ConvEl is not None else ''
             self.tc7.SetValue(str(q.CO2ConvEl)) if q.CO2ConvEl is not None else ''
             self.tc8.SetValue(str(q.NoNukesConvEl)) if q.NoNukesConvEl is not None else ''

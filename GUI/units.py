@@ -109,27 +109,27 @@ def changeMassOrVolumeUnits():
 UNITS = {
 # conversion to internal unit: [°C]
     'TEMPERATURE' : {
-        '°C':   (1.0,   0.0),
-        '°F':   (5.0/9, -32.0*5/9),
+        '\xb0C':   (1.0,   0.0),
+        '\xb0F':   (5.0/9, -32.0*5/9),
         'K':    (1.0,   -273.15)
         },
 
 # conversion to internal unit: [K]
     'TEMPERATUREDIFF' : {
         'K':    (1.0,   0.0),
-        '°F':   (5.0/9, 0.0),
+        '\xb0F':   (5.0/9, 0.0),
         },
 
 # conversion to internal unit: [1/K]
     'INVTEMP' : {
         '1/K':    (1.0, 0.0),
-        '1/°F':   (9/5.0, 0.0),
+        '1/\xb0F':   (9/5.0, 0.0),
         },
 
 # conversion to internal unit: [1/K^2]
     'INVTEMP2' : {
         '1/K^2':    (1.0, 0.0),
-        '1/°F^2':   (81/25.0, 0.0),
+        '1/\xb0F^2':   (81/25.0, 0.0),
         },
 
 # conversion to internal unit: [h]
@@ -291,14 +291,14 @@ UNITS = {
         'kWh/kgK' : (1.0,0.0),
         'kJ/kgK' : (1.0/3600.0,0.0),
         'kcal/kgK' : (1.163e-3,0.0),
-        'btu/lb°F' : (((0.0002930711*9)/(0.45359*5)),0.0)
+        'btu/lb\xb0F' : (((0.0002930711*9)/(0.45359*5)),0.0)
         },
 
 # conversion to internal unit: [kW/K]
     'HEATTRANSFERCOEF' : {
         'kW/K' : (1.0,0.0),
         'W/K' : (1.0e-3,0.0),
-        'btu/h°F' : ((0.0002930711*9)/5,0.0)
+        'btu/h\xb0F' : ((0.0002930711*9)/5,0.0)
         },
 
 # conversion to internal unit: [X]
@@ -313,7 +313,7 @@ UNITS = {
 
 # conversion to internal unit: [-]
     'ANGLE' : {
-        '°' : (1.0,0.0),
+        '\xb0' : (1.0,0.0),
         'rad' : (0.017453,0.0),
         },
 
@@ -351,13 +351,17 @@ UNITS = {
         '%s/GJ'%CURRENCY: (3.6e-3,0.0),
         '%s/btu'%CURRENCY: (1.0/0.0002930711,0.0)
         },
+        
+    'CURRENCY' : {
+        '%s'%CURRENCY : (1.0,0.0)
+        }
     }
 
 
 
 UNITSYSTEM = {
     'SI' :      {
-                'TEMPERATURE':'°C',
+                'TEMPERATURE':'\xb0C',
                 'TEMPERATUREDIFF':'K',
                 'INVTEMP' : '1/K',
                 'INVTEMP2' : '1/K^2',
@@ -377,20 +381,22 @@ UNITSYSTEM = {
                 'ENERGYFLOW':'MJ/m2a',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kWh/kg',
+                'CO2RATIO' : 'kg/kWh',
                 'SPECIFICHEAT':'kWh/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
                 'HEATLOSSCOEFF' : 'X',
                 'HEATLOSSCOEFF2' : 'X^2',
-                'ANGLE':'°',
+                'ANGLE':'\xb0',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/GJ'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
-                'UNITPRICE' : '%s/kW'%CURRENCY
+                'UNITPRICE' : '%s/kW'%CURRENCY,
+                'CURRENCY' : '%s'%CURRENCY
                 },
     
     'SI-kWh' :  {
-                'TEMPERATURE':'°C',
+                'TEMPERATURE':'\xb0C',
                 'TEMPERATUREDIFF':'K',
                 'INVTEMP' : '1/K',
                 'INVTEMP2' : '1/K^2',
@@ -410,21 +416,23 @@ UNITSYSTEM = {
                 'ENERGYFLOW':'kWh/m2a',
                 'POWER':'kW',
                 'SPECIFICENTHALPY':'kWh/kg',
+                'CO2RATIO' : 'kg/kWh',
                 'SPECIFICHEAT':'kWh/kgK',
                 'HEATTRANSFERCOEF':'kW/K',
                 'HEATLOSSCOEFF' : 'X',
                 'HEATLOSSCOEFF2' : 'X^2',
-                'ANGLE':'°',
+                'ANGLE':'\xb0',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/MWh'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
-                'UNITPRICE' : '%s/kW'%CURRENCY
+                'UNITPRICE' : '%s/kW'%CURRENCY,
+                'CURRENCY' : '%s'%CURRENCY
                 },
 
     'BTU' :     {
-                'TEMPERATURE':'°F',
-                'TEMPERATUREDIFF':'°F',
+                'TEMPERATURE':'\xb0F',
+                'TEMPERATUREDIFF':'\xb0F',
                 'INVTEMP' : '1/K',
                 'INVTEMP2' : '1/K^2',
                 'TIME':'h',
@@ -443,16 +451,18 @@ UNITSYSTEM = {
                 'ENERGYFLOW':'btu/h.ft2.a',
                 'POWER':'btu/h',
                 'SPECIFICENTHALPY':'btu/lb',
-                'SPECIFICHEAT':'btu/lb°F',
-                'HEATTRANSFERCOEF':'btu/h°F',
+                'CO2RATIO' : 'kg/kWh',
+                'SPECIFICHEAT':'btu/lb\xb0F',
+                'HEATTRANSFERCOEF':'btu/h\xb0F',
                 'HEATLOSSCOEFF' : 'X',
                 'HEATLOSSCOEFF2' : 'X^2',
-                'ANGLE':'°',
+                'ANGLE':'\xb0',
                 'FRACTION':'-',
                 'GROWTHRATE':'1/a',
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
-                'UNITPRICE' : '%s/kW'%CURRENCY
+                'UNITPRICE' : '%s/kW'%CURRENCY,
+                'CURRENCY' : '%s'%CURRENCY
                 }
 }
 

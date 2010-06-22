@@ -416,7 +416,7 @@ class PanelBB(wx.Panel):
 
 
         self.stInfo2a = wx.StaticText(id=wxID_PANELBBSTINFO2A,
-              label=_U('Temperature [\xbaC]'), name='stInfo3', parent=self,
+              label=_U('Temperature [\xb0C]'), name='stInfo3', parent=self,
               pos=wx.Point(504, 416), style=0)
         self.stInfo2b = wx.StaticText(id=-1, label=_U('Peak demand [kW]'),
               name='stInfo2b', parent=self, pos=wx.Point(616, 416), style=0)

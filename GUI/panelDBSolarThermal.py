@@ -39,7 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
-UNITS_WIDTH_ECONOMIC = UNITS_WIDTH + 20
+UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -258,7 +258,7 @@ class PanelDBSolarThermal(PanelDBBase):
         fp.popFont()
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_ECONOMIC)
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc20 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -291,7 +291,7 @@ class PanelDBSolarThermal(PanelDBBase):
                                tip = _U("STOMUnitFix"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_ECONOMIC, wUnits = 0)
+                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_LARGE, wUnits = 0)
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,

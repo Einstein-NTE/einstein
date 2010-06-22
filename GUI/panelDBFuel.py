@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -156,17 +157,18 @@ class PanelDBFuel(PanelDBBase):
         self.frame_main_properties.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'SPECIFICENTHALPY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'SPECIFICENTHALPY',
                               label = _U("FuelLCV"),
                               tip = _U("Lower calorific value"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'SPECIFICENTHALPY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'SPECIFICENTHALPY',
                               label = _U("FuelHCV"),
                               tip = _U("Higher calorific value"))
 
@@ -176,6 +178,9 @@ class PanelDBFuel(PanelDBBase):
                               unitdict = 'FRACTION',
                               label = _U("FuelDensity"),
                               tip = _U("Density"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 3 - Properties for offgas calculations
@@ -201,26 +206,23 @@ class PanelDBFuel(PanelDBBase):
                                label = _U("OffgasDensity"),
                                tip = _U("OffgasDensity"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
-
         self.tc11 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'FRACTION',
                                label = _U("Humidity"),
                                tip = _U("Humidity"))
 
         self.tc12 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'FRACTION',
                                label = _U("CombAir"),
                                tip = _U("CombAir"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               unitdict = 'FRACTION',
                                label = _U("Offgas"),
                                tip = _U("Offgas"))
-
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
-                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 4 - Environment parameters
@@ -232,6 +234,9 @@ class PanelDBFuel(PanelDBBase):
         self.frame_environment_parameters.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc14 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                #unitdict = 'DENSITY',
@@ -241,10 +246,12 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc15 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'CO2RATIO',
-                               unitdict = 'FRACTION',
+                               unitdict = 'CO2RATIO',
                                label = _U("CO2ConvFuel"),
                                tip = _U("Ratio of CO2 generation"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
@@ -349,15 +356,16 @@ class PanelDBFuel(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
+        fuelDict = FUELTYPES
         self.fillChoiceOfDBFuelType(self.tc2.entry)
         self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.FuelName)) if q.FuelName is not None else ''
             if q.FuelType is not None:
-                self.tc2.entry.SetStringSelection(q.FuelType)
+                self.tc2.SetValue(str(q.FuelType)) if q.FuelType in fuelDict.keys() else ''
             if q.DBFuelUnit is not None:
-                self.tc3.SetValue(str(q.DBFuelUnit)) if str(q.DBFuelUnit) in UNITS["MASSORVOLUME"].keys() else ''
+                self.tc3.SetValue(str(q.DBFuelUnit)) if str(q.DBFuelUnit) in self.getFuelUnitList() else ''
             self.tc4.SetValue(str(q.FuelDataSource)) if q.FuelDataSource is not None else ''
             self.tc5.SetValue(str(q.FuelComment)) if q.FuelComment is not None else ''
             self.tc6.SetValue(str(q.FuelLCV)) if q.FuelLCV is not None else ''
