@@ -184,12 +184,12 @@ class PanelDBBoiler(PanelDBBase):
                               tip = _U("Nominal electrical power consumption"))
 
         self.tc10 = ChoiceEntry(self.page2,
-                                values = ["Yes", "No"],
+                                values = [],
                                 label = _U("Economiser"),
                                 tip = _U("Does the equipment include an economiser (water preheater)?"))
 
         self.tc11 = ChoiceEntry(self.page2,
-                                values = ["Yes", "No"],
+                                values = [],
                                 label = _U("Preheater"),
                                 tip = _U("Does the equipment include an air preheater ?"))
 
@@ -367,14 +367,10 @@ class PanelDBBoiler(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "BoilerManufacturer":check(self.tc1.GetValue()),
                "BoilerModel":check(self.tc2.GetValue()),
@@ -399,15 +395,7 @@ class PanelDBBoiler(PanelDBBase):
                "BoilerOandMvar":check(self.tc21.GetValue()),
                "YearUpdate":check(self.tc22.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()
@@ -487,13 +475,15 @@ class PanelDBBoiler(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           self.tc3.GetValue() is None and\
+           self.tc3.GetValue(text = True) == "None" and\
            len(self.tc4.GetValue()) == 0 and\
            self.tc5.GetValue() is None and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
            self.tc8.GetValue(text = True) == "None" and\
            self.tc9.GetValue() is None and\
+           self.tc10.GetValue(text = True) == "No" and\
+           self.tc11.GetValue(text = True) == "No" and\
            self.tc12.GetValue() is None and\
            self.tc13.GetValue() is None and\
            self.tc14.GetValue() is None and\

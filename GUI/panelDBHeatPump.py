@@ -505,14 +505,10 @@ class PanelDBHeatPump(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "HPManufacturer":check(self.tc1.GetValue()),
                "HPModel":check(self.tc2.GetValue()),
@@ -553,15 +549,7 @@ class PanelDBHeatPump(PanelDBBase):
                "HPOandMvar":check(self.tc35.GetValue()),
                "HPYearUpdate":check(self.tc36.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()

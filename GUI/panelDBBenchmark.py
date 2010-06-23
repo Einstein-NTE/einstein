@@ -518,19 +518,15 @@ class PanelDBBenchmark(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         unitOpDict = Status.prj.getUnitOpDict()
-
+        tc2Entry = "None" if self.tc2.GetValue(text = True) == "None" else int(self.tc2.GetValue(text = True).split(':')[0])
         tmp = {
                "NACECode":check(self.tc1.GetValue(text = True)),
-               "UnitOp":check(int(self.tc2.GetValue(text = True).split(':')[0])),
+               "UnitOp":check(tc2Entry),
                "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
                "ProductUnit":check(self.tc5.GetValue()),
@@ -574,11 +570,7 @@ class PanelDBBenchmark(PanelDBBase):
                "T_SEC_TARG":check(self.tc43.GetValue()),
                "T_Unit":check(self.tc44.GetValue(text = True))
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
+        return tmp
 
     def display(self, q = None):
         self.clear()
@@ -727,8 +719,10 @@ class PanelDBBenchmark(PanelDBBase):
         return self.db.DBBenchmark_ID
 
     def allFieldsEmpty(self):
+
         if self.tc1.GetValue(text = True) == "None" and\
            self.tc2.GetValue(text = True) == "None" and\
+           self.tc3.GetValue(text = True) == "None" and\
            len(self.tc4.GetValue()) == 0 and\
            len(self.tc5.GetValue()) == 0 and\
            len(self.tc6.GetValue()) == 0 and\
@@ -749,6 +743,7 @@ class PanelDBBenchmark(PanelDBBase):
            self.tc21.GetValue() is None and\
            self.tc22.GetValue() is None and\
            self.tc23.GetValue() is None and\
+           self.tc24.GetValue(text = True) == "None" and\
            self.tc25.GetValue() is None and\
            self.tc26.GetValue() is None and\
            self.tc27.GetValue() is None and\
@@ -758,6 +753,7 @@ class PanelDBBenchmark(PanelDBBase):
            self.tc31.GetValue() is None and\
            self.tc32.GetValue() is None and\
            self.tc33.GetValue() is None and\
+           self.tc34.GetValue(text = True) == "None" and\
            self.tc35.GetValue() is None and\
            self.tc36.GetValue() is None and\
            self.tc37.GetValue() is None and\
@@ -766,7 +762,8 @@ class PanelDBBenchmark(PanelDBBase):
            self.tc40.GetValue() is None and\
            self.tc41.GetValue() is None and\
            self.tc42.GetValue() is None and\
-           self.tc43.GetValue() is None:
+           self.tc43.GetValue() is None and\
+           self.tc44.GetValue(text = True) == "None":
             return True
         else:
             return False

@@ -384,14 +384,10 @@ class PanelDBSolarThermal(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "STManufacturer":check(self.tc1.GetValue()),
                "STModel":check(self.tc2.GetValue()),
@@ -419,15 +415,7 @@ class PanelDBSolarThermal(PanelDBBase):
                "STOMUnitFix":check(self.tc24.GetValue()),
                "STYearUpdate":check(self.tc25.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()

@@ -374,14 +374,10 @@ class PanelDBCHP(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "Manufacturer":check(self.tc1.GetValue()),
                "CHPequip":check(self.tc2.GetValue()),
@@ -406,15 +402,7 @@ class PanelDBCHP(PanelDBBase):
                "OMRateVar":check(self.tc21.GetValue()),
                "YearUpdate":check(self.tc22.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()

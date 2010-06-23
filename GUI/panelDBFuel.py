@@ -314,14 +314,10 @@ class PanelDBFuel(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "FuelName":check(self.tc1.GetValue()),
                "FuelType":check(self.tc2.GetValue(text = True)),
@@ -339,15 +335,7 @@ class PanelDBFuel(PanelDBBase):
                "PEConvFuel":check(self.tc14.GetValue()),
                "CO2ConvFuel":check(self.tc15.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()

@@ -277,14 +277,10 @@ class PanelDBElectricityMix(PanelDBBase):
         self.Show()
 
 #------------------------------------------------------------------------------
-#--- UI actions
+#--- Public methods
 #------------------------------------------------------------------------------
 
-    def OnButtonOK(self, event):
-        if self.allFieldsEmpty():
-            self.theId = -1
-            return
-
+    def collectEntriesForDB(self):
         tmp = {
                "Country":check(self.tc1.GetValue()),
                "Year":check(self.tc2.GetValue()),
@@ -302,15 +298,7 @@ class PanelDBElectricityMix(PanelDBBase):
                "PercCHP":check(self.tc14.GetValue()),
                "PercOther":check(self.tc15.GetValue())
                }
-
-        self.updateValues(tmp)
-
-        if self.closeOnOk:
-            self.EndModal(wx.ID_OK)
-
-#------------------------------------------------------------------------------
-#--- Public methods
-#------------------------------------------------------------------------------
+        return tmp
 
     def display(self, q = None):
         self.clear()

@@ -103,8 +103,7 @@ class PanelDBBase(wx.Dialog):
 
         self.grid.SetColMinimalAcceptableWidth(0)
         self.grid.SetColSize(0, 0)
-
-        self.grid.SetGridCursor(0, 1)
+        self.grid.SetGridCursor(0, 0)
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -118,6 +117,16 @@ class PanelDBBase(wx.Dialog):
         self.deleteEquipment()
         event.Skip()
 
+    def OnButtonOK(self, event):
+        if self.allFieldsEmpty():
+            self.theId = -1
+            print "Enter at least one value"
+            return
+        tmp = self.collectEntriesForDB()
+        self.updateValues(tmp)
+        if self.closeOnOk:
+            self.EndModal(wx.ID_OK)
+
     def OnButtonCancel(self, event):
         event.Skip()
 
@@ -125,14 +134,8 @@ class PanelDBBase(wx.Dialog):
         self.clear()
         self.grid.ClearSelection()
         self.grid.SetGridCursor(event.GetRow(), event.GetCol())
-        id = self.grid.GetCellValue(event.GetRow(), 0)
 
-        equipments = self.getDBCol()[check(id)]
-
-        if len(equipments) > 0:
-            equipe = equipments[0]
-
-        self.display(equipe)
+        self.display(self.getCurrentEquipment(event.GetRow()))
 
         event.Skip()
 
@@ -170,10 +173,7 @@ class PanelDBBase(wx.Dialog):
                 self.grid.SetGridCursor(i, 0)
                 self.grid.MakeCellVisible(i, 0)
                 self.grid.SelectRow(i)
-                equipments = self.getDBCol()[check(retval)]
-                if len(equipments) > 0:
-                    equipe = equipments[0]
-                    self.display(equipe)
+                self.display(self.getCurrentEquipment(i))
                 break
         self.fillChoices()
 
@@ -195,30 +195,38 @@ class PanelDBBase(wx.Dialog):
             self.clearPage0()
 
     def updateValues(self, tmp):
-        row = self.grid.GetGridCursorRow()
-        col = self.grid.GetGridCursorCol()
+        if self.grid.IsSelection():
+            row = self.grid.GetGridCursorRow()
+            col = self.grid.GetGridCursorCol()
+
+            try:
+                self.getCurrentEquipment(row).update(tmp)
+            except:
+                return
+
+            for i in range(self.grid.GetNumberRows()):
+                self.grid.DeleteRows()
+            self.fillChoiceOfType()
+            self.fillChoiceOfSubType()
+            self.fillEquipmentList()
+
+            if row >= 0 and col >= 0:
+                self.grid.SetGridCursor(row, col)
+                self.grid.SelectRow(row)
+                self.grid.MakeCellVisible(row, col)
+
+    def getCurrentEquipment(self, row):
+        equipe = None
 
         try:
-            self.theId = self.grid.GetCellValue(row, 0)
+            id = self.grid.GetCellValue(row, 0)
+            equipments = self.getDBCol()[check(id)]
+            if len(equipments) > 0:
+                equipe = equipments[0]
         except:
-            return
+            pass
 
-        equipments = self.getDBCol()[check(self.theId)]
-
-        if len(equipments) > 0:
-            equipe = equipments[0]
-            equipe.update(tmp)
-
-        for i in range(self.grid.GetNumberRows()):
-            self.grid.DeleteRows()
-        self.fillChoiceOfType()
-        self.fillChoiceOfSubType()
-        self.fillEquipmentList()
-
-        if row >= 0 and col >= 0:
-            self.grid.SetGridCursor(row, col)
-            self.grid.SelectRow(row)
-            self.grid.MakeCellVisible(row, col)
+        return equipe
 
     def getNACECodeandNACESubCodeList(self):
         naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']
@@ -262,7 +270,6 @@ class PanelDBBase(wx.Dialog):
             eUnit = entry.E_Unit
             if str(eUnit) not in eUnitList and len(str(eUnit)) > 0:
                 eUnitList.append(str(eUnit))
-        eUnitList.sort()
         return eUnitList
 
     def getHUnitList(self):
@@ -272,7 +279,6 @@ class PanelDBBase(wx.Dialog):
             hUnit = entry.H_Unit
             if str(hUnit) not in hUnitList and len(str(hUnit)) > 0:
                 hUnitList.append(str(hUnit))
-        hUnitList.sort()
         return hUnitList
 
     def getTUnitList(self):
@@ -282,7 +288,6 @@ class PanelDBBase(wx.Dialog):
             tUnit = entry.T_Unit
             if str(tUnit) not in tUnitList and len(str(tUnit)) > 0:
                 tUnitList.append(str(tUnit))
-        tUnitList.sort()
         return tUnitList
 
     def getSourceSinkList(self):
@@ -376,22 +381,31 @@ class PanelDBBase(wx.Dialog):
         fillChoice(entry, unitOpList)
 
     def fillChoiceYesNo(self, entry):
-        values = ["Yes", "No"]
+        values = ["No", "Yes"]
         fillChoice(entry, values, False)
 
     def fillChoiceOfEUnit(self, entry):
         productUnitList = self.getEUnitList()
         appendNone = False if "None" in productUnitList else True;
+        if not appendNone:
+            productUnitList.remove("None")
+            appendNone = True
         fillChoice(entry, productUnitList, appendNone)
 
     def fillChoiceOfHUnit(self, entry):
         productUnitList = self.getHUnitList()
         appendNone = False if "None" in productUnitList else True;
+        if not appendNone:
+            productUnitList.remove("None")
+            appendNone = True
         fillChoice(entry, productUnitList, appendNone)
 
     def fillChoiceOfTUnit(self, entry):
         productUnitList = self.getTUnitList()
         appendNone = False if "None" in productUnitList else True;
+        if not appendNone:
+            productUnitList.remove("None")
+            appendNone = True
         fillChoice(entry, productUnitList, appendNone)
 
     def fillChoiceOfHPSourceSink(self, entry):
@@ -478,8 +492,6 @@ class PanelDBBase(wx.Dialog):
         self.fillChoices()
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
-
-
 
     def fillEquipmentList(self):
         if self.tc_subtype is not None:
