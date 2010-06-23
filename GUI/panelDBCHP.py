@@ -227,8 +227,7 @@ class PanelDBCHP(PanelDBBase):
 
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'MASSFLOWRATE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'MASSFLOWRATE',
                                label = _U("FlowRateSupply"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
@@ -250,8 +249,7 @@ class PanelDBCHP(PanelDBBase):
 
         self.tc17 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'MASSFLOWRATE',
-                               unitdict = 'FRACTION',
+                               unitdict = 'MASSFLOWRATE',
                                label = _U("FlowRateSupply2"),
                                tip = _U("Mass flow rate of heat transport medium"))
 

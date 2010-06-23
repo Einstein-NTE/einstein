@@ -238,9 +238,7 @@ class PanelDBSolarThermal(PanelDBBase):
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #fixxxme
-                               #unitdict = 'MASSPERAREA',
-                               unitdict = 'FRACTION',
+                               unitdict = 'MASSPERAREA',
                                label = _U("STWeightFactor"),
                                tip = _U("STWeightFactor"))
 

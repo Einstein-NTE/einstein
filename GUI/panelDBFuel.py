@@ -174,8 +174,7 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'DENSITY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'DENSITY',
                               label = _U("FuelDensity"),
                               tip = _U("Density"))
 
@@ -194,15 +193,13 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc9 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'HEATCAPACITY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'HEATCAPACITY',
                               label = _U("OffgasHeatCapacity"),
                               tip = _U("OffgasHeatCapacity"))
 
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'DENSITY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'DENSITY',
                                label = _U("OffgasDensity"),
                                tip = _U("OffgasDensity"))
 
@@ -239,8 +236,7 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc14 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'DENSITY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'DENSITY',
                                label = _U("PEConvFuel"),
                                tip = _U("Primary energy conversion ratio"))
 

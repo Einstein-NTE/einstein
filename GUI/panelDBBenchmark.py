@@ -178,17 +178,13 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc10 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'PU',
+                               unitdict = 'PU',
                                label = _U("Yearly production volume (minimum)"),
                                tip = _U("Yearly production volume (minimum)"))
 
         self.tc11 = FloatEntry(self.page1,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'PU',
+                               unitdict = 'PU',
                                label = _U("Yearly production volume (maximum)"),
                                tip = _U("Yearly production volume (maximum)"))
 
@@ -223,73 +219,55 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MAX"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MIN"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc20 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Electricity: Energy intensity TARGET (turnover)"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc21 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (MIN)"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc22 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (MAX)"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc23 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) TARGET"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
@@ -310,73 +288,55 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc26 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (production cost) MAX [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc27 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc28 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (turnover) MIN  [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc29 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc30 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Heat: Energy intensity (turnover) TARGET [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc31 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption MIN"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc32 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption MAX"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc33 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption TARGET"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
@@ -397,73 +357,55 @@ class PanelDBBenchmark(PanelDBBase):
 
         self.tc35 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MIN [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc36 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) MAX [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc37 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc38 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MIN [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc39 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) MAX [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc40 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERCU',
+                               unitdict = 'ENERGYPERCU',
                                label = _U("Energy intensity (turnover) TARGET [kWh/€]"),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc41 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) MIN"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc42 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) MAX"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc43 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               # FIXXXME
-                               unitdict = 'FRACTION',
-                               #unitdict = 'ENERGYPERPU',
+                               unitdict = 'ENERGYPERPU',
                                label = _U("Specific Energy Consumption (SEC) TARGET"),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 

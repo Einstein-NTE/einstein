@@ -354,7 +354,52 @@ UNITS = {
         
     'CURRENCY' : {
         '%s'%CURRENCY : (1.0,0.0)
-        }
+        },
+
+# conversion to internal unit: [X]
+    'MASSPERAREA' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'MASSFLOWRATE' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'DENSITY' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'HEATCAPACITY' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'DYNAMICVISCOSITY' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'CONDUCTIVITY' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'PU' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'ENERGYPERCU' : {
+        'X' : (1.0, 0.0),
+        },
+
+# conversion to internal unit: [X]
+    'ENERGYPERPU' : {
+        'X' : (1.0, 0.0),
+        },
     }
 
 
@@ -392,7 +437,16 @@ UNITSYSTEM = {
                 'ENERGYTARIFF':'%s/GJ'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
                 'UNITPRICE' : '%s/kW'%CURRENCY,
-                'CURRENCY' : '%s'%CURRENCY
+                'CURRENCY' : '%s'%CURRENCY,
+                'MASSPERAREA' : 'X',
+                'MASSFLOWRATE' : 'X',
+                'DENSITY' : 'X',
+                'HEATCAPACITY' : 'X',
+                'DYNAMICVISCOSITY' : 'X',
+                'CONDUCTIVITY' : 'X',
+                'PU' : 'X',
+                'ENERGYPERCU' : 'X',
+                'ENERGYPERPU' : 'X'
                 },
     
     'SI-kWh' :  {
@@ -427,7 +481,16 @@ UNITSYSTEM = {
                 'ENERGYTARIFF':'%s/MWh'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
                 'UNITPRICE' : '%s/kW'%CURRENCY,
-                'CURRENCY' : '%s'%CURRENCY
+                'CURRENCY' : '%s'%CURRENCY,
+                'MASSPERAREA' : 'X',
+                'MASSFLOWRATE' : 'X',
+                'DENSITY' : 'X',
+                'HEATCAPACITY' : 'X',
+                'DYNAMICVISCOSITY' : 'X',
+                'CONDUCTIVITY' : 'X',
+                'PU' : 'X',
+                'ENERGYPERCU' : 'X',
+                'ENERGYPERPU' : 'X'
                 },
 
     'BTU' :     {
@@ -462,7 +525,16 @@ UNITSYSTEM = {
                 'ENERGYTARIFF':'%s/btu'%CURRENCY,
                 'PRICE':'%s'%CURRENCY,
                 'UNITPRICE' : '%s/kW'%CURRENCY,
-                'CURRENCY' : '%s'%CURRENCY
+                'CURRENCY' : '%s'%CURRENCY,
+                'MASSPERAREA' : 'X',
+                'MASSFLOWRATE' : 'X',
+                'DENSITY' : 'X',
+                'HEATCAPACITY' : 'X',
+                'DYNAMICVISCOSITY' : 'X',
+                'CONDUCTIVITY' : 'X',
+                'PU' : 'X',
+                'ENERGYPERCU' : 'X',
+                'ENERGYPERPU' : 'X'
                 }
 }
 

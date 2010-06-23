@@ -151,8 +151,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'HEATCAPACITY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'HEATCAPACITY',
                               label = _U("FluidCp"),
                               tip = _U("Specific heat in liquid state"))
 
@@ -164,8 +163,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'HEATCAPACITY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'HEATCAPACITY',
                               label = _U("FluidCpG"),
                               tip = _U("Specific heat in gaseous state (vapour)"))
 
@@ -177,8 +175,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                              #unitdict = 'DENSITY',
-                              unitdict = 'FRACTION',
+                              unitdict = 'DENSITY',
                               label = _U("FluidDensity"),
                               tip = _U("Density"))
 
@@ -206,15 +203,13 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc12 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'DYNAMICVISCOSITY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'DYNAMICVISCOSITY',
                                label = _U("Viscosity"),
                                tip = _U("Dynamic Viscosity at typical working conditions"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-                               #unitdict = 'CONDUCTIVITY',
-                               unitdict = 'FRACTION',
+                               unitdict = 'CONDUCTIVITY',
                                label = _U("Conductivity"),
                                tip = _U("Thermal conductivity at typical working conditions"))
 
