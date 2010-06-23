@@ -1,0 +1,107 @@
+USE einstein;
+
+ALTER TABLE `dbboiler`
+ADD COLUMN
+	`Reference`	VARCHAR(200)	DEFAULT NULL	COMMENT 'Source of data'
+AFTER `BoilerType`,
+ADD COLUMN
+	`FuelConsum`	DOUBLE	DEFAULT NULL	COMMENT 'Nominal fuel consumption (LCV)'
+AFTER `BBEfficiency`,
+ADD COLUMN
+	`FuelType`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Fuel type'
+AFTER `FuelConsum`,
+ADD COLUMN
+	`ElConsum`	DOUBLE	DEFAULT NULL	COMMENT 'Nominal electrical power consumption'
+AFTER `FuelType`,
+ADD COLUMN
+	`ExcessAirRatio`	DOUBLE	DEFAULT NULL	COMMENT 'Typical excess air ratio'
+AFTER `Preheater`,
+ADD COLUMN
+	`YearUpdate`	INT(11)	DEFAULT NULL	COMMENT 'Year of last update of the economic data'
+AFTER `BoilerOandMvar`;
+
+ALTER TABLE `dbheatpump`
+ADD COLUMN
+	`Reference`	VARCHAR(200)	DEFAULT NULL	COMMENT 'Source of data'
+AFTER `HPSubType`,
+DROP COLUMN `HPUnitsFuelConsum`,
+DROP COLUMN `DBFuel_id`,
+ADD COLUMN
+	`FuelType`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Fuel type'
+AFTER `HPModel`,
+CHANGE COLUMN  `HPAbsEffects`
+	`HPSourceSink`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Heat source and sink',
+DROP COLUMN `HPYearManufact`,
+DROP COLUMN `HPManData`;
+
+ALTER TABLE `dbchp`
+ADD COLUMN
+	`Manufacturer`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Manufacturer'
+AFTER `DBCHP_ID`,
+ADD COLUMN	`Type`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Type'
+AFTER `CHPequip`,
+ADD COLUMN
+	`SubType`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Sub-type'
+AFTER `Type`,
+ADD COLUMN
+	`Reference`	VARCHAR(200)	DEFAULT NULL	COMMENT 'Source of data'
+AFTER `SubType`,
+ADD COLUMN
+	`FuelType`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Fuel type'
+AFTER `CHPPt`,
+ADD COLUMN
+	`FluidSupply`	INT	DEFAULT NULL	COMMENT 'Heat transport medium'
+AFTER `Eta_e`,
+ADD INDEX 	`fk_dbchp_dbfluid`	(`FluidSupply` ASC),
+ADD CONSTRAINT	`fk_dbchp_dbfluid`	FOREIGN KEY (`FluidSupply`) REFERENCES `dbfluid` (`DBFluid_ID`)
+		ON DELETE NO ACTION
+    		ON UPDATE NO ACTION,
+ADD COLUMN
+	`TSupply`	DOUBLE	DEFAULT NULL	COMMENT 'Outlet temperature at nominal conditions'
+AFTER `FluidSupply`,
+ADD COLUMN
+	`FlowRateSupply`	DOUBLE	DEFAULT NULL	COMMENT 'Mass flow rate of heat transport medium'
+AFTER `TSupply`,
+ADD COLUMN
+	`FluidSupply2`	INT	DEFAULT NULL	COMMENT 'Heat transport medium'
+AFTER `FlowRateSupply`,
+ADD INDEX	`fk_dbchp_dbfluid2`	(`FluidSupply2` ASC),
+ADD CONSTRAINT	`fk_dbchp_dbfluid2` FOREIGN KEY (`FluidSupply2`) REFERENCES `dbfluid` (`DBFluid_ID`)
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION,
+ADD COLUMN
+	`TSupply2`	DOUBLE	DEFAULT NULL	COMMENT 'Outlet temperature at nominal conditions'
+AFTER `FluidSupply2`,
+ADD COLUMN
+	
+	`FlowRateSupply2`	DOUBLE	DEFAULT NULL	COMMENT 'Mass flow rate of heat transport medium'
+AFTER `TSupply2`,
+ADD COLUMN
+	`Price`	DOUBLE	DEFAULT NULL	COMMENT 'Equipment price at factory applied installer\'s discount'
+AFTER `FlowRateSupply2`,
+ADD COLUMN
+	`YearUpdate`	INT(11)	DEFAULT NULL	COMMENT 'Year of last update of the economic data'
+AFTER `OMRateVar`;
+
+ALTER TABLE `dbfuel`
+CHANGE COLUMN `FuelCode`
+	`FuelType`	VARCHAR(20)	DEFAULT NULL	COMMENT 'Fuel type'
+AFTER `DBFuelUnit`;
+
+ALTER TABLE `dbfluid`
+ADD COLUMN
+	`FluidDataSource`	VARCHAR(200)	DEFAULT NULL	COMMENT 'Source of data'
+AFTER `RefrigerantCode`,
+ADD COLUMN
+	`FluidCpG`	DOUBLE DEFAULT NULL	COMMENT 'Specific heat in gaseous state (vapour)'
+AFTER `TCond`;
+
+ALTER TABLE `dbbenchmark`
+CHANGE COLUMN
+	`ProductionUnit`   `ProductUnit`	VARCHAR(45)	DEFAULT NULL	COMMENT 'Measurement unit for product'
+AFTER `Product`;
+
+ALTER TABLE `dbelectricitymix`
+ADD COLUMN
+	`PercCHP`	DOUBLE	DEFAULT NULL	COMMENT 'Percentage of generation by CHP (except CHP using renewables)'
+AFTER `PercNukes`;

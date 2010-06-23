@@ -222,7 +222,7 @@ class PanelDBCHP(PanelDBBase):
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply"),
+                               label = _U("TSupply"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc14 = FloatEntry(self.page3,
@@ -244,7 +244,7 @@ class PanelDBCHP(PanelDBBase):
         self.tc16 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("Tsupply2"),
+                               label = _U("TSupply2"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc17 = FloatEntry(self.page3,
@@ -405,10 +405,10 @@ class PanelDBCHP(PanelDBBase):
                "CHPPe":check(self.tc10.GetValue()),
                "Eta_e":check(self.tc11.GetValue()),
                "FluidSupply":check(self.tc12.GetValue()),
-               "Tsupply":check(self.tc13.GetValue()),
+               "TSupply":check(self.tc13.GetValue()),
                "FlowRateSupply":check(self.tc14.GetValue()),
                "FluidSupply2":check(self.tc15.GetValue()),
-               "Tsupply2":check(self.tc16.GetValue()),
+               "TSupply2":check(self.tc16.GetValue()),
                "FlowRateSupply2":check(self.tc17.GetValue()),
                "Price":check(self.tc18.GetValue()),
                "InvRate":check(self.tc19.GetValue()),
@@ -450,10 +450,10 @@ class PanelDBCHP(PanelDBBase):
             self.tc10.SetValue(str(q.CHPPe)) if q.CHPPe is not None else ''
             self.tc11.SetValue(str(q.Eta_e)) if q.Eta_e is not None else ''
             self.tc12.SetValue(str(q.FluidSupply)) if q.FluidSupply is not None else ''
-            self.tc13.SetValue(str(q.Tsupply)) if q.Tsupply is not None else ''
+            self.tc13.SetValue(str(q.TSupply)) if q.TSupply is not None else ''
             self.tc14.SetValue(str(q.FlowRateSupply)) if q.FlowRateSupply is not None else ''
             self.tc15.SetValue(str(q.FluidSupply2)) if q.FluidSupply2 is not None else ''
-            self.tc16.SetValue(str(q.Tsupply2)) if q.Tsupply2 is not None else ''
+            self.tc16.SetValue(str(q.TSupply2)) if q.TSupply2 is not None else ''
             self.tc17.SetValue(str(q.FlowRateSupply2)) if q.FlowRateSupply2 is not None else ''
             self.tc18.SetValue(str(q.Price)) if q.Price is not None else ''
             self.tc19.SetValue(str(q.InvRate)) if q.InvRate is not None else ''

@@ -593,7 +593,7 @@ def conversionFactor(unit):
 #------------------------------------------------------------------------------
 def getUnitTypes(unit):
 #------------------------------------------------------------------------------
-#   gets the unit type (TEMPERATURE, MASSFLOW, ...) from the unit (�C, kg/h, ...)
+#   gets the unit type (TEMPERATURE, MASSFLOW, ...) from the unit (°C, kg/h, ...)
 #   used for distinction of mass flow and volume flow, mass and volume, ...
 #------------------------------------------------------------------------------
     unitTypes = []
