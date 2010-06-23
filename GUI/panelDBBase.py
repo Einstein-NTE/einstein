@@ -354,30 +354,36 @@ class PanelDBBase(wx.Dialog):
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
+        self.addNoneFront(naceList)
         fillChoice(entry, naceList)
 
     def fillChoiceOfProductCodes(self, entry):
         productCodeList = self.getProductCodeList()
+        self.addNoneFront(productCodeList)
         fillChoice(entry, productCodeList)
 
     def fillChoiceOfDBFuel(self, entry):
         fuelDict = FUELTYPES
         fuelList = fuelDict.values()
         fuelList.sort()
+        self.addNoneFront(fuelList)
         fillChoice(entry, fuelList)
 
     def fillChoiceOfDBFuelType(self, entry):
         fuelDict = FUELTYPES
         fuelList = fuelDict.keys()
         fuelList.sort()
+        self.addNoneFront(fuelList)
         fillChoice(entry, fuelList)
 
     def fillChoiceOfDBFuelUnits(self, entry):
         fuelUnitList = self.getFuelUnitList()
+        self.addNoneFront(fuelUnitList)
         fillChoice(entry, fuelUnitList)
 
     def fillChoiceOfDBUnitOpCodes(self, entry):
         unitOpList = self.getUnitOpCodeList()
+        self.addNoneFront(unitOpList)
         fillChoice(entry, unitOpList)
 
     def fillChoiceYesNo(self, entry):
@@ -386,70 +392,67 @@ class PanelDBBase(wx.Dialog):
 
     def fillChoiceOfEUnit(self, entry):
         productUnitList = self.getEUnitList()
-        appendNone = False if "None" in productUnitList else True;
-        if not appendNone:
-            productUnitList.remove("None")
-            appendNone = True
-        fillChoice(entry, productUnitList, appendNone)
+        self.addNoneFront(productUnitList)
+        fillChoice(entry, productUnitList)
 
     def fillChoiceOfHUnit(self, entry):
         productUnitList = self.getHUnitList()
-        appendNone = False if "None" in productUnitList else True;
-        if not appendNone:
-            productUnitList.remove("None")
-            appendNone = True
-        fillChoice(entry, productUnitList, appendNone)
+        self.addNoneFront(productUnitList)
+        fillChoice(entry, productUnitList)
 
     def fillChoiceOfTUnit(self, entry):
         productUnitList = self.getTUnitList()
-        appendNone = False if "None" in productUnitList else True;
-        if not appendNone:
-            productUnitList.remove("None")
-            appendNone = True
-        fillChoice(entry, productUnitList, appendNone)
+        self.addNoneFront(productUnitList)
+        fillChoice(entry, productUnitList)
 
     def fillChoiceOfHPSourceSink(self, entry):
         sourceSinkList = self.getSourceSinkList()
-        appendNone = False if "None" in sourceSinkList else True;
-        fillChoice(entry, sourceSinkList, appendNone)
+        self.addNoneFront(sourceSinkList)
+        fillChoice(entry, sourceSinkList)
 
     def fillChoiceOfHPAbsHeatMed(self, entry):
         absHeatMedList = self.getFluidNameList()
-        appendNone = False if "None" in absHeatMedList else True;
-        fillChoice(entry, absHeatMedList, appendNone)
+        self.addNoneFront(absHeatMedList)
+        fillChoice(entry, absHeatMedList)
 
     def fillChoiceOfBoilerType(self, entry):
         boilerTypeList = BBTYPES
         boilerTypeList.sort()
+        self.addNoneFront(boilerTypeList)
         fillChoice(entry, boilerTypeList)
 
     def fillChoiceOfHPType(self, entry):
         hpTypeList = HPTYPES
         hpTypeList.sort()
+        self.addNoneFront(hpTypeList)
         fillChoice(entry, hpTypeList)
 
     def fillChoiceOfHPSubType(self, entry):
         hpSubTypeList = self.getHPSubTypeList()
+        self.addNoneFront(hpSubTypeList)
         fillChoice(entry, hpSubTypeList)
 
     def fillChoiceOfSTType(self, entry):
         stTypeList = STTYPES
         stTypeList.sort()
+        self.addNoneFront(stTypeList)
         fillChoice(entry, stTypeList)
 
     def fillChoiceOfCHPType(self, entry):
         chpTypeList = CHPTYPES
         chpTypeList.sort()
+        self.addNoneFront(chpTypeList)
         fillChoice(entry, chpTypeList)
 
     def fillChoiceOfCHPSubType(self, entry):
         chpSubTypeList = self.getCHPSubTypeList()
+        self.addNoneFront(chpSubTypeList)
         fillChoice(entry, chpSubTypeList)
 
     def fillChoiceOfFluidSupply(self, entry):
         fluidNameList = self.getFluidNameList()
-        appendNone = False if "None" in fluidNameList else True;
-        fillChoice(entry, fluidNameList, appendNone)
+        self.addNoneFront(fluidNameList)
+        fillChoice(entry, fluidNameList)
 
     def fillChoiceOfType(self):
         try:
@@ -492,6 +495,13 @@ class PanelDBBase(wx.Dialog):
         self.fillChoices()
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
+
+    def addNoneFront(self, list):
+        if "None" in list:
+            list.remove("None")
+        newList = ["None"]
+        for e in list: newList.append(e)
+        return newList
 
     def fillEquipmentList(self):
         if self.tc_subtype is not None:

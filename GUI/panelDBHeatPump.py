@@ -678,6 +678,10 @@ class PanelDBHeatPump(PanelDBBase):
            self.tc19.GetValue() is None and\
            self.tc20.GetValue() is None and\
            self.tc21.GetValue() is None and\
+           self.tc22.GetValue() is None and\
+           self.tc23.GetValue() is None and\
+           self.tc24.GetValue() is None and\
+           self.tc25.GetValue() is None and\
            self.tc26.GetValue(text = True) == "None" and\
            self.tc27.GetValue() is None and\
            self.tc28.GetValue() is None and\

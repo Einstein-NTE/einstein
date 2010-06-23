@@ -487,8 +487,8 @@ class PanelDBCHP(PanelDBBase):
     def allFieldsEmpty(self):
         if len(self.tc1.GetValue()) == 0 and\
            len(self.tc2.GetValue()) == 0 and\
-           len(self.tc3.GetValue(text = True)) == "None" and\
-           len(self.tc4.GetValue(text = True)) == "None" and\
+           self.tc3.GetValue(text = True) == "None" and\
+           self.tc4.GetValue(text = True) == "None" and\
            len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue(text = True) == "None" and\

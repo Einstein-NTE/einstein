@@ -349,7 +349,7 @@ class PanelDBElectricityMix(PanelDBBase):
            self.tc2.GetValue() is None and\
            len(self.tc3.GetValue()) == 0 and\
            len(self.tc4.GetValue()) == 0 and\
-           self.tc5.GetValue() is None and\
+           len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\
