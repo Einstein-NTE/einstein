@@ -609,7 +609,7 @@ class PanelDBHeatPump(PanelDBBase):
             self.tc28.SetValue(str(q.HPCondTmax)) if q.HPCondTmax is not None else ''
             self.tc29.SetValue(str(q.HPEvapTmin)) if q.HPEvapTmin is not None else ''
             if q.HPAbsHeatMed is not None:
-                self.tc30.SetValue(str(q.HPAbsHeatMed)) if q.HPAbsHeatMed in self.getAbsHeatMedList() else ''
+                self.tc30.SetValue(str(q.HPAbsHeatMed)) if q.HPAbsHeatMed in self.getFluidNameList() else ''
             self.tc31.SetValue(str(q.HPGenTmin)) if q.HPGenTmin is not None else ''
             self.tc32.SetValue(str(q.HPPrice)) if q.HPPrice is not None else ''
             self.tc33.SetValue(str(q.HPTurnKeyPrice)) if q.HPTurnKeyPrice is not None else ''

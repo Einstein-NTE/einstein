@@ -209,15 +209,10 @@ class PanelDBCHP(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
-#        self.tc12 = FloatEntry(self.page3,
-#                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'POWER',
-#                               label = _U("FluidSupply"),
-#                               tip = _U("Heat transport medium"))
-
-        self.tc12 = TextEntry(self.page3, maxchars = 200, value = '',
-                             label = _U("FluidSupply"),
-                             tip = _U("Heat transport medium"))
+        self.tc12 = ChoiceEntry(self.page3,
+                                values = [],
+                                label = _U("FluidSupply"),
+                                tip = _U("Heat transport medium"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -231,15 +226,10 @@ class PanelDBCHP(PanelDBBase):
                                label = _U("FlowRateSupply"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
-#        self.tc15 = FloatEntry(self.page3,
-#                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
-#                               unitdict = 'POWER',
-#                               label = _U("FluidSupply2"),
-#                               tip = _U("Heat transport medium"))
-
-        self.tc15 = TextEntry(self.page3, maxchars = 200, value = '',
-                             label = _U("FluidSupply2"),
-                             tip = _U("Heat transport medium"))
+        self.tc15 = ChoiceEntry(self.page3,
+                                values = [],
+                                label = _U("FluidSupply2"),
+                                tip = _U("Heat transport medium"))
 
         self.tc16 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -404,10 +394,10 @@ class PanelDBCHP(PanelDBBase):
                "Eta_t":check(self.tc9.GetValue()),
                "CHPPe":check(self.tc10.GetValue()),
                "Eta_e":check(self.tc11.GetValue()),
-               "FluidSupply":check(self.tc12.GetValue()),
+               "FluidSupply":check(self.getFluidIdOfName(self.tc12.GetValue(text = True))),
                "TSupply":check(self.tc13.GetValue()),
                "FlowRateSupply":check(self.tc14.GetValue()),
-               "FluidSupply2":check(self.tc15.GetValue()),
+               "FluidSupply2":check(self.getFluidIdOfName(self.tc15.GetValue(text = True))),
                "TSupply2":check(self.tc16.GetValue()),
                "FlowRateSupply2":check(self.tc17.GetValue()),
                "Price":check(self.tc18.GetValue()),
@@ -433,6 +423,8 @@ class PanelDBCHP(PanelDBBase):
         self.fillChoiceOfCHPType(self.tc3.entry)
         self.fillChoiceOfCHPSubType(self.tc4.entry)
         self.fillChoiceOfDBFuel(self.tc7.entry)
+        self.fillChoiceOfFluidSupply(self.tc12.entry)
+        self.fillChoiceOfFluidSupply(self.tc15.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.Manufacturer)) if q.Manufacturer is not None else ''
@@ -449,10 +441,16 @@ class PanelDBCHP(PanelDBBase):
             self.tc9.SetValue(str(q.Eta_t)) if q.Eta_t is not None else ''
             self.tc10.SetValue(str(q.CHPPe)) if q.CHPPe is not None else ''
             self.tc11.SetValue(str(q.Eta_e)) if q.Eta_e is not None else ''
-            self.tc12.SetValue(str(q.FluidSupply)) if q.FluidSupply is not None else ''
+            if q.FluidSupply is not None:
+                self.tc12.SetValue(self.getFluidNameOfId(int(q.FluidSupply)))
+            else:
+                self.tc12.SetValue("None")
             self.tc13.SetValue(str(q.TSupply)) if q.TSupply is not None else ''
             self.tc14.SetValue(str(q.FlowRateSupply)) if q.FlowRateSupply is not None else ''
-            self.tc15.SetValue(str(q.FluidSupply2)) if q.FluidSupply2 is not None else ''
+            if q.FluidSupply2 is not None:
+                self.tc15.SetValue(self.getFluidNameOfId(int(q.FluidSupply2)))
+            else:
+                self.tc15.SetValue("None")
             self.tc16.SetValue(str(q.TSupply2)) if q.TSupply2 is not None else ''
             self.tc17.SetValue(str(q.FlowRateSupply2)) if q.FlowRateSupply2 is not None else ''
             self.tc18.SetValue(str(q.Price)) if q.Price is not None else ''
@@ -490,6 +488,8 @@ class PanelDBCHP(PanelDBBase):
         self.fillChoiceOfDBFuel(self.tc7.entry)
         self.fillChoiceOfCHPType(self.tc3.entry)
         self.fillChoiceOfCHPSubType(self.tc4.entry)
+        self.fillChoiceOfFluidSupply(self.tc12.entry)
+        self.fillChoiceOfFluidSupply(self.tc15.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 
@@ -508,10 +508,10 @@ class PanelDBCHP(PanelDBBase):
            self.tc9.GetValue() is None and\
            self.tc10.GetValue() is None and\
            self.tc11.GetValue() is None and\
-           self.tc12.GetValue() is None and\
+           self.tc12.GetValue(text = True) == "None" and\
            self.tc13.GetValue() is None and\
            self.tc14.GetValue() is None and\
-           self.tc15.GetValue() is None and\
+           self.tc15.GetValue(text = True) == "None" and\
            self.tc16.GetValue() is None and\
            self.tc17.GetValue() is None and\
            self.tc18.GetValue() is None and\

@@ -290,15 +290,15 @@ class PanelDBBase(wx.Dialog):
         sourceSinkList.sort()
         return sourceSinkList
 
-    def getAbsHeatMedList(self):
-        absHeatMedTable = Status.DB.dbfluid.DBFluid_ID['%']
-        absHeatMedList = []
-        for entry in absHeatMedTable:
-            absHeatMed = entry.FluidName
-            if str(absHeatMed) not in absHeatMedList and len(str(absHeatMed)) > 0:
-                absHeatMedList.append(str(absHeatMed))
-        absHeatMedList.sort()
-        return absHeatMedList
+    def getFluidNameList(self):
+        fluidTable = Status.DB.dbfluid.DBFluid_ID['%']
+        fluidNameList = []
+        for entry in fluidTable:
+            fluidName = entry.FluidName
+            if str(fluidName) not in fluidNameList and len(str(fluidName)) > 0:
+                fluidNameList.append(str(fluidName))
+        fluidNameList.sort()
+        return fluidNameList
 
     def getHPSubTypeList(self):
         hpSubTypeList = []
@@ -326,6 +326,26 @@ class PanelDBBase(wx.Dialog):
         if str(result) == "()":
             result = None
         return result
+
+    def getFluidIdOfName(self, name):
+        result = None
+        if name is not None and len(str(name)) > 0:
+            sqlQuery = "SELECT DBFluid_ID FROM dbfluid where FluidName = '%s'"%str(name)
+            result = Status.DB.sql_query(sqlQuery)
+            if str(result) == "()":
+                result = None
+        if result is None: result = 0
+        return int(result)
+
+    def getFluidNameOfId(self, id):
+        result = None
+        if id is not None:
+            sqlQuery = "SELECT FluidName FROM dbfluid where DBFluid_ID = %d"%int(id)
+            result = Status.DB.sql_query(sqlQuery)
+            if str(result) == "()":
+                result = None
+        if result is None: result = "None"
+        return str(result)
 
     def fillChoiceOfNaceCode(self, entry):
         naceList = self.getNACECodeandNACESubCodeList()
@@ -380,7 +400,7 @@ class PanelDBBase(wx.Dialog):
         fillChoice(entry, sourceSinkList, appendNone)
 
     def fillChoiceOfHPAbsHeatMed(self, entry):
-        absHeatMedList = self.getAbsHeatMedList()
+        absHeatMedList = self.getFluidNameList()
         appendNone = False if "None" in absHeatMedList else True;
         fillChoice(entry, absHeatMedList, appendNone)
 
@@ -411,6 +431,11 @@ class PanelDBBase(wx.Dialog):
     def fillChoiceOfCHPSubType(self, entry):
         chpSubTypeList = self.getCHPSubTypeList()
         fillChoice(entry, chpSubTypeList)
+
+    def fillChoiceOfFluidSupply(self, entry):
+        fluidNameList = self.getFluidNameList()
+        appendNone = False if "None" in fluidNameList else True;
+        fillChoice(entry, fluidNameList, appendNone)
 
     def fillChoiceOfType(self):
         try:
