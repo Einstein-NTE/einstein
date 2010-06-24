@@ -39,6 +39,7 @@ import wx
 from einstein.GUI.DBEditFrame import DBEditFrame
 from einstein.GUI.panelQ4 import PanelQ4
 from einstein.modules.interfaces import Interfaces
+from einstein.modules.messageLogger import *
 
 from einstein.GUI.panelDBCHP import PanelDBCHP
 from einstein.GUI.panelDBSolarThermal import PanelDBSolarThermal
@@ -137,26 +138,26 @@ class AddEquipment(wx.Dialog):
             self.dbe = DBEditFrame(self, self.title, self.tablename, self.col_returned, self.can_edit)
 
         if self.dbe.ShowModal() == wx.ID_OK:
-	    # the user has accepted a selection from the database dialog
-	    # so we exit also from this dialog
-	    #
-	    #   Here the identity of the selected equipment should be delivered, in order
-	    #   to give it back to the calling panel
-	    # this should be cleaned somewhat
-	    self.theId = self.dbe.theId
-#	    print "addEquipment popup (Database button): ", self.theId
-#	    print "addEquipment popup (Database button): equipe = ",self.prnt.equipe.Equipment
+            # the user has accepted a selection from the database dialog
+            # so we exit also from this dialog
+            #
+            #   Here the identity of the selected equipment should be delivered, in order
+            #   to give it back to the calling panel
+            # this should be cleaned somewhat
+            self.theId = self.dbe.theId
+            #print "addEquipment popup (Database button): ", self.theId
+            #print "addEquipment popup (Database button): equipe = ",self.prnt.equipe.Equipment
 
-	    try:
-#            print "trying to set equipment row in DB "
+            try:
+                #print "trying to set equipment row in DB "
                 self.module.setEquipmentFromDB(self.prnt.equipe, self.theId)
                 self.prnt.mode = "DB"
-#            print _("addEquipment popup (Database button): equipment added to Q/C")
-	    except:
-		logTrack('addEquipment popup (Database button): setEquipmentFromDB from module did not execute')
+                #print _("addEquipment popup (Database button): equipment added to Q/C")
+            except:
+                logTrack('addEquipment popup (Database button): setEquipmentFromDB from module did not execute')
 
-	    # close this dialog
-	    self.EndModal(wx.ID_OK)
+            # close this dialog
+            self.EndModal(wx.ID_OK)
         else:
             self.EndModal(wx.ID_CANCEL)
 

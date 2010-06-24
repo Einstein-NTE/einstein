@@ -244,8 +244,8 @@ class PanelDBBase(wx.Dialog):
         equipe = None
 
         try:
-            id = self.grid.GetCellValue(row, 0)
-            equipments = self.getDBCol()[check(id)]
+            self.theId = self.grid.GetCellValue(row, 0)
+            equipments = self.getDBCol()[check(self.theId)]
             if len(equipments) > 0:
                 equipe = equipments[0]
         except:
