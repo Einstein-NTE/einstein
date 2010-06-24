@@ -159,19 +159,19 @@ class PanelDBBoiler(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc5 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
                               label = _U("BBPnom"),
                               tip = _U("Nominal thermal power"))
 
         self.tc6 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("BBEfficiency"),
                               tip = _U("Nominal efficiency"))
 
         self.tc7 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
                               label = _U("FuelConsum"),
                               tip = _U("Nominal fuel consumption (LCV)"))
@@ -182,7 +182,7 @@ class PanelDBBoiler(PanelDBBase):
                                tip = _U("Fuel type"))
 
         self.tc9 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
                               label = _U("ElConsum"),
                               tip = _U("Nominal electrical power consumption"))
@@ -198,31 +198,31 @@ class PanelDBBoiler(PanelDBBase):
                                 tip = _U("Does the equipment include an air preheater ?"))
 
         self.tc12 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("ExcessAirRatio"),
                                tip = _U("Typical excess air ratio"))
 
         self.tc13 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("BBA1"),
                                tip = _U("Linear dependence of the efficiency on the load"))
 
         self.tc14 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("BBA2"),
                                tip = _U("Quadratic dependence of the efficiency on the load"))
 
         self.tc15 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'INVTEMP',
                                label = _U("BBK1"),
                                tip = _U("Linear dependence of the efficiency on the temperature"))
 
         self.tc16 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'INVTEMP2',
                                label = _U("BBK2"),
                                tip = _U("Quadratic dependence of the efficiency on the temperature"))
@@ -241,7 +241,7 @@ class PanelDBBoiler(PanelDBBase):
         fp.popFont()
 
         self.tc17 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
                                label = _U("BoilerTemp"),
                                tip = _U("Maximum outlet temperature"))
@@ -260,25 +260,25 @@ class PanelDBBoiler(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc18 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
                                label = _U("BoilerPrice"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
                                label = _U("BoilerTurnKeyPrice"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc20 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("BoilerOandMfix"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYTARIFF',
                                label = _U("BoilerOandMvar"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))

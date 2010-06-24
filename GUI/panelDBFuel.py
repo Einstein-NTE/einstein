@@ -162,19 +162,19 @@ class PanelDBFuel(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc6 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'SPECIFICENTHALPY',
                               label = _U("FuelLCV"),
                               tip = _U("Lower calorific value"))
 
         self.tc7 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'SPECIFICENTHALPY',
                               label = _U("FuelHCV"),
                               tip = _U("Higher calorific value"))
 
         self.tc8 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'DENSITY',
                               label = _U("FuelDensity"),
                               tip = _U("Density"))
@@ -193,31 +193,31 @@ class PanelDBFuel(PanelDBBase):
         fp.popFont()
 
         self.tc9 = FloatEntry(self.page3,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'HEATCAPACITY',
                               label = _U("OffgasHeatCapacity"),
                               tip = _U("OffgasHeatCapacity"))
 
         self.tc10 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'DENSITY',
                                label = _U("OffgasDensity"),
                                tip = _U("OffgasDensity"))
 
         self.tc11 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("Humidity"),
                                tip = _U("Humidity"))
 
         self.tc12 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("CombAir"),
                                tip = _U("CombAir"))
 
         self.tc13 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("Offgas"),
                                tip = _U("Offgas"))
@@ -236,13 +236,13 @@ class PanelDBFuel(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc14 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'DENSITY',
                                label = _U("PEConvFuel"),
                                tip = _U("Primary energy conversion ratio"))
 
         self.tc15 = FloatEntry(self.page4,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'CO2RATIO',
                                label = _U("CO2ConvFuel"),
                                tip = _U("Ratio of CO2 generation"))

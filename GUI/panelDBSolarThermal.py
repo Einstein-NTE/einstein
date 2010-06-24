@@ -154,91 +154,91 @@ class PanelDBSolarThermal(PanelDBBase):
         fp.popFont()
 
         self.tc5 = StaticFloatEntry(self.page2,
-                                    ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                                    ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                     unitdict = 'POWER',
                                     label = _U("STPnomColl"),
                                     tip = _U("STPnomColl"))
 
         self.tc6 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("STc0"),
                               tip = _U("Optical efficiency"))
 
         self.tc7 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'HEATLOSSCOEFF',
                               label = _U("STc1"),
                               tip = _U("Linear thermal loss coefficient"))
 
         self.tc8 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'HEATLOSSCOEFF2',
                               label = _U("STc2"),
                               tip = _U("Quadratic thermal loss coefficient"))
 
         self.tc9 = FloatEntry(self.page2,
-                              ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
                               label = _U("K50L"),
                               tip = unicode("Incidence angle correction factor at 50º (longitudinal)", 'latin-1'))
 
         self.tc10 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("K50T"),
                                tip = unicode("Incidence angle correction factor at 50º (transversal)", 'latin-1'))
 
         self.tc11 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'MASSORVOLUMEFLOW',
                                label = _U("STMassFlowRate"),
                                tip = _U("Recommended collector mass flow rate"))
 
         self.tc12 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STLengthGross"),
                                tip = _U("STLengthGross"))
 
         self.tc13 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STHeightGross"),
                                tip = _U("STHeightGross"))
 
         self.tc14 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'AREA',
                                label = _U("STAreaGross"),
                                tip = _U("STAreaGross"))
 
         self.tc15 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STLengthAper"),
                                tip = _U("STLengthAper"))
 
         self.tc16 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'LENGTH',
                                label = _U("STHeightAper"),
                                tip = _U("STHeightAper"))
 
         self.tc17 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'AREA',
                                label = _U("STAreaAper"),
                                tip = _U("STAreaAper"))
 
         self.tc18 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
                                label = _U("STAreaFactor"),
                                tip = _U("STAreaFactor"))
 
         self.tc19 = FloatEntry(self.page2,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'MASSPERAREA',
                                label = _U("STWeightFactor"),
                                tip = _U("STWeightFactor"))
@@ -260,31 +260,31 @@ class PanelDBSolarThermal(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc20 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("STUnitPrice300kW"),
                                tip = _U("STUnitPrice300kW"))
 
         self.tc21 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice30kW"),
                                tip = _U("STUnitTurnKeyPrice30kW"))
 
         self.tc22 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice300kW"),
                                tip = _U("STUnitTurnKeyPrice300kW"))
 
         self.tc23 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("STUnitTurnKeyPrice3000kW"),
                                tip = _U("STUnitTurnKeyPrice3000kW"))
 
         self.tc24 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
                                label = _U("STOMUnitFix"),
                                tip = _U("STOMUnitFix"))
