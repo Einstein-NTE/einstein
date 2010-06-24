@@ -57,6 +57,7 @@ class PanelDBElectricityMix(PanelDBBase):
         self._init_ctrls(parent)
         self._init_grid(145)
         self.__do_layout()
+        self._bind_events()
         self.clear()
         self.fillEquipmentList()
         self.fillChoices()

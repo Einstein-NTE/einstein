@@ -71,22 +71,6 @@ class PanelDBBase(wx.Dialog):
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'Save')
         self.buttonOK.SetDefault()
 
-        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
-        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
-
-        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick);
-
-        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_DCLICK, self.OnGridCellDClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnGridLabelLeftClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
-        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
-
     def _init_grid(self, defaultColSize):
         self.grid.CreateGrid(0, len(self.colLabels))
 
@@ -104,6 +88,25 @@ class PanelDBBase(wx.Dialog):
         self.grid.SetColMinimalAcceptableWidth(0)
         self.grid.SetColSize(0, 0)
         self.grid.SetGridCursor(0, 0)
+
+    def _bind_events(self):
+        self.Bind(wx.EVT_BUTTON, self.OnButtonAddEquipment, self.buttonAddEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonDeleteEquipment, self.buttonDeleteEquipment)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.buttonCancel)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonOK, self.buttonOK)
+
+        self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_type.entry)
+        if self.tc_subtype is not None:
+            self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_subtype.entry)
+
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_DCLICK, self.OnGridCellDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.OnGridLabelLeftClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -133,9 +136,13 @@ class PanelDBBase(wx.Dialog):
     def OnGridCellLeftClick(self, event):
         self.clear()
         self.grid.ClearSelection()
-        self.grid.SetGridCursor(event.GetRow(), event.GetCol())
-
-        self.display(self.getCurrentEquipment(event.GetRow()))
+        try:
+            row = event.GetRow() if event.GetRow() >= 0 else 0
+            col = event.GetCol() if event.GetCol() >= 0 else 0
+            self.grid.SetGridCursor(row, col)
+            self.display(self.getCurrentEquipment(row))
+        except:
+            pass
 
         event.Skip()
 
@@ -147,6 +154,10 @@ class PanelDBBase(wx.Dialog):
 
     def OnGridLabelLeftClick(self, event):
         self.clear()
+        if event.GetRow() < 0 and event.GetCol() < 0:
+            self.grid.ClearSelection()
+            return
+
         if event.GetRow() >= 0:
             self.OnGridCellLeftClick(event)
             self.grid.SetGridCursor(event.GetRow(), 0)
@@ -159,6 +170,11 @@ class PanelDBBase(wx.Dialog):
         event.Skip()
 
     def OnChoiceEntryClick(self, event):
+        self.grid.ClearGrid()
+        self.grid.ClearSelection()
+        for i in range(self.grid.GetNumberRows()):
+            self.grid.DeleteRows()
+        self.fillEquipmentList()
         event.Skip()
 
 #------------------------------------------------------------------------------
