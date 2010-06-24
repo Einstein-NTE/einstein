@@ -576,12 +576,6 @@ class PanelDBBenchmark(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-        self.fillChoiceOfNaceCode(self.tc1.entry)
-        self.fillChoiceOfDBUnitOpCodes(self.tc2.entry)
-        self.fillChoiceOfProductCodes(self.tc3.entry)
-        self.fillChoiceOfEUnit(self.tc24.entry)
-        self.fillChoiceOfHUnit(self.tc34.entry)
-        self.fillChoiceOfTUnit(self.tc44.entry)
         unitOpDict = Status.prj.getUnitOpDict()
 
         if q is not None:
@@ -705,6 +699,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc42.SetValue('')
         self.tc43.SetValue('')
         self.tc44.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfNaceCode(self.tc1.entry)

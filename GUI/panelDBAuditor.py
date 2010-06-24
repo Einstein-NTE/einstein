@@ -261,6 +261,7 @@ class PanelDBAuditor(PanelDBBase):
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

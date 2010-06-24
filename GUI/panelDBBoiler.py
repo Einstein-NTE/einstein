@@ -155,6 +155,9 @@ class PanelDBBoiler(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'POWER',
@@ -223,6 +226,9 @@ class PanelDBBoiler(PanelDBBase):
                                unitdict = 'INVTEMP2',
                                label = _U("BBK2"),
                                tip = _U("Quadratic dependence of the efficiency on the temperature"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 3 - Heat source / sink
@@ -402,10 +408,6 @@ class PanelDBBoiler(PanelDBBase):
         self.clear()
 
         fuelDict = FUELTYPES
-        self.fillChoiceOfDBFuel(self.tc8.entry)
-        self.fillChoiceYesNo(self.tc10.entry)
-        self.fillChoiceYesNo(self.tc11.entry)
-        self.fillChoiceOfBoilerType(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.BoilerManufacturer)) if q.BoilerManufacturer is not None else ''
@@ -462,12 +464,13 @@ class PanelDBBoiler(PanelDBBase):
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
+        self.fillChoiceOfBoilerType(self.tc3.entry)
         self.fillChoiceOfDBFuel(self.tc8.entry)
         self.fillChoiceYesNo(self.tc10.entry)
         self.fillChoiceYesNo(self.tc11.entry)
-        self.fillChoiceOfBoilerType(self.tc3.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):

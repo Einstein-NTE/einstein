@@ -230,6 +230,15 @@ class PanelDBBase(wx.Dialog):
                 self.grid.SetGridCursor(row, col)
                 self.grid.SelectRow(row)
                 self.grid.MakeCellVisible(row, col)
+        else:
+            # no equipment selected, hence adding new one with already entered values
+            tmp = self.collectEntriesForDB()
+            self.addEquipment()
+            self.updateValues(tmp)
+            try:
+                self.display(self.getCurrentEquipment(self.grid.GetGridCursorRow()))
+            except:
+                pass
 
     def getCurrentEquipment(self, row):
         equipe = None

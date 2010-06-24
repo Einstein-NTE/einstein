@@ -342,8 +342,6 @@ class PanelDBFuel(PanelDBBase):
         self.clear()
 
         fuelDict = FUELTYPES
-        self.fillChoiceOfDBFuelType(self.tc2.entry)
-        self.fillChoiceOfDBFuelUnits(self.tc3.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.FuelName)) if q.FuelName is not None else ''
@@ -381,6 +379,7 @@ class PanelDBFuel(PanelDBBase):
         self.tc13.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfDBFuelType(self.tc2.entry)

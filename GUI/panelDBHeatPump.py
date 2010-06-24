@@ -557,11 +557,6 @@ class PanelDBHeatPump(PanelDBBase):
 
         fuelDict = FUELTYPES
         hpSourceSinkDict = HPSOURCESINK
-        self.fillChoiceOfDBFuel(self.tc11.entry)
-        self.fillChoiceOfHPSourceSink(self.tc26.entry)
-        self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
-        self.fillChoiceOfHPType(self.tc3.entry)
-        self.fillChoiceOfHPSubType(self.tc4.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.HPManufacturer)) if q.HPManufacturer is not None else ''
@@ -644,13 +639,14 @@ class PanelDBHeatPump(PanelDBBase):
         self.tc34.SetValue('')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
+        self.fillChoiceOfHPType(self.tc3.entry)
+        self.fillChoiceOfHPSubType(self.tc4.entry)
         self.fillChoiceOfDBFuel(self.tc11.entry)
         self.fillChoiceOfHPSourceSink(self.tc26.entry)
         self.fillChoiceOfHPAbsHeatMed(self.tc30.entry)
-        self.fillChoiceOfHPType(self.tc3.entry)
-        self.fillChoiceOfHPSubType(self.tc4.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
 

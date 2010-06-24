@@ -39,6 +39,7 @@ HEIGHT = 20
 LABEL_WIDTH_LEFT = 250
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
+UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
 
 VSEP = 4
 
@@ -159,6 +160,9 @@ class PanelDBElectricityMix(PanelDBBase):
         self.frame_data.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'FRACTION',
@@ -218,6 +222,9 @@ class PanelDBElectricityMix(PanelDBBase):
                                unitdict = 'FRACTION',
                                label = _U("PercOther"),
                                tip = _U("other"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
@@ -338,6 +345,7 @@ class PanelDBElectricityMix(PanelDBBase):
         self.tc13.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()
@@ -350,7 +358,6 @@ class PanelDBElectricityMix(PanelDBBase):
            self.tc2.GetValue() is None and\
            len(self.tc3.GetValue()) == 0 and\
            len(self.tc4.GetValue()) == 0 and\
-           len(self.tc5.GetValue()) == 0 and\
            self.tc6.GetValue() is None and\
            self.tc7.GetValue() is None and\
            self.tc8.GetValue() is None and\

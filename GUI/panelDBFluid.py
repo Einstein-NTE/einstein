@@ -150,6 +150,9 @@ class PanelDBFluid(PanelDBBase):
         self.frame_main_properties.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
                               unitdict = 'HEATCAPACITY',
@@ -180,6 +183,9 @@ class PanelDBFluid(PanelDBBase):
                               label = _U("FluidDensity"),
                               tip = _U("Density"))
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         #
         # tab 3 - Specific properties required only for refrigerants
         #
@@ -189,6 +195,9 @@ class PanelDBFluid(PanelDBBase):
         fp.pushFont()
         self.frame_refrigerant_properties.SetFont(fp.getFont())
         fp.popFont()
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = 0., maxval = 1.e+12, value = 0.,
@@ -219,6 +228,9 @@ class PanelDBFluid(PanelDBBase):
                                unitdict = 'SPECIFICENTHALPY',
                                label = _U("SensibleHeat"),
                                tip = _U("Senisble heat at typical working conditions"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):
         flagText = wx.TOP | wx.ALIGN_CENTER_HORIZONTAL
@@ -336,6 +348,7 @@ class PanelDBFluid(PanelDBBase):
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

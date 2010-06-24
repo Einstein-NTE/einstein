@@ -421,8 +421,6 @@ class PanelDBSolarThermal(PanelDBBase):
     def display(self, q = None):
         self.clear()
 
-        self.fillChoiceOfSTType(self.tc3.entry)
-
         if q is not None:
             self.tc1.SetValue(str(q.STManufacturer)) if q.STManufacturer is not None else ''
             self.tc2.SetValue(str(q.STModel)) if q.STModel is not None else ''
@@ -478,6 +476,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.tc23.SetValue('')
         self.tc24.SetValue('')
         self.tc25.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfSTType(self.tc3.entry)

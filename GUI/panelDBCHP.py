@@ -409,11 +409,6 @@ class PanelDBCHP(PanelDBBase):
         self.clear()
 
         fuelDict = FUELTYPES
-        self.fillChoiceOfCHPType(self.tc3.entry)
-        self.fillChoiceOfCHPSubType(self.tc4.entry)
-        self.fillChoiceOfDBFuel(self.tc7.entry)
-        self.fillChoiceOfFluidSupply(self.tc12.entry)
-        self.fillChoiceOfFluidSupply(self.tc15.entry)
 
         if q is not None:
             self.tc1.SetValue(str(q.Manufacturer)) if q.Manufacturer is not None else ''
@@ -472,11 +467,12 @@ class PanelDBCHP(PanelDBBase):
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
+        self.fillChoices()
 
     def fillChoices(self):
-        self.fillChoiceOfDBFuel(self.tc7.entry)
         self.fillChoiceOfCHPType(self.tc3.entry)
         self.fillChoiceOfCHPSubType(self.tc4.entry)
+        self.fillChoiceOfDBFuel(self.tc7.entry)
         self.fillChoiceOfFluidSupply(self.tc12.entry)
         self.fillChoiceOfFluidSupply(self.tc15.entry)
         self.fillChoiceOfType()
