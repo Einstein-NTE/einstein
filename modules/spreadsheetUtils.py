@@ -157,6 +157,9 @@ class SpreadsheetDict():
     
     @staticmethod
     def createQElectricityDictionary(Q2,db_conn):
+        
+
+        
         Q2dict = {}
         Q2dict['ElectricityPeakYear']= Q2[36]
         Q2dict['ElectricityStandYear']= Q2[37]
@@ -207,7 +210,13 @@ class SpreadsheetDict():
 
     @staticmethod
     def createQProcessDictionary(Q3,db_conn):
+        i =0
+        for elem in Q3:
+            print str(i) + " " + str(elem)
+            i=i+1
+        
         Q3dict = {}
+        Q3dict['EquipIDFromDB'] = 1
         Q3dict['Process'] = Q3[0]
         Q3dict['Description'] = Q3[1]
         Q3dict['ProcType']= Q3[2]
@@ -230,7 +239,14 @@ class SpreadsheetDict():
         Q3dict['PTStartUp']= SpreadsheetDict.normDecimalPlace(Q3[13])
         Q3dict['QOpProc']= SpreadsheetDict.normDecimalPlace(Q3[15])
         Q3dict['HeatRecOK']= Q3[16]
-        Q3dict['ProcMedOut']= Q3[17]
+        
+        try:
+            dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q3[17])+"'")
+            Q3dict['ProcMedOut']= dbfluid[0]['DBFluid_ID']
+        except:
+            pass
+        #Q3dict['ProcMedOut']= Q3[17]
+        
         Q3dict['PTOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[18])
         Q3dict['HOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[19])
         Q3dict['XOutFlow']= SpreadsheetDict.normDecimalPlace(Q3[20])
@@ -516,12 +532,15 @@ class SpreadsheetDict():
         # Belongs to Surface Q7dict["ST_IT"] = Q7[6]
         Q7dict["BiomassFromProc"] = Q7[7]
         Q7dict["BiomassFromRegion"] = Q7[8]
-        startdate, enddate = SpreadsheetDict.charDateParse(Q7[9])
-        Q7dict["PeriodBiomassRegionStart"] = startdate
-        Q7dict["PeriodBiomassRegionStop"] = enddate
-        startdate, enddate = SpreadsheetDict.parseDate(Q7[10])
-        Q7dict["PeriodBiomassProcStart"] = startdate
-        Q7dict["PeriodBiomassProcStop"] = enddate
+        
+        # inserted SQL Date causes exception in current "Renewable Energy" Tab
+        
+#        startdate, enddate = SpreadsheetDict.charDateParse(Q7[9])
+#        Q7dict["PeriodBiomassRegionStart"] = startdate
+#        Q7dict["PeriodBiomassRegionStop"] = enddate
+#        startdate, enddate = SpreadsheetDict.parseDate(Q7[10])
+#        Q7dict["PeriodBiomassProcStart"] = startdate
+#        Q7dict["PeriodBiomassProcStop"] = enddate
         Q7dict["QBiomassProc"] = Q7[11]
         Q7dict["QBiomassRegion"] = Q7[12]
         Q7dict["LCVBiomassProc"] = Q7[13]
@@ -653,15 +672,15 @@ class SpreadsheetDict():
     def createsprojectDictionary(questionnaire_id):
         sp = {}
         sp['ProjectID']=questionnaire_id
-        sp['NoOfAlternatives'] = -1
+        sp['NoOfAlternatives'] = 0
         sp['ActiveAlternative'] = -1
-        sp['WriteProtected'] = 0
-        sp['StatusQ'] = 0
+#        sp['WriteProtected'] = 0
+#        sp['StatusQ'] = 0
         sp['StatusCC'] = 0
-        sp['StatusCA'] = 0
-        sp['StatusR'] = 0 
-        sp['LanguageReport'] = 'en'
-        sp['UnitsReport'] = 'SI-kWh'
+#        sp['StatusCA'] = 0
+#        sp['StatusR'] = 0 
+#        sp['LanguageReport'] = 'en'
+#        sp['UnitsReport'] = 'SI-kWh'
         return sp
         
     
@@ -775,8 +794,14 @@ class Utils():
                 #return self.parseError(self.__sheetnames[6])
             
             try:
-                self.__md.qheatexchanger.insert(SpreadsheetDict.createQ6Dictionary(Q4_8[i+3], self.__md))
-                self.__md.qwasteheatelequip.insert(SpreadsheetDict.createQ6EDictionary(Q4_8[i+3], self.__md))
+                projectid = {'ProjectID':Questionnaire_ID}
+                Q6Dict = SpreadsheetDict.createQ6Dictionary(Q4_8[i+3], self.__md)
+                Q6Dict.update(projectid)
+                self.__md.qheatexchanger.insert(Q6Dict)
+                #self.__md.qheatexchanger.insert(SpreadsheetDict.createQ6Dictionary(Q4_8[i+3], self.__md))
+                Q6EDict = SpreadsheetDict.createQ6EDictionary(Q4_8[i+3], self.__md)
+                Q6EDict.update(projectid)
+                self.__md.qwasteheatelequip.insert(Q6EDict)
             except:
                 pass
                 #return self.parseError(self.__sheetnames[7])
@@ -802,7 +827,7 @@ class Utils():
         self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
         self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
         
-        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1]}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1], 'ProjectID':Questionnaire_ID}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
 
         try:
             # Code to skip a specific amount of columns
