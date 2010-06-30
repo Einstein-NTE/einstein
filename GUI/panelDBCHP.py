@@ -159,6 +159,7 @@ class PanelDBCHP(PanelDBBase):
         #
         self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
         self.frame_electricity = wx.StaticBox(self.page2, -1, _U("Electricity generation parameters"))
+        self.frame_thermal = wx.StaticBox(self.page2, -1, _U("Thermal generation parameters"))
         self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         fp.pushFont()
@@ -318,10 +319,13 @@ class PanelDBCHP(PanelDBBase):
 
 
         sizerPage2 = wx.StaticBoxSizer(self.frame_technical_data, wx.VERTICAL)
-        sizerPage2.Add(self.tc6, 0, flagText, VSEP)
         sizerPage2.Add(self.tc7, 0, flagText, VSEP)
         sizerPage2.Add(self.tc8, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc9, 0, flagText, VSEP)
+
+        sizer_Page2_thermal = wx.StaticBoxSizer(self.frame_thermal, wx.VERTICAL)
+        sizer_Page2_thermal.Add(self.tc6, 0, flagText, VSEP)
+        sizer_Page2_thermal.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage2.Add(sizer_Page2_thermal, 0, flagText)
 
         sizerPage2_electricity = wx.StaticBoxSizer(self.frame_electricity, wx.VERTICAL)
         sizerPage2_electricity.Add(self.tc10, 0, flagText, VSEP)
