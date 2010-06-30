@@ -153,11 +153,12 @@ class PanelDBSolarThermal(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
-        self.tc5 = StaticFloatEntry(self.page2,
-                                    ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                                    unitdict = 'POWER',
-                                    label = _U("STPnomColl"),
-                                    tip = _U("STPnomColl"))
+        self.tc5 = FloatEntry(self.page2,
+                              isStatic = True,
+                              ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+                              unitdict = 'POWER',
+                              label = _U("STPnomColl"),
+                              tip = _U("STPnomColl"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,

@@ -142,9 +142,10 @@ class PanelDBElectricityMix(PanelDBBase):
                              label = _U("Bibliographic reference / data source"),
                              tip = _U("Please give a full reference of the data source that allows for tracking back the data"))
 
-        self.tc5 = StaticTextEntry(self.page1, value = '',
-                                   label = _U("Auditor responsible for data set"),
-                                   tip = _U("Auditor responsible for data set"))
+        self.tc5 = TextEntry(self.page1, value = '',
+                             isStatic = True,
+                             label = _U("Auditor responsible for data set"),
+                             tip = _U("Auditor responsible for data set"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
