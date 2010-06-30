@@ -70,6 +70,7 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
     def parseRange(self, range, sht):
         return Utils.tupleToList(self.__xlWb.Worksheets(sht).Range(range)) 
     
+    @DeprecationWarning
     def __getExcelLists(self, sheetnames, xlWb , dlg): 
         lists = []
         if len(sheetnames)!=11:

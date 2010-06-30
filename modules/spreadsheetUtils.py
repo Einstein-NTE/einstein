@@ -463,7 +463,7 @@ class SpreadsheetDict():
         Q5dict["DDistPipe"] = Q5[10]
         Q5dict["DeltaDistPipe"] = Q5[11]
         Q5dict["NumStorageUnits"] = Q5[14]
-        Q5dict["VtotStorage"] = Q5[15]
+        Q5dict["VUnitStorage"] = Q5[15]
         Q5dict["TypeStorage"] = Q5[16]
         Q5dict["PmaxStorage"] = Q5[17]
         Q5dict["TmaxStorage"] = Q5[18]
@@ -497,7 +497,14 @@ class SpreadsheetDict():
         Q6dict["WHEEEqType"] = Q6[17]
         Q6dict["WHEEWasteHeatType"] = Q6[18]
         Q6dict["QWHEE"] = Q6[19]
-        Q6dict["WHEEMedium"] = Q6[20]
+        #Q6dict["WHEEMedium"] = Q6[20]
+        
+        try:
+            DBFluidSel = db_conn.dbfluid.sql_select('FluidName = "' + str(Q6[20])+ '"')
+            Q6dict["WHEEMedium"] = DBFluidSel[0]["DBFluid_ID"]
+        except:
+            pass
+        
         Q6dict["WHEEFlow"] = Q6[21]
         Q6dict["WHEETOutlet"] = Q6[22]
         Q6dict["WHEEPresentUse"] = Q6[23]
@@ -507,6 +514,7 @@ class SpreadsheetDict():
         Q6dict["HBatchWHEE"] = Q6[28]
         Q6dict["NDaysWHEE"] = Q6[29]
         Q6dict['AlternativeProposalNo'] = -1
+        Q6dict['WHEENo'] = 1
         return Q6dict
     
     @staticmethod
