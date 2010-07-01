@@ -360,7 +360,6 @@ class PanelDBFluid(PanelDBBase):
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

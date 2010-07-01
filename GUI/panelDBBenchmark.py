@@ -675,9 +675,9 @@ class PanelDBBenchmark(PanelDBBase):
                 self.tc44.SetValue('None')
 
     def clear(self):
-        self.tc1.SetValue('')
-        self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc1.SetValue('None')
+        self.tc2.SetValue('None')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -698,7 +698,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc21.SetValue('')
         self.tc22.SetValue('')
         self.tc23.SetValue('')
-        self.tc24.SetValue('')
+        self.tc24.SetValue('None')
         self.tc25.SetValue('')
         self.tc26.SetValue('')
         self.tc27.SetValue('')
@@ -708,7 +708,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc31.SetValue('')
         self.tc32.SetValue('')
         self.tc33.SetValue('')
-        self.tc34.SetValue('')
+        self.tc34.SetValue('None')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
         self.tc37.SetValue('')
@@ -718,8 +718,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc41.SetValue('')
         self.tc42.SetValue('')
         self.tc43.SetValue('')
-        self.tc44.SetValue('')
-        self.fillChoices()
+        self.tc44.SetValue('None')
 
     def fillChoices(self):
         self.fillChoiceOfNaceCode(self.tc1.entry)

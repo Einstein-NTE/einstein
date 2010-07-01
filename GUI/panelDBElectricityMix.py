@@ -347,7 +347,6 @@ class PanelDBElectricityMix(PanelDBBase):
         self.tc13.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

@@ -194,7 +194,8 @@ class PanelDBBase(wx.Dialog):
                 self.grid.SelectRow(i)
                 self.display(self.getCurrentEquipment(i))
                 break
-        self.fillChoices()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
 
     def deleteEquipment(self):
         if not self.grid.IsSelection():
@@ -520,7 +521,8 @@ class PanelDBBase(wx.Dialog):
         self.grid.ClearSelection()
         for i in range(self.grid.GetNumberRows()):
             self.grid.DeleteRows()
-        self.fillChoices()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
 

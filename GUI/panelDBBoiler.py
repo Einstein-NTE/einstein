@@ -445,15 +445,15 @@ class PanelDBBoiler(PanelDBBase):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
-        self.tc8.SetValue('')
+        self.tc8.SetValue('None')
         self.tc9.SetValue('')
-        self.tc10.SetValue('')
-        self.tc11.SetValue('')
+        self.tc10.SetValue('No')
+        self.tc11.SetValue('No')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
@@ -465,7 +465,6 @@ class PanelDBBoiler(PanelDBBase):
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfBoilerType(self.tc3.entry)

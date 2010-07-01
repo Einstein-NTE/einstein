@@ -477,7 +477,7 @@ class PanelDBSolarThermal(PanelDBBase):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -501,7 +501,6 @@ class PanelDBSolarThermal(PanelDBBase):
         self.turn_key_price_grid.ClearGrid()
         self.tc24.SetValue('')
         self.tc25.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfSTType(self.tc3.entry)

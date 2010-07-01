@@ -368,8 +368,8 @@ class PanelDBFuel(PanelDBBase):
 
     def clear(self):
         self.tc1.SetValue('')
-        self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc2.SetValue('None')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -382,7 +382,6 @@ class PanelDBFuel(PanelDBBase):
         self.tc13.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfDBFuelType(self.tc2.entry)
