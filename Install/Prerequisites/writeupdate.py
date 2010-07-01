@@ -6,16 +6,26 @@ import ConfigParser
 parser = OptionParser()
 (options, args) = parser.parse_args()
 
-filenum = 1
-while os.path.isfile(str(args[1]) + "\sql\\" +"update_einsteinDB_"+"0"*(3-len(str(filenum)))+str(filenum)+".txt"):
-    filenum+=1
-filenum-=1
+path = str(args[1]) + "\sql"
+path = path.replace('\\', '/')
+
+updatelist = []
+
+for elem in os.listdir(path):
+    if elem.startswith('update_einsteinDB_'):
+        updatelist.append(elem)
+
+
+#filenum = 1
+#while os.path.isfile(str(args[1]) + "\sql\\" +"update_einsteinDB_"+"0"*(3-len(str(filenum)))+str(filenum)+".txt"):
+#    filenum+=1
+#filenum-=1
 
 fobj = open( str(args[2])+"\\update.bat", "w")
 
-for i in range(1,filenum+1):
+for elem in updatelist:
     fobj.write("\""+str(args[0]) +"\""+ " --user=" + str(args[3])+" --password="+ str(args[4]) +"< "+ "\""+ str(args[1]) + "\sql\\" +
-               "update_einsteinDB_"+"0"*(3-len(str(i)))+str(i)+".txt\"" + "\n" )#+ "pause" + "\n") 
+               elem+"\"" + "\n" )#+ "pause" + "\n") 
 
 fobj.close()
 
