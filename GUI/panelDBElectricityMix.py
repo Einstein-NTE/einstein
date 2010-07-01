@@ -70,6 +70,8 @@ class PanelDBElectricityMix(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBElectricityMix", self.name)
+        self.labelButtonAdd = _U("Add")
+        self.labelButtonDelete = _U("Delete")
 
         # id needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "id", "Country", "Year", "Type"

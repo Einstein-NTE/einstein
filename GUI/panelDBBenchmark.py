@@ -71,6 +71,8 @@ class PanelDBBenchmark(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBBenchmark", self.name)
+        self.labelButtonAdd = _U("Add")
+        self.labelButtonDelete = _U("Delete")
 
         # DBBenchmark_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "Reference"

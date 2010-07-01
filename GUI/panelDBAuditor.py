@@ -69,6 +69,8 @@ class PanelDBAuditor(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBAuditor", self.name)
+        self.labelButtonAdd = _U("Add Auditor")
+        self.labelButtonDelete = _U("Delete Auditor")
 
         # Auditor_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "Auditor_ID", "Name", "City", "Country", "Company", "CompanyType"
