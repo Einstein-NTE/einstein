@@ -63,6 +63,8 @@ class PanelDBBase(wx.Dialog):
         self.tc_subtype = None
         self.labelButtonAdd = _U("Add equipment")
         self.labelButtonDelete = _U("Delete equipment")
+        self.currentRow = -1
+        self.currentCol = -1
 
     def _init_buttons(self):
         #
@@ -110,6 +112,8 @@ class PanelDBBase(wx.Dialog):
         self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
+
+        self.grid.GetGridWindow().Bind(wx.EVT_MOTION, self.OnMouseOver)
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -178,6 +182,39 @@ class PanelDBBase(wx.Dialog):
         for i in range(self.grid.GetNumberRows()):
             self.grid.DeleteRows()
         self.fillEquipmentList()
+        event.Skip()
+
+    def OnMouseOver(self, event):
+        try:
+            x, y = self.grid.CalcUnscrolledPosition(event.GetPosition())
+            numRows, numCols = self.grid.GetNumberRows(), self.grid.GetNumberCols()
+
+            col = -1
+            row = -1
+
+            totalColWidth = 0
+            for i in range(numCols):
+                totalColWidth += self.grid.GetColSize(i)
+                if totalColWidth > x:
+                    col = i
+                    break
+
+            totalRowHeight = 0
+            for i in range(numRows):
+                totalRowHeight += self.grid.GetRowSize(i)
+                if totalRowHeight > y:
+                    row = i
+                    break
+
+            if row is not self.currentRow or col is not self.currentCol:
+                if row >= 0 and row < numRows and col >= 0 and col < numCols:
+                    self.currentRow = row
+                    self.currentCol = col
+                    self.grid.GetGridWindow().SetToolTipString(self.grid.GetCellValue(row, col))
+                else:
+                    self.grid.GetGridWindow().SetToolTipString('')
+        except:
+            self.grid.GetGridWindow().SetToolTipString('')
         event.Skip()
 
 #------------------------------------------------------------------------------
