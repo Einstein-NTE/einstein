@@ -1068,7 +1068,7 @@ class Project(object):
 # 1. manipulation of questionnaire
 
         if (Status.StatusQ > 0):
-            if (Status.ANo <= 0 and Status.StatusCC > 0):
+            if (Status.ANo <= 0 and Status.StatusCC > 0): 
                 permit = (False,0,_("Data have already been confirmed as consistent. First unblock before modifying data of present state"))
             else:
                 permit = allow           
