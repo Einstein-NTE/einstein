@@ -56,6 +56,7 @@ class PanelDBCHP(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "CHP"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(125)
         self.__do_layout()
         self._bind_events()

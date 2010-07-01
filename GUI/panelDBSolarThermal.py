@@ -56,6 +56,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "SolarThermal"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(155)
         self.__do_layout()
         self._bind_events()

@@ -61,12 +61,15 @@ class PanelDBBase(wx.Dialog):
         self.notebook = None
         self.tc_type = None
         self.tc_subtype = None
+        self.labelButtonAdd = _U("Add equipment")
+        self.labelButtonDelete = _U("Delete equipment")
 
+    def _init_buttons(self):
         #
         # buttons
         #
-        self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
-        self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
+        self.buttonAddEquipment = wx.Button(self, -1, label = self.labelButtonAdd)
+        self.buttonDeleteEquipment = wx.Button(self, -1, label = self.labelButtonDelete)
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Close')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'Save')
         self.buttonOK.SetDefault()

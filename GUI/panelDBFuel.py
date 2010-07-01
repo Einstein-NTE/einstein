@@ -56,6 +56,7 @@ class PanelDBFuel(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Fuel"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(125)
         self.__do_layout()
         self._bind_events()
@@ -69,6 +70,8 @@ class PanelDBFuel(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBFuel", self.name)
+        self.labelButtonAdd = _U("Add fuel")
+        self.labelButtonDelete = _U("Delete fuel")
 
         # DBFuel_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBFuel_ID", "FuelName", "FuelType", "DBFuelUnit", "FuelLCV", "FuelHCV"

@@ -55,6 +55,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Benchmark"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(120)
         self.__do_layout()
         self._bind_events()
