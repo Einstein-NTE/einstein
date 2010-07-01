@@ -268,29 +268,33 @@ class PanelDBHeatPump(PanelDBBase):
                                label = _U("HPConstExHeatCOP"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
 
-        self.tc22 = StaticFloatEntry(self.page2,
-                                     ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                                     unitdict = 'FRACTION',
-                                     label = _U("HPExCoolCOP"),
-                                     tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
+        self.tc22 = FloatEntry(self.page2,
+                               isStatic = True,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+                               unitdict = 'FRACTION',
+                               label = _U("HPExCoolCOP"),
+                               tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc23 = StaticFloatEntry(self.page2,
-                                     ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                                     unitdict = 'FRACTION',
-                                     label = _U("HPThCoolCOP"),
-                                     tip = _U("Carnot COP for cooling mode at nominal conditions (see next point)."))
+        self.tc23 = FloatEntry(self.page2,
+                               isStatic = True,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+                               unitdict = 'FRACTION',
+                               label = _U("HPThCoolCOP"),
+                               tip = _U("Carnot COP for cooling mode at nominal conditions (see next point)."))
 
-        self.tc24 = StaticFloatEntry(self.page2,
-                                     ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                                     unitdict = 'FRACTION',
-                                     label = _U("HPExHeatCOP"),
-                                     tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
+        self.tc24 = FloatEntry(self.page2,
+                               isStatic = True,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+                               unitdict = 'FRACTION',
+                               label = _U("HPExHeatCOP"),
+                               tip = _U("Calculated from the nominal and theoretical COP at the manufact. catalogue nominal conditions and applied as a constant in extrapolation for other working conditions (see next point)."))
 
-        self.tc25 = StaticFloatEntry(self.page2,
-                                     ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                                     unitdict = 'FRACTION',
-                                     label = _U("HPThHeatCOP"),
-                                     tip = _U("Carnot COP for heating mode at nominal conditions (see next point)."))
+        self.tc25 = FloatEntry(self.page2,
+                               isStatic = True,
+                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+                               unitdict = 'FRACTION',
+                               label = _U("HPThHeatCOP"),
+                               tip = _U("Carnot COP for heating mode at nominal conditions (see next point)."))
 
         #
         # tab 3 - Heat source / sink
