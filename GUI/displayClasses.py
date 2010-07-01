@@ -54,7 +54,7 @@ EMPTYBKGCOLOR      = (255,255,255)
 INVALIDBKGCOLOR    = (255,255,0)
 LOWERACCEPTEDDATE  = '01/01/1900'
 UPPERACCEPTEDDATE  = '12/31/2050'
-LIGHTGREY         = (220,220,220,255)
+LIGHTGREY          = (236,233,216,255)
 
 ENCODING = "latin-1"    #local encoding
 
@@ -1076,7 +1076,8 @@ class TextEntry(wx.Panel):
                  label='',         # text of the label
                  tip='',           # text of the tip
                  fontsize=None,
-                 isStatic=False):
+                 isStatic=False,
+                 isMultiline=False):
 
         style = wx.NO_BORDER|wx.TAB_TRAVERSAL
         self.g = Generics()
@@ -1096,6 +1097,8 @@ class TextEntry(wx.Panel):
         entryStyle = wx.ALIGN_RIGHT
         if isStatic:
             entryStyle = entryStyle | wx.TE_READONLY
+        if isMultiline:
+            entryStyle = entryStyle | wx.TE_MULTILINE
         self.entry = wx.TextCtrl(self,-1,pos=(lblSize[0]+1,0),
                                  value=value,size=datSize,style=entryStyle)
         self.f.setFont(self.entry,size=fontsize)

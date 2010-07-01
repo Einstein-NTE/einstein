@@ -36,7 +36,9 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 40
 LABEL_WIDTH_LEFT = 260
+LABEL_WIDTH_SHORT = 180
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 
@@ -71,7 +73,7 @@ class PanelDBBenchmark(PanelDBBase):
         PanelDBBase.__init__(self, self.parent, "Edit DBBenchmark", self.name)
 
         # DBBenchmark_ID needs to remain as first entry although it is not shown on the GUI
-        self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "ProductUnit"
+        self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "Reference"
 
         self.db = Status.DB.dbbenchmark
         self.table = "dbbenchmark"
@@ -158,13 +160,21 @@ class PanelDBBenchmark(PanelDBBase):
                              label = _U("Measurement unit for product"),
                              tip = _U("Measurement unit for product"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc6 = TextEntry(self.page1, value = '',
+                             isMultiline = True,
                              label = _U("Comments on range of application"),
                              tip = _U("Additional comments on validity range (e.g. restrictions to certain types of machinery, etc.)"))
 
         self.tc7 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("Data relevance/reliability"),
                              tip = _U("Data relevance/reliability"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_SHORT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc8 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -198,16 +208,21 @@ class PanelDBBenchmark(PanelDBBase):
                                label = _U("Year (reference for economic data)"),
                                tip = _U("Reference year for the economic data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc13 = TextEntry(self.page1, value = '',
+                              isMultiline = True,
                               label = _U("References"),
                               tip = _U("Bibliographic reference (data source) of the benchmark"))
 
         self.tc14 = TextEntry(self.page1, value = '',
+                              isMultiline = True,
                               label = _U("Complementary literature"),
                               tip = _U("Additional bibliography"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Electricity consumption
@@ -439,11 +454,15 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage1_validy.Add(self.tc6, 0, flagText, VSEP)
         sizerPage1_validy.Add(self.tc7, 0, flagText, VSEP)
 
-        sizerPage1_limits = wx.StaticBoxSizer(self.frame_limits_of_validity, wx.VERTICAL)
-        sizerPage1_limits.Add(self.tc8, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc9, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc10, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage1_limits = wx.StaticBoxSizer(self.frame_limits_of_validity, wx.HORIZONTAL)
+        sizerPage1_limits_min = wx.BoxSizer(wx.VERTICAL)
+        sizerPage1_limits_max = wx.BoxSizer(wx.VERTICAL)
+        sizerPage1_limits_min.Add(self.tc8, 0, flagText, VSEP)
+        sizerPage1_limits_max.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage1_limits_min.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage1_limits_max.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage1_limits.Add(sizerPage1_limits_min)
+        sizerPage1_limits.Add(sizerPage1_limits_max)
 
         sizerPage1_data = wx.StaticBoxSizer(self.frame_data_source, wx.VERTICAL)
         sizerPage1_data.Add(self.tc12, 0, flagText, VSEP)
