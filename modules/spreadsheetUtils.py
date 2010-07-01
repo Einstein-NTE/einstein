@@ -153,6 +153,7 @@ class SpreadsheetDict():
         QFuelDict['FuelCostYear'] = QFuel[5]
         
         QFuelDict['AlternativeProposalNo'] = -1
+        QFuelDict['FuelNo']=1
         return QFuelDict
     
     @staticmethod
@@ -696,10 +697,12 @@ class SpreadsheetDict():
         sp = {}
         sp['ProjectID']= questionnaire_id
         sp['NoOfAlternatives']=-1
-        sp['ActiveAlternative']=0
+        sp['ActiveAlternative']=-1
+        sp['FinalAlternative']=0
         sp['WriteProtected']=0
-        sp['StatusQ']=0
+        sp['StatusQ']=1
         sp['StatusCC']=0
+        sp['StatusCA']=1
         sp['StatusR']=0
         sp['LanguageReport']='english'
         sp['UnitsReport']='SI-kWh'
@@ -738,7 +741,8 @@ class Utils():
             if Questionnaire_id != "":
                 Dict['Questionnaire_id']= Questionnaire_id
             Dict.update(dict)
-            db_table.insert(Dict)
+            print Dict
+            print db_table.insert(Dict)
             list = []
     
     
@@ -846,8 +850,7 @@ class Utils():
         
         
         self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
-        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-        print 'qFuel finished'
+#        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
         self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1], 'ProjectID':Questionnaire_ID}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
 
 #        try:
@@ -869,11 +872,13 @@ class Utils():
 #            pass
 
         self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
-        salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set'})
+        salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set', 'StatusEnergy' : 0})
+        self.__md.cgeneraldata.insert({'AlternativeProposalNo':-1, 'Questionnaire_id':Questionnaire_ID})
         #self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
-        
-        #self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
-        
+        self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
+
+        qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+        print qf
         return "Parsing successful!"
         
 
