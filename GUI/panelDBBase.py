@@ -49,6 +49,9 @@ class PanelDBBase(wx.Dialog):
         self.Centre()
         self.Hide()
 
+        # unitOpDict required for appendResultToGridBenchmark
+        self.unitOpDict = Status.prj.getUnitOpDict()
+
         # objects to be set by derived classes
         self.theId = -1
         self.colLabels = []
@@ -628,10 +631,30 @@ class PanelDBBase(wx.Dialog):
             self.appendResultToGrid(result)
 
     def appendResultToGrid(self, result):
+        # We want to show the UnitOp as number and text, hence it is required to
+        # ask if we are about to show dbbenchmark and call the respective method.
+        # This results in slight lower performance. If this is not desired just
+        # comment the following three lines and only the code will be shown.
+        if self.table == "dbbenchmark":
+            self.appendResultToGridBenchmark(result)
+            return
+
         if len(result) > 0:
             self.grid.AppendRows(1, True)
             for i in range(len(self.colLabels)):
                 self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
+
+    def appendResultToGridBenchmark(self, result):
+        if len(result) > 0:
+            self.grid.AppendRows(1, True)
+            for i in range(len(self.colLabels)):
+                if self.colLabels[i] == "UnitOp":
+                    try:
+                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]) + ": " + self.unitOpDict[int(result[i])])
+                    except:
+                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, "None")
+                else:
+                    self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
 
 # methods to be implemented by derived classes
     def display(self, q = None):
