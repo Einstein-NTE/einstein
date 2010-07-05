@@ -149,7 +149,6 @@ class PanelDBBoiler(PanelDBBase):
         #
         self.frame_technical_data = wx.StaticBox(self.page2, -1, _U("Technical data"))
         self.frame_boiler_spec = wx.StaticBox(self.page2, -1, _U("Boiler specific technical parameters"))
-        self.frame_eco_preh = wx.StaticBox(self.page2, -1, _U("Economiser / Preheater"))
         self.frame_technical_data.SetForegroundColour(TITLE_COLOR)
         self.frame_technical_data.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.BOLD))
         fp.pushFont()
@@ -188,15 +187,11 @@ class PanelDBBoiler(PanelDBBase):
                               label = _U("ElConsum"),
                               tip = _U("Nominal electrical power consumption"))
 
-        self.tc10 = ChoiceEntry(self.page2,
-                                values = [],
-                                label = _U("Economiser"),
-                                tip = _U("Does the equipment include an economiser (water preheater)?"))
+        self.tc10 = wx.RadioBox(self.page2, -1, "Economiser", choices = ["No", "Yes"], majorDimension = 2)
+        self.tc10.SetToolTip(wx.ToolTip(_U("Does the equipment include an economiser (water preheater)?")))
 
-        self.tc11 = ChoiceEntry(self.page2,
-                                values = [],
-                                label = _U("Preheater"),
-                                tip = _U("Does the equipment include an air preheater ?"))
+        self.tc11 = wx.RadioBox(self.page2, -1, "Preheater", choices = ["No", "Yes"], majorDimension = 2)
+        self.tc11.SetToolTip(wx.ToolTip(_U("Does the equipment include an air preheater?")))
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -319,12 +314,12 @@ class PanelDBBoiler(PanelDBBase):
         self.page1.SetSizer(sizerPage1)
 
 
-        sizerPage2_eco_preh = wx.StaticBoxSizer(self.frame_eco_preh, wx.VERTICAL)
-        sizerPage2_eco_preh.Add(self.tc10, 0, flagText, VSEP)
-        sizerPage2_eco_preh.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage2_eco_preh = wx.BoxSizer(wx.HORIZONTAL)
+        sizerPage2_eco_preh.Add(self.tc10, 0, flagText | wx.ALL, VSEP)
+        sizerPage2_eco_preh.Add(self.tc11, 0, flagText | wx.ALL, VSEP)
 
         sizerPage2_boiler_spec = wx.StaticBoxSizer(self.frame_boiler_spec, wx.VERTICAL)
-        sizerPage2_boiler_spec.Add(sizerPage2_eco_preh)
+        sizerPage2_boiler_spec.Add(sizerPage2_eco_preh, 0, wx.ALIGN_RIGHT)
         sizerPage2_boiler_spec.Add(self.tc6, 0, flagText, VSEP)
         sizerPage2_boiler_spec.Add(self.tc12, 0, flagText, VSEP)
         sizerPage2_boiler_spec.Add(self.tc13, 0, flagText, VSEP)
@@ -389,8 +384,8 @@ class PanelDBBoiler(PanelDBBase):
                "FuelConsum":check(self.tc7.GetValue()),
                "FuelType":check(self.tc8.GetValue(text = True)),
                "ElConsum":check(self.tc9.GetValue()),
-               "Economiser":check(self.tc10.GetValue(text = True)),
-               "Preheater":check(self.tc11.GetValue(text = True)),
+               "Economiser":check(self.tc10.GetStringSelection()),
+               "Preheater":check(self.tc11.GetStringSelection()),
                "ExcessAirRatio":check(self.tc12.GetValue()),
                "BBA1":check(self.tc13.GetValue()),
                "BBA2":check(self.tc14.GetValue()),
@@ -422,13 +417,13 @@ class PanelDBBoiler(PanelDBBase):
                 self.tc8.SetValue(str(q.FuelType)) if str(q.FuelType) in fuelDict.values() else ''
             self.tc9.SetValue(str(q.ElConsum)) if q.ElConsum is not None else ''
             if q.Economiser is not None and q.Economiser.lower() == "yes":
-                self.tc10.entry.SetStringSelection("Yes")
+                self.tc10.SetStringSelection("Yes")
             else:
-                self.tc10.entry.SetStringSelection("No")
+                self.tc10.SetStringSelection("No")
             if q.Preheater is not None and q.Preheater.lower() == "yes":
-                self.tc11.entry.SetStringSelection("Yes")
+                self.tc11.SetStringSelection("Yes")
             else:
-                self.tc11.entry.SetStringSelection("No")
+                self.tc11.SetStringSelection("No")
             self.tc12.SetValue(str(q.ExcessAirRatio)) if q.ExcessAirRatio is not None else ''
             self.tc13.SetValue(str(q.BBA1)) if q.BBA1 is not None else ''
             self.tc14.SetValue(str(q.BBA2)) if q.BBA2 is not None else ''
@@ -452,8 +447,8 @@ class PanelDBBoiler(PanelDBBase):
         self.tc7.SetValue('')
         self.tc8.SetValue('None')
         self.tc9.SetValue('')
-        self.tc10.SetValue('No')
-        self.tc11.SetValue('No')
+        self.tc10.SetStringSelection('No')
+        self.tc11.SetStringSelection('No')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
@@ -469,8 +464,6 @@ class PanelDBBoiler(PanelDBBase):
     def fillChoices(self):
         self.fillChoiceOfBoilerType(self.tc3.entry)
         self.fillChoiceOfDBFuel(self.tc8.entry)
-        self.fillChoiceYesNo(self.tc10.entry)
-        self.fillChoiceYesNo(self.tc11.entry)
         self.fillChoiceOfType()
 
     def getDBCol(self):
@@ -486,8 +479,8 @@ class PanelDBBoiler(PanelDBBase):
            self.tc7.GetValue() is None and\
            self.tc8.GetValue(text = True) == "None" and\
            self.tc9.GetValue() is None and\
-           self.tc10.GetValue(text = True) == "No" and\
-           self.tc11.GetValue(text = True) == "No" and\
+           self.tc10.GetStringSelection() == "No" and\
+           self.tc11.GetStringSelection() == "No" and\
            self.tc12.GetValue() is None and\
            self.tc13.GetValue() is None and\
            self.tc14.GetValue() is None and\

@@ -461,10 +461,6 @@ class PanelDBBase(wx.Dialog):
         self.addNoneFront(unitOpList)
         fillChoice(entry, unitOpList)
 
-    def fillChoiceYesNo(self, entry):
-        values = ["No", "Yes"]
-        fillChoice(entry, values, False)
-
     def fillChoiceOfEUnit(self, entry):
         productUnitList = self.getEUnitList()
         self.addNoneFront(productUnitList)

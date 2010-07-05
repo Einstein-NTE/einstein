@@ -115,7 +115,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc_type = ChoiceEntry(self.page0,
                                    values = [],
-                                   label = _U("Type"),
+                                   label = _U("RefrigerantCode"),
                                    tip = _U("Show only equipment of type"))
 
         #
