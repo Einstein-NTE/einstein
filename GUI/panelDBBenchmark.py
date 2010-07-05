@@ -39,7 +39,6 @@ HEIGHT = 20
 HEIGHT_TE_MULTILINE = 40
 LABEL_WIDTH_LEFT = 260
 LABEL_WIDTH_SHORT = 180
-#LABEL_WIDTH_LEFT_SHORT = 0#165
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 
@@ -84,6 +83,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.identifier = self.colLabels[0]
         self.type = self.colLabels[1]
         self.subtype = self.colLabels[3]
+        self.subtype2 = self.colLabels[2]
 
         # access to font properties object
         fp = FontProperties()
@@ -127,6 +127,11 @@ class PanelDBBenchmark(PanelDBBase):
                                       values = [],
                                       label = _U("ProductCode"),
                                       tip = _U("Show only"))
+
+        self.tc_subtype2 = ChoiceEntry(self.page0,
+                                       values = [],
+                                       label = _U("UnitOp"),
+                                       tip = _U("Show only"))
 
         #
         # tab 1 - Validity of benchmark - association with industrial sector, unit operation and product type
@@ -520,6 +525,7 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
         sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype2, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -865,6 +871,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.fillChoiceOfTUnit(self.tc44.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
+        self.fillChoiceOfSubType2()
 
     def getDBCol(self):
         return self.db.DBBenchmark_ID

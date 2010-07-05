@@ -60,10 +60,12 @@ class PanelDBBase(wx.Dialog):
         self.identifier = None
         self.type = None
         self.subtype = None
+        self.subtype2 = None # only needed by dbbenchmark
         self.grid = None
         self.notebook = None
         self.tc_type = None
         self.tc_subtype = None
+        self.tc_subtype2 = None # only needed by dbbenchmark
         self.labelButtonAdd = _U("Add equipment")
         self.labelButtonDelete = _U("Delete equipment")
         self.currentRow = -1
@@ -106,6 +108,10 @@ class PanelDBBase(wx.Dialog):
         self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_type.entry)
         if self.tc_subtype is not None:
             self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_subtype.entry)
+
+        # only needed by dbbenchmark
+        if self.tc_subtype2 is not None:
+            self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_subtype2.entry)
 
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
@@ -555,6 +561,22 @@ class PanelDBBase(wx.Dialog):
         except:
             pass
 
+    def fillChoiceOfSubType2(self):
+        try:
+            equipments = self.db.get_table()
+            ids = equipments.column(self.identifier)
+            subtype2List = []
+            for id in ids:
+                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype2,self.table,self.identifier,id)
+                result = Status.DB.sql_query(sqlQuery)
+                if result not in subtype2List and result is not None:
+                    subtype2List.append(str(result))
+            fillChoice(self.tc_subtype2.entry, subtype2List)
+            self.tc_subtype2.entry.Append("All")
+            self.tc_subtype2.entry.SetStringSelection("All")
+        except:
+            pass
+
     def clearPage0(self):
         self.clear()
         self.grid.ClearGrid()
@@ -574,61 +596,71 @@ class PanelDBBase(wx.Dialog):
         return newList
 
     def fillEquipmentList(self):
-        if self.tc_subtype is not None:
-            self.fillEquipmentListWithTypeAndSubType()
-        else:
-            self.fillEquipmentListWithType()
+        try:
+            equipments = self.db.get_table()
+            ids = equipments.column(self.identifier)
+            fields = ', '.join([f for f in self.colLabels])
 
-    def fillEquipmentListWithType(self):
-        equipments = self.db.get_table()
-        ids = equipments.column(self.identifier)
-        fields = ', '.join([f for f in self.colLabels])
-        if self.tc_type is not None:
-            equipe_type = self.tc_type.GetValue(True)
+            if self.tc_type is not None:
+                equipe_type = self.tc_type.GetValue(True)
 
-        for id in ids:
-            if equipe_type == "All" or len(equipe_type) <= 0:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
-            elif equipe_type == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
+                if equipe_type == "All" or len(equipe_type) <= 0:
+                    equipe_type = 'NULL'
+                    type = 'NULL'
+                elif equipe_type == "None":
+                    equipe_type = 'NULL'
+                    type = self.type
+                else:
+                    equipe_type = equipe_type
+                    type = self.type
+
+                equipe_type = '\'%s\''%equipe_type if equipe_type != 'NULL' else equipe_type
             else:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
+                equipe_type = 'NULL'
+                type = 'NULL'
 
-            result = Status.DB.sql_query(sqlQuery)
-            self.appendResultToGrid(result)
+            if self.tc_subtype is not None:
+                equipe_subtype = self.tc_subtype.GetValue(True)
 
-    def fillEquipmentListWithTypeAndSubType(self):
-        equipments = self.db.get_table()
-        ids = equipments.column(self.identifier)
-        fields = ', '.join([f for f in self.colLabels])
+                if equipe_subtype == "All" or len(equipe_subtype) <= 0:
+                    equipe_subtype = 'NULL'
+                    subtype = 'NULL'
+                elif equipe_subtype == "None":
+                    equipe_subtype = 'NULL'
+                    subtype = self.subtype
+                else:
+                    equipe_subtype = equipe_subtype
+                    subtype = self.subtype
 
-        if self.tc_type is not None:
-            equipe_type = self.tc_type.GetValue(True)
-        if self.tc_subtype is not None:
-            equipe_subtype = self.tc_subtype.GetValue(True)
-
-        for id in ids:
-            if (equipe_type == "All" or len(equipe_type) <= 0) and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
-            elif (equipe_type == "All" or len(equipe_type) <= 0) and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.subtype,self.identifier,id)
-            elif equipe_type == "None" and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
-            elif equipe_type == "None" and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s is NULL and %s = %s"%(fields,self.table,self.type,self.subtype,self.identifier,id)
-            elif (equipe_type == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.subtype,equipe_subtype,self.identifier,id)
-            elif (equipe_subtype == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
-            elif equipe_type == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = '%s' and %s = %s"%(fields,self.table,self.type,self.subtype,equipe_subtype,self.identifier,id)
-            elif equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s is NULL and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,self.identifier,id)
+                equipe_subtype = '\'%s\''%equipe_subtype if equipe_subtype != 'NULL' else equipe_subtype
             else:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,equipe_subtype,self.identifier,id)
+                equipe_subtype = 'NULL'
+                subtype = 'NULL'
 
-            result = Status.DB.sql_query(sqlQuery)
-            self.appendResultToGrid(result)
+            if self.tc_subtype2 is not None:
+                equipe_subtype2 = self.tc_subtype2.GetValue(True)
+
+                if equipe_subtype2 == "All" or len(equipe_subtype2) <= 0:
+                    equipe_subtype2 = 'NULL'
+                    subtype2 = 'NULL'
+                elif equipe_subtype2 == "None":
+                    equipe_subtype2 = 'NULL'
+                    subtype2 = self.subtype2
+                else:
+                    equipe_subtype2 = equipe_subtype2
+                    subtype2 = self.subtype2
+
+                equipe_subtype2 = '\'%s\''%equipe_subtype2 if equipe_subtype2 != 'NULL' else equipe_subtype2
+            else:
+                equipe_subtype2 = 'NULL'
+                subtype2 = 'NULL'
+
+            for id in ids:
+                sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
+                result = Status.DB.sql_query(sqlQuery)
+                self.appendResultToGrid(result)
+        except:
+            pass
 
     def appendResultToGrid(self, result):
         # We want to show the UnitOp as number and text, hence it is required to
