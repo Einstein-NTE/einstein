@@ -533,7 +533,7 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.type,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if result not in typeList and result is not None:
+                if str(result) not in typeList and result is not None:
                     typeList.append(str(result))
             fillChoice(self.tc_type.entry, typeList)
             self.tc_type.entry.Append("All")
@@ -549,7 +549,12 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if result not in subtypeList and result is not None:
+                if self.subtype == "ProductCode":
+                    try:
+                        result = PRODUCTCODES[str(result)]
+                    except:
+                        result = str(result)
+                if str(result) not in subtypeList and result is not None:
                     subtypeList.append(str(result))
             fillChoice(self.tc_subtype.entry, subtypeList)
             self.tc_subtype.entry.Append("All")
@@ -565,7 +570,12 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype2,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if result not in subtype2List and result is not None:
+                if self.subtype2 == "UnitOp":
+                    try:
+                        result = str(result) + ": " + self.unitOpDict[int(result)]
+                    except:
+                        result = str(result)
+                if str(result) not in subtype2List and result is not None:
                     subtype2List.append(str(result))
             fillChoice(self.tc_subtype2.entry, subtype2List)
             self.tc_subtype2.entry.Append("All")
@@ -633,6 +643,9 @@ class PanelDBBase(wx.Dialog):
                 equipe_subtype = 'NULL'
                 subtype = 'NULL'
 
+            if subtype == "ProductCode":
+                equipe_subtype = '\'%s\''%equipe_subtype.split(':')[0].strip('\'')
+
             if self.tc_subtype2 is not None:
                 equipe_subtype2 = self.tc_subtype2.GetValue(True)
 
@@ -650,6 +663,9 @@ class PanelDBBase(wx.Dialog):
             else:
                 equipe_subtype2 = 'NULL'
                 subtype2 = 'NULL'
+
+            if subtype2 == 'UnitOp':
+                equipe_subtype2 = '\'%s\''%equipe_subtype2.split(':')[0].strip('\'')
 
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
@@ -680,7 +696,7 @@ class PanelDBBase(wx.Dialog):
                     try:
                         self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]) + ": " + self.unitOpDict[int(result[i])])
                     except:
-                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, "None")
+                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
                 else:
                     self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
 
