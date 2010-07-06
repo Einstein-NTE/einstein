@@ -309,7 +309,10 @@ class PanelDBBase(wx.Dialog):
         for entry in naceTable:
             naceCode = entry.CodeNACE
             naceSubCode = entry.CodeNACEsub
+            naceSubName = unicode(entry.NameNACEsub,"utf-8")
             naceCode = naceCode + "." + naceSubCode
+            if len(str(naceSubName).strip()) > 0:
+                 naceCode += ": " + naceSubName
             naceList.append(str(naceCode))
         naceList.sort()
         return naceList

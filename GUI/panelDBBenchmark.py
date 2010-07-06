@@ -688,7 +688,7 @@ class PanelDBBenchmark(PanelDBBase):
         unitOpDict = Status.prj.getUnitOpDict()
         tc2Entry = "None" if self.tc2.GetValue(text = True) == "None" else int(self.tc2.GetValue(text = True).split(':')[0])
         tmp = {
-               "NACECode":check(self.tc1.GetValue(text = True)),
+               "NACECode":check(self.tc1.GetValue(text = True).split(':')[0]),
                "UnitOp":check(tc2Entry),
                "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
@@ -749,7 +749,11 @@ class PanelDBBenchmark(PanelDBBase):
                     subcode = "00"
                 if subcode != "00" and len(subcode) < 2:
                     subcode = ''.join([subcode, "0"])
-                self.tc1.entry.SetStringSelection(''.join([codes[0], '.', subcode]))
+                li = self.getNACECodeandNACESubCodeList()
+                for i in li:
+                    if i.startswith(''.join([codes[0], '.', subcode])):
+                        self.tc1.entry.SetStringSelection(i)
+                        break
             else:
                 self.tc1.SetValue("None")
             if q.UnitOp is not None:
