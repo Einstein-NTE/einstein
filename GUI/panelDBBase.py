@@ -314,6 +314,17 @@ class PanelDBBase(wx.Dialog):
         naceList.sort()
         return naceList
 
+    def getNACECodeBranchList(self):
+        naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']
+        naceList = []
+        for entry in naceTable:
+            naceCode = entry.CodeNACE
+            if naceCode is not None:
+                if str(naceCode) + ".*" not in naceList:
+                    naceList.append(str(naceCode) + ".*")
+        naceList.sort()
+        return naceList
+
     def getProductCodeList(self):
         productCodeList = []
         for entry in PRODUCTCODES.values():
@@ -535,6 +546,10 @@ class PanelDBBase(wx.Dialog):
                 result = Status.DB.sql_query(sqlQuery)
                 if str(result) not in typeList and result is not None:
                     typeList.append(str(result))
+            typeList.sort()
+            self.addNoneFront(typeList)
+            if self.type == "NACECode": # dbbenchmark
+                typeList.extend(self.getNACECodeBranchList())
             fillChoice(self.tc_type.entry, typeList)
             self.tc_type.entry.Append("All")
             self.tc_type.entry.SetStringSelection("All")
@@ -549,13 +564,15 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if self.subtype == "ProductCode":
+                if self.subtype == "ProductCode": # dbbenchmark
                     try:
                         result = PRODUCTCODES[str(result)]
                     except:
                         result = str(result)
                 if str(result) not in subtypeList and result is not None:
                     subtypeList.append(str(result))
+            subtypeList.sort()
+            self.addNoneFront(subtypeList)
             fillChoice(self.tc_subtype.entry, subtypeList)
             self.tc_subtype.entry.Append("All")
             self.tc_subtype.entry.SetStringSelection("All")
@@ -570,13 +587,15 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype2,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if self.subtype2 == "UnitOp":
+                if self.subtype2 == "UnitOp": # dbbenchmark
                     try:
                         result = str(result) + ": " + self.unitOpDict[int(result)]
                     except:
                         result = str(result)
                 if str(result) not in subtype2List and result is not None:
                     subtype2List.append(str(result))
+            subtype2List.sort()
+            self.addNoneFront(subtype2List)
             fillChoice(self.tc_subtype2.entry, subtype2List)
             self.tc_subtype2.entry.Append("All")
             self.tc_subtype2.entry.SetStringSelection("All")
@@ -643,7 +662,7 @@ class PanelDBBase(wx.Dialog):
                 equipe_subtype = 'NULL'
                 subtype = 'NULL'
 
-            if subtype == "ProductCode":
+            if subtype == "ProductCode" and equipe_subtype != 'NULL':
                 equipe_subtype = '\'%s\''%equipe_subtype.split(':')[0].strip('\'')
 
             if self.tc_subtype2 is not None:
@@ -664,11 +683,14 @@ class PanelDBBase(wx.Dialog):
                 equipe_subtype2 = 'NULL'
                 subtype2 = 'NULL'
 
-            if subtype2 == 'UnitOp':
+            if subtype2 == 'UnitOp' and equipe_subtype2 != 'NULL':
                 equipe_subtype2 = '\'%s\''%equipe_subtype2.split(':')[0].strip('\'')
 
             for id in ids:
-                sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
+                if len(equipe_type.split('.')) > 1 and equipe_type.split('.')[1].rstrip('\'') == '*': # dbbenchmark
+                    sqlQuery = "SELECT %s FROM %s WHERE %s LIKE %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, '\'%s.%%\''%equipe_type.split('.')[0].strip('\''), subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
+                else:
+                    sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
                 result = Status.DB.sql_query(sqlQuery)
                 self.appendResultToGrid(result)
         except:
