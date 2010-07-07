@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -56,6 +57,7 @@ class PanelDBFluid(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Fluid"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(155)
         self.__do_layout()
         self._bind_events()
@@ -69,6 +71,8 @@ class PanelDBFluid(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBFluid", self.name)
+        self.labelButtonAdd = _U("Add fluid")
+        self.labelButtonDelete = _U("Delete fluid")
 
         # DBFluid_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBFluid_ID", "FluidName", "RefrigerantCode"
@@ -111,7 +115,7 @@ class PanelDBFluid(PanelDBBase):
 
         self.tc_type = ChoiceEntry(self.page0,
                                    values = [],
-                                   label = _U("Type"),
+                                   label = _U("RefrigerantCode"),
                                    tip = _U("Show only equipment of type"))
 
         #
@@ -132,13 +136,21 @@ class PanelDBFluid(PanelDBBase):
                              label = _U("RefrigerantCode"),
                              tip = _U("Refrigerant code"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc3 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("FluidDataSource"),
                              tip = _U("Source of data"))
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("FluidComment"),
                              tip = _U("Additional comments"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Main physical properties
@@ -348,7 +360,6 @@ class PanelDBFluid(PanelDBBase):
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

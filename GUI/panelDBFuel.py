@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -56,6 +57,7 @@ class PanelDBFuel(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Fuel"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(125)
         self.__do_layout()
         self._bind_events()
@@ -69,6 +71,8 @@ class PanelDBFuel(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBFuel", self.name)
+        self.labelButtonAdd = _U("Add fuel")
+        self.labelButtonDelete = _U("Delete fuel")
 
         # DBFuel_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "DBFuel_ID", "FuelName", "FuelType", "DBFuelUnit", "FuelLCV", "FuelHCV"
@@ -140,13 +144,21 @@ class PanelDBFuel(PanelDBBase):
                                label = _U("DBFuelUnit"),
                                tip = _U("Default measurement unit"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("FuelDataSource"),
                              tip = _U("Source of data"))
 
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("FuelComment"),
                              tip = _U("Additional comments"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Main physical properties
@@ -365,8 +377,8 @@ class PanelDBFuel(PanelDBBase):
 
     def clear(self):
         self.tc1.SetValue('')
-        self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc2.SetValue('None')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -379,7 +391,6 @@ class PanelDBFuel(PanelDBBase):
         self.tc13.SetValue('')
         self.tc14.SetValue('')
         self.tc15.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfDBFuelType(self.tc2.entry)

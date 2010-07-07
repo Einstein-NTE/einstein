@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -56,6 +57,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "SolarThermal"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(155)
         self.__do_layout()
         self._bind_events()
@@ -137,9 +139,16 @@ class PanelDBSolarThermal(PanelDBBase):
                                label = _U("STType"),
                                tip = _U("Solarthermal Type"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("STReference"),
                              tip = _U("Source of data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Technical data
@@ -266,23 +275,38 @@ class PanelDBSolarThermal(PanelDBBase):
                                label = _U("STUnitPrice300kW"),
                                tip = _U("STUnitPrice300kW"))
 
-        self.tc21 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'UNITPRICE',
-                               label = _U("STUnitTurnKeyPrice30kW"),
-                               tip = _U("STUnitTurnKeyPrice30kW"))
+#        self.tc21 = FloatEntry(self.page3,
+#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+#                               unitdict = 'UNITPRICE',
+#                               label = _U("STUnitTurnKeyPrice30kW"),
+#                               tip = _U("STUnitTurnKeyPrice30kW"))
+#
+#        self.tc22 = FloatEntry(self.page3,
+#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+#                               unitdict = 'UNITPRICE',
+#                               label = _U("STUnitTurnKeyPrice300kW"),
+#                               tip = _U("STUnitTurnKeyPrice300kW"))
+#
+#        self.tc23 = FloatEntry(self.page3,
+#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
+#                               unitdict = 'UNITPRICE',
+#                               label = _U("STUnitTurnKeyPrice3000kW"),
+#                               tip = _U("STUnitTurnKeyPrice3000kW"))
 
-        self.tc22 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'UNITPRICE',
-                               label = _U("STUnitTurnKeyPrice300kW"),
-                               tip = _U("STUnitTurnKeyPrice300kW"))
-
-        self.tc23 = FloatEntry(self.page3,
-                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'UNITPRICE',
-                               label = _U("STUnitTurnKeyPrice3000kW"),
-                               tip = _U("STUnitTurnKeyPrice3000kW"))
+        self.turn_key_price_grid = wx.grid.Grid(name = 'STUnitTurnKeyPrice', parent = self.page3, style = 0)
+        self.turn_key_price_grid.CreateGrid(1, 3)
+        self.turn_key_price_grid.SetRowLabelValue(0, 'EUR/kW')
+        self.turn_key_price_grid.EnableGridLines(True)
+        self.turn_key_price_grid.SetDefaultRowSize(20)
+        self.turn_key_price_grid.SetRowLabelSize(85)
+        self.turn_key_price_grid.SetDefaultColSize(160)
+        self.turn_key_price_grid.EnableEditing(True)
+        self.turn_key_price_grid.SetSelectionMode(wx.grid.Grid.wxGridSelectCells)
+        self.turn_key_price_grid.SetLabelFont(wx.Font(9, wx.ROMAN, wx.ITALIC, wx.BOLD))
+        self.turn_key_price_grid.SetColLabelValue(0, "STUnitTurnKeyPrice30kW")
+        self.turn_key_price_grid.SetColLabelValue(1, "STUnitTurnKeyPrice300kW")
+        self.turn_key_price_grid.SetColLabelValue(2, "STUnitTurnKeyPrice3000kW")
+        self.turn_key_price_grid.SetGridCursor(0, 0)
 
         self.tc24 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -360,11 +384,12 @@ class PanelDBSolarThermal(PanelDBBase):
 
         sizerPage3 = wx.StaticBoxSizer(self.frame_economic_parameters, wx.VERTICAL)
         sizerPage3.Add(self.tc20, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc21, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc22, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc23, 0, flagText, VSEP)
+#        sizerPage3.Add(self.tc21, 0, flagText, VSEP)
+#        sizerPage3.Add(self.tc22, 0, flagText, VSEP)
+#        sizerPage3.Add(self.tc23, 0, flagText, VSEP)
         sizerPage3.Add(self.tc24, 0, flagText, VSEP)
         sizerPage3.Add(self.tc25, 0, flagText, VSEP)
+        sizerPage3.Add(self.turn_key_price_grid, 0, flagText, VSEP)
 
         self.page3.SetSizer(sizerPage3)
 
@@ -411,9 +436,12 @@ class PanelDBSolarThermal(PanelDBBase):
                "STAreaFactor":check(self.tc18.GetValue()),
                "STWeightFactor":check(self.tc19.GetValue()),
                "STUnitPrice300kW":check(self.tc20.GetValue()),
-               "STUnitTurnKeyPrice30kW":check(self.tc21.GetValue()),
-               "STUnitTurnKeyPrice300kW":check(self.tc22.GetValue()),
-               "STUnitTurnKeyPrice3000kW":check(self.tc23.GetValue()),
+#               "STUnitTurnKeyPrice30kW":check(self.tc21.GetValue()),
+#               "STUnitTurnKeyPrice300kW":check(self.tc22.GetValue()),
+#               "STUnitTurnKeyPrice3000kW":check(self.tc23.GetValue()),
+               "STUnitTurnKeyPrice30kW":check(self.turn_key_price_grid.GetCellValue(0, 0)),
+               "STUnitTurnKeyPrice300kW":check(self.turn_key_price_grid.GetCellValue(0, 1)),
+               "STUnitTurnKeyPrice3000kW":check(self.turn_key_price_grid.GetCellValue(0, 2)),
                "STOMUnitFix":check(self.tc24.GetValue()),
                "STYearUpdate":check(self.tc25.GetValue())
                }
@@ -444,9 +472,12 @@ class PanelDBSolarThermal(PanelDBBase):
             self.tc18.SetValue(str(q.STAreaFactor)) if q.STAreaFactor is not None else ''
             self.tc19.SetValue(str(q.STWeightFactor)) if q.STWeightFactor is not None else ''
             self.tc20.SetValue(str(q.STUnitPrice300kW)) if q.STUnitPrice300kW is not None else ''
-            self.tc21.SetValue(str(q.STUnitTurnKeyPrice30kW)) if q.STUnitTurnKeyPrice30kW is not None else ''
-            self.tc22.SetValue(str(q.STUnitTurnKeyPrice300kW)) if q.STUnitTurnKeyPrice300kW is not None else ''
-            self.tc23.SetValue(str(q.STUnitTurnKeyPrice3000kW)) if q.STUnitTurnKeyPrice3000kW is not None else ''
+#            self.tc21.SetValue(str(q.STUnitTurnKeyPrice30kW)) if q.STUnitTurnKeyPrice30kW is not None else ''
+#            self.tc22.SetValue(str(q.STUnitTurnKeyPrice300kW)) if q.STUnitTurnKeyPrice300kW is not None else ''
+#            self.tc23.SetValue(str(q.STUnitTurnKeyPrice3000kW)) if q.STUnitTurnKeyPrice3000kW is not None else ''
+            self.turn_key_price_grid.SetCellValue(0, 0, str(q.STUnitTurnKeyPrice30kW)) if q.STUnitTurnKeyPrice30kW is not None else ''
+            self.turn_key_price_grid.SetCellValue(0, 1, str(q.STUnitTurnKeyPrice300kW)) if q.STUnitTurnKeyPrice300kW is not None else ''
+            self.turn_key_price_grid.SetCellValue(0, 2, str(q.STUnitTurnKeyPrice3000kW)) if q.STUnitTurnKeyPrice3000kW is not None else ''
             self.tc24.SetValue(str(q.STOMUnitFix)) if q.STOMUnitFix is not None else ''
             self.tc25.SetValue(str(q.STYearUpdate)) if q.STYearUpdate is not None else ''
         self.Show()
@@ -454,7 +485,7 @@ class PanelDBSolarThermal(PanelDBBase):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -472,12 +503,12 @@ class PanelDBSolarThermal(PanelDBBase):
         self.tc18.SetValue('')
         self.tc19.SetValue('')
         self.tc20.SetValue('')
-        self.tc21.SetValue('')
-        self.tc22.SetValue('')
-        self.tc23.SetValue('')
+#        self.tc21.SetValue('')
+#        self.tc22.SetValue('')
+#        self.tc23.SetValue('')
+        self.turn_key_price_grid.ClearGrid()
         self.tc24.SetValue('')
         self.tc25.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfSTType(self.tc3.entry)
@@ -507,11 +538,14 @@ class PanelDBSolarThermal(PanelDBBase):
            self.tc18.GetValue() is None and\
            self.tc19.GetValue() is None and\
            self.tc20.GetValue() is None and\
-           self.tc21.GetValue() is None and\
-           self.tc22.GetValue() is None and\
-           self.tc23.GetValue() is None and\
+           len(self.turn_key_price_grid.GetCellValue(0, 0)) == 0 and\
+           len(self.turn_key_price_grid.GetCellValue(0, 1)) == 0 and\
+           len(self.turn_key_price_grid.GetCellValue(0, 2)) == 0 and\
            self.tc24.GetValue() is None and\
            self.tc25.GetValue() is None:
+#           self.tc21.GetValue() is None and\
+#           self.tc22.GetValue() is None and\
+#           self.tc23.GetValue() is None and\
             return True
         else:
             return False

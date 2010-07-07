@@ -36,11 +36,14 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 40
 LABEL_WIDTH_LEFT = 260
+LABEL_WIDTH_SHORT = 180
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 
 VSEP = 4
+VSEP_UNIT_OF_MEASUREMENT = 30
 
 def _U(text):
     try:
@@ -55,6 +58,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Benchmark"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(120)
         self.__do_layout()
         self._bind_events()
@@ -68,15 +72,18 @@ class PanelDBBenchmark(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBBenchmark", self.name)
+        self.labelButtonAdd = _U("Add")
+        self.labelButtonDelete = _U("Delete")
 
         # DBBenchmark_ID needs to remain as first entry although it is not shown on the GUI
-        self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "ProductUnit"
+        self.colLabels = "DBBenchmark_ID", "NACECode", "UnitOp", "ProductCode", "Product", "Reference"
 
         self.db = Status.DB.dbbenchmark
         self.table = "dbbenchmark"
         self.identifier = self.colLabels[0]
         self.type = self.colLabels[1]
         self.subtype = self.colLabels[3]
+        self.subtype2 = self.colLabels[2]
 
         # access to font properties object
         fp = FontProperties()
@@ -121,6 +128,11 @@ class PanelDBBenchmark(PanelDBBase):
                                       label = _U("ProductCode"),
                                       tip = _U("Show only"))
 
+        self.tc_subtype2 = ChoiceEntry(self.page0,
+                                       values = [],
+                                       label = _U("UnitOp"),
+                                       tip = _U("Show only"))
+
         #
         # tab 1 - Validity of benchmark - association with industrial sector, unit operation and product type
         #
@@ -157,13 +169,21 @@ class PanelDBBenchmark(PanelDBBase):
                              label = _U("Measurement unit for product"),
                              tip = _U("Measurement unit for product"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc6 = TextEntry(self.page1, value = '',
+                             isMultiline = True,
                              label = _U("Comments on range of application"),
                              tip = _U("Additional comments on validity range (e.g. restrictions to certain types of machinery, etc.)"))
 
         self.tc7 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("Data relevance/reliability"),
                              tip = _U("Data relevance/reliability"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_SHORT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc8 = FloatEntry(self.page1,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -197,16 +217,21 @@ class PanelDBBenchmark(PanelDBBase):
                                label = _U("Year (reference for economic data)"),
                                tip = _U("Reference year for the economic data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc13 = TextEntry(self.page1, value = '',
+                              isMultiline = True,
                               label = _U("References"),
                               tip = _U("Bibliographic reference (data source) of the benchmark"))
 
         self.tc14 = TextEntry(self.page1, value = '',
+                              isMultiline = True,
                               label = _U("Complementary literature"),
                               tip = _U("Additional bibliography"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Electricity consumption
@@ -218,59 +243,84 @@ class PanelDBBenchmark(PanelDBBase):
         self.frame_electricity_consumption.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_SHORT,
+                        wData = 0, wUnits = 0)
+
+        self.tc_2_label_prod_cost = TextEntry(self.page2, label = _U("Energy intensity (production cost)"))
+        self.tc_2_label_turnover = TextEntry(self.page2, label = _U("Energy intensity (turnover)"))
+        self.tc_2_label_spec_e_cons = TextEntry(self.page2, label = _U("Specific Energy Consumption"))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 0,
+                        wData = 0, wUnits = 0)
+
+        self.tc_2_label_space = TextEntry(self.page2, label = _U(""))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 40,
+                        wData = 0, wUnits = 0)
+
+        self.tc_2_label_min = TextEntry(self.page2, label = _U("MIN"))
+        self.tc_2_label_max = TextEntry(self.page2, label = _U("MAX"))
+        self.tc_2_label_tar = TextEntry(self.page2, label = _U("TARGET"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = 0,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) MIN"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) MAX"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) TARGET"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) MIN"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) MAX"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc20 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Electricity: Energy intensity TARGET (turnover)"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc21 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (MIN)"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc22 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (MAX)"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc23 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) TARGET"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc24 = ChoiceEntry(self.page2,
                                 values = [],
@@ -287,59 +337,84 @@ class PanelDBBenchmark(PanelDBBase):
         self.frame_fuel_consumption.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_SHORT,
+                        wData = 0, wUnits = 0)
+
+        self.tc_3_label_prod_cost = TextEntry(self.page3, label = _U("Energy intensity (production cost)"))
+        self.tc_3_label_turnover = TextEntry(self.page3, label = _U("Energy intensity (turnover)"))
+        self.tc_3_label_spec_e_cons = TextEntry(self.page3, label = _U("Specific Energy Consumption"))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 0,
+                        wData = 0, wUnits = 0)
+
+        self.tc_3_label_space = TextEntry(self.page3, label = _U(""))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 40,
+                        wData = 0, wUnits = 0)
+
+        self.tc_3_label_min = TextEntry(self.page3, label = _U("MIN"))
+        self.tc_3_label_max = TextEntry(self.page3, label = _U("MAX"))
+        self.tc_3_label_tar = TextEntry(self.page3, label = _U("TARGET"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = 0,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc25 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) MIN [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc26 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Heat: Energy intensity (production cost) MAX [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc27 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc28 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Heat: Energy intensity (turnover) MIN  [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc29 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) MAX [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc30 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Heat: Energy intensity (turnover) TARGET [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc31 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption MIN"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc32 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption MAX"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc33 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption TARGET"),
+                               label = _U(""),
                                tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc34 = ChoiceEntry(self.page3,
                                 values = [],
@@ -356,59 +431,84 @@ class PanelDBBenchmark(PanelDBBase):
         self.frame_energy_consumption.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_SHORT,
+                        wData = 0, wUnits = 0)
+
+        self.tc_4_label_prod_cost = TextEntry(self.page4, label = _U("Energy intensity (production cost)"))
+        self.tc_4_label_turnover = TextEntry(self.page4, label = _U("Energy intensity (turnover)"))
+        self.tc_4_label_spec_e_cons = TextEntry(self.page4, label = _U("Specific Energy Consumption"))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 0,
+                        wData = 0, wUnits = 0)
+
+        self.tc_4_label_space = TextEntry(self.page4, label = _U(""))
+
+        fs = FieldSizes(wHeight = HEIGHT + 20, wLabel = 40,
+                        wData = 0, wUnits = 0)
+
+        self.tc_4_label_min = TextEntry(self.page4, label = _U("MIN"))
+        self.tc_4_label_max = TextEntry(self.page4, label = _U("MAX"))
+        self.tc_4_label_tar = TextEntry(self.page4, label = _U("TARGET"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = 0,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc35 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) MIN [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc36 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) MAX [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc37 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (production cost) TARGET [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc38 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) MIN [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc39 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) MAX [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc40 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERCU',
-                               label = _U("Energy intensity (turnover) TARGET [kWh/€]"),
+                               label = _U(""),
                                tip = _U("Energetic intensity (energetic consumption  with respect to an economic value: (a) expressed as a production cost and (b) expressed as a turnover"))
 
         self.tc41 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) MIN"),
-                               tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+                               label = _U(""),
+                               tip = _U("Specific energetic consumption per product unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc42 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) MAX"),
-                               tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+                               label = _U(""),
+                               tip = _U("Specific energetic consumption per product unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
 
         self.tc43 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYPERPU',
-                               label = _U("Specific Energy Consumption (SEC) TARGET"),
-                               tip = _U("Specific energetic consumption per pruduct unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+                               label = _U(""),
+                               tip = _U("Specific energetic consumption per product unit (generic ratios) or processed medium unit (specific ratios for determined unitary operation)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc44 = ChoiceEntry(self.page4,
                                 values = [],
@@ -425,6 +525,7 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
         sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype2, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
@@ -438,11 +539,15 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage1_validy.Add(self.tc6, 0, flagText, VSEP)
         sizerPage1_validy.Add(self.tc7, 0, flagText, VSEP)
 
-        sizerPage1_limits = wx.StaticBoxSizer(self.frame_limits_of_validity, wx.VERTICAL)
-        sizerPage1_limits.Add(self.tc8, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc9, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc10, 0, flagText, VSEP)
-        sizerPage1_limits.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage1_limits = wx.StaticBoxSizer(self.frame_limits_of_validity, wx.HORIZONTAL)
+        sizerPage1_limits_min = wx.BoxSizer(wx.VERTICAL)
+        sizerPage1_limits_max = wx.BoxSizer(wx.VERTICAL)
+        sizerPage1_limits_min.Add(self.tc8, 0, flagText, VSEP)
+        sizerPage1_limits_max.Add(self.tc9, 0, flagText, VSEP)
+        sizerPage1_limits_min.Add(self.tc10, 0, flagText, VSEP)
+        sizerPage1_limits_max.Add(self.tc11, 0, flagText, VSEP)
+        sizerPage1_limits.Add(sizerPage1_limits_min)
+        sizerPage1_limits.Add(sizerPage1_limits_max)
 
         sizerPage1_data = wx.StaticBoxSizer(self.frame_data_source, wx.VERTICAL)
         sizerPage1_data.Add(self.tc12, 0, flagText, VSEP)
@@ -458,46 +563,103 @@ class PanelDBBenchmark(PanelDBBase):
 
 
         sizerPage2 = wx.StaticBoxSizer(self.frame_electricity_consumption, wx.VERTICAL)
-        sizerPage2.Add(self.tc15, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc16, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc17, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc18, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc19, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc20, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc21, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc22, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc23, 0, flagText, VSEP)
-        sizerPage2.Add(self.tc24, 0, flagText, VSEP)
+        sizerPage2_lab = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_min = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_max = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_tar = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_lab.Add(self.tc_2_label_space, 0, flagText, VSEP)
+        sizerPage2_lab.Add(self.tc_2_label_prod_cost, 0, flagText, VSEP)
+        sizerPage2_lab.Add(self.tc_2_label_turnover, 0, flagText, VSEP)
+        sizerPage2_lab.Add(self.tc_2_label_spec_e_cons, 0, flagText, VSEP)
+        sizerPage2_min.Add(self.tc_2_label_min, 0, flagText, VSEP)
+        sizerPage2_min.Add(self.tc15, 0, flagText, VSEP)
+        sizerPage2_min.Add(self.tc18, 0, flagText, VSEP)
+        sizerPage2_min.Add(self.tc21, 0, flagText, VSEP)
+        sizerPage2_max.Add(self.tc_2_label_max, 0, flagText, VSEP)
+        sizerPage2_max.Add(self.tc16, 0, flagText, VSEP)
+        sizerPage2_max.Add(self.tc19, 0, flagText, VSEP)
+        sizerPage2_max.Add(self.tc22, 0, flagText, VSEP)
+        sizerPage2_tar.Add(self.tc_2_label_tar, 0, flagText, VSEP)
+        sizerPage2_tar.Add(self.tc17, 0, flagText, VSEP)
+        sizerPage2_tar.Add(self.tc20, 0, flagText, VSEP)
+        sizerPage2_tar.Add(self.tc23, 0, flagText, VSEP)
+        sizerPage2_1 = wx.BoxSizer(wx.HORIZONTAL)
+        sizerPage2_1.Add(sizerPage2_lab)
+        sizerPage2_1.Add(sizerPage2_min)
+        sizerPage2_1.Add(sizerPage2_max)
+        sizerPage2_1.Add(sizerPage2_tar)
+        sizerPage2_2 = wx.BoxSizer(wx.VERTICAL)
+        sizerPage2_2.Add(self.tc24, 0, flagText | wx.ALIGN_RIGHT, VSEP_UNIT_OF_MEASUREMENT)
+        sizerPage2.Add(sizerPage2_1)
+        sizerPage2.Add(sizerPage2_2, 0, wx.EXPAND)
 
         self.page2.SetSizer(sizerPage2)
 
 
         sizerPage3 = wx.StaticBoxSizer(self.frame_fuel_consumption, wx.VERTICAL)
-        sizerPage3.Add(self.tc25, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc26, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc27, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc28, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc29, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc30, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc31, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc32, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc33, 0, flagText, VSEP)
-        sizerPage3.Add(self.tc34, 0, flagText, VSEP)
+        sizerPage3_lab = wx.BoxSizer(wx.VERTICAL)
+        sizerPage3_min = wx.BoxSizer(wx.VERTICAL)
+        sizerPage3_max = wx.BoxSizer(wx.VERTICAL)
+        sizerPage3_tar = wx.BoxSizer(wx.VERTICAL)
+        sizerPage3_lab.Add(self.tc_3_label_space, 0, flagText, VSEP)
+        sizerPage3_lab.Add(self.tc_3_label_prod_cost, 0, flagText, VSEP)
+        sizerPage3_lab.Add(self.tc_3_label_turnover, 0, flagText, VSEP)
+        sizerPage3_lab.Add(self.tc_3_label_spec_e_cons, 0, flagText, VSEP)
+        sizerPage3_min.Add(self.tc_3_label_min, 0, flagText, VSEP)
+        sizerPage3_min.Add(self.tc25, 0, flagText, VSEP)
+        sizerPage3_min.Add(self.tc28, 0, flagText, VSEP)
+        sizerPage3_min.Add(self.tc31, 0, flagText, VSEP)
+        sizerPage3_max.Add(self.tc_3_label_max, 0, flagText, VSEP)
+        sizerPage3_max.Add(self.tc26, 0, flagText, VSEP)
+        sizerPage3_max.Add(self.tc29, 0, flagText, VSEP)
+        sizerPage3_max.Add(self.tc32, 0, flagText, VSEP)
+        sizerPage3_tar.Add(self.tc_3_label_tar, 0, flagText, VSEP)
+        sizerPage3_tar.Add(self.tc27, 0, flagText, VSEP)
+        sizerPage3_tar.Add(self.tc30, 0, flagText, VSEP)
+        sizerPage3_tar.Add(self.tc33, 0, flagText, VSEP)
+        sizerPage3_1 = wx.BoxSizer(wx.HORIZONTAL)
+        sizerPage3_1.Add(sizerPage3_lab)
+        sizerPage3_1.Add(sizerPage3_min)
+        sizerPage3_1.Add(sizerPage3_max)
+        sizerPage3_1.Add(sizerPage3_tar)
+        sizerPage3_2 = wx.BoxSizer(wx.VERTICAL)
+        sizerPage3_2.Add(self.tc34, 0, flagText | wx.ALIGN_RIGHT, VSEP_UNIT_OF_MEASUREMENT)
+        sizerPage3.Add(sizerPage3_1)
+        sizerPage3.Add(sizerPage3_2, 0, wx.EXPAND)
 
         self.page3.SetSizer(sizerPage3)
 
 
         sizerPage4 = wx.StaticBoxSizer(self.frame_energy_consumption, wx.VERTICAL)
-        sizerPage4.Add(self.tc35, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc36, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc37, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc38, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc39, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc40, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc41, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc42, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc43, 0, flagText, VSEP)
-        sizerPage4.Add(self.tc44, 0, flagText, VSEP)
+        sizerPage4_lab = wx.BoxSizer(wx.VERTICAL)
+        sizerPage4_min = wx.BoxSizer(wx.VERTICAL)
+        sizerPage4_max = wx.BoxSizer(wx.VERTICAL)
+        sizerPage4_tar = wx.BoxSizer(wx.VERTICAL)
+        sizerPage4_lab.Add(self.tc_4_label_space, 0, flagText, VSEP)
+        sizerPage4_lab.Add(self.tc_4_label_prod_cost, 0, flagText, VSEP)
+        sizerPage4_lab.Add(self.tc_4_label_turnover, 0, flagText, VSEP)
+        sizerPage4_lab.Add(self.tc_4_label_spec_e_cons, 0, flagText, VSEP)
+        sizerPage4_min.Add(self.tc_4_label_min, 0, flagText, VSEP)
+        sizerPage4_min.Add(self.tc35, 0, flagText, VSEP)
+        sizerPage4_min.Add(self.tc38, 0, flagText, VSEP)
+        sizerPage4_min.Add(self.tc41, 0, flagText, VSEP)
+        sizerPage4_max.Add(self.tc_4_label_max, 0, flagText, VSEP)
+        sizerPage4_max.Add(self.tc36, 0, flagText, VSEP)
+        sizerPage4_max.Add(self.tc39, 0, flagText, VSEP)
+        sizerPage4_max.Add(self.tc42, 0, flagText, VSEP)
+        sizerPage4_tar.Add(self.tc_4_label_tar, 0, flagText, VSEP)
+        sizerPage4_tar.Add(self.tc37, 0, flagText, VSEP)
+        sizerPage4_tar.Add(self.tc40, 0, flagText, VSEP)
+        sizerPage4_tar.Add(self.tc43, 0, flagText, VSEP)
+        sizerPage4_1 = wx.BoxSizer(wx.HORIZONTAL)
+        sizerPage4_1.Add(sizerPage4_lab)
+        sizerPage4_1.Add(sizerPage4_min)
+        sizerPage4_1.Add(sizerPage4_max)
+        sizerPage4_1.Add(sizerPage4_tar)
+        sizerPage4_2 = wx.BoxSizer(wx.VERTICAL)
+        sizerPage4_2.Add(self.tc44, 0, flagText | wx.ALIGN_RIGHT, VSEP_UNIT_OF_MEASUREMENT)
+        sizerPage4.Add(sizerPage4_1)
+        sizerPage4.Add(sizerPage4_2, 0, wx.EXPAND)
 
         self.page4.SetSizer(sizerPage4)
 
@@ -526,7 +688,7 @@ class PanelDBBenchmark(PanelDBBase):
         unitOpDict = Status.prj.getUnitOpDict()
         tc2Entry = "None" if self.tc2.GetValue(text = True) == "None" else int(self.tc2.GetValue(text = True).split(':')[0])
         tmp = {
-               "NACECode":check(self.tc1.GetValue(text = True)),
+               "NACECode":check(self.tc1.GetValue(text = True).split(':')[0]),
                "UnitOp":check(tc2Entry),
                "ProductCode":check(findKey(PRODUCTCODES, self.tc3.GetValue(text = True))),
                "Product":check(self.tc4.GetValue()),
@@ -587,7 +749,11 @@ class PanelDBBenchmark(PanelDBBase):
                     subcode = "00"
                 if subcode != "00" and len(subcode) < 2:
                     subcode = ''.join([subcode, "0"])
-                self.tc1.entry.SetStringSelection(''.join([codes[0], '.', subcode]))
+                li = self.getNACECodeandNACESubCodeList()
+                for i in li:
+                    if i.startswith(''.join([codes[0], '.', subcode])):
+                        self.tc1.entry.SetStringSelection(i)
+                        break
             else:
                 self.tc1.SetValue("None")
             if q.UnitOp is not None:
@@ -655,9 +821,9 @@ class PanelDBBenchmark(PanelDBBase):
                 self.tc44.SetValue('None')
 
     def clear(self):
-        self.tc1.SetValue('')
-        self.tc2.SetValue('')
-        self.tc3.SetValue('')
+        self.tc1.SetValue('None')
+        self.tc2.SetValue('None')
+        self.tc3.SetValue('None')
         self.tc4.SetValue('')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
@@ -678,7 +844,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc21.SetValue('')
         self.tc22.SetValue('')
         self.tc23.SetValue('')
-        self.tc24.SetValue('')
+        self.tc24.SetValue('None')
         self.tc25.SetValue('')
         self.tc26.SetValue('')
         self.tc27.SetValue('')
@@ -688,7 +854,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc31.SetValue('')
         self.tc32.SetValue('')
         self.tc33.SetValue('')
-        self.tc34.SetValue('')
+        self.tc34.SetValue('None')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
         self.tc37.SetValue('')
@@ -698,8 +864,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.tc41.SetValue('')
         self.tc42.SetValue('')
         self.tc43.SetValue('')
-        self.tc44.SetValue('')
-        self.fillChoices()
+        self.tc44.SetValue('None')
 
     def fillChoices(self):
         self.fillChoiceOfNaceCode(self.tc1.entry)
@@ -710,6 +875,7 @@ class PanelDBBenchmark(PanelDBBase):
         self.fillChoiceOfTUnit(self.tc44.entry)
         self.fillChoiceOfType()
         self.fillChoiceOfSubType()
+        self.fillChoiceOfSubType2()
 
     def getDBCol(self):
         return self.db.DBBenchmark_ID

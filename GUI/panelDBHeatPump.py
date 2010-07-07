@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -56,6 +57,7 @@ class PanelDBHeatPump(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "HeatPump"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(120)
         self.__do_layout()
         self._bind_events()
@@ -150,9 +152,16 @@ class PanelDBHeatPump(PanelDBBase):
                                label = _U("HPSubType"),
                                tip = _U("Heatpump sub type"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("Reference"),
                              tip = _U("Source of data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Technical data
@@ -609,15 +618,15 @@ class PanelDBHeatPump(PanelDBBase):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc3.SetValue('')
-        self.tc4.SetValue('')
+        self.tc3.SetValue('None')
+        self.tc4.SetValue('None')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
         self.tc7.SetValue('')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
-        self.tc11.SetValue('')
+        self.tc11.SetValue('None')
         self.tc12.SetValue('')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
@@ -632,18 +641,17 @@ class PanelDBHeatPump(PanelDBBase):
         self.tc23.SetValue('')
         self.tc24.SetValue('')
         self.tc25.SetValue('')
-        self.tc26.SetValue('')
+        self.tc26.SetValue('None')
         self.tc27.SetValue('')
         self.tc28.SetValue('')
         self.tc29.SetValue('')
-        self.tc30.SetValue('')
+        self.tc30.SetValue('None')
         self.tc31.SetValue('')
         self.tc32.SetValue('')
         self.tc33.SetValue('')
         self.tc34.SetValue('')
         self.tc35.SetValue('')
         self.tc36.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfHPType(self.tc3.entry)

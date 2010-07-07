@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -55,6 +56,7 @@ class PanelDBAuditor(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "Auditor"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(125)
         self.__do_layout()
         self._bind_events()
@@ -68,6 +70,8 @@ class PanelDBAuditor(PanelDBBase):
 #------------------------------------------------------------------------------
 
         PanelDBBase.__init__(self, self.parent, "Edit DBAuditor", self.name)
+        self.labelButtonAdd = _U("Add Auditor")
+        self.labelButtonDelete = _U("Delete Auditor")
 
         # Auditor_ID needs to remain as first entry although it is not shown on the GUI
         self.colLabels = "Auditor_ID", "Name", "City", "Country", "Company", "CompanyType"
@@ -75,8 +79,8 @@ class PanelDBAuditor(PanelDBBase):
         self.db = Status.DB.auditor
         self.table = "auditor"
         self.identifier = self.colLabels[0]
-        self.type = self.colLabels[2]
-        self.subtype = self.colLabels[4]
+        self.type = self.colLabels[3]
+        self.subtype = self.colLabels[5]
 
         # access to font properties object
         fp = FontProperties()
@@ -107,13 +111,13 @@ class PanelDBAuditor(PanelDBBase):
 
         self.tc_type = ChoiceEntry(self.page0,
                                    values = [],
-                                   label = _U("Type"),
-                                   tip = _U("Show only equipment of type"))
+                                   label = _U("Country"),
+                                   tip = _U("Show only auditors of country"))
 
         self.tc_subtype = ChoiceEntry(self.page0,
                                       values = [],
-                                      label = _U("Subtype"),
-                                      tip = _U("Show only equipment of subtype"))
+                                      label = _U("Company type"),
+                                      tip = _U("Show only auditors of company type"))
 
         #
         # tab 1 - General Data
@@ -145,9 +149,16 @@ class PanelDBAuditor(PanelDBBase):
                              label = _U("CompanyType"),
                              tip = _U("CompanyType"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc6 = TextEntry(self.page1, maxchars = 100, value = '',
+                             isMultiline = True,
                              label = _U("Adress"),
                              tip = _U("Adress"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc7 = TextEntry(self.page1, maxchars = 45, value = '',
                              label = _U("Phone"),
@@ -261,7 +272,6 @@ class PanelDBAuditor(PanelDBBase):
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfType()

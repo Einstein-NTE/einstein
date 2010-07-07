@@ -674,9 +674,9 @@ class EinsteinFrame(wx.Frame):
 #        frameEditDBSolarThermal = DBEditFrame(None, "Edit DBSolarThermal", 'dbsolarthermal', 0, True)
         frameEditDBSolarThermal = PanelDBSolarThermal(self, "Edit DBSolarThermal")
         frameEditDBSolarThermal.ShowModal()
-    def OnMenuEditDBChiller(self, event):
-        frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
-        frameEditDBChiller.ShowModal()
+#    def OnMenuEditDBChiller(self, event):
+#        frameEditDBChiller = DBEditFrame(None, "Edit DBChiller", 'dbchiller', 0, True)
+#        frameEditDBChiller.ShowModal()
     def OnMenuEditDBElectricityMix(self, event):
 #        frameEditDBElectricityMix = DBEditFrame(None, "Edit DBElectricityMix", 'dbelectricitymix', 0, True)
         frameEditDBElectricityMix = PanelDBElectricityMix(self, "Edit DBElectricityMix", False)
@@ -1581,7 +1581,7 @@ class EinsteinFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBElectricityMix, self.EditDBElectricityMix)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBBoiler, self.EditDBBoiler)
         self.Bind(wx.EVT_MENU, self.OnMenuEditDBSolarThermal, self.EditDBSolarThermal)
-        self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
+        #self.Bind(wx.EVT_MENU, self.OnMenuEditDBChiller, self.EditDBChiller)
 
         self.Bind(wx.EVT_MENU, self.OnMenuExportAll, self.ExportAll)
         self.Bind(wx.EVT_MENU, self.OnMenuExportDBBenchmark, self.ExportDBBenchmark)

@@ -36,6 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
+HEIGHT_TE_MULTILINE = 60
 LABEL_WIDTH_LEFT = 140
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
@@ -56,6 +57,7 @@ class PanelDBCHP(PanelDBBase):
         self.closeOnOk = closeOnOk
         self.name = "CHP"
         self._init_ctrls(parent)
+        self._init_buttons()
         self._init_grid(125)
         self.__do_layout()
         self._bind_events()
@@ -150,9 +152,16 @@ class PanelDBCHP(PanelDBBase):
                                label = _U("SubType"),
                                tip = _U("SubType"))
 
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
+                             isMultiline = True,
                              label = _U("Reference"),
                              tip = _U("Source of data"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 2 - Technical data
@@ -451,19 +460,19 @@ class PanelDBCHP(PanelDBBase):
     def clear(self):
         self.tc1.SetValue('')
         self.tc2.SetValue('')
-        self.tc3.SetValue('')
-        self.tc4.SetValue('')
+        self.tc3.SetValue('None')
+        self.tc4.SetValue('None')
         self.tc5.SetValue('')
         self.tc6.SetValue('')
-        self.tc7.SetValue('')
+        self.tc7.SetValue('None')
         self.tc8.SetValue('')
         self.tc9.SetValue('')
         self.tc10.SetValue('')
         self.tc11.SetValue('')
-        self.tc12.SetValue('')
+        self.tc12.SetValue('None')
         self.tc13.SetValue('')
         self.tc14.SetValue('')
-        self.tc15.SetValue('')
+        self.tc15.SetValue('None')
         self.tc16.SetValue('')
         self.tc17.SetValue('')
         self.tc18.SetValue('')
@@ -471,7 +480,6 @@ class PanelDBCHP(PanelDBBase):
         self.tc20.SetValue('')
         self.tc21.SetValue('')
         self.tc22.SetValue('')
-        self.fillChoices()
 
     def fillChoices(self):
         self.fillChoiceOfCHPType(self.tc3.entry)

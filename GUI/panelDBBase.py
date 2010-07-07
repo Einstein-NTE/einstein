@@ -49,6 +49,9 @@ class PanelDBBase(wx.Dialog):
         self.Centre()
         self.Hide()
 
+        # unitOpDict required for appendResultToGridBenchmark
+        self.unitOpDict = Status.prj.getUnitOpDict()
+
         # objects to be set by derived classes
         self.theId = -1
         self.colLabels = []
@@ -57,16 +60,23 @@ class PanelDBBase(wx.Dialog):
         self.identifier = None
         self.type = None
         self.subtype = None
+        self.subtype2 = None # only needed by dbbenchmark
         self.grid = None
         self.notebook = None
         self.tc_type = None
         self.tc_subtype = None
+        self.tc_subtype2 = None # only needed by dbbenchmark
+        self.labelButtonAdd = _U("Add equipment")
+        self.labelButtonDelete = _U("Delete equipment")
+        self.currentRow = -1
+        self.currentCol = -1
 
+    def _init_buttons(self):
         #
         # buttons
         #
-        self.buttonAddEquipment = wx.Button(self, -1, label = _U("Add equipment"))
-        self.buttonDeleteEquipment = wx.Button(self, -1, label = _U("Delete equipment"))
+        self.buttonAddEquipment = wx.Button(self, -1, label = self.labelButtonAdd)
+        self.buttonDeleteEquipment = wx.Button(self, -1, label = self.labelButtonDelete)
         self.buttonCancel = wx.Button(self, wx.ID_CANCEL, label = 'Close')
         self.buttonOK = wx.Button(self, wx.ID_OK, label = 'Save')
         self.buttonOK.SetDefault()
@@ -99,6 +109,10 @@ class PanelDBBase(wx.Dialog):
         if self.tc_subtype is not None:
             self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_subtype.entry)
 
+        # only needed by dbbenchmark
+        if self.tc_subtype2 is not None:
+            self.Bind(wx.EVT_CHOICE, self.OnChoiceEntryClick, self.tc_subtype2.entry)
+
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.OnGridCellLeftClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.OnGridCellDClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.OnGridCellRightClick, self.grid)
@@ -107,6 +121,8 @@ class PanelDBBase(wx.Dialog):
         self.Bind(wx.grid.EVT_GRID_LABEL_LEFT_DCLICK, self.OnGridLabelDClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.OnGridLabelRightClick, self.grid)
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_DCLICK, self.OnGridLabelDClick, self.grid)
+
+        self.grid.GetGridWindow().Bind(wx.EVT_MOTION, self.OnMouseOver)
 
 #------------------------------------------------------------------------------
 #--- UI actions
@@ -177,6 +193,39 @@ class PanelDBBase(wx.Dialog):
         self.fillEquipmentList()
         event.Skip()
 
+    def OnMouseOver(self, event):
+        try:
+            x, y = self.grid.CalcUnscrolledPosition(event.GetPosition())
+            numRows, numCols = self.grid.GetNumberRows(), self.grid.GetNumberCols()
+
+            col = -1
+            row = -1
+
+            totalColWidth = 0
+            for i in range(numCols):
+                totalColWidth += self.grid.GetColSize(i)
+                if totalColWidth > x:
+                    col = i
+                    break
+
+            totalRowHeight = 0
+            for i in range(numRows):
+                totalRowHeight += self.grid.GetRowSize(i)
+                if totalRowHeight > y:
+                    row = i
+                    break
+
+            if row is not self.currentRow or col is not self.currentCol:
+                if row >= 0 and row < numRows and col >= 0 and col < numCols:
+                    self.currentRow = row
+                    self.currentCol = col
+                    self.grid.GetGridWindow().SetToolTipString(self.grid.GetCellValue(row, col))
+                else:
+                    self.grid.GetGridWindow().SetToolTipString('')
+        except:
+            self.grid.GetGridWindow().SetToolTipString('')
+        event.Skip()
+
 #------------------------------------------------------------------------------
 #--- Public methods
 #------------------------------------------------------------------------------
@@ -191,7 +240,8 @@ class PanelDBBase(wx.Dialog):
                 self.grid.SelectRow(i)
                 self.display(self.getCurrentEquipment(i))
                 break
-        self.fillChoices()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
 
     def deleteEquipment(self):
         if not self.grid.IsSelection():
@@ -259,8 +309,22 @@ class PanelDBBase(wx.Dialog):
         for entry in naceTable:
             naceCode = entry.CodeNACE
             naceSubCode = entry.CodeNACEsub
+            naceSubName = unicode(entry.NameNACEsub,"utf-8")
             naceCode = naceCode + "." + naceSubCode
+            if len(str(naceSubName).strip()) > 0:
+                 naceCode += ": " + naceSubName
             naceList.append(str(naceCode))
+        naceList.sort()
+        return naceList
+
+    def getNACECodeBranchList(self):
+        naceTable = Status.DB.dbnacecode.DBNaceCode_ID['%']
+        naceList = []
+        for entry in naceTable:
+            naceCode = entry.CodeNACE
+            if naceCode is not None:
+                if str(naceCode) + ".*" not in naceList:
+                    naceList.append(str(naceCode) + ".*")
         naceList.sort()
         return naceList
 
@@ -411,10 +475,6 @@ class PanelDBBase(wx.Dialog):
         self.addNoneFront(unitOpList)
         fillChoice(entry, unitOpList)
 
-    def fillChoiceYesNo(self, entry):
-        values = ["No", "Yes"]
-        fillChoice(entry, values, False)
-
     def fillChoiceOfEUnit(self, entry):
         productUnitList = self.getEUnitList()
         self.addNoneFront(productUnitList)
@@ -487,8 +547,12 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.type,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if result not in typeList and result is not None:
+                if str(result) not in typeList and result is not None:
                     typeList.append(str(result))
+            typeList.sort()
+            self.addNoneFront(typeList)
+            if self.type == "NACECode": # dbbenchmark
+                typeList.extend(self.getNACECodeBranchList())
             fillChoice(self.tc_type.entry, typeList)
             self.tc_type.entry.Append("All")
             self.tc_type.entry.SetStringSelection("All")
@@ -503,11 +567,41 @@ class PanelDBBase(wx.Dialog):
             for id in ids:
                 sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype,self.table,self.identifier,id)
                 result = Status.DB.sql_query(sqlQuery)
-                if result not in subtypeList and result is not None:
+                if self.subtype == "ProductCode": # dbbenchmark
+                    try:
+                        result = PRODUCTCODES[str(result)]
+                    except:
+                        result = str(result)
+                if str(result) not in subtypeList and result is not None:
                     subtypeList.append(str(result))
+            subtypeList.sort()
+            self.addNoneFront(subtypeList)
             fillChoice(self.tc_subtype.entry, subtypeList)
             self.tc_subtype.entry.Append("All")
             self.tc_subtype.entry.SetStringSelection("All")
+        except:
+            pass
+
+    def fillChoiceOfSubType2(self):
+        try:
+            equipments = self.db.get_table()
+            ids = equipments.column(self.identifier)
+            subtype2List = []
+            for id in ids:
+                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(self.subtype2,self.table,self.identifier,id)
+                result = Status.DB.sql_query(sqlQuery)
+                if self.subtype2 == "UnitOp": # dbbenchmark
+                    try:
+                        result = str(result) + ": " + self.unitOpDict[int(result)]
+                    except:
+                        result = str(result)
+                if str(result) not in subtype2List and result is not None:
+                    subtype2List.append(str(result))
+            subtype2List.sort()
+            self.addNoneFront(subtype2List)
+            fillChoice(self.tc_subtype2.entry, subtype2List)
+            self.tc_subtype2.entry.Append("All")
+            self.tc_subtype2.entry.SetStringSelection("All")
         except:
             pass
 
@@ -517,7 +611,8 @@ class PanelDBBase(wx.Dialog):
         self.grid.ClearSelection()
         for i in range(self.grid.GetNumberRows()):
             self.grid.DeleteRows()
-        self.fillChoices()
+        self.fillChoiceOfType()
+        self.fillChoiceOfSubType()
         self.fillEquipmentList()
         self.notebook.ChangeSelection(0)
 
@@ -529,67 +624,106 @@ class PanelDBBase(wx.Dialog):
         return newList
 
     def fillEquipmentList(self):
-        if self.tc_subtype is not None:
-            self.fillEquipmentListWithTypeAndSubType()
-        else:
-            self.fillEquipmentListWithType()
+        try:
+            equipments = self.db.get_table()
+            ids = equipments.column(self.identifier)
+            fields = ', '.join([f for f in self.colLabels])
 
-    def fillEquipmentListWithType(self):
-        equipments = self.db.get_table()
-        ids = equipments.column(self.identifier)
-        fields = ', '.join([f for f in self.colLabels])
-        if self.tc_type is not None:
-            equipe_type = self.tc_type.GetValue(True)
+            if self.tc_type is not None:
+                equipe_type = self.tc_type.GetValue(True)
 
-        for id in ids:
-            if equipe_type == "All" or len(equipe_type) <= 0:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
-            elif equipe_type == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
+                if equipe_type == "All" or len(equipe_type) <= 0:
+                    equipe_type = 'NULL'
+                    type = 'NULL'
+                elif equipe_type == "None":
+                    equipe_type = 'NULL'
+                    type = self.type
+                else:
+                    equipe_type = equipe_type
+                    type = self.type
+
+                equipe_type = '\'%s\''%equipe_type if equipe_type != 'NULL' else equipe_type
             else:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
+                equipe_type = 'NULL'
+                type = 'NULL'
 
-            result = Status.DB.sql_query(sqlQuery)
-            self.appendResultToGrid(result)
+            if self.tc_subtype is not None:
+                equipe_subtype = self.tc_subtype.GetValue(True)
 
-    def fillEquipmentListWithTypeAndSubType(self):
-        equipments = self.db.get_table()
-        ids = equipments.column(self.identifier)
-        fields = ', '.join([f for f in self.colLabels])
+                if equipe_subtype == "All" or len(equipe_subtype) <= 0:
+                    equipe_subtype = 'NULL'
+                    subtype = 'NULL'
+                elif equipe_subtype == "None":
+                    equipe_subtype = 'NULL'
+                    subtype = self.subtype
+                else:
+                    equipe_subtype = equipe_subtype
+                    subtype = self.subtype
 
-        if self.tc_type is not None:
-            equipe_type = self.tc_type.GetValue(True)
-        if self.tc_subtype is not None:
-            equipe_subtype = self.tc_subtype.GetValue(True)
-
-        for id in ids:
-            if (equipe_type == "All" or len(equipe_type) <= 0) and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = %s"%(fields,self.table,self.identifier,id)
-            elif (equipe_type == "All" or len(equipe_type) <= 0) and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.subtype,self.identifier,id)
-            elif equipe_type == "None" and (equipe_subtype == "All" or len(equipe_subtype) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = %s"%(fields,self.table,self.type,self.identifier,id)
-            elif equipe_type == "None" and equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s is NULL and %s = %s"%(fields,self.table,self.type,self.subtype,self.identifier,id)
-            elif (equipe_type == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.subtype,equipe_subtype,self.identifier,id)
-            elif (equipe_subtype == "All" or len(equipe_type) <= 0):
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.identifier,id)
-            elif equipe_type == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s is NULL and %s = '%s' and %s = %s"%(fields,self.table,self.type,self.subtype,equipe_subtype,self.identifier,id)
-            elif equipe_subtype == "None":
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s is NULL and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,self.identifier,id)
+                equipe_subtype = '\'%s\''%equipe_subtype if equipe_subtype != 'NULL' else equipe_subtype
             else:
-                sqlQuery = "SELECT %s FROM %s WHERE %s = '%s' and %s = '%s' and %s = %s"%(fields,self.table,self.type,equipe_type,self.subtype,equipe_subtype,self.identifier,id)
+                equipe_subtype = 'NULL'
+                subtype = 'NULL'
 
-            result = Status.DB.sql_query(sqlQuery)
-            self.appendResultToGrid(result)
+            if subtype == "ProductCode" and equipe_subtype != 'NULL':
+                equipe_subtype = '\'%s\''%equipe_subtype.split(':')[0].strip('\'')
+
+            if self.tc_subtype2 is not None:
+                equipe_subtype2 = self.tc_subtype2.GetValue(True)
+
+                if equipe_subtype2 == "All" or len(equipe_subtype2) <= 0:
+                    equipe_subtype2 = 'NULL'
+                    subtype2 = 'NULL'
+                elif equipe_subtype2 == "None":
+                    equipe_subtype2 = 'NULL'
+                    subtype2 = self.subtype2
+                else:
+                    equipe_subtype2 = equipe_subtype2
+                    subtype2 = self.subtype2
+
+                equipe_subtype2 = '\'%s\''%equipe_subtype2 if equipe_subtype2 != 'NULL' else equipe_subtype2
+            else:
+                equipe_subtype2 = 'NULL'
+                subtype2 = 'NULL'
+
+            if subtype2 == 'UnitOp' and equipe_subtype2 != 'NULL':
+                equipe_subtype2 = '\'%s\''%equipe_subtype2.split(':')[0].strip('\'')
+
+            for id in ids:
+                if len(equipe_type.split('.')) > 1 and equipe_type.split('.')[1].rstrip('\'') == '*': # dbbenchmark
+                    sqlQuery = "SELECT %s FROM %s WHERE %s LIKE %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, '\'%s.%%\''%equipe_type.split('.')[0].strip('\''), subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
+                else:
+                    sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
+                result = Status.DB.sql_query(sqlQuery)
+                self.appendResultToGrid(result)
+        except:
+            pass
 
     def appendResultToGrid(self, result):
+        # We want to show the UnitOp as number and text, hence it is required to
+        # ask if we are about to show dbbenchmark and call the respective method.
+        # This results in slight lower performance. If this is not desired just
+        # comment the following three lines and only the code will be shown.
+        if self.table == "dbbenchmark":
+            self.appendResultToGridBenchmark(result)
+            return
+
         if len(result) > 0:
             self.grid.AppendRows(1, True)
             for i in range(len(self.colLabels)):
                 self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
+
+    def appendResultToGridBenchmark(self, result):
+        if len(result) > 0:
+            self.grid.AppendRows(1, True)
+            for i in range(len(self.colLabels)):
+                if self.colLabels[i] == "UnitOp":
+                    try:
+                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]) + ": " + self.unitOpDict[int(result[i])])
+                    except:
+                        self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
+                else:
+                    self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
 
 # methods to be implemented by derived classes
     def display(self, q = None):
