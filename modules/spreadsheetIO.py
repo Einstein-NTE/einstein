@@ -45,10 +45,8 @@ class ImportQ(object):
         
 
         self.infile = openfilecreate('Choose a questionnaire file for importing',
-                                     'Spreadsheet files (*.xls,*.odt)|*.xls;*.ods|\
-                                     Excel files (*.xls)|*.xls|\
-                                     Open Office calc files (*.ods)|*.ods',
-                                     style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+                                     'Spreadsheet files (*.xls,*.ods)|*.xls;*.ods|Excel files (*.xls)|*.xls|Open Office calc files (*.ods)|*.ods'
+                                     ,style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if self.infile is None:
             return None       
         
