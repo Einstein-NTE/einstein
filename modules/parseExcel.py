@@ -31,7 +31,7 @@ import pSQL
 try:
     from win32com.client import Dispatch
 except ImportError:
-    pass
+    print "ImportError win32com.client"
 
 from spreadsheetUtils import Utils
 from dialogGauge import DialogGauge
@@ -52,11 +52,6 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
                 self.sheetnames.append(__sheets[i].Name)
     
     
-    def __tupleToList(self,tuple):
-        data = []
-        for elem in tuple:
-            data.append(elem.GetValue())
-        return data
     
     def __openExcelDispatch(self,filepath):
         xlApp = Dispatch("Excel.Application")
@@ -278,7 +273,7 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
     def endProcessing(self):
         self.__closeExcelDispatch(self.__xlWb, self.__xlApp)
         
-
+        
 
     
 
