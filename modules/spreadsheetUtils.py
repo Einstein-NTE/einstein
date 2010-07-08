@@ -28,6 +28,7 @@
 #==============================================================================
 
 import re
+import time
 from GUITools import *
 
 class SpreadsheetDict():
@@ -47,7 +48,7 @@ class SpreadsheetDict():
         try:
             return float(str(number).replace(',', '.'))
         except:
-            return "no valid number" 
+            return None
 
     @staticmethod
     def parseDate(date):
@@ -77,7 +78,7 @@ class SpreadsheetDict():
     def createQuestionnaireDictionary(Q1,db_conn):
         Q1dict = {}
 
-        Q1dict['Name']= check(Q1[0])
+        Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
         Q1dict['City']= check(Q1[2])
         Q1dict['Contact']= check(Q1[4])
         Q1dict['Role']= check(Q1[6])
@@ -748,6 +749,8 @@ class Utils():
             if Questionnaire_id != "":
                 Dict['Questionnaire_id']= Questionnaire_id
             Dict.update(dict)
+            for key in Dict.keys():
+                Dict[key] = check(Dict[key])
             print Dict
             print db_table.insert(Dict)
             list = []
@@ -778,13 +781,21 @@ class Utils():
         Q1dict = SpreadsheetDict.createQuestionnaireDictionary(Q1, self.__md)
         Q9dict = SpreadsheetDict.createQ9dictionary(Q9Questionnaire, self.__md)
         NaceDict = SpreadsheetDict.createNACEDictionary(Q1, self.__md)
-        strNace = "CodeNACE = '"+str(Q1[20])+"' AND CodeNACESub ='"+str(int(Q1[24]))+"'"
+        try:
+            strNace = "CodeNACE = '"+str(Q1[20])+"' AND CodeNACESub ='"+str(int(Q1[24]))+"'"
+        except:
+            strNace = ""
         dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
         
         Q1dict.update(Q9dict)
-        Q1dict.update({'DBNaceCode_id':dbnacecodeid[0]['DBNaceCode_ID'], 
-                       'Branch' : dbnacecodeid[0]['NameNACE'], 
-                       'SubBranch' : dbnacecodeid[0]['NameNACEsub']})
+        try:
+            Q1dict.update({'DBNaceCode_id':check(dbnacecodeid[0]['DBNaceCode_ID']),
+                           'Branch' : check(dbnacecodeid[0]['NameNACE']),
+                           'SubBranch' : check(dbnacecodeid[0]['NameNACEsub'])})
+        except:
+            Q1dict.update({'DBNaceCode_id':check(None),
+                           'Branch' : check(None),
+                           'SubBranch' : check(None)})
         Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
 #        except:
 #            return self.parseError(self.__sheetnames[0])

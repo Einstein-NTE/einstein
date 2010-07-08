@@ -271,6 +271,7 @@ class OOSpreadsheetParser(parseSpreadsheet):
         for elem in domtable:
             if elem.getAttribute("table:name")==worksheet:
                 table = elem
+                break
         if table == None:
             print "Area not found"
             return
