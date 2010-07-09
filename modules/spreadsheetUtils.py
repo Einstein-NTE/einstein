@@ -80,7 +80,7 @@ class SpreadsheetDict():
 
         #Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
         if Q1[0] is not None:
-            Q1dict['Name'] = check(Q1[0] + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
+            Q1dict['Name'] = check(str(Q1[0]) + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
         else:
             Q1dict['Name'] = check(time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
         Q1dict['City']= check(Q1[2])
@@ -284,7 +284,7 @@ class SpreadsheetDict():
         Q3dict['ScheduleTolerance']= check(Q3[33])
         Q3dict['StartUpDuration']= check(Q3[34])
         Q3dict['InFlowDuration']= check(Q3[34])
-        Q3dict['HBatch']= check(Q3[35]+Q3[34])
+        #Q3dict['HBatch']= check(Q3[35]+Q3[34])
         Q3dict['OutFlowDuration']= check(Q3[36])
         
         Q3dict['AlternativeProposalNo'] = -1

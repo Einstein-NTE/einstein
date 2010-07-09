@@ -64,14 +64,22 @@ class SpreadsheetProcessing():
             dlg = DialogGauge(None,self.__dialog[0],self.__dialog[1])
             self.spreadsheetparser.startProcessing()
             
-            __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
+            try:
+                __handle, lists = self.__getLists(self.__sheetnames, dlg, self.spreadsheetparser)
+            except:
+                __handle, lists = "", []
             if len(lists)==0:
                 self.spreadsheetparser.endProcessing()
                 dlg.Destroy()
                 return __handle
             dlg.update(80)
             DButil = Utils(self.__md, self.__sheetnames)
-            __handle = DButil.writeToDB(lists)
+            try:
+                __handle = DButil.writeToDB(lists)
+            except:
+                self.spreadsheetparser.endProcessing()
+                dlg.Destroy()
+                return "Error while writing to database"
             self.spreadsheetparser.endProcessing()
             dlg.Destroy()
         else:
