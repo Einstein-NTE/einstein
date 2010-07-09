@@ -751,8 +751,8 @@ class Utils():
             Dict.update(dict)
             for key in Dict.keys():
                 Dict[key] = check(Dict[key])
-            print Dict
-            print db_table.insert(Dict)
+            #print Dict
+            db_table.insert(Dict)
             list = []
     
     
@@ -896,7 +896,6 @@ class Utils():
         self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
 
         qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-        print qf
         return "Parsing successful!"
         
 

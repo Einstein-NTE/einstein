@@ -122,9 +122,8 @@ class SpreadsheetProcessing():
             return Utils.parseError(sheetnames[3]), []
         dlg.update(40)    
         try: 
-            
-            if(self.__fileending == 'xls'):   
-                sht = sheetnames[8]
+            sht = sheetnames[8]
+            if(self.__fileending == 'xls'):
                 QRenewables = []
                 QRenewables += spreadsheetparser.parseRange("Q7_Interest",sht)
                 QRenewables += spreadsheetparser.parseRange("Q7_REReason",sht)
@@ -133,12 +132,11 @@ class SpreadsheetProcessing():
                 QRenewables += spreadsheetparser.parseRange("Q7_Biomass",sht)
             else:
                 QRenewables = []
-                QRenewables.append(spreadsheetparser.parseRange( "Q7_Interest", sheetnames[8]))
-                QRenewables += spreadsheetparser.parseRange( "Q7_REReason", sheetnames[8])
-                QRenewables.append(spreadsheetparser.parseRange( "Q7_Others", sheetnames[8]))
-                QRenewables += spreadsheetparser.parseRange( "Q7_Latitude", sheetnames[8])
-                QRenewables += spreadsheetparser.parseRange( "Q7_Biomass", sheetnames[8])
-                                                                
+                QRenewables.append(spreadsheetparser.parseRange( "Q7_Interest", sht))
+                QRenewables += spreadsheetparser.parseRange( "Q7_REReason", sht)
+                QRenewables.append(spreadsheetparser.parseRange( "Q7_Others", sht))
+                QRenewables += spreadsheetparser.parseRange( "Q7_Latitude", sht)
+                QRenewables += spreadsheetparser.parseRange( "Q7_Biomass", sht)
             
             QSurf = spreadsheetparser.parseRange("Q7_Area",sht)
             QSurf += spreadsheetparser.parseRange("Q7_Roof",sht)
