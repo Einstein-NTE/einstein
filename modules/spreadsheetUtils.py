@@ -78,7 +78,11 @@ class SpreadsheetDict():
     def createQuestionnaireDictionary(Q1,db_conn):
         Q1dict = {}
 
-        Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
+        #Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
+        if Q1[0] is not None:
+            Q1dict['Name'] = check(Q1[0] + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
+        else:
+            Q1dict['Name'] = check(time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
         Q1dict['City']= check(Q1[2])
         Q1dict['Contact']= check(Q1[4])
         Q1dict['Role']= check(Q1[6])
