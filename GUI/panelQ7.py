@@ -742,12 +742,16 @@ class PanelQ7(wx.Panel):
         
         self.listBoxEnergy.Clear()
         for surface in surfaceList:
-            self.listBoxEnergy.Append(surface)
+            if surface is not None:
+                self.listBoxEnergy.Append(surface)
 
         if len(surfaceList) > 0:
             if self.selectedSurfaceName == None:
                 self.selectedSurfaceName = surfaceList[0]
-            self.listBoxEnergy.SetStringSelection(self.selectedSurfaceName)
+            try:
+                self.listBoxEnergy.SetStringSelection(self.selectedSurfaceName)
+            except:
+                pass
             self.fillPageSurface()
 
 #------------------------------------------------------------------------------

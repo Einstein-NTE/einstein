@@ -623,7 +623,8 @@ class PanelQ6(wx.Panel):
 
         self.listBoxWHEE.Clear()
         for whee in self.WHEEList:
-            self.listBoxWHEE.Append(whee)
+            if whee is not None:
+                self.listBoxWHEE.Append(whee)
 
         if self.WHEEName is not None: self.listBoxWHEE.SetStringSelection(self.WHEEName)
 
@@ -634,7 +635,10 @@ class PanelQ6(wx.Panel):
         self.sourceList.extend(Status.prj.getProcessList("Process"))
         self.sourceList.extend(Status.prj.getWHEEList("WHEEName"))
         
-        fillChoice(self.tc6.entry,self.sourceList)
+        try:
+            fillChoice(self.tc6.entry,self.sourceList)
+        except:
+            pass
 
         self.sinkList = Status.prj.getEqList("Equipment")
         self.sinkList.extend(Status.prj.getPipeList("Pipeduct"))
