@@ -114,7 +114,13 @@ def check(value, length = None):
             else:
                 return value.encode("utf-8")
         else:
-            return value
+            try:
+                if length is not None:
+                    return str(value)[0:length:]
+                else:
+                    return str(value)
+            except:
+                return value
     else:
         return 'NULL'
 #==============================================================================

@@ -81,7 +81,12 @@ class SpreadsheetDict():
 
         #Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
         if Q1[0] is not None:
-            Q1dict['Name'] = check(str(Q1[0]) + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()), 45)
+            name = str(Q1[0])
+            timestr = " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
+            namelen = 45 - len(timestr)
+            name = name[0:namelen:]
+            name += timestr
+            Q1dict['Name'] = check(name, 45)
         else:
             Q1dict['Name'] = check(time.strftime("%m/%d/%y %H:%M:%S", time.localtime()), 45)
         Q1dict['City']= check(Q1[2], 45)
@@ -143,10 +148,10 @@ class SpreadsheetDict():
     @staticmethod
     def createQProductDictionary(QProduct,db_conn):
         qproddict = {}
-        qproddict['Product'] = check(QProduct[0])
-        qproddict['ProductCode'] = check(QProduct[1])
+        qproddict['Product'] = check(QProduct[0], 45)
+        qproddict['ProductCode'] = check(QProduct[1], 45)
         qproddict['QProdYear'] = check(QProduct[2])
-        qproddict['ProdUnit'] = check(QProduct[3])
+        qproddict['ProdUnit'] = check(QProduct[3], 45)
         try: qproddict['TurnoverProd'] = check(float(QProduct[4]) * UNITS["PRICE"]["MEUR"][0])
         except: qproddict['TurnoverProd'] = check(None)
         try: qproddict['FuelProd'] = check(float(QProduct[5]) * UNITS["ENERGY"]["MWh"][0])
@@ -166,7 +171,7 @@ class SpreadsheetDict():
             QFuelDict['DBFuel_id'] = DBFuelSel[0]["DBFuel_ID"]
         except:
             QFuelDict['DBFuel_id'] = check(None)
-        QFuelDict['FuelUnit'] = check(QFuel[1])
+        QFuelDict['FuelUnit'] = check(QFuel[1], 45)
         QFuelDict['MFuelYear'] = check(QFuel[2])
         try: QFuelDict['FECFuel'] = check(float(QFuel[3]) * UNITS["ENERGY"]["MWh"][0])
         except: QFuelDict['FECFuel'] = check(None)
@@ -204,12 +209,12 @@ class SpreadsheetDict():
         Q2dict['PowerContrTot']= check(Q2[45])
         #Q2[46] empty
         #Q2[47] empty
-        Q2dict['ElTariffClassPeak']= check(Q2[48])
-        Q2dict['ElTariffClassStd']= check(Q2[49])
-        Q2dict['ElTariffClassTotVall']= check(Q2[50])
-        Q2dict['ElTariffClassTot']= check(Q2[51])
+        Q2dict['ElTariffClassPeak']= check(Q2[48], 45)
+        Q2dict['ElTariffClassStd']= check(Q2[49], 45)
+        Q2dict['ElTariffClassTotVall']= check(Q2[50], 45)
+        Q2dict['ElTariffClassTot']= check(Q2[51], 45)
         #Q2[52] empty
-        Q2dict['ElTariffClassCHP']= check(Q2[53])
+        Q2dict['ElTariffClassCHP']= check(Q2[53], 45)
         Q2dict['ElTariffPowPeak']= check(Q2[54])
         Q2dict['ElTariffPowStd']= check(Q2[55])
         Q2dict['ElTariffPowVall']= check(Q2[56])
@@ -259,9 +264,9 @@ class SpreadsheetDict():
         
         Q3dict = {}
         #Q3dict['EquipIDFromDB'] = 1
-        Q3dict['Process'] = check(Q3[0])
-        Q3dict['Description'] = check(Q3[1])
-        Q3dict['ProcType']= check(Q3[2])
+        Q3dict['Process'] = check(Q3[0], 45)
+        Q3dict['Description'] = check(Q3[1], 200)
+        Q3dict['ProcType']= check(Q3[2], 45)
         try:
             dbunitop = db_conn.dbunitoperation.sql_select("UnitOperation"+"='"+str(Q3[3])+"'")
             Q3dict['DBUnitOperation_id']= dbunitop[0]['DBUnitOperation_ID']
@@ -283,7 +288,7 @@ class SpreadsheetDict():
         Q3dict['VolProcMed']= check(SpreadsheetDict.normDecimalPlace(Q3[12]))
         Q3dict['PTStartUp']= check(SpreadsheetDict.normDecimalPlace(Q3[13]))
         Q3dict['QOpProc']= check(SpreadsheetDict.normDecimalPlace(Q3[15]))
-        Q3dict['HeatRecOK']= check(Q3[16])
+        Q3dict['HeatRecOK']= check(Q3[16], 4)
         
         try:
             dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q3[17])+"'")
@@ -310,7 +315,7 @@ class SpreadsheetDict():
             Q3dict['SupplyMedDBFluid_id']= dbfluid[0]['DBFluid_ID']
         except:
             Q3dict['SupplyMedDBFluid_id'] = check(None)
-        Q3dict['PipeDuctProc']= check(Q3[29])
+        Q3dict['PipeDuctProc']= check(Q3[29], 45)
         Q3dict['TSupply']= check(Q3[30])
         Q3dict['SupplyMedFlow']= check(Q3[31])
         try: Q3dict['UPH']= check(float(Q3[32]) * UNITS["ENERGY"]["MWh"][0])
@@ -400,7 +405,7 @@ class SpreadsheetDict():
             
             processid = db_conn.qprocessdata.sql_select("Process"+"='"+processName+"'")
             PPD['qprocessdata_QProcessData_ID']= processid[-1]['QProcessData_ID']
-            PPID = db_conn.process_periods.insert(check(PPD))
+            PPID = db_conn.process_periods.insert(PPD)
             
             #PPID = db_conn.process_periods.sql_select("LAST_INSERT_ID()")
             #PPID = PPID[-1]['id']
@@ -408,7 +413,7 @@ class SpreadsheetDict():
             profilesID = db_conn.profiles.sql_select("name"+"='"+profileName+"'")
             profilesID = profilesID[-1]['id']
             
-            db_conn.process_period_profiles.insert(check({'process_periods_id' : PPID, 'profiles_id' : profilesID}))
+            db_conn.process_period_profiles.insert({'process_periods_id' : PPID, 'profiles_id' : profilesID})
         except:
             print "createProcessPeriodsDictionary"
         
@@ -429,11 +434,11 @@ class SpreadsheetDict():
     def createQ4HDictionary(Q4H,db_conn):
 
         Q4Hdict = {}
-        Q4Hdict["Equipment"] = check(Q4H[0])
-        Q4Hdict["Manufact"] = check(Q4H[1])
+        Q4Hdict["Equipment"] = check(Q4H[0], 45)
+        Q4Hdict["Manufact"] = check(Q4H[1], 45)
         Q4Hdict["YearManufact"] = check(Q4H[2])
-        Q4Hdict["Model"] = check(Q4H[3])
-        Q4Hdict["EquipType"] = check(Q4H[4])
+        Q4Hdict["Model"] = check(Q4H[3], 45)
+        Q4Hdict["EquipType"] = check(Q4H[4], 45)
         Q4Hdict["NumEquipUnits"] = check(Q4H[5])
         Q4Hdict["HCGPnom"] = check(Q4H[8])
         try:
@@ -442,7 +447,7 @@ class SpreadsheetDict():
         except:
             Q4Hdict['DBFuel_id'] = check(None)
         Q4Hdict["FuelConsum"] = check(Q4H[10])
-        Q4Hdict["UnitsFuelConsum"] = check(Q4H[11])
+        Q4Hdict["UnitsFuelConsum"] = check(Q4H[11], 45)
         Q4Hdict["ElectriConsum"] = check(Q4H[12])
         Q4Hdict["HCGTEfficiency"] = check(Q4H[13])
         Q4Hdict["PartLoad"] = check(Q4H[14])
@@ -450,13 +455,13 @@ class SpreadsheetDict():
         Q4Hdict["ExcessAirRatio"] = check(Q4H[17])
         Q4Hdict["ElectriProduction"] = check(Q4H[19])
         Q4Hdict["HCGEEfficiency"] = check(Q4H[20])
-        Q4Hdict["PipeDuctEquip"] = check(Q4H[24])
-        Q4Hdict["HeatSourceLT"] = check(Q4H[26])
+        Q4Hdict["PipeDuctEquip"] = check(Q4H[24], 45)
+        Q4Hdict["HeatSourceLT"] = check(Q4H[26], 200)
         Q4Hdict["THeatSourceLT"] = check(Q4H[27])
         Q4Hdict["Refrigerant"] = check(Q4H[28])
         Q4Hdict["ThermalConsum"] = check(Q4H[30])
         Q4Hdict["THeatSourceHT"] = check(Q4H[31])
-        Q4Hdict["HeatSourceHT"] = check(Q4H[32])
+        Q4Hdict["HeatSourceHT"] = check(Q4H[32], 200)
         Q4Hdict["HPerDayEq"] = check(Q4H[35])
         Q4Hdict["NDaysEq"] = check(Q4H[36])
         
@@ -466,11 +471,11 @@ class SpreadsheetDict():
     @staticmethod
     def createQ4CDictionary(Q4C,db_conn):
         Q4Cdict = {}
-        Q4Cdict["Equipment"] = check(Q4C[0])
-        Q4Cdict["Manufact"] = check(Q4C[1])
+        Q4Cdict["Equipment"] = check(Q4C[0], 45)
+        Q4Cdict["Manufact"] = check(Q4C[1], 45)
         Q4Cdict["YearManufact"] = check(Q4C[2])
-        Q4Cdict["Model"] = check(Q4C[3])
-        Q4Cdict["EquipType"] = check(Q4C[4])
+        Q4Cdict["Model"] = check(Q4C[3], 45)
+        Q4Cdict["EquipType"] = check(Q4C[4], 45)
         Q4Cdict["NumEquipUnits"] = check(Q4C[5])
         Q4Cdict["HCGPnom"] = check(Q4C[8])
         Q4Cdict["Refrigerant"] = check(Q4C[9])
@@ -478,13 +483,13 @@ class SpreadsheetDict():
         Q4Cdict["HCGTEfficiency"] = check(Q4C[11])
         Q4Cdict["PartLoad"] = check(Q4C[12])
         Q4Cdict["FuelConsum"] = check(Q4C[14])
-        Q4Cdict["UnitsFuelConsum"] = check(Q4C[15])
-        Q4Cdict["PipeDuctEquip"] = check(Q4C[19])
-        Q4Cdict["DestinationWasteHeat"] = check(Q4C[21])
+        Q4Cdict["UnitsFuelConsum"] = check(Q4C[15], 45)
+        Q4Cdict["PipeDuctEquip"] = check(Q4C[19], 45)
+        Q4Cdict["DestinationWasteHeat"] = check(Q4C[21], 200)
         Q4Cdict["TemperatureReCooling"] = check(Q4C[22])
         Q4Cdict["ThermalConsum"] = check(Q4C[23])
         Q4Cdict["THeatSourceHT"] = check(Q4C[24])
-        Q4Cdict["HeatSourceHT"] = check(Q4C[25])
+        Q4Cdict["HeatSourceHT"] = check(Q4C[25], 200)
         Q4Cdict["HPerDayEq"] = check(Q4C[28])
         Q4Cdict["NDaysEq"] = check(Q4C[29])
         
@@ -494,7 +499,7 @@ class SpreadsheetDict():
     @staticmethod
     def createQ5Dictionary(Q5,Questionnaire_ID, db_conn):
         Q5dict = {}
-        Q5dict["Pipeduct"] = check(Q5[0])
+        Q5dict["Pipeduct"] = check(Q5[0], 45)
         try:
             dbfluid = db_conn.dbfluid.sql_select("FluidName"+"='"+str(Q5[1])+"'")
             Q5dict["HeatDistMedium"]= dbfluid[0]['DBFluid_ID']
@@ -517,7 +522,7 @@ class SpreadsheetDict():
         except: Q5dict["DeltaDistPipe"] = check(None)
         Q5dict["NumStorageUnits"] = check(Q5[14])
         Q5dict["VUnitStorage"] = check(Q5[15])
-        Q5dict["TypeStorage"] = check(Q5[16])
+        Q5dict["TypeStorage"] = check(Q5[16], 45)
         Q5dict["PmaxStorage"] = check(Q5[17])
         Q5dict["TmaxStorage"] = check(Q5[18])
         Q5dict['AlternativeProposalNo'] = -1
@@ -529,21 +534,21 @@ class SpreadsheetDict():
     @staticmethod
     def createQ6Dictionary(Q6,db_conn):
         Q6dict={}
-        Q6dict["HXName"] = check(Q6[0])
-        Q6dict["HXType"] = check(Q6[1])
+        Q6dict["HXName"] = check(Q6[0], 300)
+        Q6dict["HXType"] = check(Q6[1], 300)
         Q6dict["QdotHX"] = check(Q6[2])
         try: Q6dict["HXLMTD"] = check(float(Q6[3]) + UNITS["TEMPERATURE"]["K"][1])
         except: Q6dict["HXLMTD"] = check(None)
         try: Q6dict["QHX"] = check(float(Q6[4]) * UNITS["ENERGY"]["MWh"][0])
         except: Q6dict["QHX"] = check(None)
-        Q6dict["HXSource"] = check(Q6[5])
+        Q6dict["HXSource"] = check(Q6[5], 300)
         Q6dict["HXTSourceInlet"] = check(Q6[6])
         try: Q6dict["HXhSourceInlet"] = check(float(Q6[7]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
         except: Q6dict["HXhSourceInlet"] = check(None)
         Q6dict["HXTSourceOutlet"] = check(Q6[8])
         try: Q6dict["HXhSourceOutlet"] = check(float(Q6[9]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
         except: Q6dict["HXhSourceOutlet"] = check(None)
-        Q6dict["HXSink"] = check(Q6[10])
+        Q6dict["HXSink"] = check(Q6[10], 300)
         Q6dict["HXTSinkInlet"] = check(Q6[11])
         Q6dict["HXTSinkOutlet"] = check(Q6[12])
         Q6dict['AlternativeProposalNo'] = -1
@@ -552,9 +557,9 @@ class SpreadsheetDict():
     @staticmethod
     def createQ6EDictionary(Q6,db_conn):
         Q6dict={}
-        Q6dict["WHEEName"] = check(Q6[16])
-        Q6dict["WHEEEqType"] = check(Q6[17])
-        Q6dict["WHEEWasteHeatType"] = check(Q6[18])
+        Q6dict["WHEEName"] = check(Q6[16], 45)
+        Q6dict["WHEEEqType"] = check(Q6[17], 45)
+        Q6dict["WHEEWasteHeatType"] = check(Q6[18], 45)
         Q6dict["QWHEE"] = check(Q6[19])
         #Q6dict["WHEEMedium"] = check(Q6[20])
         
@@ -566,7 +571,7 @@ class SpreadsheetDict():
         
         Q6dict["WHEEFlow"] = check(Q6[21])
         Q6dict["WHEETOutlet"] = check(Q6[22])
-        Q6dict["WHEEPresentUse"] = check(Q6[23])
+        Q6dict["WHEEPresentUse"] = check(Q6[23], 45)
         
         Q6dict["HPerDayWHEE"] = check(Q6[26])
         Q6dict["NBatchWHEE"] = check(Q6[27])
@@ -596,11 +601,11 @@ class SpreadsheetDict():
                 
         Q7dict["REReason"] = check(REReason)
         if Q7[4]!="":
-            Q7dict["REMotivation"] = check(Q7[4])
+            Q7dict["REMotivation"] = check(Q7[4], 45)
         Q7dict["Latitude"] = check(Q7[5])
         # Belongs to Surface Q7dict["ST_IT"] = check(Q7[6])
-        Q7dict["BiomassFromProc"] = check(Q7[7])
-        Q7dict["BiomassFromRegion"] = check(Q7[8])
+        Q7dict["BiomassFromProc"] = check(Q7[7], 45)
+        Q7dict["BiomassFromRegion"] = check(Q7[8], 45)
         
         # inserted SQL Date causes exception in current "Renewable Energy" Tab
         
@@ -627,13 +632,13 @@ class SpreadsheetDict():
     @staticmethod
     def createQSurfDictionary(QSurfarea,db_conn):
         QSurfdict = {}
-        QSurfdict['SurfAreaName'] = check(QSurfarea[0])
+        QSurfdict['SurfAreaName'] = check(QSurfarea[0], 45)
         QSurfdict['SurfArea'] = check(QSurfarea[1])
         QSurfdict['Inclination'] = check(QSurfarea[2])
-        QSurfdict['AzimuthClass'] = check(QSurfarea[3])
-        QSurfdict['Shading'] = check(QSurfarea[4])
+        QSurfdict['AzimuthClass'] = check(QSurfarea[3], 4)
+        QSurfdict['Shading'] = check(QSurfarea[4], 20)
         QSurfdict['Distance'] = check(QSurfarea[5])
-        QSurfdict['RoofType'] = check(QSurfarea[6])
+        QSurfdict['RoofType'] = check(QSurfarea[6], 45)
         QSurfdict['RoofStaticLoadCap'] = check(QSurfarea[7])
         if str(QSurfarea[8]).lower() == "yes": 
             QSurfdict['Sketch'] = 1
@@ -646,10 +651,10 @@ class SpreadsheetDict():
     def createQ8Dictionary(Q8,db_conn):
         Q8dict = {}
         
-        Q8dict['BuildName'] = check(Q8[0])
+        Q8dict['BuildName'] = check(Q8[0], 45)
         Q8dict['BuildConstructSurface'] = check(Q8[1])
         Q8dict['BuildUsefulSurface'] = check(Q8[2])
-        Q8dict['BuildUsage'] = check(Q8[3])
+        Q8dict['BuildUsage'] = check(Q8[3], 45)
         
         Q8dict['BuildHoursOccup'] = check(Q8[5])
         Q8dict['BuildDaysInUse'] = check(Q8[6])
