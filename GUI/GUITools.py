@@ -101,7 +101,7 @@ def setChoice(choice,strChoice):
     except:choice.SetSelection(-1)
 #------------------------------------------------------------------------------		
 #------------------------------------------------------------------------------
-def check(value):
+def check(value, length = None):
 #------------------------------------------------------------------------------
 #   auxiliary function. substitutes ""'s and None's by 'NULL'
 #   (should be moved some day to a separate file with sql-tools ...)
@@ -109,7 +109,10 @@ def check(value):
     if value <> "" and value <> "None" and value is not None:
         if isinstance(value,str) or isinstance(value,unicode):
             logDebug("GuiTools (check): string or unicode instance detected: %r"%value)
-            return value.encode("utf-8")
+            if length is not None:
+                return value.encode("utf-8")[0:length:]
+            else:
+                return value.encode("utf-8")
         else:
             return value
     else:

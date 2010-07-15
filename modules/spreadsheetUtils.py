@@ -81,32 +81,42 @@ class SpreadsheetDict():
 
         #Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
         if Q1[0] is not None:
-            Q1dict['Name'] = check(str(Q1[0]) + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
+            Q1dict['Name'] = check(str(Q1[0]) + " - " + time.strftime("%m/%d/%y %H:%M:%S", time.localtime()), 45)
         else:
-            Q1dict['Name'] = check(time.strftime("%m/%d/%y %H:%M:%S", time.localtime()))
-        Q1dict['City']= check(Q1[2])
-        Q1dict['Contact']= check(Q1[4])
-        Q1dict['Role']= check(Q1[6])
-        Q1dict['Address']= check(Q1[8])
-        Q1dict['Phone']= check(Q1[10])
-        Q1dict['Fax']= check(Q1[12])
-        Q1dict['Email']= check(Q1[14])
-        Q1dict['DescripIndustry']= check(Q1[16])
-        Q1dict['Branch']= check(Q1[18])
+            Q1dict['Name'] = check(time.strftime("%m/%d/%y %H:%M:%S", time.localtime()), 45)
+        Q1dict['City']= check(Q1[2], 45)
+        Q1dict['Contact']= check(Q1[4], 45)
+        Q1dict['Role']= check(Q1[6], 45)
+        Q1dict['Address']= check(Q1[8], 200)
+        Q1dict['Phone']= check(Q1[10], 45)
+        Q1dict['Fax']= check(Q1[12], 45)
+        Q1dict['Email']= check(Q1[14], 45)
+        Q1dict['DescripIndustry']= check(Q1[16], 200)
+        Q1dict['Branch']= check(Q1[18], 100)
         #Q1dict['NACE']=check(Q1[20]  
-        Q1dict['SubBranch']=check(Q1[22])
+        Q1dict['SubBranch']=check(Q1[22], 100)
         #Q1dict['SubNACE']=check(Q1[24]
         try:
-            Q1dict['NEmployees']= check(int(Q1[26]))
-            Q1dict['Turnover']= check(float(Q1[27]) * UNITS["PRICE"]["MEUR"][0])
-            Q1dict['ProdCost']= check(float(Q1[28]) * UNITS["PRICE"]["MEUR"][0])
-            Q1dict['BaseYear']= check(float(Q1[29]))
-            Q1dict['Growth']= check(float(Q1[30]))
-            Q1dict['OMThermal']= check(float(Q1[32]))
-            Q1dict['OMElectrical']= check(float(Q1[33]))
-            Q1dict['HPerDayInd']= check(float(Q1[34]))
-            Q1dict['NShifts']= check(int(Q1[38]))
-            Q1dict['NDaysInd']= check(int(Q1[42]))
+            try: Q1dict['NEmployees']= check(int(Q1[26]))
+            except: Q1dict['NEmployees']= check(None)
+            try: Q1dict['Turnover']= check(float(Q1[27]) * UNITS["PRICE"]["MEUR"][0])
+            except: Q1dict['Turnover']= check(None)
+            try: Q1dict['ProdCost']= check(float(Q1[28]) * UNITS["PRICE"]["MEUR"][0])
+            except: Q1dict['ProdCost']= check(None)
+            try: Q1dict['BaseYear']= check(float(Q1[29]))
+            except: Q1dict['BaseYear']= check(None)
+            try: Q1dict['Growth']= check(float(Q1[30]))
+            except: Q1dict['Growth']= check(None)
+            try: Q1dict['OMThermal']= check(float(Q1[32]))
+            except: Q1dict['OMThermal']= check(None)
+            try: Q1dict['OMElectrical']= check(float(Q1[33]))
+            except: Q1dict['OMElectrical']= check(None)
+            try: Q1dict['HPerDayInd']= check(float(Q1[34]))
+            except: Q1dict['HPerDayInd']= check(None)
+            try: Q1dict['NShifts']= check(int(Q1[38]))
+            except: Q1dict['NShifts']= check(None)
+            try: Q1dict['NDaysInd']= check(int(Q1[42]))
+            except: Q1dict['NDaysInd']= check(None)
         except:
             error = "Value-error"
         
@@ -137,9 +147,12 @@ class SpreadsheetDict():
         qproddict['ProductCode'] = check(QProduct[1])
         qproddict['QProdYear'] = check(QProduct[2])
         qproddict['ProdUnit'] = check(QProduct[3])
-        qproddict['TurnoverProd'] = check(float(QProduct[4]) * UNITS["PRICE"]["MEUR"][0])
-        qproddict['FuelProd'] = check(float(QProduct[5]) * UNITS["ENERGY"]["MWh"][0])
-        qproddict['ElProd'] = check(float(QProduct[6]) * UNITS["ENERGY"]["MWh"][0])
+        try: qproddict['TurnoverProd'] = check(float(QProduct[4]) * UNITS["PRICE"]["MEUR"][0])
+        except: qproddict['TurnoverProd'] = check(None)
+        try: qproddict['FuelProd'] = check(float(QProduct[5]) * UNITS["ENERGY"]["MWh"][0])
+        except: qproddict['TurnoverProd'] = check(None)
+        try: qproddict['ElProd'] = check(float(QProduct[6]) * UNITS["ENERGY"]["MWh"][0])
+        except: qproddict['TurnoverProd'] = check(None)
         
         qproddict['AlternativeProposalNo'] = -1
         
@@ -155,7 +168,8 @@ class SpreadsheetDict():
             QFuelDict['DBFuel_id'] = check(None)
         QFuelDict['FuelUnit'] = check(QFuel[1])
         QFuelDict['MFuelYear'] = check(QFuel[2])
-        QFuelDict['FECFuel'] = check(float(QFuel[3]) * UNITS["ENERGY"]["MWh"][0])
+        try: QFuelDict['FECFuel'] = check(float(QFuel[3]) * UNITS["ENERGY"]["MWh"][0])
+        except: QFuelDict['FECFuel'] = check(None)
         QFuelDict['FuelTariff'] = check(QFuel[4])
         QFuelDict['FuelCostYear'] = check(QFuel[5])
         
@@ -172,12 +186,18 @@ class SpreadsheetDict():
 #            index+=1
         
         Q2dict = {}
-        Q2dict['ElectricityPeakYear']= check(float(Q2[36]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityStandYear']= check(float(Q2[37]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityValleyYear']= check(float(Q2[38]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityTotYear']= check(float(Q2[39]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElGenera']= check(float(Q2[40]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElSales']= check(float(Q2[41]) * UNITS["ENERGY"]["MWh"][0])
+        try: Q2dict['ElectricityPeakYear']= check(float(Q2[36]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityPeakYear']= check(None)
+        try: Q2dict['ElectricityStandYear']= check(float(Q2[37]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityStandYear']= check(None)
+        try: Q2dict['ElectricityValleyYear']= check(float(Q2[38]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityValleyYear']= check(None)
+        try: Q2dict['ElectricityTotYear']= check(float(Q2[39]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityValleyYear']= check(None)
+        try: Q2dict['ElGenera']= check(float(Q2[40]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityValleyYear']= check(None)
+        try: Q2dict['ElSales']= check(float(Q2[41]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityValleyYear']= check(None)
         Q2dict['PowerContrPeak']= check(Q2[42])
         Q2dict['PowerContrStd']= check(Q2[43])
         Q2dict['PowerContrVall']= check(Q2[44])
@@ -196,12 +216,17 @@ class SpreadsheetDict():
         Q2dict['ElTariffPowTot']= check(Q2[57])
         #Q2[58] none
         Q2dict['ElTariffPowCHP']= check(Q2[59])
-        Q2dict['ElTariffCPeak']= check(float(Q2[60]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
-        Q2dict['ElTariffCStd']= check(float(Q2[61]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
-        Q2dict['ElTariffCVall']= check(float(Q2[62]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
-        Q2dict['ElTariffCTot']= check(float(Q2[63]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        try: Q2dict['ElTariffCPeak']= check(float(Q2[60]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        except: Q2dict['ElTariffCPeak']= check(None)
+        try: Q2dict['ElTariffCStd']= check(float(Q2[61]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        except: Q2dict['ElTariffCPeak']= check(None)
+        try: Q2dict['ElTariffCVall']= check(float(Q2[62]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        except: Q2dict['ElTariffCPeak']= check(None)
+        try: Q2dict['ElTariffCTot']= check(float(Q2[63]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        except: Q2dict['ElTariffCTot']= check(None)
         #Q2[64] none
-        Q2dict['ETariffCHP']= check(float(Q2[65]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        try: Q2dict['ETariffCHP']= check(float(Q2[65]) / UNITS["ENERGYTARIFF"]["%s/MWh"%CURRENCY][0])
+        except: Q2dict['ETariffCHP']= check(None)
         Q2dict['ElCostYearPeak']= check(Q2[66])
         Q2dict['ElCostYearStd']= check(Q2[67])
         Q2dict['ElCostYearVall']= check(Q2[68])
@@ -209,12 +234,18 @@ class SpreadsheetDict():
         #Q2[70] none
         Q2dict['ElSalesYearCHP']= check(Q2[71])
         #Q2[72] - Q[83] none
-        Q2dict['ElectricityRef']= check(float(Q2[84]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityAC']= check(float(Q2[85]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityThOther']= check(float(Q2[86]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityMotors']= check(float(Q2[87]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityChem']= check(float(Q2[88]) * UNITS["ENERGY"]["MWh"][0])
-        Q2dict['ElectricityLight']= check(float(Q2[89]) * UNITS["ENERGY"]["MWh"][0])
+        try: Q2dict['ElectricityRef']= check(float(Q2[84]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
+        try: Q2dict['ElectricityAC']= check(float(Q2[85]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
+        try: Q2dict['ElectricityThOther']= check(float(Q2[86]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
+        try: Q2dict['ElectricityMotors']= check(float(Q2[87]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
+        try: Q2dict['ElectricityChem']= check(float(Q2[88]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
+        try: Q2dict['ElectricityLight']= check(float(Q2[89]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q2dict['ElectricityRef']= check(None)
         
         Q2dict['AlternativeProposalNo'] = -1
         return Q2dict
@@ -262,7 +293,8 @@ class SpreadsheetDict():
         #Q3dict['ProcMedOut']= Q3[17]
         
         Q3dict['PTOutFlow']= check(SpreadsheetDict.normDecimalPlace(Q3[18]))
-        Q3dict['HOutFlow']= check(float(SpreadsheetDict.normDecimalPlace(Q3[19])) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        try: Q3dict['HOutFlow']= check(float(SpreadsheetDict.normDecimalPlace(Q3[19])) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        except: Q3dict['HOutFlow']= check(None)
         Q3dict['XOutFlow']= check(SpreadsheetDict.normDecimalPlace(Q3[20]))
         Q3dict['PTFinal']= check(SpreadsheetDict.normDecimalPlace(Q3[21]))
         
@@ -280,8 +312,9 @@ class SpreadsheetDict():
             Q3dict['SupplyMedDBFluid_id'] = check(None)
         Q3dict['PipeDuctProc']= check(Q3[29])
         Q3dict['TSupply']= check(Q3[30])
-        Q3dict['SupplyMedFlow']= check(Q3[31])   
-        Q3dict['UPH']= check(float(Q3[32]) * UNITS["ENERGY"]["MWh"][0])
+        Q3dict['SupplyMedFlow']= check(Q3[31])
+        try: Q3dict['UPH']= check(float(Q3[32]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q3dict['UPH']= check(None)
         Q3dict['ScheduleTolerance']= check(Q3[33])
         Q3dict['StartUpDuration']= check(Q3[34])
         Q3dict['InFlowDuration']= check(Q3[34])
@@ -472,13 +505,16 @@ class SpreadsheetDict():
         Q5dict["DistribCircFlow"] = check(Q5[2])
         Q5dict["ToutDistrib"] = check(Q5[3])
         Q5dict["TreturnDistrib"] = check(Q5[4])
-        Q5dict["PercentRecirc"] = check(float(Q5[5]) * UNITS["FRACTION"]["%"][0])
+        try: Q5dict["PercentRecirc"] = check(float(Q5[5]) * UNITS["FRACTION"]["%"][0])
+        except: Q5dict["PercentRecirc"] = check(None)
         Q5dict["Tfeedup"] = check(Q5[6])
         Q5dict["PressDistMedium"] = check(Q5[7])
         Q5dict["TotLengthDistPipe"] = check(Q5[8])
         Q5dict["UAPipe"] = check(Q5[9])
-        Q5dict["DDistPipe"] = check(float(Q5[10]) * UNITS["LENGTH"]["mm"][0])
-        Q5dict["DeltaDistPipe"] = check(float(Q5[11]) * UNITS["LENGTH"]["mm"][0])
+        try: Q5dict["DDistPipe"] = check(float(Q5[10]) * UNITS["LENGTH"]["mm"][0])
+        except: Q5dict["DDistPipe"] = check(None)
+        try: Q5dict["DeltaDistPipe"] = check(float(Q5[11]) * UNITS["LENGTH"]["mm"][0])
+        except: Q5dict["DeltaDistPipe"] = check(None)
         Q5dict["NumStorageUnits"] = check(Q5[14])
         Q5dict["VUnitStorage"] = check(Q5[15])
         Q5dict["TypeStorage"] = check(Q5[16])
@@ -496,13 +532,17 @@ class SpreadsheetDict():
         Q6dict["HXName"] = check(Q6[0])
         Q6dict["HXType"] = check(Q6[1])
         Q6dict["QdotHX"] = check(Q6[2])
-        Q6dict["HXLMTD"] = check(float(Q6[3]) + UNITS["TEMPERATURE"]["K"][1])
-        Q6dict["QHX"] = check(float(Q6[4]) * UNITS["ENERGY"]["MWh"][0])
+        try: Q6dict["HXLMTD"] = check(float(Q6[3]) + UNITS["TEMPERATURE"]["K"][1])
+        except: Q6dict["HXLMTD"] = check(None)
+        try: Q6dict["QHX"] = check(float(Q6[4]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q6dict["QHX"] = check(None)
         Q6dict["HXSource"] = check(Q6[5])
         Q6dict["HXTSourceInlet"] = check(Q6[6])
-        Q6dict["HXhSourceInlet"] = check(float(Q6[7]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        try: Q6dict["HXhSourceInlet"] = check(float(Q6[7]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        except: Q6dict["HXhSourceInlet"] = check(None)
         Q6dict["HXTSourceOutlet"] = check(Q6[8])
-        Q6dict["HXhSourceOutlet"] = check(float(Q6[9]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        try: Q6dict["HXhSourceOutlet"] = check(float(Q6[9]) * UNITS["SPECIFICENTHALPY"]["kJ/kg"][0])
+        except: Q6dict["HXhSourceOutlet"] = check(None)
         Q6dict["HXSink"] = check(Q6[10])
         Q6dict["HXTSinkInlet"] = check(Q6[11])
         Q6dict["HXTSinkOutlet"] = check(Q6[12])
@@ -539,12 +579,14 @@ class SpreadsheetDict():
     @staticmethod
     def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
-        
-        if str(Q7[0]).lower()=="yes":
-            Q7dict["REInterest"] = 1
-        elif str(Q7[0]).lower()=="no":
+        try:
+            if str(Q7[0]).lower()=="yes":
+                Q7dict["REInterest"] = 1
+            else:
+                Q7dict["REInterest"] = 0
+        except:
             Q7dict["REInterest"] = 0
-            
+
         REReason = ""    
         for i in xrange(4):
             if(str(Q7[i]).upper() == "YES" or str(Q7[i]).upper() == "Y"):
@@ -595,7 +637,7 @@ class SpreadsheetDict():
         QSurfdict['RoofStaticLoadCap'] = check(QSurfarea[7])
         if str(QSurfarea[8]).lower() == "yes": 
             QSurfdict['Sketch'] = 1
-        elif str(QSurfarea[8]).lower()== "no":
+        else:
             QSurfdict['Sketch'] = 0
     
         return QSurfdict
@@ -615,9 +657,12 @@ class SpreadsheetDict():
         
         Q8dict['BuildMaxHP'] = check(Q8[9])
         Q8dict['BuildMaxCP'] = check(Q8[10])
-        Q8dict['BuildAnnualHeating'] = check(float(Q8[11]) * UNITS["ENERGY"]["MWh"][0])
-        Q8dict['BuildAnnualAirCond'] = check(float(Q8[12]) * UNITS["ENERGY"]["MWh"][0])
-        Q8dict['BuildDailyDHW'] = check(float(Q8[13]) / UNITS["VOLUME"]["l"][0])
+        try: Q8dict['BuildAnnualHeating'] = check(float(Q8[11]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q8dict['BuildAnnualHeating'] = check(None)
+        try: Q8dict['BuildAnnualAirCond'] = check(float(Q8[12]) * UNITS["ENERGY"]["MWh"][0])
+        except: Q8dict['BuildAnnualAirCond'] = check(None)
+        try: Q8dict['BuildDailyDHW'] = check(float(Q8[13]) / UNITS["VOLUME"]["l"][0])
+        except: Q8dict['BuildDailyDHW'] = check(None)
         Q8dict['BuildTHeating'] = check(Q8[14])
         Q8dict['BuildTAirCond'] = check(Q8[15])
         
@@ -647,11 +692,16 @@ class SpreadsheetDict():
     @staticmethod
     def createQ9dictionary(Q9,db_conn):
         Q9dict = {}
-        Q9dict["InflationRate"] = check(float(Q9[0]) * UNITS["FRACTION"]["%"][0])
-        Q9dict["FuelPriceRate"] = check(float(Q9[1]) * UNITS["FRACTION"]["%"][0])
-        Q9dict["InterestExtFinancing"] = check(float(Q9[2]) * UNITS["FRACTION"]["%"][0])
-        Q9dict["PercentExtFinancing"] = check(float(Q9[3]) * UNITS["FRACTION"]["%"][0])
-        Q9dict["CompSpecificDiscountRate"] = check(float(Q9[4]) * UNITS["FRACTION"]["%"][0])
+        try: Q9dict["InflationRate"] = check(float(Q9[0]) * UNITS["FRACTION"]["%"][0])
+        except: Q9dict["InflationRate"] = check(None)
+        try: Q9dict["FuelPriceRate"] = check(float(Q9[1]) * UNITS["FRACTION"]["%"][0])
+        except: Q9dict["FuelPriceRate"] = check(None)
+        try: Q9dict["InterestExtFinancing"] = check(float(Q9[2]) * UNITS["FRACTION"]["%"][0])
+        except: Q9dict["InterestExtFinancing"] = check(None)
+        try: Q9dict["PercentExtFinancing"] = check(float(Q9[3]) * UNITS["FRACTION"]["%"][0])
+        except: Q9dict["PercentExtFinancing"] = check(None)
+        try: Q9dict["CompSpecificDiscountRate"] = check(float(Q9[4]) * UNITS["FRACTION"]["%"][0])
+        except: Q9dict["CompSpecificDiscountRate"] = check(None)
         Q9dict["AmortisationTime"] = check(Q9[5])
         Q9dict["OMGenTot"] = check(Q9[6])
         Q9dict["OMGenUtilities"] = check(Q9[7])
