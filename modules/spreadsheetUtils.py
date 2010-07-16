@@ -856,9 +856,10 @@ class Utils():
             Q1dict.update({'DBNaceCode_id':check(None),
                            'Branch' : check(None),
                            'SubBranch' : check(None)})
-        Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
-#        except:
-#            return self.parseError(self.__sheetnames[0])
+        try:
+            Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
+        except:
+            return self.parseError(self.__sheetnames[0])
         
         quest_id = 'Questionnaire_id'
         
