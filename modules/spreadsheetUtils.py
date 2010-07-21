@@ -461,8 +461,8 @@ class SpreadsheetDict():
         
         #Q4Hdict["Refrigerant"] = check(Q4H[28])
         try:
-            DBFluidSel = db_conn.dbfluid.sql_select('RefrigerantCode = "' + str(Q4H[28])+ '"')
-            Q4Hdict['Refrigerant'] = DBFuelSel[0]["DBFluid_ID"]
+            DBFluidSel = db_conn.dbfluid.sql_select('FluidName = "' + str(Q4H[28])+ '"')
+            Q4Hdict['Refrigerant'] = DBFluidSel[0]["DBFluid_ID"]
         except:
             Q4Hdict['Refrigerant'] = check(None)
         Q4Hdict["ThermalConsum"] = check(Q4H[30])
@@ -486,8 +486,8 @@ class SpreadsheetDict():
         Q4Cdict["HCGPnom"] = check(Q4C[8])
         
         try:
-            DBFluidSel = db_conn.dbfluid.sql_select('RefrigerantCode = "' + str(Q4C[9])+ '"')
-            Q4Cdict['Refrigerant'] = DBFuelSel[0]["DBFluid_ID"]
+            DBFluidSel = db_conn.dbfluid.sql_select('FluidName = "' + str(Q4C[9])+ '"')
+            Q4Cdict['Refrigerant'] = DBFluidSel[0]["DBFluid_ID"]
         except:
             Q4Cdict['Refrigerant'] = check(None)
         
