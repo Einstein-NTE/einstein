@@ -366,27 +366,27 @@ class SpreadsheetDict():
         profileID = []
         for i in xrange(3):
             try:
-                profileID = db_conn.profiles.insert(check(SpreadsheetDict.createProfilesDictionary(QProfiles[i], db_conn)))
+                profileID.append(db_conn.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], db_conn)))
                 #profid = db_conn.profiles.sql_select("name"+"='"+QProfiles[i][-1]+"'")
                 #profileID.append(profid[-1]['id'])
             except:
-                pass
+                print "Profile not inserted"
         intervalID = []
         
         for i in xrange(len(QIntervals)/2):
             try:
                 interval = SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], db_conn)
-                intervalID = db_conn.intervals.insert(check(interval))
+                intervalID.append(db_conn.intervals.insert(interval))
                 #interid = db_conn.intervals.sql_select("LAST_INSERT_ID()")
                 #intervalID.append(interid[-1]['id'])
             except:
-                pass
+                print "Interval not inserted"
         
         for j in xrange(30):
             try:
-                db_conn.profile_intervals.insert(check({"profiles_id" : profileID[int(j/10)], "intervals_id" : intervalID[j]}))
+                db_conn.profile_intervals.insert({"profiles_id" : profileID[int(j/10)], "intervals_id" : intervalID[j]})
             except:
-                pass
+                print "ProfileIntervals not inserted"
         
     @staticmethod
     def createProcessPeriodsDictionary(processName, db_conn, profileName):
@@ -862,14 +862,17 @@ class Utils():
         Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
 
         errorlog = []
-        #try:
-#        for i in xrange(3):
-#            self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md))
-#
-#        for i in xrange(len(QIntervals)/2):
-#            self.__md.intervals.insert(SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
-        #except:
-         #   return self.parseError(self.__sheetnames[3])
+        
+#        profile_id = []
+#        try:
+#            for i in xrange(3):
+#                profile_id.append(self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md)))
+#    
+#            for i in xrange(len(QIntervals)/2):
+#                self.__md.intervals.insert(SpreadsheetDict.createIntervalDictionary([QIntervals[i],QIntervals[len(QIntervals)/2+i]], self.__md))
+#        except:
+#            errorlog.append("Schedule Profiles or Intervals could not be inserted")
+#            #return self.parseError(self.__sheetnames[3])
         
         SpreadsheetDict.createProfileIntervals(QProfiles, QIntervals, self.__md)
         
