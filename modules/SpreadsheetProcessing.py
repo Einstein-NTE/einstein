@@ -83,7 +83,7 @@ class SpreadsheetProcessing():
             self.spreadsheetparser.endProcessing()
             dlg.Destroy()
         else:
-            return "Parsing of Spreadsheet not possible. Check if all System Components exist"
+            return "Parsing of Spreadsheet not possible. Check if all System Components exist. If Excel is opened, please close it!"
         
         Status.SQL.commit()
         return __handle

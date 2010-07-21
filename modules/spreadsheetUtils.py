@@ -458,7 +458,13 @@ class SpreadsheetDict():
         Q4Hdict["PipeDuctEquip"] = check(Q4H[24], 45)
         Q4Hdict["HeatSourceLT"] = check(Q4H[26], 200)
         Q4Hdict["THeatSourceLT"] = check(Q4H[27])
-        Q4Hdict["Refrigerant"] = check(Q4H[28])
+        
+        #Q4Hdict["Refrigerant"] = check(Q4H[28])
+        try:
+            DBFluidSel = db_conn.dbfluid.sql_select('RefrigerantCode = "' + str(Q4H[28])+ '"')
+            Q4Hdict['Refrigerant'] = DBFuelSel[0]["DBFluid_ID"]
+        except:
+            Q4Hdict['Refrigerant'] = check(None)
         Q4Hdict["ThermalConsum"] = check(Q4H[30])
         Q4Hdict["THeatSourceHT"] = check(Q4H[31])
         Q4Hdict["HeatSourceHT"] = check(Q4H[32], 200)
@@ -478,7 +484,15 @@ class SpreadsheetDict():
         Q4Cdict["EquipType"] = check(Q4C[4], 45)
         Q4Cdict["NumEquipUnits"] = check(Q4C[5])
         Q4Cdict["HCGPnom"] = check(Q4C[8])
-        Q4Cdict["Refrigerant"] = check(Q4C[9])
+        
+        try:
+            DBFluidSel = db_conn.dbfluid.sql_select('RefrigerantCode = "' + str(Q4C[9])+ '"')
+            Q4Cdict['Refrigerant'] = DBFuelSel[0]["DBFluid_ID"]
+        except:
+            Q4Cdict['Refrigerant'] = check(None)
+        
+        #Q4Cdict["Refrigerant"] = check(Q4C[9])
+        
         Q4Cdict["ElectriConsum"] = check(Q4C[10])
         Q4Cdict["HCGTEfficiency"] = check(Q4C[11])
         Q4Cdict["PartLoad"] = check(Q4C[12])
@@ -825,7 +839,7 @@ class Utils():
     def writeToDB(self,lists):
         Q1, Q2, QProduct, QFuel, Q3, QRenewables, QSurf, QProfiles, QIntervals, Q9Questionnaire, Q4_8, latitude = lists
 
-
+        errorlog = []
         #try:
 #        for i in xrange(3):
 #            self.__md.profiles.insert(SpreadsheetDict.createProfilesDictionary(QProfiles[i], self.__md))
@@ -845,6 +859,7 @@ class Utils():
             strNace = "CodeNACE = '"+str(Q1[20])+"' AND CodeNACESub ='"+str(int(Q1[24]))+"'"
         except:
             strNace = ""
+            errorlog.append("NACECode not found")
         dbnacecodeid = self.__md.dbnacecode.sql_select(strNace)
         
         Q1dict.update(Q9dict)
@@ -856,6 +871,7 @@ class Utils():
             Q1dict.update({'DBNaceCode_id':check(None),
                            'Branch' : check(None),
                            'SubBranch' : check(None)})
+            errorlog.append("NACECode Branch and Sub-Branch not found")
         try:
             Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
         except:
@@ -880,7 +896,7 @@ class Utils():
                 Q4Hdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Hdict)
             except:
-                pass
+                errorlog.append("Q4H Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[4])
                 
             try:    
@@ -888,13 +904,13 @@ class Utils():
                 Q4Cdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Cdict)
             except:
-                pass
+                errorlog.append("Q4C Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[5])
             
             try:
                 self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], Questionnaire_ID, self.__md))
             except:
-                pass
+                errorlog.append("Q5 Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[6])
             
             try:
@@ -907,7 +923,7 @@ class Utils():
                 Q6EDict.update(projectid)
                 self.__md.qwasteheatelequip.insert(Q6EDict)
             except:
-                pass
+                errorlog.append("Q6 and Q6E Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[7])
                 
             try:
@@ -915,7 +931,7 @@ class Utils():
                 Q8dict[quest_id]=Questionnaire_ID
                 self.__md.qbuildings.insert(Q8dict)
             except:
-                pass
+                errorlog.append("Q8 Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[9])
                 
                 
@@ -957,6 +973,10 @@ class Utils():
         self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
 
         qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+        
+        for elem in errorlog:
+            print elem
+        
         return "Parsing successful!"
         
 
