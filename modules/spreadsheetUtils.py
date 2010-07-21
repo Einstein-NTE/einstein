@@ -431,7 +431,7 @@ class SpreadsheetDict():
                 pass
             
     @staticmethod
-    def createQ4HDictionary(Q4H,db_conn):
+    def createQ4HDictionary(Q4H,db_conn, quest_id):
 
         Q4Hdict = {}
         Q4Hdict["Equipment"] = check(Q4H[0], 45)
@@ -443,7 +443,7 @@ class SpreadsheetDict():
         Q4Hdict["HCGPnom"] = check(Q4H[8])
         try:
             DBFuelSel = db_conn.dbfuel.sql_select('FuelName = "' + str(Q4H[9])+ '"')
-            Q4Hdict['DBFuel_id'] = DBFuelSel[0]["DBFuel_ID"]
+            Q4Hdict['DBFuel_id'] = check(DBFuelSel[0]["DBFuel_ID"])
         except:
             Q4Hdict['DBFuel_id'] = check(None)
         Q4Hdict["FuelConsum"] = check(Q4H[10])
@@ -455,7 +455,19 @@ class SpreadsheetDict():
         Q4Hdict["ExcessAirRatio"] = check(Q4H[17])
         Q4Hdict["ElectriProduction"] = check(Q4H[19])
         Q4Hdict["HCGEEfficiency"] = check(Q4H[20])
-        Q4Hdict["PipeDuctEquip"] = check(Q4H[24], 45)
+        
+        try:
+            Pipeduct = db_conn.qdistributionhc.sql_select('Questionnaire_id = "' 
+                                                          + str(quest_id)+ '"'
+                                                          + ' AND Pipeduct = "' 
+                                                          + str(Q4H[24])+ '"')
+            Q4Hdict["PipeDuctEquip"] = Pipeduct[0]["QDistributionHC_ID"]
+        except:
+            Q4Hdict["PipeDuctEquip"] = check(None)
+        
+        #Q4Hdict["PipeDuctEquip"] = check(Q4H[24], 45)
+        
+        
         Q4Hdict["HeatSourceLT"] = check(Q4H[26], 200)
         Q4Hdict["THeatSourceLT"] = check(Q4H[27])
         
@@ -475,7 +487,7 @@ class SpreadsheetDict():
         return Q4Hdict
         
     @staticmethod
-    def createQ4CDictionary(Q4C,db_conn):
+    def createQ4CDictionary(Q4C,db_conn, quest_id):
         Q4Cdict = {}
         Q4Cdict["Equipment"] = check(Q4C[0], 45)
         Q4Cdict["Manufact"] = check(Q4C[1], 45)
@@ -498,7 +510,17 @@ class SpreadsheetDict():
         Q4Cdict["PartLoad"] = check(Q4C[12])
         Q4Cdict["FuelConsum"] = check(Q4C[14])
         Q4Cdict["UnitsFuelConsum"] = check(Q4C[15], 45)
-        Q4Cdict["PipeDuctEquip"] = check(Q4C[19], 45)
+        
+        try:
+            Pipeduct = db_conn.qdistributionhc.sql_select('Questionnaire_id = "' 
+                                                          + str(quest_id)+ '"'
+                                                          + ' AND Pipeduct = "' 
+                                                          + str(Q4C[19])+ '"')
+            Q4Cdict["PipeDuctEquip"] = Pipeduct[0]["QDistributionHC_ID"]
+        except:
+            Q4Cdict["PipeDuctEquip"] = check(None)
+        
+        #Q4Cdict["PipeDuctEquip"] = check(Q4C[19], 45)
         Q4Cdict["DestinationWasteHeat"] = check(Q4C[21], 200)
         Q4Cdict["TemperatureReCooling"] = check(Q4C[22])
         Q4Cdict["ThermalConsum"] = check(Q4C[23])
@@ -888,11 +910,17 @@ class Utils():
         
         Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
 
+        for i in xrange(0,25,5):
+            try:
+                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], Questionnaire_ID, self.__md))
+            except:
+                errorlog.append("Q5 Dictionary could not be inserted")
+                #return self.parseError(self.__sheetnames[6])
 
 
         for i in xrange(0,25,5):
             try:
-                Q4Hdict = SpreadsheetDict.createQ4HDictionary(Q4_8[i],self.__md)
+                Q4Hdict = SpreadsheetDict.createQ4HDictionary(Q4_8[i],self.__md, Questionnaire_ID)
                 Q4Hdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Hdict)
             except:
@@ -900,18 +928,13 @@ class Utils():
                 #return self.parseError(self.__sheetnames[4])
                 
             try:    
-                Q4Cdict = SpreadsheetDict.createQ4CDictionary(Q4_8[i+1], self.__md)
+                Q4Cdict = SpreadsheetDict.createQ4CDictionary(Q4_8[i+1], self.__md, Questionnaire_ID)
                 Q4Cdict[quest_id]=Questionnaire_ID
                 self.__md.qgenerationhc.insert(Q4Cdict)
             except:
                 errorlog.append("Q4C Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[5])
             
-            try:
-                self.__md.qdistributionhc.insert(SpreadsheetDict.createQ5Dictionary(Q4_8[i+2], Questionnaire_ID, self.__md))
-            except:
-                errorlog.append("Q5 Dictionary could not be inserted")
-                #return self.parseError(self.__sheetnames[6])
             
             try:
                 projectid = {'ProjectID':Questionnaire_ID}
