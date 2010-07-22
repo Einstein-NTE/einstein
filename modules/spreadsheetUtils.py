@@ -31,6 +31,7 @@ import re
 import time
 from GUITools import *
 from units import *
+from constants import *
 
 class SpreadsheetDict():
 
@@ -804,10 +805,10 @@ class SpreadsheetDict():
         sp['ActiveAlternative']=-1
         sp['FinalAlternative']=0
         sp['WriteProtected']=0
-        sp['StatusQ']=1
-        sp['StatusCC']=0
-        sp['StatusCA']=1
-        sp['StatusR']=0
+        sp['StatusQ']=EINSTEIN_NOTOK
+        sp['StatusCC']=EINSTEIN_NOTOK
+        sp['StatusCA']=EINSTEIN_NOTOK
+        sp['StatusR']=EINSTEIN_NOTOK
         sp['LanguageReport']='english'
         sp['UnitsReport']='SI-kWh'
         return sp
@@ -992,9 +993,22 @@ class Utils():
 #        except:
 #            pass
 
-        self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
-        salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 'AlternativeProposalNo' : -1, 'ShortName' : 'New Proposal', 'Description' : 'data set', 'StatusEnergy' : 0})
-        self.__md.cgeneraldata.insert({'AlternativeProposalNo':-1, 'Questionnaire_id':Questionnaire_ID})
+        #self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
+        salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 
+                                                        'AlternativeProposalNo' : -1, 
+                                                        'ShortName' : 'New Proposal', 
+                                                        'Description' : 'data set', 
+                                                        'StatusEnergy' : 0})
+        
+        self.__md.cgeneraldata.insert({'AlternativeProposalNo':-1, 
+                                       'Questionnaire_id':Questionnaire_ID,                              
+                                       'NFuels':0,
+                                       'NEquipe':0,
+                                       'NPipeDuct':0,
+                                       'NThProc':0,
+                                       'NProducts':0,
+                                       'NHX':0,
+                                       'NWHEE':0})
         #self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
         self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
 

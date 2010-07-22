@@ -122,7 +122,9 @@ class CheckFETfuel():
 
                 self.FuelTariff.setValue(qfuel.FuelTariff)
                 self.FuelCostYear.setValue(qfuel.FuelCostYear)
-                
+            else:
+                self.FuelLCV = 0.0
+                self.MFuelYear.setValue(qfuel.MFuelYear,err=0.0)
         except:
             self.FuelLCV = 0.0
             print "CheckFETfuel(importData): error reading data from qfuel"
