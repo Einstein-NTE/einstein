@@ -54,6 +54,7 @@ class SpreadsheetDict():
 
     @staticmethod
     def parseDate(date):
+        print type(date)
         if date != None:
             split = re.split('\W+', date)
             #print split
@@ -76,6 +77,15 @@ class SpreadsheetDict():
             return str(split[0]), str(split[1])
         else:
             return None, None
+    
+    @staticmethod
+    def parseSpreadsheetDate(date):
+        print type(date)
+        if date != None:
+            split = re.split('\W+', date)
+            print split
+            print "no split"
+            
     
     @staticmethod
     def checkFilledState(Q):
@@ -695,8 +705,25 @@ class SpreadsheetDict():
         return QSurfdict
     
     @staticmethod
+    def toMysqlDate(date):
+        try:
+            date = str(date).split(' ')
+            time = date[1]
+            date = str(date[0]).split('/')
+            datetime = date[2]+'-'+date[0]+'-'+date[1]+' '+time
+            return datetime
+        except:
+            return '00-00-00 00:00:00'
+        
+    @staticmethod
     def createQ8Dictionary(Q8,db_conn):
         Q8dict = {}
+        
+        index = 0
+        
+        for elem in Q8:
+            print str(index)+": "+str(elem)
+            index+=1
         
         Q8dict['BuildName'] = check(Q8[0], 45)
         Q8dict['BuildConstructSurface'] = check(Q8[1])
@@ -707,35 +734,54 @@ class SpreadsheetDict():
         Q8dict['BuildDaysInUse'] = check(Q8[6])
         # Date Q8dict[''] = check(Q8[7])
         
-        Q8dict['BuildMaxHP'] = check(Q8[9])
-        Q8dict['BuildMaxCP'] = check(Q8[10])
-        try: Q8dict['BuildAnnualHeating'] = check(float(Q8[11]) * UNITS["ENERGY"]["MWh"][0])
+        Q8dict['BuildMaxHP'] = check(Q8[10])
+        Q8dict['BuildMaxCP'] = check(Q8[11])
+        try: Q8dict['BuildAnnualHeating'] = check(float(Q8[12]) * UNITS["ENERGY"]["MWh"][0])
         except: Q8dict['BuildAnnualHeating'] = check(None)
-        try: Q8dict['BuildAnnualAirCond'] = check(float(Q8[12]) * UNITS["ENERGY"]["MWh"][0])
+        try: Q8dict['BuildAnnualAirCond'] = check(float(Q8[13]) * UNITS["ENERGY"]["MWh"][0])
         except: Q8dict['BuildAnnualAirCond'] = check(None)
-        try: Q8dict['BuildDailyDHW'] = check(float(Q8[13]) / UNITS["VOLUME"]["l"][0])
+        try: Q8dict['BuildDailyDHW'] = check(float(Q8[14]) / UNITS["VOLUME"]["l"][0])
         except: Q8dict['BuildDailyDHW'] = check(None)
-        Q8dict['BuildTHeating'] = check(Q8[14])
-        Q8dict['BuildTAirCond'] = check(Q8[15])
-        
-        datestart, dateend = SpreadsheetDict.parseDate(Q8[7])
-        if datestart != None:
-            Q8dict['BuildHolidaysPeriodStart_1'] = datestart
-        if dateend != None:
-            Q8dict['BuildHolidaysPeriodStop_1'] = dateend
-        # date Q8dict[''] = Q8[16]
-        # date Q8dict[''] = Q8[17]
-        datestart, dateend = SpreadsheetDict.parseDate(Q8[16])
-        if datestart != None:
-            Q8dict['BuildHeatingPeriodStart'] = datestart
-        if dateend != None:
-            Q8dict['BuildHeatingPeriodStop'] = dateend
-            
-        datestart, dateend = SpreadsheetDict.parseDate(Q8[17])
-        if datestart != None:
-            Q8dict['BuildAirCondPeriodStart'] = datestart
-        if dateend != None:
-            Q8dict['BuildAirCondPeriodStop'] = dateend
+        Q8dict['BuildTHeating'] = check(Q8[15])
+        Q8dict['BuildTAirCond'] = check(Q8[16])
+     
+        print SpreadsheetDict.toMysqlDate(Q8[7])
+        print SpreadsheetDict.toMysqlDate(Q8[8])
+        print SpreadsheetDict.toMysqlDate(Q8[17])
+        print SpreadsheetDict.toMysqlDate(Q8[18])
+        print SpreadsheetDict.toMysqlDate(Q8[19])
+        print SpreadsheetDict.toMysqlDate(Q8[20])
+     
+        Q8dict['BuildHolidaysPeriodStart_1'] = SpreadsheetDict.toMysqlDate(Q8[7])
+        Q8dict['BuildHolidaysPeriodStop_1'] = SpreadsheetDict.toMysqlDate(Q8[8])
+        Q8dict['BuildHeatingPeriodStart'] = SpreadsheetDict.toMysqlDate(Q8[17])
+        Q8dict['BuildHeatingPeriodStop'] = SpreadsheetDict.toMysqlDate(Q8[18])
+        Q8dict['BuildAirCondPeriodStart'] = SpreadsheetDict.toMysqlDate(Q8[19])
+        Q8dict['BuildAirCondPeriodStop'] = SpreadsheetDict.toMysqlDate(Q8[20])
+#        datestart, dateend = SpreadsheetDict.parseDate(Q8[7])
+#        if datestart != None:
+#            Q8dict['BuildHolidaysPeriodStart_1'] = datestart
+#        if dateend != None:
+#            Q8dict['BuildHolidaysPeriodStop_1'] = dateend
+#            
+#        SpreadsheetDict.parseSpreadsheetDate(Q8[8])
+#        # date Q8dict[''] = Q8[16]
+#        # date Q8dict[''] = Q8[17]
+#        datestart, dateend = SpreadsheetDict.parseDate(Q8[17])
+#        if datestart != None:
+#            Q8dict['BuildHeatingPeriodStart'] = datestart
+#        if dateend != None:
+#            Q8dict['BuildHeatingPeriodStop'] = dateend
+#            
+#        SpreadsheetDict.parseSpreadsheetDate(Q8[18])
+#            
+#        datestart, dateend = SpreadsheetDict.parseDate(Q8[19])
+#        if datestart != None:
+#            Q8dict['BuildAirCondPeriodStart'] = datestart
+#        if dateend != None:
+#            Q8dict['BuildAirCondPeriodStop'] = dateend
+#        
+#        SpreadsheetDict.parseSpreadsheetDate(Q8[20])
         
         Q8dict['AlternativeProposalNo'] = -1
         
@@ -967,12 +1013,13 @@ class Utils():
                 errorlog.append("Q6 and Q6E Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[7])
                 
-            try:
-                Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
-                Q8dict[quest_id]=Questionnaire_ID
-                self.__md.qbuildings.insert(Q8dict)
-            except:
-                errorlog.append("Q8 Dictionary could not be inserted")
+#            try:
+            print "Number: " + str(i)
+            Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
+            Q8dict[quest_id]=Questionnaire_ID
+            self.__md.qbuildings.insert(Q8dict)
+#            except:
+#                errorlog.append("Q8 Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[9])
                 
                 
@@ -1003,6 +1050,8 @@ class Utils():
                 SpreadsheetDict.createProcessPeriodsDictionary(Q3n[i], self.__md, QProfiles[i][-1])
         
             SpreadsheetDict.createProcessScheduleCorrDictionary(Q3n, self.__md)
+            qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+
         except:
             errorlog.append("Error occured at QProduct, QFuel or QSurfarea")
 #            return self.parseError("QProduct, QFuel or QSurfarea")
@@ -1011,29 +1060,31 @@ class Utils():
 #            pass
 #        try:
             #self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
-        salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 
-                                                        'AlternativeProposalNo' : -1, 
-                                                        'ShortName' : 'New Proposal', 
-                                                        'Description' : 'data set', 
-                                                        'StatusEnergy' : 0})
         
-        self.__md.cgeneraldata.insert({'AlternativeProposalNo':-1, 
-                                       'Questionnaire_id':Questionnaire_ID,                              
-                                       'NFuels':0,
-                                       'NEquipe':0,
-                                       'NPipeDuct':0,
-                                       'NThProc':0,
-                                       'NProducts':0,
-                                       'NHX':0,
-                                       'NWHEE':0})
+        try:
+            salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 
+                                                            'AlternativeProposalNo' : -1, 
+                                                            'ShortName' : 'New Proposal', 
+                                                            'Description' : 'data set', 
+                                                            'StatusEnergy' : 0})
+            
+            self.__md.cgeneraldata.insert({'AlternativeProposalNo':-1, 
+                                           'Questionnaire_id':Questionnaire_ID,                              
+                                           'NFuels':0,
+                                           'NEquipe':0,
+                                           'NPipeDuct':0,
+                                           'NThProc':0,
+                                           'NProducts':0,
+                                           'NHX':0,
+                                           'NWHEE':0})
+            self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
+        except:
+            errorlog.append("Inserting into salternatives and sproject failed")
+            self.printLog(errorlog)
+            return "Couldn't create new Project! Check the Data in your Questionnaire and try again"
+        
         #self.__md.sproject.insert(SpreadsheetDict.createsprojectDictionary(Questionnaire_ID))
-        self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
-
-        qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-#        except:
-#            errorlog.append("Inserting into salternatives and sproject failed")
-#            self.printLog(errorlog)
-#            return "Couldn't create new Project! Check the Data in your Questionnaire and try again"
+        
         
         self.printLog(errorlog)
         
