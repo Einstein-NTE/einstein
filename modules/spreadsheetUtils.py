@@ -671,7 +671,6 @@ class SpreadsheetDict():
         Q7dict["BiomassFromProc"] = check(Q7[7], 45)
         Q7dict["BiomassFromRegion"] = check(Q7[8], 45)
         
-        
         # inserted SQL Date causes exception in current "Renewable Energy" Tab
         # varchar(6) in Database..cant insert Date Type
         #Q7dict["PeriodBiomassRegionStart"] = SpreadsheetDict.toMysqlDate(Q7[10])#10
