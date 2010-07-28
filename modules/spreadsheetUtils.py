@@ -641,6 +641,13 @@ class SpreadsheetDict():
     @staticmethod
     def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
+        
+        index = 0
+        
+        for elem in Q7:
+            print str(index)+": "+str(elem)
+            index+=1
+        
         try:
             if str(Q7[0]).lower()=="yes":
                 Q7dict["REInterest"] = 1
@@ -665,22 +672,21 @@ class SpreadsheetDict():
         Q7dict["BiomassFromRegion"] = check(Q7[8], 45)
         
         # inserted SQL Date causes exception in current "Renewable Energy" Tab
-        
-#        startdate, enddate = SpreadsheetDict.charDateParse(Q7[9])
-#        Q7dict["PeriodBiomassRegionStart"] = startdate
-#        Q7dict["PeriodBiomassRegionStop"] = enddate
-#        startdate, enddate = SpreadsheetDict.parseDate(Q7[10])
-#        Q7dict["PeriodBiomassProcStart"] = startdate
-#        Q7dict["PeriodBiomassProcStop"] = enddate
-        Q7dict["QBiomassProc"] = check(Q7[11])
-        Q7dict["QBiomassRegion"] = check(Q7[12])
-        Q7dict["LCVBiomassProc"] = check(Q7[13])
-        Q7dict["LCVBiomassRegion"] = check(Q7[14])
-        Q7dict["HumidBiomassProc"] = check(Q7[15])
-        Q7dict["HumidBiomassRegion"] = check(Q7[16])
-        Q7dict["PriceBiomassProc"] = check(Q7[17])
-        Q7dict["PriceBiomassRegion"] = check(Q7[18])
-        Q7dict["SpaceBiomassProc"] = check(Q7[21])
+        # varchar(6) in Database..cant insert Date Type
+        #Q7dict["PeriodBiomassRegionStart"] = SpreadsheetDict.toMysqlDate(Q7[10])#10
+        #Q7dict["PeriodBiomassRegionStop"] = SpreadsheetDict.toMysqlDate(Q7[12])#12
+        Q7dict["PeriodBiomassProcStart"] = SpreadsheetDict.toMysqlDate(Q7[9])
+        Q7dict["PeriodBiomassProcStop"] = SpreadsheetDict.toMysqlDate(Q7[11])
+
+        Q7dict["QBiomassProc"] = check(Q7[13])
+        Q7dict["QBiomassRegion"] = check(Q7[14])
+        Q7dict["LCVBiomassProc"] = check(Q7[15])
+        Q7dict["LCVBiomassRegion"] = check(Q7[16])
+        Q7dict["HumidBiomassProc"] = check(Q7[17])
+        Q7dict["HumidBiomassRegion"] = check(Q7[18])
+        Q7dict["PriceBiomassProc"] = check(Q7[19])
+        Q7dict["PriceBiomassRegion"] = check(Q7[20])
+        Q7dict["SpaceBiomassProc"] = check(Q7[23])
         
         Q7dict['AlternativeProposalNo'] = -1
         return Q7dict        
@@ -719,12 +725,6 @@ class SpreadsheetDict():
     def createQ8Dictionary(Q8,db_conn):
         Q8dict = {}
         
-        index = 0
-        
-        for elem in Q8:
-            print str(index)+": "+str(elem)
-            index+=1
-        
         Q8dict['BuildName'] = check(Q8[0], 45)
         Q8dict['BuildConstructSurface'] = check(Q8[1])
         Q8dict['BuildUsefulSurface'] = check(Q8[2])
@@ -744,13 +744,6 @@ class SpreadsheetDict():
         except: Q8dict['BuildDailyDHW'] = check(None)
         Q8dict['BuildTHeating'] = check(Q8[15])
         Q8dict['BuildTAirCond'] = check(Q8[16])
-     
-        print SpreadsheetDict.toMysqlDate(Q8[7])
-        print SpreadsheetDict.toMysqlDate(Q8[8])
-        print SpreadsheetDict.toMysqlDate(Q8[17])
-        print SpreadsheetDict.toMysqlDate(Q8[18])
-        print SpreadsheetDict.toMysqlDate(Q8[19])
-        print SpreadsheetDict.toMysqlDate(Q8[20])
      
         Q8dict['BuildHolidaysPeriodStart_1'] = SpreadsheetDict.toMysqlDate(Q8[7])
         Q8dict['BuildHolidaysPeriodStop_1'] = SpreadsheetDict.toMysqlDate(Q8[8])
@@ -1024,12 +1017,12 @@ class Utils():
                 
                 
                 
-        try:
-            QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)
-            QRenewables[quest_id] = Questionnaire_ID
-            self.__md.qrenewables.insert(QRenewables)
-        except:
-            errorlog.append(str(self.__sheetnames[8]) + " could not be inserted")
+#        try:
+        QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)
+        QRenewables[quest_id] = Questionnaire_ID
+        self.__md.qrenewables.insert(QRenewables)
+#        except:
+#            errorlog.append(str(self.__sheetnames[8]) + " could not be inserted")
             #return self.parseError(self.__sheetnames[8])
         
         try:
