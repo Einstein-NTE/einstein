@@ -76,10 +76,20 @@ class SpreadsheetDict():
             return str(split[0]), str(split[1])
         else:
             return None, None
+    
+    @staticmethod
+    def checkFilledState(Q):
+        for i in xrange(len(Q)):
+            if str(Q[i]).startswith('Zahl >') or str(Q[i]).startswith('decimals=1, minval'):
+                Q[i]=None
+        return Q
+    
     @staticmethod
     def createQuestionnaireDictionary(Q1,db_conn):
         Q1dict = {}
-
+        Q1 = SpreadsheetDict.checkFilledState(Q1)
+        
+        
         #Q1dict['Name']= check(Q1[0]) if Q1[0] is not None else time.strftime("%m/%d/%y %H:%M:%S", time.localtime())
         if Q1[0] is not None:
             name = str(Q1[0])
@@ -733,6 +743,7 @@ class SpreadsheetDict():
     
     @staticmethod
     def createQ9dictionary(Q9,db_conn):
+        Q9 = SpreadsheetDict.checkFilledState(Q9)
         Q9dict = {}
         try: Q9dict["InflationRate"] = check(float(Q9[0]) * UNITS["FRACTION"]["%"][0])
         except: Q9dict["InflationRate"] = check(None)
@@ -874,9 +885,10 @@ class Utils():
 #        except:
 #            errorlog.append("Schedule Profiles or Intervals could not be inserted")
 #            #return self.parseError(self.__sheetnames[3])
-        
-        SpreadsheetDict.createProfileIntervals(QProfiles, QIntervals, self.__md)
-        
+        try:
+            SpreadsheetDict.createProfileIntervals(QProfiles, QIntervals, self.__md)
+        except:
+            errorlog.append("Profile Intervals could not be inserted")
 #        try:
         Q1dict = SpreadsheetDict.createQuestionnaireDictionary(Q1, self.__md)
         Q9dict = SpreadsheetDict.createQ9dictionary(Q9Questionnaire, self.__md)
@@ -901,6 +913,7 @@ class Utils():
         try:
             Questionnaire_ID = self.__md.questionnaire.insert(Q1dict)
         except:
+            self.printLog(errorlog)
             return self.parseError(self.__sheetnames[0])
         
         quest_id = 'Questionnaire_id'
@@ -910,7 +923,8 @@ class Utils():
             q2dict[quest_id]=Questionnaire_ID
             self.__md.qelectricity.insert(q2dict)
         except:
-            return self.parseError(self.__sheetnames[1])
+            errorlog.append(str(self.__sheetnames[1])+" could not be inserted")
+            #return self.parseError(self.__sheetnames[1])
         
         Areas = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
 
@@ -968,32 +982,35 @@ class Utils():
             QRenewables[quest_id] = Questionnaire_ID
             self.__md.qrenewables.insert(QRenewables)
         except:
-            return self.parseError(self.__sheetnames[8])
+            errorlog.append(str(self.__sheetnames[8]) + " could not be inserted")
+            #return self.parseError(self.__sheetnames[8])
         
-        
-        self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
-#        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
-        self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1], 'ProjectID':Questionnaire_ID}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
+        try:
+            self.splitColumns(3, 5, QProduct, {}, Questionnaire_ID ,SpreadsheetDict.createQProductDictionary,self.__md.qproduct)
+    #        self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+            self.splitColumns(4, 4, QSurf, {'ST_IT':latitude[1], 'ProjectID':Questionnaire_ID}, "", SpreadsheetDict.createQSurfDictionary, self.__md.qsurfarea)
 
-#        try:
             # Code to skip a specific amount of columns
-        index =0
-        Q3n = []
-        for i in range(0,len(Q3),3):
-            Q3n.append(Q3[i]) 
-            index+=1
+            index =0
+            Q3n = []
+            for i in range(0,len(Q3),3):
+                Q3n.append(Q3[i]) 
+                index+=1
+            
+            self.splitColumns(3, 3, Q3n, {}, Questionnaire_ID, SpreadsheetDict.createQProcessDictionary,self.__md.qprocessdata)
         
-        self.splitColumns(3, 3, Q3n, {}, Questionnaire_ID, SpreadsheetDict.createQProcessDictionary,self.__md.qprocessdata)
-        #except:
-        #    return self.parseError("QProduct, QFuel or QSurfarea")
-        for i in xrange(3):
-            SpreadsheetDict.createProcessPeriodsDictionary(Q3n[i], self.__md, QProfiles[i][-1])
+            for i in xrange(3):
+                SpreadsheetDict.createProcessPeriodsDictionary(Q3n[i], self.__md, QProfiles[i][-1])
         
-        SpreadsheetDict.createProcessScheduleCorrDictionary(Q3n, self.__md)
+            SpreadsheetDict.createProcessScheduleCorrDictionary(Q3n, self.__md)
+        except:
+            errorlog.append("Error occured at QProduct, QFuel or QSurfarea")
+#            return self.parseError("QProduct, QFuel or QSurfarea")
+
 #        except:
 #            pass
-
-        #self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
+#        try:
+            #self.__md.cgeneraldata.insert({'Questionnaire_id' : Questionnaire_ID, 'AlternativeProposalNo' : -1})
         salternatives = self.__md.salternatives.insert({'ProjectID' : Questionnaire_ID, 
                                                         'AlternativeProposalNo' : -1, 
                                                         'ShortName' : 'New Proposal', 
@@ -1013,14 +1030,22 @@ class Utils():
         self.__md.sproject.insert(SpreadsheetDict.sprojectdict(Questionnaire_ID, salternatives))
 
         qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
+#        except:
+#            errorlog.append("Inserting into salternatives and sproject failed")
+#            self.printLog(errorlog)
+#            return "Couldn't create new Project! Check the Data in your Questionnaire and try again"
         
-        for elem in errorlog:
-            print elem
+        self.printLog(errorlog)
         
-        return "Parsing successful!"
+        if len(errorlog)==0:
+            return "New Project created!"
+        
+        return "New Project created! Check Project if all Data is inserted"
         
 
-    
+    def printLog(self, errorlog):
+        for elem in errorlog:
+            print elem
     
     
     
