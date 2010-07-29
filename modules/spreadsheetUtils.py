@@ -1006,23 +1006,22 @@ class Utils():
                 errorlog.append("Q6 and Q6E Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[7])
                 
-#            try:
-            print "Number: " + str(i)
-            Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
-            Q8dict[quest_id]=Questionnaire_ID
-            self.__md.qbuildings.insert(Q8dict)
-#            except:
-#                errorlog.append("Q8 Dictionary could not be inserted")
+            try:
+                Q8dict = SpreadsheetDict.createQ8Dictionary(Q4_8[i+4], self.__md)
+                Q8dict[quest_id]=Questionnaire_ID
+                self.__md.qbuildings.insert(Q8dict)
+            except:
+                errorlog.append("Q8 Dictionary could not be inserted")
                 #return self.parseError(self.__sheetnames[9])
                 
                 
                 
-#        try:
-        QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)
-        QRenewables[quest_id] = Questionnaire_ID
-        self.__md.qrenewables.insert(QRenewables)
-#        except:
-#            errorlog.append(str(self.__sheetnames[8]) + " could not be inserted")
+        try:
+            QRenewables = SpreadsheetDict.createQ7Dictionary(QRenewables, self.__md)
+            QRenewables[quest_id] = Questionnaire_ID
+            self.__md.qrenewables.insert(QRenewables)
+        except:
+            errorlog.append(str(self.__sheetnames[8]) + " could not be inserted")
             #return self.parseError(self.__sheetnames[8])
         
         try:
