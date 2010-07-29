@@ -54,7 +54,6 @@ class SpreadsheetDict():
 
     @staticmethod
     def parseDate(date):
-        print type(date)
         if date != None:
             split = re.split('\W+', date)
             #print split
@@ -78,13 +77,7 @@ class SpreadsheetDict():
         else:
             return None, None
     
-    @staticmethod
-    def parseSpreadsheetDate(date):
-        print type(date)
-        if date != None:
-            split = re.split('\W+', date)
-            print split
-            print "no split"
+
             
     
     @staticmethod
@@ -642,11 +635,6 @@ class SpreadsheetDict():
     def createQ7Dictionary(Q7,db_conn):
         Q7dict = {}
         
-        index = 0
-        
-        for elem in Q7:
-            print str(index)+": "+str(elem)
-            index+=1
         
         try:
             if str(Q7[0]).lower()=="yes":
