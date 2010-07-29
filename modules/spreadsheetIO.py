@@ -40,7 +40,7 @@ def _U(text):
 
 
 class ImportQ(object):
-#Import Dialog for questionnaires    
+    #Import Dialog for questionnaires    
     def __init__(self):#,mode="ignore",infile=None):
         
 
@@ -60,6 +60,6 @@ class ImportQ(object):
         else:
             wx.MessageBox('File corrupted', 'Info')
         
-         
-        #conn.close()
-        
+ 
+ 
+ 

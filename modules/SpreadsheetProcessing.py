@@ -40,7 +40,6 @@ class SpreadsheetProcessing():
     def __init__(self, inputfile, frame, fileending):
         self.__filepath=inputfile
         self.__fileending = fileending
-        #self.__md = self.__connectToDB(frame.DBHost, frame.DBUser, frame.DBPass, frame.DBName)
         self.__md = Status.DB
         self.__error = 0
         if fileending == 'xls':
@@ -74,12 +73,12 @@ class SpreadsheetProcessing():
                 return __handle
             dlg.update(80)
             DButil = Utils(self.__md, self.__sheetnames)
-            #try:
+            try:
             __handle = DButil.writeToDB(lists)
-            #except:
-#                self.spreadsheetparser.endProcessing()
-#                dlg.Destroy()
-#                return "Error while writing to database"
+            except:
+                self.spreadsheetparser.endProcessing()
+                dlg.Destroy()
+                return "Error while writing to database"
             self.spreadsheetparser.endProcessing()
             dlg.Destroy()
         else:
@@ -190,7 +189,6 @@ class SpreadsheetProcessing():
         startStructure = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
         
         
-        # Change to xrange(5) to get all sheets --> Q4C_5
         for i in xrange(5):
             for j in xrange(len(structureNames)):
                 try:
