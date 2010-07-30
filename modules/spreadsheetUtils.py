@@ -839,7 +839,6 @@ class Utils():
             Dict.update(dict)
             for key in Dict.keys():
                 Dict[key] = check(Dict[key])
-            #print Dict
             db_table.insert(Dict)
             list = []
     
@@ -979,7 +978,7 @@ class Utils():
             qf = self.splitColumns(6, 6, QFuel, {}, Questionnaire_ID ,SpreadsheetDict.createQFuelDictionary,self.__md.qfuel)
 
         except:
-            errorlog.append("Error occured at QProduct, QFuel or QSurfarea")
+            errorlog.append("QProduct, QFuel or QSurfarea could not be inserted")
 
 #        except:
 #            pass

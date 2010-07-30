@@ -74,7 +74,7 @@ class SpreadsheetProcessing():
             dlg.update(80)
             DButil = Utils(self.__md, self.__sheetnames)
             try:
-            __handle = DButil.writeToDB(lists)
+                __handle = DButil.writeToDB(lists)
             except:
                 self.spreadsheetparser.endProcessing()
                 dlg.Destroy()

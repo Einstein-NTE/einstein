@@ -71,6 +71,7 @@ class OOSpreadsheetParser(parseSpreadsheet):
     def parseRange(self, range, sht):
         return self.parseOOxmlarea(self.__parsedDom,range,sht) 
         
+    @DeprecationWarning
     def __getLists(self,dlg, sheetnames): 
         lists = []
         #if len(sheetnames)!=11:
@@ -265,8 +266,7 @@ class OOSpreadsheetParser(parseSpreadsheet):
         for elem in xrange(2,len(cellrange)):
             cellr.append(cellrange[elem].strip(".:"))
         cellrange = cellr
-        #Test cellrange for correct values and length(ascii signs, numbers)
-        #On OO only rectangular areas can be selected -> length should be ok
+
         domtable = parsedDom.getElementsByTagName("table:table")
         for elem in domtable:
             if elem.getAttribute("table:name")==worksheet:

@@ -160,8 +160,7 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
         
         startStructure = ["Q4H_", "Q4C_", "Q5_", "Q6_", "Q8_"]
         
-        
-        # Change to xrange(5) to get all sheets --> Q4C_5
+
         for i in xrange(5):
             for j in xrange(len(structureNames)):
                 try:
@@ -191,34 +190,6 @@ class ExcelSpreadsheetParser(parseSpreadsheet):
         lists.append(Q4_8)
         lists.append(latitude)
         
-        
-        """
-        biglist = []
-        for listelem in lists:
-            QList = []
-            for elem in listelem:
-                try:
-                    QList.append(float(elem))
-                except:
-                    try:
-                        QList.append(float(str(elem).replace(',', '.')))
-                    except:
-                        if type(elem) == type(QList):
-                           list = []
-                           for el in elem:
-                               try:
-                                   list.append(float(el))
-                               except:
-                                   try:
-                                       list.append(float(str(el).replace(',', '.')))
-                                   except:
-                                       list.append(el)
-                           QList.append(list)
-                        else:
-                            QList.append(elem)
-            biglist.append(QList)
-        print biglist
-        """
        
         return "", lists
 
