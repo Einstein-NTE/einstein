@@ -37,7 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 HEIGHT_TE_MULTILINE = 180
-LABEL_WIDTH_LEFT = 140
+LABEL_WIDTH_LEFT_SHORT = 140
+LABEL_WIDTH_LEFT_LONG = 300
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
@@ -83,7 +84,7 @@ class PanelDBSolarThermal(PanelDBBase):
         # access to font properties object
         fp = FontProperties()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.notebook = wx.Notebook(self, -1, style = 0)
@@ -127,27 +128,27 @@ class PanelDBSolarThermal(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 20, value = '',
-                             label = _U("STManufacturer"),
+                             label = _U("Solarthermal Manufacturer"),
                              tip = _U("Solarthermal Manufacturer"))
 
         self.tc2 = TextEntry(self.page1, maxchars = 20, value = '',
-                             label = _U("STModel"),
+                             label = _U("Solarthermal Model"),
                              tip = _U("Solarthermal Model"))
 
         self.tc3 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("STType"),
+                               label = _U("Solarthermal Type"),
                                tip = _U("Solarthermal Type"))
 
-        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              isMultiline = True,
-                             label = _U("STReference"),
+                             label = _U("Reference"),
                              tip = _U("Source of data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -162,6 +163,9 @@ class PanelDBSolarThermal(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc5 = FloatEntry(self.page2,
                               isStatic = True,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -172,38 +176,41 @@ class PanelDBSolarThermal(PanelDBBase):
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("STc0"),
+                              label = _U("Optical efficiency"),
                               tip = _U("Optical efficiency"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'HEATLOSSCOEFF',
-                              label = _U("STc1"),
+                              label = _U("Linear thermal loss coefficient"),
                               tip = _U("Linear thermal loss coefficient"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'HEATLOSSCOEFF2',
-                              label = _U("STc2"),
+                              label = _U("Quadratic thermal loss coefficient"),
                               tip = _U("Quadratic thermal loss coefficient"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("K50L"),
+                              label = _U("Incidence angle correction factor at 50º (longitudinal)"),
                               tip = unicode("Incidence angle correction factor at 50º (longitudinal)", 'latin-1'))
 
         self.tc10 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("K50T"),
+                               label = _U("Incidence angle correction factor at 50º (transversal)"),
                                tip = unicode("Incidence angle correction factor at 50º (transversal)", 'latin-1'))
 
         self.tc11 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'MASSORVOLUMEFLOW',
-                               label = _U("STMassFlowRate"),
+                               label = _U("Recommended collector mass flow rate"),
                                tip = _U("Recommended collector mass flow rate"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
@@ -253,7 +260,7 @@ class PanelDBSolarThermal(PanelDBBase):
                                label = _U("STWeightFactor"),
                                tip = _U("STWeightFactor"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -266,7 +273,7 @@ class PanelDBSolarThermal(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 70,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc20 = FloatEntry(self.page3,
@@ -274,24 +281,6 @@ class PanelDBSolarThermal(PanelDBBase):
                                unitdict = 'UNITPRICE',
                                label = _U("STUnitPrice300kW"),
                                tip = _U("STUnitPrice300kW"))
-
-#        self.tc21 = FloatEntry(self.page3,
-#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-#                               unitdict = 'UNITPRICE',
-#                               label = _U("STUnitTurnKeyPrice30kW"),
-#                               tip = _U("STUnitTurnKeyPrice30kW"))
-#
-#        self.tc22 = FloatEntry(self.page3,
-#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-#                               unitdict = 'UNITPRICE',
-#                               label = _U("STUnitTurnKeyPrice300kW"),
-#                               tip = _U("STUnitTurnKeyPrice300kW"))
-#
-#        self.tc23 = FloatEntry(self.page3,
-#                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-#                               unitdict = 'UNITPRICE',
-#                               label = _U("STUnitTurnKeyPrice3000kW"),
-#                               tip = _U("STUnitTurnKeyPrice3000kW"))
 
         self.turn_key_price_grid = wx.grid.Grid(name = 'STUnitTurnKeyPrice', parent = self.page3, style = 0)
         self.turn_key_price_grid.CreateGrid(1, 3)
@@ -314,15 +303,15 @@ class PanelDBSolarThermal(PanelDBBase):
                                label = _U("STOMUnitFix"),
                                tip = _U("STOMUnitFix"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 70,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_LARGE, wUnits = 0)
 
         self.tc25 = FloatEntry(self.page3,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
-                               label = _U("STYearUpdate"),
+                               label = _U("Year of last update of the economic data"),
                                tip = _U("Year of last update of the economic data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):

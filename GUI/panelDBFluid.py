@@ -37,7 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 HEIGHT_TE_MULTILINE = 180
-LABEL_WIDTH_LEFT = 140
+LABEL_WIDTH_LEFT_SHORT = 140
+LABEL_WIDTH_LEFT_LONG = 250
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
@@ -85,7 +86,7 @@ class PanelDBFluid(PanelDBBase):
         # access to font properties object
         fp = FontProperties()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.notebook = wx.Notebook(self, -1, style = 0)
@@ -129,27 +130,27 @@ class PanelDBFluid(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("FluidName"),
+                             label = _U("Name of the fluid"),
                              tip = _U("Name of the fluid"))
 
         self.tc2 = TextEntry(self.page1, maxchars = 6, value = '',
-                             label = _U("RefrigerantCode"),
+                             label = _U("Refrigerant code"),
                              tip = _U("Refrigerant code"))
 
-        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc3 = TextEntry(self.page1, maxchars = 200, value = '',
                              isMultiline = True,
-                             label = _U("FluidDataSource"),
+                             label = _U("Source of data"),
                              tip = _U("Source of data"))
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              isMultiline = True,
-                             label = _U("FluidComment"),
+                             label = _U("Additional comments"),
                              tip = _U("Additional comments"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -162,40 +163,40 @@ class PanelDBFluid(PanelDBBase):
         self.frame_main_properties.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                              unitdict = 'HEATCAPACITY',
-                              label = _U("FluidCp"),
+                              unitdict = 'SPECIFICHEAT',
+                              label = _U("Specific heat in liquid state"),
                               tip = _U("Specific heat in liquid state"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'TEMPERATURE',
-                              label = _U("TCond"),
+                              label = _U("Temperature of evaporation"),
                               tip = _U("Temperature of evaporation"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                              unitdict = 'HEATCAPACITY',
-                              label = _U("FluidCpG"),
+                              unitdict = 'SPECIFICHEAT',
+                              label = _U("Specific heat in gaseous state (vapour)"),
                               tip = _U("Specific heat in gaseous state (vapour)"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'SPECIFICENTHALPY',
-                              label = _U("LatentHeat"),
+                              label = _U("Latent heat of evaporation"),
                               tip = _U("Latent heat of evaporation"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'DENSITY',
-                              label = _U("FluidDensity"),
+                              label = _U("Density"),
                               tip = _U("Density"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -208,40 +209,40 @@ class PanelDBFluid(PanelDBBase):
         self.frame_refrigerant_properties.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc10 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'CO2RATIO',
-                               label = _U("SpecificMassFlow"),
+                               label = _U("Typical specific mass flow of refrigerant"),
                                tip = _U("Typical specific mass flow of refrigerant"))
 
         self.tc11 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("THighP"),
+                               label = _U("Typical outlet temperature of compressor"),
                                tip = _U("Typical outlet temperature of compressor"))
 
         self.tc12 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'DYNAMICVISCOSITY',
-                               label = _U("Viscosity"),
+                               unitdict = 'CINEMATICVISCOSITY',
+                               label = _U("Dynamic Viscosity at typical working conditions"),
                                tip = _U("Dynamic Viscosity at typical working conditions"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'CONDUCTIVITY',
-                               label = _U("Conductivity"),
+                               label = _U("Thermal conductivity at typical working conditions"),
                                tip = _U("Thermal conductivity at typical working conditions"))
 
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'SPECIFICENTHALPY',
-                               label = _U("SensibleHeat"),
+                               label = _U("Senisble heat at typical working conditions"),
                                tip = _U("Senisble heat at typical working conditions"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):

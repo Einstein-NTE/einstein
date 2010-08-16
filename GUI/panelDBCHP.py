@@ -37,7 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 HEIGHT_TE_MULTILINE = 180
-LABEL_WIDTH_LEFT = 140
+LABEL_WIDTH_LEFT_SHORT = 140
+LABEL_WIDTH_LEFT_LONG = 350
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
@@ -84,7 +85,7 @@ class PanelDBCHP(PanelDBBase):
         # access to font properties object
         fp = FontProperties()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.notebook = wx.Notebook(self, -1, style = 0)
@@ -152,7 +153,7 @@ class PanelDBCHP(PanelDBBase):
                                label = _U("SubType"),
                                tip = _U("SubType"))
 
-        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
@@ -160,7 +161,7 @@ class PanelDBCHP(PanelDBBase):
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -175,39 +176,42 @@ class PanelDBCHP(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 50,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("CHPPt"),
+                              label = _U("Nominal thermal power"),
                               tip = _U("Nominal thermal power"))
 
         self.tc7 = ChoiceEntry(self.page2,
                                values = [],
-                               label = _U("FuelType"),
+                               label = _U("Fuel type"),
                                tip = _U("Fuel type"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("FuelConsum"),
+                              label = _U("Nominal fuel consumption"),
                               tip = _U("Nominal fuel consumption"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("Eta_t"),
+                              label = _U("Nominal thermal conversion efficiency"),
                               tip = _U("Nominal thermal conversion efficiency"))
 
         self.tc10 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'POWER',
-                               label = _U("CHPPe"),
+                               label = _U("Nominal electrical power"),
                                tip = _U("Nominal electrical power"))
 
         self.tc11 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("Eta_e"),
+                               label = _U("Electrical efficiency"),
                                tip = _U("Electrical efficiency"))
 
         #
@@ -220,38 +224,44 @@ class PanelDBCHP(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 100,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc12 = ChoiceEntry(self.page3,
                                 values = [],
-                                label = _U("FluidSupply"),
+                                label = _U("Heat transport medium"),
                                 tip = _U("Heat transport medium"))
 
         self.tc13 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("TSupply"),
+                               label = _U("Outlet temperature at nominal conditions"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc14 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply"),
+                               unitdict = 'MASSFLOW',
+                               label = _U("Mass flow rate of heat transport medium"),
                                tip = _U("Mass flow rate of heat transport medium"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = 30,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc15 = ChoiceEntry(self.page3,
                                 values = [],
-                                label = _U("FluidSupply2"),
+                                label = _U("(2)"),
                                 tip = _U("Heat transport medium"))
 
         self.tc16 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("TSupply2"),
+                               label = _U("(2)"),
                                tip = _U("Outlet temperature at nominal conditions"))
 
         self.tc17 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                               unitdict = 'MASSFLOWRATE',
-                               label = _U("FlowRateSupply2"),
+                               unitdict = 'MASSFLOW',
+                               label = _U("(2)"),
                                tip = _U("Mass flow rate of heat transport medium"))
 
         #
@@ -264,42 +274,42 @@ class PanelDBCHP(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("Price"),
+                               label = _U("Equipment price at factory applied installer's discount"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("InvRate"),
+                               label = _U("Turn-key price"),
                                tip = _U("Turn-key price"))
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
-                               label = _U("OMRateFix"),
+                               label = _U("Annual operational and maintenance fixed costs"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYTARIFF',
-                               label = _U("OMRateVar"),
+                               label = _U("Annual operational and maintenance variable costs dependant on usage"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_LARGE, wUnits = 0)
 
         self.tc22 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
-                               label = _U("YearUpdate"),
+                               label = _U("Year of last update of the economic data"),
                                tip = _U("Year of last update of the economic data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):

@@ -400,6 +400,10 @@ UNITS = {
     'ENERGYPERPU' : {
         'X' : (1.0, 0.0),
         },
+
+    'CINEMATICVISCOSITY' : {
+        'X' : (1.0, 0.0),
+        },
     }
 
 
@@ -446,7 +450,8 @@ UNITSYSTEM = {
                 'CONDUCTIVITY' : 'X',
                 'PU' : 'X',
                 'ENERGYPERCU' : 'X',
-                'ENERGYPERPU' : 'X'
+                'ENERGYPERPU' : 'X',
+                'CINEMATICVISCOSITY' : 'X',
                 },
     
     'SI-kWh' :  {
@@ -490,7 +495,8 @@ UNITSYSTEM = {
                 'CONDUCTIVITY' : 'X',
                 'PU' : 'X',
                 'ENERGYPERCU' : 'X',
-                'ENERGYPERPU' : 'X'
+                'ENERGYPERPU' : 'X',
+                'CINEMATICVISCOSITY' : 'X',
                 },
 
     'BTU' :     {
@@ -534,7 +540,8 @@ UNITSYSTEM = {
                 'CONDUCTIVITY' : 'X',
                 'PU' : 'X',
                 'ENERGYPERCU' : 'X',
-                'ENERGYPERPU' : 'X'
+                'ENERGYPERPU' : 'X',
+                'CINEMATICVISCOSITY' : 'X',
                 }
 }
 

@@ -37,7 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 HEIGHT_TE_MULTILINE = 180
-LABEL_WIDTH_LEFT = 140
+LABEL_WIDTH_LEFT_SHORT = 140
+LABEL_WIDTH_LEFT_LONG = 350
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
@@ -83,7 +84,7 @@ class PanelDBBoiler(PanelDBBase):
         # access to font properties object
         fp = FontProperties()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.notebook = wx.Notebook(self, -1, style = 0)
@@ -129,19 +130,19 @@ class PanelDBBoiler(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("BoilerManufacturer"),
+                             label = _U("Boiler Manufacturer"),
                              tip = _U("Boiler Manufacturer"))
 
         self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("BoilerModel"),
+                             label = _U("Boiler Model"),
                              tip = _U("Boiler Model"))
 
         self.tc3 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("BoilerType"),
+                               label = _U("Boiler type"),
                                tip = _U("Boiler type"))
 
-        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
@@ -149,7 +150,7 @@ class PanelDBBoiler(PanelDBBase):
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -163,36 +164,36 @@ class PanelDBBoiler(PanelDBBase):
         self.frame_technical_data.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG - 50,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc5 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("BBPnom"),
+                              label = _U("Nominal thermal power"),
                               tip = _U("Nominal thermal power"))
 
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("BBEfficiency"),
+                              label = _U("Nominal efficiency"),
                               tip = _U("Nominal efficiency"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("FuelConsum"),
+                              label = _U("Nominal fuel consumption (LCV)"),
                               tip = _U("Nominal fuel consumption (LCV)"))
 
         self.tc8 = ChoiceEntry(self.page2,
                                values = [],
-                               label = _U("FuelType"),
+                               label = _U("Fuel type"),
                                tip = _U("Fuel type"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("ElConsum"),
+                              label = _U("Nominal electrical power consumption"),
                               tip = _U("Nominal electrical power consumption"))
 
         self.tc10 = wx.RadioBox(self.page2, -1, "Economiser", choices = ["No", "Yes"], majorDimension = 2)
@@ -204,34 +205,34 @@ class PanelDBBoiler(PanelDBBase):
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("ExcessAirRatio"),
+                               label = _U("Typical excess air ratio"),
                                tip = _U("Typical excess air ratio"))
 
         self.tc13 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("BBA1"),
+                               label = _U("Linear dependence of the efficiency on the load"),
                                tip = _U("Linear dependence of the efficiency on the load"))
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("BBA2"),
+                               label = _U("Quadratic dependence of the efficiency on the load"),
                                tip = _U("Quadratic dependence of the efficiency on the load"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'INVTEMP',
-                               label = _U("BBK1"),
+                               label = _U("Linear dependence of the efficiency on the temperature"),
                                tip = _U("Linear dependence of the efficiency on the temperature"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'INVTEMP2',
-                               label = _U("BBK2"),
+                               label = _U("Quadratic dependence of the efficiency on the temperature"),
                                tip = _U("Quadratic dependence of the efficiency on the temperature"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -244,11 +245,17 @@ class PanelDBBoiler(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
+
         self.tc17 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("BoilerTemp"),
+                               label = _U("Maximum outlet temperature"),
                                tip = _U("Maximum outlet temperature"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
         # tab 4 - Economic Parameters
@@ -260,43 +267,43 @@ class PanelDBBoiler(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc18 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("BoilerPrice"),
+                               label = _U("Equipment price at factory applied installer's discount"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc19 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("BoilerTurnKeyPrice"),
+                               label = _U("Price of installed equipment"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc20 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
-                               label = _U("BoilerOandMfix"),
+                               label = _U("Annual operational and maintenance fixed costs"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc21 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYTARIFF',
-                               label = _U("BoilerOandMvar"),
+                               label = _U("Annual operational and maintenance variable costs dependant on usage"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_LARGE, wUnits = 0)
 
         self.tc22 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
-                               label = _U("YearUpdate"),
+                               label = _U("Year of last update of the economic data"),
                                tip = _U("Year of last update of the economic data"))
 
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):

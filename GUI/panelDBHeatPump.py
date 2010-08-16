@@ -37,7 +37,8 @@ from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
 HEIGHT_TE_MULTILINE = 180
-LABEL_WIDTH_LEFT = 140
+LABEL_WIDTH_LEFT_SHORT = 140
+LABEL_WIDTH_LEFT_LONG = 350
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
 UNITS_WIDTH_LARGE = UNITS_WIDTH + 20
@@ -84,7 +85,7 @@ class PanelDBHeatPump(PanelDBBase):
         # access to font properties object
         fp = FontProperties()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.notebook = wx.Notebook(self, -1, style = 0)
@@ -135,24 +136,24 @@ class PanelDBHeatPump(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("HPManufacturer"),
+                             label = _U("Heatpump Manufacturer"),
                              tip = _U("Heatpump Manufacturer"))
 
         self.tc2 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("HPModel"),
+                             label = _U("Heatpump Model"),
                              tip = _U("Heatpump Model"))
 
         self.tc3 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("HPType"),
+                               label = _U("Heatpump type"),
                                tip = _U("Heatpump type"))
 
         self.tc4 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("HPSubType"),
+                               label = _U("Heatpump sub type"),
                                tip = _U("Heatpump sub type"))
 
-        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT_SHORT,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
@@ -160,7 +161,7 @@ class PanelDBHeatPump(PanelDBBase):
                              label = _U("Reference"),
                              tip = _U("Source of data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 50,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         #
@@ -181,101 +182,107 @@ class PanelDBHeatPump(PanelDBBase):
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("HPHeatCap"),
+                              label = _U("Nominal heating capacity"),
                               tip = _U("Nominal heating capacity"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("HPHeatCOP"),
+                              label = _U("Nominal COP for heating mode"),
                               tip = _U("Nominal COP for heating mode"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'POWER',
-                              label = _U("HPCoolCap"),
+                              label = _U("Nominal cooling capacity"),
                               tip = _U("Nominal cooling capacity"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("HPCoolCOP"),
+                              label = _U("Nominal COP for cooling mode"),
                               tip = _U("Nominal COP for cooling mode"))
 
         self.tc10 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'POWER',
-                               label = _U("HPFuelConsum"),
+                               label = _U("Nominal fuel consumption"),
                                tip = _U("Nominal fuel consumption"))
 
         self.tc11 = ChoiceEntry(self.page2,
                                 values = [],
-                                label = _U("FuelType"),
+                                label = _U("Fuel type"),
                                 tip = _U("Fuel type"))
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'POWER',
-                               label = _U("HPElectConsum"),
+                               label = _U("Nominal electrical power consumption"),
                                tip = _U("Nominal electrical power consumption"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT + 50,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc13 = TextEntry(self.page2, maxchars = 45, value = '',
-                              label = _U("HPWorkFluid"),
+                              label = _U("Refrigerant / absorbent refrigerant pair"),
                               tip = _U("Refrigerant / absorbent refrigerant pair"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG - 50,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPCondTinC"),
+                               label = _U("inlet temperature to the condenser (and absorber) (Cool)"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPGenTinC"),
+                               label = _U("inlet temperature to the generator (Cool)"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc16 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPEvapTinC"),
+                               label = _U("inlet temperature to the evaporator (Cool)"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc17 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATUREDIFF',
-                               label = _U("HPConstExCoolCOP"),
+                               label = _U("Constant exergetic COP approximation is valid (Cool)"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = 40,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc18 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPCondTinH"),
+                               label = _U("(Heat)"),
                                tip = _U("inlet temperature to the condenser (and absorber)"))
 
         self.tc19 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPGenTinH"),
+                               label = _U("(Heat)"),
                                tip = _U("inlet temperature to the generator"))
 
         self.tc20 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPEvapTinH"),
+                               label = _U("(Heat)"),
                                tip = _U("inlet temperature to the evaporator"))
 
         self.tc21 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATUREDIFF',
-                               label = _U("HPConstExHeatCOP"),
+                               label = _U("(Heat)"),
                                tip = _U("Temperature range around the nominal temperatures for which the constant exergetic COP approximation is valid (e.g. +-20 K)"))
+
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_SHORT,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
         self.tc22 = FloatEntry(self.page2,
                                isStatic = True,
@@ -317,38 +324,41 @@ class PanelDBHeatPump(PanelDBBase):
         self.frame_heat_source_sink.SetFont(fp.getFont())
         fp.popFont()
 
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG + 50,
+                        wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
+
         self.tc26 = ChoiceEntry(self.page3,
                                 values = [],
-                                label = _U("HPSourceSink"),
+                                label = _U("Heat source and sink"),
                                 tip = _U("Heat source and sink"))
 
         self.tc27 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATUREDIFF',
-                               label = _U("HPLimDT"),
+                               label = _U("Maximum acceptable temperature difference between evaporator and condenser"),
                                tip = _U("Maximum acceptable temperature difference between evaporator and condenser temperatures (primary fluid: Tco - Tev) - working limit"))
 
         self.tc28 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPCondTmax"),
+                               label = _U("Maximum condensing (and absorption) temperature"),
                                tip = _U("Maximum condensing (and absorption) temperature (primary fluid) - working limit"))
 
         self.tc29 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPEvapTmin"),
+                               label = _U("Minimum evaporating temperature"),
                                tip = _U("Minimum evaporating temperature (primary fluid) - working limit"))
 
         self.tc30 = ChoiceEntry(self.page3,
                                 values = [],
-                                label = _U("HPAbsHeatMed"),
+                                label = _U("Heat transport medium used for heat supply to the generator"),
                                 tip = _U("Heat transport medium used for heat supply to the generator"))
 
         self.tc31 = FloatEntry(self.page3,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'TEMPERATURE',
-                               label = _U("HPGenTmin"),
+                               label = _U("Minimum required inlet temperature to the generator"),
                                tip = _U("Minimum required inlet temperature to the generator"))
 
         #
@@ -361,42 +371,42 @@ class PanelDBHeatPump(PanelDBBase):
         self.frame_economic_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc32 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("HPPrice"),
+                               label = _U("Equipment price at factory applied installer's discount"),
                                tip = _U("Equipment price at factory applied installer's discount"))
 
         self.tc33 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'PRICE',
-                               label = _U("HPTurnKeyPrice"),
+                               label = _U("Price of installed equipment"),
                                tip = _U("Price of installed equipment (including work, additional accessories, pumps, regulation, etc)"))
 
         self.tc34 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'UNITPRICE',
-                               label = _U("HPOandMfix"),
+                               label = _U("Annual operational and maintenance fixed costs"),
                                tip = _U("Annual operational and maintenance fixed costs (approximate average per kW heating)"))
 
         self.tc35 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'ENERGYTARIFF',
-                               label = _U("HPOandMvar"),
+                               label = _U("Annual operational and maintenance variable costs dependant on usage"),
                                tip = _U("Annual operational and maintenance variable costs dependant on usage (approximate average per MWh heating)"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH_LARGE, wUnits = 0)
 
         self.tc36 = FloatEntry(self.page4,
                                ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
-                               label = _U("HPYearUpdate"),
+                               label = _U("Year of last update of the economic data"),
                                tip = _U("Year of last update of the economic data"))
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT_LONG,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH)
 
     def __do_layout(self):

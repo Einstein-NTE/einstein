@@ -130,12 +130,12 @@ class PanelDBElectricityMix(PanelDBBase):
                         wData = DATA_ENTRY_WIDTH_LEFT + UNITS_WIDTH, wUnits = 0)
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("Country"),
+                             label = _U("Country or region"),
                              tip = _U("Country or region"))
 
         self.tc2 = FloatEntry(self.page1,
                               ipart = 4, decimals = 0, minval = 1900, maxval = 2100, value = 2010,
-                              label = _U("Year"),
+                              label = _U("Year of data"),
                               tip = _U("Year of data"))
 
         self.tc3 = TextEntry(self.page1, maxchars = 20, value = '',
@@ -172,7 +172,7 @@ class PanelDBElectricityMix(PanelDBBase):
         self.frame_data.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT + 20,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc6 = FloatEntry(self.page2,
@@ -184,55 +184,55 @@ class PanelDBElectricityMix(PanelDBBase):
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'CO2RATIO',
-                              label = _U("CO2ConvEl"),
+                              label = _U("CO2 generation per unit of electricity"),
                               tip = _U("CO2 generation per unit of electricity"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'CO2RATIO',
-                              label = _U("NoNukesConvEl"),
+                              label = _U("Highly radiactive nuclear waste per unit of electricity"),
                               tip = _U("Highly radiactive nuclear waste per unit of electricity"))
 
         self.tc9 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'FRACTION',
-                              label = _U("PercNaturalGas"),
+                              label = _U("Natural Gas"),
                               tip = _U("natural gas"))
 
         self.tc10 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercCarbon"),
+                               label = _U("Carbon"),
                                tip = _U("carbon"))
 
         self.tc11 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercOil"),
+                               label = _U("Oil"),
                                tip = _U("oil"))
 
         self.tc12 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercRenewables"),
+                               label = _U("Renewables"),
                                tip = _U("renewables"))
 
         self.tc13 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercNukes"),
+                               label = _U("Nukes"),
                                tip = _U("nuclear"))
 
         self.tc14 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercCHP"),
+                               label = _U("CHP"),
                                tip = _U("CHP (except CHP using renewables)"))
 
         self.tc15 = FloatEntry(self.page2,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'FRACTION',
-                               label = _U("PercOther"),
+                               label = _U("Other"),
                                tip = _U("other"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,

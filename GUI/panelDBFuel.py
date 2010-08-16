@@ -131,17 +131,17 @@ class PanelDBFuel(PanelDBBase):
         fp.popFont()
 
         self.tc1 = TextEntry(self.page1, maxchars = 45, value = '',
-                             label = _U("FuelName"),
+                             label = _U("Name of the fuel"),
                              tip = _U("Name of the fuel"))
 
         self.tc2 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("FuelType"),
+                               label = _U("Fuel type"),
                                tip = _U("Fuel type"))
 
         self.tc3 = ChoiceEntry(self.page1,
                                values = [],
-                               label = _U("DBFuelUnit"),
+                               label = _U("Default measurement unit"),
                                tip = _U("Default measurement unit"))
 
         fs = FieldSizes(wHeight = HEIGHT_TE_MULTILINE, wLabel = LABEL_WIDTH_LEFT,
@@ -149,12 +149,12 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc4 = TextEntry(self.page1, maxchars = 200, value = '',
                              isMultiline = True,
-                             label = _U("FuelDataSource"),
+                             label = _U("Source of data"),
                              tip = _U("Source of data"))
 
         self.tc5 = TextEntry(self.page1, maxchars = 200, value = '',
                              isMultiline = True,
-                             label = _U("FuelComment"),
+                             label = _U("Additional comments"),
                              tip = _U("Additional comments"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
@@ -176,19 +176,19 @@ class PanelDBFuel(PanelDBBase):
         self.tc6 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'SPECIFICENTHALPY',
-                              label = _U("FuelLCV"),
+                              label = _U("Lower calorific value"),
                               tip = _U("Lower calorific value"))
 
         self.tc7 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'SPECIFICENTHALPY',
-                              label = _U("FuelHCV"),
+                              label = _U("Higher calorific value"),
                               tip = _U("Higher calorific value"))
 
         self.tc8 = FloatEntry(self.page2,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                               unitdict = 'DENSITY',
-                              label = _U("FuelDensity"),
+                              label = _U("Density"),
                               tip = _U("Density"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
@@ -206,7 +206,7 @@ class PanelDBFuel(PanelDBBase):
 
         self.tc9 = FloatEntry(self.page3,
                               ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
-                              unitdict = 'HEATCAPACITY',
+                              unitdict = 'SPECIFICHEAT',
                               label = _U("OffgasHeatCapacity"),
                               tip = _U("OffgasHeatCapacity"))
 
@@ -244,19 +244,19 @@ class PanelDBFuel(PanelDBBase):
         self.frame_environment_parameters.SetFont(fp.getFont())
         fp.popFont()
 
-        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
+        fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT + 20,
                         wData = DATA_ENTRY_WIDTH_LEFT, wUnits = UNITS_WIDTH_LARGE)
 
         self.tc14 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'DENSITY',
-                               label = _U("PEConvFuel"),
+                               label = _U("Primary energy conversion ratio"),
                                tip = _U("Primary energy conversion ratio"))
 
         self.tc15 = FloatEntry(self.page4,
                                ipart = 6, decimals = 1, minval = -INFINITE, maxval = INFINITE, value = 0.,
                                unitdict = 'CO2RATIO',
-                               label = _U("CO2ConvFuel"),
+                               label = _U("Ratio of CO2 generation"),
                                tip = _U("Ratio of CO2 generation"))
 
         fs = FieldSizes(wHeight = HEIGHT, wLabel = LABEL_WIDTH_LEFT,
