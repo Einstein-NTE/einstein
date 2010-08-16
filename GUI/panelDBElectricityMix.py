@@ -36,7 +36,7 @@ from einstein.modules.messageLogger import *
 from einstein.GUI.panelDBBase import PanelDBBase
 
 HEIGHT = 20
-HEIGHT_TE_MULTILINE = 60
+HEIGHT_TE_MULTILINE = 180
 LABEL_WIDTH_LEFT = 250
 DATA_ENTRY_WIDTH_LEFT = 140
 UNITS_WIDTH = 55
