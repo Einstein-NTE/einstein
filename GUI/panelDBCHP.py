@@ -125,6 +125,10 @@ class PanelDBCHP(PanelDBBase):
                                       label = _U("Subtype"),
                                       tip = _U("Show only equipment of subtype"))
 
+        self.tc_help = wx.StaticBox(self.page0, -1, _U('Help'))
+        self.tc_help_text = wx.StaticText(self.page0, -1, _U('Click on the column labels to sort the table.'))
+        self.tc_help_text.SetFont(wx.Font(8, wx.SWISS, wx.ITALIC, wx.NORMAL, False, 'Tahoma'))
+
         #
         # tab 1 - Descriptive Data
         #
@@ -323,6 +327,10 @@ class PanelDBCHP(PanelDBBase):
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
         sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+
+        sizerPage0Help = wx.StaticBoxSizer(self.tc_help, wx.VERTICAL)
+        sizerPage0Help.Add(self.tc_help_text, 0, wx.EXPAND | wx.ALL, VSEP)
+        sizerPage0.Add(sizerPage0Help, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 
