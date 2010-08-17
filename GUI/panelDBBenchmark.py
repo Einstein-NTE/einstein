@@ -524,8 +524,8 @@ class PanelDBBenchmark(PanelDBBase):
         sizerPage0 = wx.StaticBoxSizer(self.frame_summary_table, wx.VERTICAL)
         sizerPage0.Add(self.grid, 1, wx.EXPAND | wx.ALL, 56)
         sizerPage0.Add(self.tc_type, 0, flagText | wx.ALIGN_RIGHT, VSEP)
-        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
         sizerPage0.Add(self.tc_subtype2, 0, flagText | wx.ALIGN_RIGHT, VSEP)
+        sizerPage0.Add(self.tc_subtype, 0, flagText | wx.ALIGN_RIGHT, VSEP)
 
         self.page0.SetSizer(sizerPage0)
 

@@ -52,6 +52,9 @@ class PanelDBBase(wx.Dialog):
         # unitOpDict required for appendResultToGridBenchmark
         self.unitOpDict = Status.prj.getUnitOpDict()
 
+        self.sort_reverse = False
+        self.sort_col = -1
+
         # objects to be set by derived classes
         self.theId = -1
         self.colLabels = []
@@ -174,7 +177,14 @@ class PanelDBBase(wx.Dialog):
             self.grid.ClearSelection()
             return
 
-        if event.GetRow() >= 0:
+        if event.GetRow() < 0:
+            self.grid.ClearGrid()
+            self.grid.ClearSelection()
+            for i in range(self.grid.GetNumberRows()):
+                self.grid.DeleteRows()
+            self.fillEquipmentList(event.GetCol())
+
+        else:
             self.OnGridCellLeftClick(event)
             self.grid.SetGridCursor(event.GetRow(), 0)
         event.Skip()
@@ -623,7 +633,7 @@ class PanelDBBase(wx.Dialog):
         for e in list: newList.append(e)
         return newList
 
-    def fillEquipmentList(self):
+    def fillEquipmentList(self, sort_by_col = None):
         try:
             equipments = self.db.get_table()
             ids = equipments.column(self.identifier)
@@ -689,12 +699,36 @@ class PanelDBBase(wx.Dialog):
             if subtype2 == 'UnitOp' and equipe_subtype2 != 'NULL':
                 equipe_subtype2 = '\'%s\''%equipe_subtype2.split(':')[0].strip('\'')
 
+            results = []
             for id in ids:
                 if len(equipe_type.split('.')) > 1 and equipe_type.split('.')[1].rstrip('\'') == '*': # dbbenchmark
                     sqlQuery = "SELECT %s FROM %s WHERE %s LIKE %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, '\'%s.%%\''%equipe_type.split('.')[0].strip('\''), subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
                 else:
                     sqlQuery = "SELECT %s FROM %s WHERE %s <=> %s AND %s <=> %s AND %s <=> %s AND %s <=> %s"%(fields, self.table, type, equipe_type, subtype, equipe_subtype, subtype2, equipe_subtype2, self.identifier, id)
                 result = Status.DB.sql_query(sqlQuery)
+                if len(result) > 0:
+                    results.append(result)
+
+            if sort_by_col is not None:
+
+                l = []
+                for i in range(len(self.colLabels)):
+                    l.append(i)
+                l.remove(0)
+                l.remove(sort_by_col)
+                m = [sort_by_col]
+                for i in range(len(l)):
+                    m.append(l[i])
+
+                if sort_by_col != self.sort_col:
+                    self.sort_reverse = False
+                    self.sort_col = sort_by_col
+                sorted = self.sortResults(results, m, self.sort_reverse)
+                if sorted is not None:
+                    results = sorted
+                self.sort_reverse = False if self.sort_reverse is True else True
+
+            for result in results:
                 self.appendResultToGrid(result)
         except:
             pass
@@ -724,6 +758,14 @@ class PanelDBBase(wx.Dialog):
                         self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
                 else:
                     self.grid.SetCellValue(self.grid.GetNumberRows() - 1, i, str(result[i]))
+
+    def sortResults(self, results, cols, rev = False):
+        try:
+            for col in reversed(cols):
+                results = sorted(results, key = lambda b: b[col], reverse = rev)
+            return results
+        except:
+            pass
 
 # methods to be implemented by derived classes
     def display(self, q = None):
