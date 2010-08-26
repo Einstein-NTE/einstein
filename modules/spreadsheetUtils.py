@@ -305,7 +305,7 @@ class SpreadsheetDict():
         Q3dict['PTFinal']= check(SpreadsheetDict.normDecimalPlace(Q3[21]))
         
         Q3dict['mOutFlowNom']= check(SpreadsheetDict.normDecimalPlace(Q3[22]))
-        Q3dict['VOutFlowNom']= check(SpreadsheetDict.normDecimalPlace(Q3[23]))
+        Q3dict['VOutFlowCycle']= check(SpreadsheetDict.normDecimalPlace(Q3[23]))
         Q3dict['HPerDayProc']= check(Q3[24])
         Q3dict['NBatch']= check(Q3[25])
         Q3dict['HBatch']= check(Q3[26])
